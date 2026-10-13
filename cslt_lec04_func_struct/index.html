@@ -126,6 +126,7 @@ svg.d1 .fd1,svg.d2 .fd2,svg.d3 .fd3{opacity:1}
 #hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
 @media (max-width:700px){#hint{display:none}}
 @media print{#nav,#bar,#hint{display:none}}
+.c720{stroke-dasharray:720;stroke-dashoffset:720}
 </style>
 </head>
 <body>
@@ -766,7 +767,7 @@ cout << r.topLeft.x;       // 1  (truy cập lồng)
       <line x1="40" y1="300" x2="405" y2="300" stroke="#8a91b4" stroke-width="2"/><line x1="40" y1="300" x2="40" y2="12" stroke="#8a91b4" stroke-width="2"/>
       <text x="392" y="320" fill="#545c80" font-size="16">x</text><text x="20" y="20" fill="#545c80" font-size="16">y</text>
       <!-- scale 45: TL(1,5)->(85,75) BR(6,2)->(310,210) -->
-      <rect class="draw dr1" x="85" y="75" width="225" height="135" fill="rgba(236,72,153,.08)" stroke="#7c3aed" stroke-width="3" style="stroke-dasharray:720;stroke-dashoffset:720"/>
+      <rect class="draw c720 dr1" x="85" y="75" width="225" height="135" fill="rgba(236,72,153,.08)" stroke="#7c3aed" stroke-width="3"/>
       <circle cx="85" cy="75" r="8" fill="#7c3aed"/><text x="60" y="62" fill="#6d28d9" font-size="17">topLeft (1,5)</text>
       <circle cx="310" cy="210" r="8" fill="#0891b2"/><text x="240" y="236" fill="#0e7490" font-size="17">bottomRight (6,2)</text>
       <text class="fadein fd2" x="160" y="150" fill="#ea580c" font-size="17">width = 6−1 = 5</text>

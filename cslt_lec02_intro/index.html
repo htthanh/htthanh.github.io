@@ -1,0 +1,991 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nhập môn C++</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+h1{font-size:70px;line-height:1.1;font-weight:800}
+h2{font-size:38px;line-height:1.2;font-weight:800}
+h3{font-size:23px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:22px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:26px;margin:6px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.88em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 6px;border-radius:6px;color:#be185d}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.cols.c64{grid-template-columns:1.25fr 1fr}.cols.c46{grid-template-columns:1fr 1.2fr}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.card.bad{border-color:#fecdd3;background:linear-gradient(180deg,#fff1f3,#fff)}
+.card.good{border-color:#a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff)}
+.lbl{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
+.icon{font-size:34px;margin-bottom:4px}
+.note{margin-top:12px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:20px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.code{font-family:var(--mono);font-size:18px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
+.code.sm{font-size:16.5px}.code.xs{font-size:15px;line-height:1.45}.code.xxs{font-size:13.6px;line-height:1.38;padding:8px 0}
+.code .ln{padding:0 14px 0 8px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.11);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.13);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
+.code-title{font-family:var(--mono);font-size:15px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+.f.zoom{transform:scale(.85)}.f.zoom.on{transform:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:19px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.legend{display:flex;flex-direction:column;gap:10px}
+.leg{border-radius:12px;padding:10px 16px;background:#fff;border:1px solid var(--line)}
+.leg b{display:block;font-size:21px;margin-bottom:2px}
+.leg p{font-size:19px}
+.leg.a{border-left:6px solid #7c3aed}.leg.b{border-left:6px solid #06b6d4}.leg.c{border-left:6px solid #f59e0b}
+.console{font-family:var(--mono);font-size:17px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.mem{display:flex;align-items:center;gap:16px;min-height:130px}
+.frame{border:2px solid #e4dcfb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
+.frame .fname{font-family:var(--mono);font-size:16px;color:var(--muted);margin-bottom:6px}
+.var{display:flex;align-items:center;gap:10px}
+.vn{font-family:var(--mono);font-size:21px;color:var(--t);font-weight:600}
+.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #c4b5fd;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
+.vb .new{display:none}
+.callee,.arw{opacity:0;transform:translateX(-14px);transition:all .5s}
+.mem.s1 .callee,.mem.s1 .arw{opacity:1;transform:none}
+.mem.s2 .chg .old{display:none}.mem.s2 .chg .new{display:inline;animation:pop .5s}
+.mem.s2 .chg{border-color:#f59e0b;box-shadow:0 0 18px rgba(245,158,11,.5)}
+.mem.s3 .callee,.mem.s3 .arw{opacity:.15;transform:translateY(10px)}
+.mem.s3 .result{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.5)}
+.arw{font-family:var(--mono);font-size:16px;color:var(--gold);text-align:center;line-height:1.2;font-weight:600}
+.arw .bar{display:block;font-size:30px}
+.alias{font-size:18px;color:var(--accent2);font-weight:600}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.25)}100%{transform:none;opacity:1}}
+.flow{display:flex;align-items:center;gap:12px;justify-content:center}
+.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:18px;border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:14px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.h{border-color:var(--gold)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#c4b5fd}.box.exe{border-color:#ec4899;background:#fdf2f8}
+.ar{color:var(--muted);font-size:26px;text-align:center}
+.stack{display:flex;flex-direction:column;gap:8px}
+svg text{font-family:var(--mono);font-weight:600}
+.draw{stroke-dasharray:400;stroke-dashoffset:400;transition:stroke-dashoffset 1s ease}
+svg.d1 .dr1,svg.d2 .dr2,svg.d3 .dr3{stroke-dashoffset:0}
+.fadein{opacity:0;transition:opacity .6s}
+svg.d1 .fd1,svg.d2 .fd2,svg.d3 .fd3{opacity:1}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:19px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05)}
+.ag:hover{border-color:#ec4899;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
+.ag b{color:#db2777;margin-right:6px;font-family:var(--mono)}
+.formula{font-family:var(--mono);font-size:23px;text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:16px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+@media (max-width:700px){#hint{display:none}}
+@media print{#nav,#bar,#hint{display:none}}
+
+/* lec03 additions */
+.chain{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pv{display:inline-flex;align-items:center;font-family:var(--mono);font-size:18px;font-weight:700;padding:5px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;white-space:nowrap}
+.pv.yes{background:#d1fae5;border-color:#34d399;color:#047857}
+.pv.no{background:#ffe4e6;border-color:#fb7185;color:#be123c}
+.pv.skip{background:#f1f5f9;border-color:#cbd5e1;color:#94a3b8;text-decoration:line-through;border-style:dashed}
+.op{font-family:var(--mono);font-size:26px;font-weight:800;color:var(--sa1)}
+.tt th,.tt td{text-align:center}.tt td:first-child{color:var(--text);font-weight:400}
+.tt tr.hit td{background:#fdf2f8;color:#be185d}
+tr.f{transform:none}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.code.show-s .mark-s{opacity:.3;text-decoration:line-through}
+.arr{display:flex;gap:12px;justify-content:center;margin-top:6px}
+.cell{width:84px;height:84px;border-radius:16px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:800;transition:all .45s;box-shadow:0 6px 16px -10px rgba(124,58,237,.4)}
+.cell small{font-size:13px;color:var(--muted);font-weight:600}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857;transform:translateY(-6px)}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;transform:translateY(-10px) scale(1.06);box-shadow:0 10px 24px -8px rgba(225,29,72,.5)}
+.cell.skip{opacity:.3;transform:scale(.92)}
+.syn{display:flex;gap:12px;align-items:center;justify-content:center;font-family:var(--mono);font-size:24px;font-weight:700}
+.sy{padding:8px 16px;border-radius:12px;color:#fff}
+.sy.c1{background:linear-gradient(135deg,#7c3aed,#a855f7)}.sy.c2{background:linear-gradient(135deg,#059669,#10b981)}.sy.c3{background:linear-gradient(135deg,#e11d48,#f97316)}
+.spin{display:inline-block;animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* lec02 additions */
+.cell .new{display:none}
+.cell.fill .old,.inc.p1 .s1 .old,.inc.p2 .s2 .old{display:none}
+.cell.fill .new,.inc.p1 .s1 .new,.inc.p2 .s2 .new{display:inline;animation:pop .5s}
+.cell.fill,.inc.p1 .s1,.inc.p2 .s2{border-color:#10b981;background:#ecfdf5;color:#047857}
+.inc{display:flex;gap:16px}
+.c440{stroke-dasharray:440;stroke-dashoffset:440}.c720{stroke-dasharray:720;stroke-dashoffset:720}
+.bar{height:14px;background:#f1edfd;border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7c3aed,#ec4899);border-radius:99px;transition:width 1.1s .3s ease}
+.slide.active .bar i{width:var(--w)}
+.chars{display:flex;margin:5px 0}
+.ch{width:28px;height:38px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:700;border:1px solid #e4dcfb;margin-right:-1px;background:#fff}
+.ch.pad{color:#c4b5fd;font-weight:400}.ch.a{background:#f3edff}.ch.b{background:#e6f8fd}.ch.c{background:#fff7e0;color:#b45309}
+.ch.b.pad[class]{color:#7dd3fc}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="deck">
+<!-- ===================== TITLE ===================== -->
+<section class="slide" id="title">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// C++ · Introduction</div>
+    <h1 class="in">Nhập môn<br><span class="grad">lập trình C++</span></h1>
+    <p class="in muted" style="font-size:26px;margin-top:20px;max-width:880px">20 câu hỏi: cấu trúc chương trình, comment, <code class="i">cout</code>/<code class="i">cin</code>, biến &amp; hằng, kiểu dữ liệu, toán tử, định dạng với <code class="i">&lt;iomanip&gt;</code>, và các bài tập đầu tiên.</p>
+    <p class="in" style="margin-top:36px;font-size:19px;color:#8a91b4">Dùng phím ← → hoặc Space để chuyển · F: toàn màn hình</p>
+  </div>
+</section>
+
+<!-- ===================== AGENDA ===================== -->
+<section class="slide" id="agenda">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:18px">· bấm vào câu hỏi để đi tới</span></div>
+  <div class="agenda in">
+    <div class="ag" data-goto="q1"><b>01</b>Cấu trúc chương trình</div>
+    <div class="ag" data-goto="q2"><b>02</b>Comment</div>
+    <div class="ag" data-goto="q3"><b>03</b>In ra màn hình: cout</div>
+    <div class="ag" data-goto="q4"><b>04</b>Thư viện &lt;cmath&gt;</div>
+    <div class="ag" data-goto="q5"><b>05</b>Biến &amp; quy tắc đặt tên</div>
+    <div class="ag" data-goto="q6"><b>06</b>Hằng (const)</div>
+    <div class="ag" data-goto="q7"><b>07</b>#define vs const</div>
+    <div class="ag" data-goto="q8"><b>08</b>Kiểu số nguyên</div>
+    <div class="ag" data-goto="q9"><b>09</b>Kiểu số thực</div>
+    <div class="ag" data-goto="q10"><b>10</b>Chia nguyên, chia thực, %</div>
+    <div class="ag" data-goto="q11"><b>11</b>cin nhập số nguyên</div>
+    <div class="ag" data-goto="q12"><b>12</b>cin nhập số thực</div>
+    <div class="ag" data-goto="q13"><b>13</b>setprecision, fixed</div>
+    <div class="ag" data-goto="q14"><b>14</b>setw, left, right, setfill</div>
+    <div class="ag" data-goto="q15"><b>15</b>+= -= *= /=</div>
+    <div class="ag" data-goto="q16"><b>16</b>++a và a++</div>
+    <div class="ag" data-goto="q17"><b>17</b>a-- và --a</div>
+    <div class="ag" data-goto="q18"><b>18</b>Bài tập: hiệu 2 số nguyên</div>
+    <div class="ag" data-goto="q19"><b>19</b>Bài tập: tích 2 số thực</div>
+    <div class="ag" data-goto="q20"><b>20</b>Bài tập: hình tròn</div>
+  </div>
+</section>
+
+<!-- ===================== Q1 ===================== -->
+<section class="slide" id="q1">
+  <div class="hdr in"><span class="qn">CÂU 1</span><h2>Cấu trúc cơ bản của chương trình C++</h2></div>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr">
+<script type="text/x-cpp" class="sm" id="c1" data-mark="1:a;2:b;4:c;4-9:c;5-7:d;8:c">
+#include <iostream>        // khai báo thư viện
+using namespace std;       // dùng tên trong std
+
+int main() {               // hàm chính – điểm bắt đầu
+    // các câu lệnh, mỗi lệnh kết thúc bằng ;
+    cout << "Hello, C++!" << endl;
+    // ...
+    return 0;              // 0 = chạy thành công
+}
+</script>
+    <div class="legend">
+      <div class="leg a f" data-act="#c1|show-a"><b>① Tiền xử lý: #include</b><p>Chèn thư viện cần dùng. <code class="i">&lt;iostream&gt;</code> cung cấp <code class="i">cout</code> và <code class="i">cin</code>.</p></div>
+      <div class="leg b f" data-act="#c1|show-b"><b>② using namespace std;</b><p>Cho phép viết <code class="i">cout</code> thay vì <code class="i">std::cout</code>.</p></div>
+      <div class="leg c f" data-act="#c1|show-c"><b>③ Hàm main()</b><p>Mọi chương trình C++ bắt đầu chạy từ <code class="i">main</code>. Thân hàm nằm trong <code class="i">{ }</code>; <code class="i">return 0;</code> báo hệ điều hành rằng chương trình kết thúc bình thường.</p></div>
+      <div class="leg f" style="border-left:6px solid #ec4899" data-act="#c1|show-d"><b>④ Các câu lệnh</b><p>Chạy lần lượt từ trên xuống, mỗi lệnh kết thúc bằng dấu <code class="i">;</code>.</p></div>
+      <div class="console f">Hello, C++!</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q2 ===================== -->
+<section class="slide" id="q2">
+  <div class="hdr in"><span class="qn">CÂU 2</span><h2>Comment (chú thích)</h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+<script type="text/x-cpp" id="c2" data-mark="1-5:a;9:b;10:b;12:c">
+/*
+ * Chương trình: tính tiền điện
+ * Tác giả: Nguyễn Văn An
+ * Ngày: 13/10/2026
+ */
+#include <iostream>
+using namespace std;
+int main() {
+    int kwh = 120;              // số điện tiêu thụ
+    int gia = 2000;             // giá 1 kWh (đồng)
+    cout << kwh * gia << endl;
+    // cout << "debug: " << kwh;   ← tạm tắt dòng này
+    return 0;
+}
+</script>
+    <div>
+      <div class="card f"><h3>Comment dùng để làm gì?</h3><p style="font-size:19px">Ghi chú cho <b>người đọc</b> code: giải thích ý nghĩa, mô tả tác giả và mục đích, hoặc tạm vô hiệu hóa một dòng code. Trình biên dịch <b>bỏ qua</b> hoàn toàn comment.</p></div>
+      <div class="leg a f" style="margin-top:12px" data-act="#c2|show-a"><b>Comment nhiều dòng <code class="i">/* … */</code></b><p>Bắt đầu bằng <code class="i">/*</code>, kết thúc bằng <code class="i">*/</code>. Hay dùng cho phần mô tả đầu file hoặc đầu hàm.</p></div>
+      <div class="leg b f" style="margin-top:10px" data-act="#c2|show-b"><b>Comment một dòng <code class="i">//</code></b><p>Từ <code class="i">//</code> đến hết dòng. Hay dùng để giải thích ngắn bên cạnh code.</p></div>
+      <div class="leg c f" style="margin-top:10px" data-act="#c2|show-c"><b>"Comment out" code</b><p>Tạm tắt một lệnh khi debug mà không cần xóa nó.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q3 ===================== -->
+<section class="slide" id="q3">
+  <div class="hdr in"><span class="qn">CÂU 3</span><h2>In ra màn hình với <code class="i" style="font-size:33px">cout</code></h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+    <div>
+<script type="text/x-cpp" id="c3" data-mark="2:a;3:b;4:c;5-6:d">
+string name = "An";  int age = 19;
+cout << "Xin chao!" << endl;                 // chuỗi + xuống dòng
+cout << "Ten: " << name << '\n';             // ghép chuỗi và biến
+cout << "Nam sau " << age + 1 << " tuoi\n";  // in biểu thức
+cout << "Dong 1\n"
+     << "Dong 2\n";                          // nối nhiều <<
+</script>
+      <div class="console" style="margin-top:14px"><span class="cl" id="c3l1">Xin chao!</span><span class="cl" id="c3l2">Ten: An</span><span class="cl" id="c3l3">Nam sau 20 tuoi</span><span class="cl" id="c3l4">Dong 1
+Dong 2</span></div>
+      <span class="f ghost" data-act="#c3l1|show;#c3|show-a"></span>
+      <span class="f ghost" data-act="#c3l2|show;#c3|show-b"></span>
+      <span class="f ghost" data-act="#c3l3|show;#c3|show-c"></span>
+      <span class="f ghost" data-act="#c3l4|show;#c3|show-d"></span>
+    </div>
+    <div>
+      <div class="card"><h3>Cú pháp</h3><div class="syn" style="justify-content:flex-start;font-size:21px"><span class="sy c1">cout</span><span class="op">&lt;&lt;</span><span class="sy c2">giá trị 1</span><span class="op">&lt;&lt;</span><span class="sy c3">giá trị 2</span></div>
+        <p style="font-size:19px;margin-top:10px"><code class="i">&lt;&lt;</code> (toán tử chèn) "đẩy" dữ liệu vào luồng xuất <code class="i">cout</code> theo thứ tự từ trái sang phải.</p></div>
+      <ul style="margin-top:12px">
+        <li style="font-size:19px">Cần <code class="i">#include &lt;iostream&gt;</code>.</li>
+        <li style="font-size:19px">In được chuỗi <code class="i">"…"</code>, ký tự <code class="i">'…'</code>, số, biến và biểu thức.</li>
+        <li style="font-size:19px">Xuống dòng: <code class="i">endl</code> (xuống dòng và đẩy dữ liệu ra ngay) hoặc <code class="i">'\n'</code> (nhanh hơn).</li>
+        <li style="font-size:19px">Viết không dấu trong chuỗi để tránh lỗi font trên console.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q4 ===================== -->
+<section class="slide" id="q4">
+  <div class="hdr in"><span class="qn">CÂU 4</span><h2>Các hàm trong thư viện <code class="i" style="font-size:33px">&lt;cmath&gt;</code></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr">
+<script type="text/x-cpp" class="sm" id="c4">
+#include <iostream>
+#include <cmath>                       // hoặc <math.h>
+using namespace std;
+int main() {
+    cout << sqrt(16.0)  << endl;       // 4
+    cout << pow(2, 10)  << endl;       // 1024
+    cout << fabs(-7.5)  << endl;       // 7.5
+    cout << round(3.6)  << endl;       // 4
+    cout << floor(3.7)  << endl;       // 3
+    cout << ceil(3.2)   << endl;       // 4
+}
+</script>
+    <table class="tt">
+      <tr><th>Hàm</th><th>Ý nghĩa</th><th>Ví dụ → kết quả</th></tr>
+      <tr class="f"><td><code class="i">sqrt(x)</code></td><td>Căn bậc hai √x</td><td>sqrt(16) → <b>4</b></td></tr>
+      <tr class="f"><td><code class="i">pow(x, y)</code></td><td>Lũy thừa x<sup>y</sup></td><td>pow(2, 10) → <b>1024</b></td></tr>
+      <tr class="f"><td><code class="i">fabs(x)</code></td><td>Trị tuyệt đối |x|</td><td>fabs(−7.5) → <b>7.5</b></td></tr>
+      <tr class="f"><td><code class="i">round(x)</code></td><td>Làm tròn gần nhất</td><td>round(3.6) → <b>4</b></td></tr>
+      <tr class="f"><td><code class="i">floor(x)</code></td><td>Làm tròn xuống</td><td>floor(3.7) → <b>3</b></td></tr>
+      <tr class="f"><td><code class="i">ceil(x)</code></td><td>Làm tròn lên</td><td>ceil(3.2) → <b>4</b></td></tr>
+      <tr class="f"><td><code class="i">sin, cos</code></td><td>Lượng giác (radian)</td><td>sin(0) → <b>0</b></td></tr>
+    </table>
+  </div>
+  <div class="note blue f">Ví dụ ứng dụng: khoảng cách 2 điểm <code class="i">sqrt(pow(x2-x1, 2) + pow(y2-y1, 2))</code>; số trang cần in <code class="i">ceil(soTrang / 2.0)</code>.</div>
+</section>
+
+<!-- ===================== Q5 ===================== -->
+<section class="slide" id="q5">
+  <div class="hdr in"><span class="qn">CÂU 5</span><h2>Biến (variable) &amp; quy tắc đặt tên</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr">
+    <div>
+      <div class="card in"><h3>Biến dùng để làm gì?</h3><p style="font-size:19px">Biến là một <b>ô nhớ có tên</b> để lưu dữ liệu. Giá trị của nó có thể <b>thay đổi</b> khi chương trình chạy. Biến phải được khai báo kiểu trước khi dùng.</p>
+<script type="text/x-cpp" class="sm">
+int age = 19;          // kiểu  tên  = giá trị đầu
+double gpa;  gpa = 3.6;
+age = age + 1;         // giá trị thay đổi → 20
+</script></div>
+      <div class="card f" style="margin-top:12px"><h3>Quy tắc đặt tên</h3><ul>
+        <li style="font-size:18px">Chỉ gồm chữ cái, chữ số và dấu <code class="i">_</code></li>
+        <li style="font-size:18px">Không bắt đầu bằng chữ số</li>
+        <li style="font-size:18px">Không trùng từ khóa (<code class="i">int</code>, <code class="i">for</code>, <code class="i">return</code>…)</li>
+        <li style="font-size:18px">Phân biệt hoa thường: <code class="i">Age</code> ≠ <code class="i">age</code></li>
+        <li style="font-size:18px">Nên đặt tên có nghĩa: <code class="i">studentCount</code>, <code class="i">total_price</code></li></ul></div>
+    </div>
+    <div class="cols" style="gap:12px">
+      <div class="card good f"><span class="lbl good">✔ ĐÚNG</span>
+        <p style="font-family:var(--mono);font-size:19px;line-height:1.7">age<br>_count<br>soLuong<br>total_price<br>x1<br>MAX_SIZE</p></div>
+      <div class="card bad f"><span class="lbl bad">✘ SAI</span>
+        <p style="font-family:var(--mono);font-size:17px;line-height:1.7">2name <span class="muted">← số đầu</span><br>so luong <span class="muted">← dấu cách</span><br>tong-tien <span class="muted">← dấu -</span><br>int <span class="muted">← từ khóa</span><br>diem% <span class="muted">← ký tự lạ</span><br>điểm <span class="muted">← có dấu</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q6 ===================== -->
+<section class="slide" id="q6">
+  <div class="hdr in"><span class="qn">CÂU 6</span><h2>Hằng (constant) – khác biến thế nào?</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr">
+    <div>
+<script type="text/x-cpp" id="c6" data-mark="1-2:a;6:d">
+const double VAT = 0.08;          // thuế 8%
+const int MAX_STUDENTS = 50;
+
+double price = 200000;            // biến
+price = price * (1 + VAT);        // ✔ dùng hằng để tính
+// VAT = 0.1;                     // ✘ LỖI: không gán lại hằng
+cout << price << endl;            // 216000
+</script>
+      <div class="console f" style="margin-top:12px" data-act="#c6|show-a">216000</div>
+      <div class="card bad f" style="margin-top:12px" data-act="#c6|show-d"><p style="font-size:17px;font-family:var(--mono);color:#be123c">error: assignment of read-only variable 'VAT'</p></div>
+    </div>
+    <div>
+      <div class="card in"><h3>Constant dùng để làm gì?</h3><p style="font-size:19px">Lưu giá trị <b>cố định</b> suốt chương trình (thuế suất, số π, sĩ số tối đa…). Đặt tên có nghĩa thay cho "con số ma thuật". Khi cần đổi chỉ sửa một chỗ, và trình biên dịch chặn việc vô tình sửa giá trị.</p></div>
+      <table class="tt f" style="margin-top:12px">
+        <tr><th></th><th>Variable</th><th>Constant</th></tr>
+        <tr><td>Giá trị</td><td>Thay đổi được</td><td>Cố định</td></tr>
+        <tr><td>Khởi tạo</td><td>Có thể để sau</td><td>Bắt buộc ngay khi khai báo</td></tr>
+        <tr><td>Từ khóa</td><td>—</td><td><code class="i">const</code></td></tr>
+        <tr><td>Quy ước tên</td><td>camelCase</td><td>CHỮ_HOA</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q7 ===================== -->
+<section class="slide" id="q7">
+  <div class="hdr in"><span class="qn">CÂU 7</span><h2><code class="i" style="font-size:33px">#define</code> vs <code class="i" style="font-size:33px">const</code></h2></div>
+  <div class="cols">
+    <div>
+      <div class="code-title">Code bạn viết</div>
+<script type="text/x-cpp" class="sm" id="c7" data-mark="2:a;6:b">
+#include <iostream>
+#define PI 3.14159          // không có = và ;
+using namespace std;
+int main() {
+    double r = 2;
+    cout << PI * r * r;     // 12.5664
+}
+</script>
+      <div class="code-title f" style="margin-top:12px">⬇ Sau bước tiền xử lý (preprocessor)</div>
+<script type="text/x-cpp" class="sm f" id="c7b" data-mark="5:b">
+// (dòng #define đã biến mất)
+int main() {
+    double r = 2;
+    cout << 3.14159 * r * r;   // PI được thay bằng chữ
+}
+</script>
+    </div>
+    <div>
+      <table class="tt f">
+        <tr><th></th><th>#define</th><th>const</th></tr>
+        <tr><td>Bản chất</td><td>Thay thế văn bản trước khi biên dịch</td><td>Biến chỉ đọc</td></tr>
+        <tr><td>Kiểu dữ liệu</td><td>Không có</td><td>Có, được kiểm tra</td></tr>
+        <tr><td>Phạm vi</td><td>Từ chỗ define đến hết file</td><td>Theo khối { } như biến</td></tr>
+        <tr><td>Debug</td><td>Không thấy tên PI</td><td>Thấy tên và giá trị</td></tr>
+        <tr><td>Cú pháp</td><td><code class="i">#define PI 3.14</code></td><td><code class="i">const double PI = 3.14;</code></td></tr>
+      </table>
+      <div class="note f" style="font-size:18px">Trong C++ nên ưu tiên <b>const</b> vì an toàn kiểu. Lỗi hay gặp: <code class="i">#define PI = 3.14;</code> thì <code class="i">PI*r</code> thành <code class="i">= 3.14;*r</code> → lỗi biên dịch.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q8 ===================== -->
+<section class="slide" id="q8">
+  <div class="hdr in"><span class="qn">CÂU 8</span><h2>Kiểu dữ liệu số nguyên</h2></div>
+  <table class="tt in">
+    <tr><th>Kiểu</th><th>Kích thước*</th><th></th><th>Phạm vi</th><th>Ví dụ dùng</th></tr>
+    <tr><td><code class="i">short</code></td><td>2 byte</td><td style="width:200px"><div class="bar"><i style="--w:12.5%"></i></div></td><td>−32 768 → 32 767</td><td>Năm sinh, số tầng</td></tr>
+    <tr><td><code class="i">int</code></td><td>4 byte</td><td><div class="bar"><i style="--w:25%"></i></div></td><td>≈ ±2.1 tỷ</td><td>Tuổi, số lượng, điểm</td></tr>
+    <tr><td><code class="i">long</code></td><td>4 hoặc 8 byte</td><td><div class="bar"><i style="--w:50%"></i></div></td><td>Phụ thuộc hệ điều hành</td><td>—</td></tr>
+    <tr><td><code class="i">long long</code></td><td>8 byte</td><td><div class="bar"><i style="--w:100%"></i></div></td><td>≈ ±9.2 × 10<sup>18</sup></td><td>Dân số thế giới, số tiền lớn</td></tr>
+    <tr><td><code class="i">unsigned int</code></td><td>4 byte</td><td><div class="bar"><i style="--w:25%"></i></div></td><td>0 → ≈ 4.29 tỷ</td><td>Giá trị không âm</td></tr>
+  </table>
+  <div class="cols" style="margin-top:14px;grid-template-columns:1.15fr 1fr">
+<script type="text/x-cpp" class="xs" id="c8" data-mark="2:a;3-4:d">
+long long world = 8100000000LL;   // int không chứa nổi
+cout << world << endl;            // 8100000000
+short s = 32767;                  // giá trị lớn nhất của short
+s = s + 1;  cout << s;            // -32768 → TRÀN SỐ!
+</script>
+    <div>
+      <div class="console f" data-act="#c8|show-a;#c8|show-d">8100000000
+-32768</div>
+      <p class="f" style="font-size:18px;margin-top:8px">Khác biệt chính là <b>kích thước</b>, kéo theo <b>phạm vi</b>. Vượt phạm vi sẽ <b>tràn số</b> (overflow) và cho kết quả sai. <span class="muted">*Theo g++ 64-bit; <code class="i">sizeof(long)</code> = 4 trên Windows.</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q9 ===================== -->
+<section class="slide" id="q9">
+  <div class="hdr in"><span class="qn">CÂU 9</span><h2>Kiểu dữ liệu số thực</h2></div>
+  <table class="tt in">
+    <tr><th>Kiểu</th><th>Kích thước</th><th>Độ chính xác</th><th>Ví dụ dùng</th></tr>
+    <tr><td><code class="i">float</code></td><td>4 byte</td><td>≈ 6–7 chữ số</td><td>Đồ họa, cảm biến, tiết kiệm bộ nhớ</td></tr>
+    <tr><td><code class="i">double</code></td><td>8 byte</td><td>≈ 15–16 chữ số</td><td><b>Mặc định</b>: điểm số, tiền, khoa học</td></tr>
+    <tr><td><code class="i">long double</code></td><td>8–16 byte</td><td>≈ 18–19 chữ số (g++)</td><td>Tính toán cần cực kỳ chính xác</td></tr>
+  </table>
+  <div class="cols" style="margin-top:14px;grid-template-columns:1.1fr 1fr">
+<script type="text/x-cpp" class="sm">
+float       f  = 1.0f / 3;
+double      d  = 1.0 / 3;
+long double ld = 1.0L / 3;
+cout << setprecision(20);
+cout << f << '\n' << d << '\n' << ld << '\n';
+float big = 16777217;  cout << big;    // mất 1 đơn vị!
+</script>
+    <div>
+      <div class="console f" style="font-size:16px">0.33333334<span style="color:#fb7185">32674407959</span>
+0.3333333333333333<span style="color:#fb7185">1483</span>
+0.3333333333333333333<span style="color:#fb7185">4</span>
+16777216</div>
+      <p class="f" style="font-size:18px;margin-top:8px">Phần <span style="color:#e11d48;font-weight:700">màu đỏ</span> là sai số: kiểu càng lớn thì càng nhiều chữ số đúng. float chỉ đủ chính xác khoảng 7 chữ số nên 16 777 217 bị lưu thành 16 777 216.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q10 ===================== -->
+<section class="slide" id="q10">
+  <div class="hdr in"><span class="qn">CÂU 10</span><h2>Chia nguyên, chia thực và toán tử %</h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+    <div>
+<script type="text/x-cpp" id="c10" data-mark="1:a;2-4:b;5:c;8-10:d">
+cout << 7 / 2      << endl;   // 3    int / int   → chia nguyên
+cout << 7.0 / 2    << endl;   // 3.5  có số thực → chia thực
+cout << 7 / 2.0    << endl;   // 3.5
+cout << (double)7 / 2 << endl;// 3.5  ép kiểu
+cout << 7 % 3      << endl;   // 1    phần dư
+
+int sec = 3725;               // đổi giây ra giờ:phút:giây
+cout << sec / 3600 << "h "
+     << sec % 3600 / 60 << "m "
+     << sec % 60 << "s";      // 1h 2m 5s
+</script>
+    </div>
+    <div>
+      <div class="card f" data-act="#c10|show-a"><h3>Chia nguyên</h3><p style="font-size:19px">Hai toán hạng đều là số nguyên → kết quả <b>bỏ phần thập phân</b>: 7 / 2 = 3. (Với số âm, C++ cắt về phía 0: −7 / 2 = −3.)</p></div>
+      <div class="card f" style="margin-top:10px" data-act="#c10|show-b"><h3>Chia thực</h3><p style="font-size:19px">Chỉ cần <b>một</b> toán hạng là số thực → kết quả là số thực: 3.5.</p></div>
+      <div class="card f" style="margin-top:10px" data-act="#c10|show-c"><h3>Toán tử % (modulo)</h3><p style="font-size:19px">Lấy <b>phần dư</b>, chỉ dùng với số nguyên: 7 % 3 = 1, 17 % 5 = 2. Hay dùng để kiểm tra chẵn lẻ (<code class="i">n % 2 == 0</code>) hoặc tách chữ số.</p></div>
+      <div class="console f" style="margin-top:10px" data-act="#c10|show-d">1h 2m 5s</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q11 ===================== -->
+<section class="slide" id="q11">
+  <div class="hdr in"><span class="qn">CÂU 11</span><h2>Dùng <code class="i" style="font-size:33px">cin</code> nhập một số nguyên</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+<script type="text/x-cpp" class="sm" id="c11" data-mark="2:a;3:b;4:c">
+int birthYear;
+cout << "Nhap nam sinh: ";
+cin >> birthYear;                    // đọc số nguyên từ bàn phím
+cout << "Tuoi cua ban: " << 2026 - birthYear << endl;
+</script>
+      <div class="console" style="margin-top:14px"><span class="cl" id="c11l1">Nhap nam sinh: <span class="in">2007</span></span><span class="cl" id="c11l2">Tuoi cua ban: 19</span></div>
+    </div>
+    <div>
+      <div class="flow" style="justify-content:flex-start;gap:14px">
+        <div class="box" style="min-width:0">⌨️ 2007<small>bàn phím</small></div><div class="ar">→</div>
+        <div class="box cpp" style="min-width:0">cin &gt;&gt;<small>đọc số</small></div><div class="ar">→</div>
+        <div class="cell" id="b11" style="width:110px"><span class="old">?</span><span class="new">2007</span><small>birthYear</small></div>
+      </div>
+      <span class="f ghost" data-act="#c11l1|show;#c11|show-a;#c11|show-b;#b11|fill"></span>
+      <span class="f ghost" data-act="#c11l2|show;#c11|show-c"></span>
+      <ul style="margin-top:18px">
+        <li class="f" style="font-size:19px"><code class="i">&gt;&gt;</code> (toán tử trích) lấy dữ liệu từ <code class="i">cin</code> rồi đưa vào biến. Nên <code class="i">cout</code> lời nhắc trước để người dùng biết cần nhập gì.</li>
+        <li class="f" style="font-size:19px">Nhập nhiều số một lần: <code class="i">cin &gt;&gt; a &gt;&gt; b;</code>, các số cách nhau bởi dấu cách hoặc Enter.</li>
+        <li class="f" style="font-size:19px">Nhập <code class="i">3.9</code> vào biến int thì biến chỉ nhận <b>3</b>; nhập chữ thì cin bị lỗi.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q12 ===================== -->
+<section class="slide" id="q12">
+  <div class="hdr in"><span class="qn">CÂU 12</span><h2>Dùng <code class="i" style="font-size:33px">cin</code> nhập một số thực</h2></div>
+  <div class="cols" style="grid-template-columns:1.05fr 1fr">
+    <div>
+<script type="text/x-cpp" class="sm" id="c12" data-mark="3:a;4:b;5:c">
+double weight, height;
+cout << "Can nang (kg) va chieu cao (m): ";
+cin >> weight >> height;             // nhập 2 số thực
+double bmi = weight / (height * height);
+cout << "BMI = " << bmi << endl;
+</script>
+      <div class="console" style="margin-top:14px"><span class="cl" id="c12l1">Can nang (kg) va chieu cao (m): <span class="in">60 1.7</span></span><span class="cl" id="c12l2">BMI = 20.7612</span></div>
+    </div>
+    <div>
+      <div class="flow" style="justify-content:flex-start;gap:12px">
+        <div class="box">⌨️ 60 1.7</div><div class="ar">→</div>
+        <div class="cell" id="b12a" style="width:100px"><span class="old">?</span><span class="new">60</span><small>weight</small></div>
+        <div class="cell" id="b12b" style="width:100px"><span class="old">?</span><span class="new">1.7</span><small>height</small></div>
+      </div>
+      <span class="f ghost" data-act="#c12l1|show;#c12|show-a;#b12a|fill;#b12b|fill"></span>
+      <span class="f ghost" data-act="#c12l2|show;#c12|show-b;#c12|show-c"></span>
+      <ul style="margin-top:18px">
+        <li class="f" style="font-size:19px">Khai báo biến kiểu <code class="i">double</code> (hoặc <code class="i">float</code>) thì cin đọc được số có phần thập phân.</li>
+        <li class="f" style="font-size:19px">Dùng dấu <b>chấm</b> <code class="i">1.7</code>, không dùng dấu phẩy <code class="i">1,7</code>.</li>
+        <li class="f" style="font-size:19px">Nhập số nguyên <code class="i">60</code> vào biến double vẫn được, nó được lưu thành 60.0.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q13 ===================== -->
+<section class="slide" id="q13">
+  <div class="hdr in"><span class="qn">CÂU 13</span><h2>Định dạng số với <code class="i" style="font-size:33px">&lt;iomanip&gt;</code></h2></div>
+  <div class="cols" style="grid-template-columns:1.3fr 1fr">
+    <div>
+<script type="text/x-cpp" class="sm" id="c13" data-mark="4:a;5:b;6:c;7:d">
+#include <iomanip>
+double pi = 3.14159265;
+cout << pi << endl;                          // 3.14159
+cout << setprecision(3) << pi << endl;       // 3.14
+cout << fixed << setprecision(2) << pi << endl; // 3.14
+cout << setprecision(4) << pi << endl;       // 3.1416
+cout << 7.0 << endl;                         // 7.0000
+</script>
+    </div>
+    <div>
+      <div class="console"><span class="cl show">3.14159</span><span class="cl" id="c13l1">3.14</span><span class="cl" id="c13l2">3.14</span><span class="cl" id="c13l3">3.1416</span><span class="cl" id="c13l4">7.0000</span></div>
+      <div class="card f" style="margin-top:12px" data-act="#c13l1|show;#c13|show-a"><h3>setprecision(n) không có fixed</h3><p style="font-size:18px">n là <b>tổng số chữ số có nghĩa</b>: 3 chữ số → 3.14. Mặc định là 6.</p></div>
+      <div class="card f" style="margin-top:10px" data-act="#c13l2|show;#c13|show-b"><h3>fixed + setprecision(n)</h3><p style="font-size:18px">n là <b>số chữ số sau dấu chấm</b>, có làm tròn: 2 → 3.14.</p></div>
+      <div class="card f" style="margin-top:10px" data-act="#c13l3|show;#c13l4|show;#c13|show-c;#c13|show-d"><h3>Có hiệu lực lâu dài</h3><p style="font-size:18px">Thiết lập giữ nguyên cho các lần in sau. Vì vậy 3.14159265 in thành 3.1416 (đã làm tròn), và 7.0 in thành 7.0000.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q14 ===================== -->
+<section class="slide" id="q14">
+  <div class="hdr in"><span class="qn">CÂU 14</span><h2><code class="i" style="font-size:33px">setw</code>, <code class="i" style="font-size:33px">left</code>, <code class="i" style="font-size:33px">right</code>, <code class="i" style="font-size:33px">setfill</code></h2></div>
+<script type="text/x-cpp" class="xs" id="c14" data-mark="2:a;3:b;4-5:c;6:d">
+cout << fixed << setprecision(1);
+cout << left << setw(10) << "Ten"  << right << setw(8) << "Diem" << '\n';
+cout << setfill('-') << setw(18) << "" << setfill(' ') << '\n';    // kẻ vạch
+cout << left << setw(10) << "An"   << right << setw(8) << 8.5  << '\n';
+cout << left << setw(10) << "Binh" << right << setw(8) << 10.0 << '\n';
+cout << setfill('0') << right << setw(5) << 42 << '\n';           // mã số 00042
+</script>
+  <div class="cols" style="grid-template-columns:auto 1fr;margin-top:14px;gap:30px">
+    <div>
+      <p class="code-title">Kết quả (mỗi ô = 1 ký tự, · = dấu cách)</p>
+      <div class="chars f" data-act="#c14|show-a" data-segs='[["Ten",10,"L","a"],["Diem",8,"R","b"]]'></div>
+      <div class="chars f" data-act="#c14|show-b" data-segs='[["",18,"R","c","-"]]'></div>
+      <div class="chars f" data-act="#c14|show-c" data-segs='[["An",10,"L","a"],["8.5",8,"R","b"]]'></div>
+      <div class="chars f" data-segs='[["Binh",10,"L","a"],["10.0",8,"R","b"]]'></div>
+      <div class="chars f" data-act="#c14|show-d" data-segs='[["42",5,"R","b","0"]]' style="margin-top:12px"></div>
+    </div>
+    <div>
+      <ul>
+        <li style="font-size:19px"><code class="i">setw(n)</code>: in trong ô rộng n ký tự, chỉ có tác dụng cho <b>một</b> giá trị ngay sau nó.</li>
+        <li style="font-size:19px"><code class="i">left</code> / <code class="i">right</code>: căn trái / phải trong ô (mặc định là right). Ô <span style="background:#f3edff;padding:0 6px;border-radius:4px">tím</span> rộng 10 căn trái, ô <span style="background:#e6f8fd;padding:0 6px;border-radius:4px">xanh</span> rộng 8 căn phải.</li>
+        <li style="font-size:19px"><code class="i">setfill(c)</code>: ký tự lấp chỗ trống (mặc định là dấu cách). Dùng để kẻ vạch <code class="i">------</code> hoặc thêm số 0 ở đầu mã số.</li>
+        <li style="font-size:19px">Kết hợp các thao tác này để in <b>bảng</b> có cột thẳng hàng.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q15 ===================== -->
+<section class="slide" id="q15">
+  <div class="hdr in"><span class="qn">CÂU 15</span><h2>Toán tử gán kết hợp <code class="i" style="font-size:33px">+= -= *= /=</code></h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr">
+    <div>
+<script type="text/x-cpp" id="c15" data-mark="2:a;3:b;4:c;5:d">
+int x = 10;
+x += 5;     // x = x + 5   → 15
+x -= 3;     // x = x - 3   → 12
+x *= 2;     // x = x * 2   → 24
+x /= 4;     // x = x / 4   → 6
+cout << x << endl;          // 6
+</script>
+      <div class="note blue f">Ví dụ thực tế: <code class="i">total += price;</code> cộng dồn tiền hàng, <code class="i">balance -= amount;</code> trừ tiền khi rút, <code class="i">salary *= 1.1;</code> tăng lương 10%.</div>
+    </div>
+    <div>
+      <div class="arr" style="flex-wrap:wrap;justify-content:flex-start">
+        <div class="cell ok" style="width:100px">10<small>ban đầu</small></div>
+        <div class="cell" id="b15a" style="width:100px">15<small>+= 5</small></div>
+        <div class="cell" id="b15b" style="width:100px">12<small>-= 3</small></div>
+        <div class="cell" id="b15c" style="width:100px">24<small>*= 2</small></div>
+        <div class="cell" id="b15d" style="width:100px">6<small>/= 4</small></div>
+      </div>
+      <span class="f ghost" data-act="#b15a|ok;#c15|show-a"></span>
+      <span class="f ghost" data-act="#b15b|ok;#c15|show-b"></span>
+      <span class="f ghost" data-act="#b15c|ok;#c15|show-c"></span>
+      <span class="f ghost" data-act="#b15d|ok;#c15|show-d"></span>
+      <p class="f" style="font-size:19px;margin-top:16px"><code class="i">x op= y</code> là cách viết gọn của <code class="i">x = x op y</code>: ngắn hơn và tên biến chỉ phải viết một lần. Lưu ý <code class="i">x /= 4</code> với x là int vẫn là <b>chia nguyên</b>: 24 / 4 = 6, còn 25 / 4 cũng ra 6.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q16 ===================== -->
+<section class="slide" id="q16">
+  <div class="hdr in"><span class="qn">CÂU 16</span><h2><code class="i" style="font-size:33px">++a</code> khác <code class="i" style="font-size:33px">a++</code> thế nào?</h2></div>
+  <div class="cols">
+    <div class="card">
+      <span class="lbl info">PREFIX: TĂNG TRƯỚC, DÙNG SAU</span>
+<script type="text/x-cpp" class="sm">
+int a = 5;
+int b = ++a;    // a = 6, b = 6
+</script>
+      <div class="inc" id="i16a" style="margin-top:12px">
+        <div class="cell s1"><span class="old">5</span><span class="new">6</span><small>a</small></div>
+        <div class="cell s2"><span class="old">?</span><span class="new">6</span><small>b</small></div>
+      </div>
+      <p class="say16a muted" style="font-size:18px;margin-top:10px">① a tăng lên 6 → ② gán giá trị <b>mới</b> (6) cho b.</p>
+    </div>
+    <div class="card">
+      <span class="lbl info" style="background:#fde0ef;color:#be185d">POSTFIX: DÙNG TRƯỚC, TĂNG SAU</span>
+<script type="text/x-cpp" class="sm">
+int a = 5;
+int b = a++;    // b = 5, a = 6
+</script>
+      <div class="inc" id="i16b" style="margin-top:12px">
+        <div class="cell s2"><span class="old">5</span><span class="new">6</span><small>a</small></div>
+        <div class="cell s1"><span class="old">?</span><span class="new">5</span><small>b</small></div>
+      </div>
+      <p class="muted" style="font-size:18px;margin-top:10px">① gán giá trị <b>cũ</b> (5) cho b → ② a mới tăng lên 6.</p>
+    </div>
+  </div>
+  <span class="f ghost" data-act="#i16a|p1"></span><span class="f ghost" data-act="#i16a|p2"></span>
+  <span class="f ghost" data-act="#i16b|p1"></span><span class="f ghost" data-act="#i16b|p2"></span>
+  <div class="note f">Nếu đứng riêng một mình thì <code class="i">a++;</code> và <code class="i">++a;</code> cho cùng kết quả (a tăng 1). Chúng chỉ khác nhau khi được dùng <b>bên trong biểu thức</b> (gán, in, so sánh…).</div>
+</section>
+
+<!-- ===================== Q17 ===================== -->
+<section class="slide" id="q17">
+  <div class="hdr in"><span class="qn">CÂU 17</span><h2><code class="i" style="font-size:33px">a--</code> khác <code class="i" style="font-size:33px">--a</code> thế nào?</h2></div>
+  <div class="cols">
+    <div class="card">
+      <span class="lbl info" style="background:#fde0ef;color:#be185d">POSTFIX: DÙNG TRƯỚC, GIẢM SAU</span>
+<script type="text/x-cpp" class="sm">
+int a = 5;
+cout << a-- << endl;   // in 5
+cout << a   << endl;   // in 4
+</script>
+      <div class="inc" id="i17a" style="margin-top:12px">
+        <div class="cell s1"><span class="old">—</span><span class="new">5</span><small>được in</small></div>
+        <div class="cell s2"><span class="old">5</span><span class="new">4</span><small>a</small></div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="lbl info">PREFIX: GIẢM TRƯỚC, DÙNG SAU</span>
+<script type="text/x-cpp" class="sm">
+int a = 5;
+cout << --a << endl;   // in 4
+cout << a   << endl;   // in 4
+</script>
+      <div class="inc" id="i17b" style="margin-top:12px">
+        <div class="cell s1"><span class="old">5</span><span class="new">4</span><small>a</small></div>
+        <div class="cell s2"><span class="old">—</span><span class="new">4</span><small>được in</small></div>
+      </div>
+    </div>
+  </div>
+  <span class="f ghost" data-act="#i17a|p1"></span><span class="f ghost" data-act="#i17a|p2"></span>
+  <span class="f ghost" data-act="#i17b|p1"></span><span class="f ghost" data-act="#i17b|p2"></span>
+  <div class="cols f" style="margin-top:14px;grid-template-columns:1fr 1fr">
+    <div class="console">5
+4</div>
+    <div class="console">4
+4</div>
+  </div>
+  <div class="note blue f">Ví dụ đếm ngược: <code class="i">while (n-- &gt; 0)</code> so sánh với giá trị cũ rồi mới giảm. Còn <code class="i">--n</code> giảm trước rồi mới so sánh, nên vòng lặp chạy ít hơn 1 lần.</div>
+</section>
+
+<!-- ===================== ORIGINAL ===================== -->
+<section class="slide" id="base">
+  <div class="hdr in"><span class="qn">CÂU 18–20</span><h2>Chương trình gốc: tổng 2 số nguyên</h2></div>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr">
+<script type="text/x-cpp" class="xs" id="c0" data-mark="5:a;6-10:b;12-13:c;15:d">
+#include<iostream>
+using namespace std;
+
+int main(){
+   int a, b;
+   cout << "DAY LA CHUONG TRINH TINH TONG 2 SO NGUYEN" << endl;
+   cout << "Hay nhap vao so nguyen a: ";
+   cin >> a;
+   cout << "Hay nhap vao so nguyen b: ";
+   cin >> b;
+
+   int tong;
+   tong = a + b;
+
+   cout << tong << endl;
+   cout << "CHUONG TRINH KET THUC. BYE" << endl;
+   return 0;
+}
+</script>
+    <div>
+      <div class="leg a f" data-act="#c0|show-a"><b>Khai báo biến</b><p>Kiểu của a, b quyết định nhập số nguyên hay số thực.</p></div>
+      <div class="leg b f" style="margin-top:10px" data-act="#c0|show-b"><b>Nhập dữ liệu</b><p>Tiêu đề, lời nhắc rồi <code class="i">cin</code>.</p></div>
+      <div class="leg c f" style="margin-top:10px" data-act="#c0|show-c"><b>Xử lý</b><p>Tính toán bằng phép <code class="i">+</code>.</p></div>
+      <div class="leg f" style="margin-top:10px;border-left:6px solid #ec4899" data-act="#c0|show-d"><b>Xuất kết quả</b><p>In kết quả rồi kết thúc.</p></div>
+      <p class="f" style="font-size:19px;margin-top:12px">Ở các câu 18–20, chỉ cần sửa những phần <b>được tô màu</b>. Khung chương trình giữ nguyên.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q18 ===================== -->
+<section class="slide" id="q18">
+  <div class="hdr in"><span class="qn">CÂU 18</span><h2>Chương trình tính hiệu 2 số nguyên</h2></div>
+  <div class="cols" style="grid-template-columns:1.3fr 1fr">
+<script type="text/x-cpp" class="xs" id="c18" data-mark="6:b;12-13:b;15:b">
+#include<iostream>
+using namespace std;
+
+int main(){
+   int a, b;
+   cout << "DAY LA CHUONG TRINH TINH HIEU 2 SO NGUYEN" << endl;
+   cout << "Hay nhap vao so nguyen a: ";
+   cin >> a;
+   cout << "Hay nhap vao so nguyen b: ";
+   cin >> b;
+
+   int hieu;
+   hieu = a - b;
+
+   cout << "Hieu a - b = " << hieu << endl;
+   cout << "CHUONG TRINH KET THUC. BYE" << endl;
+   return 0;
+}
+</script>
+    <div>
+      <div class="card f" data-act="#c18|show-b"><h3>Những chỗ đã sửa</h3><ul>
+        <li style="font-size:18px">Tiêu đề: TONG → <b>HIEU</b></li>
+        <li style="font-size:18px">Biến <code class="i">tong</code> → <code class="i">hieu</code>, phép <code class="i">+</code> → <code class="i">-</code></li>
+        <li style="font-size:18px">In kèm chú thích cho rõ ràng</li></ul></div>
+      <div class="console f" style="margin-top:12px;font-size:15px">DAY LA CHUONG TRINH TINH HIEU 2 SO NGUYEN
+Hay nhap vao so nguyen a: <span class="in">15</span>
+Hay nhap vao so nguyen b: <span class="in">27</span>
+Hieu a - b = -12
+CHUONG TRINH KET THUC. BYE</div>
+      <p class="f" style="font-size:17px;margin-top:8px">Hiệu có thể âm, và kiểu <code class="i">int</code> chứa được số âm.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q19 ===================== -->
+<section class="slide" id="q19">
+  <div class="hdr in"><span class="qn">CÂU 19</span><h2>Chương trình tính tích 2 số thực</h2></div>
+  <div class="cols" style="grid-template-columns:1.3fr 1fr">
+<script type="text/x-cpp" class="xs" id="c19" data-mark="5:a;6-7:b;9:b;12-13:b;15:b">
+#include<iostream>
+using namespace std;
+
+int main(){
+   double a, b;
+   cout << "DAY LA CHUONG TRINH TINH TICH 2 SO THUC" << endl;
+   cout << "Hay nhap vao so thuc a: ";
+   cin >> a;
+   cout << "Hay nhap vao so thuc b: ";
+   cin >> b;
+
+   double tich;
+   tich = a * b;
+
+   cout << "Tich a * b = " << tich << endl;
+   cout << "CHUONG TRINH KET THUC. BYE" << endl;
+   return 0;
+}
+</script>
+    <div>
+      <div class="card f" data-act="#c19|show-a"><h3>Thay đổi quan trọng nhất</h3><p style="font-size:18px"><code class="i">int</code> → <code class="i">double</code> cho cả a, b và biến kết quả. Nếu giữ int thì nhập 1.5 chỉ còn 1.</p></div>
+      <div class="card f" style="margin-top:10px" data-act="#c19|show-b"><h3>Các chỗ khác</h3><p style="font-size:18px">Đổi tiêu đề và lời nhắc, đổi tên biến thành <code class="i">tich</code>, phép <code class="i">+</code> thành <code class="i">*</code>.</p></div>
+      <div class="console f" style="margin-top:12px;font-size:15px">DAY LA CHUONG TRINH TINH TICH 2 SO THUC
+Hay nhap vao so thuc a: <span class="in">1.5</span>
+Hay nhap vao so thuc b: <span class="in">2.4</span>
+Tich a * b = 3.6
+CHUONG TRINH KET THUC. BYE</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q20 ===================== -->
+<section class="slide" id="q20">
+  <div class="hdr in"><span class="qn">CÂU 20</span><h2>Chu vi &amp; diện tích hình tròn</h2></div>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr">
+<script type="text/x-cpp" class="sm" id="c20" data-mark="2-3:a;5:a;10:b;11-12:c;14-16:d">
+#include <iostream>
+#include <iomanip>
+#include <cmath>
+using namespace std;
+const double PI = 3.14159265358979;
+
+int main() {
+    double r;
+    cout << "Nhap ban kinh r: ";
+    cin >> r;
+    double chuVi   = 2 * PI * r;
+    double dienTich = PI * pow(r, 2);      // hoặc PI * r * r
+
+    cout << fixed << setprecision(2);
+    cout << "Chu vi    = " << chuVi << endl;
+    cout << "Dien tich = " << dienTich << endl;
+    return 0;
+}
+</script>
+    <div>
+      <svg viewBox="0 0 300 170" width="100%" id="sv20">
+        <circle class="draw c440 dr1" cx="110" cy="85" r="70" fill="rgba(124,58,237,.08)" stroke="#7c3aed" stroke-width="4"/>
+        <line x1="110" y1="85" x2="180" y2="85" stroke="#ec4899" stroke-width="3"/>
+        <circle cx="110" cy="85" r="4" fill="#ec4899"/>
+        <text x="132" y="78" font-size="16" fill="#db2777">r</text>
+        <text class="fadein fd1" x="195" y="60" font-size="15" fill="#7c3aed">C = 2πr</text>
+        <text class="fadein fd2" x="195" y="110" font-size="15" fill="#0891b2">S = πr²</text>
+      </svg>
+      <span class="f ghost" data-act="#sv20|d1;#c20|show-a;#c20|show-b;#c20|show-c"></span>
+      <span class="f ghost" data-act="#sv20|d2"></span>
+      <div class="console f" data-act="#c20|show-d">Nhap ban kinh r: <span class="in">2.5</span>
+Chu vi    = 15.71
+Dien tich = 19.63</div>
+      <p class="f" style="font-size:17px;margin-top:10px">Bài này dùng lại hằng <code class="i">const</code> (câu 6), <code class="i">pow</code> từ &lt;cmath&gt; (câu 4), <code class="i">cin</code> số thực (câu 12) và <code class="i">fixed setprecision</code> (câu 13).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="slide" id="end">
+  <div class="title-wrap" style="align-items:center;text-align:center">
+    <div class="orb" style="width:360px;height:360px;background:#f9a8d4;left:10%;top:10%"></div>
+    <h1 class="in">Tóm tắt <span class="grad">nhanh</span></h1>
+    <div class="cols4 in" style="margin-top:32px;text-align:left;max-width:1150px">
+      <div class="card"><h3>Khung chương trình</h3><p style="font-size:18px"><code class="i">#include</code>, <code class="i">main()</code>, các lệnh kết thúc bằng <code class="i">;</code>. Comment <code class="i">//</code> và <code class="i">/* */</code>.</p></div>
+      <div class="card"><h3>Dữ liệu</h3><p style="font-size:18px">Biến và hằng (<code class="i">const</code> tốt hơn <code class="i">#define</code>). Số nguyên: short / int / long long. Số thực: float / double.</p></div>
+      <div class="card"><h3>Toán tử</h3><p style="font-size:18px"><code class="i">/</code> với int là chia nguyên, <code class="i">%</code> lấy phần dư. Có <code class="i">+=</code>… và <code class="i">++a</code> khác <code class="i">a++</code>.</p></div>
+      <div class="card"><h3>Nhập / Xuất</h3><p style="font-size:18px"><code class="i">cin &gt;&gt;</code> và <code class="i">cout &lt;&lt;</code>. Định dạng bằng <code class="i">setprecision</code>, <code class="i">fixed</code>, <code class="i">setw</code>, <code class="i">setfill</code>.</p></div>
+    </div>
+  </div>
+</section>
+
+<script>
+// render char-grid rows for setw demo
+document.querySelectorAll(".chars").forEach(el=>{
+  const segs=JSON.parse(el.dataset.segs);let h="";
+  segs.forEach(([txt,w,al,cls,fill])=>{
+    const f=fill||" ";const pad=Math.max(0,w-txt.length);
+    const cells=al==="L"?[...txt].map(c=>[c,0]).concat(Array(pad).fill([f,1])):Array(pad).fill([f,1]).concat([...txt].map(c=>[c,0]));
+    h+=cells.map(([c,p])=>`<span class="ch ${cls}${p?" pad":""}">${c===" "?"·":c}</span>`).join("");
+  });
+  el.innerHTML=h;
+});
+</script>
+</div></div>
+
+<div id="bar"></div>
+<div id="hint">← → / Space: chuyển · Shift+→: qua slide · Home: đầu · F: toàn màn hình</div>
+<div id="nav"><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+
+<script>
+(function(){
+  // ---------- C++ highlighter ----------
+  const KW=new Set("if else for while do return break continue switch case default struct class using namespace const static new delete true false sizeof public private include pragma auto".split(" "));
+  const TY=new Set("int double float char void bool long short unsigned string Point2D Rectangle".split(" "));
+  const LIB=new Set("cout cin endl sqrt fabs hypot std".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line){
+    if(/^\s*#/.test(line)) return '<span class="p">'+esc(line)+'</span>';
+    const re=/(\/\/.*$)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="n">'+m[3]+'</span>';
+      else if(m[4]){
+        const w=m[4];
+        let cls=KW.has(w)?"k":TY.has(w)?"t":LIB.has(w)?"fn":(m[5]?"fn":"");
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[5]?esc(m[5]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-cpp"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");const [a,b]=r.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+
+  // ---------- deck engine ----------
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")];
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  function act(el,on){["act","act2"].forEach(k=>{const v=el.dataset[k];if(!v)return;v.split(";").forEach(p=>{const [sel,cls]=p.split("|");const t=document.querySelector(sel);if(t)t.classList.toggle(cls,on)})})}
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step)||(i<cur&&false);f.classList.toggle("on",on);act(f,on)});
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.textContent=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length;
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    history.replaceState(null,"","#"+slides[cur].id);
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+  addEventListener("keydown",e=>{
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+</script>
+</body>
+</html>
