@@ -1,0 +1,1191 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Java Common Classes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+h1{font-size:70px;line-height:1.1;font-weight:800}
+h2{font-size:38px;line-height:1.2;font-weight:800}
+h3{font-size:23px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:22px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:26px;margin:6px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.88em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 6px;border-radius:6px;color:#be185d}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.cols.c64{grid-template-columns:1.25fr 1fr}.cols.c46{grid-template-columns:1fr 1.2fr}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.card.bad{border-color:#fecdd3;background:linear-gradient(180deg,#fff1f3,#fff)}
+.card.good{border-color:#a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff)}
+.lbl{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
+.icon{font-size:34px;margin-bottom:4px}
+.note{margin-top:12px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:20px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.code{font-family:var(--mono);font-size:18px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
+.code.sm{font-size:16.5px}.code.xs{font-size:15px;line-height:1.45}.code.xxs{font-size:13.6px;line-height:1.38;padding:8px 0}
+.code .ln{padding:0 14px 0 8px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.11);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.13);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
+.code-title{font-family:var(--mono);font-size:15px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+.f.zoom{transform:scale(.85)}.f.zoom.on{transform:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:19px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.legend{display:flex;flex-direction:column;gap:10px}
+.leg{border-radius:12px;padding:10px 16px;background:#fff;border:1px solid var(--line)}
+.leg b{display:block;font-size:21px;margin-bottom:2px}
+.leg p{font-size:19px}
+.leg.a{border-left:6px solid #7c3aed}.leg.b{border-left:6px solid #06b6d4}.leg.c{border-left:6px solid #f59e0b}
+.console{font-family:var(--mono);font-size:17px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.mem{display:flex;align-items:center;gap:16px;min-height:130px}
+.frame{border:2px solid #e4dcfb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
+.frame .fname{font-family:var(--mono);font-size:16px;color:var(--muted);margin-bottom:6px}
+.var{display:flex;align-items:center;gap:10px}
+.vn{font-family:var(--mono);font-size:21px;color:var(--t);font-weight:600}
+.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #c4b5fd;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
+.vb .new{display:none}
+.callee,.arw{opacity:0;transform:translateX(-14px);transition:all .5s}
+.mem.s1 .callee,.mem.s1 .arw{opacity:1;transform:none}
+.mem.s2 .chg .old{display:none}.mem.s2 .chg .new{display:inline;animation:pop .5s}
+.mem.s2 .chg{border-color:#f59e0b;box-shadow:0 0 18px rgba(245,158,11,.5)}
+.mem.s3 .callee,.mem.s3 .arw{opacity:.15;transform:translateY(10px)}
+.mem.s3 .result{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.5)}
+.arw{font-family:var(--mono);font-size:16px;color:var(--gold);text-align:center;line-height:1.2;font-weight:600}
+.arw .bar{display:block;font-size:30px}
+.alias{font-size:18px;color:var(--accent2);font-weight:600}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.25)}100%{transform:none;opacity:1}}
+.flow{display:flex;align-items:center;gap:12px;justify-content:center}
+.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:18px;border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:14px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.h{border-color:var(--gold)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#c4b5fd}.box.exe{border-color:#ec4899;background:#fdf2f8}
+.ar{color:var(--muted);font-size:26px;text-align:center}
+.stack{display:flex;flex-direction:column;gap:8px}
+svg text{font-family:var(--mono);font-weight:600}
+.draw{stroke-dasharray:400;stroke-dashoffset:400;transition:stroke-dashoffset 1s ease}
+svg.d1 .dr1,svg.d2 .dr2,svg.d3 .dr3{stroke-dashoffset:0}
+.fadein{opacity:0;transition:opacity .6s}
+svg.d1 .fd1,svg.d2 .fd2,svg.d3 .fd3{opacity:1}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:19px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05)}
+.ag:hover{border-color:#ec4899;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
+.ag b{color:#db2777;margin-right:6px;font-family:var(--mono)}
+.formula{font-family:var(--mono);font-size:23px;text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:16px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+@media (max-width:700px){#hint{display:none}}
+@media print{#nav,#bar,#hint{display:none}}
+
+/* lec03 additions */
+.chain{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pv{display:inline-flex;align-items:center;font-family:var(--mono);font-size:18px;font-weight:700;padding:5px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;white-space:nowrap}
+.pv.yes{background:#d1fae5;border-color:#34d399;color:#047857}
+.pv.no{background:#ffe4e6;border-color:#fb7185;color:#be123c}
+.pv.skip{background:#f1f5f9;border-color:#cbd5e1;color:#94a3b8;text-decoration:line-through;border-style:dashed}
+.op{font-family:var(--mono);font-size:26px;font-weight:800;color:var(--sa1)}
+.tt th,.tt td{text-align:center}.tt td:first-child{color:var(--text);font-weight:400}
+.tt tr.hit td{background:#fdf2f8;color:#be185d}
+tr.f{transform:none}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.code.show-s .mark-s{opacity:.3;text-decoration:line-through}
+.arr{display:flex;gap:12px;justify-content:center;margin-top:6px}
+.cell{width:84px;height:84px;border-radius:16px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:800;transition:all .45s;box-shadow:0 6px 16px -10px rgba(124,58,237,.4)}
+.cell small{font-size:13px;color:var(--muted);font-weight:600}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857;transform:translateY(-6px)}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;transform:translateY(-10px) scale(1.06);box-shadow:0 10px 24px -8px rgba(225,29,72,.5)}
+.cell.skip{opacity:.3;transform:scale(.92)}
+.syn{display:flex;gap:12px;align-items:center;justify-content:center;font-family:var(--mono);font-size:24px;font-weight:700}
+.sy{padding:8px 16px;border-radius:12px;color:#fff}
+.sy.c1{background:linear-gradient(135deg,#7c3aed,#a855f7)}.sy.c2{background:linear-gradient(135deg,#059669,#10b981)}.sy.c3{background:linear-gradient(135deg,#e11d48,#f97316)}
+.spin{display:inline-block;animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* lec02 additions */
+.cell .new{display:none}
+.cell.fill .old,.inc.p1 .s1 .old,.inc.p2 .s2 .old{display:none}
+.cell.fill .new,.inc.p1 .s1 .new,.inc.p2 .s2 .new{display:inline;animation:pop .5s}
+.cell.fill,.inc.p1 .s1,.inc.p2 .s2{border-color:#10b981;background:#ecfdf5;color:#047857}
+.inc{display:flex;gap:16px}
+.c440{stroke-dasharray:440;stroke-dashoffset:440}.c720{stroke-dasharray:720;stroke-dashoffset:720}
+.bar{height:14px;background:#f1edfd;border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7c3aed,#ec4899);border-radius:99px;transition:width 1.1s .3s ease}
+.slide.active .bar i{width:var(--w)}
+.chars{display:flex;margin:5px 0}
+.ch{width:28px;height:38px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:700;border:1px solid #e4dcfb;margin-right:-1px;background:#fff}
+.ch.pad{color:#c4b5fd;font-weight:400}.ch.a{background:#f3edff}.ch.b{background:#e6f8fd}.ch.c{background:#fff7e0;color:#b45309}
+.ch.b.pad[class]{color:#7dd3fc}
+
+/* oop lec03 additions */
+.xl{margin-top:14px}
+.xlat{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:22px;font-weight:700}
+.xlat .src{padding:8px 16px;border-radius:12px;background:#fff;border:2px solid #e4dcfb}
+.xlat .dst{padding:8px 16px;border-radius:12px;background:linear-gradient(135deg,#f3edff,#fdf2f8);border:2px solid #c4b5fd;color:#4c1d95}
+.xlat .dst b{color:#db2777}
+.xlat .arrow{font-size:28px;color:var(--sa1)}
+.xlat.go .dst{animation:pop .6s}
+.opgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.opgrid span{display:flex;align-items:center;justify-content:center;height:62px;border-radius:12px;background:#fff;border:2px solid #ece8f7;font-family:var(--mono);font-size:22px;font-weight:700;color:#1e1b3a;box-shadow:0 4px 12px -8px rgba(124,58,237,.4)}
+.slide.active .opgrid span{animation:pop .5s both}
+.opgrid span:nth-child(7n+2){animation-delay:.04s!important}.opgrid span:nth-child(7n+3){animation-delay:.08s!important}.opgrid span:nth-child(7n+4){animation-delay:.12s!important}.opgrid span:nth-child(7n+5){animation-delay:.16s!important}.opgrid span:nth-child(7n+6){animation-delay:.2s!important}.opgrid span:nth-child(7n){animation-delay:.24s!important}
+.opgrid span.mb{background:#cffafe;border-color:#22d3ee;color:#0e7490}
+.opgrid.lit span.mb{box-shadow:0 0 0 4px rgba(34,211,238,.35),0 8px 20px -6px rgba(8,145,178,.6);transform:scale(1.08);transition:all .4s}
+.opgrid span{font-size:20px}
+.fr-demo{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.frac{display:inline-flex;flex-direction:column;align-items:center;font-family:var(--mono);font-size:22px;font-weight:700;padding:4px 10px;border-radius:10px;background:#fff;border:2px solid #ece8f7}
+.frac span:first-child{border-bottom:3px solid currentColor;padding:0 6px}
+.frac.hl{background:#fff7e0;border-color:#fcd34d;color:#b45309;font-size:18px}
+.frac.ok{background:#d1fae5;border-color:#34d399;color:#047857}
+.lr{display:flex;align-items:stretch;gap:10px}
+.lr .side{flex:1;border-radius:14px;padding:10px 14px;border:2px solid;display:flex;flex-direction:column}
+.lr .side b{font-size:20px}.lr .side span{font-family:var(--mono);font-size:16px;color:var(--muted)}
+.lr .l{border-color:#fb7185;background:#fff1f3}.lr .r{border-color:#a78bfa;background:#f5f3ff}
+.lr .mid{display:flex;align-items:center;font-family:var(--mono);font-size:30px;font-weight:800;color:var(--sa1)}
+.leg p b{display:inline;font-size:inherit;margin:0}
+
+/* pointer memory diagrams */
+.mm{position:relative;width:100%}
+.mm>*{position:absolute}
+.mm .wires{left:0;top:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.mm .w{fill:none;stroke:#7c3aed;stroke-width:3;transition:all .5s}
+.lab{font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.12em;color:#a78bfa}
+.obj{left:0;width:180px;border:2.5px solid #c4b5fd;border-radius:14px;background:#fff;box-shadow:0 8px 20px -12px rgba(124,58,237,.5);overflow:hidden;transition:all .5s}
+.obj .oh{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-weight:800;font-size:18px;padding:5px 12px}
+.obj .oh small{font-weight:500;font-size:13px;opacity:.85}
+.obj.dupe .oh{background:linear-gradient(135deg,#db2777,#f472b6)}
+.obj .row{font-family:var(--mono);font-size:18px;font-weight:700;padding:5px 12px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #f1edfd}
+.dot{width:14px;height:14px;border-radius:50%;background:#7c3aed;box-shadow:0 0 0 4px #ede9fe}
+.heap{display:flex;transition:all .5s}
+.heap span{width:46px;height:50px;display:flex;align-items:center;justify-content:center;border:2.5px solid #fbbf24;margin-right:-2.5px;background:#fff7e0;font-family:var(--mono);font-size:20px;font-weight:800;color:#b45309;transition:all .5s}
+.heap span:first-child{border-radius:10px 0 0 10px}.heap span:last-child{border-radius:0 10px 10px 0}
+.heap.cp span{border-color:#22d3ee;background:#ecfeff;color:#0e7490}
+.tag{font-size:15px;font-weight:600;padding:6px 12px;border-radius:10px;background:#fff7e0;border:1.5px solid #fcd34d;color:#92400e;max-width:250px;line-height:1.3}
+.tag.bad{background:#fff1f3;border-color:#fda4af;color:#be123c}.tag.ok{background:#ecfdf5;border-color:#6ee7b7;color:#047857;max-width:260px}
+.boom{font-size:20px;font-weight:800;padding:8px 16px;border-radius:12px;background:linear-gradient(135deg,#e11d48,#f97316);color:#fff;box-shadow:0 10px 30px -8px rgba(225,29,72,.6)}
+.mm .ap1,.mm .ap2,.mm .ap3,.mm .ap4{opacity:0;transition:opacity .5s}
+.mm.s1 .ap1,.mm.s2 .ap2,.mm.s3 .ap3,.mm.s4 .ap4{opacity:1}
+.mm.s4 .boom{animation:shake .5s 2}
+@keyframes shake{25%{transform:translateX(-6px) rotate(-2deg)}75%{transform:translateX(6px) rotate(2deg)}}
+.mm.s1 .gone1,.mm.s2 .gone2,.mm.s3 .gone3,.mm.s4 .gone4{opacity:.18!important;filter:grayscale(1)}
+.mm .chg1 .n,.mm .chg2 .n,.mm .chg3 .n{display:none}
+.mm.s1 .chg1 .o,.mm.s2 .chg2 .o,.mm.s3 .chg3 .o{display:none}
+.mm.s1 .chg1 .n,.mm.s2 .chg2 .n,.mm.s3 .chg3 .n{display:inline;animation:pop .5s}
+.mm.s2 .chg2,.mm.s3 .chg3{background:#ffe4e6!important;border-color:#e11d48!important;color:#be123c!important}
+.mm .fill3{color:transparent}.mm.s3 .fill3{color:#b45309;transition:color .4s}
+.mm.s3 .fill3:nth-child(2){transition-delay:.15s}.mm.s3 .fill3:nth-child(3){transition-delay:.3s}.mm.s3 .fill3:nth-child(4){transition-delay:.45s}.mm.s3 .fill3:nth-child(5){transition-delay:.6s}
+.mm.s3 .free3 span,.mm.s2 .free2 span{background:repeating-linear-gradient(45deg,#f1f5f9 0 6px,#e2e8f0 6px 12px)!important;border-color:#94a3b8!important;border-style:dashed!important;color:#94a3b8!important}
+.mm.s3 .bad3{stroke:#e11d48!important;stroke-dasharray:7 6}
+.mm.s1 .gone1 span{text-decoration:line-through}
+
+/* java Q&A */
+.qcard{background:#fff;border:1px solid var(--line);border-left:6px solid var(--sa1);border-radius:14px;padding:10px 16px;font-size:19px;line-height:1.45;box-shadow:0 6px 18px -12px rgba(124,58,237,.35)}
+.acard{background:linear-gradient(180deg,#f3fcf8,#fff);border:1px solid #bbf7d0;border-radius:14px;padding:10px 16px;margin-bottom:10px}
+.acard p,.acard li{font-size:17.5px;line-height:1.45}
+.qlab{display:inline-block;font-size:13px;font-weight:800;letter-spacing:.06em;padding:2px 10px;border-radius:999px;background:#f3edff;color:#6d28d9;margin-right:8px;vertical-align:2px}
+.qlab.ok{background:#d1fae5;color:#047857;margin-bottom:4px}
+.part-tag{margin-left:auto;font-size:14px;font-weight:700;color:var(--muted);background:#fff;border:1px solid var(--line);padding:4px 12px;border-radius:999px;white-space:nowrap}
+ul.mini li{font-size:16.5px;margin:3px 0}
+.cap{font-size:15px;margin-top:6px}
+.qnote{font-size:16.5px;margin-top:10px}
+.qnote p{font-size:16.5px;line-height:1.45}
+.qnote p+p,.qnote p+ul,.qnote ul+p{margin-top:6px}
+table.io{font-size:16px;margin-bottom:10px}
+table.io td:first-child{color:var(--text);font-weight:400}
+.slide.qs .console{font-size:15px;line-height:1.45;margin-top:2px;white-space:pre-wrap;word-break:break-word}
+.slide.qs .hdr{margin-bottom:12px}
+.slide.qs h2{font-size:33px}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="deck"><section class="slide" id="title">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// Java 17+ · W03 · Questions &amp; Answers</div>
+    <h1 class="in">Java Common Classes<br><span class="grad">String · BigDecimal · Date-Time · Format</span></h1>
+    <p class="in muted" style="font-size:25px;margin-top:20px;max-width:900px">50 câu hỏi tình huống thực tế kèm đáp án. Mọi output là kết quả chạy thật trên JDK 21.</p>
+    <p class="in" style="margin-top:22px;font-size:18px"><code class="i">Locale vi = Locale.forLanguageTag("vi-VN");</code> &nbsp; <code class="i">ZoneId VN = ZoneId.of("Asia/Ho_Chi_Minh");</code></p>
+    <p class="in" style="margin-top:18px;font-size:18px;color:#8a91b4">Dùng phím ← → hoặc Space để chuyển · F: toàn màn hình · A: hiện hết slide</p>
+  </div>
+</section>
+
+<section class="slide" id="agenda">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:18px">· 4 phần · 50 câu</span></div>
+  <div class="cols4 in" style="grid-template-columns:repeat(4,1fr)"><div class="card ag" data-goto="partA" style="cursor:pointer"><div class="icon">🔤</div><h3>Phần A</h3><p style="font-size:18px"><b>String &amp; StringBuilder</b></p><p class="muted" style="font-size:16px;margin-top:6px">Câu 1 – 10</p></div><div class="card ag" data-goto="partB" style="cursor:pointer"><div class="icon">💰</div><h3>Phần B</h3><p style="font-size:18px"><b>BigDecimal</b></p><p class="muted" style="font-size:16px;margin-top:6px">Câu 11 – 15</p></div><div class="card ag" data-goto="partC" style="cursor:pointer"><div class="icon">🕒</div><h3>Phần C</h3><p style="font-size:18px"><b>LocalDateTime, Instant, ZonedDateTime, OffsetDateTime</b></p><p class="muted" style="font-size:16px;margin-top:6px">Câu 16 – 40</p></div><div class="card ag" data-goto="partD" style="cursor:pointer"><div class="icon">🧾</div><h3>Phần D</h3><p style="font-size:18px"><b>DateTimeFormatter, NumberFormat, DecimalFormat, Formatter, CompactNumberFormat</b></p><p class="muted" style="font-size:16px;margin-top:6px">Câu 41 – 50</p></div></div>
+</section>
+
+<section class="slide" id="partA">
+  <div class="hdr in"><span class="qn">PHẦN A</span><h2>🔤 String &amp; StringBuilder</h2></div>
+  <div class="agenda in" style="grid-template-columns:repeat(2,1fr);gap:8px;font-size:18px"><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q1"><b>01</b>isBlank: chặn username rỗng</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q2"><b>02</b>Chuẩn hóa họ tên</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q3"><b>03</b>Đếm chuỗi con với indexOf</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q4"><b>04</b>So sánh email: equals vs ==</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q5"><b>05</b>Che số điện thoại</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q6"><b>06</b>Lấy phần mở rộng file</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q7"><b>07</b>Chuỗi cấu hình → Map</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q8"><b>08</b>Kiểm tra palindrome</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q9"><b>09</b>StringBuilder vs +=</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q10"><b>10</b>Kiểm tra mật khẩu mạnh</div></div>
+</section>
+
+<section class="slide qs" id="q1">
+  <div class="hdr in"><span class="qn">CÂU 1</span><h2>isBlank: chặn username rỗng</h2><span class="part-tag">Phần A</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Form đăng ký cần chặn username không hợp lệ: <code class="i">null</code>, chuỗi rỗng <code class="i">""</code>, hoặc chỉ toàn khoảng trắng <code class="i">"   "</code>. Viết hàm <code class="i">isInvalid(String s)</code>.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
+    <div class="f"><script type="text/x-cpp" id="c1" data-mark="" style="font-size:16.5px">
+static boolean isInvalid(String s) {
+    return s == null || s.isBlank();
+}
+</script></div>
+    <div><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Dùng <code class="i">isBlank()</code> (Java 11+) – trả <code class="i">true</code> cho chuỗi rỗng hoặc chỉ chứa whitespace. Phải kiểm tra <code class="i">null</code> trước vì gọi method trên <code class="i">null</code> sẽ ném <code class="i">NullPointerException</code>.</p></div><div class="f"><table class="tt io"><tr><th>Input</th><th>Output</th></tr><tr><td><code class="i">null</code></td><td><code class="i">true</code></td></tr><tr><td><code class="i">""</code></td><td><code class="i">true</code></td></tr><tr><td><code class="i">"   "</code></td><td><code class="i">true</code></td></tr><tr><td><code class="i">" an "</code></td><td><code class="i">false</code></td></tr></table></div><div class="note f qnote"><p>Lưu ý: <code class="i">isEmpty()</code> chỉ kiểm tra độ dài = 0, nên <code class="i">"   ".isEmpty()</code> là <code class="i">false</code>.</p></div></div>
+  </div></div>
+  
+</section>
+
+<section class="slide qs" id="q2">
+  <div class="hdr in"><span class="qn">CÂU 2</span><h2>Chuẩn hóa họ tên</h2><span class="part-tag">Phần A</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Người dùng nhập họ tên lộn xộn <code class="i">"  nguyễn   văn   an  "</code>. Hãy chuẩn hóa thành <code class="i">"Nguyễn Văn An"</code> (bỏ khoảng trắng thừa, viết hoa chữ cái đầu mỗi từ).</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">strip()</code> bỏ khoảng trắng hai đầu (hỗ trợ Unicode tốt hơn <code class="i">trim()</code>), <code class="i">split("\\s+")</code> tách theo một hoặc nhiều khoảng trắng, sau đó <code class="i">substring</code> + <code class="i">toUpperCase/toLowerCase</code> cho từng từ, cuối cùng ghép lại bằng <code class="i">String.join</code>.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c2" data-mark="" style="font-size:16.5px">
+String input = "  nguyễn   văn   an  ";
+String[] words = input.strip().split("\\s+");
+for (int i = 0; i < words.length; i++) {
+    String w = words[i];
+    words[i] = w.substring(0, 1).toUpperCase() + w.substring(1).toLowerCase();
+}
+String result = String.join(" ", words);
+System.out.println(result);
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console f" data-act="#c2|show-a;#c2|show-b;#c2|show-c;#c2|show-d">Nguyễn Văn An</div></div><div><div class="note f qnote"><ul class="mini"><li>Input: <code class="i">"  nguyễn   văn   an  "</code></li></ul></div></div></div></div>
+  
+</section>
+
+<section class="slide qs" id="q3">
+  <div class="hdr in"><span class="qn">CÂU 3</span><h2>Đếm chuỗi con với indexOf</h2><span class="part-tag">Phần A</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Đếm số lần chuỗi con <code class="i">"an"</code> xuất hiện (không chồng lấn) trong <code class="i">"banana an"</code>.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
+    <div class="f"><script type="text/x-cpp" id="c3" data-mark="" style="font-size:16.5px">
+String text = "banana an", sub = "an";
+int count = 0, idx = 0;
+while ((idx = text.indexOf(sub, idx)) != -1) {
+    count++;
+    idx += sub.length();
+}
+System.out.println(count);
+</script></div>
+    <div><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Dùng <code class="i">indexOf(str, fromIndex)</code> trong vòng lặp; mỗi lần tìm thấy thì nhảy qua độ dài chuỗi con.</p></div><div class="console f" data-act="#c3|show-a;#c3|show-b;#c3|show-c;#c3|show-d">3</div><p class="muted cap">(vị trí 1, 3, 7)</p><div class="note f qnote"><ul class="mini"><li>Input: <code class="i">text = "banana an"</code>, <code class="i">sub = "an"</code></li></ul></div></div>
+  </div></div>
+  
+</section>
+
+<section class="slide qs" id="q4">
+  <div class="hdr in"><span class="qn">CÂU 4</span><h2>So sánh email: equals vs ==</h2><span class="part-tag">Phần A</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Email người dùng nhập là <code class="i">"An@GlobeDr.com"</code>, email trong database là <code class="i">"an@globedr.com"</code>. Viết điều kiện kiểm tra hai email này trùng nhau. Vì sao không nên dùng <code class="i">==</code>?</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Dùng <code class="i">equalsIgnoreCase()</code> để so sánh nội dung không phân biệt hoa thường. Toán tử <code class="i">==</code> so sánh <b>tham chiếu</b> (hai biến có trỏ cùng một object không), không so sánh nội dung; chuỗi đọc từ input/DB là object khác nhau nên <code class="i">==</code> thường cho <code class="i">false</code> dù nội dung giống hệt.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c4" data-mark="4:a;5:b;6:c" style="font-size:16.5px">
+String input = "An@GlobeDr.com";
+String fromDb = new String("an@globedr.com");
+
+System.out.println(input.strip().equalsIgnoreCase(fromDb));   // true
+System.out.println("an@globedr.com" == fromDb);              // false (khác object)
+System.out.println("an@globedr.com".equals(fromDb));         // true  (cùng nội dung)
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c4l0">true</span><span class="cl" id="c4l1">false</span><span class="cl" id="c4l2">true</span></div></div><div></div></div></div>
+  <span class="f ghost" data-act="#c4l0|show;#c4|show-a"></span><span class="f ghost" data-act="#c4l1|show;#c4|show-b"></span><span class="f ghost" data-act="#c4l2|show;#c4|show-c"></span>
+</section>
+
+<section class="slide qs" id="q5">
+  <div class="hdr in"><span class="qn">CÂU 5</span><h2>Che số điện thoại</h2><span class="part-tag">Phần A</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Khi hiển thị số điện thoại <code class="i">"0912345678"</code> trên màn hình, chỉ giữ 4 số cuối, phần còn lại thay bằng <code class="i"><i></code> → <code class="i">"<b></i></b>*5678"</code>.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Cách 1 dùng <code class="i">repeat()</code> + <code class="i">substring()</code>; cách 2 dùng <code class="i">replaceAll</code> với regex lookahead.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c5" data-mark="4:a;7:b" style="font-size:16.5px">
+String phone = "0912345678";
+int keep = 4;
+String masked = "*".repeat(phone.length() - keep) + phone.substring(phone.length() - keep);
+System.out.println(masked);                                   // ******5678
+
+// Cách 2: thay mọi chữ số mà phía sau nó còn ít nhất 4 chữ số
+System.out.println(phone.replaceAll("\\d(?=\\d{4})", "*"));  // ******5678
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c5l0">******5678</span><span class="cl" id="c5l1">******5678</span></div></div><div></div></div></div>
+  <span class="f ghost" data-act="#c5l0|show;#c5|show-a"></span><span class="f ghost" data-act="#c5l1|show;#c5|show-b"></span>
+</section>
+
+<section class="slide qs" id="q6">
+  <div class="hdr in"><span class="qn">CÂU 6</span><h2>Lấy phần mở rộng file</h2><span class="part-tag">Phần A</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Lấy phần mở rộng (viết thường) của tên file <code class="i">"report.final.PDF"</code>. Nếu tên file không có dấu chấm thì trả về <code class="i">""</code>.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
+    <div class="f"><script type="text/x-cpp" id="c6" data-mark="" style="font-size:12.6px">
+static String ext(String fileName) {
+    int dot = fileName.lastIndexOf('.');
+    return (dot == -1) ? "" : fileName.substring(dot + 1).toLowerCase();
+}
+</script></div>
+    <div><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Dùng <code class="i">lastIndexOf('.')</code> (vì tên file có thể chứa nhiều dấu chấm), sau đó <code class="i">substring</code> và <code class="i">toLowerCase</code>.</p></div><div class="f"><table class="tt io"><tr><th>Input</th><th>Output</th></tr><tr><td><code class="i">"report.final.PDF"</code></td><td><code class="i">"pdf"</code></td></tr><tr><td><code class="i">"README"</code></td><td><code class="i">""</code></td></tr></table></div></div>
+  </div></div>
+  
+</section>
+
+<section class="slide qs" id="q7">
+  <div class="hdr in"><span class="qn">CÂU 7</span><h2>Chuỗi cấu hình → Map</h2><span class="part-tag">Phần A</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Chuyển chuỗi cấu hình <code class="i">"host=localhost;port=8080;db=globedr"</code> thành <code class="i">Map&lt;String, String&gt;</code>.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
+    <div class="f"><script type="text/x-cpp" id="c7" data-mark="" style="font-size:13.6px">
+String config = "host=localhost;port=8080;db=globedr";
+Map<String, String> map = new LinkedHashMap<>();
+for (String pair : config.split(";")) {
+    String[] kv = pair.split("=", 2);
+    map.put(kv[0].strip(), kv.length > 1 ? kv[1].strip() : "");
+}
+System.out.println(map);
+</script></div>
+    <div><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">split(";")</code> tách từng cặp, rồi <code class="i">split("=", 2)</code> tách key/value (tham số <code class="i">2</code> giữ nguyên dấu <code class="i">=</code> nếu value có chứa <code class="i">=</code>).</p></div><div class="console f" data-act="#c7|show-a;#c7|show-b;#c7|show-c;#c7|show-d">{host=localhost, port=8080, db=globedr}</div></div>
+  </div></div>
+  
+</section>
+
+<section class="slide qs" id="q8">
+  <div class="hdr in"><span class="qn">CÂU 8</span><h2>Kiểm tra palindrome</h2><span class="part-tag">Phần A</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Kiểm tra câu <code class="i">"A man, a plan, a canal: Panama"</code> có phải palindrome không, bỏ qua dấu câu, khoảng trắng và hoa/thường.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Dùng <code class="i">replaceAll</code> để loại ký tự không phải chữ/số, <code class="i">toLowerCase()</code>, rồi đảo chuỗi bằng <code class="i">StringBuilder.reverse()</code> (String không có hàm reverse).</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c8" data-mark="" style="font-size:16.5px">
+String s = "A man, a plan, a canal: Panama";
+String clean = s.replaceAll("[^A-Za-z0-9]", "").toLowerCase();   // "amanaplanacanalpanama"
+boolean isPalindrome = clean.equals(new StringBuilder(clean).reverse().toString());
+System.out.println(isPalindrome);
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console f" data-act="#c8|show-a;#c8|show-b;#c8|show-c;#c8|show-d">true</div></div><div></div></div></div>
+  
+</section>
+
+<section class="slide qs" id="q9">
+  <div class="hdr in"><span class="qn">CÂU 9</span><h2>StringBuilder vs +=</h2><span class="part-tag">Phần A</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Cần tạo chuỗi <code class="i">"1,2,3,4,5,6,7,8,9,10"</code> bằng vòng lặp. Viết code dùng <code class="i">StringBuilder</code> và giải thích vì sao không nên dùng <code class="i">s += i</code> trong vòng lặp lớn.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
+    <div class="f"><script type="text/x-cpp" id="c9" data-mark="" style="font-size:16.5px">
+StringBuilder sb = new StringBuilder();
+for (int i = 1; i <= 10; i++) {
+    sb.append(i).append(',');
+}
+sb.setLength(sb.length() - 1);   // xóa dấu ',' cuối
+System.out.println(sb.toString());
+</script></div>
+    <div><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">String</code> là <b>immutable</b> – mỗi lần <code class="i">+=</code> tạo một object String mới và copy toàn bộ nội dung cũ → độ phức tạp O(n²) với vòng lặp lớn. <code class="i">StringBuilder</code> thay đổi trên cùng một buffer nên hiệu quả hơn. Dấu phẩy thừa cuối cùng được xóa bằng <code class="i">setLength()</code>.</p></div><div class="console f" data-act="#c9|show-a;#c9|show-b;#c9|show-c;#c9|show-d">1,2,3,4,5,6,7,8,9,10</div><div class="note f qnote"><p>(Cách gọn hơn: <code class="i">IntStream.rangeClosed(1, 10).mapToObj(String::valueOf).collect(Collectors.joining(","))</code>.)</p></div></div>
+  </div></div>
+  
+</section>
+
+<section class="slide qs" id="q10">
+  <div class="hdr in"><span class="qn">CÂU 10</span><h2>Kiểm tra mật khẩu mạnh</h2><span class="part-tag">Phần A</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Mật khẩu hợp lệ khi: dài ít nhất 8 ký tự, có ít nhất 1 chữ hoa và 1 chữ số. Kiểm tra <code class="i">"Globedr2026"</code> và <code class="i">"globedr"</code>.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Dùng <code class="i">length()</code> và <code class="i">chars()</code> (trả <code class="i">IntStream</code> các ký tự) kết hợp <code class="i">anyMatch</code>.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c10" data-mark="6:a;7:b" style="font-size:16.5px">
+static boolean isStrong(String pw) {
+    return pw.length() >= 8
+        && pw.chars().anyMatch(Character::isUpperCase)
+        && pw.chars().anyMatch(Character::isDigit);
+}
+System.out.println(isStrong("Globedr2026"));  // true
+System.out.println(isStrong("globedr"));      // false (ngắn, không có chữ hoa và số)
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c10l0">true</span><span class="cl" id="c10l1">false</span></div></div><div></div></div></div>
+  <span class="f ghost" data-act="#c10l0|show;#c10|show-a"></span><span class="f ghost" data-act="#c10l1|show;#c10|show-b"></span>
+</section>
+
+<section class="slide" id="partB">
+  <div class="hdr in"><span class="qn">PHẦN B</span><h2>💰 BigDecimal</h2></div>
+  <div class="agenda in" style="grid-template-columns:repeat(2,1fr);gap:8px;font-size:18px"><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q11"><b>11</b>0.1 + 0.2 với BigDecimal</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q12"><b>12</b>Tính VAT, làm tròn HALF_UP</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q13"><b>13</b>Chia đều hóa đơn</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q14"><b>14</b>equals vs compareTo</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q15"><b>15</b>toPlainString()</div></div>
+</section>
+
+<section class="slide qs" id="q11">
+  <div class="hdr in"><span class="qn">CÂU 11</span><h2>0.1 + 0.2 với BigDecimal</h2><span class="part-tag">Phần B</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span><code class="i">System.out.println(0.1 + 0.2)</code> in ra <code class="i">0.30000000000000004</code>. Hãy tính đúng <code class="i">0.1 + 0.2 = 0.3</code> cho bài toán tiền tệ. Vì sao <code class="i">new BigDecimal(0.1)</code> vẫn sai?</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
+    <div class="f"><script type="text/x-cpp" id="c11" data-mark="3:a;4:b;5:c" style="font-size:15px">
+BigDecimal a = new BigDecimal("0.1");
+BigDecimal b = new BigDecimal("0.2");
+System.out.println(a.add(b));               // 0.3
+System.out.println(BigDecimal.valueOf(0.1)); // 0.1
+System.out.println(new BigDecimal(0.1));
+// 0.1000000000000000055511151231257827021181583404541015625
+</script></div>
+    <div><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">double</code> lưu nhị phân nên không biểu diễn chính xác 0.1. Tạo <code class="i">BigDecimal</code> từ <b>String</b> (hoặc <code class="i">BigDecimal.valueOf(double)</code>), không dùng constructor <code class="i">BigDecimal(double)</code> vì nó copy nguyên giá trị nhị phân sai lệch.</p></div><div class="console"><span class="cl" id="c11l0">0.3</span><span class="cl" id="c11l1">0.1</span><span class="cl" id="c11l2">0.1000000000000000055511151231257827021181583404541015625</span></div></div>
+  </div></div>
+  <span class="f ghost" data-act="#c11l0|show;#c11|show-a"></span><span class="f ghost" data-act="#c11l1|show;#c11|show-b"></span><span class="f ghost" data-act="#c11l2|show;#c11|show-c"></span>
+</section>
+
+<section class="slide qs" id="q12">
+  <div class="hdr in"><span class="qn">CÂU 12</span><h2>Tính VAT, làm tròn HALF_UP</h2><span class="part-tag">Phần B</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Giá sản phẩm <code class="i">199999.99</code>, thuế VAT 10%. Tính tiền thuế, làm tròn 2 chữ số thập phân theo kiểu thông thường (≥ 5 thì làm tròn lên).</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">multiply()</code> rồi <code class="i">setScale(2, RoundingMode.HALF_UP)</code>.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c12" data-mark="" style="font-size:16.5px">
+BigDecimal price = new BigDecimal("199999.99");
+BigDecimal vatRate = new BigDecimal("0.10");
+BigDecimal vat = price.multiply(vatRate).setScale(2, RoundingMode.HALF_UP);
+System.out.println(vat);
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console f" data-act="#c12|show-a;#c12|show-b;#c12|show-c;#c12|show-d">20000.00</div></div><div><div class="note f qnote"><ul class="mini"><li>Giá trị chưa làm tròn: <code class="i">19999.9990</code></li></ul></div></div></div></div>
+  
+</section>
+
+<section class="slide qs" id="q13">
+  <div class="hdr in"><span class="qn">CÂU 13</span><h2>Chia đều hóa đơn</h2><span class="part-tag">Phần B</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Chia đều hóa đơn <code class="i">100.00</code> cho 3 người. Gọi <code class="i">divide()</code> không tham số thì bị lỗi gì? Hãy chia sao cho tổng 3 phần vẫn đúng bằng 100.00.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">new BigDecimal("100").divide(new BigDecimal("3"))</code> ném <code class="i">ArithmeticException: Non-terminating decimal expansion</code> vì 33.333… vô hạn. Phải chỉ định scale và <code class="i">RoundingMode</code>. Phần dư dồn cho người cuối dùng <code class="i">subtract()</code>.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c13" data-mark="" style="font-size:16.5px">
+BigDecimal total = new BigDecimal("100.00");
+BigDecimal n = BigDecimal.valueOf(3);
+
+BigDecimal each = total.divide(n, 2, RoundingMode.HALF_UP);              // 33.33
+BigDecimal last = total.subtract(each.multiply(BigDecimal.valueOf(2)));  // 33.34
+System.out.println(each + " + " + each + " + " + last);
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console f" data-act="#c13|show-a;#c13|show-b;#c13|show-c;#c13|show-d">33.33 + 33.33 + 33.34</div></div><div></div></div></div>
+  
+</section>
+
+<section class="slide qs" id="q14">
+  <div class="hdr in"><span class="qn">CÂU 14</span><h2>equals vs compareTo</h2><span class="part-tag">Phần B</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span><code class="i">new BigDecimal("2.0").equals(new BigDecimal("2.00"))</code> trả về gì? Khi so sánh hai số tiền, nên dùng hàm nào? Điều này ảnh hưởng thế nào khi đưa BigDecimal vào <code class="i">HashSet</code>?</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
+    <div class="f"><script type="text/x-cpp" id="c14" data-mark="2:a;3:b;5:c;6:d" style="font-size:13.6px">
+BigDecimal x = new BigDecimal("2.0"), y = new BigDecimal("2.00");
+System.out.println(x.equals(y));          // false
+System.out.println(x.compareTo(y) == 0);  // true
+
+System.out.println(new HashSet<>(List.of(x)).contains(y)); // false
+System.out.println(new TreeSet<>(List.of(x)).contains(y)); // true
+</script></div>
+    <div><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">equals()</code> so sánh cả <b>giá trị và scale</b> → <code class="i">2.0</code> (scale 1) khác <code class="i">2.00</code> (scale 2) → <code class="i">false</code>. So sánh giá trị dùng <code class="i">compareTo() == 0</code>. <code class="i">HashSet</code> dùng <code class="i">equals/hashCode</code> nên coi hai số là khác nhau; <code class="i">TreeSet</code> dùng <code class="i">compareTo</code> nên coi là trùng.</p></div><div class="console"><span class="cl" id="c14l0">false</span><span class="cl" id="c14l1">true</span><span class="cl" id="c14l2">false</span><span class="cl" id="c14l3">true</span></div><div class="note f qnote"><p>Giải pháp nếu bắt buộc dùng HashSet: chuẩn hóa trước bằng <code class="i">stripTrailingZeros()</code> hoặc <code class="i">setScale(2)</code>.</p></div></div>
+  </div></div>
+  <span class="f ghost" data-act="#c14l0|show;#c14|show-a"></span><span class="f ghost" data-act="#c14l1|show;#c14|show-b"></span><span class="f ghost" data-act="#c14l2|show;#c14|show-c"></span><span class="f ghost" data-act="#c14l3|show;#c14|show-d"></span>
+</section>
+
+<section class="slide qs" id="q15">
+  <div class="hdr in"><span class="qn">CÂU 15</span><h2>toPlainString()</h2><span class="part-tag">Phần B</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Sau khi gọi <code class="i">stripTrailingZeros()</code> cho <code class="i">100.00</code>, in ra lại thành <code class="i">1E+2</code> khiến hóa đơn hiển thị sai. Làm sao in ra <code class="i">100</code>?</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
+    <div class="f"><script type="text/x-cpp" id="c15" data-mark="2:a;3:b;5:c" style="font-size:13.6px">
+BigDecimal v = new BigDecimal("100.00").stripTrailingZeros();
+System.out.println(v);                 // 1E+2
+System.out.println(v.toPlainString()); // 100
+
+System.out.println(new BigDecimal("1E+3").toPlainString()); // 1000
+</script></div>
+    <div><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">toString()</code> có thể dùng ký pháp khoa học khi scale âm. Dùng <code class="i">toPlainString()</code> để luôn in dạng thường.</p></div><div class="console"><span class="cl" id="c15l0">1E+2</span><span class="cl" id="c15l1">100</span><span class="cl" id="c15l2">1000</span></div></div>
+  </div></div>
+  <span class="f ghost" data-act="#c15l0|show;#c15|show-a"></span><span class="f ghost" data-act="#c15l1|show;#c15|show-b"></span><span class="f ghost" data-act="#c15l2|show;#c15|show-c"></span>
+</section>
+
+<section class="slide" id="partC">
+  <div class="hdr in"><span class="qn">PHẦN C</span><h2>🕒 LocalDateTime, Instant, ZonedDateTime, OffsetDateTime</h2></div>
+  <div class="agenda in" style="grid-template-columns:repeat(3,1fr);gap:8px;font-size:15px"><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q16"><b>16</b>plusMinutes: giờ kết thúc</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q17"><b>17</b>parse &amp; getDayOfWeek</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q18"><b>18</b>Đếm ngày đến Giáng sinh</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q19"><b>19</b>TemporalAdjusters: cuối tháng</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q20"><b>20</b>next vs nextOrSame</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q21"><b>21</b>plusMonths &amp; ngày 31</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q22"><b>22</b>Kiểm tra trùng lịch họp</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q23"><b>23</b>truncatedTo: nhóm theo giờ</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q24"><b>24</b>Duration: giờ làm việc</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q25"><b>25</b>Đo thời gian thực thi</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q26"><b>26</b>Epoch millis → Instant</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q27"><b>27</b>UTC → giờ Việt Nam</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q28"><b>28</b>LocalDateTime → Instant</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q29"><b>29</b>Token hết hạn: Instant.plus</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q30"><b>30</b>JWT exp: epoch second</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q31"><b>31</b>Quy đổi giờ sang New York</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q32"><b>32</b>withZoneSameLocal vs SameInstant</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q33"><b>33</b>DST gap: 02:30 không tồn tại</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q34"><b>34</b>DST overlap: 01:30 hai lần</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q35"><b>35</b>plusDays vs plusHours</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q36"><b>36</b>Khoảng “hôm nay” theo giờ VN</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q37"><b>37</b>ZoneRules: offset &amp; DST</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q38"><b>38</b>OffsetDateTime → UTC</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q39"><b>39</b>equals vs isEqual</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q40"><b>40</b>Sắp xếp sự kiện &amp; java.util.Date</div></div>
+</section>
+
+<section class="slide qs" id="q16">
+  <div class="hdr in"><span class="qn">CÂU 16</span><h2>plusMinutes: giờ kết thúc</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Cuộc họp bắt đầu lúc <code class="i">2026-10-12 08:30</code>, kéo dài 90 phút. Tính giờ kết thúc.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
+    <div class="f"><script type="text/x-cpp" id="c16" data-mark="" style="font-size:15px">
+LocalDateTime start = LocalDateTime.of(2026, 10, 12, 8, 30);
+LocalDateTime end = start.plusMinutes(90);
+System.out.println(end);
+</script></div>
+    <div><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Tạo bằng <code class="i">LocalDateTime.of(...)</code>, cộng bằng <code class="i">plusMinutes()</code>. LocalDateTime là immutable → phải gán kết quả.</p></div><div class="console f" data-act="#c16|show-a;#c16|show-b;#c16|show-c;#c16|show-d">2026-10-12T10:00</div></div>
+  </div></div>
+  
+</section>
+
+<section class="slide qs" id="q17">
+  <div class="hdr in"><span class="qn">CÂU 17</span><h2>parse &amp; getDayOfWeek</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Hệ thống nhận chuỗi <code class="i">"2026-10-12T08:30:00"</code>. Hãy cho biết ngày đó là thứ mấy và có phải cuối tuần không.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
+    <div class="f"><script type="text/x-cpp" id="c17" data-mark="" style="font-size:12.6px">
+LocalDateTime dt = LocalDateTime.parse("2026-10-12T08:30:00");
+DayOfWeek dow = dt.getDayOfWeek();
+boolean weekend = dow == DayOfWeek.SATURDAY || dow == DayOfWeek.SUNDAY;
+System.out.println(dow + " - weekend: " + weekend);
+</script></div>
+    <div><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">LocalDateTime.parse()</code> đọc chuỗi ISO-8601, <code class="i">getDayOfWeek()</code> trả enum <code class="i">DayOfWeek</code>.</p></div><div class="console f" data-act="#c17|show-a;#c17|show-b;#c17|show-c;#c17|show-d">MONDAY - weekend: false</div></div>
+  </div></div>
+  
+</section>
+
+<section class="slide qs" id="q18">
+  <div class="hdr in"><span class="qn">CÂU 18</span><h2>Đếm ngày đến Giáng sinh</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Hôm nay là <code class="i">2026-10-12 08:30</code>. Còn bao nhiêu ngày nữa đến Giáng sinh <code class="i">2026-12-25</code>?</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
+    <div class="f"><script type="text/x-cpp" id="c18" data-mark="" style="font-size:15px">
+LocalDateTime now = LocalDateTime.of(2026, 10, 12, 8, 30);
+LocalDate xmas = LocalDate.of(2026, 12, 25);
+long days = ChronoUnit.DAYS.between(now.toLocalDate(), xmas);
+System.out.println(days);
+</script></div>
+    <div><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Lấy phần ngày bằng <code class="i">toLocalDate()</code> rồi dùng <code class="i">ChronoUnit.DAYS.between()</code>.</p></div><div class="console f" data-act="#c18|show-a;#c18|show-b;#c18|show-c;#c18|show-d">74</div><div class="note f qnote"><p>Lưu ý: nếu dùng <code class="i">ChronoUnit.DAYS.between(now, xmas.atStartOfDay())</code> thì chỉ tính các ngày <b>trọn vẹn</b> 24h → <code class="i">73</code>.</p></div></div>
+  </div></div>
+  
+</section>
+
+<section class="slide qs" id="q19">
+  <div class="hdr in"><span class="qn">CÂU 19</span><h2>TemporalAdjusters: cuối tháng</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Ngày lập hóa đơn là <code class="i">2026-02-10 09:00</code>. Tính hạn thanh toán là ngày cuối cùng của tháng đó và ngày đầu của tháng kế tiếp.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">with(TemporalAdjusters.lastDayOfMonth())</code> và <code class="i">with(TemporalAdjusters.firstDayOfNextMonth())</code>.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c19" data-mark="2:a;3:b" style="font-size:16.5px">
+LocalDateTime invoice = LocalDateTime.of(2026, 2, 10, 9, 0);
+System.out.println(invoice.with(TemporalAdjusters.lastDayOfMonth()));      // 2026-02-28T09:00
+System.out.println(invoice.with(TemporalAdjusters.firstDayOfNextMonth())); // 2026-03-01T09:00
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c19l0">2026-02-28T09:00</span><span class="cl" id="c19l1">2026-03-01T09:00</span></div></div><div></div></div></div>
+  <span class="f ghost" data-act="#c19l0|show;#c19|show-a"></span><span class="f ghost" data-act="#c19l1|show;#c19|show-b"></span>
+</section>
+
+<section class="slide qs" id="q20">
+  <div class="hdr in"><span class="qn">CÂU 20</span><h2>next vs nextOrSame</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Lịch họp team cố định vào thứ Hai. Hôm nay <code class="i">2026-10-12</code> (đúng thứ Hai). Tìm "thứ Hai kế tiếp" trong hai trường hợp: (a) không tính hôm nay, (b) tính cả hôm nay.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">TemporalAdjusters.next()</code> luôn nhảy sang tuần sau; <code class="i">nextOrSame()</code> giữ nguyên nếu hôm nay đã đúng thứ.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c20" data-mark="2:a;3:b" style="font-size:16.5px">
+LocalDateTime today = LocalDateTime.of(2026, 10, 12, 8, 0);
+System.out.println(today.with(TemporalAdjusters.next(DayOfWeek.MONDAY)));       // 2026-10-19T08:00
+System.out.println(today.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY))); // 2026-10-12T08:00
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c20l0">2026-10-19T08:00</span><span class="cl" id="c20l1">2026-10-12T08:00</span></div></div><div></div></div></div>
+  <span class="f ghost" data-act="#c20l0|show;#c20|show-a"></span><span class="f ghost" data-act="#c20l1|show;#c20|show-b"></span>
+</section>
+
+<section class="slide qs" id="q21">
+  <div class="hdr in"><span class="qn">CÂU 21</span><h2>plusMonths &amp; ngày 31</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Gói thuê bao bắt đầu <code class="i">2026-01-31</code>, gia hạn hàng tháng. Tính ngày gia hạn lần 1 và lần 2. Vì sao gọi <code class="i">plusMonths(1)</code> hai lần liên tiếp cho kết quả khác <code class="i">plusMonths(2)</code> từ ngày gốc?</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">plusMonths()</code> tự <b>kẹp</b> về ngày hợp lệ cuối tháng (31/02 không tồn tại → 28/02). Khi cộng tiếp từ 28/02 thì ra 28/03, mất thông tin "ngày 31". Nên luôn tính từ ngày gốc: <code class="i">start.plusMonths(k)</code>.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c21" data-mark="2:a;3:b;4:c" style="font-size:16.5px">
+LocalDateTime start = LocalDateTime.of(2026, 1, 31, 0, 0);
+System.out.println(start.plusMonths(1));               // 2026-02-28T00:00
+System.out.println(start.plusMonths(1).plusMonths(1)); // 2026-03-28T00:00  (sai ý đồ)
+System.out.println(start.plusMonths(2));               // 2026-03-31T00:00  (đúng)
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c21l0">2026-02-28T00:00</span><span class="cl" id="c21l1">2026-03-28T00:00</span><span class="cl" id="c21l2">2026-03-31T00:00</span></div></div><div></div></div></div>
+  <span class="f ghost" data-act="#c21l0|show;#c21|show-a"></span><span class="f ghost" data-act="#c21l1|show;#c21|show-b"></span><span class="f ghost" data-act="#c21l2|show;#c21|show-c"></span>
+</section>
+
+<section class="slide qs" id="q22">
+  <div class="hdr in"><span class="qn">CÂU 22</span><h2>Kiểm tra trùng lịch họp</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Phòng họp đã có lịch <code class="i">09:00–10:30</code> ngày 2026-10-12. Một yêu cầu mới <code class="i">10:00–11:00</code> cùng ngày. Viết hàm kiểm tra hai khoảng thời gian có bị trùng không.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Hai khoảng <code class="i">[s1, e1)</code> và <code class="i">[s2, e2)</code> giao nhau khi <code class="i">s1 &lt; e2 &amp;&amp; s2 &lt; e1</code>, dùng <code class="i">isBefore()</code>.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c22" data-mark="5:a;6:b" style="font-size:15px">
+static boolean overlaps(LocalDateTime s1, LocalDateTime e1, LocalDateTime s2, LocalDateTime e2) {
+    return s1.isBefore(e2) && s2.isBefore(e1);
+}
+LocalDate d = LocalDate.of(2026, 10, 12);
+System.out.println(overlaps(d.atTime(9, 0), d.atTime(10, 30), d.atTime(10, 0), d.atTime(11, 0)));  // true
+System.out.println(overlaps(d.atTime(9, 0), d.atTime(10, 30), d.atTime(10, 30), d.atTime(11, 0))); // false (nối tiếp)
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c22l0">true</span><span class="cl" id="c22l1">false</span></div></div><div></div></div></div>
+  <span class="f ghost" data-act="#c22l0|show;#c22|show-a"></span><span class="f ghost" data-act="#c22l1|show;#c22|show-b"></span>
+</section>
+
+<section class="slide qs" id="q23">
+  <div class="hdr in"><span class="qn">CÂU 23</span><h2>truncatedTo: nhóm theo giờ</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Cần thống kê số request theo từng giờ. Log có thời điểm <code class="i">2026-10-12T08:47:33.123</code>. Hãy đưa về mốc đầu giờ để làm key nhóm.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">truncatedTo(ChronoUnit.HOURS)</code> cắt bỏ phút, giây, nano.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c23" data-mark="" style="font-size:16.5px">
+LocalDateTime t = LocalDateTime.of(2026, 10, 12, 8, 47, 33, 123_000_000);
+System.out.println(t.truncatedTo(ChronoUnit.HOURS));
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console f" data-act="#c23|show-a;#c23|show-b;#c23|show-c;#c23|show-d">2026-10-12T08:00</div></div><div><div class="note f qnote"><ul class="mini"><li>Input: <code class="i">2026-10-12T08:47:33.123</code></li></ul></div></div></div></div>
+  
+</section>
+
+<section class="slide qs" id="q24">
+  <div class="hdr in"><span class="qn">CÂU 24</span><h2>Duration: giờ làm việc</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Nhân viên check-in <code class="i">08:15</code> và check-out <code class="i">17:40</code> ngày 2026-10-12. Hiển thị thời gian làm việc dạng <code class="i">"9 giờ 25 phút"</code>.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">Duration.between()</code> rồi <code class="i">toHours()</code> và <code class="i">toMinutesPart()</code> (Java 9+).</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c24" data-mark="4:a;5:b" style="font-size:16.5px">
+LocalDateTime in  = LocalDateTime.of(2026, 10, 12, 8, 15);
+LocalDateTime out = LocalDateTime.of(2026, 10, 12, 17, 40);
+Duration d = Duration.between(in, out);
+System.out.println(d);                                                   // PT9H25M
+System.out.println(d.toHours() + " giờ " + d.toMinutesPart() + " phút"); // 9 giờ 25 phút
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c24l0">PT9H25M</span><span class="cl" id="c24l1">9 giờ 25 phút</span></div></div><div></div></div></div>
+  <span class="f ghost" data-act="#c24l0|show;#c24|show-a"></span><span class="f ghost" data-act="#c24l1|show;#c24|show-b"></span>
+</section>
+
+<section class="slide qs" id="q25">
+  <div class="hdr in"><span class="qn">CÂU 25</span><h2>Đo thời gian thực thi</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Đo thời gian thực thi của một đoạn code (đơn vị mili giây) bằng Date-Time API.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
+    <div class="f"><script type="text/x-cpp" id="c25" data-mark="" style="font-size:13.6px">
+Instant start = Instant.now();
+Thread.sleep(200);                         // giả lập công việc
+Instant end = Instant.now();
+System.out.println(Duration.between(start, end).toMillis() + " ms");
+</script></div>
+    <div><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">Instant.now()</code> trước và sau, <code class="i">Duration.between(...).toMillis()</code>. (Với benchmark chính xác cao nên dùng <code class="i">System.nanoTime()</code>.)</p></div><div class="console f" data-act="#c25|show-a;#c25|show-b;#c25|show-c;#c25|show-d">200 ms</div><p class="muted cap">(giá trị thay đổi mỗi lần chạy)</p></div>
+  </div></div>
+  
+</section>
+
+<section class="slide qs" id="q26">
+  <div class="hdr in"><span class="qn">CÂU 26</span><h2>Epoch millis → Instant</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>API trả về timestamp dạng epoch millis <code class="i">1760000000000</code>. Chuyển sang <code class="i">Instant</code> (UTC) và giờ Việt Nam.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">Instant.ofEpochMilli()</code> rồi <code class="i">atZone(ZoneId)</code>.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c26" data-mark="2:a;3:b" style="font-size:15px">
+Instant ins = Instant.ofEpochMilli(1760000000000L);
+System.out.println(ins);                                     // 2025-10-09T08:53:20Z
+System.out.println(ins.atZone(ZoneId.of("Asia/Ho_Chi_Minh"))); // 2025-10-09T15:53:20+07:00[Asia/Ho_Chi_Minh]
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c26l0">2025-10-09T08:53:20Z</span><span class="cl" id="c26l1">2025-10-09T15:53:20+07:00[Asia/Ho_Chi_Minh]</span></div></div><div></div></div></div>
+  <span class="f ghost" data-act="#c26l0|show;#c26|show-a"></span><span class="f ghost" data-act="#c26l1|show;#c26|show-b"></span>
+</section>
+
+<section class="slide qs" id="q27">
+  <div class="hdr in"><span class="qn">CÂU 27</span><h2>UTC → giờ Việt Nam</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Server lưu log bằng UTC: <code class="i">"2026-10-12T01:30:00Z"</code>. Hiển thị cho người dùng Việt Nam thời điểm này theo giờ địa phương (chỉ cần ngày giờ, không cần múi giờ).</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">Instant.parse()</code> → <code class="i">atZone(VN)</code> → <code class="i">toLocalDateTime()</code>.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c27" data-mark="3:a;4:b" style="font-size:16.5px">
+Instant ins = Instant.parse("2026-10-12T01:30:00Z");
+ZonedDateTime vnTime = ins.atZone(ZoneId.of("Asia/Ho_Chi_Minh"));
+System.out.println(vnTime);                   // 2026-10-12T08:30+07:00[Asia/Ho_Chi_Minh]
+System.out.println(vnTime.toLocalDateTime()); // 2026-10-12T08:30
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c27l0">2026-10-12T08:30+07:00[Asia/Ho_Chi_Minh]</span><span class="cl" id="c27l1">2026-10-12T08:30</span></div></div><div></div></div></div>
+  <span class="f ghost" data-act="#c27l0|show;#c27|show-a"></span><span class="f ghost" data-act="#c27l1|show;#c27|show-b"></span>
+</section>
+
+<section class="slide qs" id="q28">
+  <div class="hdr in"><span class="qn">CÂU 28</span><h2>LocalDateTime → Instant</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Người dùng ở Việt Nam chọn lịch hẹn <code class="i">2026-10-12T08:30</code> (LocalDateTime). Cần lưu xuống DB dưới dạng <code class="i">Instant</code> UTC. Vì sao không có hàm <code class="i">localDateTime.toInstant()</code> không tham số?</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
+    <div class="f"><script type="text/x-cpp" id="c28" data-mark="4:a;5:b" style="font-size:13.6px">
+LocalDateTime ldt = LocalDateTime.parse("2026-10-12T08:30");
+Instant i1 = ldt.atZone(ZoneId.of("Asia/Ho_Chi_Minh")).toInstant();
+Instant i2 = ldt.toInstant(ZoneOffset.ofHours(7));
+System.out.println(i1); // 2026-10-12T01:30:00Z
+System.out.println(i2); // 2026-10-12T01:30:00Z
+</script></div>
+    <div><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">LocalDateTime</code> <b>không có thông tin múi giờ</b> nên không xác định được một thời điểm tuyệt đối. Phải gắn zone (<code class="i">atZone</code>) hoặc offset (<code class="i">toInstant(ZoneOffset)</code>).</p></div><div class="console"><span class="cl" id="c28l0">2026-10-12T01:30:00Z</span><span class="cl" id="c28l1">2026-10-12T01:30:00Z</span></div></div>
+  </div></div>
+  <span class="f ghost" data-act="#c28l0|show;#c28|show-a"></span><span class="f ghost" data-act="#c28l1|show;#c28|show-b"></span>
+</section>
+
+<section class="slide qs" id="q29">
+  <div class="hdr in"><span class="qn">CÂU 29</span><h2>Token hết hạn: Instant.plus</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Token được tạo lúc <code class="i">Instant.now()</code>, hết hạn sau 30 ngày. Tính thời điểm hết hạn và viết hàm kiểm tra token đã hết hạn chưa. Vì sao <code class="i">instant.plus(1, ChronoUnit.MONTHS)</code> bị lỗi?</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">Instant</code> chỉ hỗ trợ đơn vị cố định (nano → DAYS, với DAYS = 24h). "Tháng" có độ dài thay đổi theo lịch/múi giờ nên Instant không hỗ trợ → ném <code class="i">UnsupportedTemporalTypeException: Unsupported unit: Months</code>. Nếu cần cộng tháng, chuyển sang <code class="i">ZonedDateTime</code> trước.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c29" data-mark="3:a" style="font-size:16.5px">
+Instant issuedAt = Instant.parse("2026-10-12T01:30:00Z");
+Instant expiresAt = issuedAt.plus(30, ChronoUnit.DAYS);       // hoặc plus(Duration.ofDays(30))
+System.out.println(expiresAt);                                // 2026-11-11T01:30:00Z
+
+boolean expired = Instant.now().isAfter(expiresAt);
+
+// Cộng tháng đúng cách:
+Instant plus1Month = issuedAt.atZone(ZoneOffset.UTC).plusMonths(1).toInstant(); // 2026-11-12T01:30:00Z
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c29l0">2026-11-11T01:30:00Z</span></div></div><div></div></div></div>
+  <span class="f ghost" data-act="#c29l0|show;#c29|show-a"></span>
+</section>
+
+<section class="slide qs" id="q30">
+  <div class="hdr in"><span class="qn">CÂU 30</span><h2>JWT exp: epoch second</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Trường <code class="i">exp</code> của JWT là số giây kể từ epoch. Chuyển thời điểm <code class="i">2026-10-12T01:30:00Z</code> thành giá trị <code class="i">exp</code> và ngược lại.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
+    <div class="f"><script type="text/x-cpp" id="c30" data-mark="3:a;4:b" style="font-size:12.6px">
+Instant t = Instant.parse("2026-10-12T01:30:00Z");
+long exp = t.getEpochSecond();
+System.out.println(exp);                         // 1791768600
+System.out.println(Instant.ofEpochSecond(exp));  // 2026-10-12T01:30:00Z
+</script></div>
+    <div><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">getEpochSecond()</code> và <code class="i">Instant.ofEpochSecond()</code>.</p></div><div class="console"><span class="cl" id="c30l0">1791768600</span><span class="cl" id="c30l1">2026-10-12T01:30:00Z</span></div></div>
+  </div></div>
+  <span class="f ghost" data-act="#c30l0|show;#c30|show-a"></span><span class="f ghost" data-act="#c30l1|show;#c30|show-b"></span>
+</section>
+
+<section class="slide qs" id="q31">
+  <div class="hdr in"><span class="qn">CÂU 31</span><h2>Quy đổi giờ sang New York</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Cuộc họp online lúc <code class="i">09:00</code> ngày <code class="i">2026-10-12</code> theo giờ Hà Nội. Đồng nghiệp ở New York sẽ tham gia lúc mấy giờ (giờ địa phương của họ)?</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Tạo <code class="i">ZonedDateTime</code> ở zone <code class="i">Asia/Ho_Chi_Minh</code> rồi <code class="i">withZoneSameInstant(ZoneId.of("America/New_York"))</code> – giữ nguyên thời điểm, đổi cách hiển thị. Tháng 10 New York đang dùng giờ mùa hè EDT (-04:00).</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c31" data-mark="" style="font-size:16.5px">
+ZonedDateTime hanoi = ZonedDateTime.of(2026, 10, 12, 9, 0, 0, 0, ZoneId.of("Asia/Ho_Chi_Minh"));
+ZonedDateTime ny = hanoi.withZoneSameInstant(ZoneId.of("America/New_York"));
+System.out.println(ny);
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console f" data-act="#c31|show-a;#c31|show-b;#c31|show-c;#c31|show-d">2026-10-11T22:00-04:00[America/New_York]</div><p class="muted cap">(22h tối hôm trước)</p></div><div></div></div></div>
+  
+</section>
+
+<section class="slide qs" id="q32">
+  <div class="hdr in"><span class="qn">CÂU 32</span><h2>withZoneSameLocal vs SameInstant</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Một developer viết <code class="i">hanoi.withZoneSameLocal(ZoneId.of("America/New_York"))</code> cho bài toán ở câu 31 và ra kết quả sai. Giải thích khác biệt giữa <code class="i">withZoneSameLocal</code> và <code class="i">withZoneSameInstant</code>.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><ul class="mini"><li><code class="i">withZoneSameInstant</code>: giữ nguyên <b>thời điểm tuyệt đối</b>, đổi giờ hiển thị → dùng khi quy đổi múi giờ.</li><li><code class="i">withZoneSameLocal</code>: giữ nguyên <b>giờ đồng hồ</b> (09:00), chỉ gắn zone mới → thành một thời điểm khác hẳn (chênh 11 tiếng).</li></ul></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c32" data-mark="2:a;3:b" style="font-size:13.6px">
+ZonedDateTime hanoi = ZonedDateTime.of(2026, 10, 12, 9, 0, 0, 0, ZoneId.of("Asia/Ho_Chi_Minh"));
+System.out.println(hanoi.withZoneSameInstant(ZoneId.of("America/New_York"))); // 2026-10-11T22:00-04:00[America/New_York]
+System.out.println(hanoi.withZoneSameLocal(ZoneId.of("America/New_York")));   // 2026-10-12T09:00-04:00[America/New_York]
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c32l0">2026-10-11T22:00-04:00[America/New_York]</span><span class="cl" id="c32l1">2026-10-12T09:00-04:00[America/New_York]</span></div></div><div></div></div></div>
+  <span class="f ghost" data-act="#c32l0|show;#c32|show-a"></span><span class="f ghost" data-act="#c32l1|show;#c32|show-b"></span>
+</section>
+
+<section class="slide qs" id="q33">
+  <div class="hdr in"><span class="qn">CÂU 33</span><h2>DST gap: 02:30 không tồn tại</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Ngày <code class="i">2026-03-08</code> New York chuyển sang giờ mùa hè: đồng hồ nhảy từ <code class="i">01:59:59</code> lên <code class="i">03:00</code>. Nếu tạo lịch lúc <code class="i">02:30</code> ngày đó ở New York thì Java xử lý thế nào?</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">02:30</code> rơi vào <b>khoảng trống (gap)</b>, không tồn tại. <code class="i">ZonedDateTime.of()</code> tự đẩy về sau đúng bằng độ dài gap (1 giờ) → <code class="i">03:30</code> với offset mới <code class="i">-04:00</code>.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c33" data-mark="" style="font-size:16.5px">
+ZonedDateTime z = ZonedDateTime.of(2026, 3, 8, 2, 30, 0, 0, ZoneId.of("America/New_York"));
+System.out.println(z);
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console f" data-act="#c33|show-a;#c33|show-b;#c33|show-c;#c33|show-d">2026-03-08T03:30-04:00[America/New_York]</div></div><div></div></div></div>
+  
+</section>
+
+<section class="slide qs" id="q34">
+  <div class="hdr in"><span class="qn">CÂU 34</span><h2>DST overlap: 01:30 hai lần</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Ngày <code class="i">2026-11-01</code> New York kết thúc giờ mùa hè: đồng hồ lùi từ <code class="i">02:00</code> về <code class="i">01:00</code>, nên giờ <code class="i">01:30</code> xuất hiện <b>hai lần</b>. Làm sao chọn lần thứ nhất hoặc lần thứ hai?</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Đây là <b>overlap</b>. Mặc định Java chọn offset sớm hơn (<code class="i">-04:00</code>). Dùng <code class="i">withEarlierOffsetAtOverlap()</code> / <code class="i">withLaterOffsetAtOverlap()</code> để chọn rõ ràng.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c34" data-mark="2:a;3:b" style="font-size:16.5px">
+ZonedDateTime z = ZonedDateTime.of(2026, 11, 1, 1, 30, 0, 0, ZoneId.of("America/New_York"));
+System.out.println(z);                            // 2026-11-01T01:30-04:00[America/New_York] (lần 1)
+System.out.println(z.withLaterOffsetAtOverlap()); // 2026-11-01T01:30-05:00[America/New_York] (lần 2)
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c34l0">2026-11-01T01:30-04:00[America/New_York] (lần 1)</span><span class="cl" id="c34l1">2026-11-01T01:30-05:00[America/New_York] (lần 2)</span></div></div><div></div></div></div>
+  <span class="f ghost" data-act="#c34l0|show;#c34|show-a"></span><span class="f ghost" data-act="#c34l1|show;#c34|show-b"></span>
+</section>
+
+<section class="slide qs" id="q35">
+  <div class="hdr in"><span class="qn">CÂU 35</span><h2>plusDays vs plusHours</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Có lịch nhắc lúc <code class="i">2026-03-07 12:00</code> ở New York. Muốn nhắc lại "cùng giờ ngày hôm sau". Nên dùng <code class="i">plusDays(1)</code> hay <code class="i">plusHours(24)</code>? So sánh kết quả.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Ngày 08/03 chỉ có 23 giờ (chuyển DST). <code class="i">plusDays(1)</code> cộng theo <b>lịch</b> → giữ 12:00; <code class="i">plusHours(24)</code> cộng theo <b>thời lượng tuyệt đối</b> → lệch thành 13:00. Bài toán "cùng giờ ngày mai" phải dùng <code class="i">plusDays</code>.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c35" data-mark="2:a;3:b" style="font-size:16.5px">
+ZonedDateTime z = ZonedDateTime.of(2026, 3, 7, 12, 0, 0, 0, ZoneId.of("America/New_York"));
+System.out.println(z.plusDays(1));   // 2026-03-08T12:00-04:00[America/New_York]
+System.out.println(z.plusHours(24)); // 2026-03-08T13:00-04:00[America/New_York]
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c35l0">2026-03-08T12:00-04:00[America/New_York]</span><span class="cl" id="c35l1">2026-03-08T13:00-04:00[America/New_York]</span></div></div><div></div></div></div>
+  <span class="f ghost" data-act="#c35l0|show;#c35|show-a"></span><span class="f ghost" data-act="#c35l1|show;#c35|show-b"></span>
+</section>
+
+<section class="slide qs" id="q36">
+  <div class="hdr in"><span class="qn">CÂU 36</span><h2>Khoảng “hôm nay” theo giờ VN</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>DB lưu cột <code class="i">created_at</code> dạng UTC. Viết truy vấn lấy các bản ghi "trong ngày hôm nay theo giờ Việt Nam" (2026-10-12). Hãy tính cặp <code class="i">Instant</code> [start, end) để đưa vào điều kiện <code class="i">WHERE created_at &gt;= ? AND created_at &lt; ?</code>.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
+    <div class="f"><script type="text/x-cpp" id="c36" data-mark="" style="font-size:15px">
+ZoneId VN = ZoneId.of("Asia/Ho_Chi_Minh");
+LocalDate day = LocalDate.of(2026, 10, 12);
+Instant start = day.atStartOfDay(VN).toInstant();
+Instant end   = day.plusDays(1).atStartOfDay(VN).toInstant();
+System.out.println(start + " -> " + end);
+</script></div>
+    <div><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">LocalDate.atStartOfDay(zone)</code> trả <code class="i">ZonedDateTime</code> đầu ngày theo zone (an toàn với DST), rồi <code class="i">toInstant()</code>.</p></div><div class="console f" data-act="#c36|show-a;#c36|show-b;#c36|show-c;#c36|show-d">2026-10-11T17:00:00Z -&gt; 2026-10-12T17:00:00Z</div></div>
+  </div></div>
+  
+</section>
+
+<section class="slide qs" id="q37">
+  <div class="hdr in"><span class="qn">CÂU 37</span><h2>ZoneRules: offset &amp; DST</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Cần hiển thị chênh lệch múi giờ của New York so với UTC tại hai thời điểm <code class="i">2026-10-12</code> và <code class="i">2026-12-12</code>, đồng thời cho biết lúc đó có đang áp dụng giờ mùa hè không.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">ZoneId.getRules()</code> trả <code class="i">ZoneRules</code>; dùng <code class="i">getOffset(Instant)</code> và <code class="i">isDaylightSavings(Instant)</code>. Offset của một zone <b>không cố định</b>, phụ thuộc thời điểm.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c37" data-mark="4:a;5:b" style="font-size:16.5px">
+ZoneRules rules = ZoneId.of("America/New_York").getRules();
+Instant oct = Instant.parse("2026-10-12T00:00:00Z");
+Instant dec = Instant.parse("2026-12-12T00:00:00Z");
+System.out.println(rules.getOffset(oct) + " DST=" + rules.isDaylightSavings(oct)); // -04:00 DST=true
+System.out.println(rules.getOffset(dec) + " DST=" + rules.isDaylightSavings(dec)); // -05:00 DST=false
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c37l0">-04:00 DST=true</span><span class="cl" id="c37l1">-05:00 DST=false</span></div></div><div></div></div></div>
+  <span class="f ghost" data-act="#c37l0|show;#c37|show-a"></span><span class="f ghost" data-act="#c37l1|show;#c37|show-b"></span>
+</section>
+
+<section class="slide qs" id="q38">
+  <div class="hdr in"><span class="qn">CÂU 38</span><h2>OffsetDateTime → UTC</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>API đối tác trả về <code class="i">"2026-10-12T08:30:00+07:00"</code>. Hệ thống của bạn quy ước mọi thời gian lưu theo UTC. Chuyển giá trị này sang UTC (vẫn giữ kiểu <code class="i">OffsetDateTime</code>). Ngoài ra, nếu đang có một <code class="i">ZonedDateTime</code> thì chuyển sang <code class="i">OffsetDateTime</code> thế nào?</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">OffsetDateTime.parse()</code> rồi <code class="i">withOffsetSameInstant(ZoneOffset.UTC)</code>. Từ ZonedDateTime dùng <code class="i">toOffsetDateTime()</code> (bỏ thông tin quy tắc zone, chỉ giữ offset tại thời điểm đó – phù hợp lưu JDBC/JSON).</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c38" data-mark="2:a;5:b" style="font-size:16.5px">
+OffsetDateTime odt = OffsetDateTime.parse("2026-10-12T08:30:00+07:00");
+System.out.println(odt.withOffsetSameInstant(ZoneOffset.UTC)); // 2026-10-12T01:30Z
+
+ZonedDateTime ny = ZonedDateTime.of(2026, 10, 12, 10, 0, 0, 0, ZoneId.of("America/New_York"));
+System.out.println(ny.toOffsetDateTime());                     // 2026-10-12T10:00-04:00
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c38l0">2026-10-12T01:30Z</span><span class="cl" id="c38l1">2026-10-12T10:00-04:00</span></div></div><div></div></div></div>
+  <span class="f ghost" data-act="#c38l0|show;#c38|show-a"></span><span class="f ghost" data-act="#c38l1|show;#c38|show-b"></span>
+</section>
+
+<section class="slide qs" id="q39">
+  <div class="hdr in"><span class="qn">CÂU 39</span><h2>equals vs isEqual</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Hai service gửi về hai giá trị <code class="i">"2026-10-12T08:30:00+07:00"</code> và <code class="i">"2026-10-12T01:30:00Z"</code>. Viết code kiểm tra chúng có cùng một thời điểm không. <code class="i">equals()</code> có dùng được không?</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
+    <div class="f"><script type="text/x-cpp" id="c39" data-mark="3:a;4:b;5:c" style="font-size:12.6px">
+OffsetDateTime a = OffsetDateTime.parse("2026-10-12T08:30:00+07:00");
+OffsetDateTime b = OffsetDateTime.parse("2026-10-12T01:30:00Z");
+System.out.println(a.equals(b));                             // false
+System.out.println(a.isEqual(b));                            // true
+System.out.println(a.toInstant().equals(b.toInstant()));     // true
+</script></div>
+    <div><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">equals()</code> so sánh cả local date-time <b>và</b> offset → <code class="i">false</code>. Để so sánh thời điểm tuyệt đối dùng <code class="i">isEqual()</code> (hoặc so sánh <code class="i">toInstant()</code>).</p></div><div class="console"><span class="cl" id="c39l0">false</span><span class="cl" id="c39l1">true</span><span class="cl" id="c39l2">true</span></div></div>
+  </div></div>
+  <span class="f ghost" data-act="#c39l0|show;#c39|show-a"></span><span class="f ghost" data-act="#c39l1|show;#c39|show-b"></span><span class="f ghost" data-act="#c39l2|show;#c39|show-c"></span>
+</section>
+
+<section class="slide qs" id="q40">
+  <div class="hdr in"><span class="qn">CÂU 40</span><h2>Sắp xếp sự kiện &amp; java.util.Date</h2><span class="part-tag">Phần C</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Có danh sách sự kiện đến từ nhiều nước với offset khác nhau: <code class="i">2026-10-12T09:00+07:00</code>, <code class="i">2026-10-12T01:30Z</code>, <code class="i">2026-10-11T21:00-04:00</code>. Hãy sắp xếp theo đúng thứ tự xảy ra trên trục thời gian. Ngoài ra, thư viện cũ trả về <code class="i">java.util.Date</code> – chuyển nó sang <code class="i">OffsetDateTime</code> (+07:00) thế nào?</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Sắp xếp theo <code class="i">toInstant()</code> (đổi hết về UTC: 02:00Z, 01:30Z, 01:00Z). Với <code class="i">java.util.Date</code> dùng <code class="i">date.toInstant()</code> làm cầu nối, rồi <code class="i">atOffset()</code>/<code class="i">atZone()</code>; chiều ngược lại <code class="i">Date.from(instant)</code>.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c40" data-mark="6:a;10:b;12:c" style="font-size:16.5px">
+List<OffsetDateTime> events = new ArrayList<>(List.of(
+    OffsetDateTime.parse("2026-10-12T09:00+07:00"),
+    OffsetDateTime.parse("2026-10-12T01:30Z"),
+    OffsetDateTime.parse("2026-10-11T21:00-04:00")));
+events.sort(Comparator.comparing(OffsetDateTime::toInstant));
+System.out.println(events);
+// [2026-10-11T21:00-04:00, 2026-10-12T01:30Z, 2026-10-12T09:00+07:00]
+
+Date legacy = new Date(1760000000000L);
+System.out.println(legacy.toInstant().atOffset(ZoneOffset.ofHours(7))); // 2025-10-09T15:53:20+07:00
+Date back = Date.from(Instant.parse("2026-10-12T01:30:00Z"));
+System.out.println(back.getTime());                                     // 1791768600000
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c40l0">[2026-10-11T21:00-04:00, 2026-10-12T01:30Z, 2026-10-12T09:00+07:00]</span><span class="cl" id="c40l1">2025-10-09T15:53:20+07:00</span><span class="cl" id="c40l2">1791768600000</span></div></div><div></div></div></div>
+  <span class="f ghost" data-act="#c40l0|show;#c40|show-a"></span><span class="f ghost" data-act="#c40l1|show;#c40|show-b"></span><span class="f ghost" data-act="#c40l2|show;#c40|show-c"></span>
+</section>
+
+<section class="slide" id="partD">
+  <div class="hdr in"><span class="qn">PHẦN D</span><h2>🧾 DateTimeFormatter, NumberFormat, DecimalFormat, Formatter, CompactNumberFormat</h2></div>
+  <div class="agenda in" style="grid-template-columns:repeat(2,1fr);gap:8px;font-size:18px"><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q41"><b>41</b>DateTimeFormatter: format &amp; parse</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q42"><b>42</b>Ngày tháng tiếng Việt</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q43"><b>43</b>Lỗi YYYY vs yyyy</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q44"><b>44</b>ResolverStyle.STRICT</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q45"><b>45</b>Tiền VND / USD</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q46"><b>46</b>Parse số kiểu Việt &amp; phần trăm</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q47"><b>47</b>DecimalFormat pattern</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q48"><b>48</b>HALF_EVEN vs HALF_UP</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q49"><b>49</b>Formatter: bảng hóa đơn</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q50"><b>50</b>CompactNumberFormat</div></div>
+</section>
+
+<section class="slide qs" id="q41">
+  <div class="hdr in"><span class="qn">CÂU 41</span><h2>DateTimeFormatter: format &amp; parse</h2><span class="part-tag">Phần D</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Màn hình hiển thị ngày giờ theo dạng <code class="i">dd/MM/yyyy HH:mm</code>. Hãy (a) format <code class="i">2026-10-12T08:30</code> ra chuỗi, (b) đọc chuỗi người dùng nhập <code class="i">"25/12/2026 18:00"</code> thành <code class="i">LocalDateTime</code>.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Tạo <code class="i">DateTimeFormatter.ofPattern(...)</code> (thread-safe, nên khai báo <code class="i">static final</code> dùng lại), dùng <code class="i">format()</code> và <code class="i">LocalDateTime.parse(text, formatter)</code>.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c41" data-mark="2:a;3:b" style="font-size:16.5px">
+DateTimeFormatter F = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+System.out.println(LocalDateTime.of(2026, 10, 12, 8, 30).format(F)); // 12/10/2026 08:30
+System.out.println(LocalDateTime.parse("25/12/2026 18:00", F));      // 2026-12-25T18:00
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c41l0">12/10/2026 08:30</span><span class="cl" id="c41l1">2026-12-25T18:00</span></div></div><div><div class="note f qnote"><p>Lưu ý: <code class="i">MM</code> = tháng, <code class="i">mm</code> = phút; <code class="i">HH</code> = giờ 0–23, <code class="i">hh</code> = giờ 1–12.</p></div></div></div></div>
+  <span class="f ghost" data-act="#c41l0|show;#c41|show-a"></span><span class="f ghost" data-act="#c41l1|show;#c41|show-b"></span>
+</section>
+
+<section class="slide qs" id="q42">
+  <div class="hdr in"><span class="qn">CÂU 42</span><h2>Ngày tháng tiếng Việt</h2><span class="part-tag">Phần D</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Hiển thị ngày <code class="i">2026-10-12</code> theo kiểu văn bản tiếng Việt: <code class="i">"Thứ Hai, ngày 12 tháng 10 năm 2026"</code>.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Pattern <code class="i">EEEE</code> (tên thứ đầy đủ) + <code class="i">Locale</code> vi-VN; phần chữ cố định đặt trong dấu nháy đơn <code class="i">'...'</code>.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c42" data-mark="" style="font-size:16.5px">
+DateTimeFormatter f = DateTimeFormatter.ofPattern(
+        "EEEE, 'ngày' dd 'tháng' MM 'năm' yyyy", Locale.forLanguageTag("vi-VN"));
+System.out.println(LocalDate.of(2026, 10, 12).format(f));
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console f" data-act="#c42|show-a;#c42|show-b;#c42|show-c;#c42|show-d">Thứ Hai, ngày 12 tháng 10 năm 2026</div></div><div><div class="note f qnote"><ul class="mini"><li>(Với pattern <code class="i">"EEEE, dd MMMM, yyyy"</code> + vi-VN → <code class="i">Thứ Hai, 12 tháng 10, 2026</code>)</li></ul></div></div></div></div>
+  
+</section>
+
+<section class="slide qs" id="q43">
+  <div class="hdr in"><span class="qn">CÂU 43</span><h2>Lỗi YYYY vs yyyy</h2><span class="part-tag">Phần D</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Báo cáo cuối năm in ngày <code class="i">2026-12-28</code> ra thành <code class="i">28/12/2027</code> dù code dùng <code class="i">ofPattern("dd/MM/YYYY", Locale.US)</code>. Tìm nguyên nhân và sửa.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">Y</code> là <b>week-based-year</b> (năm theo tuần), không phải năm lịch. Với Locale.US, tuần chứa ngày 01/01/2027 bắt đầu từ Chủ nhật 27/12/2026 nên 28/12/2026 thuộc "năm tuần" 2027. Sửa thành <code class="i">yyyy</code> (hoặc <code class="i">uuuu</code>).</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c43" data-mark="2:a;3:b" style="font-size:16.5px">
+LocalDate d = LocalDate.of(2026, 12, 28);
+System.out.println(d.format(DateTimeFormatter.ofPattern("dd/MM/YYYY", Locale.US))); // 28/12/2027  (sai)
+System.out.println(d.format(DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.US))); // 28/12/2026  (đúng)
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c43l0">28/12/2027</span><span class="cl" id="c43l1">28/12/2026</span></div></div><div></div></div></div>
+  <span class="f ghost" data-act="#c43l0|show;#c43|show-a"></span><span class="f ghost" data-act="#c43l1|show;#c43|show-b"></span>
+</section>
+
+<section class="slide qs" id="q44">
+  <div class="hdr in"><span class="qn">CÂU 44</span><h2>ResolverStyle.STRICT</h2><span class="part-tag">Phần D</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Form nhập ngày sinh: người dùng gõ <code class="i">"30/02/2026"</code>. Với pattern <code class="i">dd/MM/yyyy</code> mặc định, Java âm thầm chuyển thành <code class="i">2026-02-28</code> thay vì báo lỗi. Hãy validate chặt chẽ để ngày không tồn tại bị từ chối.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Mặc định <code class="i">ResolverStyle.SMART</code> tự điều chỉnh ngày. Dùng <code class="i">withResolverStyle(ResolverStyle.STRICT)</code>. Lưu ý: ở chế độ STRICT phải dùng <code class="i">uuuu</code> (năm) thay vì <code class="i">yyyy</code> (year-of-era) – nếu không, ngay cả ngày hợp lệ cũng parse lỗi vì thiếu era.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c44" data-mark="5:a;9:b" style="font-size:16.5px">
+DateTimeFormatter smart  = DateTimeFormatter.ofPattern("dd/MM/uuuu");
+DateTimeFormatter strict = DateTimeFormatter.ofPattern("dd/MM/uuuu")
+                                            .withResolverStyle(ResolverStyle.STRICT);
+
+System.out.println(LocalDate.parse("30/02/2026", smart));  // 2026-02-28 (âm thầm sửa)
+try {
+    LocalDate.parse("30/02/2026", strict);
+} catch (DateTimeParseException e) {
+    System.out.println(e.getMessage());
+    // Text '30/02/2026' could not be parsed: Invalid date 'FEBRUARY 30'
+}
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c44l0">2026-02-28</span><span class="cl" id="c44l1">Text &#x27;30/02/2026&#x27; could not be parsed: Invalid date &#x27;FEBRUARY 30&#x27;</span></div></div><div></div></div></div>
+  <span class="f ghost" data-act="#c44l0|show;#c44|show-a"></span><span class="f ghost" data-act="#c44l1|show;#c44|show-b"></span>
+</section>
+
+<section class="slide qs" id="q45">
+  <div class="hdr in"><span class="qn">CÂU 45</span><h2>Tiền VND / USD</h2><span class="part-tag">Phần D</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Hiển thị số tiền <code class="i">1234567.891</code> theo định dạng tiền Việt Nam và tiền USD.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">NumberFormat.getCurrencyInstance(Locale)</code>. VND không có phần lẻ nên tự làm tròn về số nguyên; dấu phân nhóm là <code class="i">.</code>.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c45" data-mark="3:a;4:b" style="font-size:16.5px">
+NumberFormat vnd = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("vi-VN"));
+NumberFormat usd = NumberFormat.getCurrencyInstance(Locale.US);
+System.out.println(vnd.format(1234567.891)); // 1.234.568 ₫
+System.out.println(usd.format(1234567.891)); // $1,234,567.89
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c45l0">1.234.568 ₫</span><span class="cl" id="c45l1">$1,234,567.89</span></div></div><div><div class="note f qnote"><p>Lưu ý: khoảng trắng trước <code class="i">₫</code> là <b>non-breaking space</b> (<code class="i"> </code>), không phải space thường – cẩn thận khi viết unit test so sánh chuỗi.</p></div></div></div></div>
+  <span class="f ghost" data-act="#c45l0|show;#c45|show-a"></span><span class="f ghost" data-act="#c45l1|show;#c45|show-b"></span>
+</section>
+
+<section class="slide qs" id="q46">
+  <div class="hdr in"><span class="qn">CÂU 46</span><h2>Parse số kiểu Việt &amp; phần trăm</h2><span class="part-tag">Phần D</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Người dùng Việt Nam nhập số tiền <code class="i">"1.234.567,89"</code> (dấu <code class="i">.</code> phân nhóm, dấu <code class="i">,</code> thập phân). Chuyển chuỗi thành số. Đồng thời hiển thị tỉ lệ <code class="i">0.12345</code> dưới dạng phần trăm có 1 chữ số thập phân theo kiểu Việt Nam.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
+    <div class="f"><script type="text/x-cpp" id="c46" data-mark="3:a;7:b" style="font-size:13.6px">
+Locale vi = Locale.forLanguageTag("vi-VN");
+Number n = NumberFormat.getNumberInstance(vi).parse("1.234.567,89");
+System.out.println(n.doubleValue());   // 1234567.89
+
+NumberFormat pct = NumberFormat.getPercentInstance(vi);
+pct.setMinimumFractionDigits(1);
+System.out.println(pct.format(0.12345)); // 12,3%
+</script></div>
+    <div><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">NumberFormat.getNumberInstance(vi).parse()</code> đọc đúng quy ước Việt Nam. <code class="i">getPercentInstance()</code> tự nhân 100; <code class="i">setMinimumFractionDigits/setMaximumFractionDigits</code> điều chỉnh số chữ số lẻ.</p></div><div class="console"><span class="cl" id="c46l0">1234567.89</span><span class="cl" id="c46l1">12,3%</span></div><div class="note f qnote"><p>(Nếu dùng <code class="i">Double.parseDouble("1.234.567,89")</code> sẽ ném <code class="i">NumberFormatException</code>.)</p></div></div>
+  </div></div>
+  <span class="f ghost" data-act="#c46l0|show;#c46|show-a"></span><span class="f ghost" data-act="#c46l1|show;#c46|show-b"></span>
+</section>
+
+<section class="slide qs" id="q47">
+  <div class="hdr in"><span class="qn">CÂU 47</span><h2>DecimalFormat pattern</h2><span class="part-tag">Phần D</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Báo cáo yêu cầu: (a) số luôn có 2 chữ số thập phân và phân nhóm hàng nghìn, ví dụ <code class="i">1234567.5</code> → <code class="i">1,234,567.50</code> (kiểu Mỹ) và <code class="i">1.234.567,50</code> (kiểu Việt); (b) mã đơn hàng luôn đủ 5 chữ số, <code class="i">42</code> → <code class="i">00042</code>.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">DecimalFormat</code> với pattern: <code class="i">#</code> = chữ số tùy chọn, <code class="i">0</code> = chữ số bắt buộc (thêm 0 nếu thiếu), <code class="i">,</code> = phân nhóm, <code class="i">.</code> = thập phân. Ký hiệu thực tế phụ thuộc <code class="i">DecimalFormatSymbols</code> của locale.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c47" data-mark="4:a;5:b;6:c" style="font-size:15px">
+double v = 1234567.5;
+DecimalFormat us = new DecimalFormat("#,##0.00", DecimalFormatSymbols.getInstance(Locale.US));
+DecimalFormat vn = new DecimalFormat("#,##0.00", DecimalFormatSymbols.getInstance(Locale.forLanguageTag("vi-VN")));
+System.out.println(us.format(v));                          // 1,234,567.50
+System.out.println(vn.format(v));                          // 1.234.567,50
+System.out.println(new DecimalFormat("00000").format(42)); // 00042
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c47l0">1,234,567.50</span><span class="cl" id="c47l1">1.234.567,50</span><span class="cl" id="c47l2">00042</span></div></div><div></div></div></div>
+  <span class="f ghost" data-act="#c47l0|show;#c47|show-a"></span><span class="f ghost" data-act="#c47l1|show;#c47|show-b"></span><span class="f ghost" data-act="#c47l2|show;#c47|show-c"></span>
+</section>
+
+<section class="slide qs" id="q48">
+  <div class="hdr in"><span class="qn">CÂU 48</span><h2>HALF_EVEN vs HALF_UP</h2><span class="part-tag">Phần D</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Dùng <code class="i">new DecimalFormat("0.00")</code> để làm tròn <code class="i">0.125</code> thì ra <code class="i">0.12</code> thay vì <code class="i">0.13</code> như mong đợi. Giải thích và sửa.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">DecimalFormat</code> mặc định dùng <code class="i">RoundingMode.HALF_EVEN</code> (làm tròn về số chẵn khi đúng nửa – "banker's rounding"). Đổi bằng <code class="i">setRoundingMode(RoundingMode.HALF_UP)</code>. Ngoài ra nên truyền <code class="i">BigDecimal</code> thay vì <code class="i">double</code> để tránh sai số nhị phân.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c48" data-mark="2:a;5:b;6:c" style="font-size:16.5px">
+DecimalFormat df = new DecimalFormat("0.00", DecimalFormatSymbols.getInstance(Locale.US));
+System.out.println(df.format(0.125));                    // 0.12  (HALF_EVEN)
+
+df.setRoundingMode(RoundingMode.HALF_UP);
+System.out.println(df.format(0.125));                    // 0.13
+System.out.println(df.format(new BigDecimal("2.345")));  // 2.35
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c48l0">0.12</span><span class="cl" id="c48l1">0.13</span><span class="cl" id="c48l2">2.35</span></div></div><div></div></div></div>
+  <span class="f ghost" data-act="#c48l0|show;#c48|show-a"></span><span class="f ghost" data-act="#c48l1|show;#c48|show-b"></span><span class="f ghost" data-act="#c48l2|show;#c48|show-c"></span>
+</section>
+
+<section class="slide qs" id="q49">
+  <div class="hdr in"><span class="qn">CÂU 49</span><h2>Formatter: bảng hóa đơn</h2><span class="part-tag">Phần D</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>In hóa đơn dạng bảng thẳng cột ra console: cột tên món căn trái rộng 10, số lượng căn phải rộng 5, thành tiền căn phải rộng 12 có phân nhóm và 2 số lẻ. Dữ liệu: <code class="i">("Cà phê", 2, 45000.0)</code>, <code class="i">("Bánh mì", 10, 250000.5)</code>.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
+    <div class="f"><script type="text/x-cpp" id="c49" data-mark="" style="font-size:15px">
+StringBuilder sb = new StringBuilder();
+try (Formatter fm = new Formatter(sb, Locale.US)) {
+    fm.format("%-10s|%5s|%12s%n", "Món", "SL", "Thành tiền");
+    fm.format("%-10s|%5d|%,12.2f%n", "Cà phê", 2, 45000.0);
+    fm.format("%-10s|%5d|%,12.2f%n", "Bánh mì", 10, 250000.5);
+}
+System.out.print(sb);
+</script></div>
+    <div><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Dùng <code class="i">java.util.Formatter</code> (hoặc <code class="i">String.format</code> / <code class="i">"...".formatted()</code> – bên trong cũng dùng Formatter). Cú pháp <code class="i">%[flags][width][.precision]conversion</code>: <code class="i">-</code> căn trái, <code class="i">,</code> phân nhóm, <code class="i">%n</code> xuống dòng theo hệ điều hành.</p></div><div class="console f" data-act="#c49|show-a;#c49|show-b;#c49|show-c;#c49|show-d">Món       |   SL|  Thành tiền
+Cà phê    |    2|   45,000.00
+Bánh mì   |   10|  250,000.50</div><div class="note f qnote"><p>Một số flag khác: <code class="i">String.format("%05d|%x|%+d", 42, 255, 7)</code> → <code class="i">00042|ff|+7</code>.</p></div></div>
+  </div></div>
+  
+</section>
+
+<section class="slide qs" id="q50">
+  <div class="hdr in"><span class="qn">CÂU 50</span><h2>CompactNumberFormat</h2><span class="part-tag">Phần D</span></div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Trang video cần hiển thị lượt xem dạng rút gọn: <code class="i">1234567</code> → <code class="i">"1.2M"</code> (tiếng Anh) và <code class="i">"1,2 Tr"</code> / <code class="i">"1,2 triệu"</code> (tiếng Việt). Số nhỏ như <code class="i">999</code> giữ nguyên.</div>
+  <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">NumberFormat.getCompactNumberInstance(Locale, Style)</code> (Java 12+, trả về <code class="i">CompactNumberFormat</code>). <code class="i">Style.SHORT</code> cho dạng viết tắt, <code class="i">Style.LONG</code> cho dạng đầy đủ; mặc định không có số lẻ → cần <code class="i">setMaximumFractionDigits(1)</code>.</p></div><div></div></div>
+  <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c50" data-mark="" style="font-size:15px">
+Locale vi = Locale.forLanguageTag("vi-VN");
+NumberFormat enShort = NumberFormat.getCompactNumberInstance(Locale.US, NumberFormat.Style.SHORT);
+enShort.setMaximumFractionDigits(1);
+NumberFormat viShort = NumberFormat.getCompactNumberInstance(vi, NumberFormat.Style.SHORT);
+viShort.setMaximumFractionDigits(1);
+NumberFormat viLong  = NumberFormat.getCompactNumberInstance(vi, NumberFormat.Style.LONG);
+viLong.setMaximumFractionDigits(1);
+
+for (long v : new long[]{999, 1_234, 1_234_567, 2_500_000_000L}) {
+    System.out.println(v + " -> " + enShort.format(v) + " | " + viShort.format(v) + " | " + viLong.format(v));
+}
+</script></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console f" data-act="#c50|show-a;#c50|show-b;#c50|show-c;#c50|show-d">999 -&gt; 999 | 999 | 999
+1234 -&gt; 1.2K | 1,2 N | 1,2 nghìn
+1234567 -&gt; 1.2M | 1,2 Tr | 1,2 triệu
+2500000000 -&gt; 2.5B | 2,5 T | 2,5 tỷ</div></div><div><div class="note f qnote"><p>(Không gọi <code class="i">setMaximumFractionDigits</code> thì <code class="i">1234567</code> → <code class="i">1M</code>. Có thể parse ngược: <code class="i">enShort.parse("1M")</code> → <code class="i">1000000</code>.)</p></div></div></div></div>
+  
+</section>
+
+<section class="slide" id="end">
+  <div class="title-wrap" style="align-items:center;text-align:center">
+    <div class="orb" style="width:360px;height:360px;background:#f9a8d4;left:10%;top:10%"></div>
+    <h1 class="in">Tóm tắt <span class="grad">nhanh</span></h1>
+    <div class="cols4 in" style="margin-top:32px;text-align:left;max-width:1180px">
+      <div class="card"><h3>String</h3><p style="font-size:17px">Immutable. So sánh nội dung bằng <code class="i">equals</code>, không dùng <code class="i">==</code>. Dùng <code class="i">isBlank</code>, <code class="i">strip</code>. Nối chuỗi trong vòng lặp thì dùng <code class="i">StringBuilder</code>.</p></div>
+      <div class="card"><h3>BigDecimal</h3><p style="font-size:17px">Tạo từ <b>String</b>. Luôn chỉ định <code class="i">RoundingMode</code> khi chia. So sánh giá trị bằng <code class="i">compareTo</code>; in bằng <code class="i">toPlainString</code>.</p></div>
+      <div class="card"><h3>Date-Time</h3><p style="font-size:17px">Lưu và so sánh bằng <code class="i">Instant</code> (UTC); hiển thị bằng <code class="i">ZonedDateTime</code>. Cẩn thận DST: <code class="i">plusDays</code> khác <code class="i">plusHours(24)</code>.</p></div>
+      <div class="card"><h3>Format</h3><p style="font-size:17px">Dùng <code class="i">yyyy</code> chứ không phải <code class="i">YYYY</code>, và <code class="i">STRICT</code> khi validate. NumberFormat/DecimalFormat theo <code class="i">Locale</code>; chú ý HALF_EVEN.</p></div>
+    </div>
+  </div>
+</section>
+<script>
+// render char-grid rows for setw demo
+document.querySelectorAll(".chars").forEach(el=>{
+  const segs=JSON.parse(el.dataset.segs);let h="";
+  segs.forEach(([txt,w,al,cls,fill])=>{
+    const f=fill||" ";const pad=Math.max(0,w-txt.length);
+    const cells=al==="L"?[...txt].map(c=>[c,0]).concat(Array(pad).fill([f,1])):Array(pad).fill([f,1]).concat([...txt].map(c=>[c,0]));
+    h+=cells.map(([c,p])=>`<span class="ch ${cls}${p?" pad":""}">${c===" "?"·":c}</span>`).join("");
+  });
+  el.innerHTML=h;
+});
+</script>
+</div></div>
+
+<div id="bar"></div>
+<div id="hint">← → / Space: chuyển · Shift+→: qua slide · Home: đầu · F: toàn màn hình</div>
+<div id="nav"><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+
+<script>
+(function(){
+  // ---------- C++ highlighter ----------
+  const KW=new Set("if else for while do return break continue switch case default struct class static new true false public private try catch throw throws final var null this super extends implements import interface enum instanceof".split(" "));
+  const TY=new Set("int double float char void boolean long short byte".split(" "));
+  const LIB=new Set("System out println print".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line){
+    if(/^\s*#/.test(line)) return '<span class="p">'+esc(line)+'</span>';
+    const re=/(\/\/.*$)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="n">'+m[3]+'</span>';
+      else if(m[4]){
+        const w=m[4];
+        let cls=KW.has(w)?"k":TY.has(w)?"t":(/^[A-Z][a-z]/.test(w)?"t":(LIB.has(w)?"fn":(m[5]?"fn":"")));
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[5]?esc(m[5]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-cpp"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");const [a,b]=r.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+
+  // ---------- deck engine ----------
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")];
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  function act(el,on){["act","act2"].forEach(k=>{const v=el.dataset[k];if(!v)return;v.split(";").forEach(p=>{const [sel,cls]=p.split("|");const t=document.querySelector(sel);if(t)t.classList.toggle(cls,on)})})}
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step)||(i<cur&&false);f.classList.toggle("on",on);act(f,on)});
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.textContent=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length;
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    history.replaceState(null,"","#"+slides[cur].id);
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+  addEventListener("keydown",e=>{
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+</script>
+
+<script>
+// auto-fit: shrink code font to avoid horizontal cut, scale Q&A body to fit slide height
+(function(){
+  function fitCode(root){root.querySelectorAll(".code").forEach(c=>{let fs=parseFloat(getComputedStyle(c).fontSize);let g=0;while(c.scrollWidth>c.clientWidth+1&&fs>10&&g++<40){fs-=0.4;c.style.fontSize=fs+"px";}})}
+  function fitAll(){
+    document.querySelectorAll(".qbody").forEach(b=>{b.style.transform="";b.style.width="";});
+    fitCode(document);
+    document.querySelectorAll(".qbody").forEach(b=>{
+      const avail=720-48-b.offsetTop, h=b.scrollHeight;
+      if(h>avail){const k=Math.max(.62,avail/h);b.style.transformOrigin="top left";b.style.transform="scale("+k+")";b.style.width=(100/k)+"%";fitCode(b);}
+    });
+  }
+  fitAll(); addEventListener("load",fitAll); if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitAll);
+})();
+</script>
+</body>
+</html>
