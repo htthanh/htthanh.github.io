@@ -1,0 +1,1483 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Java vs C++ – W03 OOP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+h1{font-size:70px;line-height:1.1;font-weight:800}
+h2{font-size:34px;line-height:1.2;font-weight:800}
+h2 code{font-family:var(--mono);font-size:.9em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 8px;border-radius:8px;color:#be185d}
+h3{font-size:21px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:22px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:24px;margin:5px 0}
+ul li::before{content:"";position:absolute;left:3px;top:.55em;width:9px;height:9px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i,p code,li code,td code{font-family:var(--mono);font-size:.86em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 5px;border-radius:6px;color:#be185d}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.qcols{grid-template-columns:.78fr 1.22fr;height:590px}
+.acols{grid-template-columns:.95fr 1.05fr;gap:20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}
+.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols3>.card:nth-child(3n) h3{color:#db2777}
+.lbl{display:inline-block;font-size:14px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
+.qcard{background:#fff;border:1px solid var(--line);border-left:6px solid var(--sa1);border-radius:16px;padding:16px 20px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.qcard p{font-size:21px}
+.note{margin-top:14px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:19px;line-height:1.4}
+.tagline{margin-top:14px}
+.pill{display:inline-block;font-family:var(--mono);font-size:15px;font-weight:600;padding:4px 12px;border-radius:999px;border:1.5px solid #c4b5fd;background:#f5f3ff;color:#5b21b6}
+.ans{border:1px solid #a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff);border-radius:16px;padding:10px 18px 12px;margin-bottom:14px;box-shadow:0 8px 24px -14px rgba(5,150,105,.35)}
+.ans .lbl{margin-bottom:4px}
+.ans p{font-size:19px;line-height:1.42}
+.code{font-family:var(--mono);font-size:15px;line-height:1.45;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:8px 0;overflow:hidden;position:relative}
+.code.xs{font-size:14px}
+.code .ln{padding:0 14px 0 6px;white-space:pre;display:flex}
+.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code-title{font-family:var(--mono);font-size:14px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.console{font-family:var(--mono);font-size:15px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre;overflow:hidden}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.console.err{color:#fda4af}
+.console.err::before{content:"● ● ●   javac";color:#fb7185}
+.cl{display:block;opacity:0;transform:translateX(-6px);transition:opacity .3s,transform .3s}
+.type.on .cl{opacity:1;transform:none}
+.explain{padding:12px 18px 14px}
+.explain p,.explain li{font-size:16.5px;line-height:1.45}
+.explain p{margin:4px 0}
+.explain table{border-collapse:separate;border-spacing:0;width:100%;font-size:15px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;margin:6px 0}
+.explain th,.explain td{padding:4px 8px;text-align:center;border-bottom:1px solid var(--line)}
+.explain th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+.explain tr:last-child td{border-bottom:none}
+.explain pre.mini{font-family:var(--mono);font-size:13.5px;line-height:1.4;background:var(--code);border:1px solid var(--line);border-radius:10px;padding:6px 12px;margin:6px 0;white-space:pre;overflow:hidden}
+.explain pre.mini code{background:none;border:none;padding:0;color:var(--text);font-size:inherit}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center;position:relative}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.agenda{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 12px;cursor:pointer;transition:all .2s;font-size:16px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05);display:flex;align-items:center}
+.ag:hover{border-color:#ec4899;transform:translateY(-3px);box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
+.ag b{color:#db2777;margin-right:8px;font-family:var(--mono)}
+.ag code{font-family:var(--mono);font-size:.88em;color:#be185d}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:16px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+@media (max-width:700px){#hint{display:none}}
+#deck.fitting .slide{transform:none!important;transition:none!important}
+@media print{#nav,#bar,#hint{display:none}}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="deck">
+<section class="slide" id="title">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// Java Programming · Week 3 · Short Q&amp;A</div>
+    <h1 class="in">Java OOP<br><span class="grad">Những điểm khác C++</span></h1>
+    <p class="in muted" style="font-size:26px;margin-top:20px;max-width:900px">21 câu hỏi ngắn dựa trên <b>03.02 More on Methods &amp; Classes</b> và <b>03.03 Inheritance</b>. Mỗi câu có input, output (chạy thật với JDK 21), giải thích chi tiết và so sánh với C++.</p>
+    <p class="in" style="margin-top:30px;font-size:21px">Hồ Tuấn Thanh · <span class="muted">htthanh@fit.hcmus.edu.vn</span></p>
+    <p class="in" style="margin-top:14px;font-size:18px;color:#8a91b4">Dùng phím ← → hoặc Space để chuyển · A: hiện hết · F: toàn màn hình</p>
+  </div>
+</section>
+<section class="slide" id="agenda">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:18px">· bấm để đi tới · Phần A: 01–10 · Phần B: 11–21</span></div>
+  <div class="agenda in"><div class="ag" data-goto="q1"><b>01</b><span>Truy cập mặc định (default / package-private)</span></div><div class="ag" data-goto="q2"><b>02</b><span>Truyền tham số kiểu cơ sở (primitive)</span></div><div class="ag" data-goto="q3"><b>03</b><span>Truyền object: sửa field vs gán lại tham số</span></div><div class="ag" data-goto="q4"><b>04</b><span>Trả về object tạo bên trong method</span></div><div class="ag" data-goto="q5"><b>05</b><span>Không có tham số mặc định (default arguments)</span></div><div class="ag" data-goto="q6"><b>06</b><span>Phép gán <code>=</code> và "copy constructor"</span></div><div class="ag" data-goto="q7"><b>07</b><span>Biến static: khai báo, giá trị mặc định, cách truy cập</span></div><div class="ag" data-goto="q8"><b>08</b><span>Hạn chế của static method</span></div><div class="ag" data-goto="q9"><b>09</b><span>Static block (khối khởi tạo static)</span></div><div class="ag" data-goto="q10"><b>10</b><span>Đệ quy không có điểm dừng → StackOverflowError</span></div><div class="ag" data-goto="q11"><b>11</b><span>Từ khóa <code>extends</code> và đơn kế thừa</span></div><div class="ag" data-goto="q12"><b>12</b><span><code>protected</code> trong Java rộng hơn C++</span></div><div class="ag" data-goto="q13"><b>13</b><span>Gọi constructor lớp cha bằng <code>super(...)</code></span></div><div class="ag" data-goto="q14"><b>14</b><span>Thứ tự constructor &amp; gọi method override trong constructor</span></div><div class="ag" data-goto="q15"><b>15</b><span>Truy cập member bị che (name hiding) bằng <code>super.member</code></span></div><div class="ag" data-goto="q16"><b>16</b><span>Mọi method đều "virtual" theo mặc định</span></div><div class="ag" data-goto="q17"><b>17</b><span>Overload ở lớp con không che method lớp cha</span></div><div class="ag" data-goto="q18"><b>18</b><span>Tham chiếu lớp cha trỏ tới object lớp con – không có <em>object slicing</em></span></div><div class="ag" data-goto="q19"><b>19</b><span>Abstract method / abstract class</span></div><div class="ag" data-goto="q20"><b>20</b><span>Từ khóa <code>final</code>: method, class, biến</span></div><div class="ag" data-goto="q21"><b>21</b><span>Lớp gốc <code>Object</code> và <code>toString()</code></span></div></div>
+</section>
+<section class="slide" id="partA">
+  <div class="orb" style="width:340px;height:340px;background:#c4b5fd;right:6%;top:12%"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// Phần A · 03.02</div>
+    <h1 class="in"><span class="grad">More on Methods and Classes</span></h1>
+    <p class="in muted" style="font-size:24px;margin-top:16px">10 câu hỏi</p>
+  </div>
+</section>
+<section class="slide" id="q1">
+  <div class="hdr in"><span class="qn">CÂU 1</span><h2 class="fitw">Truy cập mặc định (default / package-private)</h2></div>
+  <div class="cols qcols">
+    <div class="in">
+      <div class="qcard"><span class="lbl info">CÂU HỎI</span><p>Trong Java, member không ghi access modifier (ví dụ <code>int gamma;</code>) có truy cập được từ một class khác cùng file/package không? So với C++ thì sao?</p></div>
+      <div class="note f">🤔 Dự đoán output trước khi xem đáp án. Code này in ra gì?</div>
+      <p class="tagline f"><span class="pill">Access modifiers</span></p>
+    </div>
+    <div class="in fitbox">
+      <div class="code-title">Input · AccessDemo.java</div>
+      <script type="text/x-java" class="fit">
+class MyClass {
+    private int alpha;   // private
+    public  int beta;    // public
+    int gamma;           // default (package-private)
+
+    void setAlpha(int a) { alpha = a; }
+    int  getAlpha()      { return alpha; }
+}
+
+public class AccessDemo {
+    public static void main(String[] args) {
+        MyClass ob = new MyClass();
+        ob.setAlpha(-99);
+        ob.beta  = 88;
+        ob.gamma = 99;            // OK: cùng package
+        // ob.alpha = 10;         // lỗi: alpha là private
+        System.out.println(ob.getAlpha() + " " + ob.beta + " " + ob.gamma);
+    }
+}
+</script>
+    </div>
+  </div>
+</section>
+<section class="slide" id="a1">
+  <div class="hdr in"><span class="qn">CÂU 1 · ĐÁP ÁN</span><h2 class="fitw">Truy cập mặc định (default / package-private)</h2></div>
+  <div class="ans f"><span class="lbl good">TRẢ LỜI NGẮN</span><p>Được. Không ghi modifier = <em>default (package-private)</em>: mọi class trong cùng package đều truy cập được. Trong C++, member của <code>class</code> mặc định là <code>private</code>.</p></div>
+  <div class="cols acols">
+    <div>
+      <div class="f type"><div class="code-title">Output</div>
+        <div class="console fit"><span class="cl">-99 88 99</span></div></div>
+      <div class="f" style="margin-top:12px"><div class="code-title">So sánh với C++</div>
+        <script type="text/x-cpp" class="xs fit">
+class MyClass {
+    int gamma;          // C++: mặc định private
+};
+// ob.gamma = 99;      // C++: error: 'int MyClass::gamma' is private
+</script></div>
+    </div>
+    <div class="card explain f fitv"><h3>Giải thích chi tiết</h3><ul>
+<li>Java có <strong>4 mức</strong> truy cập: <code>public</code>, <code>protected</code>, <em>default</em> (không ghi gì), <code>private</code>.</li>
+<li>Default <strong>không phải</strong> <code>private</code> như C++: nó cho phép mọi class <strong>cùng package</strong> truy cập. Vì <code>MyClass</code> và <code>AccessDemo</code> nằm cùng file (cùng <em>unnamed package</em>), <code>ob.gamma = 99</code> hợp lệ.</li>
+<li>Khác biệt cú pháp: Java ghi modifier <strong>trước từng member</strong>, không có kiểu khối <code>public:</code> / <code>private:</code> như C++.</li>
+<li>Java <strong>không có <code>friend</code></strong>; muốn "mở" cho class khác thì dùng default/<code>protected</code> trong cùng package hoặc getter/setter.</li>
+</ul></div>
+  </div>
+</section>
+<section class="slide" id="q2">
+  <div class="hdr in"><span class="qn">CÂU 2</span><h2 class="fitw">Truyền tham số kiểu cơ sở (primitive)</h2></div>
+  <div class="cols qcols">
+    <div class="in">
+      <div class="qcard"><span class="lbl info">CÂU HỎI</span><p>Sau khi gọi <code>ob.noChange(a, b)</code>, giá trị của <code>a</code> và <code>b</code> trong <code>main</code> là gì? Java có cách nào viết <code>void f(int &amp;x)</code> như C++ không?</p></div>
+      <div class="note f">🤔 Dự đoán output trước khi xem đáp án. Code này in ra gì?</div>
+      <p class="tagline f"><span class="pill">Pass by value</span></p>
+    </div>
+    <div class="in fitbox">
+      <div class="code-title">Input · CallByValue.java</div>
+      <script type="text/x-java" class="fit">
+class Test {
+    void noChange(int i, int j) {
+        i = i + j;
+        j = -j;
+    }
+}
+
+public class CallByValue {
+    public static void main(String[] args) {
+        Test ob = new Test();
+        int a = 15, b = 20;
+        System.out.println("a and b before call: " + a + " " + b);
+        ob.noChange(a, b);
+        System.out.println("a and b after call: "  + a + " " + b);
+    }
+}
+</script>
+    </div>
+  </div>
+</section>
+<section class="slide" id="a2">
+  <div class="hdr in"><span class="qn">CÂU 2 · ĐÁP ÁN</span><h2 class="fitw">Truyền tham số kiểu cơ sở (primitive)</h2></div>
+  <div class="ans f"><span class="lbl good">TRẢ LỜI NGẮN</span><p><code>a</code> và <code>b</code> không đổi (15 20). Java <strong>luôn truyền theo giá trị (call-by-value)</strong>, không có tham chiếu <code>&amp;</code> hay con trỏ <code>*</code> cho primitive.</p></div>
+  <div class="cols acols">
+    <div>
+      <div class="f type"><div class="code-title">Output</div>
+        <div class="console fit"><span class="cl">a and b before call: 15 20</span><span class="cl">a and b after call: 15 20</span></div></div>
+      <div class="f" style="margin-top:12px"><div class="code-title">So sánh với C++</div>
+        <script type="text/x-cpp" class="xs fit">
+void change(int &i, int &j) { i = i + j; j = -j; }  // C++ làm được
+// Java: KHÔNG có tham chiếu & cho primitive
+</script></div>
+    </div>
+    <div class="card explain f fitv"><h3>Giải thích chi tiết</h3><ul>
+<li><code>i</code>, <code>j</code> là <strong>bản sao</strong> của <code>a</code>, <code>b</code>; thay đổi <code>i</code>, <code>j</code> không ảnh hưởng đến biến gốc.</li>
+<li>Java <strong>không có</strong> cú pháp <code>int &amp;x</code> hay <code>int *p</code>. Mọi tham số đều là call-by-value.</li>
+<li>Muốn method "trả về" nhiều giá trị: dùng giá trị trả về, mảng, hoặc gói vào một object (xem câu tiếp theo).</li>
+</ul></div>
+  </div>
+</section>
+<section class="slide" id="q3">
+  <div class="hdr in"><span class="qn">CÂU 3</span><h2 class="fitw">Truyền object: sửa field vs gán lại tham số</h2></div>
+  <div class="cols qcols">
+    <div class="in">
+      <div class="qcard"><span class="lbl info">CÂU HỎI</span><p>Java truyền object vào method theo kiểu gì? Kết quả in ra sau <code>change(ob)</code> và <code>reassign(ob)</code> là gì?</p></div>
+      <div class="note f">🤔 Dự đoán output trước khi xem đáp án. Code này in ra gì?</div>
+      <p class="tagline f"><span class="pill">Pass object reference</span></p>
+    </div>
+    <div class="in fitbox">
+      <div class="code-title">Input · PassObjRef.java</div>
+      <script type="text/x-java" class="fit">
+class Test1 {
+    int a, b;
+    Test1(int i, int j) { a = i; b = j; }
+
+    void change(Test1 ob) {          // sửa object mà ob trỏ tới
+        ob.a = ob.a + ob.b;
+        ob.b = -ob.b;
+    }
+    void reassign(Test1 ob) {        // chỉ đổi bản sao tham chiếu
+        ob = new Test1(0, 0);
+    }
+}
+
+public class PassObjRef {
+    public static void main(String[] args) {
+        Test1 ob = new Test1(15, 20);
+        System.out.println("before : " + ob.a + " " + ob.b);
+        ob.change(ob);
+        System.out.println("change : " + ob.a + " " + ob.b);
+        ob.reassign(ob);
+        System.out.println("reassign: " + ob.a + " " + ob.b);
+    }
+}
+</script>
+    </div>
+  </div>
+</section>
+<section class="slide" id="a3">
+  <div class="hdr in"><span class="qn">CÂU 3 · ĐÁP ÁN</span><h2 class="fitw">Truyền object: sửa field vs gán lại tham số</h2></div>
+  <div class="ans f"><span class="lbl good">TRẢ LỜI NGẮN</span><p>Java truyền <strong>giá trị của tham chiếu</strong> (copy of reference). Sửa field qua tham chiếu → thấy ở ngoài (35 -20); gán tham số sang object mới → <strong>không</strong> ảnh hưởng ở ngoài.</p></div>
+  <div class="cols acols">
+    <div>
+      <div class="f type"><div class="code-title">Output</div>
+        <div class="console fit"><span class="cl">before : 15 20</span><span class="cl">change : 35 -20</span><span class="cl">reassign: 35 -20</span></div></div>
+      <div class="f" style="margin-top:12px"><div class="code-title">So sánh với C++</div>
+        <script type="text/x-cpp" class="xs fit">
+void reassign(Test1 *&ob) { ob = new Test1(0,0); } // C++: đổi được con trỏ của caller
+// Java: không có "reference to reference"
+</script></div>
+    </div>
+    <div class="card explain f fitv"><h3>Giải thích chi tiết</h3><ul>
+<li>Biến kiểu class trong Java là <strong>tham chiếu</strong> (gần giống con trỏ C++ nhưng không có số học con trỏ, không <code>*</code>, <code>-&gt;</code>).</li>
+<li>Khi gọi method, tham chiếu được <strong>sao chép</strong>: tham số và đối số cùng trỏ tới <strong>một object</strong> → <code>change()</code> sửa <code>ob.a</code>, <code>ob.b</code> thì <code>main</code> thấy.</li>
+<li><code>reassign()</code> chỉ cho <strong>bản sao tham chiếu</strong> trỏ sang object mới → biến <code>ob</code> trong <code>main</code> vẫn trỏ object cũ → không đổi.</li>
+<li>Hệ quả: trong Java <strong>không viết được</strong> hàm <code>swap(Box x, Box y)</code> hoán đổi 2 biến của caller như <code>swap(T &amp;a, T &amp;b)</code> của C++.</li>
+</ul></div>
+  </div>
+</section>
+<section class="slide" id="q4">
+  <div class="hdr in"><span class="qn">CÂU 4</span><h2 class="fitw">Trả về object tạo bên trong method</h2></div>
+  <div class="cols qcols">
+    <div class="in">
+      <div class="qcard"><span class="lbl info">CÂU HỎI</span><p>Method <code>getErrorInfo()</code> trả về <code>new Err(...)</code> được tạo bên trong method. Có nguy cơ <em>dangling</em> như C++ không? Ai giải phóng object đó?</p></div>
+      <div class="note f">🤔 Dự đoán output trước khi xem đáp án. Code này in ra gì?</div>
+      <p class="tagline f"><span class="pill">Returning objects</span></p>
+    </div>
+    <div class="in fitbox">
+      <div class="code-title">Input · ErrInfo.java</div>
+      <script type="text/x-java" class="fit">
+class Err {
+    String msg;
+    int severity;
+    Err(String m, int s) { msg = m; severity = s; }
+}
+
+class ErrorInfo {
+    String msgs[] = { "Output Error", "Input Error",
+                      "Disk Full", "Index Out-Of-Bounds" };
+    int howbad[] = { 3, 3, 2, 4 };
+
+    Err getErrorInfo(int i) {
+        if (i >= 0 & i < msgs.length)
+            return new Err(msgs[i], howbad[i]);
+        else
+            return new Err("Invalid Error Code", 0);
+    }
+}
+
+public class ErrInfo {
+    public static void main(String[] args) {
+        ErrorInfo err = new ErrorInfo();
+        Err e = err.getErrorInfo(2);
+        System.out.println(e.msg + " severity: " + e.severity);
+        e = err.getErrorInfo(19);
+        System.out.println(e.msg + " severity: " + e.severity);
+    }
+}
+</script>
+    </div>
+  </div>
+</section>
+<section class="slide" id="a4">
+  <div class="hdr in"><span class="qn">CÂU 4 · ĐÁP ÁN</span><h2 class="fitw">Trả về object tạo bên trong method</h2></div>
+  <div class="ans f"><span class="lbl good">TRẢ LỜI NGẮN</span><p>Không. Mọi object Java nằm trên <strong>heap</strong>, method chỉ trả về tham chiếu; object được <strong>Garbage Collector</strong> tự thu hồi khi không còn ai tham chiếu – không có <code>delete</code>.</p></div>
+  <div class="cols acols">
+    <div>
+      <div class="f type"><div class="code-title">Output</div>
+        <div class="console fit"><span class="cl">Disk Full severity: 2</span><span class="cl">Invalid Error Code severity: 0</span></div></div>
+      <div class="f" style="margin-top:12px"><div class="code-title">So sánh với C++</div>
+        <script type="text/x-cpp" class="xs fit">
+Err& getErrorInfo(int i) {
+    Err local("Disk Full", 2);
+    return local;       // C++: dangling reference – undefined behavior
+}
+</script></div>
+    </div>
+    <div class="card explain f fitv"><h3>Giải thích chi tiết</h3><ul>
+<li>Java <strong>không có object cục bộ trên stack</strong>; <code>new</code> luôn cấp phát trên heap. Biến cục bộ chỉ giữ <strong>tham chiếu</strong>.</li>
+<li>Trả về tham chiếu tới object vừa tạo là hoàn toàn an toàn – không có lỗi <em>dangling reference/pointer</em> như khi C++ trả về <code>&amp;local</code> hoặc con trỏ tới biến cục bộ.</li>
+<li>Không có <code>delete</code> / destructor: khi <code>e</code> được gán sang object khác, object cũ không còn ai tham chiếu và sẽ được <strong>GC</strong> thu hồi.</li>
+<li>Lưu ý thêm: <code>msgs.length</code> – mảng Java tự biết độ dài; dùng chỉ số ngoài biên sẽ ném <code>ArrayIndexOutOfBoundsException</code> chứ không "đọc rác" như C++.</li>
+</ul></div>
+  </div>
+</section>
+<section class="slide" id="q5">
+  <div class="hdr in"><span class="qn">CÂU 5</span><h2 class="fitw">Không có tham số mặc định (default arguments)</h2></div>
+  <div class="cols qcols">
+    <div class="in">
+      <div class="qcard"><span class="lbl info">CÂU HỎI</span><p>Đoạn code khai báo <code>void show(int a, int b = 0)</code> có biên dịch được trong Java không? Nếu không, Java thay thế bằng cách nào?</p></div>
+      <div class="note f">🤔 Dự đoán output trước khi xem đáp án. Code này <b>có biên dịch được không</b>?</div>
+      <p class="tagline f"><span class="pill">Overloading</span></p>
+    </div>
+    <div class="in fitbox">
+      <div class="code-title">Input · DefaultArg.java</div>
+      <script type="text/x-java" class="fit">
+class Printer {
+    void show(int a, int b = 0) {        // C++ style
+        System.out.println(a + " " + b);
+    }
+}
+
+public class DefaultArg {
+    public static void main(String[] args) {
+        new Printer().show(5);
+    }
+}
+</script>
+    </div>
+  </div>
+</section>
+<section class="slide" id="a5">
+  <div class="hdr in"><span class="qn">CÂU 5 · ĐÁP ÁN</span><h2 class="fitw">Không có tham số mặc định (default arguments)</h2></div>
+  <div class="ans f"><span class="lbl good">TRẢ LỜI NGẮN</span><p>Không biên dịch được – Java <strong>không hỗ trợ default arguments</strong>. Thay bằng <strong>method overloading</strong>: viết thêm <code>show(int a)</code> gọi lại <code>show(a, 0)</code>.</p></div>
+  <div class="cols acols">
+    <div>
+      <div class="f type"><div class="code-title">Output · lỗi biên dịch (javac)</div>
+        <div class="console fit err"><span class="cl">DefaultArg.java:2: error: &#x27;,&#x27;, &#x27;)&#x27;, or &#x27;[&#x27; expected</span><span class="cl">    void show(int a, int b = 0) {        // C++ style</span><span class="cl">                          ^</span><span class="cl">1 error</span></div></div>
+      <div class="f" style="margin-top:12px"><div class="code-title">So sánh với C++</div>
+        <script type="text/x-cpp" class="xs fit">
+void show(int a, int b = 0);   // C++: hợp lệ
+show(5);                        // in 5 0
+</script></div>
+    </div>
+    <div class="card explain f fitv"><h3>Giải thích chi tiết</h3><ul>
+<li>Java chủ động bỏ default arguments để tránh nhập nhằng khi kết hợp với overloading.</li>
+<li>Cách làm chuẩn trong Java là <strong>overloading</strong> (slide "Method overloading" / "Overloading constructors"):</li>
+</ul>
+<pre class="mini"><code>class Printer {
+    void show(int a)        { show(a, 0); }          // &quot;giá trị mặc định&quot;
+    void show(int a, int b) { System.out.println(a + &quot; &quot; + b); }
+}
+// new Printer().show(5);  →  5 0
+</code></pre>
+<ul>
+<li>Với constructor, dùng <code>this(...)</code> để gọi constructor khác (ví dụ <code>MyClass1() { this(0); }</code>).</li>
+<li>Giống C++: chỉ khác <strong>kiểu trả về</strong> thì <strong>không</strong> đủ để overload.</li>
+</ul></div>
+  </div>
+</section>
+<section class="slide" id="q6">
+  <div class="hdr in"><span class="qn">CÂU 6</span><h2 class="fitw">Phép gán <code>=</code> và "copy constructor"</h2></div>
+  <div class="cols qcols">
+    <div class="in">
+      <div class="qcard"><span class="lbl info">CÂU HỎI</span><p>Với <code>Summation s2 = s1;</code> và <code>Summation s3 = new Summation(s1);</code>, sau khi gán <code>s1.sum = 100</code>, giá trị <code>s2.sum</code>, <code>s3.sum</code> là bao nhiêu?</p></div>
+      <div class="note f">🤔 Dự đoán output trước khi xem đáp án. Code này in ra gì?</div>
+      <p class="tagline f"><span class="pill">Copy</span></p>
+    </div>
+    <div class="in fitbox">
+      <div class="code-title">Input · SumDemo.java</div>
+      <script type="text/x-java" class="fit">
+class Summation {
+    int sum;
+    Summation(int num) {                 // construct from an int
+        sum = 0;
+        for (int i = 1; i <= num; i++) sum += i;
+    }
+    Summation(Summation ob) {            // "copy constructor" tự viết
+        sum = ob.sum;
+    }
+}
+
+public class SumDemo {
+    public static void main(String[] args) {
+        Summation s1 = new Summation(5);     // 15
+        Summation s2 = s1;                   // copy THAM CHIẾU
+        Summation s3 = new Summation(s1);    // tạo object MỚI
+        s1.sum = 100;
+        System.out.println("s2.sum: " + s2.sum);
+        System.out.println("s3.sum: " + s3.sum);
+        System.out.println("s1 == s2: " + (s1 == s2));
+        System.out.println("s1 == s3: " + (s1 == s3));
+    }
+}
+</script>
+    </div>
+  </div>
+</section>
+<section class="slide" id="a6">
+  <div class="hdr in"><span class="qn">CÂU 6 · ĐÁP ÁN</span><h2 class="fitw">Phép gán <code>=</code> và "copy constructor"</h2></div>
+  <div class="ans f"><span class="lbl good">TRẢ LỜI NGẮN</span><p><code>s2.sum = 100</code> (s2 và s1 cùng một object), <code>s3.sum = 15</code> (object mới). Java <strong>không tự sinh copy constructor / <code>operator=</code></strong>; <code>=</code> chỉ sao chép <strong>tham chiếu</strong>.</p></div>
+  <div class="cols acols">
+    <div>
+      <div class="f type"><div class="code-title">Output</div>
+        <div class="console fit"><span class="cl">s2.sum: 100</span><span class="cl">s3.sum: 15</span><span class="cl">s1 == s2: true</span><span class="cl">s1 == s3: false</span></div></div>
+      <div class="f" style="margin-top:12px"><div class="code-title">So sánh với C++</div>
+        <script type="text/x-cpp" class="xs fit">
+Summation s2 = s1;   // C++: copy constructor -> object riêng
+s1.sum = 100;        // s2.sum vẫn là 15
+</script></div>
+    </div>
+    <div class="card explain f fitv"><h3>Giải thích chi tiết</h3><ul>
+<li>Trong C++, <code>Summation s2 = s1;</code> gọi <strong>copy constructor</strong> (tự sinh nếu không viết) → s2 là object độc lập.</li>
+<li>Trong Java, <code>s2 = s1</code> chỉ làm <strong>hai biến cùng trỏ vào một object</strong> → sửa qua <code>s1</code> thì <code>s2</code> thấy.</li>
+<li>Muốn bản sao thật sự phải <strong>tự viết</strong> constructor nhận object cùng kiểu (<code>Summation(Summation ob)</code>) như slide, hoặc dùng <code>clone()</code>.</li>
+<li><code>==</code> trên object so sánh <strong>địa chỉ tham chiếu</strong>, không so sánh nội dung (muốn so nội dung dùng <code>equals()</code>).</li>
+<li>Java <strong>không cho overload toán tử</strong> (<code>operator=</code>, <code>operator==</code>…).</li>
+</ul></div>
+  </div>
+</section>
+<section class="slide" id="q7">
+  <div class="hdr in"><span class="qn">CÂU 7</span><h2 class="fitw">Biến static: khai báo, giá trị mặc định, cách truy cập</h2></div>
+  <div class="cols qcols">
+    <div class="in">
+      <div class="qcard"><span class="lbl info">CÂU HỎI</span><p>Biến <code>static int y;</code> có cần định nghĩa lại bên ngoài class như C++ (<code>int StaticDemo::y;</code>) không? Giá trị ban đầu là gì và chương trình in ra gì?</p></div>
+      <div class="note f">🤔 Dự đoán output trước khi xem đáp án. Code này in ra gì?</div>
+      <p class="tagline f"><span class="pill">static</span></p>
+    </div>
+    <div class="in fitbox">
+      <div class="code-title">Input · SDemo.java</div>
+      <script type="text/x-java" class="fit">
+class StaticDemo {
+    int x;              // instance variable
+    static int y;       // static variable – dùng chung
+    int sum() { return x + y; }
+}
+
+public class SDemo {
+    public static void main(String[] args) {
+        System.out.println("StaticDemo.y = " + StaticDemo.y);   // chưa có object nào
+        StaticDemo ob1 = new StaticDemo();
+        StaticDemo ob2 = new StaticDemo();
+        ob1.x = 10; ob2.x = 20;
+
+        StaticDemo.y = 19;
+        System.out.println(ob1.sum() + " " + ob2.sum());
+        StaticDemo.y = 100;
+        System.out.println(ob1.sum() + " " + ob2.sum());
+    }
+}
+</script>
+    </div>
+  </div>
+</section>
+<section class="slide" id="a7">
+  <div class="hdr in"><span class="qn">CÂU 7 · ĐÁP ÁN</span><h2 class="fitw">Biến static: khai báo, giá trị mặc định, cách truy cập</h2></div>
+  <div class="ans f"><span class="lbl good">TRẢ LỜI NGẮN</span><p>Không cần định nghĩa ngoài class; biến static được khởi tạo mặc định = 0. Truy cập bằng <code>TênClass.y</code> (dấu chấm, không phải <code>::</code>). Output: 0, 29 39, 110 120.</p></div>
+  <div class="cols acols">
+    <div>
+      <div class="f type"><div class="code-title">Output</div>
+        <div class="console fit"><span class="cl">StaticDemo.y = 0</span><span class="cl">29 39</span><span class="cl">110 120</span></div></div>
+      <div class="f" style="margin-top:12px"><div class="code-title">So sánh với C++</div>
+        <script type="text/x-cpp" class="xs fit">
+class StaticDemo { public: static int y; };
+int StaticDemo::y;            // C++: BẮT BUỘC định nghĩa ngoài class
+StaticDemo::y = 19;           // dùng ::
+</script></div>
+    </div>
+    <div class="card explain f fitv"><h3>Giải thích chi tiết</h3><ul>
+<li>C++: thành viên static (không phải <code>const</code>/<code>inline</code>) phải <strong>định nghĩa ngoài class</strong> (<code>int StaticDemo::y;</code>), nếu không sẽ lỗi link.</li>
+<li>Java: chỉ cần khai báo trong class; JVM cấp phát khi <strong>nạp class</strong>.</li>
+<li><strong>Field</strong> (cả static lẫn instance) trong Java luôn có <strong>giá trị mặc định</strong>: <code>0</code>, <code>0.0</code>, <code>false</code>, <code>null</code>. (Ngược lại, <strong>biến cục bộ</strong> phải được gán trước khi dùng, nếu không sẽ lỗi biên dịch.)</li>
+<li>Truy cập: <code>StaticDemo.y</code> (dấu <code>.</code>), Java không có toán tử phạm vi <code>::</code>. Có thể dùng được cả <code>ob1.y</code> nhưng không khuyến khích.</li>
+<li>y được <strong>chia sẻ</strong> giữa ob1 và ob2: 10+19=29, 20+19=39; sau đó 10+100=110, 20+100=120.</li>
+</ul></div>
+  </div>
+</section>
+<section class="slide" id="q8">
+  <div class="hdr in"><span class="qn">CÂU 8</span><h2 class="fitw">Hạn chế của static method</h2></div>
+  <div class="cols qcols">
+    <div class="in">
+      <div class="qcard"><span class="lbl info">CÂU HỎI</span><p>Static method <code>valDivDenom()</code> truy cập biến instance <code>denom</code> – có biên dịch được không? Static method có dùng được <code>this</code> không?</p></div>
+      <div class="note f">🤔 Dự đoán output trước khi xem đáp án. Code này <b>có biên dịch được không</b>?</div>
+      <p class="tagline f"><span class="pill">static</span></p>
+    </div>
+    <div class="in fitbox">
+      <div class="code-title">Input · StaticError.java</div>
+      <script type="text/x-java" class="fit">
+public class StaticError {
+    int denom = 3;              // instance variable
+    static int val = 1024;      // static variable
+
+    static int valDivDenom() {
+        return val / denom;     // won't compile!
+    }
+
+    public static void main(String[] args) {
+        System.out.println(valDivDenom());
+    }
+}
+</script>
+    </div>
+  </div>
+</section>
+<section class="slide" id="a8">
+  <div class="hdr in"><span class="qn">CÂU 8 · ĐÁP ÁN</span><h2 class="fitw">Hạn chế của static method</h2></div>
+  <div class="ans f"><span class="lbl good">TRẢ LỜI NGẮN</span><p>Không. Static method chỉ truy cập trực tiếp <strong>static member</strong>, và <strong>không có <code>this</code></strong>. javac báo: <em>non-static variable denom cannot be referenced from a static context</em>.</p></div>
+  <div class="cols acols">
+    <div>
+      <div class="f type"><div class="code-title">Output · lỗi biên dịch (javac)</div>
+        <div class="console fit err"><span class="cl">StaticError.java:6: error: non-static variable denom cannot be referenced from a static context</span><span class="cl">        return val / denom;     // won&#x27;t compile!</span><span class="cl">                     ^</span><span class="cl">1 error</span></div></div>
+      <div class="f" style="margin-top:12px"><div class="code-title">So sánh với C++</div>
+        <script type="text/x-cpp" class="xs fit">
+static int valDivDenom() { return val / denom; }
+// C++: error: invalid use of member 'denom' in static member function
+</script></div>
+    </div>
+    <div class="card explain f fitv"><h3>Giải thích chi tiết</h3><ul>
+<li>Static method thuộc về <strong>class</strong>, gọi được khi chưa có object nào → không biết <code>denom</code> của object nào → lỗi.</li>
+<li>Quy tắc giống C++, nhưng gặp <strong>thường xuyên hơn</strong> trong Java vì <code>main</code> bắt buộc là <code>public static void main(String[] args)</code> nằm <strong>trong một class</strong>: từ <code>main</code> không gọi trực tiếp được method instance của chính class đó.</li>
+<li>Cách sửa: tạo object (<code>new StaticError().denom</code>), hoặc khai báo <code>denom</code> là <code>static</code>.</li>
+<li>Java không có hàm toàn cục (global function) như C++; "hàm tiện ích" được viết thành <strong>static method</strong> (ví dụ <code>Math.sqrt()</code>).</li>
+</ul></div>
+  </div>
+</section>
+<section class="slide" id="q9">
+  <div class="hdr in"><span class="qn">CÂU 9</span><h2 class="fitw">Static block (khối khởi tạo static)</h2></div>
+  <div class="cols qcols">
+    <div class="in">
+      <div class="qcard"><span class="lbl info">CÂU HỎI</span><p>Thứ tự các dòng in ra của chương trình dưới đây là gì? Static block chạy khi nào? C++ có cú pháp tương đương không?</p></div>
+      <div class="note f">🤔 Dự đoán output trước khi xem đáp án. Code này in ra gì?</div>
+      <p class="tagline f"><span class="pill">static</span></p>
+    </div>
+    <div class="in fitbox">
+      <div class="code-title">Input · SDemo3.java</div>
+      <script type="text/x-java" class="fit">
+class StaticBlock {
+    static double rootOf2;
+    static double rootOf3;
+
+    static {                                   // static block
+        System.out.println("Inside static block.");
+        rootOf2 = Math.sqrt(2.0);
+        rootOf3 = Math.sqrt(3.0);
+    }
+
+    StaticBlock(String msg) { System.out.println(msg); }
+}
+
+public class SDemo3 {
+    public static void main(String[] args) {
+        System.out.println("Start main");
+        StaticBlock ob  = new StaticBlock("Inside Constructor");
+        StaticBlock ob2 = new StaticBlock("Second object");
+        System.out.println("Square root of 2 is " + StaticBlock.rootOf2);
+        System.out.println("Square root of 3 is " + StaticBlock.rootOf3);
+    }
+}
+</script>
+    </div>
+  </div>
+</section>
+<section class="slide" id="a9">
+  <div class="hdr in"><span class="qn">CÂU 9 · ĐÁP ÁN</span><h2 class="fitw">Static block (khối khởi tạo static)</h2></div>
+  <div class="ans f"><span class="lbl good">TRẢ LỜI NGẮN</span><p><code>Start main</code> → <code>Inside static block.</code> → <code>Inside Constructor</code> → 2 dòng căn bậc hai. Static block chạy <strong>một lần</strong>, khi class được <strong>nạp lần đầu</strong> (trước constructor). C++ không có cú pháp này.</p></div>
+  <div class="cols acols">
+    <div>
+      <div class="f type"><div class="code-title">Output</div>
+        <div class="console fit"><span class="cl">Start main</span><span class="cl">Inside static block.</span><span class="cl">Inside Constructor</span><span class="cl">Second object</span><span class="cl">Square root of 2 is 1.4142135623730951</span><span class="cl">Square root of 3 is 1.7320508075688772</span></div></div>
+      <div class="f" style="margin-top:12px"><div class="code-title">So sánh với C++</div>
+        <script type="text/x-cpp" class="xs fit">
+// C++ không có static block, ví dụ thay thế:
+double StaticBlock::rootOf2 = std::sqrt(2.0);
+</script></div>
+    </div>
+    <div class="card explain f fitv"><h3>Giải thích chi tiết</h3><ul>
+<li>JVM nạp class <strong>lười (lazy)</strong>: <code>StaticBlock</code> chỉ được nạp khi lần đầu dùng đến (<code>new StaticBlock(...)</code>), vì thế <code>Start main</code> in <strong>trước</strong>.</li>
+<li>Static block chạy <strong>đúng một lần</strong> khi nạp class, <strong>trước</strong> mọi constructor → tạo object thứ hai không in lại "Inside static block.".</li>
+<li>Dùng để khởi tạo các biến static cần tính toán phức tạp.</li>
+<li>C++ không có <code>static { }</code>; thường phải dùng hàm khởi tạo riêng hoặc biến static có initializer, và thứ tự khởi tạo giữa các file không xác định (<em>static initialization order fiasco</em>).</li>
+</ul></div>
+  </div>
+</section>
+<section class="slide" id="q10">
+  <div class="hdr in"><span class="qn">CÂU 10</span><h2 class="fitw">Đệ quy không có điểm dừng → StackOverflowError</h2></div>
+  <div class="cols qcols">
+    <div class="in">
+      <div class="qcard"><span class="lbl info">CÂU HỎI</span><p>Gọi <code>factR(0)</code> với hàm giai thừa đệ quy trong slide (điều kiện dừng <code>n == 1</code>) thì điều gì xảy ra? Có bắt được lỗi này không?</p></div>
+      <div class="note f">🤔 Dự đoán output trước khi xem đáp án. Code này in ra gì?</div>
+      <p class="tagline f"><span class="pill">Recursion</span></p>
+    </div>
+    <div class="in fitbox">
+      <div class="code-title">Input · Recursion.java</div>
+      <script type="text/x-java" class="fit">
+class Factorial {
+    int factR(int n) {               // recursive
+        if (n == 1) return 1;
+        return factR(n - 1) * n;
+    }
+}
+
+public class Recursion {
+    public static void main(String[] args) {
+        Factorial f = new Factorial();
+        System.out.println("Factorial of 5 is " + f.factR(5));
+        try {
+            System.out.println(f.factR(0));   // không bao giờ gặp n == 1
+        } catch (StackOverflowError e) {
+            System.out.println("Caught: " + e.getClass().getName());
+        }
+        System.out.println("Program continues");
+    }
+}
+</script>
+    </div>
+  </div>
+</section>
+<section class="slide" id="a10">
+  <div class="hdr in"><span class="qn">CÂU 10 · ĐÁP ÁN</span><h2 class="fitw">Đệ quy không có điểm dừng → StackOverflowError</h2></div>
+  <div class="ans f"><span class="lbl good">TRẢ LỜI NGẮN</span><p>Đệ quy vô hạn (0, -1, -2, …) → JVM ném <strong><code>java.lang.StackOverflowError</code></strong>, có thể <code>catch</code> được. Trong C++ đây là <em>undefined behavior</em> (thường crash – segmentation fault).</p></div>
+  <div class="cols acols">
+    <div>
+      <div class="f type"><div class="code-title">Output</div>
+        <div class="console fit"><span class="cl">Factorial of 5 is 120</span><span class="cl">Caught: java.lang.StackOverflowError</span><span class="cl">Program continues</span></div></div>
+      <div class="f" style="margin-top:12px"><div class="code-title">So sánh với C++</div>
+        <script type="text/x-cpp" class="xs fit">
+int factR(int n) { if (n == 1) return 1; return factR(n-1)*n; }
+factR(0);   // C++: tràn stack -> Segmentation fault (core dumped)
+</script></div>
+    </div>
+    <div class="card explain f fitv"><h3>Giải thích chi tiết</h3><ul>
+<li>Mỗi lần gọi đệ quy chiếm một <em>stack frame</em>; vì <code>n</code> giảm mãi mà không bằng 1 nên stack bị tràn.</li>
+<li>JVM kiểm soát stack và ném <strong><code>StackOverflowError</code></strong> (một <code>Error</code>, không phải <code>Exception</code>) → chương trình có thông báo rõ ràng, thậm chí <code>catch</code> để chạy tiếp (chỉ nên làm khi demo).</li>
+<li>C++ không kiểm tra: tràn stack là <em>undefined behavior</em>, thường crash bằng <em>segmentation fault</em> không có thông tin.</li>
+<li>Sửa: dùng điều kiện dừng <code>if (n &lt;= 1) return 1;</code>.</li>
+</ul></div>
+  </div>
+</section>
+<section class="slide" id="partB">
+  <div class="orb" style="width:340px;height:340px;background:#c4b5fd;right:6%;top:12%"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// Phần B · 03.03</div>
+    <h1 class="in"><span class="grad">Inheritance</span></h1>
+    <p class="in muted" style="font-size:24px;margin-top:16px">11 câu hỏi</p>
+  </div>
+</section>
+<section class="slide" id="q11">
+  <div class="hdr in"><span class="qn">CÂU 11</span><h2 class="fitw">Từ khóa <code>extends</code> và đơn kế thừa</h2></div>
+  <div class="cols qcols">
+    <div class="in">
+      <div class="qcard"><span class="lbl info">CÂU HỎI</span><p>Khai báo <code>class C extends A, B { }</code> có hợp lệ trong Java không? Java có <code>public/protected/private inheritance</code> như C++ không?</p></div>
+      <div class="note f">🤔 Dự đoán output trước khi xem đáp án. Code này <b>có biên dịch được không</b>?</div>
+      <p class="tagline f"><span class="pill">extends</span></p>
+    </div>
+    <div class="in fitbox">
+      <div class="code-title">Input · Multi.java</div>
+      <script type="text/x-java" class="fit">
+class A { void hello() { System.out.println("A"); } }
+class B { void hi()    { System.out.println("B"); } }
+
+class C extends A, B { }          // C++: class C : public A, public B
+
+public class Multi {
+    public static void main(String[] args) {
+        new C().hello();
+    }
+}
+</script>
+    </div>
+  </div>
+</section>
+<section class="slide" id="a11">
+  <div class="hdr in"><span class="qn">CÂU 11 · ĐÁP ÁN</span><h2 class="fitw">Từ khóa <code>extends</code> và đơn kế thừa</h2></div>
+  <div class="ans f"><span class="lbl good">TRẢ LỜI NGẮN</span><p>Không hợp lệ – Java chỉ cho phép <strong>đơn kế thừa class</strong> (một class cha). Java cũng <strong>không có</strong> kiểu kế thừa public/protected/private: mọi kế thừa đều tương đương <em>public inheritance</em>. Đa kế thừa "kiểu" được làm bằng <strong>interface</strong>.</p></div>
+  <div class="cols acols">
+    <div>
+      <div class="f type"><div class="code-title">Output · lỗi biên dịch (javac)</div>
+        <div class="console fit err"><span class="cl">Multi.java:4: error: &#x27;{&#x27; expected</span><span class="cl">class C extends A, B { }          // C++: class C : public A, public B</span><span class="cl">                 ^</span><span class="cl">1 error</span></div></div>
+      <div class="f" style="margin-top:12px"><div class="code-title">So sánh với C++</div>
+        <script type="text/x-cpp" class="xs fit">
+class C : public A, public B { };   // C++: hợp lệ (đa kế thừa)
+class D : private A { };            // C++: private inheritance
+</script></div>
+    </div>
+    <div class="card explain f fitv"><h3>Giải thích chi tiết</h3><ul>
+<li>Cú pháp Java: <code>class Triangle extends TwoDShape { ... }</code> (C++: <code>class Triangle : public TwoDShape</code>).</li>
+<li>Java bỏ đa kế thừa class để tránh vấn đề <strong>diamond</strong> (C++ phải dùng <code>virtual</code> inheritance). Thay vào đó, một class có thể <code>implements</code> <strong>nhiều interface</strong> (bài 03.04).</li>
+<li>Không có <code>: private Base</code> hay <code>: protected Base</code> – quyền truy cập của member cha giữ nguyên trong class con.</li>
+<li>Mọi class không ghi <code>extends</code> đều ngầm định <code>extends Object</code> → toàn bộ class Java tạo thành <strong>một cây duy nhất</strong> gốc là <code>Object</code> (C++ không có lớp gốc chung).</li>
+</ul></div>
+  </div>
+</section>
+<section class="slide" id="q12">
+  <div class="hdr in"><span class="qn">CÂU 12</span><h2 class="fitw"><code>protected</code> trong Java rộng hơn C++</h2></div>
+  <div class="cols qcols">
+    <div class="in">
+      <div class="qcard"><span class="lbl info">CÂU HỎI</span><p>Class <code>Other</code> <strong>không</strong> kế thừa <code>A</code> nhưng cùng package. Nó có đọc được field <code>protected int p</code> của <code>A</code> không?</p></div>
+      <div class="note f">🤔 Dự đoán output trước khi xem đáp án. Code này in ra gì?</div>
+      <p class="tagline f"><span class="pill">protected</span></p>
+    </div>
+    <div class="in fitbox">
+      <div class="code-title">Input · ProtDemo.java</div>
+      <script type="text/x-java" class="fit">
+class A {
+    protected int p = 7;
+    private   int q = 8;
+}
+
+class Other {                         // KHÔNG phải subclass của A
+    void peek(A a) {
+        System.out.println("p = " + a.p);   // OK: cùng package
+        // System.out.println(a.q);         // lỗi: private
+    }
+}
+
+public class ProtDemo {
+    public static void main(String[] args) {
+        new Other().peek(new A());
+    }
+}
+</script>
+    </div>
+  </div>
+</section>
+<section class="slide" id="a12">
+  <div class="hdr in"><span class="qn">CÂU 12 · ĐÁP ÁN</span><h2 class="fitw"><code>protected</code> trong Java rộng hơn C++</h2></div>
+  <div class="ans f"><span class="lbl good">TRẢ LỜI NGẮN</span><p>Được. Trong Java, <code>protected</code> = <strong>truy cập trong cùng package + các subclass</strong> (kể cả ở package khác). Trong C++, <code>protected</code> chỉ dành cho class đó và class dẫn xuất.</p></div>
+  <div class="cols acols">
+    <div>
+      <div class="f type"><div class="code-title">Output</div>
+        <div class="console fit"><span class="cl">p = 7</span></div></div>
+      <div class="f" style="margin-top:12px"><div class="code-title">So sánh với C++</div>
+        <script type="text/x-cpp" class="xs fit">
+class A { protected: int p = 7; };
+class Other { void peek(A a) { a.p; } };   // C++: error: 'int A::p' is protected
+</script></div>
+    </div>
+    <div class="card explain f fitv"><h3>Giải thích chi tiết</h3><p>Bảng quyền truy cập trong Java:</p>
+<table>
+<thead>
+<tr>
+<th>Modifier</th>
+<th>Cùng class</th>
+<th>Cùng package</th>
+<th>Subclass (khác package)</th>
+<th>Mọi nơi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>public</code></td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+</tr>
+<tr>
+<td><code>protected</code></td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+<td>✘</td>
+</tr>
+<tr>
+<td><em>default</em></td>
+<td>✔</td>
+<td>✔</td>
+<td>✘</td>
+<td>✘</td>
+</tr>
+<tr>
+<td><code>private</code></td>
+<td>✔</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Vì vậy <code>protected</code> trong Java <strong>lỏng hơn</strong> C++: mọi class cùng package đều thấy.</li>
+<li>Giống C++: member <code>private</code> của class cha <strong>không</strong> truy cập trực tiếp được từ class con (slide <em>Member access and inheritance</em>) → dùng getter/setter như <code>getWidth()</code>.</li>
+</ul></div>
+  </div>
+</section>
+<section class="slide" id="q13">
+  <div class="hdr in"><span class="qn">CÂU 13</span><h2 class="fitw">Gọi constructor lớp cha bằng <code>super(...)</code></h2></div>
+  <div class="cols qcols">
+    <div class="in">
+      <div class="qcard"><span class="lbl info">CÂU HỎI</span><p>Java dùng gì thay cho <em>member initializer list</em> <code>: TwoDShape(w, h)</code> của C++? Đoạn code gọi <code>showDim()</code> trước <code>super(w, h)</code> có biên dịch được không?</p></div>
+      <div class="note f">🤔 Dự đoán output trước khi xem đáp án. Code này <b>có biên dịch được không</b>?</div>
+      <p class="tagline f"><span class="pill">super()</span></p>
+    </div>
+    <div class="in fitbox">
+      <div class="code-title">Input · SuperFirst.java</div>
+      <script type="text/x-java" class="fit">
+class TwoDShape {
+    private double width, height;
+    TwoDShape(double w, double h) { width = w; height = h; }
+    void showDim() { System.out.println(width + " x " + height); }
+}
+
+class Triangle extends TwoDShape {
+    private String style;
+    Triangle(String s, double w, double h) {
+        showDim();          // dùng object khi phần cha chưa được tạo
+        super(w, h);        // phải đứng đầu!
+        style = s;
+    }
+}
+
+public class SuperFirst {
+    public static void main(String[] args) {
+        new Triangle("filled", 4, 4);
+    }
+}
+</script>
+    </div>
+  </div>
+</section>
+<section class="slide" id="a13">
+  <div class="hdr in"><span class="qn">CÂU 13 · ĐÁP ÁN</span><h2 class="fitw">Gọi constructor lớp cha bằng <code>super(...)</code></h2></div>
+  <div class="ans f"><span class="lbl good">TRẢ LỜI NGẮN</span><p>Dùng <code>super(parameterlist);</code> và nó <strong>phải là câu lệnh đầu tiên</strong> trong constructor của class con. Code dưới bị lỗi: <em>call to super must be first statement in constructor</em>.</p></div>
+  <div class="cols acols">
+    <div>
+      <div class="f type"><div class="code-title">Output · lỗi biên dịch (javac)</div>
+        <div class="console fit err"><span class="cl">SuperFirst.java:11: error: call to super must be first statement in constructor</span><span class="cl">        super(w, h);        // phải đứng đầu!</span><span class="cl">             ^</span><span class="cl">1 error</span></div></div>
+      <div class="f" style="margin-top:12px"><div class="code-title">So sánh với C++</div>
+        <script type="text/x-cpp" class="xs fit">
+Triangle(std::string s, double w, double h)
+    : TwoDShape(w, h), style(s) { }   // C++: initializer list
+</script></div>
+    </div>
+    <div class="card explain f fitv"><h3>Giải thích chi tiết</h3><ul>
+<li>C++: <code>Triangle(string s, double w, double h) : TwoDShape(w, h), style(s) { }</code>.</li>
+<li>Java: không có initializer list; thay bằng <code>super(w, h);</code> <strong>ở dòng đầu</strong> của constructor. Đảm bảo phần lớp cha luôn được khởi tạo trước.</li>
+<li>Nếu không viết <code>super(...)</code>, compiler <strong>tự chèn <code>super();</code></strong> (constructor không tham số). Nếu lớp cha không có constructor không tham số → lỗi biên dịch.</li>
+<li>Tương tự, <code>this(...)</code> (gọi constructor khác cùng class) cũng phải đứng đầu; không thể vừa <code>this(...)</code> vừa <code>super(...)</code>.</li>
+<li>Ghi chú: từ <strong>Java 25</strong> (JEP 513 – <em>Flexible Constructor Bodies</em>) được phép đặt một số câu lệnh <strong>không dùng <code>this</code></strong> trước <code>super(...)</code>, nhưng gọi method instance như <code>showDim()</code> vẫn bị cấm.</li>
+</ul></div>
+  </div>
+</section>
+<section class="slide" id="q14">
+  <div class="hdr in"><span class="qn">CÂU 14</span><h2 class="fitw">Thứ tự constructor &amp; gọi method override trong constructor</h2></div>
+  <div class="cols qcols">
+    <div class="in">
+      <div class="qcard"><span class="lbl info">CÂU HỎI</span><p>Tạo <code>new B()</code> – chương trình in ra gì? Khi constructor của <code>A</code> gọi <code>show()</code> (đã được <code>B</code> override) thì phiên bản nào chạy, <code>k</code> bằng bao nhiêu?</p></div>
+      <div class="note f">🤔 Dự đoán output trước khi xem đáp án. Code này in ra gì?</div>
+      <p class="tagline f"><span class="pill">Constructor order</span></p>
+    </div>
+    <div class="in fitbox">
+      <div class="code-title">Input · CtorOrder.java</div>
+      <script type="text/x-java" class="fit">
+class A {
+    A() {
+        System.out.println("Constructing A.");
+        show();                              // gọi method bị override
+    }
+    void show() { System.out.println("A.show()"); }
+}
+
+class B extends A {
+    int k = 5;
+    B() { System.out.println("Constructing B. k = " + k); }
+    void show() { System.out.println("B.show() k = " + k); }
+}
+
+public class CtorOrder {
+    public static void main(String[] args) {
+        new B();
+    }
+}
+</script>
+    </div>
+  </div>
+</section>
+<section class="slide" id="a14">
+  <div class="hdr in"><span class="qn">CÂU 14 · ĐÁP ÁN</span><h2 class="fitw">Thứ tự constructor &amp; gọi method override trong constructor</h2></div>
+  <div class="ans f"><span class="lbl good">TRẢ LỜI NGẮN</span><p>Constructor chạy từ <strong>cha → con</strong> (A rồi B). Nhưng <code>show()</code> gọi trong constructor A lại chạy <strong>bản của B</strong> (dynamic dispatch), lúc đó <code>k</code> còn = <strong>0</strong>. C++ thì sẽ gọi <code>A::show()</code>.</p></div>
+  <div class="cols acols">
+    <div>
+      <div class="f type"><div class="code-title">Output</div>
+        <div class="console fit"><span class="cl">Constructing A.</span><span class="cl">B.show() k = 0</span><span class="cl">Constructing B. k = 5</span></div></div>
+      <div class="f" style="margin-top:12px"><div class="code-title">So sánh với C++</div>
+        <script type="text/x-cpp" class="xs fit">
+// C++ (show là virtual):
+// Constructing A.
+// A.show()            <- C++ gọi bản của A
+// Constructing B. k = 5
+</script></div>
+    </div>
+    <div class="card explain f fitv"><h3>Giải thích chi tiết</h3><ul>
+<li>Thứ tự giống C++: constructor hoàn tất <strong>theo thứ tự dẫn xuất</strong> – lớp cha trước, lớp con sau (slide <em>When are constructors executed?</em>).</li>
+<li><strong>Khác biệt quan trọng:</strong> trong Java, object ngay từ đầu đã là kiểu <code>B</code>, nên <code>show()</code> gọi trong <code>A()</code> được <strong>dispatch tới <code>B.show()</code></strong>. Lúc này field <code>k</code> chưa được khởi tạo (initializer <code>k = 5</code> chạy sau khi <code>super()</code> xong) nên <code>k</code> mang giá trị mặc định <strong>0</strong>.</li>
+<li>Trong C++, trong lúc chạy constructor của <code>A</code>, object được coi là <code>A</code> → gọi <code>A::show()</code>.</li>
+<li>Bài học: <strong>tránh gọi method có thể bị override trong constructor</strong>.</li>
+<li>Java <strong>không có destructor</strong>; dọn dẹp tài nguyên dùng <code>try-with-resources</code>/<code>close()</code>.</li>
+</ul></div>
+  </div>
+</section>
+<section class="slide" id="q15">
+  <div class="hdr in"><span class="qn">CÂU 15</span><h2 class="fitw">Truy cập member bị che (name hiding) bằng <code>super.member</code></h2></div>
+  <div class="cols qcols">
+    <div class="in">
+      <div class="qcard"><span class="lbl info">CÂU HỎI</span><p>Class <code>B</code> khai báo lại field <code>i</code> che field <code>i</code> của <code>A</code>. Làm sao truy cập <code>i</code> của lớp cha? Chương trình in gì?</p></div>
+      <div class="note f">🤔 Dự đoán output trước khi xem đáp án. Code này in ra gì?</div>
+      <p class="tagline f"><span class="pill">super.member</span></p>
+    </div>
+    <div class="in fitbox">
+      <div class="code-title">Input · UseSuper.java</div>
+      <script type="text/x-java" class="fit">
+class A { int i; }
+
+class B extends A {
+    int i;                       // che i của A
+    B(int a, int b) {
+        super.i = a;             // i trong A
+        i = b;                   // i trong B
+    }
+    void show() {
+        System.out.println("i in superclass: " + super.i);
+        System.out.println("i in subclass: "   + i);
+    }
+}
+
+public class UseSuper {
+    public static void main(String[] args) {
+        B subOb = new B(1, 2);
+        subOb.show();
+    }
+}
+</script>
+    </div>
+  </div>
+</section>
+<section class="slide" id="a15">
+  <div class="hdr in"><span class="qn">CÂU 15 · ĐÁP ÁN</span><h2 class="fitw">Truy cập member bị che (name hiding) bằng <code>super.member</code></h2></div>
+  <div class="ans f"><span class="lbl good">TRẢ LỜI NGẮN</span><p>Dùng <code>super.i</code> (C++ dùng <code>A::i</code>). Output: <code>i in superclass: 1</code> và <code>i in subclass: 2</code>.</p></div>
+  <div class="cols acols">
+    <div>
+      <div class="f type"><div class="code-title">Output</div>
+        <div class="console fit"><span class="cl">i in superclass: 1</span><span class="cl">i in subclass: 2</span></div></div>
+      <div class="f" style="margin-top:12px"><div class="code-title">So sánh với C++</div>
+        <script type="text/x-cpp" class="xs fit">
+void show() {
+    std::cout << A::i << " " << i;   // C++: dùng Base::member
+}
+</script></div>
+    </div>
+    <div class="card explain f fitv"><h3>Giải thích chi tiết</h3><ul>
+<li><code>super</code> có 2 dạng: <code>super(args)</code> gọi constructor cha, <code>super.member</code> truy cập field/method của cha.</li>
+<li>Java <strong>không có toán tử phạm vi <code>::</code></strong>, nên không viết <code>A::i</code> được; <code>super</code> chỉ lùi <strong>một cấp</strong> (không có <code>super.super.i</code>).</li>
+<li>Hay dùng <code>super.method()</code> trong method override để tái sử dụng logic của lớp cha, ví dụ:</li>
+</ul>
+<pre class="mini"><code>void show() { super.show(); System.out.println(&quot;k: &quot; + k); }
+</code></pre>
+<ul>
+<li>Field <strong>không</strong> tham gia đa hình: biến kiểu <code>A</code> trỏ tới object <code>B</code> thì <code>a.i</code> vẫn là <code>i</code> của <code>A</code>.</li>
+</ul></div>
+  </div>
+</section>
+<section class="slide" id="q16">
+  <div class="hdr in"><span class="qn">CÂU 16</span><h2 class="fitw">Mọi method đều "virtual" theo mặc định</h2></div>
+  <div class="cols qcols">
+    <div class="in">
+      <div class="qcard"><span class="lbl info">CÂU HỎI</span><p>Không có từ khóa <code>virtual</code>, gọi <code>supRef.who()</code> qua tham chiếu kiểu <code>Sup</code> sẽ chạy phiên bản nào? Kết quả in ra là gì?</p></div>
+      <div class="note f">🤔 Dự đoán output trước khi xem đáp án. Code này in ra gì?</div>
+      <p class="tagline f"><span class="pill">Dynamic dispatch</span></p>
+    </div>
+    <div class="in fitbox">
+      <div class="code-title">Input · DynDispDemo.java</div>
+      <script type="text/x-java" class="fit">
+class Sup  { void who() { System.out.println("who() in Sup");  } }
+class Sub1 extends Sup { void who() { System.out.println("who() in Sub1"); } }
+class Sub2 extends Sup { void who() { System.out.println("who() in Sub2"); } }
+
+public class DynDispDemo {
+    public static void main(String[] args) {
+        Sup supRef;
+        supRef = new Sup();   supRef.who();
+        supRef = new Sub1();  supRef.who();
+        supRef = new Sub2();  supRef.who();
+    }
+}
+</script>
+    </div>
+  </div>
+</section>
+<section class="slide" id="a16">
+  <div class="hdr in"><span class="qn">CÂU 16 · ĐÁP ÁN</span><h2 class="fitw">Mọi method đều "virtual" theo mặc định</h2></div>
+  <div class="ans f"><span class="lbl good">TRẢ LỜI NGẮN</span><p>Chạy phiên bản của <strong>object thực tế</strong> (dynamic method dispatch): <code>who() in Sup</code>, <code>who() in Sub1</code>, <code>who() in Sub2</code>. Trong Java, mọi instance method (không <code>static</code>/<code>private</code>/<code>final</code>) đều là <em>virtual</em> mặc định.</p></div>
+  <div class="cols acols">
+    <div>
+      <div class="f type"><div class="code-title">Output</div>
+        <div class="console fit"><span class="cl">who() in Sup</span><span class="cl">who() in Sub1</span><span class="cl">who() in Sub2</span></div></div>
+      <div class="f" style="margin-top:12px"><div class="code-title">So sánh với C++</div>
+        <script type="text/x-cpp" class="xs fit">
+class Sup { public: void who() { cout << "who() in Sup"; } };  // không virtual
+Sup *p = new Sub1(); p->who();   // C++: in "who() in Sup"
+</script></div>
+    </div>
+    <div class="card explain f fitv"><h3>Giải thích chi tiết</h3><ul>
+<li>C++: nếu <code>who()</code> <strong>không</strong> khai báo <code>virtual</code> thì <code>supRef-&gt;who()</code> luôn gọi <code>Sup::who()</code> (static binding) → in 3 lần "who() in Sup".</li>
+<li>Java: lời gọi method instance được quyết định <strong>lúc chạy</strong> dựa trên kiểu object thực sự → <strong>runtime polymorphism</strong> mà không cần từ khóa nào.</li>
+<li>Không bị override được: method <code>static</code> (bị <em>hide</em>), <code>private</code> (không kế thừa), <code>final</code> (cấm override).</li>
+<li>Nên đánh dấu <code>@Override</code> trên method override: nếu gõ sai tên/tham số, compiler báo lỗi ngay (C++11 có <code>override</code> tương tự).</li>
+</ul></div>
+  </div>
+</section>
+<section class="slide" id="q17">
+  <div class="hdr in"><span class="qn">CÂU 17</span><h2 class="fitw">Overload ở lớp con không che method lớp cha</h2></div>
+  <div class="cols qcols">
+    <div class="in">
+      <div class="qcard"><span class="lbl info">CÂU HỎI</span><p>Lớp <code>B</code> thêm <code>show(String msg)</code> (khác tham số với <code>show()</code> của <code>A</code>). Gọi <code>subOb.show()</code> không tham số có hợp lệ không? In ra gì?</p></div>
+      <div class="note f">🤔 Dự đoán output trước khi xem đáp án. Code này in ra gì?</div>
+      <p class="tagline f"><span class="pill">Overload vs override</span></p>
+    </div>
+    <div class="in fitbox">
+      <div class="code-title">Input · Overload.java</div>
+      <script type="text/x-java" class="fit">
+class A {
+    int i, j;
+    A(int a, int b) { i = a; j = b; }
+    void show() { System.out.println("i and j: " + i + " " + j); }
+}
+
+class B extends A {
+    int k;
+    B(int a, int b, int c) { super(a, b); k = c; }
+    void show(String msg) {                  // overload, KHÔNG override
+        System.out.println(msg + k);
+    }
+}
+
+public class Overload {
+    public static void main(String[] args) {
+        B subOb = new B(1, 2, 3);
+        subOb.show("This is k: ");   // show(String) của B
+        subOb.show();                // show() của A
+    }
+}
+</script>
+    </div>
+  </div>
+</section>
+<section class="slide" id="a17">
+  <div class="hdr in"><span class="qn">CÂU 17 · ĐÁP ÁN</span><h2 class="fitw">Overload ở lớp con không che method lớp cha</h2></div>
+  <div class="ans f"><span class="lbl good">TRẢ LỜI NGẮN</span><p>Hợp lệ. Hai method có chữ ký khác nhau nên là <strong>overload</strong> chứ không phải override; <code>subOb.show()</code> gọi bản của <code>A</code>. Trong C++ thì <code>B::show(string)</code> <strong>che (hide)</strong> <code>A::show()</code> → lỗi biên dịch.</p></div>
+  <div class="cols acols">
+    <div>
+      <div class="f type"><div class="code-title">Output</div>
+        <div class="console fit"><span class="cl">This is k: 3</span><span class="cl">i and j: 1 2</span></div></div>
+      <div class="f" style="margin-top:12px"><div class="code-title">So sánh với C++</div>
+        <script type="text/x-cpp" class="xs fit">
+class B : public A { public: void show(std::string msg); };
+B subOb(1,2,3);
+subOb.show();   // C++: error: no matching function for call to 'B::show()'
+                // cần: using A::show;
+</script></div>
+    </div>
+    <div class="card explain f fitv"><h3>Giải thích chi tiết</h3><ul>
+<li><strong>Override</strong>: cùng tên + cùng danh sách tham số (+ kiểu trả về tương thích) → thay thế bản của lớp cha.</li>
+<li><strong>Overload</strong>: cùng tên, khác tham số → tồn tại song song.</li>
+<li>Java gom tất cả method cùng tên từ lớp cha và lớp con rồi chọn theo đối số → <code>show()</code> của <code>A</code> vẫn dùng được.</li>
+<li>C++ có quy tắc <strong>name hiding</strong>: khai báo <code>show(string)</code> trong <code>B</code> che mọi <code>show</code> của <code>A</code>; muốn dùng phải thêm <code>using A::show;</code>.</li>
+</ul></div>
+  </div>
+</section>
+<section class="slide" id="q18">
+  <div class="hdr in"><span class="qn">CÂU 18</span><h2 class="fitw">Tham chiếu lớp cha trỏ tới object lớp con – không có <em>object slicing</em></h2></div>
+  <div class="cols qcols">
+    <div class="in">
+      <div class="qcard"><span class="lbl info">CÂU HỎI</span><p>Sau <code>X x2 = y;</code> (Y extends X) rồi <code>x2.a = 19;</code>, giá trị <code>y.a</code> là bao nhiêu? <code>x2.b</code> có truy cập được không?</p></div>
+      <div class="note f">🤔 Dự đoán output trước khi xem đáp án. Code này in ra gì?</div>
+      <p class="tagline f"><span class="pill">Superclass reference</span></p>
+    </div>
+    <div class="in fitbox">
+      <div class="code-title">Input · SupSubRef.java</div>
+      <script type="text/x-java" class="fit">
+class X {
+    int a;
+    X(int i) { a = i; }
+}
+
+class Y extends X {
+    int b;
+    Y(int i, int j) { super(j); b = i; }
+}
+
+public class SupSubRef {
+    public static void main(String[] args) {
+        Y y = new Y(5, 6);
+        X x2 = y;                    // OK: Y là một X
+        System.out.println("x2.a: " + x2.a);
+        x2.a = 19;
+        System.out.println("y.a : " + y.a);
+        // x2.b = 27;                // Error: X doesn't have a b member
+        System.out.println("same object: " + (x2 == y));
+    }
+}
+</script>
+    </div>
+  </div>
+</section>
+<section class="slide" id="a18">
+  <div class="hdr in"><span class="qn">CÂU 18 · ĐÁP ÁN</span><h2 class="fitw">Tham chiếu lớp cha trỏ tới object lớp con – không có <em>object slicing</em></h2></div>
+  <div class="ans f"><span class="lbl good">TRẢ LỜI NGẮN</span><p><code>y.a = 19</code> vì <code>x2</code> và <code>y</code> là <strong>cùng một object</strong> – Java không cắt object (<em>slicing</em>) như C++ <code>X x2 = y;</code>. Nhưng <code>x2.b</code> <strong>lỗi biên dịch</strong>: tham chiếu kiểu <code>X</code> chỉ "biết" member của <code>X</code>.</p></div>
+  <div class="cols acols">
+    <div>
+      <div class="f type"><div class="code-title">Output</div>
+        <div class="console fit"><span class="cl">x2.a: 6</span><span class="cl">y.a : 19</span><span class="cl">same object: true</span></div></div>
+      <div class="f" style="margin-top:12px"><div class="code-title">So sánh với C++</div>
+        <script type="text/x-cpp" class="xs fit">
+Y y(5, 6);
+X x2 = y;        // C++: slicing – x2 là object X mới (copy)
+x2.a = 19;       // y.a vẫn = 6
+</script></div>
+    </div>
+    <div class="card explain f fitv"><h3>Giải thích chi tiết</h3><ul>
+<li>Java là ngôn ngữ <strong>strongly typed</strong>: một biến kiểu <code>X</code> không thể trỏ tới object của class <code>Y</code> không liên quan; nhưng <strong>được</strong> trỏ tới object của <strong>subclass</strong>.</li>
+<li>Vì biến chỉ là tham chiếu, <code>X x2 = y;</code> <strong>không sao chép</strong> object → không có <em>object slicing</em> (C++ <code>X x2 = y;</code> sẽ copy phần <code>X</code> thành object mới).</li>
+<li>Kiểu <strong>khai báo</strong> của biến quyết định member nào được phép truy cập lúc biên dịch (<code>x2.b</code> lỗi); kiểu <strong>object thật</strong> quyết định method override nào chạy lúc runtime.</li>
+<li>Muốn dùng <code>b</code> phải ép kiểu xuống: <code>((Y) x2).b</code> (nếu sai kiểu sẽ ném <code>ClassCastException</code>, có thể kiểm tra trước bằng <code>instanceof</code>).</li>
+</ul></div>
+  </div>
+</section>
+<section class="slide" id="q19">
+  <div class="hdr in"><span class="qn">CÂU 19</span><h2 class="fitw">Abstract method / abstract class</h2></div>
+  <div class="cols qcols">
+    <div class="in">
+      <div class="qcard"><span class="lbl info">CÂU HỎI</span><p>Java khai báo hàm thuần ảo (C++: <code>virtual double area() = 0;</code>) như thế nào? Có tạo được <code>new TwoDShape()</code> khi <code>TwoDShape</code> là abstract không?</p></div>
+      <div class="note f">🤔 Dự đoán output trước khi xem đáp án. Code này in ra gì?</div>
+      <p class="tagline f"><span class="pill">abstract</span></p>
+    </div>
+    <div class="in fitbox">
+      <div class="code-title">Input · AbsShape.java</div>
+      <script type="text/x-java" class="fit">
+abstract class TwoDShape {
+    private double width, height;
+    private String name;
+    TwoDShape(double w, double h, String n) { width = w; height = h; name = n; }
+    double getWidth()  { return width; }
+    double getHeight() { return height; }
+    String getName()   { return name; }
+    abstract double area();                    // không có thân
+}
+
+class Triangle extends TwoDShape {
+    Triangle(double w, double h) { super(w, h, "triangle"); }
+    double area() { return getWidth() * getHeight() / 2; }
+}
+
+class Rectangle extends TwoDShape {
+    Rectangle(double w, double h) { super(w, h, "rectangle"); }
+    double area() { return getWidth() * getHeight(); }
+}
+
+public class AbsShape {
+    public static void main(String[] args) {
+        TwoDShape[] shapes = { new Triangle(8, 12), new Rectangle(10, 4) };
+        // TwoDShape t = new TwoDShape(1, 1, "x");   // lỗi: abstract
+        for (TwoDShape s : shapes)
+            System.out.println(s.getName() + ": " + s.area());
+    }
+}
+</script>
+    </div>
+  </div>
+</section>
+<section class="slide" id="a19">
+  <div class="hdr in"><span class="qn">CÂU 19 · ĐÁP ÁN</span><h2 class="fitw">Abstract method / abstract class</h2></div>
+  <div class="ans f"><span class="lbl good">TRẢ LỜI NGẮN</span><p>Dùng <code>abstract double area();</code> và class chứa nó <strong>bắt buộc</strong> khai báo <code>abstract class</code>. Không thể <code>new</code> một abstract class (lỗi: <em>TwoDShape is abstract; cannot be instantiated</em>), nhưng được dùng làm kiểu tham chiếu/mảng.</p></div>
+  <div class="cols acols">
+    <div>
+      <div class="f type"><div class="code-title">Output</div>
+        <div class="console fit"><span class="cl">triangle: 48.0</span><span class="cl">rectangle: 40.0</span></div></div>
+      <div class="f" style="margin-top:12px"><div class="code-title">So sánh với C++</div>
+        <script type="text/x-cpp" class="xs fit">
+class TwoDShape {
+public:
+    virtual double area() = 0;   // C++: pure virtual
+};
+</script></div>
+    </div>
+    <div class="card explain f fitv"><h3>Giải thích chi tiết</h3><ul>
+<li>C++: class trở thành abstract <strong>ngầm định</strong> khi có ít nhất một hàm <code>= 0</code>. Java: phải ghi rõ từ khóa <strong><code>abstract</code></strong> cho cả method và class.</li>
+<li>Java cho phép <code>abstract class</code> <strong>không có</strong> abstract method nào (chỉ để cấm tạo object).</li>
+<li>Abstract class vẫn có <strong>field, constructor, method có thân</strong> (constructor được gọi qua <code>super(...)</code> từ lớp con).</li>
+<li><code>abstract</code> chỉ dùng cho <strong>instance method</strong>: không dùng với <code>static</code> method hay constructor.</li>
+<li>Subclass không override hết abstract method thì cũng phải là <code>abstract</code>.</li>
+<li><code>TwoDShape[] shapes = {...}</code> – mảng các <strong>tham chiếu</strong>; <code>for (TwoDShape s : shapes)</code> là vòng lặp for-each.</li>
+</ul></div>
+  </div>
+</section>
+<section class="slide" id="q20">
+  <div class="hdr in"><span class="qn">CÂU 20</span><h2 class="fitw">Từ khóa <code>final</code>: method, class, biến</h2></div>
+  <div class="cols qcols">
+    <div class="in">
+      <div class="qcard"><span class="lbl info">CÂU HỎI</span><p><code>final</code> có những tác dụng gì trong Java? Đoạn code dưới in ra gì, và nếu <code>class B extends A</code> override <code>final void meth()</code> thì sao?</p></div>
+      <div class="note f">🤔 Dự đoán output trước khi xem đáp án. Code này in ra gì?</div>
+      <p class="tagline f"><span class="pill">final</span></p>
+    </div>
+    <div class="in fitbox">
+      <div class="code-title">Input · FinalD.java</div>
+      <script type="text/x-java" class="fit">
+class ErrorMsg {
+    final int OUTERR = 0;            // hằng số – tương tự const
+    final int INERR = 1;
+    final int DISKERR = 2;
+    final int INDEXERR = 3;
+    String msgs[] = { "Output Error", "Input Error",
+                      "Disk Full", "Index Out-Of-Bounds" };
+
+    final String getErrorMsg(int i) {         // không cho override
+        if (i >= 0 & i < msgs.length) return msgs[i];
+        else return "Invalid Error Code";
+    }
+}
+
+final class Util { }                          // không cho kế thừa
+// class MyUtil extends Util { }              // lỗi: cannot inherit from final Util
+
+public class FinalD {
+    public static void main(String[] args) {
+        ErrorMsg err = new ErrorMsg();
+        System.out.println(err.getErrorMsg(err.OUTERR));
+        System.out.println(err.getErrorMsg(err.DISKERR));
+        // err.OUTERR = 5;                    // lỗi: cannot assign a value to final variable
+    }
+}
+</script>
+    </div>
+  </div>
+</section>
+<section class="slide" id="a20">
+  <div class="hdr in"><span class="qn">CÂU 20 · ĐÁP ÁN</span><h2 class="fitw">Từ khóa <code>final</code>: method, class, biến</h2></div>
+  <div class="ans f"><span class="lbl good">TRẢ LỜI NGẮN</span><p><code>final</code> method: <strong>không override</strong> được; <code>final</code> class: <strong>không kế thừa</strong> được; <code>final</code> biến: chỉ gán <strong>một lần</strong> (≈ <code>const</code>). Output: <code>Output Error</code>, <code>Disk Full</code>. Override method final → lỗi <em>meth() in B cannot override meth() in A; overridden method is final</em>.</p></div>
+  <div class="cols acols">
+    <div>
+      <div class="f type"><div class="code-title">Output</div>
+        <div class="console fit"><span class="cl">Output Error</span><span class="cl">Disk Full</span></div></div>
+      <div class="f" style="margin-top:12px"><div class="code-title">So sánh với C++</div>
+        <script type="text/x-cpp" class="xs fit">
+const int OUTERR = 0;                     // C++: const
+class Util final { };                     // C++11: final class
+virtual void meth() final;                // C++11: final method
+</script></div>
+    </div>
+    <div class="card explain f fitv"><h3>Giải thích chi tiết</h3><ul>
+<li>Java <strong>không có <code>const</code></strong> (là từ khóa dành riêng nhưng không dùng); hằng số được khai báo bằng <code>final</code>, thường kết hợp <code>static final</code> và viết HOA: <code>static final int OUTERR = 0;</code>.</li>
+<li><code>final</code> method/class tương ứng <code>final</code> của C++11, nhưng trong Java vì mọi method mặc định là virtual nên <code>final</code> method còn giúp <strong>gọi tĩnh</strong> (không cần dispatch).</li>
+<li>Ví dụ trong thư viện: <code>String</code>, <code>Math</code>, <code>Integer</code> đều là <code>final class</code>.</li>
+<li>Lưu ý: <code>final</code> với <strong>tham chiếu</strong> chỉ cấm gán biến sang object khác; nội dung object (ví dụ phần tử <code>msgs[0]</code>) vẫn sửa được – khác <code>const</code> của C++.</li>
+</ul></div>
+  </div>
+</section>
+<section class="slide" id="q21">
+  <div class="hdr in"><span class="qn">CÂU 21</span><h2 class="fitw">Lớp gốc <code>Object</code> và <code>toString()</code></h2></div>
+  <div class="cols qcols">
+    <div class="in">
+      <div class="qcard"><span class="lbl info">CÂU HỎI</span><p>Mọi class Java đều ngầm kế thừa từ đâu? <code>System.out.println(obj)</code> in ra gì khi class <strong>chưa</strong> và <strong>đã</strong> override <code>toString()</code>?</p></div>
+      <div class="note f">🤔 Dự đoán output trước khi xem đáp án. Code này in ra gì?</div>
+      <p class="tagline f"><span class="pill">Object</span></p>
+    </div>
+    <div class="in fitbox">
+      <div class="code-title">Input · ObjDemo.java</div>
+      <script type="text/x-java" class="fit">
+class Point {                          // ngầm định: extends Object
+    int x, y;
+    Point(int x, int y) { this.x = x; this.y = y; }
+}
+
+class Point2 extends Point {
+    Point2(int x, int y) { super(x, y); }
+    @Override
+    public String toString() { return "(" + x + ", " + y + ")"; }
+}
+
+public class ObjDemo {
+    public static void main(String[] args) {
+        Object o1 = new Point(1, 2);       // mọi object đều là Object
+        Object o2 = new Point2(3, 4);
+        System.out.println(o1.toString().startsWith("Point@"));
+        System.out.println(o2);            // tự gọi toString()
+        System.out.println("P = " + o2);   // nối chuỗi cũng gọi toString()
+    }
+}
+</script>
+    </div>
+  </div>
+</section>
+<section class="slide" id="a21">
+  <div class="hdr in"><span class="qn">CÂU 21 · ĐÁP ÁN</span><h2 class="fitw">Lớp gốc <code>Object</code> và <code>toString()</code></h2></div>
+  <div class="ans f"><span class="lbl good">TRẢ LỜI NGẮN</span><p>Mọi class đều ngầm <code>extends Object</code>. Chưa override: in <code>TênClass@hashcode</code> (ví dụ <code>Point@1b6d3586</code>). Đã override <code>toString()</code>: in chuỗi tự định nghĩa – tương tự overload <code>operator&lt;&lt;</code> trong C++.</p></div>
+  <div class="cols acols">
+    <div>
+      <div class="f type"><div class="code-title">Output</div>
+        <div class="console fit"><span class="cl">true</span><span class="cl">(3, 4)</span><span class="cl">P = (3, 4)</span></div></div>
+      <div class="f" style="margin-top:12px"><div class="code-title">So sánh với C++</div>
+        <script type="text/x-cpp" class="xs fit">
+std::ostream& operator<<(std::ostream& os, const Point2& p) {
+    return os << "(" << p.x << ", " << p.y << ")";
+}
+</script></div>
+    </div>
+    <div class="card explain f fitv"><h3>Giải thích chi tiết</h3><ul>
+<li><code>Object</code> (gói <code>java.lang</code>) là gốc của mọi class; nó cung cấp sẵn <code>toString()</code>, <code>equals()</code>, <code>hashCode()</code>, <code>getClass()</code>…</li>
+<li><code>toString()</code> mặc định trả về <code>getClass().getName() + "@" + Integer.toHexString(hashCode())</code> → giá trị hash <strong>thay đổi</strong> giữa các lần chạy, vì vậy ví dụ chỉ in <code>true</code> khi kiểm tra tiền tố <code>Point@</code>.</li>
+<li><code>println(o)</code> và phép nối chuỗi <code>"P = " + o</code> tự động gọi <code>toString()</code> → đây là cách "in object" của Java, thay cho <code>ostream&amp; operator&lt;&lt;</code> trong C++.</li>
+<li>Khi override phải giữ <code>public</code> (không được giảm quyền truy cập của method cha); dùng <code>@Override</code> để compiler kiểm tra.</li>
+<li>Bài tập slide 47 (<em>Override the method toString() to display information of each student</em>) áp dụng đúng kỹ thuật này.</li>
+</ul></div>
+  </div>
+</section>
+<section class="slide" id="end">
+  <div class="title-wrap" style="align-items:center;text-align:center">
+    <div class="orb" style="width:360px;height:360px;background:#f9a8d4;left:10%;top:10%"></div>
+    <h1 class="in">Tóm tắt: <span class="grad">Java ≠ C++</span></h1>
+    <div class="cols3 in" style="margin-top:32px;text-align:left;max-width:1150px">
+      <div class="card"><h3>Tham chiếu &amp; bộ nhớ</h3><p style="font-size:19px">Luôn <b>call-by-value</b>; biến object là <b>tham chiếu</b>, <code class="i">=</code> không copy object. Object nằm trên heap, có <b>GC</b>, không <code class="i">delete</code>, không destructor.</p></div>
+      <div class="card"><h3>Truy cập &amp; static</h3><p style="font-size:19px">Default = <b>package-private</b>; <code class="i">protected</code> gồm cả package. Static field không cần định nghĩa ngoài class, có <b>static block</b>.</p></div>
+      <div class="card"><h3>Kế thừa</h3><p style="font-size:19px">Đơn kế thừa với <code class="i">extends</code>, <code class="i">super(...)</code>; method mặc định <b>virtual</b>; không name hiding, không slicing; <code class="i">abstract</code>, <code class="i">final</code>, gốc <code class="i">Object</code>.</p></div>
+    </div>
+  </div>
+</section>
+</div></div>
+<div id="bar"></div>
+<div id="hint">← → / Space: chuyển · Shift+→: qua slide · O: nội dung · A: hiện hết · F: toàn màn hình</div>
+<div id="nav"><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+<script>
+(function(){
+  // ---------- highlighter (Java / C++) ----------
+  const KW={
+    java:new Set("abstract class extends implements interface final static new return if else for while do break continue switch case default try catch finally throw throws private public protected super this import package true false null instanceof void".split(" ")),
+    cpp:new Set("if else for while do return class struct public private protected virtual override final const static new delete using namespace true false sizeof auto void".split(" "))};
+  const TY=new Set("int double float char boolean bool long short byte String Object std string ostream Math System".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line,lang){
+    if(/^\s*#/.test(line)) return '<span class="p">'+esc(line)+'</span>';
+    const re=/(\/\/.*$)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(@\w+)|\b(\d+(?:\.\d+)?[fFL]?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="p">'+m[3]+'</span>';
+      else if(m[4]) out+='<span class="n">'+m[4]+'</span>';
+      else if(m[5]){
+        const w=m[5];
+        let cls=KW[lang].has(w)?"k":(TY.has(w)||/^[A-Z]/.test(w))?"t":(m[6]?"fn":"");
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[6]?esc(m[6]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-java"],script[type="text/x-cpp"]').forEach(sc=>{
+    const lang=sc.type.endsWith("java")?"java":"cpp";
+    const lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    div.innerHTML=lines.map((l,i)=>'<div class="ln"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l,lang)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+  // ---------- auto-fit: shrink fonts so every slide fits 1280x720 ----------
+  const LIMIT=720-30;
+  function bottomOf(slide){let b=0;slide.querySelectorAll(".hdr,.ans,.cols>div,.cols>div>*").forEach(e=>{b=Math.max(b,e.offsetTop+e.offsetHeight+(e.offsetParent&&e.offsetParent!==slide?e.offsetParent.offsetTop:0))});return b}
+  function shrink(el,test,min){let fs=parseFloat(getComputedStyle(el).fontSize);let g=0;while(test()&&fs>min&&g++<60){fs-=.5;el.style.fontSize=fs+"px"}}
+  function fitSlide(s){
+    s.querySelectorAll(".fitw").forEach(h=>shrink(h,()=>h.scrollWidth>h.clientWidth+1||h.offsetHeight>48,22));
+    s.querySelectorAll(".code.fit,.console.fit").forEach(c=>shrink(c,()=>c.scrollWidth>c.clientWidth+1,10.5));
+    const box=s.querySelector(".fitbox .code");
+    if(box) shrink(box,()=>box.getBoundingClientRect().bottom-s.getBoundingClientRect().top>LIMIT,10.5);
+    const ex=s.querySelector(".fitv");
+    if(ex){
+      const els=[...ex.querySelectorAll("p,li,td,th,pre")];
+      let fs=16.5,g=0;
+      const over=()=>ex.getBoundingClientRect().bottom-s.getBoundingClientRect().top>LIMIT;
+      const left=s.querySelector(".acols>div:first-child");
+      const overL=()=>left&&left.getBoundingClientRect().bottom-s.getBoundingClientRect().top>LIMIT;
+      while(over()&&fs>12.5&&g++<40){fs-=.5;els.forEach(e=>e.style.fontSize=(e.tagName==="PRE"?fs-2.5:e.tagName==="TD"||e.tagName==="TH"?fs-1.5:fs)+"px")}
+      if(overL()){const a=s.querySelector(".ans p");if(a)shrink(a,overL,15)}
+      left&&left.querySelectorAll(".code,.console").forEach(c=>shrink(c,overL,11));
+    }
+  }
+
+  // ---------- deck engine ----------
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")];
+  function scale(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",scale);
+  function fitAll(){deck.classList.add("fitting");deck.style.transform="none";slides.forEach(fitSlide);deck.classList.remove("fitting");scale()}
+  fitAll();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitAll);
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>frags(i).forEach((f,k)=>f.classList.toggle("on",i===cur&&k<step)));
+    slides[cur].querySelectorAll(".type.on .cl").forEach((l,i)=>l.style.transitionDelay=(.12+i*.16)+"s");
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length;
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    history.replaceState(null,"","#"+slides[cur].id);
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+  addEventListener("keydown",e=>{
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="o"||e.key==="O")go(1);
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+</script>
+</body>
+</html>
