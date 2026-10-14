@@ -1,0 +1,791 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OOP – Con trỏ trong lớp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+h1{font-size:70px;line-height:1.1;font-weight:800}
+h2{font-size:38px;line-height:1.2;font-weight:800}
+h3{font-size:23px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:22px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:26px;margin:6px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.88em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 6px;border-radius:6px;color:#be185d}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.cols.c64{grid-template-columns:1.25fr 1fr}.cols.c46{grid-template-columns:1fr 1.2fr}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.card.bad{border-color:#fecdd3;background:linear-gradient(180deg,#fff1f3,#fff)}
+.card.good{border-color:#a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff)}
+.lbl{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
+.icon{font-size:34px;margin-bottom:4px}
+.note{margin-top:12px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:20px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.code{font-family:var(--mono);font-size:18px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
+.code.sm{font-size:16.5px}.code.xs{font-size:15px;line-height:1.45}.code.xxs{font-size:13.6px;line-height:1.38;padding:8px 0}
+.code .ln{padding:0 14px 0 8px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.11);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.13);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
+.code-title{font-family:var(--mono);font-size:15px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+.f.zoom{transform:scale(.85)}.f.zoom.on{transform:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:19px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.legend{display:flex;flex-direction:column;gap:10px}
+.leg{border-radius:12px;padding:10px 16px;background:#fff;border:1px solid var(--line)}
+.leg b{display:block;font-size:21px;margin-bottom:2px}
+.leg p{font-size:19px}
+.leg.a{border-left:6px solid #7c3aed}.leg.b{border-left:6px solid #06b6d4}.leg.c{border-left:6px solid #f59e0b}
+.console{font-family:var(--mono);font-size:17px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.mem{display:flex;align-items:center;gap:16px;min-height:130px}
+.frame{border:2px solid #e4dcfb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
+.frame .fname{font-family:var(--mono);font-size:16px;color:var(--muted);margin-bottom:6px}
+.var{display:flex;align-items:center;gap:10px}
+.vn{font-family:var(--mono);font-size:21px;color:var(--t);font-weight:600}
+.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #c4b5fd;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
+.vb .new{display:none}
+.callee,.arw{opacity:0;transform:translateX(-14px);transition:all .5s}
+.mem.s1 .callee,.mem.s1 .arw{opacity:1;transform:none}
+.mem.s2 .chg .old{display:none}.mem.s2 .chg .new{display:inline;animation:pop .5s}
+.mem.s2 .chg{border-color:#f59e0b;box-shadow:0 0 18px rgba(245,158,11,.5)}
+.mem.s3 .callee,.mem.s3 .arw{opacity:.15;transform:translateY(10px)}
+.mem.s3 .result{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.5)}
+.arw{font-family:var(--mono);font-size:16px;color:var(--gold);text-align:center;line-height:1.2;font-weight:600}
+.arw .bar{display:block;font-size:30px}
+.alias{font-size:18px;color:var(--accent2);font-weight:600}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.25)}100%{transform:none;opacity:1}}
+.flow{display:flex;align-items:center;gap:12px;justify-content:center}
+.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:18px;border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:14px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.h{border-color:var(--gold)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#c4b5fd}.box.exe{border-color:#ec4899;background:#fdf2f8}
+.ar{color:var(--muted);font-size:26px;text-align:center}
+.stack{display:flex;flex-direction:column;gap:8px}
+svg text{font-family:var(--mono);font-weight:600}
+.draw{stroke-dasharray:400;stroke-dashoffset:400;transition:stroke-dashoffset 1s ease}
+svg.d1 .dr1,svg.d2 .dr2,svg.d3 .dr3{stroke-dashoffset:0}
+.fadein{opacity:0;transition:opacity .6s}
+svg.d1 .fd1,svg.d2 .fd2,svg.d3 .fd3{opacity:1}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:19px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05)}
+.ag:hover{border-color:#ec4899;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
+.ag b{color:#db2777;margin-right:6px;font-family:var(--mono)}
+.formula{font-family:var(--mono);font-size:23px;text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:16px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+@media (max-width:700px){#hint{display:none}}
+@media print{#nav,#bar,#hint{display:none}}
+
+/* lec03 additions */
+.chain{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pv{display:inline-flex;align-items:center;font-family:var(--mono);font-size:18px;font-weight:700;padding:5px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;white-space:nowrap}
+.pv.yes{background:#d1fae5;border-color:#34d399;color:#047857}
+.pv.no{background:#ffe4e6;border-color:#fb7185;color:#be123c}
+.pv.skip{background:#f1f5f9;border-color:#cbd5e1;color:#94a3b8;text-decoration:line-through;border-style:dashed}
+.op{font-family:var(--mono);font-size:26px;font-weight:800;color:var(--sa1)}
+.tt th,.tt td{text-align:center}.tt td:first-child{color:var(--text);font-weight:400}
+.tt tr.hit td{background:#fdf2f8;color:#be185d}
+tr.f{transform:none}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.code.show-s .mark-s{opacity:.3;text-decoration:line-through}
+.arr{display:flex;gap:12px;justify-content:center;margin-top:6px}
+.cell{width:84px;height:84px;border-radius:16px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:800;transition:all .45s;box-shadow:0 6px 16px -10px rgba(124,58,237,.4)}
+.cell small{font-size:13px;color:var(--muted);font-weight:600}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857;transform:translateY(-6px)}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;transform:translateY(-10px) scale(1.06);box-shadow:0 10px 24px -8px rgba(225,29,72,.5)}
+.cell.skip{opacity:.3;transform:scale(.92)}
+.syn{display:flex;gap:12px;align-items:center;justify-content:center;font-family:var(--mono);font-size:24px;font-weight:700}
+.sy{padding:8px 16px;border-radius:12px;color:#fff}
+.sy.c1{background:linear-gradient(135deg,#7c3aed,#a855f7)}.sy.c2{background:linear-gradient(135deg,#059669,#10b981)}.sy.c3{background:linear-gradient(135deg,#e11d48,#f97316)}
+.spin{display:inline-block;animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* lec02 additions */
+.cell .new{display:none}
+.cell.fill .old,.inc.p1 .s1 .old,.inc.p2 .s2 .old{display:none}
+.cell.fill .new,.inc.p1 .s1 .new,.inc.p2 .s2 .new{display:inline;animation:pop .5s}
+.cell.fill,.inc.p1 .s1,.inc.p2 .s2{border-color:#10b981;background:#ecfdf5;color:#047857}
+.inc{display:flex;gap:16px}
+.c440{stroke-dasharray:440;stroke-dashoffset:440}.c720{stroke-dasharray:720;stroke-dashoffset:720}
+.bar{height:14px;background:#f1edfd;border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7c3aed,#ec4899);border-radius:99px;transition:width 1.1s .3s ease}
+.slide.active .bar i{width:var(--w)}
+.chars{display:flex;margin:5px 0}
+.ch{width:28px;height:38px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:700;border:1px solid #e4dcfb;margin-right:-1px;background:#fff}
+.ch.pad{color:#c4b5fd;font-weight:400}.ch.a{background:#f3edff}.ch.b{background:#e6f8fd}.ch.c{background:#fff7e0;color:#b45309}
+.ch.b.pad[class]{color:#7dd3fc}
+
+/* oop lec03 additions */
+.xl{margin-top:14px}
+.xlat{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:22px;font-weight:700}
+.xlat .src{padding:8px 16px;border-radius:12px;background:#fff;border:2px solid #e4dcfb}
+.xlat .dst{padding:8px 16px;border-radius:12px;background:linear-gradient(135deg,#f3edff,#fdf2f8);border:2px solid #c4b5fd;color:#4c1d95}
+.xlat .dst b{color:#db2777}
+.xlat .arrow{font-size:28px;color:var(--sa1)}
+.xlat.go .dst{animation:pop .6s}
+.opgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.opgrid span{display:flex;align-items:center;justify-content:center;height:62px;border-radius:12px;background:#fff;border:2px solid #ece8f7;font-family:var(--mono);font-size:22px;font-weight:700;color:#1e1b3a;box-shadow:0 4px 12px -8px rgba(124,58,237,.4)}
+.slide.active .opgrid span{animation:pop .5s both}
+.opgrid span:nth-child(7n+2){animation-delay:.04s!important}.opgrid span:nth-child(7n+3){animation-delay:.08s!important}.opgrid span:nth-child(7n+4){animation-delay:.12s!important}.opgrid span:nth-child(7n+5){animation-delay:.16s!important}.opgrid span:nth-child(7n+6){animation-delay:.2s!important}.opgrid span:nth-child(7n){animation-delay:.24s!important}
+.opgrid span.mb{background:#cffafe;border-color:#22d3ee;color:#0e7490}
+.opgrid.lit span.mb{box-shadow:0 0 0 4px rgba(34,211,238,.35),0 8px 20px -6px rgba(8,145,178,.6);transform:scale(1.08);transition:all .4s}
+.opgrid span{font-size:20px}
+.fr-demo{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.frac{display:inline-flex;flex-direction:column;align-items:center;font-family:var(--mono);font-size:22px;font-weight:700;padding:4px 10px;border-radius:10px;background:#fff;border:2px solid #ece8f7}
+.frac span:first-child{border-bottom:3px solid currentColor;padding:0 6px}
+.frac.hl{background:#fff7e0;border-color:#fcd34d;color:#b45309;font-size:18px}
+.frac.ok{background:#d1fae5;border-color:#34d399;color:#047857}
+.lr{display:flex;align-items:stretch;gap:10px}
+.lr .side{flex:1;border-radius:14px;padding:10px 14px;border:2px solid;display:flex;flex-direction:column}
+.lr .side b{font-size:20px}.lr .side span{font-family:var(--mono);font-size:16px;color:var(--muted)}
+.lr .l{border-color:#fb7185;background:#fff1f3}.lr .r{border-color:#a78bfa;background:#f5f3ff}
+.lr .mid{display:flex;align-items:center;font-family:var(--mono);font-size:30px;font-weight:800;color:var(--sa1)}
+.leg p b{display:inline;font-size:inherit;margin:0}
+
+/* pointer memory diagrams */
+.mm{position:relative;width:100%}
+.mm>*{position:absolute}
+.mm .wires{left:0;top:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.mm .w{fill:none;stroke:#7c3aed;stroke-width:3;transition:all .5s}
+.lab{font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.12em;color:#a78bfa}
+.obj{left:0;width:180px;border:2.5px solid #c4b5fd;border-radius:14px;background:#fff;box-shadow:0 8px 20px -12px rgba(124,58,237,.5);overflow:hidden;transition:all .5s}
+.obj .oh{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-weight:800;font-size:18px;padding:5px 12px}
+.obj .oh small{font-weight:500;font-size:13px;opacity:.85}
+.obj.dupe .oh{background:linear-gradient(135deg,#db2777,#f472b6)}
+.obj .row{font-family:var(--mono);font-size:18px;font-weight:700;padding:5px 12px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #f1edfd}
+.dot{width:14px;height:14px;border-radius:50%;background:#7c3aed;box-shadow:0 0 0 4px #ede9fe}
+.heap{display:flex;transition:all .5s}
+.heap span{width:46px;height:50px;display:flex;align-items:center;justify-content:center;border:2.5px solid #fbbf24;margin-right:-2.5px;background:#fff7e0;font-family:var(--mono);font-size:20px;font-weight:800;color:#b45309;transition:all .5s}
+.heap span:first-child{border-radius:10px 0 0 10px}.heap span:last-child{border-radius:0 10px 10px 0}
+.heap.cp span{border-color:#22d3ee;background:#ecfeff;color:#0e7490}
+.tag{font-size:15px;font-weight:600;padding:6px 12px;border-radius:10px;background:#fff7e0;border:1.5px solid #fcd34d;color:#92400e;max-width:250px;line-height:1.3}
+.tag.bad{background:#fff1f3;border-color:#fda4af;color:#be123c}.tag.ok{background:#ecfdf5;border-color:#6ee7b7;color:#047857;max-width:260px}
+.boom{font-size:20px;font-weight:800;padding:8px 16px;border-radius:12px;background:linear-gradient(135deg,#e11d48,#f97316);color:#fff;box-shadow:0 10px 30px -8px rgba(225,29,72,.6)}
+.mm .ap1,.mm .ap2,.mm .ap3,.mm .ap4{opacity:0;transition:opacity .5s}
+.mm.s1 .ap1,.mm.s2 .ap2,.mm.s3 .ap3,.mm.s4 .ap4{opacity:1}
+.mm.s4 .boom{animation:shake .5s 2}
+@keyframes shake{25%{transform:translateX(-6px) rotate(-2deg)}75%{transform:translateX(6px) rotate(2deg)}}
+.mm.s1 .gone1,.mm.s2 .gone2,.mm.s3 .gone3,.mm.s4 .gone4{opacity:.18!important;filter:grayscale(1)}
+.mm .chg1 .n,.mm .chg2 .n,.mm .chg3 .n{display:none}
+.mm.s1 .chg1 .o,.mm.s2 .chg2 .o,.mm.s3 .chg3 .o{display:none}
+.mm.s1 .chg1 .n,.mm.s2 .chg2 .n,.mm.s3 .chg3 .n{display:inline;animation:pop .5s}
+.mm.s2 .chg2,.mm.s3 .chg3{background:#ffe4e6!important;border-color:#e11d48!important;color:#be123c!important}
+.mm .fill3{color:transparent}.mm.s3 .fill3{color:#b45309;transition:color .4s}
+.mm.s3 .fill3:nth-child(2){transition-delay:.15s}.mm.s3 .fill3:nth-child(3){transition-delay:.3s}.mm.s3 .fill3:nth-child(4){transition-delay:.45s}.mm.s3 .fill3:nth-child(5){transition-delay:.6s}
+.mm.s3 .free3 span,.mm.s2 .free2 span{background:repeating-linear-gradient(45deg,#f1f5f9 0 6px,#e2e8f0 6px 12px)!important;border-color:#94a3b8!important;border-style:dashed!important;color:#94a3b8!important}
+.mm.s3 .bad3{stroke:#e11d48!important;stroke-dasharray:7 6}
+.mm.s1 .gone1 span{text-decoration:line-through}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="deck"><svg width="0" height="0" style="position:absolute"><defs><marker id="mk" markerWidth="7" markerHeight="7" refX="1" refY="3.5" viewBox="0 0 7 7" markerUnits="strokeWidth" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="context-stroke"/></marker></defs></svg>
+
+<!-- ===================== TITLE ===================== -->
+<section class="slide" id="title">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// Lập trình hướng đối tượng · LN03</div>
+    <h1 class="in">Con trỏ trong lớp<br><span class="grad">Hàm dựng &amp; Hàm hủy</span></h1>
+    <p class="in muted" style="font-size:26px;margin-top:20px;max-width:880px">Khi thuộc tính là con trỏ: hàm hủy, hàm dựng sao chép và toán tử gán bằng. Vì sao bản <b>mặc định</b> làm chương trình crash, cách sửa bằng <b>sao chép sâu</b>, và tối ưu bằng <b>move semantics</b> (C++11).</p>
+    <p class="in" style="margin-top:30px;font-size:21px">Hồ Tuấn Thanh · <span class="muted">htthanh@fit.hcmus.edu.vn</span></p>
+    <p class="in" style="margin-top:14px;font-size:18px;color:#8a91b4">Dùng phím ← → hoặc Space để chuyển · F: toàn màn hình</p>
+  </div>
+</section>
+
+<!-- ===================== AGENDA ===================== -->
+<section class="slide" id="agenda">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:18px">· bấm để đi tới</span></div>
+  <div class="agenda in" style="grid-template-columns:repeat(3,1fr)">
+    <div class="ag" data-goto="dtor"><b>01</b>Hàm hủy &amp; delete</div>
+    <div class="ag" data-goto="nhap"><b>02</b>Hàm nhập với new</div>
+    <div class="ag" data-goto="crash1"><b>03</b>Gọi hàm dựng sao chép → crash</div>
+    <div class="ag" data-goto="defcopy"><b>04</b>Hàm dựng sao chép mặc định</div>
+    <div class="ag" data-goto="shallow"><b>05</b>Vấn đề: 2 con trỏ, 1 vùng nhớ</div>
+    <div class="ag" data-goto="copyctor"><b>06</b>Cài đặt hàm dựng sao chép</div>
+    <div class="ag" data-goto="defassign"><b>07</b>Toán tử gán bằng mặc định</div>
+    <div class="ag" data-goto="assign"><b>08</b>Cài đặt toán tử gán bằng</div>
+    <div class="ag" data-goto="compare"><b>09</b>So sánh kết quả &amp; Rule of Three</div>
+    <div class="ag" data-goto="mvwhy"><b>10</b>Vì sao cần move? lvalue / rvalue</div>
+    <div class="ag" data-goto="mvctor"><b>11</b>Move constructor</div>
+    <div class="ag" data-goto="mvassign"><b>12</b>Move assignment operator</div>
+    <div class="ag" data-goto="mvdemo"><b>13</b>Kiểm chứng &amp; Rule of Five</div>
+  </div>
+</section>
+
+<!-- ===================== DTOR ===================== -->
+<section class="slide" id="dtor">
+  <div class="hdr in"><span class="qn">HÀM HỦY</span><h2>Hàm hủy: giải phóng vùng nhớ con trỏ</h2></div>
+  <ul class="in">
+    <li>Trong lớp <code class="i">MangSoNguyen</code>, ta dùng con trỏ <code class="i">a</code> để chứa một danh sách các số nguyên.</li>
+    <li>Để tránh <b>rò rỉ bộ nhớ</b> (memory leak), trong hàm hủy ta kiểm tra con trỏ <code class="i">a</code> và gọi toán tử <code class="i">delete</code>.</li>
+  </ul>
+  <div class="cols" style="margin-top:14px;grid-template-columns:1fr 1fr">
+<script type="text/x-cpp" class="sm" id="d1" data-mark="3-4:a">
+class MangSoNguyen {
+private:
+    int *a;      // con trỏ tới mảng động
+    int n;       // số phần tử
+public:
+    MangSoNguyen();
+    ~MangSoNguyen();
+};
+</script>
+<script type="text/x-cpp" class="sm" id="d2" data-mark="2:b;3:c;4:d">
+MangSoNguyen::~MangSoNguyen() {
+    if (a != NULL) {
+        delete[] a;     // giải phóng mảng
+        a = NULL;
+    }
+}
+</script>
+  </div>
+  <div class="cols" style="grid-template-columns:auto 1fr;margin-top:14px;gap:30px;align-items:center">
+    <div class="mm" id="mdt" style="width:400px;height:200px">
+      <div class="lab" style="left:0;top:0">STACK</div><div class="lab" style="left:250px;top:0">HEAP</div>
+      <div class="obj" style="top:30px;width:160px"><div class="oh">m</div><div class="row">a <span class="dot"></span></div><div class="row">n = 3</div></div>
+      <div class="heap free2" style="left:250px;top:62px"><span>4</span><span>7</span><span>1</span></div>
+      <svg class="wires" viewBox="0 0 400 230"><path class="w gone2" d="M150,82 C200,82 205,86 240,86" marker-end="url(#mk)"/></svg>
+      <div class="tag ap2" style="left:250px;top:130px">✔ đã delete[] — không rò rỉ</div>
+    </div>
+    <p class="say muted" style="font-size:20px;min-height:30px">Nhấn → để chạy từng bước.</p>
+  </div>
+  <span class="f ghost" data-act="#mdt|s1;#d1|show-a" data-say="Đối tượng m nằm trên stack; mảng 3 số nằm trên heap, do con trỏ a quản lý."></span>
+  <span class="f ghost" data-act="#mdt|s2;#d2|show-b;#d2|show-c;#d2|show-d" data-say="Khi m hết phạm vi, hàm hủy chạy: delete[] a trả vùng nhớ heap cho hệ thống, rồi gán a = NULL."></span>
+</section>
+
+<!-- ===================== NHAP ===================== -->
+<section class="slide" id="nhap">
+  <div class="hdr in"><span class="qn">HÀM NHẬP</span><h2>Hàm Nhap: cấp phát bằng <code class="i" style="font-size:33px">new</code></h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+<script type="text/x-cpp" class="sm" id="n1" data-mark="3:a;4:b;5-8:c">
+void MangSoNguyen::Nhap() {
+    cout << "Nhap n: ";
+    cin >> n;
+    a = new int[n];             // cấp phát n ô trên heap
+    for (int i = 0; i < n; i++) {
+        cout << "Nhap phan tu a[" << i << "]: ";
+        cin >> a[i];
+    }
+}
+</script>
+    <div>
+      <div class="mm" id="mnh" style="width:440px;height:150px">
+        <div class="lab" style="left:0;top:0">STACK</div><div class="lab" style="left:200px;top:0">HEAP</div>
+        <div class="obj" style="top:26px;width:150px"><div class="oh">m1</div><div class="row">a <span class="dot"></span></div><div class="row">n = <span class="chg1"><span class="o">0</span><span class="n">5</span></span></div></div>
+        <div class="heap ap2" style="left:200px;top:58px"><span class="fill3">1</span><span class="fill3">2</span><span class="fill3">3</span><span class="fill3">4</span><span class="fill3">5</span></div>
+        <svg class="wires ap2" viewBox="0 0 440 150"><path class="w" d="M140,78 C170,78 175,82 190,82" marker-end="url(#mk)"/></svg>
+      </div>
+      <div class="console" style="margin-top:10px;font-size:15px;line-height:1.4"><span class="cl" id="nl1">Nhap n: <span class="in">5</span></span><span class="cl" id="nl2">Nhap phan tu a[0]: <span class="in">1</span>
+Nhap phan tu a[1]: <span class="in">2</span>
+...
+Nhap phan tu a[4]: <span class="in">5</span></span></div>
+      <span class="f ghost" data-act="#mnh|s1;#nl1|show;#n1|show-a"></span>
+      <span class="f ghost" data-act="#mnh|s2;#n1|show-b"></span>
+      <span class="f ghost" data-act="#mnh|s3;#nl2|show;#n1|show-c"></span>
+      <p class="f" style="font-size:19px;margin-top:10px">Sau khi gọi <code class="i">m1.Nhap()</code>, đối tượng m1 sở hữu một vùng nhớ <b>động</b> 5 số nguyên trên heap.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CRASH 1 ===================== -->
+<section class="slide" id="crash1">
+  <div class="hdr in"><span class="qn">SAO CHÉP</span><h2>Gọi hàm dựng sao chép… và chương trình crash</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr">
+    <div>
+<script type="text/x-cpp" id="cr1" data-mark="4:d">
+int main() {
+    MangSoNguyen m1;
+    m1.Nhap();
+    MangSoNguyen m2 = m1;   // gọi hàm dựng sao chép
+    return 0;
+}
+</script>
+      <div class="note f" data-act="#cr1|show-d">Lớp <b>chưa</b> có hàm dựng sao chép do ta viết, nên C++ dùng <b>hàm dựng sao chép mặc định</b>.</div>
+    </div>
+    <div>
+      <div class="console f" style="font-size:15.5px;line-height:1.45">Nhap n: <span class="in">5</span>
+Nhap phan tu a[0]: <span class="in">1</span>
+...
+Nhap phan tu a[4]: <span class="in">5</span>
+<span style="color:#fb7185;font-weight:700">free(): double free detected in tcache 2
+Aborted (core dumped)</span></div>
+      <div class="card bad f" style="margin-top:12px"><h3 style="color:#be123c">💥 Kết thúc bất thường</h3><p style="font-size:18px">Trên Visual Studio là hộp thoại <i>Debug Assertion Failed</i> (như trong bài gốc), còn g++ báo <i>double free</i>. Cả hai đều do <b>delete 2 lần cùng một vùng nhớ</b>. Vì sao? Xem tiếp.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DEFAULT COPY ===================== -->
+<section class="slide" id="defcopy">
+  <div class="hdr in"><span class="qn">MẶC ĐỊNH</span><h2>Hàm dựng sao chép mặc định</h2></div>
+  <div class="cols3" style="margin-top:6px">
+    <div class="card f zoom"><div class="icon">🧬</div><h3>Có sẵn trong mỗi lớp</h3><p style="font-size:19px">Nếu ta không khai báo hàm dựng sao chép thì mỗi lớp tự có một hàm dựng sao chép <b>mặc định</b>.</p></div>
+    <div class="card f zoom"><div class="icon">📋</div><h3>Sao chép từng bit</h3><p style="font-size:19px">Nó sao chép từng bit các thuộc tính từ đối tượng <b>nguồn</b> sang đối tượng <b>đích</b> (shallow copy).</p></div>
+    <div class="card f zoom"><div class="icon">✅</div><h3>Tốt với kiểu cơ bản</h3><p style="font-size:19px">Làm việc rất tốt với các lớp có thuộc tính kiểu <code class="i">int</code>, <code class="i">float</code>, <code class="i">double</code>, <code class="i">long</code>, <code class="i">PhanSo</code>, <code class="i">Diem</code>…</p></div>
+  </div>
+  <div class="card bad f" style="margin-top:16px"><h3 style="color:#be123c">⚠ Nhưng: thuộc tính kiểu con trỏ</h3><p style="font-size:20px">Thứ được sao chép là <b>địa chỉ</b> lưu trong con trỏ, không phải <b>vùng nhớ</b> mà nó trỏ tới. Kết quả là 2 đối tượng cùng trỏ về <b>một</b> vùng nhớ.</p></div>
+</section>
+
+<!-- ===================== SHALLOW ANIM ===================== -->
+<section class="slide" id="shallow">
+  <div class="hdr in"><span class="qn">VẤN ĐỀ</span><h2>Shallow copy: 2 con trỏ cùng trỏ 1 vùng nhớ</h2></div>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr">
+    <div class="mm" id="msh" style="width:580px;height:380px">
+      <div class="lab" style="left:0;top:0">STACK</div><div class="lab" style="left:330px;top:0">HEAP</div>
+      <div class="obj gone4" style="top:30px"><div class="oh">m1 <small>(nguồn)</small></div><div class="row">a <span class="dot"></span></div><div class="row">n = 5</div></div>
+      <div class="obj ap1 gone3 dupe" style="top:210px"><div class="oh">m2 <small>(đích)</small></div><div class="row">a <span class="dot"></span></div><div class="row">n = 5</div></div>
+      <div class="heap free3" style="left:330px;top:130px"><span class="chg2"><span class="o">1</span><span class="n">99</span></span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+      <svg class="wires" viewBox="0 0 580 380">
+        <path class="w bad3" d="M170,92 C260,92 260,150 320,150" marker-end="url(#mk)"/>
+        <path class="w ap1 gone3" d="M170,272 C260,272 260,170 320,170" marker-end="url(#mk)" style="stroke:#ec4899"/>
+      </svg>
+      <div class="tag ap2" style="left:330px;top:200px">m2.Gan(0, 99) → m1 cũng thấy 99!</div>
+      <div class="tag bad ap3" style="left:330px;top:240px">~m2(): delete[] a ✔ — m1.a giờ trỏ vào vùng đã giải phóng</div>
+      <div class="boom ap4" style="left:300px;top:40px">💥 ~m1(): delete[] lần 2 → CRASH</div>
+    </div>
+    <div>
+      <div class="console" style="font-size:15px"><span class="cl" id="sh1">MangSoNguyen m2 = m1;</span><span class="cl" id="sh2">m2.Gan(0, 99);  // sửa m2…</span><span class="cl" id="sh3">}  // hết main: hủy m2 trước</span><span class="cl" id="sh4">   // rồi hủy m1</span></div>
+      <p class="say" style="font-size:20px;margin-top:14px;min-height:120px">Nhấn → để chạy từng bước.</p>
+      <span class="f ghost" data-act="#msh|s1;#sh1|show" data-say="Sao chép mặc định: m2.a = m1.a, tức là chép ĐỊA CHỈ. Hai con trỏ cùng trỏ về một vùng nhớ."></span>
+      <span class="f ghost" data-act="#msh|s2;#sh2|show" data-say="Sửa phần tử qua m2 thì m1 cũng bị đổi theo, vì thật ra chỉ có một mảng."></span>
+      <span class="f ghost" data-act="#msh|s3;#sh3|show" data-say="Hết main, m2 bị hủy trước (ngược thứ tự tạo): delete[] vùng nhớ chung. Con trỏ m1.a trở thành dangling pointer."></span>
+      <span class="f ghost" data-act="#msh|s4;#sh4|show" data-say="Hủy m1: delete[] lần thứ 2 trên vùng nhớ đã giải phóng nên chương trình crash."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== COPY CTOR ===================== -->
+<section class="slide" id="copyctor">
+  <div class="hdr in"><span class="qn">GIẢI PHÁP</span><h2>Cài đặt hàm dựng sao chép (deep copy)</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr">
+<script type="text/x-cpp" class="sm" id="cc" data-mark="2-5:a;7:b;8:c;9-10:d">
+MangSoNguyen::MangSoNguyen(const MangSoNguyen &m) {
+    if (m.a == NULL) {          // nguồn rỗng
+        a = NULL;
+        n = 0;
+    }
+    else {
+        n = m.n;
+        a = new int[n];         // vùng nhớ MỚI, riêng
+        for (int i = 0; i < n; i++)
+            a[i] = m.a[i];      // chép từng phần tử
+    }
+}
+</script>
+    <div>
+      <div class="mm" id="mdp" style="width:560px;height:330px">
+        <div class="lab" style="left:0;top:0">STACK</div><div class="lab" style="left:300px;top:0">HEAP</div>
+        <div class="obj" style="top:30px;width:170px"><div class="oh">m1</div><div class="row">a <span class="dot"></span></div><div class="row">n = 5</div></div>
+        <div class="obj ap1" style="top:190px;width:170px"><div class="oh">m2</div><div class="row">a <span class="dot"></span></div><div class="row">n = 5</div></div>
+        <div class="heap" style="left:300px;top:62px"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+        <div class="heap ap2 cp" style="left:300px;top:222px"><span class="chg3"><span class="o">1</span><span class="n">99</span></span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+        <svg class="wires" viewBox="0 0 560 330"><path class="w" d="M160,92 C220,92 240,87 290,87" marker-end="url(#mk)"/><path class="w ap2" d="M160,252 C220,252 240,247 290,247" marker-end="url(#mk)" style="stroke:#0891b2"/></svg>
+        <div class="tag ok ap3" style="left:300px;top:282px">m2.Gan(0, 99): m1 không bị ảnh hưởng</div>
+      </div>
+      <span class="f ghost" data-act="#mdp|s1;#cc|show-b"></span>
+      <span class="f ghost" data-act="#mdp|s2;#cc|show-c;#cc|show-d"></span>
+      <span class="f ghost" data-act="#mdp|s3;#cc|show-a"></span>
+      <p class="f" style="font-size:19px">Mỗi đối tượng sở hữu <b>vùng nhớ riêng</b>, nên khi hủy mỗi bên delete đúng một lần vùng nhớ của mình. Chương trình không còn crash.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DEFAULT ASSIGN ===================== -->
+<section class="slide" id="defassign">
+  <div class="hdr in"><span class="qn">TOÁN TỬ =</span><h2>Toán tử gán bằng mặc định</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr">
+    <div>
+      <ul class="in">
+        <li>Tương tự hàm dựng sao chép: nếu lớp không cài đặt toán tử gán bằng thì sẽ có sẵn <b>toán tử gán bằng mặc định</b>.</li>
+        <li>Nó làm việc khá tốt với những kiểu dữ liệu cơ bản.</li>
+        <li>Nó phát sinh vấn đề nếu thuộc tính là <b>con trỏ</b>: lại là shallow copy.</li>
+      </ul>
+<script type="text/x-cpp" class="sm f" id="da" data-mark="6:d">
+int main() {
+    MangSoNguyen m1;
+    m1.Nhap();
+    MangSoNguyen m2 = m1;   // ✔ đã có hàm dựng sao chép
+    MangSoNguyen m3;
+    m3 = m1;                // ✘ toán tử gán MẶC ĐỊNH
+}
+</script>
+    </div>
+    <div>
+      <div class="card f" data-act="#da|show-d"><h3>Phân biệt</h3>
+        <p style="font-size:19px"><code class="i">MangSoNguyen m2 = m1;</code> → <b>hàm dựng sao chép</b>, vì m2 đang được <i>tạo mới</i>.</p>
+        <p style="font-size:19px;margin-top:6px"><code class="i">m3 = m1;</code> → <b>toán tử gán bằng</b>, vì m3 <i>đã tồn tại</i>.</p></div>
+      <div class="console f" style="margin-top:12px;font-size:15.5px"><span style="color:#fb7185;font-weight:700">free(): double free detected in tcache 2
+Aborted (core dumped)</span></div>
+      <div class="card bad f" style="margin-top:12px"><h3 style="color:#be123c">Hai lỗi cùng lúc</h3><p style="font-size:18px">① m3.a và m1.a trỏ chung một vùng nhớ, nên bị <b>delete 2 lần</b>. ② Vùng nhớ cũ của m3 (nếu có) bị mất địa chỉ, gây <b>rò rỉ bộ nhớ</b>.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ASSIGN ===================== -->
+<section class="slide" id="assign">
+  <div class="hdr in"><span class="qn">GIẢI PHÁP</span><h2>Cài đặt toán tử gán bằng</h2></div>
+  <div class="cols" style="grid-template-columns:1.12fr 1fr">
+<script type="text/x-cpp" class="xs" id="as" data-mark="2-3:a;4:d;9-12:b;14:c">
+MangSoNguyen& MangSoNguyen::operator=(const MangSoNguyen &m) {
+    if (this == &m)             // tự gán: m1 = m1
+        return *this;
+    if (a != NULL) delete[] a;  // ★ giải phóng vùng cũ
+    if (m.a == NULL) {
+        a = NULL;  n = 0;
+    }
+    else {
+        n = m.n;
+        a = new int[n];
+        for (int i = 0; i < n; i++)
+            a[i] = m.a[i];
+    }
+    return *this;
+}
+</script>
+    <div>
+      <div class="mm" id="mas" style="width:520px;height:250px">
+        <div class="lab" style="left:0;top:0">STACK</div><div class="lab" style="left:250px;top:0">HEAP</div>
+        <div class="obj" style="top:30px;width:150px"><div class="oh">m1</div><div class="row">a <span class="dot"></span></div></div>
+        <div class="obj" style="top:150px;width:150px"><div class="oh">m3</div><div class="row">a <span class="dot"></span></div></div>
+        <div class="heap" style="left:250px;top:50px"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+        <div class="heap gone1" style="left:250px;top:120px"><span>7</span><span>8</span></div>
+        <div class="heap ap2 cp" style="left:250px;top:180px"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+        <svg class="wires" viewBox="0 0 520 250"><path class="w" d="M140,80 C190,80 200,75 240,75" marker-end="url(#mk)"/>
+          <path class="w gone1" d="M140,200 C190,200 200,145 240,145" marker-end="url(#mk)" style="stroke:#94a3b8"/>
+          <path class="w ap2" d="M140,200 C190,200 200,205 240,205" marker-end="url(#mk)" style="stroke:#0891b2"/></svg>
+      </div>
+      <span class="f ghost" data-act="#mas|s1;#as|show-d" data-say="Bước 1: delete[] mảng cũ [7, 8] của m3, nên không rò rỉ."></span>
+      <span class="f ghost" data-act="#mas|s2;#as|show-b" data-say="Bước 2: cấp phát mảng mới và chép từng phần tử của m1 (deep copy)."></span>
+      <span class="f ghost" data-act="#as|show-a;#as|show-c" data-say="Kiểm tra this == &amp;m để tránh tự gán, và return *this để gán nối tiếp được: a = b = c."></span>
+      <p class="say" style="font-size:19px;min-height:56px">Nhấn → để chạy từng bước.</p>
+      <div class="note f" style="font-size:16.5px">★ Dòng 4 là <b>phần bổ sung</b> so với bài gốc. Nếu thiếu, mảng cũ của m3 bị mất địa chỉ và rò rỉ bộ nhớ. Kiểm tra tự gán ở dòng 2 cũng giúp dòng 4 không xóa mất dữ liệu của chính m khi gán <code class="i">m1 = m1</code>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== COMPARE ===================== -->
+<section class="slide" id="compare">
+  <div class="hdr in"><span class="qn">KIỂM CHỨNG</span><h2>Chạy thử: trước và sau khi cài đặt</h2></div>
+<script type="text/x-cpp" class="xs">
+MangSoNguyen m1;  m1.Nhap();                 // nhập 1 2 3 4 5
+MangSoNguyen m2 = m1;   MangSoNguyen m3;   m3 = m1;
+m2.Gan(0, 99);
+cout << "m1: "; m1.Xuat();   cout << "m2: "; m2.Xuat();
+</script>
+  <div class="cols" style="margin-top:14px">
+    <div class="card bad f"><span class="lbl bad">✘ DÙNG BẢN MẶC ĐỊNH</span>
+      <div class="console" style="font-size:16px">m1: <span style="color:#fb7185">99</span> 2 3 4 5
+m2: 99 2 3 4 5
+<span style="color:#fb7185;font-weight:700">free(): double free detected
+Aborted (core dumped)</span></div></div>
+    <div class="card good f"><span class="lbl good">✔ CÓ COPY CONSTRUCTOR + operator=</span>
+      <div class="console" style="font-size:16px">m1: 1 2 3 4 5
+m2: 99 2 3 4 5
+<span style="color:#34d399">(kết thúc bình thường)</span></div></div>
+  </div>
+  <div class="note blue f"><b>Rule of Three:</b> nếu lớp cần tự viết một trong ba hàm <b>hàm hủy</b>, <b>hàm dựng sao chép</b>, <b>toán tử gán bằng</b>, thường là do có con trỏ quản lý vùng nhớ động, thì gần như chắc chắn phải viết <b>cả ba</b>.</div>
+</section>
+
+<!-- ===================== MOVE: WHY ===================== -->
+<section class="slide" id="mvwhy">
+  <div class="hdr in"><span class="qn">C++11</span><h2>Vì sao cần move semantics?</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr">
+    <div>
+<script type="text/x-cpp" class="sm" id="w1" data-mark="2:a;6:b">
+MangSoNguyen taoMang(int k) {
+    MangSoNguyen t(k);          // mảng 1 triệu phần tử
+    return t;
+}
+MangSoNguyen m4;
+m4 = taoMang(1000000);          // gán từ đối tượng TẠM
+</script>
+      <div class="card bad f" style="margin-top:12px" data-act="#w1|show-b"><h3 style="color:#be123c">Chỉ có copy: lãng phí</h3><p style="font-size:18px"><code class="i">operator=</code> (copy) cấp phát 1 triệu ô mới và chép từng phần tử, rồi đối tượng tạm bị hủy ngay sau đó cùng với mảng của nó. Chép xong rồi bỏ đi.</p></div>
+      <div class="card good f" style="margin-top:10px"><h3>Ý tưởng move</h3><p style="font-size:18px">Đối tượng tạm sắp bị hủy, nên m4 <b>"lấy luôn"</b> con trỏ của nó thay vì chép. Chỉ cần gán vài con trỏ, chi phí O(1).</p></div>
+    </div>
+    <div>
+      <table class="tt f">
+        <tr><th></th><th>lvalue</th><th>rvalue</th></tr>
+        <tr><td>Là gì</td><td>Có tên, còn dùng tiếp</td><td>Tạm thời, sắp bị hủy</td></tr>
+        <tr><td>Ví dụ</td><td><code class="i">m1</code></td><td><code class="i">taoMang(3)</code>, <code class="i">std::move(m1)</code></td></tr>
+        <tr><td>Tham chiếu</td><td><code class="i">MangSoNguyen&amp;</code></td><td><code class="i">MangSoNguyen&amp;&amp;</code></td></tr>
+        <tr><td>Hàm được gọi</td><td>copy ctor / copy =</td><td><b>move ctor / move =</b></td></tr>
+      </table>
+      <div class="note blue f" style="font-size:18px"><code class="i">std::move(x)</code> (trong <code class="i">&lt;utility&gt;</code>) <b>không di chuyển gì cả</b>. Nó chỉ ép x thành rvalue để compiler chọn hàm move, nghĩa là ta "cho phép lấy dữ liệu của x".</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MOVE CTOR ===================== -->
+<section class="slide" id="mvctor">
+  <div class="hdr in"><span class="qn">MOVE</span><h2>Move constructor</h2></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) 560px">
+    <div>
+<script type="text/x-cpp" class="sm" id="mc" data-mark="1:a;2-3:b;4-5:c">
+MangSoNguyen::MangSoNguyen(MangSoNguyen &&m) noexcept {
+    a = m.a;        // "lấy" con trỏ của m
+    n = m.n;
+    m.a = NULL;     // m buông vùng nhớ ra
+    m.n = 0;
+}
+</script>
+<script type="text/x-cpp" class="sm f" style="margin-top:10px">
+MangSoNguyen m3 = std::move(m1);   // gọi move ctor
+</script>
+      <ul style="margin-top:10px">
+        <li class="f" data-act="#mc|show-a" style="font-size:18px">Tham số là <code class="i">MangSoNguyen&amp;&amp;</code> (rvalue reference), <b>không có const</b> vì phải sửa m.</li>
+        <li class="f" data-act="#mc|show-c" style="font-size:18px"><b>Bắt buộc</b> gán <code class="i">m.a = NULL</code>. Nếu không, hàm hủy của m sẽ delete vùng nhớ mà m3 đang dùng (lại là double free).</li>
+        <li class="f" style="font-size:18px"><code class="i">noexcept</code>: cam kết không ném ngoại lệ, để <code class="i">vector</code> dám dùng move khi cấp phát lại.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="mm" id="mmv" style="width:560px;height:330px">
+        <div class="lab" style="left:0;top:0">STACK</div><div class="lab" style="left:300px;top:0">HEAP</div>
+        <div class="obj dupe" style="top:30px;width:170px"><div class="oh">m1 <small>(nguồn)</small></div><div class="row">a <span class="chg2"><span class="o"><span class="dot" style="display:inline-block"></span></span><span class="n" style="color:#94a3b8">NULL</span></span></div><div class="row">n = <span class="chg2"><span class="o">5</span><span class="n">0</span></span></div></div>
+        <div class="obj ap1" style="top:190px;width:170px"><div class="oh">m3 <small>(mới)</small></div><div class="row">a <span class="dot"></span></div><div class="row">n = 5</div></div>
+        <div class="heap" style="left:300px;top:130px"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+        <svg class="wires" viewBox="0 0 560 330"><path class="w gone2" d="M160,92 C230,92 240,150 294,150" marker-end="url(#mk)" style="stroke:#ec4899"/><path class="w ap1" d="M160,252 C230,252 240,165 294,165" marker-end="url(#mk)" style="stroke:#0891b2"/></svg>
+        <div class="tag ok ap3" style="left:300px;top:200px">Không new, không chép phần tử: chỉ vài phép gán con trỏ</div>
+      </div>
+      <span class="f ghost" data-act="#mmv|s1;#mc|show-b" data-say="① m3.a = m1.a: m3 trỏ tới đúng mảng của m1, không cấp phát mới."></span>
+      <span class="f ghost" data-act="#mmv|s2;#mc|show-c" data-say="② m1.a = NULL, m1.n = 0: m1 buông vùng nhớ. Khi m1 bị hủy, delete[] NULL là an toàn."></span>
+      <span class="f ghost" data-act="#mmv|s3" data-say="Kết quả: vẫn chỉ có 1 mảng và đúng 1 chủ sở hữu (m3). Sau std::move, không nên dùng dữ liệu của m1 nữa."></span>
+      <p class="say" style="font-size:19px;min-height:56px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MOVE ASSIGN ===================== -->
+<section class="slide" id="mvassign">
+  <div class="hdr in"><span class="qn">MOVE</span><h2>Move assignment operator</h2></div>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) 560px">
+    <div>
+<script type="text/x-cpp" class="sm" id="ma" data-mark="3:a;4:d;5-6:b;7-8:c;9:a">
+MangSoNguyen& MangSoNguyen::operator=(MangSoNguyen &&m)
+noexcept {
+    if (this == &m) return *this;
+    if (a != NULL) delete[] a;   // giải phóng vùng CŨ
+    a = m.a;                     // lấy con trỏ của m
+    n = m.n;
+    m.a = NULL;                  // m buông vùng nhớ
+    m.n = 0;
+    return *this;
+}
+</script>
+<script type="text/x-cpp" class="sm f" style="margin-top:10px">
+m4 = taoMang(3);        // vế phải là rvalue → move =
+m4 = std::move(m2);     // ép m2 thành rvalue → move =
+</script>
+      <p class="f" style="font-size:18px;margin-top:10px">Giống copy <code class="i">operator=</code> ở 3 điểm: kiểm tra tự gán, giải phóng vùng cũ, <code class="i">return *this</code>. Khác ở chỗ <b>lấy con trỏ</b> thay vì <code class="i">new</code> rồi chép.</p>
+    </div>
+    <div>
+      <div class="mm" id="mma" style="width:560px;height:330px">
+        <div class="lab" style="left:0;top:0">STACK</div><div class="lab" style="left:300px;top:0">HEAP</div>
+        <div class="obj" style="top:30px;width:170px"><div class="oh">m4</div><div class="row">a <span class="dot"></span></div><div class="row">n = <span class="chg2"><span class="o">2</span><span class="n">3</span></span></div></div>
+        <div class="obj dupe gone4" style="top:190px;width:170px"><div class="oh">tạm <small>(rvalue)</small></div><div class="row">a <span class="chg3"><span class="o"><span class="dot" style="display:inline-block"></span></span><span class="n" style="color:#94a3b8">NULL</span></span></div><div class="row">n = <span class="chg3"><span class="o">3</span><span class="n">0</span></span></div></div>
+        <div class="heap gone1" style="left:300px;top:50px"><span>7</span><span>8</span></div>
+        <div class="heap cp" style="left:300px;top:210px"><span>1</span><span>2</span><span>3</span></div>
+        <svg class="wires" viewBox="0 0 560 330"><path class="w gone1" d="M160,92 C230,92 240,75 294,75" marker-end="url(#mk)" style="stroke:#94a3b8"/><path class="w ap2" d="M160,92 C240,92 230,230 294,230" marker-end="url(#mk)" style="stroke:#7c3aed"/><path class="w gone3" d="M160,252 C230,252 240,240 294,240" marker-end="url(#mk)" style="stroke:#ec4899"/></svg>
+        <div class="tag ap4" style="left:300px;top:262px">Đối tượng tạm bị hủy: delete[] NULL, không ảnh hưởng m4</div>
+      </div>
+      <span class="f ghost" data-act="#mma|s1;#ma|show-d" data-say="① delete[] mảng cũ [7, 8] của m4 để tránh rò rỉ."></span>
+      <span class="f ghost" data-act="#mma|s2;#ma|show-b" data-say="② m4.a = tạm.a: m4 lấy luôn mảng [1, 2, 3] mà không chép."></span>
+      <span class="f ghost" data-act="#mma|s3;#ma|show-c" data-say="③ tạm.a = NULL: đối tượng tạm buông vùng nhớ."></span>
+      <span class="f ghost" data-act="#mma|s4;#ma|show-a" data-say="④ Hết câu lệnh, đối tượng tạm bị hủy một cách an toàn, và m4 là chủ duy nhất của mảng."></span>
+      <p class="say" style="font-size:19px;min-height:56px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MOVE DEMO ===================== -->
+<section class="slide" id="mvdemo">
+  <div class="hdr in"><span class="qn">KIỂM CHỨNG</span><h2>Hàm nào được gọi? · Rule of Five</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr">
+    <div>
+<script type="text/x-cpp" class="sm" id="dm" data-mark="2:a;3:b;4:c;5:d">
+MangSoNguyen m1(5);
+MangSoNguyen m2 = m1;               // lvalue → copy ctor
+MangSoNguyen m3 = std::move(m1);    // rvalue → move ctor
+MangSoNguyen m4;  m4 = taoMang(3);  // rvalue → move =
+m4 = m2;                            // lvalue → copy =
+cout << m1.Size() << " " << m3.Size();
+</script>
+      <div class="console" style="margin-top:12px;font-size:15.5px;line-height:1.45"><span class="cl" id="dl1">  [copy ctor] cap phat &amp; chep 5 phan tu</span><span class="cl" id="dl2">  [move ctor] lay con tro, khong chep</span><span class="cl" id="dl3">  [move =] giai phong cu, lay con tro</span><span class="cl" id="dl4">  [copy =] cap phat &amp; chep 5 phan tu</span><span class="cl" id="dl5">m1.Size() = 0, m3.Size() = 5</span></div>
+      <span class="f ghost" data-act="#dl1|show;#dm|show-a"></span>
+      <span class="f ghost" data-act="#dl2|show;#dm|show-b"></span>
+      <span class="f ghost" data-act="#dl3|show;#dm|show-c"></span>
+      <span class="f ghost" data-act="#dl4|show;#dm|show-d;#dl5|show"></span>
+    </div>
+    <div>
+      <div class="card f"><h3>Rule of Five (C++11)</h3>
+        <div class="chain" style="margin-top:4px"><span class="pv">~hàm hủy</span><span class="pv">copy ctor</span><span class="pv">copy =</span><span class="pv yes">move ctor</span><span class="pv yes">move =</span></div>
+        <p style="font-size:18px;margin-top:10px">Lớp quản lý tài nguyên bằng con trỏ nên cài đặt đủ <b>5 hàm</b>. Ba hàm đầu đảm bảo <b>đúng</b>, hai hàm move giúp <b>nhanh</b>.</p></div>
+      <div class="note f" style="font-size:17px">Nếu chỉ viết 3 hàm của Rule of Three, chương trình vẫn đúng nhưng mọi trường hợp đều dùng <b>copy</b>. Sau <code class="i">std::move(m1)</code>, m1 rỗng (Size = 0): chỉ nên gán lại hoặc hủy m1, không đọc dữ liệu cũ.</div>
+      <p class="f muted" style="font-size:15px;margin-top:8px">Kết quả chạy thật với g++ -std=c++17. Các hàm có thêm lệnh <code class="i">cout</code> để thấy hàm nào được gọi.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== END ===================== -->
+<section class="slide" id="end">
+  <div class="title-wrap" style="align-items:center;text-align:center">
+    <div class="orb" style="width:360px;height:360px;background:#f9a8d4;left:10%;top:10%"></div>
+    <h1 class="in">Tóm tắt</h1>
+    <div class="cols4 in" style="margin-top:32px;text-align:left;max-width:1180px">
+      <div class="card"><h3>Hàm hủy</h3><p style="font-size:19px">Thuộc tính con trỏ cấp phát bằng <code class="i">new</code> thì phải <code class="i">delete[]</code> trong hàm hủy để tránh rò rỉ bộ nhớ.</p></div>
+      <div class="card"><h3>Copy mặc định = shallow</h3><p style="font-size:19px">Hàm dựng sao chép và toán tử gán mặc định chỉ chép <b>địa chỉ</b>, gây dùng chung vùng nhớ, delete 2 lần và crash.</p></div>
+      <div class="card"><h3>Tự cài đặt deep copy</h3><p style="font-size:19px">Cấp phát vùng nhớ mới và chép từng phần tử. Với <code class="i">operator=</code>: kiểm tra tự gán, giải phóng vùng cũ, rồi <code class="i">return *this</code>.</p></div>
+      <div class="card"><h3>Move (C++11)</h3><p style="font-size:19px">Với rvalue (đối tượng tạm, <code class="i">std::move</code>): <b>lấy con trỏ</b> rồi gán nguồn về NULL, chi phí O(1). Rule of Five.</p></div>
+    </div>
+  </div>
+</section>
+
+<script>
+// render char-grid rows for setw demo
+document.querySelectorAll(".chars").forEach(el=>{
+  const segs=JSON.parse(el.dataset.segs);let h="";
+  segs.forEach(([txt,w,al,cls,fill])=>{
+    const f=fill||" ";const pad=Math.max(0,w-txt.length);
+    const cells=al==="L"?[...txt].map(c=>[c,0]).concat(Array(pad).fill([f,1])):Array(pad).fill([f,1]).concat([...txt].map(c=>[c,0]));
+    h+=cells.map(([c,p])=>`<span class="ch ${cls}${p?" pad":""}">${c===" "?"·":c}</span>`).join("");
+  });
+  el.innerHTML=h;
+});
+</script>
+</div></div>
+
+<div id="bar"></div>
+<div id="hint">← → / Space: chuyển · Shift+→: qua slide · Home: đầu · F: toàn màn hình</div>
+<div id="nav"><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+
+<script>
+(function(){
+  // ---------- C++ highlighter ----------
+  const KW=new Set("if else for while do return break continue switch case default struct class using namespace const static new delete true false sizeof public private include pragma auto".split(" "));
+  const TY=new Set("int double float char void bool long short unsigned string Point2D Rectangle".split(" "));
+  const LIB=new Set("cout cin endl sqrt fabs hypot std".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line){
+    if(/^\s*#/.test(line)) return '<span class="p">'+esc(line)+'</span>';
+    const re=/(\/\/.*$)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="n">'+m[3]+'</span>';
+      else if(m[4]){
+        const w=m[4];
+        let cls=KW.has(w)?"k":TY.has(w)?"t":LIB.has(w)?"fn":(m[5]?"fn":"");
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[5]?esc(m[5]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-cpp"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");const [a,b]=r.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+
+  // ---------- deck engine ----------
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")];
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  function act(el,on){["act","act2"].forEach(k=>{const v=el.dataset[k];if(!v)return;v.split(";").forEach(p=>{const [sel,cls]=p.split("|");const t=document.querySelector(sel);if(t)t.classList.toggle(cls,on)})})}
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step)||(i<cur&&false);f.classList.toggle("on",on);act(f,on)});
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.textContent=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length;
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    history.replaceState(null,"","#"+slides[cur].id);
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+  addEventListener("keydown",e=>{
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+</script>
+</body>
+</html>
