@@ -321,15 +321,15 @@ System.out.println(count);
 
 <section class="slide qs" id="q4">
   <div class="hdr in"><span class="qn">CÂU 4</span><h2>So sánh email: equals vs ==</h2><span class="part-tag">Phần A</span></div>
-  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Email người dùng nhập là <code class="i">"An@GlobeDr.com"</code>, email trong database là <code class="i">"an@globedr.com"</code>. Viết điều kiện kiểm tra hai email này trùng nhau. Vì sao không nên dùng <code class="i">==</code>?</div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Email người dùng nhập là <code class="i">"An@Example.com"</code>, email trong database là <code class="i">"an@example.com"</code>. Viết điều kiện kiểm tra hai email này trùng nhau. Vì sao không nên dùng <code class="i">==</code>?</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Dùng <code class="i">equalsIgnoreCase()</code> để so sánh nội dung không phân biệt hoa thường. Toán tử <code class="i">==</code> so sánh <b>tham chiếu</b> (hai biến có trỏ cùng một object không), không so sánh nội dung; chuỗi đọc từ input/DB là object khác nhau nên <code class="i">==</code> thường cho <code class="i">false</code> dù nội dung giống hệt.</p></div><div></div></div>
   <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c4" data-mark="4:a;5:b;6:c" style="font-size:16.5px">
-String input = "An@GlobeDr.com";
-String fromDb = new String("an@globedr.com");
+String input = "An@Example.com";
+String fromDb = new String("an@example.com");
 
 System.out.println(input.strip().equalsIgnoreCase(fromDb));   // true
-System.out.println("an@globedr.com" == fromDb);              // false (khác object)
-System.out.println("an@globedr.com".equals(fromDb));         // true  (cùng nội dung)
+System.out.println("an@example.com" == fromDb);              // false (khác object)
+System.out.println("an@example.com".equals(fromDb));         // true  (cùng nội dung)
 </script></div>
   <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c4l0">true</span><span class="cl" id="c4l1">false</span><span class="cl" id="c4l2">true</span></div></div><div></div></div></div>
   <span class="f ghost" data-act="#c4l0|show;#c4|show-a"></span><span class="f ghost" data-act="#c4l1|show;#c4|show-b"></span><span class="f ghost" data-act="#c4l2|show;#c4|show-c"></span>
@@ -369,10 +369,10 @@ static String ext(String fileName) {
 
 <section class="slide qs" id="q7">
   <div class="hdr in"><span class="qn">CÂU 7</span><h2>Chuỗi cấu hình → Map</h2><span class="part-tag">Phần A</span></div>
-  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Chuyển chuỗi cấu hình <code class="i">"host=localhost;port=8080;db=globedr"</code> thành <code class="i">Map&lt;String, String&gt;</code>.</div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Chuyển chuỗi cấu hình <code class="i">"host=localhost;port=8080;db=example"</code> thành <code class="i">Map&lt;String, String&gt;</code>.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
     <div class="f"><script type="text/x-cpp" id="c7" data-mark="" style="font-size:13.6px">
-String config = "host=localhost;port=8080;db=globedr";
+String config = "host=localhost;port=8080;db=example";
 Map<String, String> map = new LinkedHashMap<>();
 for (String pair : config.split(";")) {
     String[] kv = pair.split("=", 2);
@@ -380,7 +380,7 @@ for (String pair : config.split(";")) {
 }
 System.out.println(map);
 </script></div>
-    <div><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">split(";")</code> tách từng cặp, rồi <code class="i">split("=", 2)</code> tách key/value (tham số <code class="i">2</code> giữ nguyên dấu <code class="i">=</code> nếu value có chứa <code class="i">=</code>).</p></div><div class="console f" data-act="#c7|show-a;#c7|show-b;#c7|show-c;#c7|show-d">{host=localhost, port=8080, db=globedr}</div></div>
+    <div><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">split(";")</code> tách từng cặp, rồi <code class="i">split("=", 2)</code> tách key/value (tham số <code class="i">2</code> giữ nguyên dấu <code class="i">=</code> nếu value có chứa <code class="i">=</code>).</p></div><div class="console f" data-act="#c7|show-a;#c7|show-b;#c7|show-c;#c7|show-d">{host=localhost, port=8080, db=example}</div></div>
   </div></div>
   
 </section>
@@ -418,7 +418,7 @@ System.out.println(sb.toString());
 
 <section class="slide qs" id="q10">
   <div class="hdr in"><span class="qn">CÂU 10</span><h2>Kiểm tra mật khẩu mạnh</h2><span class="part-tag">Phần A</span></div>
-  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Mật khẩu hợp lệ khi: dài ít nhất 8 ký tự, có ít nhất 1 chữ hoa và 1 chữ số. Kiểm tra <code class="i">"Globedr2026"</code> và <code class="i">"globedr"</code>.</div>
+  <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Mật khẩu hợp lệ khi: dài ít nhất 8 ký tự, có ít nhất 1 chữ hoa và 1 chữ số. Kiểm tra <code class="i">"Example2026"</code> và <code class="i">"example"</code>.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Dùng <code class="i">length()</code> và <code class="i">chars()</code> (trả <code class="i">IntStream</code> các ký tự) kết hợp <code class="i">anyMatch</code>.</p></div><div></div></div>
   <div class="f" style="margin-top:10px"><script type="text/x-cpp" id="c10" data-mark="6:a;7:b" style="font-size:16.5px">
 static boolean isStrong(String pw) {
@@ -426,8 +426,8 @@ static boolean isStrong(String pw) {
         && pw.chars().anyMatch(Character::isUpperCase)
         && pw.chars().anyMatch(Character::isDigit);
 }
-System.out.println(isStrong("Globedr2026"));  // true
-System.out.println(isStrong("globedr"));      // false (ngắn, không có chữ hoa và số)
+System.out.println(isStrong("Example2026"));  // true
+System.out.println(isStrong("example"));      // false (ngắn, không có chữ hoa và số)
 </script></div>
   <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:10px"><div><div class="console"><span class="cl" id="c10l0">true</span><span class="cl" id="c10l1">false</span></div></div><div></div></div></div>
   <span class="f ghost" data-act="#c10l0|show;#c10|show-a"></span><span class="f ghost" data-act="#c10l1|show;#c10|show-b"></span>
