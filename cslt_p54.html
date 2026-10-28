@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Practice 5.4 – struct Date</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+h1{font-size:70px;line-height:1.1;font-weight:800}
+h2{font-size:38px;line-height:1.2;font-weight:800}
+h3{font-size:23px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:22px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:26px;margin:6px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.88em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 6px;border-radius:6px;color:#be185d}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.cols.c64{grid-template-columns:1.25fr 1fr}.cols.c46{grid-template-columns:1fr 1.2fr}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.card.bad{border-color:#fecdd3;background:linear-gradient(180deg,#fff1f3,#fff)}
+.card.good{border-color:#a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff)}
+.lbl{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
+.icon{font-size:34px;margin-bottom:4px}
+.note{margin-top:12px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:20px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.code{font-family:var(--mono);font-size:18px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
+.code.sm{font-size:16.5px}.code.xs{font-size:15px;line-height:1.45}.code.xxs{font-size:13.6px;line-height:1.38;padding:8px 0}
+.code .ln{padding:0 14px 0 8px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.11);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.13);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
+.code-title{font-family:var(--mono);font-size:15px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+.f.zoom{transform:scale(.85)}.f.zoom.on{transform:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:19px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.legend{display:flex;flex-direction:column;gap:10px}
+.leg{border-radius:12px;padding:10px 16px;background:#fff;border:1px solid var(--line)}
+.leg b{display:block;font-size:21px;margin-bottom:2px}
+.leg p{font-size:19px}
+.leg.a{border-left:6px solid #7c3aed}.leg.b{border-left:6px solid #06b6d4}.leg.c{border-left:6px solid #f59e0b}
+.console{font-family:var(--mono);font-size:17px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.mem{display:flex;align-items:center;gap:16px;min-height:130px}
+.frame{border:2px solid #e4dcfb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
+.frame .fname{font-family:var(--mono);font-size:16px;color:var(--muted);margin-bottom:6px}
+.var{display:flex;align-items:center;gap:10px}
+.vn{font-family:var(--mono);font-size:21px;color:var(--t);font-weight:600}
+.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #c4b5fd;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
+.vb .new{display:none}
+.callee,.arw{opacity:0;transform:translateX(-14px);transition:all .5s}
+.mem.s1 .callee,.mem.s1 .arw{opacity:1;transform:none}
+.mem.s2 .chg .old{display:none}.mem.s2 .chg .new{display:inline;animation:pop .5s}
+.mem.s2 .chg{border-color:#f59e0b;box-shadow:0 0 18px rgba(245,158,11,.5)}
+.mem.s3 .callee,.mem.s3 .arw{opacity:.15;transform:translateY(10px)}
+.mem.s3 .result{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.5)}
+.arw{font-family:var(--mono);font-size:16px;color:var(--gold);text-align:center;line-height:1.2;font-weight:600}
+.arw .bar{display:block;font-size:30px}
+.alias{font-size:18px;color:var(--accent2);font-weight:600}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.25)}100%{transform:none;opacity:1}}
+.flow{display:flex;align-items:center;gap:12px;justify-content:center}
+.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:18px;border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:14px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.h{border-color:var(--gold)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#c4b5fd}.box.exe{border-color:#ec4899;background:#fdf2f8}
+.ar{color:var(--muted);font-size:26px;text-align:center}
+.stack{display:flex;flex-direction:column;gap:8px}
+svg text{font-family:var(--mono);font-weight:600}
+.draw{stroke-dasharray:400;stroke-dashoffset:400;transition:stroke-dashoffset 1s ease}
+svg.d1 .dr1,svg.d2 .dr2,svg.d3 .dr3{stroke-dashoffset:0}
+.fadein{opacity:0;transition:opacity .6s}
+svg.d1 .fd1,svg.d2 .fd2,svg.d3 .fd3{opacity:1}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:19px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05)}
+.ag:hover{border-color:#ec4899;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
+.ag b{color:#db2777;margin-right:6px;font-family:var(--mono)}
+.formula{font-family:var(--mono);font-size:23px;text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:16px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+@media (max-width:700px){#hint{display:none}}
+@media print{#nav,#bar,#hint{display:none}}
+
+/* lec03 additions */
+.chain{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pv{display:inline-flex;align-items:center;font-family:var(--mono);font-size:18px;font-weight:700;padding:5px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;white-space:nowrap}
+.pv.yes{background:#d1fae5;border-color:#34d399;color:#047857}
+.pv.no{background:#ffe4e6;border-color:#fb7185;color:#be123c}
+.pv.skip{background:#f1f5f9;border-color:#cbd5e1;color:#94a3b8;text-decoration:line-through;border-style:dashed}
+.op{font-family:var(--mono);font-size:26px;font-weight:800;color:var(--sa1)}
+.tt th,.tt td{text-align:center}.tt td:first-child{color:var(--text);font-weight:400}
+.tt tr.hit td{background:#fdf2f8;color:#be185d}
+tr.f{transform:none}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.code.show-s .mark-s{opacity:.3;text-decoration:line-through}
+.arr{display:flex;gap:12px;justify-content:center;margin-top:6px}
+.cell{width:84px;height:84px;border-radius:16px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:800;transition:all .45s;box-shadow:0 6px 16px -10px rgba(124,58,237,.4)}
+.cell small{font-size:13px;color:var(--muted);font-weight:600}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857;transform:translateY(-6px)}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;transform:translateY(-10px) scale(1.06);box-shadow:0 10px 24px -8px rgba(225,29,72,.5)}
+.cell.skip{opacity:.3;transform:scale(.92)}
+.syn{display:flex;gap:12px;align-items:center;justify-content:center;font-family:var(--mono);font-size:24px;font-weight:700}
+.sy{padding:8px 16px;border-radius:12px;color:#fff}
+.sy.c1{background:linear-gradient(135deg,#7c3aed,#a855f7)}.sy.c2{background:linear-gradient(135deg,#059669,#10b981)}.sy.c3{background:linear-gradient(135deg,#e11d48,#f97316)}
+.spin{display:inline-block;animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* practice 5.4 additions */
+.say{font-size:19px;line-height:1.4;min-height:56px;margin-top:10px;padding:8px 14px;border-radius:10px;background:#fff;border:1px dashed #d8cdf7;color:var(--text)}
+.sim{position:relative}
+.track{position:relative;height:196px;margin:4px auto 0}
+.dc{position:absolute;top:24px;width:96px;height:78px;border-radius:14px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-weight:800;transition:left .6s cubic-bezier(.3,.8,.3,1),border-color .35s,background .35s,transform .35s,box-shadow .35s;box-shadow:0 6px 16px -10px rgba(124,58,237,.4)}
+.dc .dm{font-size:23px;line-height:1.1}.dc .yy{font-size:15px;color:var(--muted);font-weight:700}
+.dc.cmp{border-color:#06b6d4;background:#ecfeff;transform:translateY(-4px)}
+.dc.mx{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 18px rgba(245,158,11,.55);transform:translateY(-8px)}
+.dc.done{border-color:#10b981;background:#ecfdf5;color:#047857}
+.dc.done .yy{color:#059669}
+.dc.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;animation:shake .5s}
+.dc.empty{border-style:dashed;color:#c4bfdc;background:#faf9ff;box-shadow:none}
+.dc.newin{animation:pop .5s}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.ix{position:absolute;top:0;width:96px;text-align:center;font-family:var(--mono);font-size:14px;color:var(--muted);font-weight:600}
+.ptr{position:absolute;width:96px;text-align:center;font-family:var(--mono);font-size:15px;font-weight:800;transition:left .45s,opacity .3s;opacity:0}
+.ptr.on{opacity:1}
+.ptr span{display:inline-block;padding:1px 10px;border-radius:999px;color:#fff}
+.ptr.pi{top:110px}.ptr.pi span{background:#7c3aed}
+.ptr.pj{top:138px}.ptr.pj span{background:#0891b2}
+.ptr.pm{top:166px}.ptr.pm span{background:#d97706}
+.ptr span::before{content:"▲ ";font-size:11px}
+.dbox{display:inline-flex;align-items:center;font-family:var(--mono);font-size:22px;font-weight:700;background:#fff;border:2px solid var(--line);border-radius:10px;padding:4px 8px}
+.seg{padding:1px 4px;border-radius:6px}
+.seg.hl{background:#fde68a;color:#92400e;box-shadow:0 0 0 2px #f59e0b}
+.seg.eq{color:#a8a3c4}
+.cmprow{display:flex;align-items:center;gap:12px;margin:10px 0;flex-wrap:wrap}
+.vs{font-family:var(--mono);color:var(--muted);font-weight:700}
+.fld{display:flex;gap:8px;align-items:flex-end}
+.fb{display:flex;flex-direction:column;align-items:center;gap:4px}
+.fb .vb{min-width:96px}
+.fb small{font-family:var(--mono);font-size:15px;color:var(--t);font-weight:700}
+.fb em{font-style:normal;font-size:13px;color:var(--muted);font-family:var(--mono)}
+.mini{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.mini span{font-family:var(--mono);font-size:13px;border:2px solid #c4b5fd;border-radius:7px;padding:4px 6px;background:#fff}
+.mini span.dim{border-style:dashed;color:#c4bfdc}
+.res{display:inline-block;font-family:var(--mono);font-weight:700;font-size:15px;padding:2px 10px;border-radius:999px}
+.res.ok{background:#d1fae5;color:#047857}.res.no{background:#ffe4e6;color:#be123c}
+.tt2 td,.tt2 th{font-size:17px}
+.tt2 td:first-child{color:var(--text)}
+.tt2 td.seq{font-family:var(--mono);font-size:15.5px;white-space:nowrap}
+.tt2 b.g{color:#059669}
+.console .ok{color:#6ee7b7;font-weight:600}.console .er{color:#fb7185;font-weight:600}
+.code.show-s .mark-s{opacity:1}
+.err{padding:10px 14px}
+.err h3{font-size:20px;margin-bottom:4px}
+.err .code{margin:2px 0 4px}
+.err p{font-size:16px;line-height:1.35}
+.tag{font-family:var(--mono);font-size:12.5px;font-weight:800;letter-spacing:.04em;padding:1px 8px;border-radius:5px;margin-right:6px}
+.tag.bad{background:#ffe4e6;color:#be123c}.tag.good{background:#d1fae5;color:#047857}
+.code.bad{border-color:#fecdd3;background:#fff7f8}.code.good{border-color:#a7f3d0;background:#f6fffb}
+.errgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="deck">
+<!-- ===================== TITLE ===================== -->
+<section class="slide" id="title">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// C++ · Practice 5.4 · struct &amp; multi-file project</div>
+    <h1 class="in">Xử lý danh sách ngày<br><span class="grad">struct Date trong C++</span></h1>
+    <p class="in muted" style="font-size:26px;margin-top:20px;max-width:900px">Khai báo <code class="i">struct</code> biểu diễn ngày, nhập danh sách ngày (có kiểm tra hợp lệ), rồi in từ <b>ngày mới nhất</b> đến <b>ngày cũ nhất</b>. Chương trình tổ chức thành hàm và chia thành nhiều file.</p>
+    <p class="in" style="margin-top:36px;font-size:19px;color:#8a91b4">Dùng phím ← → hoặc Space để chuyển · F: toàn màn hình</p>
+  </div>
+</section>
+
+<!-- ===================== AGENDA ===================== -->
+<section class="slide" id="agenda">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:18px">· bấm vào mục để đi tới</span></div>
+  <div class="agenda in">
+    <div class="ag" data-goto="q1"><b>01</b>Phân tích đề bài</div>
+    <div class="ag" data-goto="q2"><b>02</b>Tổ chức project nhiều file</div>
+    <div class="ag" data-goto="q3"><b>03</b>struct Date (date.h)</div>
+    <div class="ag" data-goto="q4"><b>04</b>Kiểm tra ngày hợp lệ</div>
+    <div class="ag" data-goto="q5"><b>05</b>Nhập danh sách – chạy từng bước</div>
+    <div class="ag" data-goto="q6"><b>06</b>So sánh hai ngày</div>
+    <div class="ag" data-goto="q7"><b>07</b>Sắp xếp giảm dần – chạy từng bước</div>
+    <div class="ag" data-goto="q8"><b>08</b>Tóm tắt các lượt sắp xếp</div>
+    <div class="ag" data-goto="q9"><b>09</b>main.cpp &amp; in kết quả</div>
+    <div class="ag" data-goto="q10"><b>10</b>Biên dịch &amp; chạy</div>
+    <div class="ag" data-goto="q11"><b>11</b>Mở rộng: std::sort</div>
+    <div class="ag" data-goto="sum"><b>12</b>Tổng kết</div>
+    <div class="ag" data-goto="err1"><b>13</b>Lỗi hay gặp: logic</div>
+    <div class="ag" data-goto="err2"><b>14</b>Lỗi hay gặp: nhập/xuất &amp; nhiều file</div>
+  </div>
+</section>
+
+<!-- ===================== Q1 PHÂN TÍCH ===================== -->
+<section class="slide" id="q1">
+  <div class="hdr in"><span class="qn">BƯỚC 1</span><h2>Phân tích đề bài</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+      <div class="card f"><h3>Yêu cầu</h3>
+        <ul>
+          <li>Khai báo <code class="i">struct Date</code> gồm <b>day</b>, <b>month</b>, <b>year</b>.</li>
+          <li>Nhập một <b>danh sách</b> (mảng) các ngày.</li>
+          <li>In danh sách từ ngày <b>mới nhất</b> → <b>cũ nhất</b>.</li>
+          <li>Chia thành <b>hàm</b> và <b>nhiều file</b>: <code class="i">date.h</code>, <code class="i">date.cpp</code>, <code class="i">main.cpp</code>.</li>
+        </ul>
+      </div>
+      <div class="chain f" style="margin-top:16px;justify-content:center">
+        <span class="pv">① Nhập</span><span class="op">→</span><span class="pv">② Sắp xếp giảm dần</span><span class="op">→</span><span class="pv yes">③ In</span>
+      </div>
+      <div class="note blue f">“Mới nhất” = ngày <b>lớn nhất</b>. Vậy bài toán chính là <b>sắp xếp giảm dần</b>, so sánh theo thứ tự <b>năm → tháng → ngày</b>.</div>
+    </div>
+    <div>
+      <div class="code-title f">Ví dụ Input (n = 5)</div>
+      <div class="console f">5
+15 8 2023
+10 3 2024
+<span style="color:#fb7185">29 2 2023   ← sai! nhập lại</span>
+25 12 2022
+20 8 2023
+1 1 2024</div>
+      <div class="code-title f" style="margin-top:12px">Output mong đợi</div>
+      <div class="console f"><span class="ok">1. 10/03/2024</span>
+<span class="ok">2. 01/01/2024</span>
+<span class="ok">3. 20/08/2023</span>
+<span class="ok">4. 15/08/2023</span>
+<span class="ok">5. 25/12/2022</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q2 MULTI-FILE ===================== -->
+<section class="slide" id="q2">
+  <div class="hdr in"><span class="qn">BƯỚC 2</span><h2>Tổ chức project nhiều file</h2></div>
+  <div class="cols3">
+    <div class="card f"><div class="icon">📄</div><h3>date.h</h3><p style="font-size:19px"><b>Khai báo</b>: <code class="i">struct Date</code>, hằng số và <b>nguyên mẫu hàm</b> (prototype). Là “bản hợp đồng” cho các file khác.</p></div>
+    <div class="card f"><div class="icon">⚙️</div><h3>date.cpp</h3><p style="font-size:19px"><b>Định nghĩa</b> (cài đặt) các hàm: kiểm tra, nhập, so sánh, sắp xếp, in. Có <code class="i">#include "date.h"</code>.</p></div>
+    <div class="card f"><div class="icon">▶️</div><h3>main.cpp</h3><p style="font-size:19px">Chỉ chứa <code class="i">main()</code>: gọi các hàm theo thứ tự <b>nhập → sắp xếp → in</b>. Cũng <code class="i">#include "date.h"</code>.</p></div>
+  </div>
+  <div class="flow f" style="margin-top:26px">
+    <div class="stack"><div class="box cpp">date.cpp</div><div class="box cpp">main.cpp</div></div>
+    <div class="ar">→<br><small style="font-size:13px">compile</small></div>
+    <div class="stack"><div class="box o">date.o</div><div class="box o">main.o</div></div>
+    <div class="ar">→<br><small style="font-size:13px">link</small></div>
+    <div class="box exe">dates.exe<small>chương trình chạy được</small></div>
+  </div>
+  <div class="flow f" style="margin-top:12px"><div class="box h">date.h<small>được #include vào cả 2 file .cpp</small></div></div>
+  <div class="note f" style="margin-top:14px">Lợi ích: mỗi file một nhiệm vụ, dễ đọc, dễ sửa; <code class="i">date.cpp</code> có thể dùng lại cho chương trình khác chỉ bằng cách <code class="i">#include "date.h"</code>.</div>
+</section>
+
+<!-- ===================== Q3 STRUCT ===================== -->
+<section class="slide" id="q3">
+  <div class="hdr in"><span class="qn">BƯỚC 3</span><h2><code class="i" style="font-size:33px">struct Date</code> – file date.h</h2></div>
+  <div class="cols" style="grid-template-columns:1.08fr 1fr">
+    <div>
+      <div class="code-title">date.h</div>
+<script type="text/x-cpp" class="xs" id="c3" data-mark="1-2:a;21:a;4:c;6-10:b;12-19:d">
+#ifndef DATE_H          // include guard: tránh
+#define DATE_H          // khai báo trùng lặp
+
+const int MAX_DATES = 100;
+
+struct Date {
+    int day;            // 1..31
+    int month;          // 1..12
+    int year;           // >= 1
+};
+
+bool isLeapYear(int y);
+int  daysInMonth(int m, int y);
+bool isValidDate(Date d);
+void inputDate(Date &d);
+int  compareDate(Date a, Date b);
+void inputList(Date a[], int &n);
+void sortDescending(Date a[], int n);
+void printList(const Date a[], int n);
+
+#endif
+</script>
+    </div>
+    <div>
+      <div class="card f" data-act="#c3|show-a;#c3|show-b"><h3>Một biến Date trong bộ nhớ</h3>
+        <p style="font-size:18px;margin-bottom:8px"><code class="i">Date d = {15, 8, 2023};</code></p>
+        <div class="fld">
+          <div class="fb"><small>d.day</small><span class="vb">15</span><em>4 byte</em></div>
+          <div class="fb"><small>d.month</small><span class="vb">8</span><em>4 byte</em></div>
+          <div class="fb"><small>d.year</small><span class="vb">2023</span><em>4 byte</em></div>
+        </div>
+        <p style="font-size:17px;margin-top:6px" class="muted">Ba trường nằm liền nhau, truy cập bằng dấu chấm. <code class="i">sizeof(Date)</code> thường = 12.</p>
+      </div>
+      <div class="card f" style="margin-top:12px" data-act="#c3|show-c"><h3>Danh sách = mảng Date</h3>
+        <p style="font-size:18px;margin-bottom:8px"><code class="i">Date list[MAX_DATES];</code> &nbsp;<span class="muted">(dùng n phần tử đầu)</span></p>
+        <div class="mini"><span>list[0]</span><span>list[1]</span><span>list[2]</span><span>list[3]</span><span>list[4]</span><span class="dim">…</span><span class="dim">list[99]</span></div>
+      </div>
+      <div class="note blue f" data-act="#c3|show-d" style="font-size:18px">Header chỉ có <b>prototype</b> (khai báo), phần thân hàm nằm ở <code class="i">date.cpp</code>. <code class="i">Date &amp;d</code>, <code class="i">int &amp;n</code>: truyền tham chiếu để hàm <b>sửa được</b> biến của nơi gọi.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q4 VALID ===================== -->
+<section class="slide" id="q4">
+  <div class="hdr in"><span class="qn">BƯỚC 4</span><h2>Kiểm tra ngày hợp lệ</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr">
+    <div>
+      <div class="code-title">date.cpp (phần 1)</div>
+<script type="text/x-cpp" class="xxs" id="c4" data-mark="1-4:a;5-14:b;15-20:c">
+bool isLeapYear(int y) {
+    return (y % 4 == 0 && y % 100 != 0)
+           || y % 400 == 0;
+}
+int daysInMonth(int m, int y) {
+    switch (m) {
+        case 4: case 6: case 9: case 11:
+            return 30;
+        case 2:
+            return isLeapYear(y) ? 29 : 28;
+        default:
+            return 31;
+    }
+}
+bool isValidDate(Date d) {
+    if (d.year < 1 || d.month < 1 || d.month > 12)
+        return false;
+    int maxDay = daysInMonth(d.month, d.year);
+    return d.day >= 1 && d.day <= maxDay;
+}
+</script>
+    </div>
+    <div>
+      <table class="tt2">
+        <tr><th>Input</th><th>Phân tích</th><th>Kết quả</th></tr>
+        <tr class="f" data-act="#c4|show-c"><td>15/08/2023</td><td>Tháng 8 → <b>31</b> ngày; 1 ≤ 15 ≤ 31</td><td><span class="res ok">true</span></td></tr>
+        <tr class="f" data-act="#c4|show-a"><td>29/02/2023</td><td>2023 % 4 = 3 → <b>không nhuận</b> → tháng 2 có 28 ngày; 29 &gt; 28</td><td><span class="res no">false</span></td></tr>
+        <tr class="f" data-act="#c4|show-b"><td>29/02/2024</td><td>2024 % 4 = 0, % 100 ≠ 0 → <b>nhuận</b> → 29 ngày</td><td><span class="res ok">true</span></td></tr>
+        <tr class="f"><td>31/04/2024</td><td>Tháng 4 → <b>30</b> ngày; 31 &gt; 30</td><td><span class="res no">false</span></td></tr>
+        <tr class="f"><td>10/13/2024</td><td>month = 13 &gt; 12 → loại ngay ở dòng 16</td><td><span class="res no">false</span></td></tr>
+      </table>
+      <div class="note f" style="font-size:18px"><b>Năm nhuận:</b> chia hết cho 4 nhưng không chia hết cho 100, <b>hoặc</b> chia hết cho 400. Ví dụ: 1900 không nhuận, 2000 nhuận.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q5 INPUT (SIM) ===================== -->
+<section class="slide" id="q5">
+  <div class="hdr in"><span class="qn">BƯỚC 5</span><h2>Nhập danh sách – chạy từng bước</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr">
+    <div>
+      <div class="code-title">date.cpp (phần 2)</div>
+<script type="text/x-cpp" class="xs" id="c5" data-mark="9-12:a;13-15:b;2:c;3-6:d">
+void inputDate(Date &d) {
+    cin >> d.day >> d.month >> d.year;
+    while (!isValidDate(d)) {        // sai → nhập lại
+        cout << "  Ngay khong hop le, nhap lai: ";
+        cin >> d.day >> d.month >> d.year;
+    }
+}
+void inputList(Date a[], int &n) {
+    do {
+        cout << "So luong ngay: ";
+        cin >> n;
+    } while (n < 1 || n > MAX_DATES);
+    for (int i = 0; i < n; i++) {
+        cout << "Ngay " << i + 1 << " (d m y): ";
+        inputDate(a[i]);
+    }
+}
+</script>
+    </div>
+    <div class="sim" data-sim="input" data-code="c5">
+      <div class="console" id="con5" style="min-height:196px;font-size:16px"></div>
+      <div class="track" style="width:520px;height:110px;margin-top:6px"></div>
+      <span class="f ghost" data-st="input:1" data-say="Vòng do…while: nhập n = 5 (thỏa 1 ≤ n ≤ 100 nên thoát vòng)."></span>
+      <span class="f ghost" data-st="input:2" data-say="i = 0: inputDate(a[0]) đọc 15 8 2023 → isValidDate = true → lưu vào a[0]."></span>
+      <span class="f ghost" data-st="input:3" data-say="i = 1: đọc 10 3 2024 → hợp lệ → a[1]."></span>
+      <span class="f ghost" data-st="input:4" data-say="i = 2: đọc 29 2 2023 → 2023 không nhuận, tháng 2 chỉ có 28 ngày → vòng while báo lỗi, yêu cầu nhập lại."></span>
+      <span class="f ghost" data-st="input:5" data-say="Nhập lại 25 12 2022 → hợp lệ → thoát while, lưu vào a[2]."></span>
+      <span class="f ghost" data-st="input:6" data-say="i = 3: đọc 20 8 2023 → hợp lệ → a[3]."></span>
+      <span class="f ghost" data-st="input:7" data-say="i = 4: đọc 1 1 2024 → hợp lệ → a[4]. Xong: n = 5, mảng có 5 ngày hợp lệ (theo thứ tự nhập)."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q6 COMPARE ===================== -->
+<section class="slide" id="q6">
+  <div class="hdr in"><span class="qn">BƯỚC 6</span><h2>So sánh hai ngày: <code class="i" style="font-size:33px">compareDate</code></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.15fr">
+    <div>
+      <div class="code-title">date.cpp (phần 3)</div>
+<script type="text/x-cpp" class="sm" id="c6" data-mark="5-6:a;7-8:b;9:c">
+// > 0 : a muộn hơn b (a mới hơn)
+// < 0 : a sớm hơn b
+// = 0 : hai ngày bằng nhau
+int compareDate(Date a, Date b) {
+    if (a.year != b.year)
+        return a.year - b.year;
+    if (a.month != b.month)
+        return a.month - b.month;
+    return a.day - b.day;
+}
+</script>
+      <div class="note blue f" style="font-size:18px">Giống so sánh từ điển: xét <b>năm</b> trước, bằng nhau mới xét <b>tháng</b>, rồi mới tới <b>ngày</b>.</div>
+    </div>
+    <div>
+      <div class="card f" data-act="#c6|show-a"><h3>Ví dụ 1 – khác năm</h3>
+        <div class="cmprow"><span class="dbox"><span class="seg">10</span>/<span class="seg">03</span>/<span class="seg hl">2024</span></span><span class="vs">vs</span><span class="dbox"><span class="seg">15</span>/<span class="seg">08</span>/<span class="seg hl">2023</span></span></div>
+        <p style="font-size:18px">2024 − 2023 = <b>1 &gt; 0</b> ⇒ 10/03/2024 <b>mới hơn</b> (dù tháng 3 &lt; 8).</p>
+      </div>
+      <div class="card f" style="margin-top:10px" data-act="#c6|show-b"><h3>Ví dụ 2 – cùng năm, khác tháng</h3>
+        <div class="cmprow"><span class="dbox"><span class="seg">01</span>/<span class="seg hl">01</span>/<span class="seg eq">2024</span></span><span class="vs">vs</span><span class="dbox"><span class="seg">10</span>/<span class="seg hl">03</span>/<span class="seg eq">2024</span></span></div>
+        <p style="font-size:18px">Năm bằng nhau → 1 − 3 = <b>−2 &lt; 0</b> ⇒ 01/01/2024 <b>cũ hơn</b>.</p>
+      </div>
+      <div class="card f" style="margin-top:10px" data-act="#c6|show-c"><h3>Ví dụ 3 – cùng năm, cùng tháng</h3>
+        <div class="cmprow"><span class="dbox"><span class="seg hl">20</span>/<span class="seg eq">08</span>/<span class="seg eq">2023</span></span><span class="vs">vs</span><span class="dbox"><span class="seg hl">15</span>/<span class="seg eq">08</span>/<span class="seg eq">2023</span></span></div>
+        <p style="font-size:18px">20 − 15 = <b>5 &gt; 0</b> ⇒ 20/08/2023 <b>mới hơn</b>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q7 SORT (SIM) ===================== -->
+<section class="slide" id="q7">
+  <div class="hdr in"><span class="qn">BƯỚC 7</span><h2>Sắp xếp giảm dần (Interchange Sort) – từng bước</h2></div>
+  <div class="cols" style="grid-template-columns:.95fr 1.05fr">
+    <div>
+      <div class="code-title">date.cpp (phần 4)</div>
+<script type="text/x-cpp" class="sm" id="c7" data-mark="2:a;3-4:b;5-7:c">
+void sortDescending(Date a[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j < n; j++)
+            if (compareDate(a[j], a[i]) > 0){
+                Date temp = a[i];
+                a[i] = a[j];
+                a[j] = temp;
+            }
+    }
+}
+</script>
+      <p class="muted" style="font-size:17px;margin-top:10px">Ý tưởng: mỗi lượt <code class="i">i</code>, so <code class="i">a[i]</code> với từng <code class="i">a[j]</code> phía sau; gặp ngày <b>mới hơn</b> thì đổi chỗ ngay. Hết lượt, <code class="i">a[i]</code> là ngày mới nhất của đoạn <code class="i">a[i..n-1]</code>.</p>
+    </div>
+    <div class="sim" data-sim="sort" data-code="c7">
+      <div class="track" style="width:520px"></div>
+      <span class="f ghost" data-st="sort:1"></span><span class="f ghost" data-st="sort:2"></span><span class="f ghost" data-st="sort:3"></span><span class="f ghost" data-st="sort:4"></span><span class="f ghost" data-st="sort:5"></span><span class="f ghost" data-st="sort:6"></span><span class="f ghost" data-st="sort:7"></span><span class="f ghost" data-st="sort:8"></span><span class="f ghost" data-st="sort:9"></span><span class="f ghost" data-st="sort:10"></span><span class="f ghost" data-st="sort:11"></span><span class="f ghost" data-st="sort:12"></span><span class="f ghost" data-st="sort:13"></span><span class="f ghost" data-st="sort:14"></span><span class="f ghost" data-st="sort:15"></span><span class="f ghost" data-st="sort:16"></span><span class="f ghost" data-st="sort:17"></span><span class="f ghost" data-st="sort:18"></span><span class="f ghost" data-st="sort:19"></span><span class="f ghost" data-st="sort:20"></span><span class="f ghost" data-st="sort:21"></span>
+      <p class="say" id="say7" style="min-height:84px">Nhấn → để chạy từng bước.</p>
+      <div style="display:flex;gap:14px;margin-top:10px;font-size:15px;font-family:var(--mono);flex-wrap:wrap" class="muted">
+        <span><b style="color:#0891b2">■</b> đang so sánh a[j]</span><span><b style="color:#d97706">■</b> a[i] – vị trí đang chốt</span><span><b style="color:#059669">■</b> đã đúng vị trí</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q8 PASS TABLE ===================== -->
+<section class="slide" id="q8">
+  <div class="hdr in"><span class="qn">BƯỚC 8</span><h2>Tóm tắt các lượt sắp xếp</h2></div>
+  <table class="tt2">
+    <tr><th>Lượt</th><th>So a[i] với</th><th>Đổi chỗ</th><th>Dãy sau lượt (xanh = đã cố định)</th></tr>
+    <tr><td>Ban đầu</td><td>–</td><td>–</td><td class="seq">15/08/2023 · 10/03/2024 · 25/12/2022 · 20/08/2023 · 01/01/2024</td></tr>
+    <tr class="f"><td>i = 0</td><td>a[1..4]</td><td>1 lần: a[0]↔a[1]</td><td class="seq"><b class="g">10/03/2024</b> · 15/08/2023 · 25/12/2022 · 20/08/2023 · 01/01/2024</td></tr>
+    <tr class="f"><td>i = 1</td><td>a[2..4]</td><td>2 lần: a[1]↔a[3], a[1]↔a[4]</td><td class="seq"><b class="g">10/03/2024</b> · <b class="g">01/01/2024</b> · 25/12/2022 · 15/08/2023 · 20/08/2023</td></tr>
+    <tr class="f"><td>i = 2</td><td>a[3..4]</td><td>2 lần: a[2]↔a[3], a[2]↔a[4]</td><td class="seq"><b class="g">10/03/2024</b> · <b class="g">01/01/2024</b> · <b class="g">20/08/2023</b> · 25/12/2022 · 15/08/2023</td></tr>
+    <tr class="f"><td>i = 3</td><td>a[4]</td><td>1 lần: a[3]↔a[4]</td><td class="seq"><b class="g">10/03/2024</b> · <b class="g">01/01/2024</b> · <b class="g">20/08/2023</b> · <b class="g">15/08/2023</b> · <b class="g">25/12/2022</b></td></tr>
+  </table>
+  <div class="cols" style="margin-top:16px">
+    <div class="note blue f"><b>Số phép so sánh:</b> 4 + 3 + 2 + 1 = <b>10</b> = n(n−1)/2 → <b>O(n²)</b>. Số lần đổi chỗ: <b>6</b> (Interchange Sort có thể đổi chỗ nhiều lần trong một lượt).</div>
+    <div class="note f">Chỉ cần <b>n − 1</b> lượt: khi n − 1 vị trí đầu đã đúng thì phần tử cuối cùng chắc chắn là ngày <b>cũ nhất</b>.</div>
+  </div>
+</section>
+
+<!-- ===================== Q9 MAIN ===================== -->
+<section class="slide" id="q9">
+  <div class="hdr in"><span class="qn">BƯỚC 9</span><h2>main.cpp &amp; in kết quả</h2></div>
+  <div class="cols" style="grid-template-columns:1.05fr 1fr">
+    <div>
+      <div class="code-title">main.cpp</div>
+<script type="text/x-cpp" class="xxs" id="c9a" data-mark="7:a;8:b;9-10:c">
+#include <iostream>
+#include "date.h"        // dùng " " cho header tự viết
+using namespace std;
+int main() {
+    Date list[MAX_DATES];
+    int n;
+    inputList(list, n);       // ① nhập
+    sortDescending(list, n);  // ② sắp xếp giảm dần
+    cout << "\nTu moi nhat den cu nhat:\n";
+    printList(list, n);       // ③ in
+    return 0;
+}
+</script>
+      <div class="code-title" style="margin-top:10px">date.cpp (phần 5)</div>
+<script type="text/x-cpp" class="xxs" id="c9b" data-mark="1-4:c;5-11:c">
+void printDate(Date d) {     // in dạng dd/mm/yyyy
+    cout << setfill('0') << setw(2) << d.day << '/'
+         << setw(2) << d.month << '/' << d.year;
+}
+void printList(const Date a[], int n) {
+    for (int i = 0; i < n; i++) {
+        cout << i + 1 << ". ";
+        printDate(a[i]);
+        cout << '\n';
+    }
+}
+</script>
+    </div>
+    <div>
+      <div class="console f" data-act="#c9a|show-a" style="font-size:16px">So luong ngay: <span class="in">5</span>
+Ngay 1 (d m y): <span class="in">15 8 2023</span>
+Ngay 2 (d m y): <span class="in">10 3 2024</span>
+Ngay 3 (d m y): <span class="in">29 2 2023</span>
+<span class="er">  Ngay khong hop le, nhap lai: </span><span class="in">25 12 2022</span>
+Ngay 4 (d m y): <span class="in">20 8 2023</span>
+Ngay 5 (d m y): <span class="in">1 1 2024</span></div>
+      <div class="console f" data-act="#c9a|show-b;#c9a|show-c;#c9b|show-c" style="font-size:16px;margin-top:10px">Tu moi nhat den cu nhat:
+<span class="ok">1. 10/03/2024</span>
+<span class="ok">2. 01/01/2024</span>
+<span class="ok">3. 20/08/2023</span>
+<span class="ok">4. 15/08/2023</span>
+<span class="ok">5. 25/12/2022</span></div>
+      <div class="note f" style="font-size:18px"><code class="i">setfill('0')</code> + <code class="i">setw(2)</code> (thư viện <code class="i">&lt;iomanip&gt;</code>) để in <b>01</b>/<b>03</b> thay vì 1/3.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q10 BUILD ===================== -->
+<section class="slide" id="q10">
+  <div class="hdr in"><span class="qn">BƯỚC 10</span><h2>Biên dịch &amp; chạy project nhiều file</h2></div>
+  <div class="cols">
+    <div>
+      <div class="card f good"><span class="lbl good">ĐÚNG</span><h3>Biên dịch cả 2 file .cpp</h3>
+        <div class="console">$ g++ main.cpp date.cpp -o dates
+$ ./dates</div>
+        <p style="font-size:18px;margin-top:8px">Không truyền <code class="i">date.h</code> vào lệnh: header đã được <code class="i">#include</code>.</p>
+      </div>
+      <div class="card f bad" style="margin-top:12px"><span class="lbl bad">SAI</span><h3>Chỉ biên dịch main.cpp</h3>
+        <div class="console">$ g++ main.cpp -o dates
+<span class="er">undefined reference to `inputList(Date*, int&amp;)'</span></div>
+        <p style="font-size:18px;margin-top:8px">Trình liên kết (linker) không tìm thấy phần thân hàm nằm trong <code class="i">date.cpp</code>.</p>
+      </div>
+    </div>
+    <div>
+      <div class="card f"><h3>Dùng IDE?</h3>
+        <ul>
+          <li><b>Code::Blocks / Dev-C++</b>: tạo <i>Project</i> → Add files: cả 3 file.</li>
+          <li><b>Visual Studio</b>: <code class="i">date.h</code> vào <i>Header Files</i>, 2 file .cpp vào <i>Source Files</i>.</li>
+          <li><b>VS Code</b>: chạy lệnh g++ như bên trái trong Terminal.</li>
+        </ul>
+      </div>
+      <div class="note blue f">Lỗi hay gặp: <code class="i">#include "date.cpp"</code> trong main. Đừng làm vậy! Chỉ <code class="i">#include</code> file <b>.h</b>, nếu không sẽ bị lỗi <b>multiple definition</b>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q11 STD::SORT ===================== -->
+<section class="slide" id="q11">
+  <div class="hdr in"><span class="qn">MỞ RỘNG</span><h2>Cách ngắn gọn: <code class="i" style="font-size:33px">std::sort</code></h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+    <div>
+<script type="text/x-cpp" class="sm" id="c11" data-mark="1:a;4-6:b">
+#include <algorithm>
+
+void sortDescending(Date a[], int n) {
+    sort(a, a + n, [](Date x, Date y) {
+        return compareDate(x, y) > 0;   // x đứng trước nếu mới hơn
+    });
+}
+</script>
+      <div class="note blue f" data-act="#c11|show-b" style="font-size:19px">Hàm lambda trả về <code class="i">true</code> khi <code class="i">x</code> phải đứng <b>trước</b> <code class="i">y</code>. Dùng <code class="i">&gt; 0</code> ⇒ giảm dần; đổi thành <code class="i">&lt; 0</code> ⇒ tăng dần (cũ → mới).</div>
+    </div>
+    <div>
+      <div class="card f"><h3>Mẹo: đổi ngày thành 1 số</h3>
+        <div class="formula" style="font-size:19px">key = year·10000 + month·100 + day</div>
+        <p style="font-size:18px;margin-top:8px">10/03/2024 → <b>20240310</b><br>01/01/2024 → <b>20240101</b><br>So sánh hai số nguyên là ra thứ tự ngày.</p>
+      </div>
+      <div class="card f" style="margin-top:12px"><h3>So sánh hai cách</h3>
+        <p style="font-size:18px">Tự viết Interchange Sort: hiểu rõ thuật toán, <b>O(n²)</b>.<br><code class="i">std::sort</code>: ngắn gọn, <b>O(n log n)</b>, dùng trong thực tế.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="slide" id="sum">
+  <div class="hdr in"><span class="qn">TỔNG KẾT</span><h2>Những điều cần nhớ</h2></div>
+  <div class="cols4" style="margin-top:20px">
+    <div class="card f"><div class="icon">🧱</div><h3>struct</h3><p style="font-size:18px">Gom <code class="i">day, month, year</code> thành một kiểu <code class="i">Date</code>. Truy cập bằng <code class="i">d.day</code>.</p></div>
+    <div class="card f"><div class="icon">✅</div><h3>Hợp lệ</h3><p style="font-size:18px">Kiểm tra tháng 1..12, ngày ≤ số ngày của tháng, chú ý <b>năm nhuận</b> với tháng 2.</p></div>
+    <div class="card f"><div class="icon">⚖️</div><h3>So sánh</h3><p style="font-size:18px">Năm → tháng → ngày. Hàm trả về &gt;0, &lt;0, =0 để dùng lại cho mọi kiểu sắp xếp.</p></div>
+    <div class="card f"><div class="icon">🗂️</div><h3>Nhiều file</h3><p style="font-size:18px"><code class="i">.h</code> khai báo, <code class="i">.cpp</code> cài đặt, <code class="i">main.cpp</code> điều phối. Biên dịch <b>tất cả</b> file .cpp.</p></div>
+  </div>
+  <div class="note blue f" style="margin-top:22px"><b>Bài tập thêm:</b> (1) in từ cũ → mới; (2) tìm ngày xuất hiện nhiều lần; (3) tính số ngày giữa ngày mới nhất và cũ nhất.</div>
+</section>
+
+<!-- ===================== ERRORS 1 ===================== -->
+<section class="slide" id="err1">
+  <div class="hdr in"><span class="qn">LỖI HAY GẶP 1/2</span><h2>Lỗi logic: tham số, so sánh, hoán đổi</h2></div>
+  <div class="errgrid">
+    <div class="card err f"><h3>① Quên dấu <code class="i">&amp;</code> khi truyền tham số</h3>
+      <div><span class="tag bad">SAI</span></div>
+<script type="text/x-cpp" class="xxs bad">
+void inputDate(Date d) { cin >> d.day >> d.month >> d.year; }
+</script>
+      <div><span class="tag good">ĐÚNG</span></div>
+<script type="text/x-cpp" class="xxs good">
+void inputDate(Date &d) { cin >> d.day >> d.month >> d.year; }
+</script>
+      <p>Không có <code class="i">&amp;</code>, hàm chỉ nhập vào <b>bản sao</b>; <code class="i">a[i]</code> trong main vẫn là giá trị rác. Tương tự <code class="i">int &amp;n</code> trong <code class="i">inputList</code>.</p>
+    </div>
+    <div class="card err f"><h3>② So sánh ngày bằng <code class="i">&amp;&amp;</code> cả 3 trường</h3>
+      <div><span class="tag bad">SAI</span></div>
+<script type="text/x-cpp" class="xxs bad">
+return a.day > b.day && a.month > b.month && a.year > b.year;
+</script>
+      <div><span class="tag good">ĐÚNG</span></div>
+<script type="text/x-cpp" class="xxs good">
+if (a.year != b.year) return a.year - b.year;   // năm trước
+if (a.month != b.month) return a.month - b.month;
+return a.day - b.day;
+</script>
+      <p>20/08/2023 vs 15/09/2022: tháng 08 &gt; 09 sai ⇒ kết luận “không mới hơn”, trong khi năm 2023 &gt; 2022. Phải xét lần lượt <b>năm → tháng → ngày</b>.</p>
+    </div>
+    <div class="card err f"><h3>③ Hoán đổi thiếu biến tạm</h3>
+      <div><span class="tag bad">SAI</span></div>
+<script type="text/x-cpp" class="xxs bad">
+a[i] = a[j];
+a[j] = a[i];       // a[i] đã bị ghi đè!
+</script>
+      <div><span class="tag good">ĐÚNG</span></div>
+<script type="text/x-cpp" class="xxs good">
+Date temp = a[i]; a[i] = a[j]; a[j] = temp;
+// hoặc: swap(a[i], a[j]);
+</script>
+      <p>Sau dòng đầu, giá trị cũ của <code class="i">a[i]</code> bị mất ⇒ danh sách có 2 ngày trùng nhau và mất 1 ngày.</p>
+    </div>
+    <div class="card err f"><h3>④ Sai quy tắc năm nhuận / tháng 2</h3>
+      <div><span class="tag bad">SAI</span></div>
+<script type="text/x-cpp" class="xxs bad">
+bool isLeapYear(int y) { return y % 4 == 0; }
+// hoặc: tháng 2 luôn có 28 ngày
+</script>
+      <div><span class="tag good">ĐÚNG</span></div>
+<script type="text/x-cpp" class="xxs good">
+return (y % 4 == 0 && y % 100 != 0) || y % 400 == 0;
+</script>
+      <p>Chỉ xét <code class="i">% 4</code> ⇒ 29/02/1900 được chấp nhận (sai). Cho tháng 2 luôn 28 ngày ⇒ 29/02/2024 bị từ chối (sai).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ERRORS 2 ===================== -->
+<section class="slide" id="err2">
+  <div class="hdr in"><span class="qn">LỖI HAY GẶP 2/2</span><h2>Lỗi nhập/xuất &amp; project nhiều file</h2></div>
+  <div class="errgrid">
+    <div class="card err f"><h3>⑤ Nhập dạng <code class="i">15/8/2023</code> nhưng đọc bằng 3 số</h3>
+      <div><span class="tag bad">SAI</span></div>
+<script type="text/x-cpp" class="xxs bad">
+cin >> d.day >> d.month >> d.year;   // gõ: 15/8/2023
+</script>
+      <div><span class="tag good">ĐÚNG</span></div>
+<script type="text/x-cpp" class="xxs good">
+char sep;
+cin >> d.day >> sep >> d.month >> sep >> d.year;
+</script>
+      <p>Dấu <code class="i">/</code> không phải số ⇒ <code class="i">cin</code> rơi vào trạng thái lỗi, <code class="i">month</code>, <code class="i">year</code> không được gán, vòng <code class="i">while</code> nhập lại có thể <b>lặp vô tận</b>. Hoặc thống nhất nhập cách nhau bằng dấu cách.</p>
+    </div>
+    <div class="card err f"><h3>⑥ Khai báo <code class="i">struct Date</code> trong date.cpp</h3>
+      <div><span class="tag bad">SAI</span></div>
+<script type="text/x-cpp" class="xxs bad">
+// date.cpp
+struct Date { int day, month, year; };
+</script>
+      <div><span class="tag good">ĐÚNG</span></div>
+<script type="text/x-cpp" class="xxs good">
+// date.h  (main.cpp và date.cpp đều #include)
+struct Date { int day, month, year; };
+</script>
+      <p><code class="i">main.cpp</code> chỉ thấy nội dung <code class="i">date.h</code> ⇒ lỗi <b>'Date' was not declared in this scope</b>.</p>
+    </div>
+    <div class="card err f"><h3>⑦ <code class="i">#include "date.cpp"</code> / viết thân hàm trong .h</h3>
+      <div><span class="tag bad">SAI</span></div>
+<script type="text/x-cpp" class="xxs bad">
+#include "date.cpp"      // trong main.cpp
+</script>
+      <div><span class="tag good">ĐÚNG</span></div>
+<script type="text/x-cpp" class="xxs good">
+#include "date.h"        // chỉ include header
+</script>
+      <p>Hàm bị định nghĩa 2 lần (trong main.o và date.o) ⇒ lỗi linker <b>multiple definition of ...</b>. Quên include guard trong .h ⇒ <b>redefinition of 'struct Date'</b>.</p>
+    </div>
+    <div class="card err f"><h3>⑧ Không kiểm tra n / in thiếu số 0</h3>
+      <div><span class="tag bad">SAI</span></div>
+<script type="text/x-cpp" class="xxs bad">
+cin >> n;                       // n = 150 > MAX_DATES
+cout << d.day << '/' << d.month;  // 1/3/2024
+</script>
+      <div><span class="tag good">ĐÚNG</span></div>
+<script type="text/x-cpp" class="xxs good">
+while (n < 1 || n > MAX_DATES) cin >> n;
+cout << setfill('0') << setw(2) << d.day;   // 01/03
+</script>
+      <p>n vượt kích thước mảng ⇒ ghi tràn bộ nhớ, chương trình có thể <b>crash</b>. Không dùng <code class="i">setw(2)</code> ⇒ in <code class="i">1/3/2024</code> thay vì <code class="i">01/03/2024</code>.</p>
+    </div>
+  </div>
+</section>
+</div></div>
+
+<div id="bar"></div>
+<div id="hint">← → / Space: chuyển · Shift+→: qua slide · Home: đầu · F: toàn màn hình</div>
+<div id="nav"><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+<script>
+(function(){
+  // ---------- C++ highlighter ----------
+  const KW=new Set("if else for while do return break continue switch case default struct class using namespace const static new delete true false sizeof public private include pragma auto".split(" "));
+  const TY=new Set("int double float char void bool long short unsigned string Date".split(" "));
+  const LIB=new Set("cout cin endl setw setfill sort std".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line){
+    if(/^\s*#/.test(line)){
+      const k=line.indexOf("//");
+      return k<0?'<span class="p">'+esc(line)+'</span>':'<span class="p">'+esc(line.slice(0,k))+'</span><span class="c">'+esc(line.slice(k))+'</span>';
+    }
+    const re=/(\/\/.*$)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="n">'+m[3]+'</span>';
+      else if(m[4]){
+        const w=m[4];
+        let cls=KW.has(w)?"k":TY.has(w)?"t":LIB.has(w)?"fn":(m[5]?"fn":"");
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[5]?esc(m[5]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-cpp"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");const [a,b]=r.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+  // ---------- simulations ----------
+  const W=106;
+  function setCode(root,letters){
+    const c=document.getElementById(root.dataset.code);if(!c)return;
+    ["a","b","c","d"].forEach(x=>c.classList.toggle("show-"+x,(letters||"").includes(x)));
+  }
+  function cellsOnce(root,ids,labels){
+    const tr=root.querySelector(".track");
+    if(tr.dataset.built)return tr;
+    tr.dataset.built=1;
+    for(let p=0;p<5;p++){const ix=document.createElement("div");ix.className="ix";ix.style.left=p*W+"px";ix.textContent="a["+p+"]";tr.appendChild(ix)}
+    ids.forEach(id=>{const d=document.createElement("div");d.className="dc";d.dataset.id=id;tr.appendChild(d)});
+    if(labels)labels.forEach(([cls,txt])=>{const d=document.createElement("div");d.className="ptr "+cls;d.innerHTML="<span>"+txt+"</span>";tr.appendChild(d)});
+    return tr;
+  }
+  const fmt=s=>{const [dm,y]=[s.slice(0,5),s.slice(6)];return '<span class="dm">'+dm+'</span><span class="yy">'+y+'</span>'};
+
+  // --- input simulation ---
+  const IN_LINES=[
+    'So luong ngay: <span class="in">5</span>',
+    '\nNgay 1 (d m y): <span class="in">15 8 2023</span>',
+    '\nNgay 2 (d m y): <span class="in">10 3 2024</span>',
+    '\nNgay 3 (d m y): <span class="in">29 2 2023</span>\n<span class="er">  Ngay khong hop le, nhap lai: </span>',
+    '<span class="in">25 12 2022</span>',
+    '\nNgay 4 (d m y): <span class="in">20 8 2023</span>',
+    '\nNgay 5 (d m y): <span class="in">1 1 2024</span>'
+  ];
+  const IN_CELLS=[
+    [],[],
+    ["15/08/2023"],
+    ["15/08/2023","10/03/2024"],
+    ["15/08/2023","10/03/2024","!29/02/2023"],
+    ["15/08/2023","10/03/2024","25/12/2022"],
+    ["15/08/2023","10/03/2024","25/12/2022","20/08/2023"],
+    ["15/08/2023","10/03/2024","25/12/2022","20/08/2023","01/01/2024"]
+  ];
+  const IN_CODE=["","a","bc","bc","bcd","bc","bc","bc"];
+  function simInput(root,k){
+    const tr=cellsOnce(root,["0","1","2","3","4"]);
+    tr.querySelectorAll(".dc").forEach(d=>{d.style.top="24px"});
+    root.querySelector(".console").innerHTML=IN_LINES.slice(0,k).join("")+(k<7?'<span style="opacity:.6">▌</span>':"");
+    const cells=IN_CELLS[k];
+    tr.querySelectorAll(".dc").forEach((d,p)=>{
+      d.style.left=p*W+"px";
+      let v=cells[p];const prev=d.dataset.v||"";
+      if(!v){d.className="dc empty";d.innerHTML='<span class="dm">?</span><span class="yy">----</span>';d.dataset.v="";return}
+      const bad=v[0]==="!";if(bad)v=v.slice(1);
+      d.className="dc"+(bad?" bad":"")+(prev!==v&&!bad?" newin":"")+(p===cells.length-1&&k>=2?"":"");
+      if(p===cells.length-1&&!bad&&k>=2) d.classList.add("cmp");
+      d.innerHTML=fmt(v);d.dataset.v=v;
+    });
+    setCode(root,IN_CODE[k]);
+  }
+
+  // --- sort simulation ---
+  const D={A:"15/08/2023",B:"10/03/2024",C:"25/12/2022",D:"20/08/2023",E:"01/01/2024"};
+  const key=id=>{const [d,m,y]=D[id].split("/").map(Number);return {d,m,y}};
+  function why(x,y){ // giải thích compareDate(x,y)
+    const a=key(x),b=key(y);
+    if(a.y!==b.y)return `năm ${a.y} ${a.y>b.y?">":"<"} ${b.y}`;
+    if(a.m!==b.m)return `cùng năm, tháng ${a.m} ${a.m>b.m?">":"<"} ${b.m}`;
+    return `cùng năm, cùng tháng, ngày ${a.d} ${a.d>b.d?">":"<"} ${b.d}`;
+  }
+  const cmp=(x,y)=>{const a=key(x),b=key(y);return a.y!==b.y?a.y-b.y:a.m!==b.m?a.m-b.m:a.d-b.d};
+  const S=[{o:"ABCDE",say:"Dãy ban đầu (đúng thứ tự đã nhập). Mục tiêu: sắp xếp giảm dần – ngày mới nhất lên đầu."}];
+  {let o="ABCDE".split(""),nc=0,ns=0;const str=()=>o.join("");
+   for(let i=0;i<4;i++){
+     S.push({o:str(),i,done:i,c:"a",say:`Lượt i = ${i}: chốt vị trí a[${i}] (hiện là ${D[o[i]]}). So nó với a[${i+1}] … a[4].`});
+     for(let j=i+1;j<5;j++){nc++;const gt=cmp(o[j],o[i])>0;
+       S.push({o:str(),i,j,done:i,c:"b",say:`j = ${j}: compareDate(${D[o[j]]}, ${D[o[i]]}) → ${why(o[j],o[i])} ⇒ ${gt?"> 0, ngày a[j] mới hơn → đổi chỗ.":"< 0, giữ nguyên."}`});
+       if(gt){ns++;const ai=o[i],aj=o[j];[o[i],o[j]]=[o[j],o[i]];
+         S.push({o:str(),i,j,done:i,c:"c",sw:1,say:`temp = a[${i}] (${D[ai]}); a[${i}] = a[${j}]; a[${j}] = temp. Giờ a[${i}] = ${D[aj]}.`});}
+     }
+     S[S.length-1].say+=` Hết lượt: a[${i}] = ${D[o[i]]} cố định.`;S[S.length-1].done=i+1;
+   }
+   S.push({o:str(),done:5,say:`Phần tử cuối tự đúng vị trí. ${nc} lần so sánh, ${ns} lần đổi chỗ ⇒ 10/03/2024 → 01/01/2024 → 20/08/2023 → 15/08/2023 → 25/12/2022 ✔`});}
+  function simSort(root,k){
+    const tr=cellsOnce(root,Object.keys(D),[["pi","i"],["pj","j"]]);
+    const s=S[k];
+    tr.querySelectorAll(".dc").forEach(d=>{
+      const id=d.dataset.id,p=s.o.indexOf(id);
+      if(!d.innerHTML)d.innerHTML=fmt(D[id]);
+      d.style.left=p*W+"px";
+      d.className="dc"+(p<(s.done||0)?" done":p===s.i?" mx":(p===s.j&&!s.sw)?" cmp":"");
+    });
+    [["pi","i"],["pj","j"]].forEach(([c,f])=>{
+      const e=tr.querySelector(".ptr."+c);const v=s[f];
+      if(v==null){e.classList.remove("on")}else{e.classList.add("on");e.style.left=v*W+"px"}
+    });
+    root.querySelector(".say").textContent=s.say;
+    setCode(root,s.c||"");
+  }
+  const SIMS={input:simInput,sort:simSort};
+
+  // ---------- deck engine ----------
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")];
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  function act(el,on){["act","act2"].forEach(k=>{const v=el.dataset[k];if(!v)return;v.split(";").forEach(p=>{const [sel,cls]=p.split("|");const t=document.querySelector(sel);if(t)t.classList.toggle(cls,on)})})}
+  function runSims(){
+    document.querySelectorAll("[data-sim]").forEach(root=>{
+      const name=root.dataset.sim;const si=slides.indexOf(root.closest(".slide"));
+      let k=0;
+      if(si===cur) frags(si).slice(0,step).forEach(f=>{const v=f.dataset.st;if(v&&v.startsWith(name+":"))k=Math.max(k,+v.split(":")[1])});
+      else if(si<cur) frags(si).forEach(f=>{const v=f.dataset.st;if(v&&v.startsWith(name+":"))k=Math.max(k,+v.split(":")[1])});
+      SIMS[name](root,k);
+    });
+  }
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step);f.classList.toggle("on",on);act(f,on)});
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.textContent=say||"Nhấn → để chạy từng bước.";
+    runSims();
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length;
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    history.replaceState(null,"","#"+slides[cur].id);
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+  addEventListener("keydown",e=>{
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+</script>
+</body>
+</html>
