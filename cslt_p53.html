@@ -1,0 +1,1109 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quản lý sinh viên C++</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+h1{font-size:70px;line-height:1.1;font-weight:800}
+h2{font-size:38px;line-height:1.2;font-weight:800}
+h3{font-size:23px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:22px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:26px;margin:6px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.88em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 6px;border-radius:6px;color:#be185d}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.cols.c64{grid-template-columns:1.25fr 1fr}.cols.c46{grid-template-columns:1fr 1.2fr}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.card.bad{border-color:#fecdd3;background:linear-gradient(180deg,#fff1f3,#fff)}
+.card.good{border-color:#a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff)}
+.lbl{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
+.icon{font-size:34px;margin-bottom:4px}
+.note{margin-top:12px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:20px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.code{font-family:var(--mono);font-size:18px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
+.code.sm{font-size:16.5px}.code.xs{font-size:15px;line-height:1.45}.code.xxs{font-size:13.6px;line-height:1.38;padding:8px 0}
+.code .ln{padding:0 14px 0 8px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.11);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.13);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
+.code-title{font-family:var(--mono);font-size:15px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+.f.zoom{transform:scale(.85)}.f.zoom.on{transform:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:19px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.legend{display:flex;flex-direction:column;gap:10px}
+.leg{border-radius:12px;padding:10px 16px;background:#fff;border:1px solid var(--line)}
+.leg b{display:block;font-size:21px;margin-bottom:2px}
+.leg p{font-size:19px}
+.leg.a{border-left:6px solid #7c3aed}.leg.b{border-left:6px solid #06b6d4}.leg.c{border-left:6px solid #f59e0b}
+.console{font-family:var(--mono);font-size:17px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.mem{display:flex;align-items:center;gap:16px;min-height:130px}
+.frame{border:2px solid #e4dcfb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
+.frame .fname{font-family:var(--mono);font-size:16px;color:var(--muted);margin-bottom:6px}
+.var{display:flex;align-items:center;gap:10px}
+.vn{font-family:var(--mono);font-size:21px;color:var(--t);font-weight:600}
+.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #c4b5fd;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
+.vb .new{display:none}
+.callee,.arw{opacity:0;transform:translateX(-14px);transition:all .5s}
+.mem.s1 .callee,.mem.s1 .arw{opacity:1;transform:none}
+.mem.s2 .chg .old{display:none}.mem.s2 .chg .new{display:inline;animation:pop .5s}
+.mem.s2 .chg{border-color:#f59e0b;box-shadow:0 0 18px rgba(245,158,11,.5)}
+.mem.s3 .callee,.mem.s3 .arw{opacity:.15;transform:translateY(10px)}
+.mem.s3 .result{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.5)}
+.arw{font-family:var(--mono);font-size:16px;color:var(--gold);text-align:center;line-height:1.2;font-weight:600}
+.arw .bar{display:block;font-size:30px}
+.alias{font-size:18px;color:var(--accent2);font-weight:600}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.25)}100%{transform:none;opacity:1}}
+.flow{display:flex;align-items:center;gap:12px;justify-content:center}
+.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:18px;border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:14px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.h{border-color:var(--gold)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#c4b5fd}.box.exe{border-color:#ec4899;background:#fdf2f8}
+.ar{color:var(--muted);font-size:26px;text-align:center}
+.stack{display:flex;flex-direction:column;gap:8px}
+svg text{font-family:var(--mono);font-weight:600}
+.draw{stroke-dasharray:400;stroke-dashoffset:400;transition:stroke-dashoffset 1s ease}
+svg.d1 .dr1,svg.d2 .dr2,svg.d3 .dr3{stroke-dashoffset:0}
+.fadein{opacity:0;transition:opacity .6s}
+svg.d1 .fd1,svg.d2 .fd2,svg.d3 .fd3{opacity:1}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:19px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05)}
+.ag:hover{border-color:#ec4899;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
+.ag b{color:#db2777;margin-right:6px;font-family:var(--mono)}
+.formula{font-family:var(--mono);font-size:23px;text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:16px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+@media (max-width:700px){#hint{display:none}}
+@media print{#nav,#bar,#hint{display:none}}
+
+/* lec03 additions */
+.chain{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pv{display:inline-flex;align-items:center;font-family:var(--mono);font-size:18px;font-weight:700;padding:5px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;white-space:nowrap}
+.pv.yes{background:#d1fae5;border-color:#34d399;color:#047857}
+.pv.no{background:#ffe4e6;border-color:#fb7185;color:#be123c}
+.pv.skip{background:#f1f5f9;border-color:#cbd5e1;color:#94a3b8;text-decoration:line-through;border-style:dashed}
+.op{font-family:var(--mono);font-size:26px;font-weight:800;color:var(--sa1)}
+.tt th,.tt td{text-align:center}.tt td:first-child{color:var(--text);font-weight:400}
+.tt tr.hit td{background:#fdf2f8;color:#be185d}
+tr.f{transform:none}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.code.show-s .mark-s{opacity:.3;text-decoration:line-through}
+.arr{display:flex;gap:12px;justify-content:center;margin-top:6px}
+.cell{width:84px;height:84px;border-radius:16px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:800;transition:all .45s;box-shadow:0 6px 16px -10px rgba(124,58,237,.4)}
+.cell small{font-size:13px;color:var(--muted);font-weight:600}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857;transform:translateY(-6px)}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;transform:translateY(-10px) scale(1.06);box-shadow:0 10px 24px -8px rgba(225,29,72,.5)}
+.cell.skip{opacity:.3;transform:scale(.92)}
+.syn{display:flex;gap:12px;align-items:center;justify-content:center;font-family:var(--mono);font-size:24px;font-weight:700}
+.sy{padding:8px 16px;border-radius:12px;color:#fff}
+.sy.c1{background:linear-gradient(135deg,#7c3aed,#a855f7)}.sy.c2{background:linear-gradient(135deg,#059669,#10b981)}.sy.c3{background:linear-gradient(135deg,#e11d48,#f97316)}
+.spin{display:inline-block;animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* practice 5.3 additions */
+.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
+.leg.d{border-left:6px solid #ec4899}
+#dataTbl td,#dataTbl th{font-size:18px;padding:6px 10px}
+#dataTbl td:nth-child(3){color:var(--text);font-weight:600}
+#dataTbl .gcol,#dataTbl th:last-child{opacity:0;transition:opacity .4s}
+#dataTbl.showg .gcol,#dataTbl.showg th:last-child{opacity:1;color:#7c3aed;font-weight:800}
+#dataTbl tr td{transition:background .4s}
+#dataTbl.showx tr:nth-child(2) td,#dataTbl.showx tr:nth-child(4) td,#dataTbl.showx tr:nth-child(5) td,#dataTbl.showx tr:nth-child(7) td{background:#ecfdf5}
+#dataTbl.showx tr:nth-child(3) td,#dataTbl.showx tr:nth-child(6) td{color:#c0bdd0;text-decoration:line-through}
+.rec{border:2px solid #c4b5fd;border-radius:16px;background:#fff;padding:12px 16px;box-shadow:0 10px 28px -14px rgba(124,58,237,.45)}
+.rec-h{font-family:var(--mono);font-weight:800;color:#7c3aed;font-size:20px;margin-bottom:8px}
+.fld{display:grid;grid-template-columns:110px 80px 1fr;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;margin:6px 0;background:#faf8ff;border:1px dashed #e4dcfb;font-family:var(--mono);font-size:19px;transition:all .45s}
+.ft{color:#7c3aed;font-size:16px;font-weight:600}.fn2{font-weight:700}
+.fv{opacity:0;font-weight:800;color:#ea580c;transition:opacity .4s}
+.rec.r1 .fa,.rec.r2 .fb,.rec.r3 .fc,.rec.r3 .fc2{border:2px solid #f59e0b;background:#fff7e0}
+.rec.r4 .fv{opacity:1}.rec.r4 .fld{border:1px solid #a7f3d0;background:#ecfdf5}
+.charrow{display:flex;gap:3px;flex-wrap:wrap}
+.charrow span{width:32px;height:38px;display:flex;align-items:center;justify-content:center;border:2px solid #e4dcfb;border-radius:6px;font-family:var(--mono);font-weight:700;font-size:17px;background:#fff}
+.charrow .z{border-color:#e11d48;color:#e11d48;font-size:14px}.charrow .e{border-style:dashed;color:#bbb}
+.say{min-height:58px;padding:10px 16px;border-left:5px solid #ec4899;background:linear-gradient(90deg,#fdf2f8,#fff);border-radius:8px;font-size:19px;line-height:1.4}
+.vars{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.chip{display:inline-flex;font-family:var(--mono);font-weight:700;font-size:18px;padding:5px 14px;border-radius:999px;background:#f3edff;border:2px solid #c4b5fd;color:#5b21b6;transition:all .3s}
+.chip.gold{background:#fff7e0;border-color:#f59e0b;color:#b45309}
+.chip.flash{animation:pop .5s}
+.grid6{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.cols>div{min-width:0}
+.sc6{border:2px dashed #e4dcfb;border-radius:12px;padding:6px 10px;background:#fff;min-height:86px;font-family:var(--mono);transition:all .4s}
+.sc6 .ix{font-size:13px;color:var(--muted);font-weight:600}
+.sc6 .nm{font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc6 .sx{font-size:14px;color:#64607d}
+.sc6.full{border:2px solid #c4b5fd;background:#faf8ff}
+.sc6.cur{border-color:#ec4899;background:#fdf2f8;box-shadow:0 8px 20px -8px rgba(236,72,153,.6);transform:translateY(-3px)}
+.rowlbl{font-weight:700;font-size:18px;margin:8px 0 8px;color:var(--muted)}
+.arr6{display:flex;gap:10px;min-height:104px}
+.cl6{width:82px;height:100px;border-radius:14px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);transition:all .45s;box-shadow:0 6px 16px -10px rgba(124,58,237,.4)}
+.cl6 small{font-size:12px;color:var(--muted);font-weight:600}
+.cl6 b{font-size:24px}
+.cl6 span{font-size:14px;font-weight:600}
+.cl6.empty{border-style:dashed;box-shadow:none;color:#ccc}
+.cl6.cur{border-color:#0891b2;background:#ecfeff;transform:translateY(-8px)}
+.cl6.ok{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cl6.no{opacity:.35}
+.cl6.newin{animation:pop .5s;border-color:#10b981;background:#ecfdf5}
+.cond{font-family:var(--mono);font-size:19px;font-weight:700;margin:14px 0 4px;padding:8px 14px;border-radius:10px;background:#fff;border:1px solid var(--line);min-height:44px}
+.cond.yes{background:#d1fae5;border-color:#34d399;color:#047857}.cond.no{background:#ffe4e6;border-color:#fb7185;color:#be123c}
+.slots{position:relative;height:250px;margin-top:6px}
+.slot{position:absolute;top:150px;width:124px;text-align:center;font-family:var(--mono);font-size:16px;color:var(--muted);font-weight:700}
+.scard{position:absolute;top:20px;width:124px;height:120px;border-radius:16px;border:3px solid #c4b5fd;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);transition:left .7s cubic-bezier(.5,0,.3,1),background .35s,border-color .35s,transform .35s,box-shadow .35s;box-shadow:0 8px 20px -12px rgba(124,58,237,.5)}
+.scard .g{font-size:30px;font-weight:800}.scard .nm{font-size:17px;font-weight:700}.scard .id{font-size:13px;color:var(--muted)}
+.scard.cmp{border-color:#06b6d4;background:#ecfeff;transform:translateY(-10px)}
+.scard.mx{border-color:#f59e0b;background:#fff7e0;box-shadow:0 10px 26px -8px rgba(245,158,11,.6)}
+.scard.cmp.mx{background:linear-gradient(180deg,#fff7e0,#ecfeff)}
+.scard.done{border-color:#10b981;background:#ecfdf5;color:#047857}
+.ptr{position:absolute;top:186px;width:124px;text-align:center;font-family:var(--mono);font-weight:800;font-size:18px;transition:left .45s,opacity .3s}
+.ptr.pi{color:#7c3aed}.ptr.pj{color:#0891b2;top:214px}
+.sleg{display:flex;gap:16px;font-size:15px;color:var(--muted);flex-wrap:wrap}
+.sleg i{display:inline-block;width:14px;height:14px;border-radius:4px;margin-right:6px;vertical-align:-2px}
+#so-tbl td,#so-tbl th{padding:5px 10px}
+#so-tbl td:first-child{color:var(--text)}
+.ruler{font-family:var(--mono);font-size:13.5px;white-space:pre;margin-top:10px;color:var(--muted);line-height:1.4}
+.ruler b{color:#db2777}
+.pipe{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;box-shadow:0 6px 16px -12px rgba(124,58,237,.4)}
+.pipe .pn{font-size:24px;font-weight:800;color:#db2777}
+.pipe b{font-family:var(--mono);font-size:18px}
+.pipe p{font-size:16.5px;color:var(--muted);line-height:1.35}
+.stack .ar{font-size:20px;line-height:1}
+.cl{white-space:pre}
+
+.egrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.ec{background:#fff;border:1px solid var(--line);border-top:4px solid #e11d48;border-radius:14px;padding:10px 14px;box-shadow:0 8px 22px -14px rgba(225,29,72,.35);min-width:0}
+.ec h3{font-size:19px;color:#be123c;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.ec .en{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;border-radius:50%;background:#e11d48;color:#fff;font-size:15px;font-weight:800;flex:none}
+.ec .code{padding:5px 0}
+.sym{font-family:var(--mono);font-size:13.5px;line-height:1.4;background:#1e1b3a;color:#fda4af;border-radius:8px;padding:6px 10px;margin-top:6px;white-space:pre;overflow:hidden}
+.why{font-size:16px;line-height:1.35;margin-top:6px;color:var(--muted)}
+.fix{margin-top:7px;font-size:16px;padding:6px 10px;border-radius:8px;background:#ecfdf5;border-left:4px solid #10b981}
+.fix b{color:#047857}
+.fix code{white-space:nowrap}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="deck">
+<!-- ===================== TITLE ===================== -->
+<section class="slide" id="title">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// Practice 5.3 · struct · functions · multi-file project</div>
+    <h1 class="in">Quản lý sinh viên<br><span class="grad">với struct trong C++</span></h1>
+    <p class="in muted" style="font-size:26px;margin-top:20px;max-width:900px">Khai báo <code class="i">struct Student</code>, nhập danh sách N sinh viên, in danh sách sinh viên <b>giỏi</b> (GPA ≥ 8.5) theo thứ tự GPA <b>giảm dần</b>. Chạy từng bước với dữ liệu cụ thể.</p>
+    <p class="in" style="margin-top:36px;font-size:19px;color:#8a91b4">Dùng phím ← → hoặc Space để chạy từng bước · Shift+→: qua slide · F: toàn màn hình</p>
+  </div>
+</section>
+
+<!-- ===================== AGENDA ===================== -->
+<section class="slide" id="agenda">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:18px">· bấm vào mục để đi tới</span></div>
+  <div class="agenda in">
+    <div class="ag" data-goto="s1"><b>01</b>Đề bài &amp; dữ liệu mẫu</div>
+    <div class="ag" data-goto="s2"><b>02</b>Tổ chức project nhiều file</div>
+    <div class="ag" data-goto="s3"><b>03</b>struct Student</div>
+    <div class="ag" data-goto="s4"><b>04</b>student.h – khai báo</div>
+    <div class="ag" data-goto="s5"><b>05</b>Hàm getGPA</div>
+    <div class="ag" data-goto="s6"><b>06</b>Nhập danh sách N SV</div>
+    <div class="ag" data-goto="s7"><b>07</b>Lọc SV giỏi (GPA ≥ 8.5)</div>
+    <div class="ag" data-goto="s8"><b>08</b>Sắp xếp GPA giảm dần</div>
+    <div class="ag" data-goto="s9"><b>09</b>In danh sách</div>
+    <div class="ag" data-goto="s10"><b>10</b>main.cpp – ghép lại</div>
+    <div class="ag" data-goto="s11"><b>11</b>Biên dịch &amp; chạy</div>
+    <div class="ag" data-goto="s12"><b>12</b>Lưu ý &amp; mở rộng</div>
+    <div class="ag" data-goto="end"><b>13</b>Tóm tắt</div>
+    <div class="ag" data-goto="e1"><b>14</b>Lỗi khi nhập dữ liệu</div>
+    <div class="ag" data-goto="e2"><b>15</b>Lỗi về hàm &amp; tham số</div>
+    <div class="ag" data-goto="e3"><b>16</b>Lỗi lọc &amp; sắp xếp</div>
+    <div class="ag" data-goto="e4"><b>17</b>Lỗi tổ chức nhiều file</div>
+    <div class="ag" data-goto="e5"><b>18</b>Checklist trước khi nộp</div>
+  </div>
+</section>
+
+<!-- ===================== S1 ĐỀ BÀI ===================== -->
+<section class="slide" id="s1">
+  <div class="hdr in"><span class="qn">BƯỚC 1</span><h2>Đề bài &amp; dữ liệu mẫu</h2></div>
+  <div class="cols" style="grid-template-columns:.9fr 1.25fr">
+    <div>
+      <div class="card f"><h3>Yêu cầu</h3>
+        <ul>
+          <li>Khai báo <code class="i">struct Student</code>: <code class="i">id</code>, <code class="i">name</code>, <code class="i">lit</code>, <code class="i">math</code></li>
+          <li>Nhập danh sách <b>N</b> sinh viên</li>
+          <li>In SV giỏi <b>GPA ≥ 8.5</b>, GPA <b>giảm dần</b></li>
+          <li>Tổ chức thành <b>hàm</b> và <b>nhiều file</b></li>
+        </ul>
+      </div>
+      <div class="formula f" style="margin-top:14px">GPA = (lit + math) / 2</div>
+      <div class="note blue f">Struct không lưu GPA. Ta <b>tính</b> GPA bằng hàm <code class="i">getGPA()</code> từ điểm Văn và điểm Toán, nên dữ liệu không bao giờ bị lệch.</div>
+    </div>
+    <div>
+      <table class="f" id="dataTbl">
+        <tr><th>#</th><th>id</th><th>name</th><th>lit</th><th>math</th><th>GPA</th></tr>
+        <tr><td>0</td><td>1001</td><td>Nguyen Van An</td><td>8.0</td><td>9.4</td><td class="gcol">8.7</td></tr>
+        <tr><td>1</td><td>1002</td><td>Tran Thi Binh</td><td>7.5</td><td>8.3</td><td class="gcol">7.9</td></tr>
+        <tr><td>2</td><td>1003</td><td>Le Minh Chau</td><td>9.0</td><td>9.4</td><td class="gcol">9.2</td></tr>
+        <tr><td>3</td><td>1004</td><td>Pham Quoc Dung</td><td>8.0</td><td>9.0</td><td class="gcol">8.5</td></tr>
+        <tr><td>4</td><td>1005</td><td>Hoang Gia Huy</td><td>6.5</td><td>7.1</td><td class="gcol">6.8</td></tr>
+        <tr><td>5</td><td>1006</td><td>Vo Thu Ha</td><td>8.8</td><td>9.2</td><td class="gcol">9.0</td></tr>
+      </table>
+      <span class="f ghost" data-act="#dataTbl|showg"></span>
+      <span class="f ghost" data-act="#dataTbl|showx"></span>
+      <div class="console f" style="margin-top:12px;font-size:16px">== SINH VIEN GIOI (GPA >= 8.5) ==
+STT    ID  Ho ten            Van  Toan   GPA
+  1  1003  Le Minh Chau      9.0   9.4   9.2
+  2  1006  Vo Thu Ha         8.8   9.2   9.0
+  3  1001  Nguyen Van An     8.0   9.4   8.7
+  4  1004  Pham Quoc Dung    8.0   9.0   8.5</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S2 PROJECT ===================== -->
+<section class="slide" id="s2">
+  <div class="hdr in"><span class="qn">BƯỚC 2</span><h2>Tổ chức project nhiều file</h2></div>
+  <div class="flow in" style="margin-top:6px">
+    <div class="stack">
+      <div class="box h f">student.h<small>struct + khai báo hàm</small></div>
+    </div>
+    <div class="ar f">→<br><span style="font-size:14px">#include</span></div>
+    <div class="stack">
+      <div class="box cpp f">student.cpp<small>định nghĩa các hàm</small></div>
+      <div class="box m f">main.cpp<small>hàm main() gọi các hàm</small></div>
+    </div>
+    <div class="ar f">→<br><span style="font-size:14px">g++</span></div>
+    <div class="stack">
+      <div class="box o f">student.o<small>biên dịch riêng</small></div>
+      <div class="box o f">main.o<small>biên dịch riêng</small></div>
+    </div>
+    <div class="ar f">→<br><span style="font-size:14px">link</span></div>
+    <div class="box exe f">app<small>file chạy được</small></div>
+  </div>
+  <div class="cols3" style="margin-top:22px">
+    <div class="card f"><h3>student.h</h3><p style="font-size:18px">“Bản hợp đồng”: <b>có gì</b>. Chứa struct, hằng <code class="i">MAX</code> và <b>nguyên mẫu</b> (prototype) các hàm. Có include guard để không bị khai báo trùng.</p></div>
+    <div class="card f"><h3>student.cpp</h3><p style="font-size:18px">“Bản thi công”: <b>làm thế nào</b>. Thân của các hàm nhập, lọc, sắp xếp, in. Phải <code class="i">#include "student.h"</code>.</p></div>
+    <div class="card f"><h3>main.cpp</h3><p style="font-size:18px">Chỉ điều phối: nhập → lọc → sắp xếp → in. Không cần biết hàm được viết thế nào bên trong.</p></div>
+  </div>
+  <div class="console f" style="margin-top:14px"><span class="in">$ g++ main.cpp student.cpp -o app</span>
+<span class="in">$ ./app</span></div>
+</section>
+
+<!-- ===================== S3 STRUCT ===================== -->
+<section class="slide" id="s3">
+  <div class="hdr in"><span class="qn">BƯỚC 3</span><h2><code class="i" style="font-size:33px">struct Student</code> – gom dữ liệu 1 sinh viên</h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr">
+    <div>
+<script type="text/x-cpp" id="c3" data-mark="2:a;3:b;4-5:c;8:d;9-10:d">
+struct Student {
+    int    id;          // mã số sinh viên
+    char   name[101];   // họ tên (≤ 100 ký tự)
+    double lit;         // điểm Văn
+    double math;        // điểm Toán
+};
+
+Student s = {1003, "Le Minh Chau", 9.0, 9.4};
+cout << s.id << " " << s.name << "\n";
+cout << s.lit << " " << s.math << "\n";
+</script>
+      <div class="console f" style="margin-top:12px" data-act="#c3|show-d;#rec|r4">1003 Le Minh Chau
+9 9.4</div>
+      <div class="note f">Mảng <code class="i">char name[101]</code>: 100 ký tự + 1 ký tự kết thúc <code class="i">'\0'</code>. Nhập tên có dấu cách phải dùng <code class="i">cin.getline(s.name, 101)</code>.</div>
+    </div>
+    <div>
+      <div class="rec" id="rec">
+        <div class="rec-h">Student s</div>
+        <div class="fld fa"><span class="ft">int</span><span class="fn2">id</span><span class="fv">1003</span></div>
+        <div class="fld fb"><span class="ft">char[101]</span><span class="fn2">name</span><span class="fv">"Le Minh Chau"</span></div>
+        <div class="fld fc"><span class="ft">double</span><span class="fn2">lit</span><span class="fv">9.0</span></div>
+        <div class="fld fc2"><span class="ft">double</span><span class="fn2">math</span><span class="fv">9.4</span></div>
+      </div>
+      <span class="f ghost" data-act="#c3|show-a;#rec|r1"></span>
+      <span class="f ghost" data-act="#c3|show-b;#rec|r2"></span>
+      <span class="f ghost" data-act="#c3|show-c;#rec|r3"></span>
+      <div class="charrow f" style="margin-top:14px">
+        <span>L</span><span>e</span><span>␣</span><span>M</span><span>i</span><span>n</span><span>h</span><span>␣</span><span>C</span><span>h</span><span>a</span><span>u</span><span class="z">\0</span><span class="e">…</span>
+      </div>
+      <p class="f muted" style="font-size:17px;margin-top:6px">name[0] … name[11] chứa chữ, name[12] = '\0' đánh dấu kết thúc chuỗi.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S4 HEADER ===================== -->
+<section class="slide" id="s4">
+  <div class="hdr in"><span class="qn">BƯỚC 4</span><h2><code class="i" style="font-size:33px">student.h</code> – file khai báo</h2></div>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr">
+    <div>
+      <div class="code-title">student.h</div>
+<script type="text/x-cpp" class="xs" id="c4" data-mark="1-2:a;20:a;4-9:b;11:c;13-18:d">
+#ifndef STUDENT_H
+#define STUDENT_H
+
+struct Student {
+    int    id;
+    char   name[101];
+    double lit;
+    double math;
+};
+
+const int MAX = 100;                 // số SV tối đa
+
+double getGPA(const Student &s);
+void inputStudent(Student &s);
+void inputList(Student a[], int &n);
+int  filterExcellent(const Student a[], int n, Student out[]);
+void sortByGpaDesc(Student a[], int n);
+void printList(const Student a[], int n);
+
+#endif
+</script>
+    </div>
+    <div class="legend">
+      <div class="leg a f" data-act="#c4|show-a"><b>① Include guard</b><p>Nếu file được include nhiều lần, phần giữa <code class="i">#ifndef … #endif</code> chỉ được dịch <b>một</b> lần.</p></div>
+      <div class="leg b f" data-act="#c4|show-b"><b>② Định nghĩa struct</b><p>Cả student.cpp và main.cpp đều cần biết <code class="i">Student</code> gồm những gì.</p></div>
+      <div class="leg c f" data-act="#c4|show-c"><b>③ Hằng MAX</b><p>Kích thước tối đa của mảng sinh viên.</p></div>
+      <div class="leg d f" data-act="#c4|show-d"><b>④ Nguyên mẫu hàm</b><p>Chỉ có tên, kiểu trả về, tham số và dấu <code class="i">;</code>. Thân hàm nằm ở student.cpp.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S5 getGPA ===================== -->
+<section class="slide" id="s5">
+  <div class="hdr in"><span class="qn">BƯỚC 5</span><h2>Hàm <code class="i" style="font-size:33px">getGPA</code> – tính điểm trung bình</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr">
+    <div>
+<script type="text/x-cpp" id="c5" data-mark="1:a;2:b">
+double getGPA(const Student &s) {
+    return (s.lit + s.math) / 2;
+}
+</script>
+      <div class="card f" style="margin-top:14px" data-act="#c5|show-a"><h3>Vì sao <code class="i">const Student &amp;</code>?</h3>
+        <ul>
+          <li><b>&amp;</b> (tham chiếu): không sao chép cả struct (có mảng 101 ký tự) mỗi lần gọi.</li>
+          <li><b>const</b>: hàm chỉ đọc, không được phép sửa <code class="i">s</code>.</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <table class="tt f" data-act="#c5|show-b">
+        <tr><th>name</th><th>lit + math</th><th>/ 2</th></tr>
+        <tr><td>An</td><td>8.0 + 9.4 = 17.4</td><td><b>8.7</b></td></tr>
+        <tr><td>Binh</td><td>7.5 + 8.3 = 15.8</td><td><b>7.9</b></td></tr>
+        <tr class="hit"><td>Chau</td><td>9.0 + 9.4 = 18.4</td><td><b>9.2</b></td></tr>
+        <tr><td>Dung</td><td>8.0 + 9.0 = 17.0</td><td><b>8.5</b></td></tr>
+        <tr><td>Huy</td><td>6.5 + 7.1 = 13.6</td><td><b>6.8</b></td></tr>
+        <tr><td>Ha</td><td>8.8 + 9.2 = 18.0</td><td><b>9.0</b></td></tr>
+      </table>
+      <div class="note f">Nếu viết <code class="i">(s.lit + s.math) / 2</code> với kiểu <b>int</b> thì 17 / 2 = 8 (mất phần lẻ). Vì <code class="i">lit</code>, <code class="i">math</code> là <b>double</b> nên kết quả chính xác 8.5.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S6 INPUT ===================== -->
+<section class="slide" id="s6">
+  <div class="hdr in"><span class="qn">BƯỚC 6</span><h2>Nhập danh sách N sinh viên</h2></div>
+  <div class="cols" style="grid-template-columns:1.12fr 1fr">
+    <div>
+<script type="text/x-cpp" class="xs" id="c6" data-mark="2:c;3:d;4:c;5-6:c;10-13:a;14-17:b">
+void inputStudent(Student &s) {
+    cout << "  ID: ";        cin >> s.id;
+    cin.ignore();              // bỏ '\n' còn sót trong bộ đệm
+    cout << "  Ho ten: ";    cin.getline(s.name, 101);
+    cout << "  Diem Van: ";  cin >> s.lit;
+    cout << "  Diem Toan: "; cin >> s.math;
+}
+
+void inputList(Student a[], int &n) {
+    do {
+        cout << "Nhap so sinh vien N: ";
+        cin >> n;
+    } while (n <= 0 || n > MAX);   // nhập lại nếu sai
+    for (int i = 0; i < n; i++) {
+        cout << "Sinh vien thu " << i + 1 << ":\n";
+        inputStudent(a[i]);        // a[i] truyền tham chiếu
+    }
+}
+</script>
+      <div class="say" style="margin-top:10px"></div>
+    </div>
+    <div>
+      <div class="vars"><span class="chip" id="in-n">n = ?</span><span class="chip" id="in-i">i = –</span></div>
+      <div class="grid6" id="in-grid"></div>
+      <div class="console" id="in-con" style="margin-top:12px;font-size:15.5px;min-height:176px;line-height:1.45"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S7 FILTER ===================== -->
+<section class="slide" id="s7">
+  <div class="hdr in"><span class="qn">BƯỚC 7</span><h2>Lọc sinh viên giỏi: <code class="i" style="font-size:33px">GPA ≥ 8.5</code></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.08fr">
+    <div>
+<script type="text/x-cpp" class="sm" id="c7" data-mark="4:a;5:b;6:c;7:d">
+int filterExcellent(const Student a[], int n,
+                    Student out[]) {
+    int k = 0;                     // số SV giỏi đã tìm
+    for (int i = 0; i < n; i++)
+        if (getGPA(a[i]) >= 8.5)
+            out[k++] = a[i];       // chép sang mảng mới
+    return k;
+}
+</script>
+      <div class="say" style="margin-top:12px"></div>
+      <div class="note blue" style="margin-top:10px;font-size:18px"><code class="i">out[k++] = a[i]</code>: gán vào <code class="i">out[k]</code> rồi mới tăng k. Mảng gốc <code class="i">a</code> giữ nguyên (tham số <b>const</b>).</div>
+    </div>
+    <div>
+      <div class="rowlbl">a[ ] – danh sách gốc (n = 6)</div>
+      <div class="arr6" id="fl-a"></div>
+      <div class="cond" id="fl-cond">&nbsp;</div>
+      <div class="rowlbl">out[ ] – sinh viên giỏi <span class="chip" id="fl-k" style="margin-left:8px">k = 0</span></div>
+      <div class="arr6" id="fl-out"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S8 SORT ===================== -->
+<section class="slide" id="s8">
+  <div class="hdr in"><span class="qn">BƯỚC 8</span><h2>Sắp xếp GPA giảm dần – Interchange Sort</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr">
+    <div>
+<script type="text/x-cpp" class="sm" id="c8" data-mark="2:a;3:b;4:b;5-7:c">
+void sortByGpaDesc(Student a[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j < n; j++)
+            if (getGPA(a[j]) > getGPA(a[i])){
+                Student temp = a[i];
+                a[i] = a[j];
+                a[j] = temp;
+            }
+    }
+}
+</script>
+      <div class="say" style="margin-top:10px"></div>
+      <table class="tt" id="so-tbl" style="margin-top:10px;font-size:16px"></table>
+    </div>
+    <div>
+      <div class="vars"><span class="chip" id="so-i">i = –</span><span class="chip" id="so-j">j = –</span><span class="chip gold" id="so-m">temp = –</span></div>
+      <div class="slots" id="so-slots"></div>
+      <div class="sleg"><span><i style="background:#a5f3fc"></i>đang so sánh a[j]</span><span><i style="background:#fde68a"></i>a[i] – vị trí đang chốt</span><span><i style="background:#a7f3d0"></i>đã đúng vị trí</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S9 PRINT ===================== -->
+<section class="slide" id="s9">
+  <div class="hdr in"><span class="qn">BƯỚC 9</span><h2>In danh sách với <code class="i" style="font-size:33px">&lt;iomanip&gt;</code></h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+    <div>
+<script type="text/x-cpp" class="xs" id="c9" data-mark="2-5:a;6:b;7:b;8-12:c">
+void printList(const Student a[], int n) {
+    if (n == 0) {
+        cout << "Khong co sinh vien gioi.\n";
+        return;
+    }
+    cout << fixed << setprecision(1);       // 1 chữ số thập phân
+    cout << "STT    ID  Ho ten            Van  Toan   GPA\n";
+    for (int i = 0; i < n; i++)
+        cout << setw(3) << i + 1 << setw(6) << a[i].id << "  "
+             << left << setw(16) << a[i].name << right
+             << setw(5) << a[i].lit << setw(6) << a[i].math
+             << setw(6) << getGPA(a[i]) << "\n";
+}
+</script>
+      <div class="cols3" style="margin-top:12px;gap:10px">
+        <div class="card f" style="padding:10px 12px"><h3 style="font-size:18px">setw(w)</h3><p style="font-size:16px">Cột rộng w ký tự</p></div>
+        <div class="card f" style="padding:10px 12px"><h3 style="font-size:18px">left / right</h3><p style="font-size:16px">Căn trái tên, căn phải số</p></div>
+        <div class="card f" style="padding:10px 12px"><h3 style="font-size:18px">setprecision(1)</h3><p style="font-size:16px">9 → 9.0, 8.7 → 8.7</p></div>
+      </div>
+    </div>
+    <div>
+      <div class="code-title">excellent[ ] sau khi sắp xếp (k = 4)</div>
+      <div class="console" style="font-size:15px;line-height:1.55"><span class="cl" id="p0">== SINH VIEN GIOI (GPA >= 8.5) ==
+STT    ID  Ho ten            Van  Toan   GPA</span><span class="cl" id="p1">  1  1003  Le Minh Chau      9.0   9.4   9.2</span><span class="cl" id="p2">  2  1006  Vo Thu Ha         8.8   9.2   9.0</span><span class="cl" id="p3">  3  1001  Nguyen Van An     8.0   9.4   8.7</span><span class="cl" id="p4">  4  1004  Pham Quoc Dung    8.0   9.0   8.5</span></div>
+      <span class="f ghost" data-act="#p0|show;#c9|show-b"></span>
+      <span class="f ghost" data-act="#p1|show;#c9|show-c"></span>
+      <span class="f ghost" data-act="#p2|show"></span>
+      <span class="f ghost" data-act="#p3|show"></span>
+      <span class="f ghost" data-act="#p4|show"></span>
+      <div class="ruler f">  1  1003  Le Minh Chau      9.0   9.4   9.2
+<b>└3┘└─6──┘  └──────16──────┘└─5─┘└─6──┘└─6──┘</b></div>
+      <div class="note f" data-act="#c9|show-a">Nếu k = 0 (không ai đạt), hàm in <code class="i">Khong co sinh vien gioi.</code> rồi <code class="i">return</code> sớm.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S10 MAIN ===================== -->
+<section class="slide" id="s10">
+  <div class="hdr in"><span class="qn">BƯỚC 10</span><h2><code class="i" style="font-size:33px">main.cpp</code> – ghép các hàm lại</h2></div>
+  <div class="cols" style="grid-template-columns:1.3fr 1fr">
+    <div>
+      <div class="code-title">main.cpp</div>
+<script type="text/x-cpp" class="xs" id="c10" data-mark="6:a;9:a;10:b;11:c;13-14:d">
+#include <iostream>
+#include "student.h"   // "" : file của mình
+using namespace std;
+
+int main() {
+    Student list[MAX], excellent[MAX];
+    int n;
+
+    inputList(list, n);                          // ① nhập
+    int k = filterExcellent(list, n, excellent); // ② lọc
+    sortByGpaDesc(excellent, k);                 // ③ sắp xếp
+
+    cout << "\n== SINH VIEN GIOI (GPA >= 8.5) ==\n";
+    printList(excellent, k);                     // ④ in
+    return 0;
+}
+</script>
+    </div>
+    <div class="stack" style="gap:10px">
+      <div class="pipe f" data-act="#c10|show-a"><span class="pn">①</span><div><b>inputList(list, n)</b><p>list = [An 8.7, Binh 7.9, Chau 9.2, Dung 8.5, Huy 6.8, Ha 9.0], n = 6</p></div></div>
+      <div class="ar f">↓</div>
+      <div class="pipe f" data-act="#c10|show-b"><span class="pn">②</span><div><b>filterExcellent → k = 4</b><p>excellent = [An 8.7, Chau 9.2, Dung 8.5, Ha 9.0]</p></div></div>
+      <div class="ar f">↓</div>
+      <div class="pipe f" data-act="#c10|show-c"><span class="pn">③</span><div><b>sortByGpaDesc(excellent, 4)</b><p>excellent = [Chau 9.2, Ha 9.0, An 8.7, Dung 8.5]</p></div></div>
+      <div class="ar f">↓</div>
+      <div class="pipe f" data-act="#c10|show-d"><span class="pn">④</span><div><b>printList(excellent, 4)</b><p>In bảng 4 dòng ra màn hình</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S11 RUN ===================== -->
+<section class="slide" id="s11">
+  <div class="hdr in"><span class="qn">BƯỚC 11</span><h2>Biên dịch &amp; chạy toàn bộ chương trình</h2></div>
+  <div class="console f" style="font-size:16px;margin-bottom:12px"><span class="in">$ g++ main.cpp student.cpp -o app &amp;&amp; ./app</span></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr 1fr;gap:14px">
+    <div class="console f" style="font-size:14.5px;line-height:1.4">Nhap so sinh vien N: <span class="in">6</span>
+Sinh vien thu 1:
+  ID: <span class="in">1001</span>
+  Ho ten: <span class="in">Nguyen Van An</span>
+  Diem Van: <span class="in">8.0</span>
+  Diem Toan: <span class="in">9.4</span>
+Sinh vien thu 2:
+  ID: <span class="in">1002</span>
+  Ho ten: <span class="in">Tran Thi Binh</span>
+  Diem Van: <span class="in">7.5</span>
+  Diem Toan: <span class="in">8.3</span>
+Sinh vien thu 3:
+  ID: <span class="in">1003</span>
+  Ho ten: <span class="in">Le Minh Chau</span>
+  Diem Van: <span class="in">9.0</span>
+  Diem Toan: <span class="in">9.4</span></div>
+    <div class="console f" style="font-size:14.5px;line-height:1.4">Sinh vien thu 4:
+  ID: <span class="in">1004</span>
+  Ho ten: <span class="in">Pham Quoc Dung</span>
+  Diem Van: <span class="in">8.0</span>
+  Diem Toan: <span class="in">9.0</span>
+Sinh vien thu 5:
+  ID: <span class="in">1005</span>
+  Ho ten: <span class="in">Hoang Gia Huy</span>
+  Diem Van: <span class="in">6.5</span>
+  Diem Toan: <span class="in">7.1</span>
+Sinh vien thu 6:
+  ID: <span class="in">1006</span>
+  Ho ten: <span class="in">Vo Thu Ha</span>
+  Diem Van: <span class="in">8.8</span>
+  Diem Toan: <span class="in">9.2</span></div>
+    <div>
+      <div class="console f" style="font-size:12.6px;line-height:1.5">== SINH VIEN GIOI (GPA >= 8.5) ==
+STT    ID  Ho ten            Van  Toan   GPA
+  1  1003  Le Minh Chau      9.0   9.4   9.2
+  2  1006  Vo Thu Ha         8.8   9.2   9.0
+  3  1001  Nguyen Van An     8.0   9.4   8.7
+  4  1004  Pham Quoc Dung    8.0   9.0   8.5</div>
+      <div class="card good f" style="margin-top:12px"><span class="lbl good">KẾT QUẢ ĐÚNG</span><p style="font-size:17px">Binh (7.9) và Huy (6.8) bị loại. Dung có GPA <b>đúng bằng 8.5</b> vẫn được in vì điều kiện là <code class="i">&gt;=</code>. Thứ tự 9.2 → 9.0 → 8.7 → 8.5 giảm dần.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S12 NOTES ===================== -->
+<section class="slide" id="s12">
+  <div class="hdr in"><span class="qn">BƯỚC 12</span><h2>Lưu ý thường gặp &amp; mở rộng</h2></div>
+  <div class="cols" style="gap:18px">
+    <div class="card bad f"><span class="lbl bad">LỖI: QUÊN cin.ignore()</span>
+<script type="text/x-cpp" class="xs">
+cin >> s.id;                  // bộ đệm còn "\n"
+cin.getline(s.name, 101);     // đọc ngay "\n" → name rỗng!
+</script>
+      <p style="font-size:17px;margin-top:6px"><code class="i">cin &gt;&gt;</code> để lại ký tự xuống dòng. <code class="i">getline</code> gặp nó liền dừng nên tên bị bỏ trống. Thêm <code class="i">cin.ignore()</code> ở giữa.</p></div>
+    <div class="card f"><span class="lbl info">TEST: KHÔNG AI ĐẠT</span>
+      <div class="console" style="font-size:14.5px;line-height:1.4">Nhap so sinh vien N: <span class="in">2</span>
+...  Van <span class="in">7</span>   Toan <span class="in">8</span>     → GPA 7.5
+...  Van <span class="in">8</span>   Toan <span class="in">8.9</span>   → GPA 8.45
+
+== SINH VIEN GIOI (GPA >= 8.5) ==
+Khong co sinh vien gioi.</div>
+      <p style="font-size:17px;margin-top:6px">8.45 &lt; 8.5 nên không đạt. Luôn thử trường hợp danh sách kết quả rỗng.</p></div>
+    <div class="card good f"><span class="lbl good">MỞ RỘNG: std::sort</span>
+<script type="text/x-cpp" class="xs">
+#include <algorithm>
+sort(a, a + n, [](const Student &x, const Student &y) {
+    return getGPA(x) > getGPA(y);   // > : giảm dần
+});
+</script>
+      <p style="font-size:17px;margin-top:6px">Thư viện chuẩn sắp xếp nhanh hơn (O(n log n)). Tự viết Interchange Sort giúp hiểu thuật toán.</p></div>
+    <div class="card f"><span class="lbl info">VÌ SAO DÙNG MẢNG out[ ] RIÊNG?</span>
+      <ul>
+        <li style="font-size:18px">Danh sách gốc <code class="i">list</code> giữ nguyên thứ tự nhập để dùng cho chức năng khác.</li>
+        <li style="font-size:18px">Mỗi hàm làm <b>một việc</b>: lọc riêng, sắp xếp riêng, in riêng, nên dễ kiểm tra và tái sử dụng.</li>
+      </ul></div>
+  </div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="slide" id="end">
+  <div class="title-wrap" style="align-items:center;text-align:center">
+    <div class="orb" style="width:360px;height:360px;background:#f9a8d4;left:10%;top:10%"></div>
+    <h1 class="in">Tóm tắt <span class="grad">nhanh</span></h1>
+    <div class="cols4 in" style="margin-top:32px;text-align:left;max-width:1150px">
+      <div class="card"><h3>struct</h3><p style="font-size:18px">Gom <code class="i">id, name, lit, math</code> thành một kiểu. Truy cập bằng dấu <code class="i">.</code>; chuỗi C nhập bằng <code class="i">cin.getline</code>.</p></div>
+      <div class="card"><h3>Hàm</h3><p style="font-size:18px">Truyền <code class="i">Student &amp;</code> để sửa, <code class="i">const Student &amp;</code> để chỉ đọc. Mảng truyền vào hàm luôn dùng chung bộ nhớ.</p></div>
+      <div class="card"><h3>Thuật toán</h3><p style="font-size:18px">Lọc: duyệt và chép phần tử thỏa <code class="i">GPA ≥ 8.5</code>. Interchange Sort: so a[i] với mọi a[j] phía sau, GPA lớn hơn thì đổi chỗ.</p></div>
+      <div class="card"><h3>Nhiều file</h3><p style="font-size:18px"><code class="i">.h</code> khai báo, <code class="i">.cpp</code> định nghĩa, <code class="i">main.cpp</code> điều phối. Biên dịch: <code class="i">g++ main.cpp student.cpp</code>.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== E1 LỖI NHẬP ===================== -->
+<section class="slide" id="e1">
+  <div class="hdr in"><span class="qn">LỖI 1–4</span><h2>Lỗi hay gặp khi <span class="grad">nhập dữ liệu</span></h2></div>
+  <div class="egrid">
+    <div class="ec f"><h3><span class="en">1</span>Dùng <code class="i">cin &gt;&gt;</code> để nhập họ tên</h3>
+<script type="text/x-cpp" class="xs">
+cin >> s.name;          // nhập: Nguyen Van An
+</script>
+      <div class="sym">name = "Nguyen"   lit = 0   math = 6.9e-310 (rác)</div>
+      <p class="why"><code class="i">&gt;&gt;</code> dừng ở dấu cách. "Van" bị đọc vào <code class="i">lit</code> → thất bại, <code class="i">cin</code> rơi vào trạng thái lỗi, mọi lệnh nhập sau đều bị bỏ qua.</p>
+      <div class="fix f"><b>Sửa:</b> <code class="i">cin.getline(s.name, 101);</code></div>
+    </div>
+    <div class="ec f"><h3><span class="en">2</span>Quên <code class="i">cin.ignore()</code> trước <code class="i">getline</code></h3>
+<script type="text/x-cpp" class="xs">
+cin >> s.id;                  // bộ đệm còn lại '\n'
+cin.getline(s.name, 101);     // đọc ngay '\n'
+</script>
+      <div class="sym">name = ""   lit = 0      // tên rỗng, điểm hỏng</div>
+      <p class="why">Chương trình như "nhảy cóc" qua dòng nhập họ tên.</p>
+      <div class="fix f"><b>Sửa:</b> thêm <code class="i">cin.ignore();</code> ngay sau <code class="i">cin &gt;&gt; s.id;</code></div>
+    </div>
+    <div class="ec f"><h3><span class="en">3</span>Gán chuỗi cho mảng <code class="i">char</code> bằng <code class="i">=</code></h3>
+<script type="text/x-cpp" class="xs">
+s.name = "Nguyen Van An";
+</script>
+      <div class="sym">error: incompatible types in assignment of
+       'const char [14]' to 'char [101]'</div>
+      <p class="why">Mảng không gán trực tiếp được, khác với <code class="i">std::string</code>.</p>
+      <div class="fix f"><b>Sửa:</b> <code class="i">strcpy(s.name, "Nguyen Van An");</code> (cần <code class="i">&lt;cstring&gt;</code>)</div>
+    </div>
+    <div class="ec f"><h3><span class="en">4</span>Lặp quá số phần tử / không kiểm tra N</h3>
+<script type="text/x-cpp" class="xs">
+for (int i = 0; i <= n; i++)   // dư 1 lần: a[n]
+    inputStudent(a[i]);
+</script>
+      <div class="sym">Sinh vien thu 7:     // nhập N = 6 mà bị hỏi 7 người</div>
+      <p class="why">Nếu N &gt; MAX (ví dụ 150) thì ghi ra ngoài mảng <code class="i">a[100]</code>: lỗi bộ nhớ, có thể crash.</p>
+      <div class="fix f"><b>Sửa:</b> dùng <code class="i">i &lt; n</code> và <code class="i">do…while (n &lt;= 0 || n &gt; MAX)</code></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== E2 LỖI HÀM ===================== -->
+<section class="slide" id="e2">
+  <div class="hdr in"><span class="qn">LỖI 5–8</span><h2>Lỗi về <span class="grad">hàm &amp; tham số</span></h2></div>
+  <div class="egrid">
+    <div class="ec f"><h3><span class="en">5</span>Truyền tham trị khi hàm cần sửa struct</h3>
+<script type="text/x-cpp" class="xs">
+void inputStudent(Student s) {  // thiếu &
+    cin >> s.id; ...      // ghi vào BẢN SAO
+}
+</script>
+      <div class="sym">a[0].id, a[0].name = giá trị rác   // chưa từng được gán</div>
+      <p class="why">Nhập xong, bản sao bị hủy khi hàm kết thúc. <code class="i">a[i]</code> trong <code class="i">main</code> không thay đổi.</p>
+      <div class="fix f"><b>Sửa:</b> <code class="i">void inputStudent(Student &amp;s)</code></div>
+    </div>
+    <div class="ec f"><h3><span class="en">6</span>N không được trả về <code class="i">main</code></h3>
+<script type="text/x-cpp" class="xs">
+void inputList(Student a[], int n)   // thiếu &
+...
+int n;  inputList(list, n);  // n vẫn là rác
+</script>
+      <div class="sym">n = giá trị rác → vòng for chạy sai số lần, có thể crash</div>
+      <p class="why">Mảng thì luôn được dùng chung, nhưng biến <code class="i">int</code> truyền tham trị chỉ là bản sao.</p>
+      <div class="fix f"><b>Sửa:</b> <code class="i">int &amp;n</code> (hoặc hàm <code class="i">return n;</code>)</div>
+    </div>
+    <div class="ec f"><h3><span class="en">7</span>Thiếu ngoặc trong công thức GPA</h3>
+<script type="text/x-cpp" class="xs">
+return s.lit + s.math / 2;     // = lit + (math / 2)
+</script>
+      <div class="sym">1  1003  Le Minh Chau   9.0  9.4  13.7
+...  cả 6 SV đều "giỏi", GPA từ 10.1 đến 13.7</div>
+      <p class="why"><code class="i">/</code> ưu tiên hơn <code class="i">+</code>. GPA &gt; 10 là dấu hiệu chắc chắn có lỗi.</p>
+      <div class="fix f"><b>Sửa:</b> <code class="i">return (s.lit + s.math) / 2;</code></div>
+    </div>
+    <div class="ec f"><h3><span class="en">8</span>Hàm GPA trả về kiểu <code class="i">int</code></h3>
+<script type="text/x-cpp" class="xs">
+int getGPA(const Student &s) {     // nên là double
+    return (s.lit + s.math) / 2;    // 8.7 → 8
+}
+</script>
+      <div class="sym">Chỉ còn 2 SV: Chau (9), Ha (9). An 8.7→8, Dung 8.5→8 bị loại</div>
+      <p class="why">Phần thập phân bị cắt bỏ khi chuyển sang <code class="i">int</code>.</p>
+      <div class="fix f"><b>Sửa:</b> <code class="i">double getGPA(const Student &amp;s)</code></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== E3 LỖI THUẬT TOÁN ===================== -->
+<section class="slide" id="e3">
+  <div class="hdr in"><span class="qn">LỖI 9–12</span><h2>Lỗi trong <span class="grad">lọc &amp; sắp xếp</span></h2></div>
+  <div class="egrid">
+    <div class="ec f"><h3><span class="en">9</span>Dùng <code class="i">&gt;</code> thay vì <code class="i">&gt;=</code></h3>
+<script type="text/x-cpp" class="xs">
+if (getGPA(a[i]) > 8.5)          // đề: GPA >= 8.5
+</script>
+      <div class="sym">Chỉ in 3 SV: Chau 9.2, Ha 9.0, An 8.7   // mất Dung 8.5</div>
+      <p class="why">Luôn thử dữ liệu nằm <b>đúng biên</b> (GPA = 8.5).</p>
+      <div class="fix f"><b>Sửa:</b> <code class="i">if (getGPA(a[i]) &gt;= 8.5)</code></div>
+    </div>
+    <div class="ec f"><h3><span class="en">10</span>Quên tăng <code class="i">k</code> khi chép</h3>
+<script type="text/x-cpp" class="xs">
+if (getGPA(a[i]) >= 8.5)
+    out[k] = a[i];              // quên k++
+</script>
+      <div class="sym">Khong co sinh vien gioi.       // k vẫn = 0</div>
+      <p class="why">Mọi SV giỏi đều ghi đè lên <code class="i">out[0]</code>, hàm trả về k = 0. Viết <code class="i">out[i] = a[i]</code> cũng sai: mảng out bị "lỗ".</p>
+      <div class="fix f"><b>Sửa:</b> <code class="i">out[k++] = a[i];</code></div>
+    </div>
+    <div class="ec f"><h3><span class="en">11</span>Đảo ngược dấu so sánh khi sắp xếp</h3>
+<script type="text/x-cpp" class="xs">
+if (getGPA(a[j]) < getGPA(a[i]))     // dấu ngược
+</script>
+      <div class="sym">1 Dung 8.5   2 An 8.7   3 Ha 9.0   4 Chau 9.2   // tăng dần</div>
+      <p class="why">Đề yêu cầu <b>giảm dần</b>: phần tử phía sau có GPA <b>lớn hơn</b> mới phải đổi lên trước.</p>
+      <div class="fix f"><b>Sửa:</b> <code class="i">if (getGPA(a[j]) &gt; getGPA(a[i]))</code></div>
+    </div>
+    <div class="ec f"><h3><span class="en">12</span>Hoán đổi thiếu biến <code class="i">temp</code></h3>
+<script type="text/x-cpp" class="xs">
+a[i] = a[j];       // a[i] cũ bị ghi đè, mất luôn
+a[j] = a[i];       // gán lại chính a[j]
+</script>
+      <div class="sym">1  1003  Le Minh Chau  ...  9.2
+2  1003  Le Minh Chau  ...  9.2   // trùng, mất An, Dung</div>
+      <p class="why">Sau lệnh đầu, cả a[i] và a[j] đều là cùng một SV. Phải cất a[i] vào biến tạm trước.</p>
+      <div class="fix f"><b>Sửa:</b> <code class="i">Student temp = a[i]; a[i] = a[j]; a[j] = temp;</code></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== E4 LỖI NHIỀU FILE ===================== -->
+<section class="slide" id="e4">
+  <div class="hdr in"><span class="qn">LỖI 13–16</span><h2>Lỗi khi tổ chức <span class="grad">nhiều file</span></h2></div>
+  <div class="egrid">
+    <div class="ec f"><h3><span class="en">13</span>Chỉ biên dịch <code class="i">main.cpp</code></h3>
+      <div class="console" style="font-size:14px;padding:6px 12px"><span class="in">$ g++ main.cpp -o app</span></div>
+      <div class="sym">undefined reference to `inputList(Student*, int&amp;)'</div>
+      <p class="why">Linker không tìm thấy thân hàm vì <code class="i">student.cpp</code> không được dịch. Trong IDE: file .cpp chưa được thêm vào project.</p>
+      <div class="fix f"><b>Sửa:</b> <code class="i">g++ main.cpp student.cpp -o app</code></div>
+    </div>
+    <div class="ec f"><h3><span class="en">14</span><code class="i">#include "student.cpp"</code></h3>
+<script type="text/x-cpp" class="xs">
+#include "student.h"
+#include "student.cpp"     // SAI: include file .cpp
+</script>
+      <div class="sym">multiple definition of `getGPA(Student const&amp;)'</div>
+      <p class="why">Thân hàm bị dịch 2 lần (trong main.o và student.o).</p>
+      <div class="fix f"><b>Sửa:</b> chỉ <code class="i">#include</code> file <b>.h</b>, không bao giờ include file .cpp</div>
+    </div>
+    <div class="ec f"><h3><span class="en">15</span>Thiếu include guard</h3>
+<script type="text/x-cpp" class="xs">
+// student.h không có #ifndef / #define / #endif
+#include "student.h"
+#include "student.h"     // (thường do include gián tiếp)
+</script>
+      <div class="sym">error: redefinition of 'struct Student'</div>
+      <div class="fix f"><b>Sửa:</b> bọc header bằng <code class="i">#ifndef STUDENT_H … #endif</code> (hoặc <code class="i">#pragma once</code>)</div>
+    </div>
+    <div class="ec f"><h3><span class="en">16</span>Prototype khác định nghĩa</h3>
+<script type="text/x-cpp" class="xs">
+// student.h
+int filterExcellent(const Student[], int, Student[]);
+// student.cpp  (thiếu const)
+int filterExcellent(Student a[], int n, Student out[])
+</script>
+      <div class="sym">undefined reference to
+  `filterExcellent(Student const*, int, Student*)'</div>
+      <p class="why">Thiếu <code class="i">const</code> → C++ coi là 2 hàm khác nhau (overload).</p>
+      <div class="fix f"><b>Sửa:</b> chép y hệt chữ ký hàm từ file .h sang .cpp</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CHECKLIST ===================== -->
+<section class="slide" id="e5">
+  <div class="hdr in"><span class="qn">CHECKLIST</span><h2>Tự kiểm tra trước khi nộp bài</h2></div>
+  <div class="cols" style="gap:20px">
+    <div class="card f"><h3>✅ Code</h3>
+      <ul>
+        <li style="font-size:19px">Tên nhập bằng <code class="i">cin.getline</code>, có <code class="i">cin.ignore()</code> phía trước</li>
+        <li style="font-size:19px">Hàm sửa dữ liệu nhận <code class="i">&amp;</code>; hàm chỉ đọc nhận <code class="i">const &amp;</code></li>
+        <li style="font-size:19px">GPA kiểu <code class="i">double</code>, có ngoặc <code class="i">(lit + math) / 2</code></li>
+        <li style="font-size:19px">Điều kiện <code class="i">&gt;= 8.5</code>, chép bằng <code class="i">out[k++]</code></li>
+        <li style="font-size:19px">Sắp xếp dùng dấu <code class="i">&gt;</code>, đổi chỗ cả struct qua <code class="i">temp</code></li>
+        <li style="font-size:19px">Header có include guard, chỉ include file .h</li>
+      </ul>
+    </div>
+    <div>
+      <div class="card f"><h3>🧪 Bộ test nên thử</h3>
+        <table class="tt" style="font-size:17px;margin-top:4px">
+          <tr><th>Test</th><th>Kỳ vọng</th></tr>
+          <tr><td>6 SV mẫu</td><td>Chau, Ha, An, Dung</td></tr>
+          <tr><td>GPA = 8.5 đúng biên</td><td>được in</td></tr>
+          <tr><td>GPA = 8.45</td><td>không được in</td></tr>
+          <tr><td>Không ai đạt</td><td>"Khong co sinh vien gioi."</td></tr>
+          <tr><td>N = 0 hoặc N = 101</td><td>bắt nhập lại N</td></tr>
+          <tr><td>Hai SV cùng GPA</td><td>in cả hai, liền nhau</td></tr>
+        </table>
+      </div>
+      <div class="note f">Mẹo: nhìn output, nếu thấy <b>GPA &gt; 10</b>, <b>tên rỗng</b> hay <b>SV bị trùng</b> thì quay lại các lỗi 2, 7 và 12.</div>
+    </div>
+  </div>
+</section>
+</div></div>
+
+<div id="bar"></div>
+<div id="hint">← → / Space: chuyển · Shift+→: qua slide · Home: đầu · F: toàn màn hình</div>
+<div id="nav"><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+
+<script>
+(function(){
+  const SV=[
+    {id:1001,name:"Nguyen Van An",sh:"An",lit:8.0,math:9.4},
+    {id:1002,name:"Tran Thi Binh",sh:"Binh",lit:7.5,math:8.3},
+    {id:1003,name:"Le Minh Chau",sh:"Chau",lit:9.0,math:9.4},
+    {id:1004,name:"Pham Quoc Dung",sh:"Dung",lit:8.0,math:9.0},
+    {id:1005,name:"Hoang Gia Huy",sh:"Huy",lit:6.5,math:7.1},
+    {id:1006,name:"Vo Thu Ha",sh:"Ha",lit:8.8,math:9.2}];
+  const gpa=s=>(s.lit+s.math)/2, f1=x=>x.toFixed(1);
+  const H=window.HOOKS={};
+  const $=id=>document.getElementById(id);
+  function ghosts(slideId,states){
+    const sl=document.getElementById(slideId);
+    states.forEach((st,k)=>{if(k===0)return;const g=document.createElement("span");g.className="f ghost";if(st.say)g.dataset.say=st.say;sl.appendChild(g)});
+  }
+  function marks(codeId,list){const c=$(codeId);if(!c)return;["a","b","c","d"].forEach(x=>c.classList.toggle("show-"+x,list.includes(x)))}
+
+  /* ---------- S6: nhập ---------- */
+  const IN=[{}];
+  IN.push({n:6,i:null,filled:0,mk:"a",say:"do…while: nhập N = 6. Điều kiện lặp lại (n <= 0 || n > MAX) là false nên thoát, chuyển sang vòng for."});
+  SV.forEach((s,i)=>IN.push({n:6,i,filled:i+1,mk:"bc",say:`i = ${i}: gọi inputStudent(a[${i}]). Hàm ghi trực tiếp vào a[${i}] vì nhận tham chiếu Student &s.`+(i===0?" cin.ignore() bỏ '\\n' trước khi getline đọc họ tên.":"")}));
+  IN.push({n:6,i:6,filled:6,mk:"",say:"i = 6, điều kiện i < n sai nên vòng for dừng. Mảng a[] đã có đủ 6 sinh viên, n = 6 được trả về main qua tham chiếu int &n."});
+  ghosts("s6",IN);
+  H.s6=step=>{
+    const st=IN[step];
+    $("in-n").textContent="n = "+(st.n??"?");
+    $("in-i").textContent="i = "+(st.i==null?"–":st.i);
+    marks("c6",(st.mk||"").split(""));
+    $("in-grid").innerHTML=SV.map((s,k)=>{
+      const full=k<(st.filled||0);
+      return `<div class="sc6 ${full?"full":""} ${full&&k===st.i?"cur":""}"><div class="ix">a[${k}]${full?" · id "+s.id:""}</div>`+
+        (full?`<div class="nm">${s.name}</div><div class="sx">lit ${f1(s.lit)} · math ${f1(s.math)}</div>`:`<div class="sx" style="color:#ccc;margin-top:8px">?</div>`)+`</div>`}).join("");
+    let con="";
+    if(st.n) con='Nhap so sinh vien N: <span class="in">6</span>\n';
+    if(st.i!=null&&st.i<6){const s=SV[st.i];
+      con=(st.i===0?con:"…\n")+`Sinh vien thu ${st.i+1}:\n  ID: <span class="in">${s.id}</span>\n  Ho ten: <span class="in">${s.name}</span>\n  Diem Van: <span class="in">${f1(s.lit)}</span>\n  Diem Toan: <span class="in">${f1(s.math)}</span>`;}
+    if(st.i===6) con="…\n  Diem Toan: <span class=\"in\">9.2</span>\n(đã nhập xong 6 sinh viên)";
+    $("in-con").innerHTML=con||'<span style="color:#8a83b8">(chưa chạy)</span>';
+  };
+
+  /* ---------- S7: lọc ---------- */
+  const FL=[{i:null,out:[],res:[],mk:""}];
+  {let out=[],res=[];
+   SV.forEach((s,i)=>{const g=gpa(s),ok=g>=8.5-1e-9;res=res.concat([ok]);if(ok)out=out.concat([i]);
+     FL.push({i,out:out.slice(),res:res.slice(),ok,mk:ok?"abc":"ab",
+       say:`i = ${i}: getGPA(a[${i}]) = (${f1(s.lit)} + ${f1(s.math)}) / 2 = ${f1(g)}`+(ok?` ≥ 8.5 → chép vào out[${out.length-1}], k tăng lên ${out.length}.`:` < 8.5 → bỏ qua.`)})});
+   FL.push({i:null,out:out.slice(),res:res.slice(),mk:"d",done:true,say:`Hết vòng lặp: return k = ${out.length}. out[] = [An, Chau, Dung, Ha]. Lưu ý Dung có GPA đúng bằng 8.5 vẫn được chọn vì dùng >=.`});}
+  ghosts("s7",FL);
+  H.s7=step=>{
+    const st=FL[step];marks("c7",st.mk.split(""));
+    $("fl-a").innerHTML=SV.map((s,k)=>{let c="";if(k===st.i)c="cur";else if(st.res[k]!==undefined)c=st.res[k]?"ok":"no";
+      if(k===st.i)c+=st.ok?" ok":"";
+      return `<div class="cl6 ${c}"><small>a[${k}]</small><b>${f1(gpa(s))}</b><span>${s.sh}</span></div>`}).join("");
+    $("fl-out").innerHTML=[0,1,2,3,4,5].map(k=>{const idx=st.out[k];
+      if(idx===undefined)return k<4||st.out.length>k?`<div class="cl6 empty"><small>out[${k}]</small><b>·</b></div>`:"";
+      const s=SV[idx];const fresh=st.i===idx;
+      return `<div class="cl6 ok ${fresh?"newin":""}"><small>out[${k}]</small><b>${f1(gpa(s))}</b><span>${s.sh}</span></div>`}).join("");
+    const kk=$("fl-k");kk.textContent="k = "+st.out.length;
+    const c=$("fl-cond");
+    if(st.i!=null){const s=SV[st.i];c.className="cond "+(st.ok?"yes":"no");c.textContent=`getGPA(a[${st.i}]) = ${f1(gpa(s))} >= 8.5 → ${st.ok?"true":"false"}`}
+    else if(st.done){c.className="cond yes";c.textContent="return k = 4"}
+    else{c.className="cond";c.textContent="k = 0, chuẩn bị duyệt i = 0 … 5"}
+  };
+
+  /* ---------- S8: sắp xếp ---------- */
+  const EX=[0,2,3,5].map(k=>SV[k]);           // out[] sau bước lọc
+  const SO=[{ord:[0,1,2,3],i:null,j:null,t:null,sorted:0,mk:"",rows:[]}];
+  {const ord=[0,1,2,3],n=4,rows=[];const G=p=>gpa(EX[ord[p]]),N=p=>EX[ord[p]].sh;
+   for(let i=0;i<n-1;i++){
+     SO.push({ord:ord.slice(),i,j:null,t:null,sorted:i,mk:"a",rows:rows.slice(),say:`i = ${i}: chốt vị trí a[${i}] (hiện là ${N(i)}, ${f1(G(i))}). So a[${i}] với từng a[j] phía sau, j = ${i+1} … 3.`});
+     for(let j=i+1;j<n;j++){const gt=G(j)>G(i)+1e-9;
+       SO.push({ord:ord.slice(),i,j,t:null,sorted:i,mk:"b",rows:rows.slice(),say:`j = ${j}: getGPA(a[${j}]) > getGPA(a[${i}]) ? → ${f1(G(j))} > ${f1(G(i))} → ${gt?"true, đổi chỗ!":"false, giữ nguyên."}`});
+       if(gt){const a=N(i),b=N(j);[ord[i],ord[j]]=[ord[j],ord[i]];
+         rows.push([i,j,`${a} ⇄ ${b}`,ord.map(p=>f1(gpa(EX[p]))).join(" ")]);
+         SO.push({ord:ord.slice(),i,j,t:a,sorted:i,mk:"c",swapped:true,rows:rows.slice(),say:`temp = a[${i}] (${a}); a[${i}] = a[${j}] (${b}); a[${j}] = temp (${a}). Bây giờ a[${i}] là ${b}, ${f1(G(i))}.`});}
+     }
+     SO[SO.length-1].say+=` Hết vòng j: a[${i}] = ${N(i)} là GPA lớn nhất của đoạn a[${i}..3].`;
+     SO[SO.length-1].fin=i;
+   }
+   SO.push({ord:ord.slice(),i:null,j:null,t:null,sorted:4,mk:"",rows:rows.slice(),say:`i = 3 = n − 1 nên dừng. Tổng cộng ${3+2+1} lần so sánh, ${rows.length} lần đổi chỗ. Kết quả: Chau 9.2 ≥ Ha 9.0 ≥ An 8.7 ≥ Dung 8.5.`});}
+  ghosts("s8",SO);
+  let built=false;
+  H.s8=step=>{
+    const st=SO[step],box=$("so-slots"),W=136;
+    if(!built){built=true;
+      box.innerHTML=[0,1,2,3].map(p=>`<div class="slot" style="left:${p*W}px">a[${p}]</div>`).join("")+
+        EX.map((s,k)=>`<div class="scard" id="sc${k}"><div class="nm">${s.sh}</div><div class="g">${f1(gpa(s))}</div><div class="id">${s.id}</div></div>`).join("")+
+        `<div class="ptr pi" id="pi">▲ i</div><div class="ptr pj" id="pj">▲ j</div>`;}
+    const sortedN=st.fin!=null?st.fin+1:st.sorted;
+    st.ord.forEach((k,p)=>{const el=$("sc"+k);el.style.left=p*W+"px";
+      el.classList.toggle("done",p<sortedN);el.classList.toggle("cmp",p===st.j&&!st.swapped);el.classList.toggle("mx",p===st.i&&p>=sortedN)});
+    const pi=$("pi"),pj=$("pj");
+    pi.style.opacity=st.i==null?0:1;pi.style.left=(st.i??0)*W+"px";
+    pj.style.opacity=st.j==null?0:1;pj.style.left=(st.j??0)*W+"px";
+    $("so-i").textContent="i = "+(st.i??"–");$("so-j").textContent="j = "+(st.j??"–");$("so-m").textContent="temp = "+(st.t??"–");
+    marks("c8",st.mk.split(""));
+    $("so-tbl").innerHTML="<tr><th>i</th><th>j</th><th>Đổi chỗ</th><th>GPA sau bước</th></tr>"+
+      (st.rows.length?st.rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td style="text-align:left">${r[2]}</td><td><b>${r[3]}</b></td></tr>`).join(""):'<tr><td colspan="4" style="color:#aaa">8.7 9.2 8.5 9.0 (ban đầu)</td></tr>');
+  };
+})();
+</script>
+<script>
+(function(){
+  // ---------- C++ highlighter ----------
+  const KW=new Set("if else for while do return break continue switch case default struct class using namespace const static new delete true false sizeof public private include pragma auto".split(" "));
+  const TY=new Set("int double float char void bool long short unsigned string Student".split(" "));
+  const LIB=new Set("cout cin endl sqrt fabs hypot std getline ignore setw setprecision fixed left right swap sort".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line){
+    if(/^\s*#/.test(line)) return '<span class="p">'+esc(line)+'</span>';
+    const re=/(\/\/.*$)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="n">'+m[3]+'</span>';
+      else if(m[4]){
+        const w=m[4];
+        let cls=KW.has(w)?"k":TY.has(w)?"t":LIB.has(w)?"fn":(m[5]?"fn":"");
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[5]?esc(m[5]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-cpp"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");const [a,b]=r.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+
+  // ---------- deck engine ----------
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")];
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  function act(el,on){["act","act2"].forEach(k=>{const v=el.dataset[k];if(!v)return;v.split(";").forEach(p=>{const [sel,cls]=p.split("|");const t=document.querySelector(sel);if(t)t.classList.toggle(cls,on)})})}
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step)||(i<cur&&false);f.classList.toggle("on",on);act(f,on)});
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.textContent=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length;
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    history.replaceState(null,"","#"+slides[cur].id);
+    const hk=window.HOOKS&&window.HOOKS[slides[cur].id];if(hk)hk(step);
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+  addEventListener("keydown",e=>{
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+</script>
+</body>
+</html>
