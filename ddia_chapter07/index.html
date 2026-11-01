@@ -1,0 +1,1327 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DDIA Chapter 7 · Transactions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+h1{font-size:70px;line-height:1.1;font-weight:800}
+h2{font-size:38px;line-height:1.2;font-weight:800}
+h3{font-size:23px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:22px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:26px;margin:6px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.88em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 6px;border-radius:6px;color:#be185d}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.cols.c64{grid-template-columns:1.25fr 1fr}.cols.c46{grid-template-columns:1fr 1.2fr}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.card.bad{border-color:#fecdd3;background:linear-gradient(180deg,#fff1f3,#fff)}
+.card.good{border-color:#a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff)}
+.lbl{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
+.icon{font-size:34px;margin-bottom:4px}
+.note{margin-top:12px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:20px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.code{font-family:var(--mono);font-size:18px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
+.code.sm{font-size:16.5px}.code.xs{font-size:15px;line-height:1.45}.code.xxs{font-size:13.6px;line-height:1.38;padding:8px 0}
+.code .ln{padding:0 14px 0 8px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.11);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.13);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
+.code-title{font-family:var(--mono);font-size:15px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+.f.zoom{transform:scale(.85)}.f.zoom.on{transform:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:19px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.legend{display:flex;flex-direction:column;gap:10px}
+.leg{border-radius:12px;padding:10px 16px;background:#fff;border:1px solid var(--line)}
+.leg b{display:block;font-size:21px;margin-bottom:2px}
+.leg p{font-size:19px}
+.leg.a{border-left:6px solid #7c3aed}.leg.b{border-left:6px solid #06b6d4}.leg.c{border-left:6px solid #f59e0b}
+.console{font-family:var(--mono);font-size:17px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.mem{display:flex;align-items:center;gap:16px;min-height:130px}
+.frame{border:2px solid #e4dcfb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
+.frame .fname{font-family:var(--mono);font-size:16px;color:var(--muted);margin-bottom:6px}
+.var{display:flex;align-items:center;gap:10px}
+.vn{font-family:var(--mono);font-size:21px;color:var(--t);font-weight:600}
+.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #c4b5fd;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
+.vb .new{display:none}
+.callee,.arw{opacity:0;transform:translateX(-14px);transition:all .5s}
+.mem.s1 .callee,.mem.s1 .arw{opacity:1;transform:none}
+.mem.s2 .chg .old{display:none}.mem.s2 .chg .new{display:inline;animation:pop .5s}
+.mem.s2 .chg{border-color:#f59e0b;box-shadow:0 0 18px rgba(245,158,11,.5)}
+.mem.s3 .callee,.mem.s3 .arw{opacity:.15;transform:translateY(10px)}
+.mem.s3 .result{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.5)}
+.arw{font-family:var(--mono);font-size:16px;color:var(--gold);text-align:center;line-height:1.2;font-weight:600}
+.arw .bar{display:block;font-size:30px}
+.alias{font-size:18px;color:var(--accent2);font-weight:600}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.25)}100%{transform:none;opacity:1}}
+.flow{display:flex;align-items:center;gap:12px;justify-content:center}
+.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:18px;border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:14px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.h{border-color:var(--gold)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#c4b5fd}.box.exe{border-color:#ec4899;background:#fdf2f8}
+.ar{color:var(--muted);font-size:26px;text-align:center}
+.stack{display:flex;flex-direction:column;gap:8px}
+svg text{font-family:var(--mono);font-weight:600}
+.draw{stroke-dasharray:400;stroke-dashoffset:400;transition:stroke-dashoffset 1s ease}
+svg.d1 .dr1,svg.d2 .dr2,svg.d3 .dr3{stroke-dashoffset:0}
+.fadein{opacity:0;transition:opacity .6s}
+svg.d1 .fd1,svg.d2 .fd2,svg.d3 .fd3{opacity:1}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:19px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05)}
+.ag:hover{border-color:#ec4899;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
+.ag b{color:#db2777;margin-right:6px;font-family:var(--mono)}
+.formula{font-family:var(--mono);font-size:23px;text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:16px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+@media (max-width:700px){#hint{display:none}}
+@media print{#nav,#bar,#hint{display:none}}
+
+/* lec03 additions */
+.chain{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pv{display:inline-flex;align-items:center;font-family:var(--mono);font-size:18px;font-weight:700;padding:5px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;white-space:nowrap}
+.pv.yes{background:#d1fae5;border-color:#34d399;color:#047857}
+.pv.no{background:#ffe4e6;border-color:#fb7185;color:#be123c}
+.pv.skip{background:#f1f5f9;border-color:#cbd5e1;color:#94a3b8;text-decoration:line-through;border-style:dashed}
+.op{font-family:var(--mono);font-size:26px;font-weight:800;color:var(--sa1)}
+.tt th,.tt td{text-align:center}.tt td:first-child{color:var(--text);font-weight:400}
+.tt tr.hit td{background:#fdf2f8;color:#be185d}
+tr.f{transform:none}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.code.show-s .mark-s{opacity:.3;text-decoration:line-through}
+.arr{display:flex;gap:12px;justify-content:center;margin-top:6px}
+.cell{width:84px;height:84px;border-radius:16px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:800;transition:all .45s;box-shadow:0 6px 16px -10px rgba(124,58,237,.4)}
+.cell small{font-size:13px;color:var(--muted);font-weight:600}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857;transform:translateY(-6px)}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;transform:translateY(-10px) scale(1.06);box-shadow:0 10px 24px -8px rgba(225,29,72,.5)}
+.cell.skip{opacity:.3;transform:scale(.92)}
+.syn{display:flex;gap:12px;align-items:center;justify-content:center;font-family:var(--mono);font-size:24px;font-weight:700}
+.sy{padding:8px 16px;border-radius:12px;color:#fff}
+.sy.c1{background:linear-gradient(135deg,#7c3aed,#a855f7)}.sy.c2{background:linear-gradient(135deg,#059669,#10b981)}.sy.c3{background:linear-gradient(135deg,#e11d48,#f97316)}
+.spin{display:inline-block;animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* lec04 arrays additions */
+.cell .v{display:block;line-height:1}
+.cell.max{border-color:#db2777;background:#fdf2f8;color:#be185d}
+.cell.empty{border-style:dashed;background:#f8fafc;color:#cbd5e1;box-shadow:none}
+.cell.done{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cell.new{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.cell.out{opacity:.4;border-style:dashed}
+.cell.gone{border-color:#e11d48;background:#fff1f3;color:#be123c;text-decoration:line-through}
+.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(245,158,11,.55)}
+.cell.cmp{border-color:#0891b2;background:#ecfeff;color:#0e7490;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(8,145,178,.5)}
+.cell.dots{border:none;box-shadow:none;background:none;width:40px;color:var(--muted)}
+.arr.sm .cell{width:70px;height:74px;font-size:24px;border-radius:14px}
+.arr.xs .cell{width:56px;height:62px;font-size:19px;border-radius:12px}
+.arr.xs .cell small{font-size:11.5px}
+.arr.left{justify-content:flex-start}
+.addr{display:flex;gap:12px;justify-content:center;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.addr span{width:84px;text-align:center}
+.vars{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.vc{font-family:var(--mono);font-size:19px;font-weight:700;padding:5px 14px;border-radius:12px;background:#fff;border:2px solid #e4dcfb;transition:all .35s}
+.vc b{color:var(--t)}
+.vc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.45)}
+.vc.res{border-color:#10b981;background:#ecfdf5;color:#047857}
+.ci{opacity:0;transition:opacity .4s}.ci.show{opacity:1}
+.say{font-size:20px;margin-top:12px;min-height:56px;color:var(--muted)}
+.say b{color:var(--text)}
+.rowlbl{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted);margin:10px 0 4px}
+.zone{display:flex;gap:6px;justify-content:center;margin-top:8px;font-size:15px;font-weight:700}
+.zone span{padding:3px 10px;border-radius:999px}
+.z1{background:#d1fae5;color:#047857}.z2{background:#f1f5f9;color:#64748b}.z3{background:#ffe4e6;color:#be123c}
+.brace{display:flex;gap:12px;justify-content:center;margin-top:4px}
+.brace div{border-top:3px solid currentColor;padding-top:4px;text-align:center;font-family:var(--mono);font-size:15px;font-weight:700}
+.mx{display:grid;gap:6px;justify-content:center}
+.mc{width:62px;height:52px;border-radius:10px;border:2px solid #e4dcfb;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .4s}
+.mx.sm .mc{width:44px;height:36px;font-size:14px;border-radius:8px}
+.mc.ix{border:none;background:none;color:var(--muted);font-size:14px;font-weight:600;box-shadow:none}
+.mc.unused{border-style:dashed;background:#f8fafc;color:#cbd5e1}
+.mc.used{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.mc.hl{background:#fffbeb;border-color:#fcd34d}
+.mc.cur{border-color:#f59e0b;background:#fde68a;color:#92400e;transform:scale(1.12);box-shadow:0 8px 20px -6px rgba(245,158,11,.6)}
+.mc.bd{border-color:#ec4899;border-width:3px}
+.mc.inr{opacity:.3}
+.mc.pos{border-color:#10b981;background:#d1fae5;color:#047857}
+.mc.neg{background:#fff1f3;color:#be123c}
+.mc.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;border-style:dashed}
+.strip{display:flex;gap:3px;font-family:var(--mono);font-size:12px;flex-wrap:nowrap;overflow:hidden}
+.strip span{padding:6px 5px;border-radius:5px;background:#f3edff;color:#6d28d9;white-space:nowrap}
+.strip span.r1{background:#e0f2fe;color:#0369a1}
+.strip span.gap{background:none;color:var(--muted)}
+.trace td,.trace th{font-size:17px;padding:5px 10px}
+.trace td:first-child{color:var(--text)}
+.trace tr.now td{background:#fffbeb}
+.sig{font-family:var(--mono);font-size:17px;background:#fff;border:1px dashed #c4b5fd;border-radius:10px;padding:6px 12px;color:#6d28d9;display:inline-block}
+
+.cols>*{min-width:0}
+
+/* ===== DDIA ch1 additions ===== */
+.sv{width:100%;height:auto;overflow:visible}
+.sv text{font-family:"Be Vietnam Pro",system-ui,sans-serif;font-weight:700;font-size:15px;fill:#1e1b3a}
+.sv text.sm{font-size:12.5px;fill:#64607d;font-weight:500}
+.sv text.lb{font-size:12.5px;fill:#7c3aed;font-weight:700}
+.sv .nd{fill:#fff;stroke:#c4b5fd;stroke-width:2}
+.sv .nd.c2{stroke:#0891b2}.sv .nd.c3{stroke:#ec4899}.sv .nd.c4{stroke:#f59e0b}.sv .nd.c5{stroke:#10b981}
+.sv .ln{stroke:#a78bfa;stroke-width:2.2;fill:none}
+.sv .g{opacity:0;transition:opacity .55s}
+.sv .g.hot .ln{stroke:#ec4899;stroke-dasharray:7 6;animation:dash .7s linear infinite}
+.sv .g.hot .nd{filter:drop-shadow(0 6px 10px rgba(236,72,153,.35))}
+@keyframes dash{to{stroke-dashoffset:-13}}
+.sv .box6{fill:none;stroke:#ec4899;stroke-width:2.5;stroke-dasharray:9 7}
+.chip{display:inline-flex;align-items:center;gap:8px;font-size:18px;font-weight:600;padding:6px 14px;border-radius:999px;background:#fff;border:2px solid #e4dcfb;white-space:nowrap}
+.chip.p{border-color:#c4b5fd;background:#f5f0ff;color:#6d28d9}.chip.c{border-color:#a5f3fc;background:#ecfeff;color:#0e7490}.chip.k{border-color:#fbcfe8;background:#fdf2f8;color:#be185d}.chip.y{border-color:#fde68a;background:#fffbeb;color:#b45309}.chip.g{border-color:#a7f3d0;background:#ecfdf5;color:#047857}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.cell.t{font-size:15px;font-weight:700;text-align:center;line-height:1.15;padding:4px}
+.cell.t .v{font-size:15px}
+.cell.big{font-size:30px}
+.stat{font-family:var(--mono);font-size:44px;font-weight:800;line-height:1;background:linear-gradient(90deg,var(--sa1),var(--sa2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat small{font-size:18px}
+.sysbox{border-radius:14px;padding:12px 16px;text-align:center;font-weight:700;font-size:20px;border:2px solid #e4dcfb;background:#fff;transition:all .45s}
+.sysbox.fail{border-color:#e11d48;background:#fff1f3;color:#be123c;box-shadow:0 0 22px rgba(225,29,72,.35)}
+.sysbox.ok{border-color:#10b981;background:#ecfdf5;color:#047857;box-shadow:0 0 22px rgba(16,185,129,.3)}
+.shield{opacity:0;transform:scale(.7);transition:all .45s;font-size:15px;font-weight:700;color:#7c3aed;text-align:center;border:2px dashed #a78bfa;border-radius:12px;padding:6px 10px;background:#f5f0ff}
+.shield.on{opacity:1;transform:none}
+.dots{display:grid;grid-template-columns:repeat(25,1fr);gap:5px;padding:12px;background:#fff;border:1px solid var(--line);border-radius:14px}
+.dots i{display:block;aspect-ratio:1;border-radius:4px;background:#e9e3fb;transition:all .4s}
+.dots i.x{background:#e11d48;transform:scale(1.35);box-shadow:0 0 10px rgba(225,29,72,.6)}
+.dots i.r{background:#10b981}
+.node{width:110px;border-radius:14px;border:2.5px solid #c4b5fd;background:#fff;text-align:center;padding:8px 4px;font-weight:700;transition:all .45s}
+.node .ver{display:block;font-family:var(--mono);font-size:22px;color:#6d28d9}
+.node small{display:block;font-size:13px;color:var(--muted);font-weight:600}
+.node.down{border-color:#f59e0b;background:#fffbeb;opacity:.55;transform:translateY(8px)}
+.node.v2{border-color:#10b981;background:#ecfdf5}.node.v2 .ver{color:#047857}
+.node.bad{border-color:#e11d48;background:#fff1f3;color:#be123c}.node.bad .ver{color:#be123c}
+.nodes{display:flex;gap:14px;justify-content:center}
+.casc{display:flex;align-items:center;gap:6px;justify-content:center}
+.casc .ar{font-size:22px}
+.tw{display:inline-block;font-size:13px;font-weight:700;padding:2px 8px;border-radius:6px;background:#fdf2f8;color:#be185d;border:1px solid #fbcfe8;margin:2px;opacity:0;transform:translateY(-10px) scale(.6);transition:all .45s}
+.tw.show{opacity:1;transform:none}
+.tw.b{background:#ecfeff;color:#0e7490;border-color:#a5f3fc}
+.tw.y{background:#fffbeb;color:#b45309;border-color:#fde68a}
+.mbox{border:2px solid #e4dcfb;border-radius:12px;background:#fff;padding:6px 8px;min-height:84px;transition:all .4s}
+.mbox h4{font-size:14px;color:var(--muted);margin-bottom:4px}
+.mbox.hot{border-color:#0891b2;box-shadow:0 0 16px rgba(8,145,178,.35)}
+.mboxes{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.who{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:18px;padding:8px 14px;border-radius:12px;background:#fff;border:2px solid #fbcfe8}
+.big-ar{font-size:30px;color:var(--muted);text-align:center;line-height:1}
+.rt{display:flex;height:58px;border-radius:12px;overflow:hidden;border:2px solid #e4dcfb;background:#fff}
+.rt>div{display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;opacity:0;transition:opacity .45s;white-space:nowrap}
+.rt>div.show{opacity:1}
+.rt .n1,.rt .n2{background:#94a3b8}.rt .q{background:#f59e0b}.rt .sv2{background:#7c3aed}
+.brk{position:relative;height:44px;margin-top:6px}
+.brk>div{position:absolute;top:0;border-top:3px solid;text-align:center;font-size:15px;font-weight:700;padding-top:4px;opacity:0;transition:opacity .45s}
+.brk>div.show{opacity:1}
+.pc rect.b{fill:#c4b5fd;transform:translateX(var(--x0));transition:transform 1.3s cubic-bezier(.6,0,.2,1) calc(var(--d)*7ms),fill .4s}
+.pc.sorted rect.b{transform:translateX(var(--x1))}
+.pc.p95 rect.t95{fill:#f472b6}.pc.p99 rect.t99{fill:#e11d48}
+.pc .mk{opacity:0;transition:opacity .5s}
+.pc.mean .mkm,.pc.p50 .mk50,.pc.p95 .mk95,.pc.p99 .mk99{opacity:1}
+.pc text{font-family:var(--mono);font-size:12px;font-weight:700}
+.q-row{display:flex;gap:8px;align-items:center}
+.rq{height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;font-weight:700;color:#fff;transition:all .5s}
+.rq.slow{width:190px;background:linear-gradient(135deg,#e11d48,#f97316)}
+.rq.fast{width:54px;background:linear-gradient(135deg,#0891b2,#7c3aed)}
+.rq.wait{box-shadow:0 0 0 3px #fde68a;animation:shake .5s infinite}
+.rq.done{opacity:.25}
+@keyframes shake{50%{transform:translateY(-3px)}}
+.srv{border:2.5px solid #7c3aed;border-radius:14px;padding:10px 14px;text-align:center;font-weight:800;background:#f5f0ff;min-width:120px}
+.be{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;margin:6px 0}
+.be .nm{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted)}
+.be .trk{height:26px;border-radius:8px;background:#f5f3ff;position:relative;overflow:hidden}
+.be .bb{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:8px;background:linear-gradient(90deg,#0891b2,#7c3aed);transition:width 1s ease}
+.be .bb.slow{background:linear-gradient(90deg,#f97316,#e11d48)}
+.run .be .bb{width:var(--w)}
+.mach{border:3px solid #7c3aed;border-radius:14px;background:#f5f0ff;display:flex;align-items:center;justify-content:center;font-weight:800;color:#6d28d9;transition:all .7s cubic-bezier(.2,.8,.2,1);width:90px;height:70px;font-size:15px;text-align:center}
+.mach.big{width:220px;height:170px;font-size:22px;border-width:5px;box-shadow:0 14px 30px -12px rgba(124,58,237,.6)}
+.mach.sm2{width:70px;height:56px;font-size:13px;border-color:#0891b2;background:#ecfeff;color:#0e7490;opacity:0;transform:scale(.5)}
+.mach.sm2.show{opacity:1;transform:none}
+.farm{display:grid;grid-template-columns:repeat(4,70px);gap:10px;justify-content:center}
+.layer{border-radius:12px;padding:10px 14px;font-weight:700;font-size:17px;text-align:center;transition:all .6s}
+.layer.top{background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;font-size:20px}
+.layer.hid{background:#f8fafc;border:2px dashed #cbd5e1;color:#64748b;font-weight:600;font-size:16px}
+.abs.cover .layer.hid{opacity:.25;filter:blur(1.5px)}
+.toggle{display:flex;gap:10px;align-items:center;justify-content:center}
+.pill{padding:8px 16px;border-radius:999px;font-weight:800;font-size:17px;border:2px solid #e4dcfb;background:#fff;transition:all .4s;color:var(--muted)}
+.pill.on{background:linear-gradient(135deg,var(--sa1),var(--sa2));color:#fff;border-color:transparent;transform:scale(1.06)}
+.quote{font-size:21px;line-height:1.45;font-style:italic;color:#4c4672;border-left:5px solid #ec4899;padding:8px 18px;background:rgba(255,255,255,.7);border-radius:8px}
+.quote b{font-style:normal}
+.mini li{font-size:18px;margin:3px 0;line-height:1.35}
+.card p.ps,p.ps{font-size:17px;line-height:1.4}
+.vs{font-weight:800;font-size:22px;color:var(--muted);align-self:center;text-align:center}
+.here{display:inline-block;font-size:13px;font-weight:800;color:#fff;background:#e11d48;border-radius:6px;padding:2px 8px;margin-left:6px;opacity:0;transition:opacity .4s}
+.here.show{opacity:1}
+.cols4>.card.lit{box-shadow:0 0 0 3px #ec4899,0 12px 26px -10px rgba(236,72,153,.5);transform:translateY(-4px)}
+.card{transition:all .4s}
+
+.chip.c,.leg.c{font-style:normal}.leg.c{color:var(--text)}.leg.c b{color:var(--text)}
+.leg p b{display:inline;font-size:inherit;margin:0}
+.toggle .pill{font-size:15px;white-space:nowrap}
+.abs.cover .layer.hid{opacity:.4;filter:blur(1px)}
+.mach.big{width:260px;font-size:21px}
+.sv text.lb,.pc text{paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+.sv.s1 .g1{opacity:1}.sv.s2 .g2{opacity:1}.sv.s3 .g3{opacity:1}.sv.s4 .g4{opacity:1}.sv.s5 .g5{opacity:1}.sv.s6 .g6{opacity:1}.sv.s7 .g7{opacity:1}.sv.s8 .g8{opacity:1}.who.hot{border-color:#ec4899;box-shadow:0 0 18px rgba(236,72,153,.45)}.toggle.flip #ev1{background:#fff;color:var(--muted);border-color:#e4dcfb;transform:none}.toggle.flip #ev2{background:linear-gradient(135deg,var(--sa1),var(--sa2));color:#fff;border-color:transparent;transform:scale(1.06)}.dots{grid-template-columns:repeat(50,1fr);gap:3px}.dots i{border-radius:2px}
+/* ===== DDIA ch7 additions ===== */
+.tl{display:flex;flex-direction:column;gap:4px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px 12px;box-shadow:0 8px 24px -14px rgba(124,58,237,.3)}
+.tlr{display:grid;grid-template-columns:92px repeat(var(--n,6),minmax(0,1fr));gap:6px;align-items:center;position:relative;min-height:46px}
+.tlr::before{content:"";position:absolute;left:96px;right:0;top:50%;border-top:2px dashed #e4dcfb;z-index:0}
+.tlr .who2{font-weight:800;font-size:15px;color:#6d28d9;grid-column:1;line-height:1.15}
+.tlr.u2 .who2{color:#0e7490}
+.tlr.db{background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:10px}
+.tlr.db .who2{color:#b45309}
+.tlr.db::before{border-top-color:#fde68a}
+.tlr.tk{min-height:22px}.tlr.tk::before{display:none}
+.tlr.tk span{font-family:var(--mono);font-size:12px;color:#a8a3c4;text-align:center;font-weight:700}
+.ev{position:relative;z-index:1;font-family:var(--mono);font-size:13px;font-weight:700;padding:6px 4px;border-radius:10px;border:2px solid #c4b5fd;background:#f5f0ff;color:#6d28d9;text-align:center;opacity:0;transform:translateY(8px) scale(.9);transition:all .4s;line-height:1.25}
+.ev.u2{border-color:#67e8f9;background:#ecfeff;color:#0e7490}
+.ev.d{border-color:#fcd34d;background:#fffbeb;color:#b45309}
+.ev.bad{border-color:#fb7185;background:#fff1f3;color:#be123c}
+.ev.ok{border-color:#34d399;background:#ecfdf5;color:#047857}
+.ev.cm{border-style:dashed}
+.ev.wide{grid-column-end:span 2}
+.tl.s1 .e1,.tl.s2 .e2,.tl.s3 .e3,.tl.s4 .e4,.tl.s5 .e5,.tl.s6 .e6,.tl.s7 .e7,.tl.s8 .e8,.tl.s9 .e9,.tl.s10 .e10,.tl.s11 .e11,.tl.s12 .e12,.tl.s13 .e13,.tl.s14 .e14{opacity:1;transform:none}
+.acid{display:flex;gap:18px;justify-content:center}
+.lt{width:132px;height:132px;border-radius:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-size:64px;font-weight:800;line-height:1;transition:all .55s cubic-bezier(.2,.8,.2,1);box-shadow:0 12px 26px -12px rgba(124,58,237,.6)}
+.lt small{font-size:15px;font-weight:700;letter-spacing:.03em;margin-top:8px}
+.lt.a{background:linear-gradient(135deg,#7c3aed,#a855f7)}.lt.c{background:linear-gradient(135deg,#0891b2,#22d3ee)}.lt.i{background:linear-gradient(135deg,#db2777,#f472b6)}.lt.d{background:linear-gradient(135deg,#d97706,#fb923c)}
+.lt.dim{filter:grayscale(1);opacity:.35;transform:scale(.86) rotate(-8deg)}
+.lt.lit{transform:translateY(-10px) scale(1.07);box-shadow:0 18px 30px -10px rgba(236,72,153,.6)}
+.acid.sm .lt{width:86px;height:86px;font-size:40px;border-radius:18px}.acid.sm .lt small{font-size:11px;margin-top:4px}
+.mv{font-size:16px}
+.mv th,.mv td{padding:6px 10px;font-family:var(--mono);text-align:center}
+.mv td:first-child{color:var(--text)}
+.mv tr{transition:all .45s}
+.mv tr.pend{opacity:0}
+.mv tr.pend.show{opacity:1}
+.mv tr.del td{text-decoration:line-through;color:#be123c;background:#fff1f3}
+.mv tr.vis td{background:#ecfdf5;color:#047857}
+.mv tr.inv td{opacity:.35}
+.mv td.hl{background:#fffbeb;color:#b45309;font-weight:800}
+.big-n{font-family:var(--mono);font-size:58px;font-weight:800;line-height:1;transition:all .4s}
+.lk{display:inline-flex;align-items:center;gap:6px;font-size:15px;font-weight:800;padding:4px 10px;border-radius:8px}
+.lk.sh{background:#ecfeff;color:#0e7490;border:2px solid #67e8f9}.lk.ex{background:#fff1f3;color:#be123c;border:2px solid #fb7185}
+.mtx td,.mtx th{text-align:center;font-size:17px;padding:7px 10px}
+.mtx td:first-child{text-align:left;color:var(--text);font-weight:700}
+.ck{display:inline-block;opacity:0;transform:scale(.4);transition:all .4s;font-weight:800}
+.ck.y{color:#047857}.ck.n{color:#be123c}.ck.m{color:#b45309}
+.mtx.r1 .k1,.mtx.r2 .k2,.mtx.r3 .k3,.mtx.r4 .k4,.mtx.r5 .k5,.mtx.r6 .k6{opacity:1;transform:none}
+.thr{display:flex;align-items:center;gap:10px;justify-content:center}
+.cpu{border:3px solid #7c3aed;border-radius:14px;background:#f5f0ff;padding:10px 16px;font-weight:800;color:#6d28d9;text-align:center;font-size:17px;min-width:120px}
+.cpu small{display:block;font-size:12.5px;color:var(--muted);font-weight:600}
+.rtt{font-family:var(--mono);font-size:13px;font-weight:700}
+.stamp{display:inline-block;font-weight:800;font-size:16px;padding:4px 12px;border-radius:8px;border:3px solid;transform:rotate(-6deg)}
+.stamp.bad{color:#be123c;border-color:#e11d48;background:#fff1f3}.stamp.ok{color:#047857;border-color:#10b981;background:#ecfdf5}
+.vs2{display:grid;grid-template-columns:1fr 44px 1fr;gap:10px;align-items:stretch}
+.tree text{font-family:var(--mono);font-size:13px;font-weight:700;fill:#1e1b3a}
+.code .ln .cm2{color:var(--c);font-style:italic}
+.sql .k{color:var(--k);font-weight:700}
+.ctr-box{border:2px solid #e4dcfb;border-radius:14px;padding:10px 14px;background:#fff;text-align:center;transition:all .4s}
+.ctr-box.hot{border-color:#e11d48;box-shadow:0 0 18px rgba(225,29,72,.35)}
+.ctr-box.okk{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.35)}
+.ctr-box h4{font-size:14px;color:var(--muted);margin-bottom:4px;font-family:var(--mono)}
+.mini2 li{font-size:16.5px;margin:2px 0;line-height:1.35}
+.tag{display:inline-block;font-family:var(--mono);font-size:13px;font-weight:700;padding:2px 8px;border-radius:6px;background:#f3edff;color:#6d28d9;margin:2px}
+.tag.b{background:#ecfeff;color:#0e7490}.tag.r{background:#fff1f3;color:#be123c}.tag.g{background:#ecfdf5;color:#047857}.tag.y{background:#fffbeb;color:#b45309}
+.sv.s9 .g9{opacity:1}.sv.s10 .g10{opacity:1}.sv.s11 .g11{opacity:1}.sv.s12 .g12{opacity:1}
+.ph{display:flex;gap:6px;align-items:center}
+.ph .bar2{height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;transition:all .6s;opacity:.15}
+.ph .bar2.on2{opacity:1}
+
+.lt.c{font-style:normal;color:#fff}
+.cols3>*,.cols4>*{min-width:0}
+.code .ln{white-space:pre-wrap}
+.code .ln>span:last-child{min-width:0;overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="deck">
+
+<!-- ===================== TITLE ===================== -->
+<section class="slide" id="title">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// DDIA · Part II: Distributed Data · Chapter 7</div>
+    <h1 class="in" style="font-size:84px"><span class="grad">Transactions</span></h1>
+    <p class="in muted" style="font-size:24px;margin-top:18px;max-width:1000px"><i>Designing Data-Intensive Applications</i> — Martin Kleppmann. Transaction là gì, <b>ACID</b> thật sự hứa hẹn điều gì, các <b>race condition</b> nào có thể xảy ra, và database hiện thực <b>read committed</b>, <b>snapshot isolation</b>, <b>serializability</b> ra sao.</p>
+    <div class="quote in" style="margin-top:26px;max-width:1000px;font-size:19px">Nhóm thiết kế Spanner của Google cho rằng thà để developer xử lý vấn đề performance khi lạm dụng transaction, còn hơn lúc nào cũng phải “code vòng” quanh việc <i>không có</i> transaction. <b>— James Corbett et al., Spanner (2012)</b></div>
+    <p class="in" style="margin-top:26px;font-size:18px;color:#8a91b4">Phím ← → hoặc Space: chạy từng bước · Shift+→: qua slide · A: hiện hết · F: toàn màn hình</p>
+  </div>
+</section>
+
+<!-- ===================== AGENDA ===================== -->
+<section class="slide" id="agenda">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:18px">· bấm vào mục để đi tới</span></div>
+  <div class="agenda in" style="gap:10px">
+    <div class="ag" data-goto="why"><b>01</b>Vì sao cần transactions?</div>
+    <div class="ag" data-goto="slip"><b>02</b>The Slippery Concept of a Transaction</div>
+    <div class="ag" data-goto="acid"><b>03</b>The Meaning of ACID</div>
+    <div class="ag" data-goto="atom"><b>04</b>Atomicity &amp; Consistency</div>
+    <div class="ag" data-goto="iso"><b>05</b>Isolation &amp; Durability</div>
+    <div class="ag" data-goto="multi"><b>06</b>Single-object vs multi-object</div>
+    <div class="ag" data-goto="abort"><b>07</b>Handling errors &amp; aborts</div>
+    <div class="ag" data-goto="weak"><b>08</b>Weak Isolation Levels</div>
+    <div class="ag" data-goto="rc"><b>09</b>Read Committed</div>
+    <div class="ag" data-goto="skew"><b>10</b>Read skew</div>
+    <div class="ag" data-goto="si"><b>11</b>Snapshot Isolation &amp; MVCC</div>
+    <div class="ag" data-goto="rr"><b>12</b>Repeatable read: naming confusion</div>
+    <div class="ag" data-goto="lost"><b>13</b>Preventing Lost Updates</div>
+    <div class="ag" data-goto="ws"><b>14</b>Write Skew</div>
+    <div class="ag" data-goto="phantom"><b>15</b>Phantoms &amp; materializing conflicts</div>
+    <div class="ag" data-goto="ser"><b>16</b>Serializability</div>
+    <div class="ag" data-goto="serial"><b>17</b>Actual Serial Execution</div>
+    <div class="ag" data-goto="tpl"><b>18</b>Two-Phase Locking (2PL)</div>
+    <div class="ag" data-goto="ssi"><b>19</b>Serializable Snapshot Isolation</div>
+    <div class="ag" data-goto="sum"><b>20</b>Summary</div>
+  </div>
+</section>
+
+<!-- ===================== WHY ===================== -->
+<section class="slide" id="why">
+  <div class="hdr in"><span class="qn">01</span><h2>Thực tế phũ phàng của data systems</h2></div>
+  <div class="cols" style="grid-template-columns:1.05fr 1fr;gap:26px">
+    <div>
+      <div class="cols" style="gap:10px">
+        <div class="card f" style="padding:10px 14px"><div class="icon" style="font-size:26px">💥</div><p class="ps">Database software/hardware <b>fail</b> bất kỳ lúc nào — kể cả giữa chừng một write.</p></div>
+        <div class="card f" style="padding:10px 14px"><div class="icon" style="font-size:26px">🧨</div><p class="ps">Application <b>crash</b> giữa một chuỗi operations.</p></div>
+        <div class="card f" style="padding:10px 14px"><div class="icon" style="font-size:26px">🔌</div><p class="ps"><b>Network interruption</b> cắt app khỏi database, hoặc node này khỏi node kia.</p></div>
+        <div class="card f" style="padding:10px 14px"><div class="icon" style="font-size:26px">✍️</div><p class="ps">Nhiều client <b>write cùng lúc</b>, ghi đè thay đổi của nhau.</p></div>
+        <div class="card f" style="padding:10px 14px"><div class="icon" style="font-size:26px">🧩</div><p class="ps">Client đọc data vô nghĩa vì mới <b>partially updated</b>.</p></div>
+        <div class="card f" style="padding:10px 14px"><div class="icon" style="font-size:26px">🏁</div><p class="ps"><b>Race conditions</b> giữa các client gây bug khó lường.</p></div>
+      </div>
+    </div>
+    <div>
+      <h3>Transaction = gom nhiều reads &amp; writes thành <u>một logical unit</u></h3>
+      <div class="tl" id="txw" style="margin-top:8px">
+        <div class="tlr" style="--n:4"><span class="who2">BEGIN</span><div class="ev e1" style="grid-column:2">write A</div><div class="ev e2" style="grid-column:3">write B</div><div class="ev e3" style="grid-column:4">write C</div><div class="ev ok e4" style="grid-column:5">COMMIT ✓</div></div>
+        <div class="tlr u2" style="--n:4"><span class="who2">BEGIN</span><div class="ev u2 e5" style="grid-column:2">write A</div><div class="ev u2 e6" style="grid-column:3">write B</div><div class="ev bad e7" style="grid-column:4">💥 fault</div><div class="ev bad e8" style="grid-column:5">ABORT ↺</div></div>
+      </div>
+      <span class="f ghost" data-act="#txw|s1;#txw|s2;#txw|s3;#txw|s4" data-say="<b>Commit</b>: toàn bộ transaction thành công — mọi write có hiệu lực cùng lúc."></span>
+      <span class="f ghost" data-act="#txw|s5;#txw|s6;#txw|s7;#txw|s8" data-say="<b>Abort / rollback</b>: lỗi giữa chừng → mọi write bị bỏ, application có thể <b>retry an toàn</b>. Không phải lo <b>partial failure</b>."></span>
+      <div class="note blue f" style="font-size:18px">Transactions không phải định luật tự nhiên — chúng được tạo ra để <b>đơn giản hoá programming model</b>. Database lo một số lỗi và concurrency issue thay app: gọi là <b>safety guarantees</b>.</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SLIPPERY ===================== -->
+<section class="slide" id="slip">
+  <div class="hdr in"><span class="qn">02</span><h2>The Slippery Concept of a Transaction</h2></div>
+  <div class="cols3" style="margin-top:6px">
+    <div class="card f zoom"><div class="icon">🏛️</div><h3>1975 · IBM System R</h3><p class="ps">SQL database đầu tiên. Transaction support của <b>MySQL, PostgreSQL, Oracle, SQL Server</b>… giống System R đến kỳ lạ — gần như không đổi suốt 40 năm.</p></div>
+    <div class="card f zoom"><div class="icon">🌪️</div><h3>Late 2000s · NoSQL</h3><p class="ps">Data model mới, <b>replication</b> &amp; <b>partitioning</b> mặc định. Transactions là “nạn nhân” chính: bị bỏ hẳn, hoặc định nghĩa lại thành guarantee yếu hơn nhiều.</p></div>
+    <div class="card f zoom"><div class="icon">⚖️</div><h3>Hai luồng hype</h3><p class="ps">“Transactions là kẻ thù của <b>scalability</b>” vs “transaction là bắt buộc cho <i>serious applications</i> với <i>valuable data</i>”. Cả hai đều là <b>pure hyperbole</b>.</p></div>
+  </div>
+  <div class="note f" style="margin-top:18px">Sự thật: như mọi lựa chọn thiết kế kỹ thuật, transactions có <b>advantages</b> và <b>limitations</b>. Để hiểu trade-off, phải xem chính xác chúng đảm bảo điều gì — cả lúc bình thường lẫn trong các tình huống cực đoan (nhưng thực tế).</div>
+  <div class="cols f" style="margin-top:14px;gap:16px">
+    <div class="card"><p class="ps">❓ <b>Có cần transaction không?</b> Không phải app nào cũng cần; đôi khi nới lỏng guarantee để đạt <b>higher performance / availability</b>. Một số safety property đạt được mà không cần transaction.</p></div>
+    <div class="card"><p class="ps">📍 Chương này áp dụng cho cả <b>single-node</b> lẫn <b>distributed</b> databases; đào sâu <b>concurrency control</b>. Chapter 8 mới bàn riêng về thách thức của distributed systems.</p></div>
+  </div>
+</section>
+
+<!-- ===================== ACID ===================== -->
+<section class="slide" id="acid">
+  <div class="hdr in"><span class="qn">03</span><h2>The Meaning of ACID</h2></div>
+  <p class="in muted" style="font-size:20px;max-width:1150px">Thuật ngữ do <b>Theo Härder &amp; Andreas Reuter</b> đặt năm 1983 để mô tả chính xác các fault-tolerance mechanism trong database.</p>
+  <div class="acid" id="acidL" style="margin:26px 0 22px">
+    <div class="lt a f zoom">A<small>Atomicity</small></div>
+    <div class="lt c f zoom" id="ltC">C<small>Consistency</small></div>
+    <div class="lt i f zoom">I<small>Isolation</small></div>
+    <div class="lt d f zoom">D<small>Durability</small></div>
+  </div>
+  <div class="cols" style="gap:18px">
+    <div class="card bad f"><span class="lbl bad">THỰC TẾ</span><p class="ps">ACID của database này ≠ ACID của database khác. Riêng <b>isolation</b> đã rất mơ hồ. Ngày nay “<b>ACID compliant</b>” không cho biết chắc bạn nhận được guarantee gì — ACID gần như thành <b>marketing term</b>.</p></div>
+    <div class="card f"><span class="lbl info">BASE</span><p class="ps">Hệ thống không đạt ACID đôi khi được gọi là <b>BASE</b>: <b>B</b>asically <b>A</b>vailable, <b>S</b>oft state, <b>E</b>ventual consistency. Còn mơ hồ hơn ACID — định nghĩa hợp lý duy nhất có lẽ là “<b>not ACID</b>”.</p></div>
+  </div>
+</section>
+
+<!-- ===================== ATOMICITY + CONSISTENCY ===================== -->
+<section class="slide" id="atom">
+  <div class="hdr in"><span class="qn">04</span><h2>Atomicity <span class="muted" style="font-weight:600">&amp;</span> Consistency</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr;gap:26px">
+    <div>
+      <h3>Atomicity — thật ra là <i>abortability</i></h3>
+      <p class="ps">Khác “atomic operation” trong multi-threaded programming. ACID atomicity <b>không nói về concurrency</b> (đó là chữ I), mà nói về chuyện gì xảy ra khi có <b>fault</b> sau khi một số write đã được xử lý.</p>
+      <p class="rowlbl" style="margin-top:12px">Transaction: 4 writes</p>
+      <div class="arr left sm" style="justify-content:flex-start">
+        <div class="cell t" id="aw1"><span class="v">W1</span><small>insert</small></div>
+        <div class="cell t" id="aw2"><span class="v">W2</span><small>update</small></div>
+        <div class="cell t" id="aw3"><span class="v">W3</span><small>update</small></div>
+        <div class="cell t" id="aw4"><span class="v">W4</span><small>insert</small></div>
+      </div>
+      <span class="f ghost" data-act="#aw1|done;#aw2|done" data-say="W1, W2 đã được database xử lý…"></span>
+      <span class="f ghost" data-act="#aw3|bad" data-set="#aw3::<span class='v'>💥</span><small>disk full</small>" data-say="…thì <b>fault</b> ở W3: process crash, network ngắt, disk đầy, hoặc vi phạm integrity constraint."></span>
+      <span class="f ghost" data-act="#aw1|gone;#aw2|gone;#aw4|skip" data-say="Transaction bị <b>abort</b> → database phải <b>discard / undo</b> mọi write đã làm. App biết chắc <b>không có gì thay đổi</b> → retry an toàn, không sợ ghi trùng."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <h3 style="color:#0891b2">Consistency — từ bị “quá tải” nghĩa</h3>
+      <div class="chips f" style="margin:6px 0 10px"><span class="chip p">replica consistency / eventual consistency (Ch.5)</span><span class="chip c">consistent hashing (Ch.6)</span><span class="chip k">CAP: consistency = linearizability (Ch.9)</span><span class="chip y">ACID: database ở “good state”</span></div>
+      <div class="card f"><p class="ps">ACID consistency = các <b>invariants</b> luôn đúng. Ví dụ hệ thống kế toán: credits và debits trên mọi account luôn <b>balanced</b>.</p></div>
+      <div class="card bad f" style="margin-top:10px" data-act="#acidS .c|dim"><p class="ps">Nhưng invariant do <b>application</b> định nghĩa; database chỉ check được vài loại (foreign key, uniqueness constraint). A, I, D là thuộc tính của <b>database</b>; C là thuộc tính của <b>application</b> → chữ C <b>“không thật sự thuộc về ACID”</b>.</p>
+        <div class="acid sm" id="acidS" style="margin-top:8px"><div class="lt a">A</div><div class="lt c">C</div><div class="lt i">I</div><div class="lt d">D</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ISOLATION + DURABILITY ===================== -->
+<section class="slide" id="iso">
+  <div class="hdr in"><span class="qn">05</span><h2>Isolation <span class="muted" style="font-weight:600">&amp;</span> Durability</h2></div>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr;gap:24px">
+    <div>
+      <p class="ps">Figure 7-1 · Hai client cùng <b>increment</b> một counter (read → +1 → write):</p>
+      <div class="tl" id="tl71" style="margin-top:6px">
+        <div class="tlr tk" style="--n:5"><span></span><span>t1</span><span>t2</span><span>t3</span><span>t4</span><span>t5</span></div>
+        <div class="tlr" style="--n:5"><span class="who2">User 1</span><div class="ev e1" style="grid-column:2">get counter</div><div class="ev e3" style="grid-column:4">42+1 → set 43</div></div>
+        <div class="tlr db" style="--n:5"><span class="who2">Database</span><div class="ev d e1" style="grid-column:2">→ 42</div><div class="ev d e2" style="grid-column:3">→ 42</div><div class="ev d e3" style="grid-column:4">counter=43</div><div class="ev bad e4" style="grid-column:5">counter=43 ⁉</div></div>
+        <div class="tlr u2" style="--n:5"><span class="who2">User 2</span><div class="ev u2 e2" style="grid-column:3">get counter</div><div class="ev u2 e4" style="grid-column:5">42+1 → set 43</div></div>
+      </div>
+      <span class="f ghost" data-act="#tl71|s1" data-say="User 1 đọc counter = 42."></span>
+      <span class="f ghost" data-act="#tl71|s2" data-say="User 2 cũng đọc 42 — trước khi User 1 kịp ghi."></span>
+      <span class="f ghost" data-act="#tl71|s3" data-say="User 1 ghi 43."></span>
+      <span class="f ghost" data-act="#tl71|s4" data-say="User 2 cũng ghi 43. Hai lần increment nhưng counter chỉ từ <b>42 → 43</b> (đáng lẽ 44): một <b>race condition</b>."></span>
+      <div class="note blue f" style="font-size:17.5px">ACID <b>isolation</b>: các transaction chạy đồng thời không “giẫm chân” nhau. Sách giáo khoa formalize thành <b>serializability</b>: kết quả như thể chạy <b>serially</b> (lần lượt từng cái). Thực tế ít dùng vì performance penalty — Oracle 11g gọi là “serializable” nhưng thật ra là <b>snapshot isolation</b>.</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <h3 style="color:#d97706">Durability</h3>
+      <p class="ps">Lời hứa: transaction đã <b>commit</b> thì data không bị mất, kể cả khi hardware fault hay database crash.</p>
+      <div class="chips" style="margin:8px 0"><span class="chip y">single-node: nonvolatile storage + write-ahead log</span><span class="chip c">replicated: copy tới N nodes</span></div>
+      <div class="card f" style="margin-top:6px"><h3 style="font-size:19px">Replication and Durability — không gì hoàn hảo</h3>
+        <ul class="mini2">
+          <li>Ghi disk mà máy chết → data không mất nhưng <b>inaccessible</b></li>
+          <li><b>Correlated fault</b> (mất điện, bug) hạ mọi replica cùng lúc</li>
+          <li>Async replication: leader chết → mất các write gần nhất</li>
+          <li>SSD khi mất điện có thể vi phạm guarantee; cả <code class="i">fsync</code> cũng không chắc chắn</li>
+          <li>Data trên disk có thể <b>corrupt</b> âm thầm, lan vào replica &amp; backup</li>
+        </ul></div>
+      <div class="cols f" style="gap:10px;margin-top:10px">
+        <div class="card"><div class="stat">30–80<small>%</small></div><p class="ps muted">SSD có ≥1 bad block trong 4 năm đầu</p></div>
+        <div class="card"><div class="stat">vài<small> tuần</small></div><p class="ps muted">SSD rút điện có thể bắt đầu mất data</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MULTI-OBJECT ===================== -->
+<section class="slide" id="multi">
+  <div class="hdr in"><span class="qn">06</span><h2>Single-Object and Multi-Object Operations</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.15fr;gap:24px">
+    <div>
+      <p class="ps">Email app lưu <b>unread counter</b> riêng (denormalization) thay vì <code class="i">SELECT COUNT(*)</code> mỗi lần. Mỗi email mới → <b>2 writes</b>: insert email + increment counter.</p>
+      <div class="cols" style="gap:12px;margin-top:12px">
+        <div class="ctr-box" id="mbx"><h4>emails (user 2)</h4><div id="mbxv" style="font-size:20px;font-weight:700;min-height:62px">📭 (trống)</div></div>
+        <div class="ctr-box" id="cnt"><h4>mailboxes.unread</h4><div class="big-n" id="cntv">0</div></div>
+      </div>
+      <div class="ctr-box" id="u2v" style="margin-top:12px;text-align:left"><h4>User 2 đang xem</h4><div id="u2t" style="font-size:18px">—</div></div>
+      <span class="f ghost" data-act="#mbx|okk" data-set="#mbxv::📩 Hello <small style='color:#be123c'>(unread)</small>" data-say="Transaction của User 1: <b>insert</b> email mới vào mailbox của User 2 (chưa commit)."></span>
+      <span class="f ghost" data-act="#u2v|hot" data-set="#u2t::Thấy <b>1 email unread</b> nhưng counter = <b style='color:#be123c'>0</b> ⁉" data-say="Figure 7-2: User 2 đọc giữa chừng → thấy email mới nhưng counter vẫn 0. Đây là <b>dirty read</b> — vi phạm isolation."></span>
+      <span class="f ghost" data-act="#cnt|hot" data-set="#cntv::💥" data-say="Figure 7-3: giả sử update counter <b>bị lỗi</b>…"></span>
+      <span class="f ghost" data-act="#mbx|hot" data-set="#mbxv::<s>📩 Hello</s> ↺ rolled back" data-say="Với <b>atomicity</b>: transaction abort → email đã insert cũng bị <b>rollback</b>. Mailbox và counter không bao giờ lệch nhau."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <div class="card f"><h3>Nhóm operations thế nào?</h3><p class="ps">Relational DB: theo <b>TCP connection</b> — mọi thứ giữa <code class="i">BEGIN TRANSACTION</code> và <code class="i">COMMIT</code> thuộc cùng transaction. Nhiều NoSQL không có cách nhóm: <b>multi-put</b> có thể thành công với key này, fail với key kia.</p></div>
+      <div class="card f" style="margin-top:10px"><h3>Single-object writes</h3><p class="ps">Ghi một JSON 20 KB: network đứt sau 10 KB? mất điện giữa lúc overwrite? client khác đọc giữa chừng? → storage engine hầu như luôn đảm bảo atomicity (<b>log</b> for crash recovery) và isolation (<b>lock</b> mỗi object) ở mức single object. Thêm <b>increment</b>, <b>compare-and-set</b>… — gọi là “<b>lightweight transactions</b>” là <b>misleading</b>.</p></div>
+      <div class="card f" style="margin-top:10px"><h3>Vẫn cần multi-object transactions khi…</h3>
+        <div class="chips"><span class="chip p">foreign key references</span><span class="chip k">denormalized documents</span><span class="chip c">secondary indexes</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ABORTS ===================== -->
+<section class="slide" id="abort">
+  <div class="hdr in"><span class="qn">07</span><h2>Handling errors and aborts</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.25fr;gap:24px">
+    <div>
+      <div class="card good"><span class="lbl good">ACID PHILOSOPHY</span><p class="ps">Nếu sắp vi phạm atomicity, isolation hay durability, database thà <b>bỏ hẳn transaction</b> còn hơn để nó dở dang.</p></div>
+      <div class="card bad" style="margin-top:12px"><span class="lbl bad">BEST EFFORT</span><p class="ps"><b>Leaderless replication</b>: “database làm được bao nhiêu thì làm, gặp lỗi cũng không undo” → app tự recover.</p></div>
+      <div class="note f" style="font-size:18px">ORM như <b>Rails ActiveRecord</b>, <b>Django</b> không retry aborted transaction — exception nổi lên, input của user bị vứt. Đáng tiếc: <b>mục đích của abort là cho phép retry an toàn</b>.</div>
+    </div>
+    <div>
+      <h3>Retry đơn giản &amp; hiệu quả, nhưng không hoàn hảo</h3>
+      <div class="stack">
+        <div class="leg a f"><b>✅❓ Commit thành công nhưng ack bị mất</b><p>Client tưởng fail → retry → thực hiện <b>2 lần</b>, trừ khi có deduplication ở application level.</p></div>
+        <div class="leg b f"><b>🔥 Lỗi do overload</b><p>Retry làm tệ hơn → giới hạn số lần, <b>exponential backoff</b>.</p></div>
+        <div class="leg c f"><b>⏳ Chỉ retry transient errors</b><p>deadlock, isolation violation, network tạm đứt, failover. <b>Permanent error</b> (constraint violation) thì retry vô ích.</p></div>
+        <div class="leg a f" style="border-left-color:#ec4899"><b>📧 Side effects ngoài database</b><p>Gửi email không nên lặp mỗi lần retry. Cần nhiều hệ thống cùng commit/abort → <b>two-phase commit</b> (Ch.9).</p></div>
+        <div class="leg b f" style="border-left-color:#10b981"><b>💀 Client chết khi đang retry</b><p>Data đang định ghi bị mất.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== WEAK ISOLATION ===================== -->
+<section class="slide" id="weak">
+  <div class="hdr in"><span class="qn">08</span><h2>Weak Isolation Levels</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:26px">
+    <div>
+      <p class="ps">Hai transaction không đụng cùng data → chạy song song an toàn. <b>Race condition</b> chỉ xuất hiện khi một transaction đọc data mà transaction khác đang sửa, hoặc cả hai cùng sửa một data.</p>
+      <div class="card bad f" style="margin-top:12px"><span class="lbl bad">CONCURRENCY BUGS</span><p class="ps">Khó tìm bằng testing (chỉ xảy ra khi “xui” về timing), khó reproduce, khó suy luận trong app lớn. Đã gây <b>mất tiền thật</b>, bị financial auditor điều tra, làm hỏng customer data.</p></div>
+      <div class="note f" style="font-size:18px">“Dùng ACID database nếu xử lý financial data!” — trật trọng tâm: nhiều relational DB “ACID” nổi tiếng vẫn dùng <b>weak isolation</b> mặc định.</div>
+      <div class="note blue f" style="font-size:18px">Thay vì tin mù quáng vào tool, cần hiểu <b>các loại concurrency problem</b> và cách phòng tránh chúng.</div>
+    </div>
+    <div>
+      <h3>Thang isolation level (yếu → mạnh)</h3>
+      <div class="stack" style="margin-top:8px">
+        <div class="layer hid f" style="text-align:left">read uncommitted <span class="tag r">dirty reads ✗</span></div>
+        <div class="layer f" style="background:#f5f0ff;border:2px solid #c4b5fd;color:#6d28d9;text-align:left">read committed <span class="tag">no dirty reads</span><span class="tag">no dirty writes</span></div>
+        <div class="layer f" style="background:#ecfeff;border:2px solid #67e8f9;color:#0e7490;text-align:left">snapshot isolation <small>(“repeatable read”)</small> <span class="tag b">+ no read skew</span></div>
+        <div class="layer top f" style="text-align:left">serializable <span class="tag" style="background:rgba(255,255,255,.25);color:#fff">chặn mọi race condition</span></div>
+      </div>
+      <p class="ps muted f" style="margin-top:12px">Serializable có <b>performance cost</b> mà nhiều database không muốn trả → hệ thống thường dùng level yếu hơn: chặn được <b>một số</b> concurrency issue, không phải tất cả.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== READ COMMITTED ===================== -->
+<section class="slide" id="rc">
+  <div class="hdr in"><span class="qn">09</span><h2>Read Committed</h2><span class="chip p">level cơ bản nhất</span></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:22px">
+    <div>
+      <h3>① No dirty reads <span class="muted" style="font-size:15px">· Figure 7-4</span></h3>
+      <div class="tl" id="tl74">
+        <div class="tlr" style="--n:4"><span class="who2">User 1</span><div class="ev e1" style="grid-column:2">set x = 3</div><div class="ev ok e3" style="grid-column:4">commit</div></div>
+        <div class="tlr db" style="--n:4"><span class="who2">DB · x</span><div class="ev d e1" style="grid-column:2">2 → 3 <small>(uncommitted)</small></div><div class="ev d e2" style="grid-column:3">→ 2</div><div class="ev ok e3" style="grid-column:4">x = 3 ✓</div><div class="ev d e4" style="grid-column:5">→ 3</div></div>
+        <div class="tlr u2" style="--n:4"><span class="who2">User 2</span><div class="ev u2 e2" style="grid-column:3">get x</div><div class="ev u2 e4" style="grid-column:5">get x</div></div>
+      </div>
+      <span class="f ghost" data-act="#tl74|s1"></span>
+      <span class="f ghost" data-act="#tl74|s2" data-say="User 1 chưa commit → User 2 vẫn đọc giá trị cũ <b>2</b>."></span>
+      <span class="f ghost" data-act="#tl74|s3;#tl74|s4" data-say="Sau commit, mọi write của transaction <b>hiện ra cùng lúc</b> → User 2 thấy 3."></span>
+      <p class="ps" style="margin-top:10px">Tại sao quan trọng? Tránh thấy database ở trạng thái <b>partially updated</b> (Figure 7-2), và tránh đọc data sau đó bị <b>rollback</b>.</p>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <h3>② No dirty writes <span class="muted" style="font-size:15px">· Figure 7-5</span></h3>
+      <p class="ps">Alice &amp; Bob cùng mua một chiếc xe cũ. Mua = 2 writes: <code class="i">listings.buyer</code> + <code class="i">invoices.recipient</code>.</p>
+      <div class="cols" style="gap:10px;margin:10px 0">
+        <div class="ctr-box" id="lst"><h4>listings · buyer</h4><div id="lstv" style="font-size:24px;font-weight:800">—</div></div>
+        <div class="ctr-box" id="inv"><h4>invoices · recipient</h4><div id="invv" style="font-size:24px;font-weight:800">—</div></div>
+      </div>
+      <span class="f ghost" data-set="#lstv::Alice" data-say="Alice update listing → buyer = Alice (chưa commit)."></span>
+      <span class="f ghost" data-act="#lst|hot" data-set="#lstv::Bob" data-say="Bob ghi đè lên giá trị <b>uncommitted</b> của Alice → <b>dirty write</b>."></span>
+      <span class="f ghost" data-set="#invv::Bob" data-say="Bob update invoice → recipient = Bob."></span>
+      <span class="f ghost" data-act="#inv|hot" data-set="#invv::Alice" data-say="Alice ghi đè invoice. Kết quả: <b>xe bán cho Bob, hoá đơn gửi Alice</b> 🙃"></span>
+      <div class="note f" style="font-size:17px">Read committed chặn dirty writes bằng cách <b>delay write thứ hai</b> tới khi transaction đầu commit/abort. Nhưng <b>không</b> chặn race của Figure 7-1 (counter): write thứ hai xảy ra <i>sau</i> commit nên không phải dirty write.</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== IMPLEMENTING RC ===================== -->
+<section class="slide" id="rcimpl">
+  <div class="hdr in"><span class="qn">09b</span><h2>Implementing read committed</h2></div>
+  <p class="in muted" style="font-size:19px">Level rất phổ biến — default của <b>Oracle 11g, PostgreSQL, SQL Server 2012, MemSQL</b> và nhiều DB khác.</p>
+  <div class="cols3" style="margin-top:14px">
+    <div class="card f"><div class="icon">🔒</div><h3>Dirty writes → row-level locks</h3><p class="ps">Muốn sửa object (row/document) phải lấy <b>lock</b> và giữ đến khi commit/abort. Transaction khác muốn ghi cùng object phải <b>chờ</b>. DB làm tự động.</p></div>
+    <div class="card bad f"><div class="icon">🐢</div><h3>Dirty reads bằng read lock?</h3><p class="ps">Bắt reader lấy lock ngắn hạn… Không ổn: một <b>long-running write</b> làm mọi read-only transaction phải chờ → response time tệ, ảnh hưởng dây chuyền (bad operability).</p></div>
+    <div class="card good f"><div class="icon">🗂️</div><h3>Cách phổ biến: giữ 2 giá trị</h3><p class="ps">Với mỗi object đang được ghi, DB nhớ <b>old committed value</b> và <b>new value</b>. Reader khác nhận old value cho đến khi commit.</p></div>
+  </div>
+  <div class="cols f" style="margin-top:18px;gap:18px;align-items:center;grid-template-columns:1fr 1fr">
+    <div class="flow"><div class="box o">x = 2<small>committed</small></div><span class="ar">+</span><div class="box exe">x = 3<small>uncommitted · txn holds write lock</small></div></div>
+    <div class="note blue" style="margin:0;font-size:17.5px">Readers → <b>2</b> · Sau commit → mọi read chuyển sang <b>3</b>. (Chỉ DB2 và SQL Server với <code class="i">read_committed_snapshot=off</code> dùng lock cho read.)</div>
+  </div>
+</section>
+
+<!-- ===================== READ SKEW ===================== -->
+<section class="slide" id="skew">
+  <div class="hdr in"><span class="qn">10</span><h2>Read skew <span class="muted" style="font-weight:600;font-size:26px">(nonrepeatable read)</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr;gap:24px">
+    <div>
+      <p class="ps">Figure 7-6 · Alice có $1,000 chia đều 2 account. Một transaction chuyển $100 từ account 2 sang account 1.</p>
+      <div class="tl" id="tl76" style="margin-top:8px">
+        <div class="tlr" style="--n:4"><span class="who2">Alice</span><div class="ev e1" style="grid-column:2">read acct 1 → 500</div><div class="ev bad e3" style="grid-column:5">read acct 2 → 400</div></div>
+        <div class="tlr db" style="--n:4"><span class="who2">Transfer txn</span><div class="ev d e2" style="grid-column:3">acct 1 += 100 → 600</div><div class="ev d e2" style="grid-column:4">acct 2 −= 100 → 400 · commit</div></div>
+      </div>
+      <span class="f ghost" data-act="#tl76|s1" data-say="Alice đọc account 1 khi tiền chưa tới: <b>$500</b>."></span>
+      <span class="f ghost" data-act="#tl76|s2" data-say="Transfer transaction chạy xong và commit."></span>
+      <span class="f ghost" data-act="#tl76|s3;#rsk|show" data-say="Alice đọc account 2 sau khi tiền đã đi: <b>$400</b>. Tổng = <b>$900</b> — $100 “bốc hơi”!"></span>
+      <div style="display:flex;gap:14px;align-items:center;margin-top:14px"><div class="formula" style="flex:1">500 + 400 = <span style="color:#e11d48">900</span> ≠ 1,000</div><span class="here" id="rsk" style="font-size:16px;padding:6px 12px">READ SKEW</span></div>
+      <p class="ps muted" style="margin-top:10px">Read committed <b>chấp nhận</b> điều này: mọi giá trị Alice thấy đều đã committed lúc đọc. Reload vài giây sau sẽ thấy đúng.</p>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <h3>Nhưng có tình huống không chịu được</h3>
+      <div class="leg a f"><b>💾 Backups</b><p>Copy cả database mất hàng giờ trong khi write vẫn diễn ra → backup chứa phần cũ phần mới. Restore xong, tiền “biến mất” <b>vĩnh viễn</b>.</p></div>
+      <div class="leg b f" style="margin-top:10px"><b>📊 Analytic queries &amp; integrity checks</b><p>Query quét phần lớn database, thấy các phần ở <b>thời điểm khác nhau</b> → kết quả vô nghĩa.</p></div>
+      <div class="note blue f" style="font-size:18px">Giải pháp phổ biến nhất: <b>snapshot isolation</b>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SNAPSHOT ISOLATION ===================== -->
+<section class="slide" id="si">
+  <div class="hdr in"><span class="qn">11</span><h2>Snapshot Isolation</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:26px">
+    <div>
+      <p class="ps">Mỗi transaction đọc từ một <b>consistent snapshot</b>: thấy mọi data đã committed <b>tại thời điểm bắt đầu</b> transaction. Data sau đó có bị sửa, transaction vẫn chỉ thấy data cũ “đóng băng”.</p>
+      <div class="chips f" style="margin-top:12px"><span class="chip p">PostgreSQL</span><span class="chip c">MySQL / InnoDB</span><span class="chip k">Oracle</span><span class="chip y">SQL Server</span></div>
+      <div class="card good f" style="margin-top:14px"><span class="lbl good">BOON</span><p class="ps">Cho các <b>long-running, read-only queries</b> như backup, analytics: dễ suy luận hơn hẳn khi data không thay đổi dưới chân query.</p></div>
+      <div class="quote f" style="margin-top:14px;font-style:normal;font-size:22px">Key principle: <b>readers never block writers</b>, and <b>writers never block readers</b>.</div>
+    </div>
+    <div>
+      <h3>Hiện thực: MVCC</h3>
+      <p class="ps">Write vẫn dùng <b>write lock</b> (chặn dirty write), nhưng read <b>không cần lock</b>. DB giữ <b>nhiều committed versions</b> của một object vì nhiều transaction cần thấy DB ở các thời điểm khác nhau → <b>multi-version concurrency control (MVCC)</b>.</p>
+      <div class="cols f" style="gap:10px;margin-top:12px">
+        <div class="card"><h3 style="font-size:18px">Read committed</h3><p class="ps">snapshot riêng cho <b>mỗi query</b></p></div>
+        <div class="card"><h3 style="font-size:18px">Snapshot isolation</h3><p class="ps">một snapshot cho <b>cả transaction</b></p></div>
+      </div>
+      <div class="note f" style="font-size:17px">Mỗi transaction nhận một <b>txid</b> tăng dần. Mọi data nó ghi được gắn txid của writer. (txid là số 32-bit → overflow sau ~4 tỉ; PostgreSQL <b>vacuum</b> xử lý.)</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MVCC ===================== -->
+<section class="slide" id="mvcc">
+  <div class="hdr in"><span class="qn">11b</span><h2>MVCC trong PostgreSQL <span class="muted" style="font-size:20px;font-weight:600">· Figure 7-7</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr;gap:24px">
+    <div>
+      <table class="mv" id="mvt">
+        <tr><th>created_by</th><th>deleted_by</th><th>id</th><th>balance</th></tr>
+        <tr id="r1"><td>txid 3</td><td id="r1d">—</td><td>1</td><td>500</td></tr>
+        <tr id="r2"><td>txid 5</td><td id="r2d">—</td><td>2</td><td>500</td></tr>
+        <tr id="r3" class="pend"><td>txid 13</td><td>—</td><td>1</td><td>600</td></tr>
+        <tr id="r4" class="pend"><td>txid 13</td><td>—</td><td>2</td><td>400</td></tr>
+      </table>
+      <span class="f ghost" data-now="#r1|vis" data-say="Transaction <b>12</b> bắt đầu (trước 13) và đọc account 1: <b>$500</b>."></span>
+      <span class="f ghost" data-act="#r2|del;#r4|show" data-set="#r2d::txid 13" data-say="Transaction <b>13</b> trừ $100 ở account 2: <b>update = delete + create</b>. Row cũ được đánh dấu <code class='i'>deleted_by = 13</code>, row mới <code class='i'>created_by = 13</code>."></span>
+      <span class="f ghost" data-act="#r1|del;#r3|show" data-set="#r1d::txid 13" data-say="Và cộng $100 vào account 1. Rồi transaction 13 commit."></span>
+      <span class="f ghost" data-act="#r1|vis;#r2|vis;#r3|inv;#r4|inv" data-say="Transaction 12 đọc account 2: vẫn thấy <b>$500</b>! Deletion và creation do txid 13 (bắt đầu <b>sau</b> 12) đều bị bỏ qua → snapshot nhất quán: 500 + 500."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+      <div class="note blue f" style="font-size:16.5px">Row không bị xoá thật: <b>garbage collection</b> dọn sau khi chắc chắn không transaction nào còn cần.</div>
+    </div>
+    <div>
+      <h3>Visibility rules</h3>
+      <ol style="padding-left:0;list-style:none">
+        <li class="leg a f" style="margin-bottom:8px;font-size:17px"><b style="font-size:18px">1 · In-progress</b>Bỏ qua write của các transaction đang chạy lúc mình bắt đầu (kể cả khi sau đó chúng commit).</li>
+        <li class="leg b f" style="margin-bottom:8px;font-size:17px"><b style="font-size:18px">2 · Aborted</b>Bỏ qua mọi write của transaction đã abort.</li>
+        <li class="leg c f" style="margin-bottom:8px;font-size:17px"><b style="font-size:18px">3 · Later txid</b>Bỏ qua write của transaction có txid lớn hơn (bắt đầu sau), dù đã commit.</li>
+        <li class="leg a f" style="font-size:17px;border-left-color:#10b981"><b style="font-size:18px">4 · Còn lại</b>Mọi write khác đều visible.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== INDEXES + REPEATABLE READ ===================== -->
+<section class="slide" id="rr">
+  <div class="hdr in"><span class="qn">12</span><h2>Indexes &amp; Repeatable read naming confusion</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:24px">
+    <div>
+      <h3>Append-only / copy-on-write B-tree</h3>
+      <p class="ps">CouchDB, Datomic, LMDB: không overwrite page; copy page bị sửa và mọi parent tới root. Mỗi write transaction tạo <b>root mới</b> = một consistent snapshot.</p>
+      <svg class="sv tree" id="cow" viewBox="0 0 560 250" style="margin-top:6px">
+        <g class="g g1" style="opacity:1">
+          <rect class="nd" x="150" y="10" width="80" height="40" rx="10"/><text x="190" y="36" text-anchor="middle">root v1</text>
+          <line class="ln" x1="170" y1="50" x2="90" y2="100"/><line class="ln" x1="210" y1="50" x2="290" y2="100"/>
+          <rect class="nd c2" x="50" y="100" width="80" height="40" rx="10"/><text x="90" y="126" text-anchor="middle">P1</text>
+          <rect class="nd c2" x="250" y="100" width="80" height="40" rx="10"/><text x="290" y="126" text-anchor="middle">P2</text>
+          <line class="ln" x1="80" y1="140" x2="40" y2="190"/><line class="ln" x1="100" y1="140" x2="140" y2="190"/><line class="ln" x1="280" y1="140" x2="240" y2="190"/><line class="ln" x1="300" y1="140" x2="340" y2="190"/>
+          <rect class="nd c5" x="10" y="190" width="60" height="36" rx="8"/><text x="40" y="213" text-anchor="middle">L1</text>
+          <rect class="nd c5" x="110" y="190" width="60" height="36" rx="8"/><text x="140" y="213" text-anchor="middle">L2</text>
+          <rect class="nd c5" x="210" y="190" width="60" height="36" rx="8"/><text x="240" y="213" text-anchor="middle">L3</text>
+          <rect class="nd c5" x="310" y="190" width="60" height="36" rx="8"/><text x="340" y="213" text-anchor="middle">L4</text>
+        </g>
+        <g class="g g2"><rect class="nd c3" x="410" y="190" width="70" height="36" rx="8"/><text x="445" y="213" text-anchor="middle">L4′</text><text x="445" y="244" text-anchor="middle" class="sm">copy</text></g>
+        <g class="g g3"><rect class="nd c3" x="400" y="100" width="90" height="40" rx="10"/><text x="445" y="126" text-anchor="middle">P2′</text>
+          <line class="ln" x1="445" y1="140" x2="445" y2="190" style="stroke:#ec4899"/><line class="ln" x1="420" y1="140" x2="250" y2="190" style="stroke:#ec4899;stroke-dasharray:5 5"/></g>
+        <g class="g g4"><rect class="nd c3" x="400" y="10" width="90" height="40" rx="10"/><text x="445" y="36" text-anchor="middle">root v2</text>
+          <line class="ln" x1="445" y1="50" x2="445" y2="100" style="stroke:#ec4899"/><line class="ln" x1="410" y1="40" x2="130" y2="110" style="stroke:#ec4899;stroke-dasharray:5 5"/></g>
+      </svg>
+      <span class="f ghost" data-act="#cow|s2" data-say="Write sửa leaf L4 → tạo bản copy <b>L4′</b>."></span>
+      <span class="f ghost" data-act="#cow|s3" data-say="Parent P2 cũng được copy thành <b>P2′</b>, trỏ tới L4′ và L3 (không đổi)."></span>
+      <span class="f ghost" data-act="#cow|s4" data-say="Đến <b>root v2</b>. Page không bị ảnh hưởng (P1, L1, L2…) được dùng chung. Reader cũ vẫn đi từ root v1 — không cần filter theo txid. Cần background <b>compaction &amp; GC</b>."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <h3>Cùng một thứ, nhiều cái tên</h3>
+      <table class="f" style="font-size:17px">
+        <tr><th>Database</th><th>Gọi là</th><th>Thực chất</th></tr>
+        <tr><td>Oracle</td><td><code class="i">serializable</code></td><td>snapshot isolation</td></tr>
+        <tr><td>PostgreSQL, MySQL</td><td><code class="i">repeatable read</code></td><td>snapshot isolation</td></tr>
+        <tr><td>IBM DB2</td><td><code class="i">repeatable read</code></td><td>serializability</td></tr>
+      </table>
+      <p class="ps f" style="margin-top:12px">SQL standard dựa trên định nghĩa isolation level của System R (1975) — lúc đó <b>chưa có snapshot isolation</b>. Standard chỉ có <i>repeatable read</i>, trông giống bề ngoài, và bản thân định nghĩa lại <b>ambiguous, imprecise</b>.</p>
+      <div class="quote f" style="margin-top:14px;font-size:22px">→ <b>Nobody really knows what repeatable read means.</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== LOST UPDATES ===================== -->
+<section class="slide" id="lost">
+  <div class="hdr in"><span class="qn">13</span><h2>Preventing Lost Updates</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr;gap:24px">
+    <div>
+      <p class="ps">Lost update xảy ra với chu trình <b>read-modify-write</b>: hai transaction làm đồng thời → write sau <b>clobbers</b> write trước (Figure 7-1).</p>
+      <div class="chips" style="margin:10px 0"><span class="chip p">increment counter / account balance</span><span class="chip c">thêm phần tử vào list trong JSON</span><span class="chip k">2 người cùng sửa wiki page</span></div>
+      <div class="card f"><h3>① Atomic write operations</h3><p class="ps">Thường là giải pháp tốt nhất nếu diễn đạt được. Concurrency-safe trong hầu hết relational DB:</p>
+        <div class="code xs"><div class="ln "><span class="no">1</span><span><span class="k">UPDATE</span> counters <span class="k">SET</span> value = value + <span class="n">1</span> <span class="k">WHERE</span> key = <span class="s">'foo'</span>;</span></div></div>
+        <p class="ps muted" style="margin-top:6px">MongoDB: atomic update một phần JSON · Redis: atomic ops trên priority queue… Hiện thực bằng <b>exclusive lock</b> khi đọc (<i>cursor stability</i>) hoặc chạy mọi atomic op trên <b>single thread</b>. ⚠️ ORM dễ vô tình sinh read-modify-write không an toàn.</p></div>
+    </div>
+    <div>
+      <div class="card f"><h3>② Explicit locking <span class="muted" style="font-size:15px">· Example 7-1</span></h3><p class="ps">Multiplayer game: nước đi phải đúng luật — logic không viết được thành query → app tự lock rows:</p>
+        <div class="code xs" id="ex71"><div class="ln "><span class="no">1</span><span><span class="k">BEGIN</span> <span class="k">TRANSACTION</span>;</span></div><div class="ln mark-d"><span class="no">2</span><span><span class="k">SELECT</span> * <span class="k">FROM</span> figures</span></div><div class="ln mark-d"><span class="no">3</span><span>  <span class="k">WHERE</span> name = <span class="s">'robot'</span> <span class="k">AND</span> game_id = <span class="n">222</span></span></div><div class="ln mark-d"><span class="no">4</span><span>  <span class="k">FOR</span> <span class="k">UPDATE</span>;</span></div><div class="ln "><span class="no">5</span><span><span class="c">-- Check whether move is valid, then update the position</span></span></div><div class="ln "><span class="no">6</span><span><span class="c">-- of the piece that was returned by the previous SELECT.</span></span></div><div class="ln "><span class="no">7</span><span><span class="k">UPDATE</span> figures <span class="k">SET</span> position = <span class="s">'c4'</span> <span class="k">WHERE</span> id = <span class="n">1234</span>;</span></div><div class="ln "><span class="no">8</span><span><span class="k">COMMIT</span>;</span></div></div>
+        <span class="f ghost" data-act=".code#ex71|show-d" data-say="<code class='i'>FOR UPDATE</code>: DB lock mọi row query trả về. Transaction khác muốn đọc cùng row phải chờ read-modify-write này xong."></span>
+        <p class="ps muted" style="margin-top:6px">Chạy được — nhưng dễ <b>quên</b> thêm lock ở đâu đó → race condition.</p></div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== LOST UPDATES 2 ===================== -->
+<section class="slide" id="lost2">
+  <div class="hdr in"><span class="qn">13b</span><h2>Lost updates: detect, CAS &amp; replication</h2></div>
+  <div class="cols3">
+    <div class="card f"><h3>③ Automatically detecting</h3><p class="ps">Cho chạy song song; transaction manager phát hiện lost update → <b>abort</b> và bắt retry. Làm hiệu quả cùng snapshot isolation.</p>
+      <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px">
+        <span class="pv yes">PostgreSQL repeatable read ✓</span><span class="pv yes">Oracle serializable ✓</span><span class="pv yes">SQL Server snapshot ✓</span><span class="pv no">MySQL/InnoDB repeatable read ✗</span></div>
+      <p class="ps muted" style="margin-top:8px">Ưu điểm lớn: không cần app code làm gì đặc biệt → <b>ít lỗi</b> hơn.</p></div>
+    <div class="card f"><h3>④ Compare-and-set</h3><p class="ps">Ở DB không có transaction: chỉ update nếu giá trị <b>chưa đổi</b> từ lần đọc trước; không khớp → retry.</p>
+      <div class="code xxs"><div class="ln "><span class="no">1</span><span><span class="c">-- This may or may not be safe, depending on the database implementation</span></span></div><div class="ln "><span class="no">2</span><span><span class="k">UPDATE</span> wiki_pages <span class="k">SET</span> content = <span class="s">'new content'</span></span></div><div class="ln "><span class="no">3</span><span>  <span class="k">WHERE</span> id = <span class="n">1234</span> <span class="k">AND</span> content = <span class="s">'old content'</span>;</span></div></div>
+      <p class="ps muted" style="margin-top:6px">⚠️ Nếu <code class="i">WHERE</code> đọc từ <b>old snapshot</b> thì vẫn có thể lost update. Kiểm tra trước khi tin.</p></div>
+    <div class="card f"><h3>⑤ Conflict resolution &amp; replication</h3><p class="ps">Multi-leader / leaderless: không có “single up-to-date copy” → lock &amp; CAS <b>không áp dụng được</b>.</p>
+      <ul class="mini2" style="margin-top:6px"><li>Cho phép tạo nhiều <b>siblings</b>, app/data structure merge sau</li><li><b>Commutative</b> atomic ops (increment, add to set) — ý tưởng của <b>Riak 2.0 datatypes</b></li><li><b>Last write wins (LWW)</b> dễ gây lost update — nhưng lại là <b>default</b> ở nhiều replicated DB 😬</li></ul></div>
+  </div>
+</section>
+
+<!-- ===================== WRITE SKEW ===================== -->
+<section class="slide" id="ws">
+  <div class="hdr in"><span class="qn">14</span><h2>Write Skew <span class="muted" style="font-size:20px;font-weight:600">· Figure 7-8</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.35fr 1fr;gap:22px">
+    <div>
+      <p class="ps">Bệnh viện yêu cầu <b>luôn có ít nhất 1 doctor on call</b>. Alice và Bob cùng trực ca 1234, cùng thấy mệt và bấm “go off call” gần như đồng thời. DB dùng <b>snapshot isolation</b>.</p>
+      <div class="tl" id="tl78" style="margin-top:8px">
+        <div class="tlr" style="--n:4"><span class="who2">Alice</span><div class="ev e1" style="grid-column:2">COUNT on_call → 2</div><div class="ev e3" style="grid-column:4">Alice.on_call = false</div><div class="ev ok e4" style="grid-column:5">commit</div></div>
+        <div class="tlr u2" style="--n:4"><span class="who2">Bob</span><div class="ev u2 e2" style="grid-column:3">COUNT on_call → 2</div><div class="ev u2 e3" style="grid-column:4">Bob.on_call = false</div><div class="ev ok e4" style="grid-column:5">commit</div></div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;margin-top:14px">
+        <div class="node" id="dA"><span class="ver">👩‍⚕️</span>Alice<small id="dAs">on call</small></div>
+        <div class="node" id="dB"><span class="ver">👨‍⚕️</span>Bob<small id="dBs">on call</small></div>
+        <span class="here" id="wsk" style="font-size:16px;padding:6px 12px">0 DOCTOR ON CALL!</span>
+      </div>
+      <span class="f ghost" data-act="#tl78|s1" data-say="Alice kiểm tra: có 2 doctor on call ≥ 2 → an toàn để rời."></span>
+      <span class="f ghost" data-act="#tl78|s2" data-say="Bob kiểm tra trên snapshot của mình: cũng thấy 2."></span>
+      <span class="f ghost" data-act="#tl78|s3;#dA|down;#dB|down" data-set="#dAs::off call;#dBs::off call" data-say="Mỗi người update <b>record của chính mình</b> — hai object khác nhau, không đụng write lock."></span>
+      <span class="f ghost" data-act="#tl78|s4;#dA|bad;#dB|bad;#wsk|show" data-say="Cả hai commit → <b>không còn ai on call</b>. Requirement bị vi phạm: đây là <b>write skew</b>."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <h3>Characterizing write skew</h3>
+      <p class="ps">Không phải dirty write, không phải lost update (update 2 object khác nhau) — nhưng rõ ràng là race condition: chạy lần lượt thì người thứ hai đã bị chặn.</p>
+      <div class="note blue f" style="font-size:17px">Write skew = <b>generalization của lost update</b>: hai transaction <b>đọc cùng objects</b>, rồi update <b>một số</b> trong đó (có thể khác nhau). Update cùng object → dirty write / lost update.</div>
+      <h3 class="f" style="margin-top:10px;font-size:19px">Lựa chọn bị thu hẹp</h3>
+      <ul class="mini2 f">
+        <li>❌ Atomic single-object ops: vô dụng — nhiều object</li>
+        <li>❌ Auto lost-update detection: PG repeatable read, MySQL, Oracle serializable, SQL Server snapshot đều <b>không</b> phát hiện</li>
+        <li>⚠️ Multi-object constraint: hiếm DB hỗ trợ (dùng trigger / materialized view)</li>
+        <li>✅ <b>Serializable isolation</b>, hoặc second-best: <code class="i">SELECT … FOR UPDATE</code> lock các row mà transaction phụ thuộc</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MORE EXAMPLES / PHANTOM ===================== -->
+<section class="slide" id="phantom">
+  <div class="hdr in"><span class="qn">15</span><h2>More write skew &amp; Phantoms</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:22px">
+    <div>
+      <div class="cols" style="gap:10px">
+        <div class="card f" style="padding:10px 14px"><h3 style="font-size:18px">📅 Meeting room booking</h3><p class="ps">Check không có booking trùng giờ rồi insert → hai người cùng book được.</p></div>
+        <div class="card f" style="padding:10px 14px"><h3 style="font-size:18px">🎮 Multiplayer game</h3><p class="ps">Lock 1 figure không chặn 2 figure khác di chuyển vào <b>cùng ô</b>.</p></div>
+        <div class="card f" style="padding:10px 14px"><h3 style="font-size:18px">🪪 Claiming a username</h3><p class="ps">Check tên chưa ai dùng rồi tạo account. Fix đơn giản: <b>unique constraint</b>.</p></div>
+        <div class="card f" style="padding:10px 14px"><h3 style="font-size:18px">💸 Double-spending</h3><p class="ps">Hai khoản chi insert đồng thời, cộng lại làm balance <b>âm</b>.</p></div>
+      </div>
+      <p class="code-title" style="margin-top:10px">Example 7-2 · not safe under snapshot isolation</p>
+      <div class="code xxs" id="ex72"><div class="ln "><span class="no">1</span><span><span class="k">BEGIN</span> <span class="k">TRANSACTION</span>;</span></div><div class="ln mark-b"><span class="no">2</span><span><span class="c">-- Check for any existing bookings that overlap with the period of noon-1pm</span></span></div><div class="ln mark-b"><span class="no">3</span><span><span class="k">SELECT</span> <span class="k">COUNT</span>(*) <span class="k">FROM</span> bookings</span></div><div class="ln mark-b"><span class="no">4</span><span>  <span class="k">WHERE</span> room_id = <span class="n">123</span> <span class="k">AND</span> end_time &gt; <span class="s">'2015-01-01 12:00'</span> <span class="k">AND</span> start_time &lt; <span class="s">'2015-01-01 13:00'</span>;</span></div><div class="ln "><span class="no">5</span><span><span class="c">-- If the previous query returned zero:</span></span></div><div class="ln mark-d"><span class="no">6</span><span><span class="k">INSERT</span> <span class="k">INTO</span> bookings</span></div><div class="ln mark-d"><span class="no">7</span><span>  (room_id, start_time, end_time, user_id)</span></div><div class="ln mark-d"><span class="no">8</span><span>  <span class="k">VALUES</span> (<span class="n">123</span>, <span class="s">'2015-01-01 12:00'</span>, <span class="s">'2015-01-01 13:00'</span>, <span class="n">666</span>);</span></div><div class="ln "><span class="no">9</span><span><span class="k">COMMIT</span>;</span></div></div>
+    </div>
+    <div>
+      <h3>Pattern chung của write skew</h3>
+      <div class="stack">
+        <div class="leg a f" data-act=".code#ex72|show-b"><b>① SELECT kiểm tra requirement</b><p>Tìm các row khớp search condition (≥2 doctors? không có booking trùng?).</p></div>
+        <div class="leg b f"><b>② App quyết định</b><p>Dựa trên kết quả: đi tiếp, hay báo lỗi và abort.</p></div>
+        <div class="leg c f" data-act=".code#ex72|show-d"><b>③ Write (INSERT / UPDATE / DELETE) rồi commit</b><p>Write này <b>làm thay đổi precondition</b> của bước ②: chạy lại SELECT sẽ ra kết quả khác.</p></div>
+      </div>
+      <div class="card bad f" style="margin-top:10px"><span class="lbl bad">PHANTOM</span><p class="ps">Ví dụ doctors: lock được các row ở bước ① bằng <code class="i">FOR UPDATE</code>. Nhưng 4 ví dụ kia kiểm tra <b>sự vắng mặt</b> của row — query trả về 0 row thì <b>không có gì để gắn lock</b>. Một write ở transaction này làm thay đổi kết quả search query của transaction khác = <b>phantom</b>.</p></div>
+      <p class="ps muted f" style="margin-top:8px">Snapshot isolation tránh phantom cho read-only query, nhưng trong read-write transaction, phantom gây ra các ca write skew rất khó.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MATERIALIZING CONFLICTS ===================== -->
+<section class="slide" id="mat">
+  <div class="hdr in"><span class="qn">15b</span><h2>Materializing conflicts</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr;gap:26px">
+    <div>
+      <p class="ps">Phantom không có object để lock? → <b>tạo ra</b> object lock một cách nhân tạo.</p>
+      <ul class="mini" style="margin-top:8px">
+        <li>Tạo bảng <code class="i">room × time slot</code> (vd. mỗi slot 15 phút) cho 6 tháng tới, tạo sẵn mọi row.</li>
+        <li>Transaction book phòng: <code class="i">SELECT … FOR UPDATE</code> các row slot tương ứng, rồi mới check overlap và insert.</li>
+        <li>Bảng này không lưu thông tin booking — nó chỉ là <b>tập hợp locks</b>.</li>
+      </ul>
+      <div class="card bad f" style="margin-top:14px"><span class="lbl bad">LAST RESORT</span><p class="ps">Khó, dễ sai, và xấu: để cơ chế concurrency control <b>leak</b> vào data model. Trong đa số trường hợp, <b>serializable isolation</b> tốt hơn nhiều.</p></div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <p class="rowlbl">bảng locks: room × slot (12:00 → 13:45)</p>
+      <div class="mx" style="grid-template-columns:70px repeat(8,62px)">
+        <div class="mc ix"></div><div class="mc ix">12:00</div><div class="mc ix">12:15</div><div class="mc ix">12:30</div><div class="mc ix">12:45</div><div class="mc ix">13:00</div><div class="mc ix">13:15</div><div class="mc ix">13:30</div><div class="mc ix">13:45</div>
+        <div class="mc ix">R 122</div><div class="mc"></div><div class="mc"></div><div class="mc"></div><div class="mc"></div><div class="mc"></div><div class="mc"></div><div class="mc"></div><div class="mc"></div>
+        <div class="mc ix">R 123</div><div class="mc ma">🔓</div><div class="mc ma">🔓</div><div class="mc ma mb">🔓</div><div class="mc ma mb">🔓</div><div class="mc mb2"></div><div class="mc mb2"></div><div class="mc"></div><div class="mc"></div>
+        <div class="mc ix">R 124</div><div class="mc"></div><div class="mc"></div><div class="mc"></div><div class="mc"></div><div class="mc"></div><div class="mc"></div><div class="mc"></div><div class="mc"></div>
+      </div>
+      <span class="f ghost" data-act="#mat .ma|used" data-set="#mat .ma::🔒" data-say="Txn A muốn book R123 12:00–13:00 → lock 4 row slot tương ứng."></span>
+      <span class="f ghost" data-act="#mat .mb|cur;#mat .mb2|bad" data-say="Txn B muốn book R123 12:30–13:30 → đụng lock ở 12:30, 12:45 → phải <b>chờ</b>. Phantom đã biến thành <b>lock conflict</b> trên các row cụ thể."></span>
+      <span class="f ghost" data-act="#matok|show" data-say="Booking ở phòng khác, hoặc cùng phòng nhưng giờ khác, vẫn chạy song song bình thường."></span>
+      <p style="margin-top:10px"><span class="here" id="matok" style="background:#10b981;font-size:15px;padding:5px 12px">R122 / R124 vẫn tự do ✓</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SERIALIZABILITY ===================== -->
+<section class="slide" id="ser">
+  <div class="hdr in"><span class="qn">16</span><h2>Serializability</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr;gap:26px">
+    <div>
+      <h3>Một tình cảnh buồn</h3>
+      <ul class="mini">
+        <li>Isolation level khó hiểu, mỗi DB hiện thực một kiểu (“repeatable read” khác nhau rất nhiều).</li>
+        <li>Nhìn application code khó biết có an toàn ở một isolation level hay không.</li>
+        <li>Không có tool tốt để phát hiện race condition; concurrency test thì <b>nondeterministic</b>.</li>
+      </ul>
+      <div class="quote f" style="margin-top:14px">Từ thập niên 1970 tới nay, câu trả lời của giới nghiên cứu vẫn đơn giản: <b>use serializable isolation!</b></div>
+      <p class="ps f" style="margin-top:12px"><b>Serializable</b> = level mạnh nhất: dù chạy song song, kết quả như chạy <b>lần lượt từng cái</b>. Transaction đúng khi chạy một mình → vẫn đúng khi chạy đồng thời. DB chặn <b>mọi</b> race condition.</p>
+    </div>
+    <div>
+      <h3>Vậy sao không ai cũng dùng? Ba cách hiện thực:</h3>
+      <div class="stack" style="margin-top:6px">
+        <div class="card f" style="border-left:6px solid #7c3aed"><div style="display:flex;gap:14px;align-items:center"><div class="icon">🧵</div><div><h3 style="margin:0">Actual Serial Execution</h3><p class="ps">Thực sự chạy từng transaction một, trên một thread.</p></div></div></div>
+        <div class="card f" style="border-left:6px solid #0891b2"><div style="display:flex;gap:14px;align-items:center"><div class="icon">🔐</div><div><h3 style="margin:0;color:#0891b2">Two-Phase Locking (2PL)</h3><p class="ps">Hàng chục năm là lựa chọn khả thi duy nhất. <b>Pessimistic</b>.</p></div></div></div>
+        <div class="card f" style="border-left:6px solid #ec4899"><div style="display:flex;gap:14px;align-items:center"><div class="icon">🔮</div><div><h3 style="margin:0;color:#db2777">Serializable Snapshot Isolation (SSI)</h3><p class="ps">Optimistic concurrency control — mới (2008), đầy hứa hẹn.</p></div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SERIAL EXECUTION ===================== -->
+<section class="slide" id="serial">
+  <div class="hdr in"><span class="qn">17</span><h2>Actual Serial Execution</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:24px">
+    <div>
+      <p class="ps">Cách đơn giản nhất để tránh concurrency problem: <b>bỏ concurrency</b>. Isolation khi đó serializable <i>by definition</i>. Mãi tới ~<b>2007</b> mới được coi là khả thi. Vì sao?</p>
+      <div class="cols" style="gap:10px;margin-top:10px">
+        <div class="card f"><div class="icon">🧠</div><h3 style="font-size:19px">RAM rẻ</h3><p class="ps">Giữ toàn bộ <b>active dataset in memory</b> → không chờ disk.</p></div>
+        <div class="card f"><div class="icon">⚡</div><h3 style="font-size:19px">OLTP ngắn</h3><p class="ps">Ít read/write. Analytic query dài thì chạy trên snapshot, ngoài vòng serial.</p></div>
+      </div>
+      <div class="chips f" style="margin-top:12px"><span class="chip p">VoltDB / H-Store</span><span class="chip k">Redis</span><span class="chip c">Datomic</span></div>
+      <p class="ps muted f" style="margin-top:10px">Có thể nhanh hơn hệ thống concurrent vì không tốn <b>locking overhead</b>, nhưng throughput bị giới hạn ở <b>một CPU core</b>.</p>
+    </div>
+    <div>
+      <p class="rowlbl">Transaction queue → single thread</p>
+      <div class="thr" style="margin-top:8px">
+        <div class="arr sm" style="margin:0">
+          <div class="cell t" id="q5"><span class="v">T5</span></div><div class="cell t" id="q4"><span class="v">T4</span></div><div class="cell t" id="q3"><span class="v">T3</span></div><div class="cell t" id="q2"><span class="v">T2</span></div><div class="cell t" id="q1"><span class="v">T1</span></div>
+        </div>
+        <span class="big-ar">→</span>
+        <div class="cpu" id="cpu1">CPU core<small id="cpu1s">idle</small></div>
+      </div>
+      <span class="f ghost" data-act="#q1|cur" data-set="#cpu1s::running T1" data-say="T1 chạy một mình — không lock, không conflict."></span>
+      <span class="f ghost" data-act="#q1|done;#q2|cur" data-set="#cpu1s::running T2" data-say="Xong T1 thì tới T2… mỗi transaction phải <b>nhỏ và nhanh</b>."></span>
+      <span class="f ghost" data-act="#q2|done;#q3|bad" data-set="#cpu1s::T3 chờ disk… 🐢;#q3::<span class='v'>T3</span><small>slow</small>" data-say="Chỉ cần <b>một</b> transaction chậm (ví dụ cần data không có trong memory) là <b>mọi</b> transaction phía sau bị stall."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+      <div class="note f" style="font-size:16.5px">Giải pháp cho data ngoài memory: abort transaction, fetch data <b>asynchronously</b> rồi restart — gọi là <b>anti-caching</b>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== STORED PROCEDURES ===================== -->
+<section class="slide" id="sp">
+  <div class="hdr in"><span class="qn">17b</span><h2>Encapsulating transactions in stored procedures</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr;gap:24px">
+    <div>
+      <p class="ps">Con người phản hồi rất chậm → OLTP giữ transaction trong <b>một HTTP request</b>. Nhưng transaction vẫn chạy kiểu <b>interactive</b>: từng statement, qua lại giữa app và DB.</p>
+      <p class="code-title" style="margin-top:8px">Figure 7-9 · interactive transaction vs stored procedure</p>
+      <svg class="sv" id="sp79" viewBox="0 0 600 270">
+        <defs><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#a78bfa"/></marker>
+        <marker id="ah3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#ec4899"/></marker></defs>
+        <text x="20" y="22" class="lb">Interactive</text><text x="330" y="22" class="lb" style="fill:#db2777">Stored procedure</text>
+        <rect class="nd" x="10" y="34" width="80" height="34" rx="8"/><text x="50" y="56" text-anchor="middle">App</text>
+        <rect class="nd c4" x="200" y="34" width="80" height="34" rx="8"/><text x="240" y="56" text-anchor="middle">DB</text>
+        <line x1="50" y1="68" x2="50" y2="262" stroke="#e4dcfb" stroke-width="2"/><line x1="240" y1="68" x2="240" y2="262" stroke="#e4dcfb" stroke-width="2"/>
+        <g class="g g1"><line class="ln" x1="50" y1="84" x2="236" y2="104" marker-end="url(#ah2)"/><text x="140" y="86" text-anchor="middle" class="sm">SELECT count</text><line class="ln" x1="240" y1="110" x2="54" y2="130" marker-end="url(#ah2)"/><text x="130" y="134" text-anchor="middle" class="sm">2</text></g>
+        <g class="g g2"><line class="ln" x1="50" y1="146" x2="236" y2="166" marker-end="url(#ah2)"/><text x="140" y="150" text-anchor="middle" class="sm">UPDATE on_call</text><line class="ln" x1="240" y1="172" x2="54" y2="192" marker-end="url(#ah2)"/><text x="130" y="196" text-anchor="middle" class="sm">ok</text></g>
+        <g class="g g3"><line class="ln" x1="50" y1="208" x2="236" y2="228" marker-end="url(#ah2)"/><text x="140" y="212" text-anchor="middle" class="sm">COMMIT</text><line class="ln" x1="240" y1="234" x2="54" y2="254" marker-end="url(#ah2)"/><text x="130" y="258" text-anchor="middle" class="sm">ok</text></g>
+        <rect class="nd" x="330" y="34" width="80" height="34" rx="8"/><text x="370" y="56" text-anchor="middle">App</text>
+        <rect class="nd c4" x="500" y="34" width="90" height="34" rx="8"/><text x="545" y="56" text-anchor="middle">DB</text>
+        <line x1="370" y1="68" x2="370" y2="262" stroke="#e4dcfb" stroke-width="2"/><line x1="545" y1="68" x2="545" y2="262" stroke="#e4dcfb" stroke-width="2"/>
+        <g class="g g4"><line class="ln" x1="370" y1="84" x2="541" y2="104" marker-end="url(#ah3)" style="stroke:#ec4899"/><text x="455" y="86" text-anchor="middle" class="sm">call proc(args)</text>
+          <rect class="nd c3" x="500" y="108" width="90" height="74" rx="8"/><text x="545" y="132" text-anchor="middle" style="font-size:12px">count</text><text x="545" y="150" text-anchor="middle" style="font-size:12px">update</text><text x="545" y="168" text-anchor="middle" style="font-size:12px">commit</text>
+          <line class="ln" x1="545" y1="186" x2="374" y2="206" marker-end="url(#ah3)" style="stroke:#ec4899"/><text x="455" y="212" text-anchor="middle" class="sm">ok</text></g>
+      </svg>
+      <span class="f ghost" data-act="#sp79|s1" data-say="Interactive: query → chờ kết quả → query tiếp… phần lớn thời gian là <b>network round-trip</b>."></span>
+      <span class="f ghost" data-act="#sp79|s2;#sp79|s3" data-say="Nếu chạy serial kiểu này, DB chủ yếu ngồi chờ app gửi query tiếp → throughput tệ. Nên hệ thống serial <b>không cho phép</b> interactive multi-statement transaction."></span>
+      <span class="f ghost" data-act="#sp79|s4" data-say="Thay vào đó, gửi toàn bộ transaction code lên DB trước dưới dạng <b>stored procedure</b> → chạy rất nhanh, không chờ network hay disk I/O."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <div class="card bad f"><span class="lbl bad">TIẾNG XẤU</span><ul class="mini2"><li>Mỗi vendor một ngôn ngữ (PL/SQL, T-SQL, PL/pgSQL) — cũ kỹ, thiếu library</li><li>Code trong DB khó debug, version control, deploy, test, monitor</li><li>DB nhạy performance hơn app server: một procedure tệ ảnh hưởng nhiều app</li></ul></div>
+      <div class="card good f" style="margin-top:10px"><span class="lbl good">HIỆN ĐẠI</span><p class="ps">Dùng ngôn ngữ general-purpose: <b>VoltDB</b> → Java/Groovy, <b>Datomic</b> → Java/Clojure, <b>Redis</b> → Lua.</p></div>
+      <div class="note blue f" style="font-size:16.5px">VoltDB còn dùng stored procedure cho <b>replication</b>: chạy cùng procedure trên mỗi replica → procedure phải <b>deterministic</b> (ngày giờ phải qua API deterministic riêng).</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PARTITIONING / SUMMARY SERIAL ===================== -->
+<section class="slide" id="serpart">
+  <div class="hdr in"><span class="qn">17c</span><h2>Partitioning &amp; summary of serial execution</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:26px">
+    <div>
+      <p class="ps">Muốn scale ra nhiều CPU core / node: <b>partition</b> data sao cho mỗi transaction chỉ đụng <b>một partition</b> → mỗi partition có thread riêng, throughput scale <b>tuyến tính</b> theo số core.</p>
+      <div class="farm" style="grid-template-columns:repeat(4,90px);margin-top:14px">
+        <div class="mach sm2 show" style="width:90px">P1<br>thread</div><div class="mach sm2 show" style="width:90px">P2<br>thread</div><div class="mach sm2 show" style="width:90px">P3<br>thread</div><div class="mach sm2 show" style="width:90px">P4<br>thread</div>
+      </div>
+      <div class="card bad f" style="margin-top:14px"><span class="lbl bad">CROSS-PARTITION</span><p class="ps">Phải chạy <b>lock-step</b> qua mọi partition liên quan → chậm hơn nhiều bậc. VoltDB: khoảng</p><div class="stat" style="margin-top:6px">~1,000<small> writes/s</small></div><p class="ps muted">và <b>không tăng</b> khi thêm máy.</p></div>
+      <p class="ps muted f" style="margin-top:8px">Key-value đơn giản dễ partition; data có nhiều <b>secondary indexes</b> thì cần nhiều cross-partition coordination.</p>
+    </div>
+    <div>
+      <h3>Serial execution khả thi khi…</h3>
+      <div class="stack">
+        <div class="leg a f"><b>⚡ Mọi transaction nhỏ &amp; nhanh</b><p>Một transaction chậm là stall tất cả.</p></div>
+        <div class="leg b f"><b>🧠 Active dataset vừa memory</b><p>Data ít dùng có thể ra disk, nhưng truy cập trong transaction thì rất chậm.</p></div>
+        <div class="leg c f"><b>🔂 Write throughput vừa một CPU core</b><p>Hoặc partition được mà không cần cross-partition coordination.</p></div>
+        <div class="leg a f" style="border-left-color:#ec4899"><b>🚧 Cross-partition có giới hạn cứng</b><p>Dùng được, nhưng chỉ ở mức độ hạn chế.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 2PL ===================== -->
+<section class="slide" id="tpl">
+  <div class="hdr in"><span class="qn">18</span><h2>Two-Phase Locking (2PL)</h2><span class="chip k">2PL ≠ 2PC</span></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:24px">
+    <div>
+      <p class="ps">~30 năm là thuật toán serializability duy nhất được dùng rộng rãi. Nhiều transaction được <b>đọc</b> cùng object, nhưng ai muốn <b>ghi</b> thì cần <b>exclusive access</b>:</p>
+      <ul class="mini" style="margin-top:6px">
+        <li>A đã <b>đọc</b>, B muốn <b>ghi</b> → B chờ A commit/abort</li>
+        <li>A đã <b>ghi</b>, B muốn <b>đọc</b> → B chờ (không được đọc version cũ)</li>
+      </ul>
+      <div class="note f" style="font-size:17.5px">Writers chặn writers <b>và</b> readers, ngược lại cũng vậy. Trái với mantra của snapshot isolation: <i>readers never block writers…</i>. Đổi lại: chặn mọi race condition kể cả <b>lost updates</b> và <b>write skew</b>.</div>
+      <p class="ps muted" style="margin-top:8px">Dùng trong: <b>MySQL (InnoDB)</b> &amp; <b>SQL Server</b> serializable, <b>DB2</b> repeatable read.</p>
+    </div>
+    <div>
+      <h3>Lock modes</h3>
+      <table class="mtx" id="lkm">
+        <tr><th>đang giữ ↓ · muốn lấy →</th><th><span class="lk sh">shared</span></th><th><span class="lk ex">exclusive</span></th></tr>
+        <tr><td>(không có lock)</td><td><span class="ck y k1">✓</span></td><td><span class="ck y k1">✓</span></td></tr>
+        <tr><td><span class="lk sh">shared</span></td><td><span class="ck y k2">✓ cùng giữ</span></td><td><span class="ck n k3">⏳ chờ</span></td></tr>
+        <tr><td><span class="lk ex">exclusive</span></td><td><span class="ck n k4">⏳ chờ</span></td><td><span class="ck n k4">⏳ chờ</span></td></tr>
+      </table>
+      <span class="f ghost" data-act="#lkm|r1" data-say="Đọc → lấy lock <b>shared</b>; ghi → lấy lock <b>exclusive</b>."></span>
+      <span class="f ghost" data-act="#lkm|r2" data-say="Nhiều transaction có thể cùng giữ shared lock."></span>
+      <span class="f ghost" data-act="#lkm|r3" data-say="Đọc rồi ghi: <b>upgrade</b> shared → exclusive, như lấy exclusive trực tiếp."></span>
+      <span class="f ghost" data-act="#lkm|r4" data-say="Exclusive: không ai khác được giữ bất kỳ lock nào trên object đó."></span>
+      <p class="rowlbl" style="margin-top:12px">Hai phase của một transaction</p>
+      <div class="ph" id="ph2">
+        <div class="bar2" id="phA" style="flex:3;background:linear-gradient(90deg,#7c3aed,#a855f7)">① acquire locks (đang chạy)</div>
+        <div class="bar2" id="phB" style="flex:1.3;background:linear-gradient(90deg,#ec4899,#f97316)">② release all @ commit/abort</div>
+      </div>
+      <span class="f ghost" data-act="#phA|on2" data-say="Phase 1: trong lúc chạy, transaction chỉ <b>lấy thêm</b> lock và giữ tới cuối."></span>
+      <span class="f ghost" data-act="#phB|on2" data-say="Phase 2: commit/abort → <b>nhả toàn bộ</b> lock. Tên “two-phase” từ đây."></span>
+      <div class="card bad f" style="margin-top:10px;padding:10px 14px"><p class="ps">🔁 <b>Deadlock</b>: A chờ B, B chờ A. DB tự phát hiện, abort một bên; app phải retry.</p></div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 2PL PERF + PREDICATE LOCKS ===================== -->
+<section class="slide" id="pred">
+  <div class="hdr in"><span class="qn">18b</span><h2>2PL performance · Predicate &amp; index-range locks</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.15fr;gap:22px">
+    <div>
+      <div class="card bad"><span class="lbl bad">PERFORMANCE</span><ul class="mini2"><li>Overhead lấy/nhả lock, quan trọng hơn: <b>giảm concurrency</b></li><li>Không giới hạn thời lượng transaction → hàng đợi lock có thể dài</li><li>Latency <b>không ổn định</b>, rất chậm ở high percentiles khi có contention</li><li>Deadlock thường xuyên hơn → <b>wasted effort</b> khi retry</li></ul></div>
+      <div class="card f" style="margin-top:12px"><h3>Predicate lock</h3><p class="ps">Lock thuộc về <b>mọi object khớp search condition</b> — kể cả object <b>chưa tồn tại</b> (phantoms). 2PL + predicate locks = serializable.</p>
+        <div class="code xxs"><div class="ln "><span class="no">1</span><span><span class="k">SELECT</span> * <span class="k">FROM</span> bookings</span></div><div class="ln "><span class="no">2</span><span>  <span class="k">WHERE</span> room_id = <span class="n">123</span> <span class="k">AND</span></span></div><div class="ln "><span class="no">3</span><span>    end_time &gt; <span class="s">'2018-01-01 12:00'</span> <span class="k">AND</span></span></div><div class="ln "><span class="no">4</span><span>    start_time &lt; <span class="s">'2018-01-01 13:00'</span>;</span></div></div></div>
+    </div>
+    <div>
+      <p class="rowlbl">bookings: room × time — vùng bị lock</p>
+      <div class="mx" id="plg" style="grid-template-columns:70px repeat(8,58px)">
+        <div class="mc ix"></div><div class="mc ix">10h</div><div class="mc ix">11h</div><div class="mc ix">12h</div><div class="mc ix">13h</div><div class="mc ix">14h</div><div class="mc ix">15h</div><div class="mc ix">16h</div><div class="mc ix">17h</div>
+        <div class="mc ix">R 122</div><div class="mc"></div><div class="mc"></div><div class="mc tc"></div><div class="mc"></div><div class="mc"></div><div class="mc"></div><div class="mc"></div><div class="mc"></div>
+        <div class="mc ix">R 123</div><div class="mc rr"></div><div class="mc rr"></div><div class="mc rr tc pp"></div><div class="mc rr"></div><div class="mc rr"></div><div class="mc rr"></div><div class="mc rr"></div><div class="mc rr"></div>
+        <div class="mc ix">R 124</div><div class="mc"></div><div class="mc"></div><div class="mc tc"></div><div class="mc"></div><div class="mc"></div><div class="mc"></div><div class="mc"></div><div class="mc"></div>
+      </div>
+      <span class="f ghost" data-now="#plg .pp|cur" data-say="<b>Predicate lock</b>: chính xác room 123, 12:00–13:00. Nhưng check nhiều predicate lock rất tốn → performance kém."></span>
+      <span class="f ghost" data-now="#plg .rr|used" data-say="<b>Index-range lock</b> (next-key locking) trên index <code class='i'>room_id</code>: lock room 123 <b>mọi giờ</b> — rộng hơn nhưng an toàn."></span>
+      <span class="f ghost" data-now="#plg .tc|hl" data-say="Hoặc trên index thời gian: lock <b>mọi phòng</b> 12:00–13:00. Write khớp predicate gốc chắc chắn khớp xấp xỉ này."></span>
+      <span class="f ghost" data-now="#plg .mc:not(.ix)|used" data-say="Không có index phù hợp → fallback: <b>shared lock cả table</b>. Chậm, nhưng an toàn."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+      <div class="note blue" style="font-size:17px">Index-range lock kém chính xác hơn predicate lock (có thể lock rộng hơn cần) nhưng <b>overhead thấp hơn nhiều</b> → compromise tốt, chặn hiệu quả phantoms &amp; write skew.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SSI ===================== -->
+<section class="slide" id="ssi">
+  <div class="hdr in"><span class="qn">19</span><h2>Serializable Snapshot Isolation (SSI)</h2></div>
+  <p class="in muted" style="font-size:19px;max-width:1180px">Một bên: serializability nhưng chậm (2PL) hoặc khó scale (serial). Bên kia: weak isolation nhanh nhưng dính race condition. SSI (2008, PhD thesis của <b>Michael Cahill</b>): <b>full serializability</b> với penalty nhỏ so với snapshot isolation. Dùng trong <b>PostgreSQL ≥ 9.1</b> (serializable) và <b>FoundationDB</b>.</p>
+  <div class="vs2" style="margin-top:16px">
+    <div class="card f"><span class="lbl bad">PESSIMISTIC</span><h3>2PL &amp; serial execution</h3><p class="ps">Nếu <i>có thể</i> có gì sai (lock do người khác giữ) → <b>chờ</b> tới khi an toàn. Giống mutual exclusion. Serial execution là pessimistic cực đoan: như lock <b>cả database</b>, bù lại bằng transaction rất nhanh.</p>
+      <div class="q-row" style="margin-top:10px"><div class="rq fast wait">T2</div><span class="muted">⏳ chờ lock của</span><div class="rq slow">T1</div></div></div>
+    <div class="vs">vs</div>
+    <div class="card f"><span class="lbl good">OPTIMISTIC</span><h3 style="color:#db2777">SSI</h3><p class="ps">Không block — cứ chạy tiếp, hy vọng mọi thứ ổn. Lúc <b>commit</b>, DB kiểm tra isolation có bị vi phạm không; nếu có → <b>abort &amp; retry</b>. Chỉ transaction chạy serializable mới được commit.</p>
+      <div class="q-row" style="margin-top:10px"><div class="rq fast">T2</div><div class="rq slow" style="width:120px">T1</div><span class="muted">→ check @ commit</span></div></div>
+  </div>
+  <div class="cols f" style="margin-top:14px;gap:16px">
+    <div class="note" style="margin:0;font-size:17px"><b>High contention</b> → nhiều abort; hệ thống gần max throughput thì retry làm tệ thêm.</div>
+    <div class="note blue" style="margin:0;font-size:17px">Đủ spare capacity &amp; contention thấp → optimistic thường <b>nhanh hơn</b>. Commutative atomic ops (increment) giảm contention. Khác OCC cũ: mọi read từ <b>consistent snapshot</b>.</div>
+  </div>
+</section>
+
+<!-- ===================== SSI DETECT 1 ===================== -->
+<section class="slide" id="ssi1">
+  <div class="hdr in"><span class="qn">19b</span><h2>Decisions based on an outdated premise</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.45fr;gap:22px">
+    <div>
+      <p class="ps">Write skew: transaction đọc data → ra quyết định dựa trên <b>premise</b> (“đang có 2 doctor on call”) → ghi. Lúc commit, premise có thể <b>không còn đúng</b>.</p>
+      <p class="ps" style="margin-top:8px">DB không biết app dùng kết quả query thế nào → giả định mọi thay đổi của premise đều có thể làm write <b>invalid</b>. Hai trường hợp cần phát hiện:</p>
+      <div class="leg a" style="margin-top:8px"><b>① Stale MVCC read</b><p>uncommitted write xảy ra <b>trước</b> read</p></div>
+      <div class="leg b" style="margin-top:8px"><b>② Write affects prior read</b><p>write xảy ra <b>sau</b> read</p></div>
+      <div class="note f" style="font-size:16px">Sao không abort 43 ngay khi đọc stale? Vì có thể 43 là <b>read-only</b>, hoặc 42 rồi sẽ abort. Chờ tới commit giúp tránh abort thừa, giữ được long-running reads trên snapshot.</div>
+    </div>
+    <div>
+      <p class="code-title">① Figure 7-10 · Detecting stale MVCC reads</p>
+      <div class="tl" id="tl710">
+        <div class="tlr" style="--n:5"><span class="who2">Txn 42</span><div class="ev e1" style="grid-column:2">count on_call → 2</div><div class="ev e2" style="grid-column:3">Alice.on_call = false</div><div class="ev ok e4" style="grid-column:5">commit ✓</div></div>
+        <div class="tlr u2" style="--n:5"><span class="who2">Txn 43</span><div class="ev u2 e1" style="grid-column:2">count on_call → 2</div><div class="ev bad e3" style="grid-column:4">ignored 42’s write ⚑</div><div class="ev u2 e5" style="grid-column:5">Bob.on_call = false</div><div class="ev bad e6" style="grid-column:6">commit → ABORT</div></div>
+      </div>
+      <span class="f ghost" data-act="#tl710|s1" data-say="Cả 42 và 43 đếm số doctor on call: 2."></span>
+      <span class="f ghost" data-act="#tl710|s2" data-say="42 cho Alice off call — chưa commit."></span>
+      <span class="f ghost" data-act="#tl710|s3" data-say="Theo MVCC visibility rules, 43 vẫn thấy Alice on_call = true. DB <b>ghi nhận</b>: 43 đã bỏ qua một write của 42."></span>
+      <span class="f ghost" data-act="#tl710|s4;#tl710|s5" data-say="42 commit. 43 cho Bob off call."></span>
+      <span class="f ghost" data-act="#tl710|s6" data-say="43 commit: DB kiểm tra — write bị bỏ qua của 42 <b>giờ đã committed</b> → premise của 43 sai → <b>abort</b>."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SSI DETECT 2 ===================== -->
+<section class="slide" id="ssi2">
+  <div class="hdr in"><span class="qn">19c</span><h2>Detecting writes that affect prior reads</h2></div>
+  <div class="cols" style="grid-template-columns:1.45fr 1fr;gap:22px">
+    <div>
+      <p class="code-title">② Figure 7-11 · lock không block — chỉ là <b>tripwire</b></p>
+      <div class="tl" id="tl711">
+        <div class="tlr" style="--n:5"><span class="who2">Txn 42</span><div class="ev e1" style="grid-column:2">read shift 1234</div><div class="ev e2" style="grid-column:3">update Alice</div><div class="ev ok e4" style="grid-column:5">commit ✓</div></div>
+        <div class="tlr db" style="--n:5"><span class="who2">index shift_id = 1234</span><div class="ev d e1" style="grid-column:2">readers: 42, 43</div><div class="ev bad e2" style="grid-column:3">⚑ notify 43</div><div class="ev bad e3" style="grid-column:4">⚑ notify 42</div></div>
+        <div class="tlr u2" style="--n:5"><span class="who2">Txn 43</span><div class="ev u2 e1" style="grid-column:2">read shift 1234</div><div class="ev u2 e3" style="grid-column:4">update Bob</div><div class="ev bad e5" style="grid-column:6">commit → ABORT</div></div>
+      </div>
+      <span class="f ghost" data-act="#tl711|s1" data-say="Cả hai search on-call doctors của shift 1234. DB dùng index entry 1234 để <b>ghi nhớ</b> 42 và 43 đã đọc data này (không có index → track ở table level)."></span>
+      <span class="f ghost" data-act="#tl711|s2" data-say="42 ghi: tìm trong index những transaction vừa đọc data bị ảnh hưởng → <b>báo</b> cho 43 rằng read của nó có thể đã lỗi thời."></span>
+      <span class="f ghost" data-act="#tl711|s3" data-say="43 ghi → báo ngược lại cho 42."></span>
+      <span class="f ghost" data-act="#tl711|s4" data-say="42 commit trước: thành công — write của 43 chưa có hiệu lực."></span>
+      <span class="f ghost" data-act="#tl711|s5" data-say="43 commit: write xung đột của 42 <b>đã committed</b> → 43 phải <b>abort</b>."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <h3>Performance of SSI</h3>
+      <ul class="mini2">
+        <li><b>Granularity</b> tracking: chi tiết → abort chính xác nhưng bookkeeping tốn; thô → nhanh nhưng abort thừa. PostgreSQL dùng lý thuyết để giảm abort không cần thiết.</li>
+      </ul>
+      <div class="card good f" style="margin-top:8px"><h3 style="font-size:18px">vs 2PL</h3><p class="ps">Không block chờ lock. Writers không block readers và ngược lại → latency <b>dễ đoán</b>; read-only query chạy trên snapshot không cần lock.</p></div>
+      <div class="card good f" style="margin-top:8px"><h3 style="font-size:18px">vs serial execution</h3><p class="ps">Không bị giới hạn một CPU core: FoundationDB phân tán conflict detection qua nhiều máy.</p></div>
+      <div class="card bad f" style="margin-top:8px"><h3 style="font-size:18px;color:#be123c">Lưu ý</h3><p class="ps">Tỉ lệ abort quyết định performance → read-write transaction cần <b>ngắn</b>. Dù vậy SSI ít nhạy với transaction chậm hơn 2PL hay serial.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SUMMARY MATRIX ===================== -->
+<section class="slide" id="sum">
+  <div class="hdr in"><span class="qn">20</span><h2>Summary: race conditions vs isolation levels</h2></div>
+  <div class="cols" style="grid-template-columns:1.35fr 1fr;gap:22px">
+    <div>
+      <table class="mtx" id="mtx">
+        <tr><th>Anomaly</th><th>Read committed</th><th>Snapshot isolation</th><th>Serializable</th></tr>
+        <tr><td>Dirty reads</td><td><span class="ck y k1">✓</span></td><td><span class="ck y k1">✓</span></td><td><span class="ck y k1">✓</span></td></tr>
+        <tr><td>Dirty writes</td><td><span class="ck y k2">✓</span></td><td><span class="ck y k2">✓</span></td><td><span class="ck y k2">✓</span></td></tr>
+        <tr><td>Read skew</td><td><span class="ck n k3">✗</span></td><td><span class="ck y k3">✓ (MVCC)</span></td><td><span class="ck y k3">✓</span></td></tr>
+        <tr><td>Lost updates</td><td><span class="ck n k4">✗</span></td><td><span class="ck m k4">tuỳ DB / FOR UPDATE</span></td><td><span class="ck y k4">✓</span></td></tr>
+        <tr><td>Write skew</td><td><span class="ck n k5">✗</span></td><td><span class="ck n k5">✗</span></td><td><span class="ck y k5">✓</span></td></tr>
+        <tr><td>Phantoms (+ write skew)</td><td><span class="ck n k6">✗</span></td><td><span class="ck m k6">chỉ read-only</span></td><td><span class="ck y k6">✓ (index-range locks)</span></td></tr>
+      </table>
+      <span class="f ghost" data-act="#mtx|r1" data-say="<b>Dirty reads</b>: đọc write của client khác trước khi commit."></span>
+      <span class="f ghost" data-act="#mtx|r2" data-say="<b>Dirty writes</b>: ghi đè data chưa commit. Hầu như mọi implementation đều chặn."></span>
+      <span class="f ghost" data-act="#mtx|r3" data-say="<b>Read skew</b>: thấy các phần DB ở thời điểm khác nhau → snapshot isolation (MVCC)."></span>
+      <span class="f ghost" data-act="#mtx|r4" data-say="<b>Lost updates</b>: hai read-modify-write đồng thời. Có SI tự phát hiện, có SI cần lock thủ công."></span>
+      <span class="f ghost" data-act="#mtx|r5" data-say="<b>Write skew</b>: quyết định dựa trên premise đã sai lúc ghi. Chỉ <b>serializable</b> chặn được."></span>
+      <span class="f ghost" data-act="#mtx|r6" data-say="<b>Phantom reads</b>: write của người khác làm đổi kết quả search. Trong write skew cần xử lý đặc biệt như index-range locks."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <h3>3 cách hiện thực serializable</h3>
+      <div class="stack">
+        <div class="leg a f"><b>🧵 Serial execution</b><p>Đơn giản, hiệu quả nếu transaction rất nhanh và throughput vừa một CPU core.</p></div>
+        <div class="leg b f"><b>🔐 Two-phase locking</b><p>Chuẩn mực hàng chục năm; nhiều app tránh vì performance.</p></div>
+        <div class="leg c f"><b>🔮 SSI</b><p>Mới, optimistic: không block, kiểm tra lúc commit và abort nếu không serializable.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== END ===================== -->
+<section class="slide" id="end">
+  <div class="title-wrap" style="align-items:center;text-align:center">
+    <div class="orb" style="width:360px;height:360px;background:#f9a8d4;left:10%;top:10%"></div>
+    <h1 class="in" style="font-size:60px">Tóm tắt <span class="grad">Chapter 7</span></h1>
+    <p class="in muted" style="font-size:20px;margin-top:10px;max-width:1050px"><b>Transactions là một abstraction layer</b>: app được “giả vờ” rằng một số concurrency problem và hardware/software fault không tồn tại. Một lớp lớn lỗi thu gọn thành <b>transaction abort</b> — app chỉ cần <b>retry</b>.</p>
+    <div class="cols3 in" style="margin-top:22px;text-align:left;max-width:1180px">
+      <div class="card"><h3>🧱 Khi nào cần?</h3><p class="ps">Access pattern đơn giản (đọc/ghi một record) có thể sống không cần transaction. Access pattern phức tạp → transaction giảm mạnh số error case phải nghĩ tới; không có nó, denormalized data dễ <b>out of sync</b>.</p></div>
+      <div class="card"><h3>🧪 Isolation levels</h3><p class="ps"><b>Read committed</b>, <b>snapshot isolation</b> (“repeatable read”), <b>serializable</b>. Weak isolation chặn một số anomaly, phần còn lại developer tự xử lý (vd. explicit locking).</p></div>
+      <div class="card"><h3>🌐 Tiếp theo</h3><p class="ps">Các ví dụ dùng relational model, nhưng transaction có giá trị với <b>mọi data model</b>. Chapter 8–9: thử thách mới của transaction trong <b>distributed databases</b>.</p></div>
+    </div>
+  </div>
+</section>
+
+</div></div>
+<div id="bar"></div>
+<div id="hint">← → / Space: từng bước · Shift+→: qua slide · A: hiện hết · Home: đầu · F: toàn màn hình</div>
+<div id="nav"><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+<script>
+(function(){
+  // ---------- C++ highlighter (same as lec03) ----------
+  const KW=new Set("if else for while do return break continue switch case default struct class using namespace const static new delete true false sizeof public private include pragma auto".split(" "));
+  const TY=new Set("int double float char void bool long short unsigned string".split(" "));
+  const LIB=new Set("cout cin endl sqrt fabs std".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line){
+    if(/^\s*#/.test(line)) return '<span class="p">'+esc(line)+'</span>';
+    const re=/(\/\/.*$)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="n">'+m[3]+'</span>';
+      else if(m[4]){
+        const w=m[4];
+        let cls=KW.has(w)?"k":TY.has(w)?"t":LIB.has(w)?"fn":(m[5]?"fn":"");
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[5]?esc(m[5]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-cpp"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");const [a,b]=r.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+  // ---------- deck engine ----------
+  // .f fragments, shown one per step. Per fragment:
+  //   data-act  "sel|cls;…"   class kept while the fragment is shown
+  //   data-now  "sel|cls;…"   class only while it is the latest fragment
+  //   data-set  "sel::html;…" content set while shown (later fragments win)
+  //   data-say  narration for the .say line
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")].sort((x,y)=>(+x.dataset.o||0)-(+y.dataset.o||0)); // data-o: show later
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  const pairs=(v,sep)=>(v||"").split(";").filter(Boolean).map(p=>{const k=p.indexOf(sep);return [p.slice(0,k).trim(),p.slice(k+sep.length)]});
+  function tog(v,on){pairs(v,"|").forEach(([sel,cls])=>{document.querySelectorAll(sel).forEach(t=>t.classList.toggle(cls,on))})}
+  // remember original content of every data-set target
+  document.querySelectorAll("[data-set]").forEach(f=>pairs(f.dataset.set,"::").forEach(([sel])=>{document.querySelectorAll(sel).forEach(t=>{if(t.dataset.orig===undefined)t.dataset.orig=t.innerHTML})}));
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach(f=>{tog(f.dataset.now,false);tog(f.dataset.act,false)});
+      s.querySelectorAll("[data-orig]").forEach(t=>t.innerHTML=t.dataset.orig);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step);f.classList.toggle("on",on);if(on){tog(f.dataset.act,true);pairs(f.dataset.set,"::").forEach(([sel,val])=>document.querySelectorAll(sel).forEach(t=>t.innerHTML=val))}});
+      if(i===cur&&step>0)tog(fs[step-1].dataset.now,true);
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.innerHTML=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length;
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    try{history.replaceState(null,"","#"+slides[cur].id)}catch(e){}
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+  addEventListener("keydown",e=>{
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+
+</script>
+</body>
+</html>

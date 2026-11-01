@@ -1,0 +1,1325 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DDIA Chapter 6 · Partitioning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+h1{font-size:70px;line-height:1.1;font-weight:800}
+h2{font-size:38px;line-height:1.2;font-weight:800}
+h3{font-size:23px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:22px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:26px;margin:6px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.88em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 6px;border-radius:6px;color:#be185d}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.cols.c64{grid-template-columns:1.25fr 1fr}.cols.c46{grid-template-columns:1fr 1.2fr}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.card.bad{border-color:#fecdd3;background:linear-gradient(180deg,#fff1f3,#fff)}
+.card.good{border-color:#a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff)}
+.lbl{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
+.icon{font-size:34px;margin-bottom:4px}
+.note{margin-top:12px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:20px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.code{font-family:var(--mono);font-size:18px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
+.code.sm{font-size:16.5px}.code.xs{font-size:15px;line-height:1.45}.code.xxs{font-size:13.6px;line-height:1.38;padding:8px 0}
+.code .ln{padding:0 14px 0 8px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.11);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.13);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
+.code-title{font-family:var(--mono);font-size:15px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+.f.zoom{transform:scale(.85)}.f.zoom.on{transform:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:19px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.legend{display:flex;flex-direction:column;gap:10px}
+.leg{border-radius:12px;padding:10px 16px;background:#fff;border:1px solid var(--line)}
+.leg b{display:block;font-size:21px;margin-bottom:2px}
+.leg p{font-size:19px}
+.leg.a{border-left:6px solid #7c3aed}.leg.b{border-left:6px solid #06b6d4}.leg.c{border-left:6px solid #f59e0b}
+.console{font-family:var(--mono);font-size:17px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.mem{display:flex;align-items:center;gap:16px;min-height:130px}
+.frame{border:2px solid #e4dcfb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
+.frame .fname{font-family:var(--mono);font-size:16px;color:var(--muted);margin-bottom:6px}
+.var{display:flex;align-items:center;gap:10px}
+.vn{font-family:var(--mono);font-size:21px;color:var(--t);font-weight:600}
+.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #c4b5fd;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
+.vb .new{display:none}
+.callee,.arw{opacity:0;transform:translateX(-14px);transition:all .5s}
+.mem.s1 .callee,.mem.s1 .arw{opacity:1;transform:none}
+.mem.s2 .chg .old{display:none}.mem.s2 .chg .new{display:inline;animation:pop .5s}
+.mem.s2 .chg{border-color:#f59e0b;box-shadow:0 0 18px rgba(245,158,11,.5)}
+.mem.s3 .callee,.mem.s3 .arw{opacity:.15;transform:translateY(10px)}
+.mem.s3 .result{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.5)}
+.arw{font-family:var(--mono);font-size:16px;color:var(--gold);text-align:center;line-height:1.2;font-weight:600}
+.arw .bar{display:block;font-size:30px}
+.alias{font-size:18px;color:var(--accent2);font-weight:600}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.25)}100%{transform:none;opacity:1}}
+.flow{display:flex;align-items:center;gap:12px;justify-content:center}
+.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:18px;border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:14px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.h{border-color:var(--gold)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#c4b5fd}.box.exe{border-color:#ec4899;background:#fdf2f8}
+.ar{color:var(--muted);font-size:26px;text-align:center}
+.stack{display:flex;flex-direction:column;gap:8px}
+svg text{font-family:var(--mono);font-weight:600}
+.draw{stroke-dasharray:400;stroke-dashoffset:400;transition:stroke-dashoffset 1s ease}
+svg.d1 .dr1,svg.d2 .dr2,svg.d3 .dr3{stroke-dashoffset:0}
+.fadein{opacity:0;transition:opacity .6s}
+svg.d1 .fd1,svg.d2 .fd2,svg.d3 .fd3{opacity:1}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:19px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05)}
+.ag:hover{border-color:#ec4899;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
+.ag b{color:#db2777;margin-right:6px;font-family:var(--mono)}
+.formula{font-family:var(--mono);font-size:23px;text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:16px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+@media (max-width:700px){#hint{display:none}}
+@media print{#nav,#bar,#hint{display:none}}
+
+/* lec03 additions */
+.chain{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pv{display:inline-flex;align-items:center;font-family:var(--mono);font-size:18px;font-weight:700;padding:5px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;white-space:nowrap}
+.pv.yes{background:#d1fae5;border-color:#34d399;color:#047857}
+.pv.no{background:#ffe4e6;border-color:#fb7185;color:#be123c}
+.pv.skip{background:#f1f5f9;border-color:#cbd5e1;color:#94a3b8;text-decoration:line-through;border-style:dashed}
+.op{font-family:var(--mono);font-size:26px;font-weight:800;color:var(--sa1)}
+.tt th,.tt td{text-align:center}.tt td:first-child{color:var(--text);font-weight:400}
+.tt tr.hit td{background:#fdf2f8;color:#be185d}
+tr.f{transform:none}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.code.show-s .mark-s{opacity:.3;text-decoration:line-through}
+.arr{display:flex;gap:12px;justify-content:center;margin-top:6px}
+.cell{width:84px;height:84px;border-radius:16px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:800;transition:all .45s;box-shadow:0 6px 16px -10px rgba(124,58,237,.4)}
+.cell small{font-size:13px;color:var(--muted);font-weight:600}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857;transform:translateY(-6px)}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;transform:translateY(-10px) scale(1.06);box-shadow:0 10px 24px -8px rgba(225,29,72,.5)}
+.cell.skip{opacity:.3;transform:scale(.92)}
+.syn{display:flex;gap:12px;align-items:center;justify-content:center;font-family:var(--mono);font-size:24px;font-weight:700}
+.sy{padding:8px 16px;border-radius:12px;color:#fff}
+.sy.c1{background:linear-gradient(135deg,#7c3aed,#a855f7)}.sy.c2{background:linear-gradient(135deg,#059669,#10b981)}.sy.c3{background:linear-gradient(135deg,#e11d48,#f97316)}
+.spin{display:inline-block;animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* lec04 arrays additions */
+.cell .v{display:block;line-height:1}
+.cell.max{border-color:#db2777;background:#fdf2f8;color:#be185d}
+.cell.empty{border-style:dashed;background:#f8fafc;color:#cbd5e1;box-shadow:none}
+.cell.done{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cell.new{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.cell.out{opacity:.4;border-style:dashed}
+.cell.gone{border-color:#e11d48;background:#fff1f3;color:#be123c;text-decoration:line-through}
+.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(245,158,11,.55)}
+.cell.cmp{border-color:#0891b2;background:#ecfeff;color:#0e7490;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(8,145,178,.5)}
+.cell.dots{border:none;box-shadow:none;background:none;width:40px;color:var(--muted)}
+.arr.sm .cell{width:70px;height:74px;font-size:24px;border-radius:14px}
+.arr.xs .cell{width:56px;height:62px;font-size:19px;border-radius:12px}
+.arr.xs .cell small{font-size:11.5px}
+.arr.left{justify-content:flex-start}
+.addr{display:flex;gap:12px;justify-content:center;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.addr span{width:84px;text-align:center}
+.vars{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.vc{font-family:var(--mono);font-size:19px;font-weight:700;padding:5px 14px;border-radius:12px;background:#fff;border:2px solid #e4dcfb;transition:all .35s}
+.vc b{color:var(--t)}
+.vc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.45)}
+.vc.res{border-color:#10b981;background:#ecfdf5;color:#047857}
+.ci{opacity:0;transition:opacity .4s}.ci.show{opacity:1}
+.say{font-size:20px;margin-top:12px;min-height:56px;color:var(--muted)}
+.say b{color:var(--text)}
+.rowlbl{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted);margin:10px 0 4px}
+.zone{display:flex;gap:6px;justify-content:center;margin-top:8px;font-size:15px;font-weight:700}
+.zone span{padding:3px 10px;border-radius:999px}
+.z1{background:#d1fae5;color:#047857}.z2{background:#f1f5f9;color:#64748b}.z3{background:#ffe4e6;color:#be123c}
+.brace{display:flex;gap:12px;justify-content:center;margin-top:4px}
+.brace div{border-top:3px solid currentColor;padding-top:4px;text-align:center;font-family:var(--mono);font-size:15px;font-weight:700}
+.mx{display:grid;gap:6px;justify-content:center}
+.mc{width:62px;height:52px;border-radius:10px;border:2px solid #e4dcfb;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .4s}
+.mx.sm .mc{width:44px;height:36px;font-size:14px;border-radius:8px}
+.mc.ix{border:none;background:none;color:var(--muted);font-size:14px;font-weight:600;box-shadow:none}
+.mc.unused{border-style:dashed;background:#f8fafc;color:#cbd5e1}
+.mc.used{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.mc.hl{background:#fffbeb;border-color:#fcd34d}
+.mc.cur{border-color:#f59e0b;background:#fde68a;color:#92400e;transform:scale(1.12);box-shadow:0 8px 20px -6px rgba(245,158,11,.6)}
+.mc.bd{border-color:#ec4899;border-width:3px}
+.mc.inr{opacity:.3}
+.mc.pos{border-color:#10b981;background:#d1fae5;color:#047857}
+.mc.neg{background:#fff1f3;color:#be123c}
+.mc.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;border-style:dashed}
+.strip{display:flex;gap:3px;font-family:var(--mono);font-size:12px;flex-wrap:nowrap;overflow:hidden}
+.strip span{padding:6px 5px;border-radius:5px;background:#f3edff;color:#6d28d9;white-space:nowrap}
+.strip span.r1{background:#e0f2fe;color:#0369a1}
+.strip span.gap{background:none;color:var(--muted)}
+.trace td,.trace th{font-size:17px;padding:5px 10px}
+.trace td:first-child{color:var(--text)}
+.trace tr.now td{background:#fffbeb}
+.sig{font-family:var(--mono);font-size:17px;background:#fff;border:1px dashed #c4b5fd;border-radius:10px;padding:6px 12px;color:#6d28d9;display:inline-block}
+
+.cols>*{min-width:0}
+
+/* ===== DDIA ch1 additions ===== */
+.sv{width:100%;height:auto;overflow:visible}
+.sv text{font-family:"Be Vietnam Pro",system-ui,sans-serif;font-weight:700;font-size:15px;fill:#1e1b3a}
+.sv text.sm{font-size:12.5px;fill:#64607d;font-weight:500}
+.sv text.lb{font-size:12.5px;fill:#7c3aed;font-weight:700}
+.sv .nd{fill:#fff;stroke:#c4b5fd;stroke-width:2}
+.sv .nd.c2{stroke:#0891b2}.sv .nd.c3{stroke:#ec4899}.sv .nd.c4{stroke:#f59e0b}.sv .nd.c5{stroke:#10b981}
+.sv .ln{stroke:#a78bfa;stroke-width:2.2;fill:none}
+.sv .g{opacity:0;transition:opacity .55s}
+.sv .g.hot .ln{stroke:#ec4899;stroke-dasharray:7 6;animation:dash .7s linear infinite}
+.sv .g.hot .nd{filter:drop-shadow(0 6px 10px rgba(236,72,153,.35))}
+@keyframes dash{to{stroke-dashoffset:-13}}
+.sv .box6{fill:none;stroke:#ec4899;stroke-width:2.5;stroke-dasharray:9 7}
+.chip{display:inline-flex;align-items:center;gap:8px;font-size:18px;font-weight:600;padding:6px 14px;border-radius:999px;background:#fff;border:2px solid #e4dcfb;white-space:nowrap}
+.chip.p{border-color:#c4b5fd;background:#f5f0ff;color:#6d28d9}.chip.c{border-color:#a5f3fc;background:#ecfeff;color:#0e7490}.chip.k{border-color:#fbcfe8;background:#fdf2f8;color:#be185d}.chip.y{border-color:#fde68a;background:#fffbeb;color:#b45309}.chip.g{border-color:#a7f3d0;background:#ecfdf5;color:#047857}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.cell.t{font-size:15px;font-weight:700;text-align:center;line-height:1.15;padding:4px}
+.cell.t .v{font-size:15px}
+.cell.big{font-size:30px}
+.stat{font-family:var(--mono);font-size:44px;font-weight:800;line-height:1;background:linear-gradient(90deg,var(--sa1),var(--sa2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat small{font-size:18px}
+.sysbox{border-radius:14px;padding:12px 16px;text-align:center;font-weight:700;font-size:20px;border:2px solid #e4dcfb;background:#fff;transition:all .45s}
+.sysbox.fail{border-color:#e11d48;background:#fff1f3;color:#be123c;box-shadow:0 0 22px rgba(225,29,72,.35)}
+.sysbox.ok{border-color:#10b981;background:#ecfdf5;color:#047857;box-shadow:0 0 22px rgba(16,185,129,.3)}
+.shield{opacity:0;transform:scale(.7);transition:all .45s;font-size:15px;font-weight:700;color:#7c3aed;text-align:center;border:2px dashed #a78bfa;border-radius:12px;padding:6px 10px;background:#f5f0ff}
+.shield.on{opacity:1;transform:none}
+.dots{display:grid;grid-template-columns:repeat(25,1fr);gap:5px;padding:12px;background:#fff;border:1px solid var(--line);border-radius:14px}
+.dots i{display:block;aspect-ratio:1;border-radius:4px;background:#e9e3fb;transition:all .4s}
+.dots i.x{background:#e11d48;transform:scale(1.35);box-shadow:0 0 10px rgba(225,29,72,.6)}
+.dots i.r{background:#10b981}
+.node{width:110px;border-radius:14px;border:2.5px solid #c4b5fd;background:#fff;text-align:center;padding:8px 4px;font-weight:700;transition:all .45s}
+.node .ver{display:block;font-family:var(--mono);font-size:22px;color:#6d28d9}
+.node small{display:block;font-size:13px;color:var(--muted);font-weight:600}
+.node.down{border-color:#f59e0b;background:#fffbeb;opacity:.55;transform:translateY(8px)}
+.node.v2{border-color:#10b981;background:#ecfdf5}.node.v2 .ver{color:#047857}
+.node.bad{border-color:#e11d48;background:#fff1f3;color:#be123c}.node.bad .ver{color:#be123c}
+.nodes{display:flex;gap:14px;justify-content:center}
+.casc{display:flex;align-items:center;gap:6px;justify-content:center}
+.casc .ar{font-size:22px}
+.tw{display:inline-block;font-size:13px;font-weight:700;padding:2px 8px;border-radius:6px;background:#fdf2f8;color:#be185d;border:1px solid #fbcfe8;margin:2px;opacity:0;transform:translateY(-10px) scale(.6);transition:all .45s}
+.tw.show{opacity:1;transform:none}
+.tw.b{background:#ecfeff;color:#0e7490;border-color:#a5f3fc}
+.tw.y{background:#fffbeb;color:#b45309;border-color:#fde68a}
+.mbox{border:2px solid #e4dcfb;border-radius:12px;background:#fff;padding:6px 8px;min-height:84px;transition:all .4s}
+.mbox h4{font-size:14px;color:var(--muted);margin-bottom:4px}
+.mbox.hot{border-color:#0891b2;box-shadow:0 0 16px rgba(8,145,178,.35)}
+.mboxes{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.who{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:18px;padding:8px 14px;border-radius:12px;background:#fff;border:2px solid #fbcfe8}
+.big-ar{font-size:30px;color:var(--muted);text-align:center;line-height:1}
+.rt{display:flex;height:58px;border-radius:12px;overflow:hidden;border:2px solid #e4dcfb;background:#fff}
+.rt>div{display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;opacity:0;transition:opacity .45s;white-space:nowrap}
+.rt>div.show{opacity:1}
+.rt .n1,.rt .n2{background:#94a3b8}.rt .q{background:#f59e0b}.rt .sv2{background:#7c3aed}
+.brk{position:relative;height:44px;margin-top:6px}
+.brk>div{position:absolute;top:0;border-top:3px solid;text-align:center;font-size:15px;font-weight:700;padding-top:4px;opacity:0;transition:opacity .45s}
+.brk>div.show{opacity:1}
+.pc rect.b{fill:#c4b5fd;transform:translateX(var(--x0));transition:transform 1.3s cubic-bezier(.6,0,.2,1) calc(var(--d)*7ms),fill .4s}
+.pc.sorted rect.b{transform:translateX(var(--x1))}
+.pc.p95 rect.t95{fill:#f472b6}.pc.p99 rect.t99{fill:#e11d48}
+.pc .mk{opacity:0;transition:opacity .5s}
+.pc.mean .mkm,.pc.p50 .mk50,.pc.p95 .mk95,.pc.p99 .mk99{opacity:1}
+.pc text{font-family:var(--mono);font-size:12px;font-weight:700}
+.q-row{display:flex;gap:8px;align-items:center}
+.rq{height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;font-weight:700;color:#fff;transition:all .5s}
+.rq.slow{width:190px;background:linear-gradient(135deg,#e11d48,#f97316)}
+.rq.fast{width:54px;background:linear-gradient(135deg,#0891b2,#7c3aed)}
+.rq.wait{box-shadow:0 0 0 3px #fde68a;animation:shake .5s infinite}
+.rq.done{opacity:.25}
+@keyframes shake{50%{transform:translateY(-3px)}}
+.srv{border:2.5px solid #7c3aed;border-radius:14px;padding:10px 14px;text-align:center;font-weight:800;background:#f5f0ff;min-width:120px}
+.be{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;margin:6px 0}
+.be .nm{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted)}
+.be .trk{height:26px;border-radius:8px;background:#f5f3ff;position:relative;overflow:hidden}
+.be .bb{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:8px;background:linear-gradient(90deg,#0891b2,#7c3aed);transition:width 1s ease}
+.be .bb.slow{background:linear-gradient(90deg,#f97316,#e11d48)}
+.run .be .bb{width:var(--w)}
+.mach{border:3px solid #7c3aed;border-radius:14px;background:#f5f0ff;display:flex;align-items:center;justify-content:center;font-weight:800;color:#6d28d9;transition:all .7s cubic-bezier(.2,.8,.2,1);width:90px;height:70px;font-size:15px;text-align:center}
+.mach.big{width:220px;height:170px;font-size:22px;border-width:5px;box-shadow:0 14px 30px -12px rgba(124,58,237,.6)}
+.mach.sm2{width:70px;height:56px;font-size:13px;border-color:#0891b2;background:#ecfeff;color:#0e7490;opacity:0;transform:scale(.5)}
+.mach.sm2.show{opacity:1;transform:none}
+.farm{display:grid;grid-template-columns:repeat(4,70px);gap:10px;justify-content:center}
+.layer{border-radius:12px;padding:10px 14px;font-weight:700;font-size:17px;text-align:center;transition:all .6s}
+.layer.top{background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;font-size:20px}
+.layer.hid{background:#f8fafc;border:2px dashed #cbd5e1;color:#64748b;font-weight:600;font-size:16px}
+.abs.cover .layer.hid{opacity:.25;filter:blur(1.5px)}
+.toggle{display:flex;gap:10px;align-items:center;justify-content:center}
+.pill{padding:8px 16px;border-radius:999px;font-weight:800;font-size:17px;border:2px solid #e4dcfb;background:#fff;transition:all .4s;color:var(--muted)}
+.pill.on{background:linear-gradient(135deg,var(--sa1),var(--sa2));color:#fff;border-color:transparent;transform:scale(1.06)}
+.quote{font-size:21px;line-height:1.45;font-style:italic;color:#4c4672;border-left:5px solid #ec4899;padding:8px 18px;background:rgba(255,255,255,.7);border-radius:8px}
+.quote b{font-style:normal}
+.mini li{font-size:18px;margin:3px 0;line-height:1.35}
+.card p.ps,p.ps{font-size:17px;line-height:1.4}
+.vs{font-weight:800;font-size:22px;color:var(--muted);align-self:center;text-align:center}
+.here{display:inline-block;font-size:13px;font-weight:800;color:#fff;background:#e11d48;border-radius:6px;padding:2px 8px;margin-left:6px;opacity:0;transition:opacity .4s}
+.here.show{opacity:1}
+.cols4>.card.lit{box-shadow:0 0 0 3px #ec4899,0 12px 26px -10px rgba(236,72,153,.5);transform:translateY(-4px)}
+.card{transition:all .4s}
+
+.chip.c,.leg.c{font-style:normal}.leg.c{color:var(--text)}.leg.c b{color:var(--text)}
+.leg p b{display:inline;font-size:inherit;margin:0}
+.toggle .pill{font-size:15px;white-space:nowrap}
+.abs.cover .layer.hid{opacity:.4;filter:blur(1px)}
+.mach.big{width:260px;font-size:21px}
+.sv text.lb,.pc text{paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+.sv.s1 .g1{opacity:1}.sv.s2 .g2{opacity:1}.sv.s3 .g3{opacity:1}.sv.s4 .g4{opacity:1}.sv.s5 .g5{opacity:1}.sv.s6 .g6{opacity:1}.sv.s7 .g7{opacity:1}.sv.s8 .g8{opacity:1}.who.hot{border-color:#ec4899;box-shadow:0 0 18px rgba(236,72,153,.45)}.toggle.flip #ev1{background:#fff;color:var(--muted);border-color:#e4dcfb;transform:none}.toggle.flip #ev2{background:linear-gradient(135deg,var(--sa1),var(--sa2));color:#fff;border-color:transparent;transform:scale(1.06)}.dots{grid-template-columns:repeat(50,1fr);gap:3px}.dots i{border-radius:2px}
+/* ===== DDIA ch6 additions ===== */
+.ncols{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ncols.c5{grid-template-columns:repeat(5,1fr)}
+.ncol{border:2px solid #e4dcfb;border-radius:14px;background:#fff;padding:8px 8px 10px;transition:all .45s;min-height:60px}
+.ncol h4{font-size:15px;text-align:center;color:var(--muted);margin-bottom:6px;font-family:var(--mono)}
+.ncol.hot{border-color:#ec4899;box-shadow:0 0 18px rgba(236,72,153,.35)}
+.ncol.newn{border-color:#10b981;border-style:dashed;background:#f0fdf8}
+.ncol.dead{border-color:#e11d48;background:#fff1f3}
+.pt{display:block;font-family:var(--mono);font-size:14px;font-weight:700;padding:5px 8px;border-radius:8px;margin:5px 0;text-align:center;border:2px solid #c4b5fd;background:#fff;color:#6d28d9;transition:all .45s}
+.pt.L{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border-color:transparent}
+.pt.F{border-style:dashed;background:#faf8ff}
+.pt.hide{opacity:0;transform:scale(.6)}
+.pt.on{opacity:1;transform:none}
+.pt.lit{box-shadow:0 0 0 3px #f59e0b;transform:scale(1.05)}
+.pt.gone{opacity:.25;border-style:dashed;text-decoration:line-through}
+.pt.mv{background:#ecfdf5;border-color:#10b981;color:#047857}
+.pt.c2{border-color:#a5f3fc;color:#0e7490}.pt.c3{border-color:#fbcfe8;color:#be185d}.pt.c4{border-color:#fde68a;color:#b45309}
+.pt.L.c2{background:linear-gradient(135deg,#0891b2,#06b6d4)}.pt.L.c3{background:linear-gradient(135deg,#db2777,#ec4899)}.pt.L.c4{background:linear-gradient(135deg,#d97706,#f59e0b)}
+.pt.L.c2,.pt.L.c3,.pt.L.c4{color:#fff;border-color:transparent}
+/* load bars */
+.bars{display:flex;align-items:flex-end;gap:8px;height:170px;padding:10px 12px 0;background:#fff;border:1px solid var(--line);border-radius:14px}
+.bars .bc{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.bars .b{width:100%;border-radius:8px 8px 3px 3px;background:linear-gradient(180deg,#a78bfa,#7c3aed);height:var(--h0,10%);transition:height .8s cubic-bezier(.2,.8,.2,1),background .4s}
+.bars .bl{font-family:var(--mono);font-size:12px;color:var(--muted);font-weight:700;padding:4px 0}
+.bars.s1 .b{height:var(--h1)}.bars.s2 .b{height:var(--h2)}.bars.s3 .b{height:var(--h3)}
+.bars.s2 .b.hs{background:linear-gradient(180deg,#f97316,#e11d48)}
+.bars.s2 .b:not(.hs){background:#e9e3fb}
+.qarr{display:flex;gap:8px;padding:0 12px;margin-top:6px}
+.qarr span{flex:1;text-align:center;font-size:18px;color:#0891b2;font-weight:800;opacity:0;transform:translateY(-8px);transition:all .4s}
+.qarr.on span{opacity:1;transform:none}
+/* books */
+.books{display:flex;gap:6px;align-items:flex-end;justify-content:center}
+.book{width:62px;border-radius:6px 6px 3px 3px;background:linear-gradient(180deg,#f5f0ff,#e9e3fb);border:2px solid #c4b5fd;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:6px 2px;font-family:var(--mono);font-weight:800;transition:all .45s;height:150px}
+.book .vn2{font-size:11px;color:var(--muted)}
+.book .rg{font-size:15px;color:#6d28d9;writing-mode:vertical-rl;transform:rotate(180deg)}
+.book.hit{border-color:#f59e0b;background:linear-gradient(180deg,#fffbeb,#fde68a);transform:translateY(-14px);box-shadow:0 12px 24px -10px rgba(245,158,11,.6)}
+.book.cmp{border-color:#ec4899;background:linear-gradient(180deg,#fdf2f8,#fbcfe8)}
+/* hash strip */
+.hstrip{position:relative;height:64px;border-radius:12px;display:flex;overflow:visible;border:2px solid #e4dcfb;background:#fff}
+.hstrip .hp{flex:1;display:flex;align-items:flex-end;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:800;padding-bottom:4px;border-right:2px dashed #d8ccf8}
+.hstrip .hp:last-child{border-right:none}
+.hstrip .hp:nth-child(1){background:#f5f0ff;color:#6d28d9}.hstrip .hp:nth-child(2){background:#ecfeff;color:#0e7490}.hstrip .hp:nth-child(3){background:#fdf2f8;color:#be185d}.hstrip .hp:nth-child(4){background:#fffbeb;color:#b45309}
+.hstrip .dot{position:absolute;top:8px;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:#e11d48;box-shadow:0 0 0 3px #fff,0 4px 10px rgba(225,29,72,.5);opacity:0;transform:translateY(-20px) scale(.4);transition:all .5s}
+.hstrip .dot.show{opacity:1;transform:none}
+.hstrip .dot i{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-style:normal;font-family:var(--mono);font-size:11px;font-weight:800;color:#be123c;white-space:nowrap}
+.hscale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:4px}
+.ht td,.ht th{font-size:15.5px;padding:5px 10px;font-family:var(--mono)}
+.ht td:first-child{color:var(--text);font-weight:600}
+.ht tr td.hv{color:#0284c7}
+.ht tr td.pp{font-weight:800}
+.ht tr.f{transform:none}
+.ht td.p0{color:#6d28d9}.ht td.p1{color:#0e7490}.ht td.p2{color:#be185d}.ht td.p3{color:#b45309}
+/* docs / index */
+.doc{font-family:var(--mono);font-size:13.5px;border:1.5px solid #e4dcfb;border-radius:8px;padding:4px 8px;margin:4px 0;background:#fff;transition:all .4s;line-height:1.35}
+.doc b{color:#6d28d9}
+.doc.red{border-color:#fda4af}
+.doc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 12px rgba(245,158,11,.45)}
+.doc.new{opacity:0;transform:translateY(-10px)}
+.doc.new.show{opacity:1;transform:none}
+.ix{font-family:var(--mono);font-size:13px;padding:3px 8px;border-radius:6px;background:#f8fafc;border:1px solid #e2e8f0;margin:3px 0;transition:all .4s;display:flex;justify-content:space-between;gap:6px}
+.ix .tk{color:#0e7490;font-weight:700}
+.ix .ids{color:#64748b}
+.ix.hot{background:#fde68a;border-color:#f59e0b;transform:scale(1.04)}
+.ix.upd{background:#d1fae5;border-color:#10b981}
+.ix .add{color:#047857;font-weight:800;display:none}
+.ix.upd .add{display:inline}
+.part{border:2px solid #e4dcfb;border-radius:14px;background:#fff;padding:8px 10px;transition:all .45s}
+.part h4{font-size:15px;color:var(--muted);margin-bottom:4px;display:flex;justify-content:space-between}
+.part.hot{border-color:#0891b2;box-shadow:0 0 18px rgba(8,145,178,.35)}
+.part.wr{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.35)}
+.part.idle{opacity:.45}
+.sub{font-size:12px;font-weight:800;letter-spacing:.06em;color:#94a3b8;margin:6px 0 2px}
+.client{display:flex;align-items:center;justify-content:center;gap:10px}
+.msg{font-family:var(--mono);font-size:14px;font-weight:700;padding:4px 10px;border-radius:999px;background:#fff;border:2px solid #e4dcfb;transition:all .4s;opacity:.35}
+.msg.on{opacity:1;border-color:#0891b2;color:#0e7490;background:#ecfeff}
+.msg.ok{opacity:1;border-color:#10b981;color:#047857;background:#ecfdf5}
+/* growing partition */
+.tank{width:100%;height:46px;border-radius:10px;border:2px solid #c4b5fd;background:#fff;position:relative;overflow:hidden}
+.tank .fill{position:absolute;left:0;top:0;bottom:0;width:var(--w,15%);background:linear-gradient(90deg,#a78bfa,#7c3aed);transition:width 1s ease,background .4s}
+.tank .tl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;font-weight:800;color:#1e1b3a;mix-blend-mode:normal}
+.tank.full .fill{background:linear-gradient(90deg,#f97316,#e11d48)}
+.limit{position:absolute;right:0;top:-2px;bottom:-2px;border-right:3px dashed #e11d48}
+/* ring strip for proportional */
+.seg{display:flex;height:54px;border-radius:12px;overflow:hidden;border:2px solid #e4dcfb}
+.seg>div{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12.5px;font-weight:800;color:#fff;border-right:1px solid rgba(255,255,255,.8);transition:all .6s}
+.seg .a{background:#7c3aed}.seg .b{background:#0891b2}.seg .c{background:#db2777}
+.seg .nn{transition:background .6s}
+.seg.on .nn{background:#10b981;box-shadow:inset 0 0 0 3px #065f46}
+.seg .sp{position:relative}
+.seg.cut .sp::after{content:"";position:absolute;right:-1px;top:0;bottom:0;border-right:3px dashed #fde68a}
+/* routing svg */
+.rsv text{font-family:"Be Vietnam Pro",system-ui,sans-serif;font-weight:700;font-size:14px;fill:#1e1b3a}
+.rsv text.sm{font-size:11.5px;fill:#64607d;font-weight:600}
+.rsv .nd{fill:#fff;stroke:#c4b5fd;stroke-width:2}
+.rsv .nd.own{fill:#ecfdf5;stroke:#10b981}
+.rsv .nd.rt{fill:#ecfeff;stroke:#0891b2}
+.rsv .nd.cl{fill:#fdf2f8;stroke:#ec4899}
+.rsv .ln{stroke:#cbd5e1;stroke-width:2.4;fill:none;transition:stroke .4s}
+.rsv .pth{stroke:#ec4899;stroke-width:3;fill:none;stroke-dasharray:600;stroke-dashoffset:600;transition:stroke-dashoffset .9s ease}
+.rsv.r1 .p1,.rsv.r2 .p2,.rsv.r3 .p3,.rsv.r4 .p4,.rsv.r5 .p5,.rsv.r6 .p6{stroke-dashoffset:0}
+.rsv .lab{opacity:0;transition:opacity .5s}
+.rsv.r1 .l1,.rsv.r2 .l2,.rsv.r3 .l3,.rsv.r4 .l4,.rsv.r5 .l5,.rsv.r6 .l6{opacity:1}
+.rsv .pane{fill:#fff;stroke:#ece8f7;stroke-width:1.5}
+.rsv .zk{fill:#fffbeb;stroke:#f59e0b;stroke-width:2.2}
+.mod{display:flex;gap:10px;align-items:center;justify-content:center;font-family:var(--mono);font-size:22px;font-weight:800}
+.mod .r{padding:6px 14px;border-radius:12px;background:#fff;border:2px solid #e4dcfb;transition:all .4s;opacity:.25}
+.mod .r.on{opacity:1;border-color:#e11d48;color:#be123c;background:#fff1f3}
+.mod .r.on0{opacity:1;border-color:#7c3aed;color:#6d28d9;background:#f5f0ff}
+.kg{display:grid;grid-template-columns:repeat(10,1fr);gap:6px}
+.kc{border-radius:10px;border:2px solid #e4dcfb;background:#fff;text-align:center;font-family:var(--mono);padding:4px 0;transition:all .45s}
+.kc .h{display:block;font-size:11px;color:var(--muted)}
+.kc .n{display:block;font-size:19px;font-weight:800;color:#6d28d9}
+.kc .n2{display:none;font-size:19px;font-weight:800}
+.kg.m11 .kc .n{display:none}.kg.m11 .kc .n2{display:block;color:#047857}
+.kg.m11 .kc.mv{border-color:#e11d48;background:#fff1f3}.kg.m11 .kc.mv .n2{color:#be123c}
+.kg.m11 .kc:not(.mv){border-color:#10b981;background:#ecfdf5}
+.casc2{display:flex;gap:12px;justify-content:center;align-items:flex-end}
+.ld{height:10px;border-radius:5px;background:#e9e3fb;margin-top:6px;overflow:hidden}
+.ld i{display:block;height:100%;width:var(--l,40%);background:linear-gradient(90deg,#10b981,#f59e0b 70%,#e11d48);transition:width .7s}
+.speech{font-size:13px;font-weight:700;color:#be123c;min-height:18px;text-align:center;margin-top:4px;opacity:0;transition:opacity .4s}
+.speech.show{opacity:1}
+.mpp{display:flex;align-items:center;gap:10px;justify-content:center}
+.stg{display:flex;flex-direction:column;gap:6px}
+.stg .box{min-width:100px;font-size:15px;padding:6px 10px;opacity:.25;transition:all .45s}
+.stg .box.on{opacity:1;border-color:#7c3aed;background:#f5f0ff}
+.ld i.hi{width:95%}.ld i.full{width:98%}.ld i.even{width:48%}
+.part.dead{border-color:#e11d48;background:#fff1f3;box-shadow:0 0 18px rgba(225,29,72,.35)}
+#dy .dy2,#dy .dyB2{display:none}
+#dy.s1 #dyt .fill{--w:60%}
+#dy.s2 #dyt .fill{--w:100%;background:linear-gradient(90deg,#f97316,#e11d48)}
+#dy.s3 .dy1{display:none}#dy.s3 .dy2{display:block;animation:pop .5s}
+#dy.s4 .dyB1{display:none}#dy.s4 .dyB2{display:block;animation:pop .5s}#dy.s4 .dyidle{display:none}
+#dy.s2 #dyA{border-color:#e11d48}
+.node .speech{font-size:12px}
+.ix.ci{opacity:0}.ix.ci.show{opacity:1}
+.ncol.ci{opacity:0;transform:translateY(10px);transition:all .5s}.ncol.ci.show{opacity:1;transform:none}
+
+.leg.zl{padding:7px 14px}.leg.zl b{font-size:18px}.leg.zl p{font-size:15.5px;line-height:1.35}
+.bars.s2 .b:not(.hs){background:#cfc2f7}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="deck">
+
+<!-- ===================== TITLE ===================== -->
+<section class="slide" id="title">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// DDIA · Part II: Distributed Data · Chapter 6</div>
+    <h1 class="in" style="font-size:76px"><span class="grad">Partitioning</span></h1>
+    <p class="in muted" style="font-size:24px;margin-top:18px;max-width:1000px"><i>Designing Data-Intensive Applications</i> — Martin Kleppmann. Khi dataset quá lớn hoặc query throughput quá cao cho một máy, ta phải chia data thành nhiều <b>partitions</b> (còn gọi là <b>sharding</b>): chọn cách chia, xử lý <b>secondary indexes</b>, <b>rebalancing</b> và <b>request routing</b>.</p>
+    <div class="quote in" style="margin-top:26px;max-width:1000px;font-size:19px">“Clearly, we must break away from the sequential and not limit the computers. We must state definitions and provide for priorities and descriptions of data. We must state relationships, not procedures.” <b>— Grace Murray Hopper, Management and the Computer of the Future (1962)</b></div>
+    <p class="in" style="margin-top:26px;font-size:18px;color:#8a91b4">Phím ← → hoặc Space: chạy từng bước · Shift+→: qua slide · A: hiện hết · F: toàn màn hình</p>
+  </div>
+</section>
+
+<!-- ===================== AGENDA ===================== -->
+<section class="slide" id="agenda">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:18px">· bấm vào mục để đi tới</span></div>
+  <div class="agenda in" style="gap:10px">
+    <div class="ag" data-goto="what"><b>01</b>Partitioning là gì? Terminology</div>
+    <div class="ag" data-goto="repl"><b>02</b>Partitioning and Replication</div>
+    <div class="ag" data-goto="kv"><b>03</b>Partitioning of Key-Value Data: skew &amp; hot spots</div>
+    <div class="ag" data-goto="range"><b>04</b>Partitioning by Key Range</div>
+    <div class="ag" data-goto="rangehot"><b>05</b>Key range &amp; timestamp hot spot</div>
+    <div class="ag" data-goto="hash"><b>06</b>Partitioning by Hash of Key</div>
+    <div class="ag" data-goto="hash2"><b>07</b>Consistent hashing, range queries &amp; compound key</div>
+    <div class="ag" data-goto="skew"><b>08</b>Skewed Workloads &amp; Relieving Hot Spots</div>
+    <div class="ag" data-goto="sidx"><b>09</b>Partitioning and Secondary Indexes</div>
+    <div class="ag" data-goto="bydoc"><b>10</b>Secondary Indexes by Document (local)</div>
+    <div class="ag" data-goto="byterm"><b>11</b>Secondary Indexes by Term (global)</div>
+    <div class="ag" data-goto="lvg"><b>12</b>Local vs Global index</div>
+    <div class="ag" data-goto="rebal"><b>13</b>Rebalancing Partitions</div>
+    <div class="ag" data-goto="modn"><b>14</b>How not to do it: hash mod N</div>
+    <div class="ag" data-goto="fixed"><b>15</b>Fixed number of partitions</div>
+    <div class="ag" data-goto="dyn"><b>16</b>Dynamic partitioning</div>
+    <div class="ag" data-goto="prop"><b>17</b>Partitioning proportionally to nodes</div>
+    <div class="ag" data-goto="ops"><b>18</b>Automatic or Manual Rebalancing</div>
+    <div class="ag" data-goto="route"><b>19</b>Request Routing</div>
+    <div class="ag" data-goto="zk"><b>20</b>ZooKeeper, gossip &amp; co.</div>
+    <div class="ag" data-goto="mpp"><b>21</b>Parallel Query Execution</div>
+    <div class="ag" data-goto="summary"><b>22</b>Summary</div>
+  </div>
+</section>
+
+<!-- ===================== WHAT ===================== -->
+<section class="slide" id="what">
+  <div class="hdr in"><span class="qn">01</span><h2>Partitioning là gì?</h2></div>
+  <div class="cols" style="grid-template-columns:1.05fr 1fr;gap:26px">
+    <div>
+      <p style="font-size:20px">Chapter 5 nói về <b>replication</b> (nhiều bản copy của <i>cùng</i> data). Với dataset rất lớn hoặc query throughput rất cao, như vậy chưa đủ → cần <b>chia nhỏ data thành partitions</b>.</p>
+      <ul class="mini" style="margin-top:10px">
+        <li class="f">Mỗi record / row / document thuộc về <b>đúng một partition</b>.</li>
+        <li class="f">Mỗi partition là một <b>small database</b> của riêng nó (có thể hỗ trợ operation chạm nhiều partition).</li>
+        <li class="f">Lý do chính: <b>scalability</b>. Các partitions đặt trên nhiều node trong cluster <b>shared-nothing</b> → data trải ra nhiều disk, query load trải ra nhiều processor.</li>
+        <li class="f">Query trên một partition: mỗi node tự chạy độc lập → thêm node = tăng throughput. Query lớn, phức tạp có thể <b>parallelize</b> trên nhiều node (khó hơn nhiều).</li>
+      </ul>
+      <div class="note f" style="font-size:17px">Pioneered từ thập niên 1980 bởi <b>Teradata</b>, <b>Tandem NonStop SQL</b>; gần đây được NoSQL databases &amp; Hadoop-based data warehouses “rediscover”. Áp dụng cho cả transactional lẫn analytics workloads.</div>
+    </div>
+    <div>
+      <div class="card f" style="padding:14px 18px"><span class="lbl info">TERMINOLOGICAL CONFUSION</span><p class="ps" style="margin-bottom:10px">Cùng một khái niệm, mỗi hệ thống gọi một kiểu:</p>
+        <table class="tt" style="font-size:17px">
+          <tr><th>System</th><th>Gọi partition là</th></tr>
+          <tr><td>MongoDB, Elasticsearch, SolrCloud</td><td><b>shard</b></td></tr>
+          <tr><td>HBase</td><td><b>region</b></td></tr>
+          <tr><td>Bigtable</td><td><b>tablet</b></td></tr>
+          <tr><td>Cassandra, Riak</td><td><b>vnode</b></td></tr>
+          <tr><td>Couchbase</td><td><b>vBucket</b></td></tr>
+        </table>
+      </div>
+      <div class="card bad f" style="margin-top:12px"><span class="lbl bad">ĐỪNG NHẦM</span><p class="ps">Partitioning ở đây = <b>cố ý</b> chia database lớn thành nhiều database nhỏ. Không liên quan đến <b>network partitions (netsplits)</b> — một loại fault mạng giữa các node (Chapter 8).</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== REPLICATION ===================== -->
+<section class="slide" id="repl">
+  <div class="hdr in"><span class="qn">02</span><h2>Partitioning <span class="grad">+</span> Replication</h2></div>
+  <div class="cols" style="grid-template-columns:1.35fr 1fr;gap:24px">
+    <div>
+      <div class="ncols" id="rp">
+        <div class="ncol" id="rn1"><h4>Node 1</h4><span class="pt L">P1 · leader</span><span class="pt F c4 hide" id="r14">P4 · follower</span><span class="pt F c3 hide" id="r13">P3 · follower</span></div>
+        <div class="ncol" id="rn2"><h4>Node 2</h4><span class="pt L c2">P2 · leader</span><span class="pt F hide" id="r21">P1 · follower</span><span class="pt F c4 hide" id="r24">P4 · follower</span></div>
+        <div class="ncol" id="rn3"><h4>Node 3</h4><span class="pt L c3">P3 · leader</span><span class="pt F c2 hide" id="r32">P2 · follower</span><span class="pt F hide" id="r31">P1 · follower</span></div>
+        <div class="ncol" id="rn4"><h4>Node 4</h4><span class="pt L c4">P4 · leader</span><span class="pt F c3 hide" id="r43">P3 · follower</span><span class="pt F c2 hide" id="r42">P2 · follower</span></div>
+      </div>
+      <div class="sysbox" style="margin-top:14px;font-size:17px" id="rpmsg">4 partitions · mỗi partition có 1 leader</div>
+      <span class="f ghost" data-act="#r21|on;#r31|on" data-now="#r21|lit;#r31|lit" data-set="#rpmsg::P1 được replicate sang Node 2 &amp; Node 3 (replication factor = 3)" data-say="Mỗi record thuộc <b>đúng một partition</b>, nhưng partition đó được <b>lưu trên nhiều node</b> để fault tolerance."></span>
+      <span class="f ghost" data-act="#r32|on;#r42|on;#r43|on;#r13|on;#r14|on;#r24|on" data-set="#rpmsg::Mỗi partition: 1 leader + 2 followers, rải trên các node khác nhau" data-say="Với <b>leader–follower replication</b>: leader của mỗi partition ở một node, followers ở các node khác."></span>
+      <span class="f ghost" data-now="#rn1|hot" data-act="#rpmsg|ok" data-set="#rpmsg::Node 1 = leader của P1, follower của P3 &amp; P4" data-say="Một node chứa <b>nhiều partitions</b>: vừa là <b>leader</b> cho vài partition, vừa là <b>follower</b> cho partition khác."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <div class="card f"><h3>Hai lựa chọn gần như độc lập</h3><p class="ps">Mọi thứ về replication ở Chapter 5 áp dụng y nguyên cho replication của partitions. Lựa chọn <b>partitioning scheme</b> phần lớn độc lập với <b>replication scheme</b>.</p></div>
+      <div class="note blue f" style="font-size:18px">Để đơn giản, phần còn lại của chapter <b>bỏ qua replication</b> và chỉ tập trung vào partitioning.</div>
+      <div class="chips f" style="margin-top:14px"><span class="chip p">P# · leader</span><span class="chip">P# · follower (dashed)</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== KEY-VALUE ===================== -->
+<section class="slide" id="kv">
+  <div class="hdr in"><span class="qn">03</span><h2>Partitioning of Key-Value Data</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.15fr;gap:26px">
+    <div>
+      <p style="font-size:20px">Câu hỏi: record nào lưu ở node nào? <b>Mục tiêu</b>: chia <b>data</b> và <b>query load</b> đều cho các node.</p>
+      <ul class="mini" style="margin-top:10px">
+        <li class="f">Chia công bằng → <i>về lý thuyết</i> 10 nodes xử lý được <b>10×</b> data và <b>10×</b> read/write throughput.</li>
+        <li class="f">Chia không công bằng = <b>skewed</b>. Partition có load cao bất thường = <b>hot spot</b>. Cực đoan: 9/10 nodes idle, bottleneck là 1 node bận.</li>
+        <li class="f">Gán record cho node <b>ngẫu nhiên</b>? Data đều, nhưng khi đọc một item thì không biết nó ở đâu → phải <b>query tất cả nodes</b> song song.</li>
+        <li class="f">Làm tốt hơn: giả sử data model <b>key-value</b> đơn giản, luôn truy cập record theo <b>primary key</b> — như tra bách khoa toàn thư theo tiêu đề.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="bars" id="kvb">
+        <div class="bc"><div class="b" style="--h1:55%;--h2:8%;--h3:52%"></div><span class="bl">N1</span></div>
+        <div class="bc"><div class="b" style="--h1:55%;--h2:6%;--h3:58%"></div><span class="bl">N2</span></div>
+        <div class="bc"><div class="b" style="--h1:55%;--h2:9%;--h3:50%"></div><span class="bl">N3</span></div>
+        <div class="bc"><div class="b hs" style="--h1:55%;--h2:98%;--h3:56%"></div><span class="bl">N4</span></div>
+        <div class="bc"><div class="b" style="--h1:55%;--h2:7%;--h3:54%"></div><span class="bl">N5</span></div>
+        <div class="bc"><div class="b" style="--h1:55%;--h2:5%;--h3:57%"></div><span class="bl">N6</span></div>
+        <div class="bc"><div class="b" style="--h1:55%;--h2:8%;--h3:51%"></div><span class="bl">N7</span></div>
+        <div class="bc"><div class="b" style="--h1:55%;--h2:6%;--h3:55%"></div><span class="bl">N8</span></div>
+        <div class="bc"><div class="b" style="--h1:55%;--h2:7%;--h3:53%"></div><span class="bl">N9</span></div>
+        <div class="bc"><div class="b" style="--h1:55%;--h2:9%;--h3:56%"></div><span class="bl">N10</span></div>
+      </div>
+      <div class="qarr" id="kvq"><span>↑</span><span>↑</span><span>↑</span><span>↑</span><span>↑</span><span>↑</span><span>↑</span><span>↑</span><span>↑</span><span>↑</span></div>
+      <div class="sysbox" style="margin-top:8px;font-size:17px" id="kvmsg">Load trên 10 nodes</div>
+      <span class="f ghost" data-act="#kvb|s1;#kvmsg|ok" data-set="#kvmsg::✅ Fair share: mỗi node ~10% load" data-say="Lý tưởng: mỗi node nhận <b>phần chia công bằng</b> của data và query load."></span>
+      <span class="f ghost" data-now="#kvb|s2;#kvmsg|fail" data-set="#kvmsg::🔥 Skewed: N4 là hot spot, 9 nodes còn lại gần như idle" data-say="<b>Skew</b>: hầu hết load dồn vào một partition → <b>hot spot</b>. Thêm node cũng vô ích."></span>
+      <span class="f ghost" data-act="#kvb|s3;#kvq|on" data-set="#kvmsg::🎲 Random assignment: data đều, nhưng đọc 1 key = hỏi cả 10 nodes" data-say="Random assignment tránh được hot spot, nhưng <b>mất khả năng định vị</b> key → mọi read phải gửi tới tất cả nodes."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== KEY RANGE ===================== -->
+<section class="slide" id="range">
+  <div class="hdr in"><span class="qn">04</span><h2>Partitioning by <span class="grad">Key Range</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr;gap:24px">
+    <div>
+      <p style="font-size:19px;margin-bottom:10px">Gán cho mỗi partition một <b>continuous range of keys</b> (min → max) — giống các volume của bộ bách khoa toàn thư giấy.</p>
+      <div class="books" id="bk">
+        <div class="book cmp0" id="v1"><span class="vn2">1</span><span class="rg">A – B</span></div>
+        <div class="book"><span class="vn2">2</span><span class="rg">C – Ce</span></div>
+        <div class="book"><span class="vn2">3</span><span class="rg">Cf – D</span></div>
+        <div class="book"><span class="vn2">4</span><span class="rg">E – F</span></div>
+        <div class="book"><span class="vn2">5</span><span class="rg">G – Ha</span></div>
+        <div class="book" id="v6"><span class="vn2">6</span><span class="rg">He – K</span></div>
+        <div class="book"><span class="vn2">7</span><span class="rg">L – Me</span></div>
+        <div class="book"><span class="vn2">8</span><span class="rg">Mf – O</span></div>
+        <div class="book"><span class="vn2">9</span><span class="rg">P – Q</span></div>
+        <div class="book"><span class="vn2">10</span><span class="rg">R – Sa</span></div>
+        <div class="book"><span class="vn2">11</span><span class="rg">Sb – Sz</span></div>
+        <div class="book" id="v12"><span class="vn2">12</span><span class="rg">T – Z</span></div>
+      </div>
+      <p class="muted" style="font-size:14px;text-align:center;margin-top:6px">Minh hoạ theo Figure 6-2 (boundaries chỉ mang tính ví dụ)</p>
+      <div class="sysbox" style="margin-top:8px;font-size:17px" id="bkmsg">12 volumes = 12 partitions</div>
+      <span class="f ghost" data-now="#v1|cmp;#v12|cmp" data-set="#bkmsg::Vol 1 chỉ có A–B, Vol 12 chứa cả T, U, V, X, Y, Z" data-say="Ranges <b>không cần đều nhau</b> vì data không phân bố đều. Partition boundaries phải <b>thích nghi theo data</b>."></span>
+      <span class="f ghost" data-now="#v6|hit" data-act="#bkmsg|ok" data-set="#bkmsg::lookup(&quot;Kleppmann&quot;) → He ≤ K ≤ K → Volume 6" data-say="Biết boundaries → xác định ngay partition chứa key. Biết partition nằm ở node nào → gửi request thẳng tới node đó."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <div class="card f"><h3>Ai chọn boundaries?</h3><p class="ps">Administrator chọn <b>manually</b>, hoặc database tự chọn <b>automatically</b> (xem Rebalancing). Dùng bởi <b>Bigtable</b>, <b>HBase</b>, <b>RethinkDB</b>, <b>MongoDB</b> (trước 2.4).</p></div>
+      <div class="card good f" style="margin-top:12px"><span class="lbl good">ƯU ĐIỂM · SORTED KEYS</span><p class="ps">Trong mỗi partition giữ keys <b>sorted</b> (xem SSTables &amp; LSM-Trees) → <b>range scans</b> dễ; key có thể dùng như <b>concatenated index</b> để lấy nhiều record liên quan trong 1 query.</p></div>
+      <div class="console f" style="margin-top:12px;font-size:15px"><span class="in">key</span> = year-month-day-hour-minute-second
+<span class="in">scan</span> 2026-10-01 … 2026-10-31
+→ tất cả readings của tháng 10</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== KEY RANGE HOT SPOT ===================== -->
+<section class="slide" id="rangehot">
+  <div class="hdr in"><span class="qn">05</span><h2>Nhược điểm của Key Range: <span class="grad">hot spots</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:24px">
+    <div class="card bad">
+      <span class="lbl bad">KEY = timestamp</span>
+      <p class="ps">Sensor network ghi measurement liên tục. Partition theo thời gian → <b>một partition / ngày</b>.</p>
+      <div class="bars" id="rh1" style="height:150px;margin-top:10px">
+        <div class="bc"><div class="b" style="--h0:30%;--h1:9%"></div><span class="bl">10-27</span></div>
+        <div class="bc"><div class="b" style="--h0:30%;--h1:9%"></div><span class="bl">10-28</span></div>
+        <div class="bc"><div class="b" style="--h0:30%;--h1:9%"></div><span class="bl">10-29</span></div>
+        <div class="bc"><div class="b" style="--h0:30%;--h1:9%"></div><span class="bl">10-30</span></div>
+        <div class="bc"><div class="b" style="--h0:30%;--h1:9%"></div><span class="bl">10-31</span></div>
+        <div class="bc"><div class="b hs" style="--h0:6%;--h1:96%;--h2:96%"></div><span class="bl" style="color:#be123c">today</span></div>
+      </div>
+      <p class="ps f" style="margin-top:8px">Mọi write đều vào partition của <b>hôm nay</b> → partition đó <b>overloaded</b> trong khi các partition khác idle.</p>
+      <span class="f ghost" data-act="#rh1|s1;#rh1|s2" data-say="Writes đổ vào theo thời gian thực → <b>tất cả</b> đều rơi vào partition “today”."></span>
+    </div>
+    <div class="card good">
+      <span class="lbl good">KEY = sensor_name + timestamp</span>
+      <p class="ps">Prefix timestamp bằng <b>sensor name</b> → partition trước theo sensor, sau đó mới theo time.</p>
+      <div class="bars" id="rh2" style="height:150px;margin-top:10px">
+        <div class="bc"><div class="b" style="--h0:6%;--h1:58%"></div><span class="bl">a–d</span></div>
+        <div class="bc"><div class="b" style="--h0:6%;--h1:62%"></div><span class="bl">e–h</span></div>
+        <div class="bc"><div class="b" style="--h0:6%;--h1:55%"></div><span class="bl">i–m</span></div>
+        <div class="bc"><div class="b" style="--h0:6%;--h1:60%"></div><span class="bl">n–r</span></div>
+        <div class="bc"><div class="b" style="--h0:6%;--h1:57%"></div><span class="bl">s–v</span></div>
+        <div class="bc"><div class="b" style="--h0:6%;--h1:61%"></div><span class="bl">w–z</span></div>
+      </div>
+      <p class="ps f" style="margin-top:8px">Nhiều sensor cùng active → write load <b>trải đều</b>. Trade-off: muốn lấy nhiều sensor trong một time range thì phải chạy <b>một range query riêng cho mỗi sensor</b>.</p>
+      <span class="f ghost" data-act="#rh2|s1" data-say="Đổi phần tử đầu tiên của key → writes <b>phân tán</b> qua các partitions."></span>
+    </div>
+  </div>
+  <p class="say" style="margin-top:6px">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== HASH ===================== -->
+<section class="slide" id="hash">
+  <div class="hdr in"><span class="qn">06</span><h2>Partitioning by <span class="grad">Hash of Key</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.15fr;gap:24px">
+    <div>
+      <p style="font-size:19px">Vì rủi ro skew &amp; hot spots, nhiều distributed datastores dùng <b>hash function</b> để quyết định partition của một key.</p>
+      <ul class="mini" style="margin-top:8px">
+        <li class="f">Hash tốt biến data <b>skewed</b> thành <b>uniformly distributed</b>: string 32-bit hash → số “ngẫu nhiên” trong 0 … 2<sup>32</sup>−1, dù input rất giống nhau.</li>
+        <li class="f">Không cần <b>cryptographically strong</b>: Cassandra &amp; MongoDB dùng <b>MD5</b>, Voldemort dùng <b>Fowler–Noll–Vo</b>.</li>
+        <li class="f">Cẩn thận hash built-in: Java <code class="i">Object.hashCode()</code>, Ruby <code class="i">Object#hash</code> — cùng key có thể ra hash khác nhau ở các process khác nhau.</li>
+        <li class="f">Gán mỗi partition một <b>range of hashes</b> (không phải range of keys). Boundaries có thể chia đều, hoặc chọn pseudorandomly.</li>
+      </ul>
+    </div>
+    <div>
+      <table class="ht">
+        <tr><th>key (timestamp)</th><th>md5 (32 bit đầu)</th><th>partition</th></tr>
+        <tr class="f"><td>2026-11-01 12:00:24</td><td class="hv">c8c11314</td><td class="pp p3">P3</td></tr>
+        <tr class="f"><td>2026-11-01 12:00:25</td><td class="hv">433b8957</td><td class="pp p1">P1</td></tr>
+        <tr class="f"><td>2026-11-01 12:00:26</td><td class="hv">4c836979</td><td class="pp p1">P1</td></tr>
+        <tr class="f"><td>2026-11-01 12:00:27</td><td class="hv">cc74230d</td><td class="pp p3">P3</td></tr>
+        <tr class="f"><td>2026-11-01 12:00:28</td><td class="hv">8661767c</td><td class="pp p2">P2</td></tr>
+        <tr class="f"><td>2026-11-01 12:00:29</td><td class="hv">0552efdb</td><td class="pp p0">P0</td></tr>
+      </table>
+      <div style="margin-top:28px">
+        <div class="hstrip" id="hs">
+          <div class="hp">P0</div><div class="hp">P1</div><div class="hp">P2</div><div class="hp">P3</div>
+          <span class="dot" id="hd1" style="left:78.4%"><i>:24</i></span>
+          <span class="dot" id="hd2" style="left:26.3%"><i>:25</i></span>
+          <span class="dot" id="hd3" style="left:29.9%"><i style="top:18px">:26</i></span>
+          <span class="dot" id="hd4" style="left:79.9%"><i style="top:18px">:27</i></span>
+          <span class="dot" id="hd5" style="left:52.5%"><i>:28</i></span>
+          <span class="dot" id="hd6" style="left:2.1%"><i>:29</i></span>
+        </div>
+        <div class="hscale"><span>0x00000000</span><span>0x3fffffff</span><span>0x7fffffff</span><span>0xbfffffff</span><span>0xffffffff</span></div>
+      </div>
+      <p class="muted" style="font-size:15px;margin-top:8px">Các timestamp liên tiếp nhau bị <b>rải khắp</b> các partitions (MD5 thật, 4 ranges đều nhau).</p>
+      <span class="f ghost" data-act="#hd1|show;#hd2|show;#hd3|show" data-say="Các key <b>kề nhau</b> (cách nhau 1 giây) cho ra hash <b>rất khác nhau</b>…"></span>
+      <span class="f ghost" data-act="#hd4|show;#hd5|show;#hd6|show" data-say="…nên writes được phân bố <b>công bằng</b> giữa các partitions — kể cả khi keys là timestamp."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== HASH 2 ===================== -->
+<section class="slide" id="hash2">
+  <div class="hdr in"><span class="qn">07</span><h2>Cái giá của hashing &amp; <span class="grad">compound primary key</span></h2></div>
+  <div class="cols3" style="grid-template-columns:1fr 1fr 1.1fr;gap:16px">
+    <div class="card f">
+      <h3>⚠️ “Consistent Hashing”</h3>
+      <p class="ps">Theo Karger et al.: cách phân bố load trên hệ thống cache cỡ internet (như <b>CDN</b>), dùng <b>randomly chosen partition boundaries</b> để khỏi cần central control hay distributed consensus.</p>
+      <p class="ps" style="margin-top:6px">“Consistent” ở đây <b>không</b> liên quan replica consistency hay ACID consistency — nó mô tả một cách <b>rebalancing</b>. Không hiệu quả lắm cho databases, docs hay dùng sai.</p>
+      <div class="note" style="font-size:16px">Gợi ý của tác giả: tránh thuật ngữ này, gọi là <b>hash partitioning</b>.</div>
+    </div>
+    <div class="card bad f">
+      <span class="lbl bad">MẤT RANGE QUERIES</span>
+      <p class="ps">Keys từng kề nhau giờ bị rải khắp partitions → <b>sort order mất</b>.</p>
+      <ul class="mini" style="margin-top:6px">
+        <li>MongoDB (hash-based sharding): range query gửi tới <b>tất cả</b> partitions.</li>
+        <li>Riak, Couchbase, Voldemort: <b>không hỗ trợ</b> range query trên primary key.</li>
+      </ul>
+    </div>
+    <div class="card good f">
+      <span class="lbl good">CASSANDRA · COMPROMISE</span>
+      <p class="ps">Compound primary key: <b>chỉ phần đầu được hash</b> để chọn partition; các column còn lại là <b>concatenated index</b> để sort trong SSTables.</p>
+      <div class="code xs" id="cql" style="margin-top:8px">
+        <div class="ln"><span class="no">1</span><span><span class="k">CREATE TABLE</span> updates (</span></div>
+        <div class="ln"><span class="no">2</span><span>  user_id <span class="t">bigint</span>,</span></div>
+        <div class="ln"><span class="no">3</span><span>  update_timestamp <span class="t">timestamp</span>,</span></div>
+        <div class="ln"><span class="no">4</span><span>  body <span class="t">text</span>,</span></div>
+        <div class="ln mark-a"><span class="no">5</span><span>  <span class="k">PRIMARY KEY</span> ((user_id),</span></div>
+        <div class="ln mark-b"><span class="no">6</span><span>     update_timestamp));</span></div>
+      </div>
+      <p class="ps" style="margin-top:6px"><span id="cq1" style="color:#6d28d9;font-weight:700">user_id</span> → hash → partition · <span id="cq2" style="color:#0e7490;font-weight:700">update_timestamp</span> → sorted trong partition.</p>
+      <span class="f ghost" data-act="#cql|show-a" data-say="<b>user_id</b> được hash → các user khác nhau nằm ở các partitions khác nhau."></span>
+      <span class="f ghost" data-act="#cql|show-b" data-say="Trong cùng một user, updates được lưu <b>sorted theo timestamp</b> trên một partition → range scan hiệu quả khi đã fix user_id. Mô hình đẹp cho <b>one-to-many</b>."></span>
+    </div>
+  </div>
+  <p class="say" style="margin-top:10px">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== SKEW ===================== -->
+<section class="slide" id="skew">
+  <div class="hdr in"><span class="qn">08</span><h2>Skewed Workloads &amp; <span class="grad">Relieving Hot Spots</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.15fr;gap:24px">
+    <div>
+      <p style="font-size:19px">Hashing giảm hot spots nhưng <b>không loại bỏ hoàn toàn</b>: nếu mọi read/write đều vào <b>cùng một key</b>, chúng vẫn tới cùng một partition.</p>
+      <div class="card f" style="margin-top:10px"><h3>🌟 Celebrity problem</h3><p class="ps">Celebrity có hàng triệu followers làm gì đó → “storm of activity”: rất nhiều write vào cùng key (user ID của celebrity, hoặc ID của action được comment). Hash của hai ID giống nhau vẫn giống nhau.</p></div>
+      <div class="card f" style="margin-top:10px"><h3>Giải pháp ở application</h3><p class="ps">Đa số data systems chưa tự bù được skew này → application phải tự làm: thêm <b>random number</b> 2 chữ số vào đầu/cuối key → chia writes cho <b>100 keys</b> khác nhau, nằm ở các partitions khác nhau.</p></div>
+      <div class="card bad f" style="margin-top:10px"><span class="lbl bad">TRADE-OFF</span><p class="ps">Read phải đọc cả <b>100 keys</b> rồi combine. Cần <b>bookkeeping</b>: chỉ split các hot keys (số ít), và phải theo dõi key nào đang bị split.</p></div>
+    </div>
+    <div>
+      <div class="client"><div class="who" id="skw">✍️ 1M writes → key <code class="i">celeb_42</code></div></div>
+      <div class="big-ar" style="margin:8px 0;font-size:16px;font-weight:700" id="skar">↓ hash(key) ↓</div>
+      <div class="ncols">
+        <div class="part" id="sk0"><h4>P0</h4><div class="ld"><i style="--l:12%" id="skl0"></i></div><div class="sub">KEYS</div><div class="ix ci" id="sk0k"><span class="tk">07_celeb_42</span></div><div class="ix ci" id="sk0k2"><span class="tk">63_celeb_42</span></div></div>
+        <div class="part" id="sk1"><h4>P1</h4><div class="ld"><i style="--l:12%" id="skl1"></i></div><div class="sub">KEYS</div><div class="ix" id="sk1k"><span class="tk">celeb_42</span></div><div class="ix ci" id="sk1k2"><span class="tk">31_celeb_42</span></div></div>
+        <div class="part" id="sk2"><h4>P2</h4><div class="ld"><i style="--l:12%" id="skl2"></i></div><div class="sub">KEYS</div><div class="ix ci" id="sk2k"><span class="tk">88_celeb_42</span></div><div class="ix ci" id="sk2k2"><span class="tk">15_celeb_42</span></div></div>
+        <div class="part" id="sk3"><h4>P3</h4><div class="ld"><i style="--l:12%" id="skl3"></i></div><div class="sub">KEYS</div><div class="ix ci" id="sk3k"><span class="tk">42_celeb_42</span></div><div class="ix ci" id="sk3k2"><span class="tk">99_celeb_42</span></div></div>
+      </div>
+      <div class="sysbox" style="margin-top:12px;font-size:17px" id="skmsg">Hash partitioning, nhưng một key cực “hot”</div>
+      <span class="f ghost" data-now="#skw|hot;#skl1|full;#sk1|dead;#skmsg|fail" data-set="#skmsg::🔥 Mọi write vào celeb_42 đều tới P1" data-say="Mọi request cho <b>celeb_42</b> → cùng hash → cùng <b>P1</b>. Hashing không giúp được."></span>
+      <span class="f ghost" data-act="#skl0|even;#skl1|even;#skl2|even;#skl3|even;#skmsg|ok;#sk0k|show;#sk0k2|show;#sk1k2|show;#sk2k|show;#sk2k2|show;#sk3k|show;#sk3k2|show" data-set="#skmsg::✅ 00_celeb_42 … 99_celeb_42 → 100 keys rải trên mọi partition;#skar::↓ prefix random 00–99, rồi hash ↓" data-say="Thêm <b>random prefix 00–99</b> → 100 keys khác nhau → writes chia đều trên các partitions."></span>
+      <span class="f ghost" data-now="#sk0|hot;#sk1|hot;#sk2|hot;#sk3|hot" data-set="#skmsg::📖 Read celeb_42 = đọc 100 keys rồi combine" data-say="Cái giá: <b>reads</b> phải fan-out tới 100 keys và gộp kết quả. Chỉ đáng làm với số ít hot keys."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SECONDARY INDEX INTRO ===================== -->
+<section class="slide" id="sidx">
+  <div class="hdr in"><span class="qn">09</span><h2>Partitioning and <span class="grad">Secondary Indexes</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:26px">
+    <div>
+      <p style="font-size:20px">Các scheme trên dựa vào <b>key-value</b> model: biết primary key → biết partition → route request.</p>
+      <p style="font-size:20px;margin-top:10px">Với <b>secondary index</b>, mọi thứ phức tạp hơn: nó thường không xác định record duy nhất mà là cách <b>tìm các occurrences của một value</b>:</p>
+      <div class="chips f" style="margin-top:12px"><span class="chip p">all actions by user 123</span><span class="chip c">articles containing “hogwash”</span><span class="chip k">cars whose color is red</span></div>
+      <ul class="mini f" style="margin-top:14px">
+        <li>“Bread and butter” của <b>relational databases</b>, phổ biến cả ở <b>document databases</b>.</li>
+        <li>Nhiều key-value stores (<b>HBase</b>, <b>Voldemort</b>) tránh vì phức tạp; một số (<b>Riak</b>) bắt đầu thêm vào vì quá hữu ích.</li>
+        <li>Là <i>raison d’être</i> của search servers như <b>Solr</b>, <b>Elasticsearch</b>.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="card bad f"><span class="lbl bad">VẤN ĐỀ</span><p class="ps">Secondary indexes <b>không map gọn gàng</b> vào partitions.</p></div>
+      <div class="cols f" style="margin-top:14px;gap:14px">
+        <div class="card" style="border-top:5px solid #7c3aed"><h3>📄 Document-based</h3><p class="ps">Mỗi partition giữ index cho <b>documents của nó</b> → <b>local index</b>.</p></div>
+        <div class="card" style="border-top:5px solid #0891b2"><h3 style="color:#0891b2">🔤 Term-based</h3><p class="ps">Một index chung, được partition theo <b>term</b> → <b>global index</b>.</p></div>
+      </div>
+      <div class="note blue f" style="font-size:17px">Ví dụ xuyên suốt: website bán <b>xe cũ</b>, partition theo <b>document ID</b> (0–499 ở partition 0, 500–999 ở partition 1), cần filter theo <code class="i">color</code> và <code class="i">make</code>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== BY DOCUMENT ===================== -->
+<section class="slide" id="bydoc">
+  <div class="hdr in"><span class="qn">10</span><h2>Secondary Indexes by <span class="grad">Document</span> · local index</h2></div>
+  <div class="cols" style="grid-template-columns:1.45fr 1fr;gap:22px">
+    <div>
+      <div class="cols" style="gap:14px">
+        <div class="part" id="d0"><h4><span>Partition 0</span><span>IDs 0–499</span></h4>
+          <div class="sub">PRIMARY KEY INDEX</div>
+          <div class="doc red"><b>191</b> {color: red, make: Honda}</div>
+          <div class="doc"><b>214</b> {color: black, make: Dodge}</div>
+          <div class="doc red"><b>306</b> {color: red, make: Ford}</div>
+          <div class="sub">LOCAL SECONDARY INDEXES</div>
+          <div class="ix"><span class="tk">color:black</span><span class="ids">[214]</span></div>
+          <div class="ix" id="d0r"><span class="tk">color:red</span><span class="ids">[191, 306]</span></div>
+          <div class="ix"><span class="tk">make:Dodge</span><span class="ids">[214]</span></div>
+          <div class="ix"><span class="tk">make:Ford</span><span class="ids">[306]</span></div>
+          <div class="ix"><span class="tk">make:Honda</span><span class="ids">[191]</span></div>
+        </div>
+        <div class="part" id="d1"><h4><span>Partition 1</span><span>IDs 500–999</span></h4>
+          <div class="sub">PRIMARY KEY INDEX</div>
+          <div class="doc"><b>515</b> {color: silver, make: Dodge}</div>
+          <div class="doc red"><b>768</b> {color: red, make: Volvo}</div>
+          <div class="doc new" id="d893"><b>893</b> {color: silver, make: Audi}</div>
+          <div class="sub">LOCAL SECONDARY INDEXES</div>
+          <div class="ix" id="d1r"><span class="tk">color:red</span><span class="ids">[768]</span></div>
+          <div class="ix" id="d1s"><span class="tk">color:silver</span><span class="ids">[515<span class="add">, 893</span>]</span></div>
+          <div class="ix ci" id="d1a"><span class="tk">make:Audi</span><span class="ids">[893]</span></div>
+          <div class="ix"><span class="tk">make:Dodge</span><span class="ids">[515]</span></div>
+          <div class="ix"><span class="tk">make:Volvo</span><span class="ids">[768]</span></div>
+        </div>
+      </div>
+      <div class="client" style="margin-top:10px"><span class="msg" id="dq">🔍 color = red ?</span><span class="msg" id="dq0">→ P0</span><span class="msg" id="dq1">→ P1</span><span class="msg" id="dres">⇒ [191, 306, 768]</span></div>
+      <span class="f ghost" data-act="#d893|show;#d1s|upd;#d1a|show;#d1a|upd" data-now="#d1|wr;#d0|idle" data-say="<b>Write</b> doc 893: chỉ đụng tới <b>partition chứa document ID đó</b>. Partition tự cập nhật secondary index của nó."></span>
+      <span class="f ghost" data-act="#dq|on;#dq0|on;#dq1|on" data-now="#d0|hot;#d1|hot;#d0r|hot;#d1r|hot" data-say="<b>Read</b> “red cars”: xe đỏ có ở <b>cả hai</b> partition → phải gửi query tới <b>tất cả partitions</b> (scatter)…"></span>
+      <span class="f ghost" data-act="#dres|ok" data-say="…rồi gộp kết quả (gather). Đây là <b>scatter/gather</b> — read trên secondary index trở nên tốn kém."></span>
+      <p class="say" style="margin-top:4px;min-height:48px;font-size:18px">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <div class="card good f"><span class="lbl good">WRITE: ĐƠN GIẢN</span><p class="ps">Mỗi partition hoàn toàn độc lập, giữ secondary index chỉ cho documents <b>của nó</b> — không quan tâm partition khác. Vì vậy gọi là <b>local index</b>.</p></div>
+      <div class="card bad f" style="margin-top:12px"><span class="lbl bad">READ: SCATTER/GATHER</span><p class="ps">Dù query song song, scatter/gather dễ bị <b>tail latency amplification</b>. Khó tránh khi filter nhiều secondary indexes cùng lúc (color <b>và</b> make).</p></div>
+      <div class="card f" style="margin-top:12px"><h3>Ai dùng?</h3><div class="chips"><span class="chip p">MongoDB</span><span class="chip c">Riak</span><span class="chip k">Cassandra</span><span class="chip y">Elasticsearch</span><span class="chip g">SolrCloud</span><span class="chip p">VoltDB</span></div><p class="ps muted" style="margin-top:8px">Vendors khuyên thiết kế partitioning để secondary index query phục vụ được từ <b>một partition</b> — nhưng không phải lúc nào cũng làm được.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== BY TERM ===================== -->
+<section class="slide" id="byterm">
+  <div class="hdr in"><span class="qn">11</span><h2>Secondary Indexes by <span class="grad">Term</span> · global index</h2></div>
+  <div class="cols" style="grid-template-columns:1.45fr 1fr;gap:22px">
+    <div>
+      <div class="cols" style="gap:14px">
+        <div class="part" id="t0"><h4><span>Partition 0</span><span>IDs 0–499</span></h4>
+          <div class="sub">PRIMARY KEY INDEX</div>
+          <div class="doc"><b>191</b> {color: red, make: Honda}</div>
+          <div class="doc"><b>214</b> {color: black, make: Dodge}</div>
+          <div class="doc"><b>306</b> {color: red, make: Ford}</div>
+          <div class="sub">GLOBAL INDEX · colors a–r · makes a–f</div>
+          <div class="ix"><span class="tk">color:black</span><span class="ids">[214]</span></div>
+          <div class="ix" id="t0r"><span class="tk">color:red</span><span class="ids">[191, 306, 768]</span></div>
+          <div class="ix ci" id="t0a"><span class="tk">make:Audi</span><span class="ids">[893]</span></div>
+          <div class="ix"><span class="tk">make:Dodge</span><span class="ids">[214, 515]</span></div>
+          <div class="ix"><span class="tk">make:Ford</span><span class="ids">[306]</span></div>
+        </div>
+        <div class="part" id="t1"><h4><span>Partition 1</span><span>IDs 500–999</span></h4>
+          <div class="sub">PRIMARY KEY INDEX</div>
+          <div class="doc"><b>515</b> {color: silver, make: Dodge}</div>
+          <div class="doc"><b>768</b> {color: red, make: Volvo}</div>
+          <div class="doc new" id="t893"><b>893</b> {color: silver, make: Audi}</div>
+          <div class="sub">GLOBAL INDEX · colors s–z · makes h–z</div>
+          <div class="ix" id="t1s"><span class="tk">color:silver</span><span class="ids">[515<span class="add">, 893</span>]</span></div>
+          <div class="ix"><span class="tk">color:yellow</span><span class="ids">[ ]</span></div>
+          <div class="ix"><span class="tk">make:Honda</span><span class="ids">[191]</span></div>
+          <div class="ix"><span class="tk">make:Volvo</span><span class="ids">[768]</span></div>
+        </div>
+      </div>
+      <div class="client" style="margin-top:10px"><span class="msg" id="tq">🔍 color = red ?</span><span class="msg" id="tq0">→ chỉ P0</span><span class="msg" id="tres">⇒ [191, 306, 768]</span></div>
+      <span class="f ghost" data-act="#tq|on;#tq0|on;#tres|ok" data-now="#t0|hot;#t0r|hot;#t1|idle" data-say="<b>Read</b> “red cars”: term <code class='i'>color:red</code> nằm trong range a–r → chỉ cần hỏi <b>một partition</b>. Không còn scatter/gather."></span>
+      <span class="f ghost" data-act="#t893|show;#t1s|upd;#t0a|show;#t0a|upd" data-now="#t0|wr;#t1|wr" data-say="<b>Write</b> doc 893 (silver Audi): <code class='i'>color:silver</code> ở P1, nhưng <code class='i'>make:Audi</code> ở P0 → một write chạm <b>nhiều partitions</b>."></span>
+      <p class="say" style="margin-top:4px;min-height:48px;font-size:18px">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <div class="card f"><h3>Term-partitioned</h3><p class="ps">Index chung không thể đặt trên một node (sẽ thành bottleneck) → index cũng phải partition, nhưng <b>khác</b> primary key. <b>Term</b> (vd. <code class="i">color:red</code>) quyết định partition của index — tên gọi đến từ <b>full-text indexes</b>.</p><p class="ps" style="margin-top:6px">Partition theo <b>term</b> → range scans (vd. asking price); theo <b>hash of term</b> → load đều hơn.</p></div>
+      <div class="card bad f" style="margin-top:12px"><span class="lbl bad">WRITE: CHẬM &amp; PHỨC TẠP</span><p class="ps">Index luôn up-to-date cần <b>distributed transaction</b> qua mọi partition liên quan — không phải DB nào cũng hỗ trợ. Thực tế update global index thường <b>asynchronous</b>.</p></div>
+      <div class="note f" style="font-size:16px"><b>DynamoDB</b>: global secondary indexes cập nhật trong “a fraction of a second” bình thường, có thể lâu hơn khi infrastructure gặp fault. Cũng dùng ở <b>Riak search</b>, <b>Oracle</b> data warehouse.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== LOCAL VS GLOBAL ===================== -->
+<section class="slide" id="lvg">
+  <div class="hdr in"><span class="qn">12</span><h2>Local vs Global secondary index</h2></div>
+  <table style="font-size:20px">
+    <tr><th style="width:20%"></th><th>📄 Document-partitioned (<b>local</b>)</th><th>🔤 Term-partitioned (<b>global</b>)</th></tr>
+    <tr class="f"><td>Index nằm ở đâu</td><td>Cùng partition với primary key &amp; value</td><td>Partition riêng, theo indexed value (term)</td></tr>
+    <tr class="f"><td>Write 1 document</td><td><span class="lbl good">1 partition</span> chỉ partition chứa doc</td><td><span class="lbl bad">nhiều partitions</span> mỗi term có thể ở node khác</td></tr>
+    <tr class="f"><td>Read theo index</td><td><span class="lbl bad">scatter/gather</span> query mọi partition</td><td><span class="lbl good">1 partition</span> chứa term cần tìm</td></tr>
+    <tr class="f"><td>Consistency</td><td>Index cập nhật đồng bộ cùng write</td><td>Thường <b>asynchronous</b> — đọc ngay sau write có thể chưa thấy</td></tr>
+    <tr class="f"><td>Ví dụ</td><td>MongoDB, Riak, Cassandra, Elasticsearch, SolrCloud, VoltDB</td><td>DynamoDB GSI, Riak search, Oracle DW (global index)</td></tr>
+  </table>
+  <div class="note blue f" style="font-size:19px;margin-top:16px">Trade-off cổ điển: <b>local</b> ưu tiên write, <b>global</b> ưu tiên read. Chapter 12 sẽ quay lại cách implement term-partitioned secondary indexes.</div>
+</section>
+
+<!-- ===================== REBALANCING ===================== -->
+<section class="slide" id="rebal">
+  <div class="hdr in"><span class="qn">13</span><h2><span class="grad">Rebalancing</span> Partitions</h2></div>
+  <p style="font-size:20px">Theo thời gian, mọi thứ thay đổi → data &amp; requests phải chuyển từ node này sang node khác. Quá trình di chuyển load trong cluster gọi là <b>rebalancing</b>.</p>
+  <div class="cols3" style="margin-top:14px">
+    <div class="card f"><div class="icon">📈</div><h3>Query throughput tăng</h3><p class="ps">Cần thêm <b>CPUs</b> để xử lý load.</p></div>
+    <div class="card f"><div class="icon">💾</div><h3>Dataset size tăng</h3><p class="ps">Cần thêm <b>disks</b> và <b>RAM</b> để lưu trữ.</p></div>
+    <div class="card f"><div class="icon">💥</div><h3>Machine fails</h3><p class="ps">Máy khác phải <b>take over</b> trách nhiệm của máy hỏng.</p></div>
+  </div>
+  <h3 class="f" style="margin-top:20px;color:#db2777">Minimum requirements cho rebalancing</h3>
+  <div class="cols3" style="margin-top:6px">
+    <div class="leg a f"><b>⚖️ Fair share</b><p>Sau rebalancing, load (storage, reads, writes) chia <b>công bằng</b> giữa các node.</p></div>
+    <div class="leg b f"><b>🟢 Online</b><p>Trong lúc rebalancing, database vẫn <b>nhận reads &amp; writes</b>.</p></div>
+    <div class="leg c f"><b>🚚 Move tối thiểu</b><p>Không di chuyển data nhiều hơn cần thiết → nhanh, ít network &amp; disk I/O.</p></div>
+  </div>
+</section>
+
+<!-- ===================== MOD N ===================== -->
+<section class="slide" id="modn">
+  <div class="hdr in"><span class="qn">14</span><h2>How not to do it: <span class="grad">hash mod N</span></h2></div>
+  <div class="cols" style="grid-template-columns:.85fr 1.25fr;gap:24px">
+    <div>
+      <p style="font-size:19px">Sao không chia hash thành ranges mà dùng luôn <code class="i">hash(key) % N</code>? Với 10 nodes, <code class="i">hash % 10</code> → 0…9, trông rất tiện.</p>
+      <div class="formula" style="margin-top:12px">hash(key) = <span style="color:#7c3aed">123456</span></div>
+      <div class="mod" style="margin-top:10px;flex-direction:column;gap:8px">
+        <span class="r" id="m10">N = 10 → node 6</span>
+        <span class="r" id="m11">N = 11 → node 3</span>
+        <span class="r" id="m12">N = 12 → node 0</span>
+      </div>
+      <span class="f ghost" data-act="#m10|on0" data-say="10 nodes: 123456 mod 10 = <b>6</b>."></span>
+      <span class="f ghost" data-act="#m11|on" data-say="Thêm 1 node: 123456 mod 11 = <b>3</b> → key phải <b>chuyển</b> node."></span>
+      <span class="f ghost" data-act="#m12|on" data-say="Thêm node nữa: mod 12 = <b>0</b> → lại chuyển. Mỗi lần N đổi, gần như mọi key đều phải move."></span>
+      <div class="card bad f" style="margin-top:14px"><span class="lbl bad">VẤN ĐỀ</span><p class="ps">Khi N thay đổi, <b>hầu hết keys</b> phải di chuyển → rebalancing <b>quá đắt</b>. Cần cách không move data nhiều hơn mức cần.</p></div>
+    </div>
+    <div>
+      <p class="rowlbl" style="margin-top:0" id="kgl">20 keys · node = hash % 10</p>
+      <div class="kg" id="kg">
+        <div class="kc"><span class="h">439563</span><span class="n">3</span><span class="n2">3</span></div>
+        <div class="kc"><span class="h">258176</span><span class="n">6</span><span class="n2">6</span></div>
+        <div class="kc mv"><span class="h">514002</span><span class="n">2</span><span class="n2">5</span></div>
+        <div class="kc mv"><span class="h">782554</span><span class="n">4</span><span class="n2">3</span></div>
+        <div class="kc mv"><span class="h">150631</span><span class="n">1</span><span class="n2">8</span></div>
+        <div class="kc mv"><span class="h">175954</span><span class="n">4</span><span class="n2">9</span></div>
+        <div class="kc mv"><span class="h">961168</span><span class="n">8</span><span class="n2">10</span></div>
+        <div class="kc mv"><span class="h">661913</span><span class="n">3</span><span class="n2">10</span></div>
+        <div class="kc mv"><span class="h">198702</span><span class="n">2</span><span class="n2">9</span></div>
+        <div class="kc"><span class="h">483452</span><span class="n">2</span><span class="n2">2</span></div>
+        <div class="kc mv"><span class="h">711097</span><span class="n">7</span><span class="n2">2</span></div>
+        <div class="kc mv"><span class="h">160816</span><span class="n">6</span><span class="n2">7</span></div>
+        <div class="kc mv"><span class="h">632084</span><span class="n">4</span><span class="n2">2</span></div>
+        <div class="kc mv"><span class="h">325127</span><span class="n">7</span><span class="n2">0</span></div>
+        <div class="kc mv"><span class="h">139317</span><span class="n">7</span><span class="n2">2</span></div>
+        <div class="kc mv"><span class="h">190122</span><span class="n">2</span><span class="n2">9</span></div>
+        <div class="kc mv"><span class="h">554710</span><span class="n">0</span><span class="n2">2</span></div>
+        <div class="kc mv"><span class="h">538485</span><span class="n">5</span><span class="n2">2</span></div>
+        <div class="kc mv"><span class="h">173248</span><span class="n">8</span><span class="n2">9</span></div>
+        <div class="kc mv"><span class="h">352353</span><span class="n">3</span><span class="n2">1</span></div>
+      </div>
+      <div class="sysbox" style="margin-top:14px;font-size:18px" id="kgmsg">Mỗi ô: hash (trên) · node được gán (dưới)</div>
+      <span class="f ghost" data-act="#kg|m11;#kgmsg|fail" data-set="#kgl::20 keys · node = hash % 11 (sau khi thêm 1 node);#kgmsg::🔴 17 / 20 keys phải di chuyển chỉ vì thêm 1 node (lý tưởng: ~1/11)" data-say="Từ 10 → 11 nodes: <b>85%</b> keys đổi node (kỳ vọng ~10/11). Lý tưởng chỉ cần chuyển ~<b>1/11</b> data sang node mới."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FIXED ===================== -->
+<section class="slide" id="fixed">
+  <div class="hdr in"><span class="qn">15</span><h2>Fixed number of partitions</h2></div>
+  <div class="cols" style="grid-template-columns:1.4fr 1fr;gap:22px">
+    <div>
+      <p style="font-size:19px;margin-bottom:10px">Tạo <b>nhiều partitions hơn số nodes</b> ngay từ đầu, mỗi node giữ vài partitions. Vd. 10 nodes, 1,000 partitions → ~100 partitions/node.</p>
+      <div class="ncols c5">
+        <div class="ncol" id="fn0"><h4>Node 0</h4><span class="pt">p0</span><span class="pt">p4</span><span class="pt">p8</span><span class="pt">p12</span><span class="pt" id="fp16">p16</span></div>
+        <div class="ncol" id="fn1"><h4>Node 1</h4><span class="pt c2">p1</span><span class="pt c2">p5</span><span class="pt c2">p9</span><span class="pt c2">p13</span><span class="pt c2" id="fp17">p17</span></div>
+        <div class="ncol" id="fn2"><h4>Node 2</h4><span class="pt c3">p2</span><span class="pt c3">p6</span><span class="pt c3">p10</span><span class="pt c3">p14</span><span class="pt c3" id="fp18">p18</span></div>
+        <div class="ncol" id="fn3"><h4>Node 3</h4><span class="pt c4">p3</span><span class="pt c4">p7</span><span class="pt c4">p11</span><span class="pt c4">p15</span><span class="pt c4" id="fp19">p19</span></div>
+        <div class="ncol newn ci" id="fn4"><h4>Node 4 ✨</h4><span class="pt mv hide" id="fq16">p16</span><span class="pt mv hide" id="fq17">p17</span><span class="pt mv hide" id="fq18">p18</span><span class="pt mv hide" id="fq19">p19</span></div>
+      </div>
+      <div class="sysbox" style="margin-top:12px;font-size:17px" id="fxmsg">4 nodes · 20 partitions · 5 partitions/node</div>
+      <span class="f ghost" data-act="#fn4|show" data-set="#fxmsg::Node 4 join cluster" data-say="Node mới join cluster…"></span>
+      <span class="f ghost" data-act="#fp16|gone;#fp17|gone;#fp18|gone;#fp19|gone;#fq16|on;#fq17|on;#fq18|on;#fq19|on;#fxmsg|ok" data-now="#fp16|lit;#fp17|lit;#fp18|lit;#fp19|lit" data-set="#fxmsg::✅ Node 4 “steal” 1 partition từ mỗi node → 4 partitions/node" data-say="…và <b>“steal” vài partitions</b> từ mỗi node cũ cho đến khi phân bố công bằng. Bỏ node thì làm ngược lại."></span>
+      <span class="f ghost" data-set="#fxmsg::Key → partition KHÔNG đổi · chỉ partition → node đổi" data-say="Chỉ <b>toàn bộ partition</b> được move. Số partitions và việc gán key → partition <b>không đổi</b>. Trong lúc transfer, reads/writes vẫn dùng <b>assignment cũ</b>."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <div class="card f"><h3>Ưu điểm</h3><p class="ps">Có thể bù cho <b>mismatched hardware</b>: node mạnh nhận nhiều partitions hơn. Dùng ở <b>Riak</b>, <b>Elasticsearch</b>, <b>Couchbase</b>, <b>Voldemort</b>.</p></div>
+      <div class="card f" style="margin-top:12px"><h3>Chọn số partitions</h3><p class="ps">Thường cố định từ lúc setup (đơn giản hơn split/merge). Số partitions = <b>số node tối đa</b> → phải chọn đủ lớn cho tương lai, nhưng mỗi partition có <b>management overhead</b>.</p></div>
+      <div class="card bad f" style="margin-top:12px"><span class="lbl bad">KHÓ KHI DATASET BIẾN ĐỘNG</span><p class="ps">Kích thước partition ∝ tổng data. Quá lớn → rebalancing &amp; recovery đắt; quá nhỏ → overhead. Khó đạt mức <b>“just right”</b>.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DYNAMIC ===================== -->
+<section class="slide" id="dyn">
+  <div class="hdr in"><span class="qn">16</span><h2><span class="grad">Dynamic</span> partitioning</h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr;gap:24px">
+    <div>
+      <p style="font-size:19px">Với key range partitioning, boundaries cố định mà chọn sai → có thể dồn hết data vào một partition. Vì vậy <b>HBase</b>, <b>RethinkDB</b> tạo partitions <b>dynamically</b>.</p>
+      <div id="dy" style="margin-top:14px">
+        <div class="cols" style="gap:14px">
+          <div class="ncol" id="dyA"><h4>Node A</h4>
+            <div class="dy1"><div class="tank" id="dyt"><div class="fill"></div><div class="limit"></div><div class="tl" id="dyl">P1 · keys A–Z · 1.5 GB</div></div></div>
+            <div class="dy2"><div class="tank"><div class="fill" style="--w:50%"></div><div class="limit"></div><div class="tl">P1 · A–M · 5 GB</div></div></div>
+            <div class="dy2 dyB1"><div class="tank" style="margin-top:8px"><div class="fill" style="--w:50%"></div><div class="limit"></div><div class="tl">P2 · N–Z · 5 GB</div></div></div>
+          </div>
+          <div class="ncol" id="dyB"><h4>Node B</h4>
+            <div class="dyB2"><div class="tank"><div class="fill" style="--w:50%;background:linear-gradient(90deg,#34d399,#10b981)"></div><div class="limit"></div><div class="tl">P2 · N–Z · 5 GB</div></div></div>
+            <p class="muted dyidle" style="font-size:15px;text-align:center;padding-top:10px">idle 😴</p>
+          </div>
+        </div>
+        <p class="muted" style="font-size:14px;margin-top:6px">Đường đứt đỏ = ngưỡng split (HBase default <b>10 GB</b>)</p>
+      </div>
+      <div class="sysbox" style="margin-top:8px;font-size:17px" id="dymsg">Empty database: chỉ có 1 partition</div>
+      <span class="f ghost" data-act="#dy|s1" data-set="#dymsg::Data tăng dần… mọi write vẫn vào 1 partition trên Node A;#dyl::P1 · keys A–Z · 6 GB" data-say="Database trống bắt đầu với <b>một partition</b> (chưa có thông tin để vẽ boundaries) → node khác idle."></span>
+      <span class="f ghost" data-act="#dy|s2;#dymsg|fail" data-set="#dymsg::⚠️ P1 vượt 10 GB;#dyl::P1 · keys A–Z · 10 GB" data-say="Partition lớn vượt ngưỡng cấu hình…"></span>
+      <span class="f ghost" data-act="#dy|s3" data-now="#dymsg|ok" data-set="#dymsg::✂️ Split thành 2 partitions, mỗi bên ~một nửa data" data-say="…được <b>split</b> làm đôi — giống những gì xảy ra ở top level của <b>B-tree</b>."></span>
+      <span class="f ghost" data-act="#dy|s4;#dymsg|ok" data-set="#dymsg::🚚 Chuyển một nửa sang Node B để cân bằng load (HBase: qua HDFS)" data-say="Một nửa được <b>transfer</b> sang node khác. Ngược lại, partition co lại dưới ngưỡng thì <b>merge</b> với partition kề bên."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <div class="card good f"><span class="lbl good">ƯU ĐIỂM</span><p class="ps">Số partitions <b>thích nghi</b> với tổng data volume: ít data → ít partitions, overhead nhỏ; nhiều data → mỗi partition bị giới hạn ở một max size.</p></div>
+      <div class="card bad f" style="margin-top:12px"><span class="lbl bad">CAVEAT</span><p class="ps">Lúc đầu chỉ 1 partition → mọi write vào 1 node. Giải pháp: <b>pre-splitting</b> (HBase, MongoDB) — cấu hình sẵn initial partitions; với key range thì phải biết trước key distribution.</p></div>
+      <div class="note blue f" style="font-size:17px">Không chỉ cho key range: <b>MongoDB</b> (từ 2.4) hỗ trợ cả key-range lẫn hash partitioning, và split dynamically trong cả hai trường hợp.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PROPORTIONAL ===================== -->
+<section class="slide" id="prop">
+  <div class="hdr in"><span class="qn">17</span><h2>Partitioning <span class="grad">proportionally to nodes</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr;gap:24px">
+    <div>
+      <p style="font-size:19px">Cách thứ ba (<b>Cassandra</b>, <b>Ketama</b>): <b>số partitions cố định trên mỗi node</b> → số partitions ∝ số nodes.</p>
+      <p class="rowlbl">Hash range 0 … 2<sup>32</sup> · 3 nodes × 3 partitions</p>
+      <div class="seg" id="sg">
+        <div class="a" style="flex:10">A</div>
+        <div class="b sp" style="flex:6">B</div><div class="b nn" style="flex:6">B</div>
+        <div class="c" style="flex:9">C</div>
+        <div class="a sp" style="flex:7">A</div><div class="a nn" style="flex:7">A</div>
+        <div class="b" style="flex:11">B</div>
+        <div class="c" style="flex:10">C</div>
+        <div class="c sp" style="flex:5">C</div><div class="c nn" style="flex:5">C</div>
+        <div class="a" style="flex:12">A</div>
+        <div class="b" style="flex:12">B</div>
+      </div>
+      <div class="chips" style="margin-top:12px"><span class="chip p">Node A</span><span class="chip c">Node B</span><span class="chip k">Node C</span><span class="chip g">Node D (mới)</span></div>
+      <span class="f ghost" data-act="#sg|cut" data-say="Node D join: <b>chọn ngẫu nhiên</b> một số partitions hiện có để split…"></span>
+      <span class="f ghost" data-act="#sg|on" data-say="…rồi nhận <b>một nửa</b> của mỗi partition bị split, nửa kia giữ nguyên. Random có thể split không đều, nhưng trung bình trên nhiều partitions (Cassandra: <b>256 partitions/node</b>) thì công bằng."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+      <div class="note f" style="font-size:16px">Chọn boundaries ngẫu nhiên đòi hỏi <b>hash-based partitioning</b> — gần nhất với định nghĩa gốc của consistent hashing. Cassandra 3.0 có thuật toán rebalancing tránh unfair splits.</div>
+    </div>
+    <div>
+      <table class="f" style="font-size:16.5px">
+        <tr><th>Strategy</th><th>Số partitions</th><th>Kích thước partition</th></tr>
+        <tr><td>Fixed</td><td>Cố định</td><td>∝ dataset size</td></tr>
+        <tr><td>Dynamic</td><td>∝ dataset size</td><td>Trong khoảng min–max</td></tr>
+        <tr><td>Proportional<br>to nodes</td><td>∝ số nodes</td><td>∝ dataset / nodes → <b>khá ổn định</b></td></tr>
+      </table>
+      <div class="card f" style="margin-top:12px"><p class="ps">Fixed &amp; dynamic: số partitions <b>độc lập</b> với số nodes. Proportional: data tăng (nodes giữ nguyên) → partition lớn dần; thêm node → partition nhỏ lại. Vì data nhiều thường cần nhiều node, size partition giữ <b>khá ổn định</b>.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== OPS ===================== -->
+<section class="slide" id="ops">
+  <div class="hdr in"><span class="qn">18</span><h2>Operations: <span class="grad">Automatic or Manual</span> Rebalancing?</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr;gap:24px">
+    <div>
+      <div class="toggle" style="justify-content:space-between;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px">
+        <span class="pill on">Fully automatic</span><span class="muted" style="font-size:22px">⟷</span><span class="pill">Fully manual</span>
+      </div>
+      <ul class="mini" style="margin-top:12px">
+        <li><b>Automatic</b>: system tự quyết khi nào move partition, không cần administrator.</li>
+        <li><b>Manual</b>: assignment partition → node do administrator cấu hình tường minh.</li>
+        <li><b>Ở giữa</b>: <b>Couchbase</b>, <b>Riak</b>, <b>Voldemort</b> tự sinh <i>suggested</i> assignment, admin phải <b>commit</b> mới có hiệu lực.</li>
+      </ul>
+      <div class="card f" style="margin-top:10px"><p class="ps">Automatic tiện (ít operational work) nhưng <b>unpredictable</b>: rebalancing đắt — reroute requests, move lượng lớn data — có thể làm quá tải network/nodes và ảnh hưởng requests khác.</p></div>
+      <div class="note blue f" style="font-size:17px">Có <b>human in the loop</b> thì chậm hơn, nhưng tránh được <b>operational surprises</b>.</div>
+    </div>
+    <div>
+      <h3 style="color:#db2777">Kịch bản nguy hiểm: auto rebalancing + auto failure detection</h3>
+      <div class="casc2" style="margin-top:10px">
+        <div class="node" id="o1">N1<small>node</small><div class="ld"><i style="--l:45%" id="ol1"></i></div><div class="speech" id="os1">quá tải, chậm…</div></div>
+        <div class="node" id="o2">N2<small>node</small><div class="ld"><i style="--l:45%" id="ol2"></i></div><div class="speech" id="os2">N1 chết rồi?</div></div>
+        <div class="node" id="o3">N3<small>node</small><div class="ld"><i style="--l:45%" id="ol3"></i></div><div class="speech" id="os3">N1 chết rồi?</div></div>
+        <div class="node" id="o4">N4<small>node</small><div class="ld"><i style="--l:45%" id="ol4"></i></div><div class="speech" id="os4"></div></div>
+      </div>
+      <div class="sysbox" style="margin-top:14px;font-size:17px" id="omsg">Cluster hoạt động bình thường</div>
+      <span class="f ghost" data-act="#o1|down;#os1|show;#ol1|hi" data-set="#omsg::N1 tạm thời overloaded, phản hồi chậm" data-say="Một node bị <b>overloaded</b> và tạm thời phản hồi chậm…"></span>
+      <span class="f ghost" data-act="#os2|show;#os3|show" data-set="#omsg::Các node khác kết luận: N1 đã chết" data-say="…các node khác <b>tưởng nó đã chết</b>…"></span>
+      <span class="f ghost" data-act="#ol2|hi;#ol3|hi;#ol4|hi;#omsg|fail" data-set="#omsg::🚚 Auto rebalance: move load khỏi N1 → thêm tải cho N1 (gửi data), các node khác &amp; network" data-say="…và <b>tự động rebalance</b>: việc move data đè thêm tải lên chính N1, các node khác và network…"></span>
+      <span class="f ghost" data-act="#o2|bad;#o3|bad;#o4|bad;#o1|bad" data-set="#omsg::💥 Cascading failure" data-say="…tình hình tệ hơn và có thể dẫn tới <b>cascading failure</b>."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ROUTING ===================== -->
+<section class="slide" id="route">
+  <div class="hdr in"><span class="qn">19</span><h2><span class="grad">Request Routing</span> · gửi request tới node nào?</h2></div>
+  <p style="font-size:19px">Partitions được rebalance → assignment partition → node thay đổi. Muốn read/write key <code class="i">"foo"</code> thì phải connect tới <b>IP address &amp; port</b> nào? Đây là một dạng của bài toán tổng quát <b>service discovery</b>.</p>
+  <svg class="rsv" id="rt" viewBox="0 0 1190 320" style="width:100%;height:auto;margin-top:8px">
+    <defs><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#ec4899"/></marker></defs>
+    <!-- pane 1 -->
+    <g transform="translate(0,0)">
+      <rect class="pane" x="2" y="2" width="386" height="316" rx="16"/>
+      <text x="18" y="26" style="fill:#7c3aed">① Contact any node</text>
+      <rect class="nd cl" x="135" y="40" width="120" height="42" rx="10"/><text x="195" y="66" text-anchor="middle">Client</text>
+      <rect class="nd" x="20" y="214" width="100" height="48" rx="10"/><text x="70" y="236" text-anchor="middle">Node 0</text><text x="70" y="252" text-anchor="middle" class="sm">P0</text>
+      <rect class="nd" x="145" y="214" width="100" height="48" rx="10"/><text x="195" y="236" text-anchor="middle">Node 1</text><text x="195" y="252" text-anchor="middle" class="sm">P1</text>
+      <rect class="nd own" x="270" y="214" width="100" height="48" rx="10"/><text x="320" y="236" text-anchor="middle">Node 2</text><text x="320" y="252" text-anchor="middle" class="sm">P2 · owns “foo”</text>
+      <path class="pth p1" d="M170,82 L80,212" marker-end="url(#ah2)"/>
+      <path class="pth p1" d="M70,262 Q195,320 318,264" marker-end="url(#ah2)"/>
+      <g class="lab l1"><text x="40" y="150" class="sm" style="fill:#be185d">round-robin LB</text><text x="195" y="304" text-anchor="middle" class="sm" style="fill:#be185d">không phải của mình → forward</text></g>
+    </g>
+    <!-- pane 2 -->
+    <g transform="translate(400,0)">
+      <rect class="pane" x="2" y="2" width="386" height="316" rx="16"/>
+      <text x="18" y="26" style="fill:#0891b2">② Routing tier</text>
+      <rect class="nd cl" x="135" y="40" width="120" height="42" rx="10"/><text x="195" y="66" text-anchor="middle">Client</text>
+      <rect class="nd rt" x="95" y="124" width="200" height="44" rx="10"/><text x="195" y="146" text-anchor="middle">Routing tier</text><text x="195" y="161" text-anchor="middle" class="sm">partition-aware load balancer</text>
+      <rect class="nd" x="20" y="214" width="100" height="48" rx="10"/><text x="70" y="236" text-anchor="middle">Node 0</text><text x="70" y="252" text-anchor="middle" class="sm">P0</text>
+      <rect class="nd" x="145" y="214" width="100" height="48" rx="10"/><text x="195" y="236" text-anchor="middle">Node 1</text><text x="195" y="252" text-anchor="middle" class="sm">P1</text>
+      <rect class="nd own" x="270" y="214" width="100" height="48" rx="10"/><text x="320" y="236" text-anchor="middle">Node 2</text><text x="320" y="252" text-anchor="middle" class="sm">P2 · owns “foo”</text>
+      <path class="pth p2" d="M195,82 L195,122" marker-end="url(#ah2)"/>
+      <path class="pth p2" d="M250,168 L305,212" marker-end="url(#ah2)"/>
+      <g class="lab l2"><text x="195" y="300" text-anchor="middle" class="sm" style="fill:#be185d">routing tier không xử lý request, chỉ forward</text></g>
+    </g>
+    <!-- pane 3 -->
+    <g transform="translate(800,0)">
+      <rect class="pane" x="2" y="2" width="386" height="316" rx="16"/>
+      <text x="18" y="26" style="fill:#db2777">③ Partition-aware client</text>
+      <rect class="nd cl" x="110" y="40" width="170" height="42" rx="10"/><text x="195" y="60" text-anchor="middle">Client</text><text x="195" y="75" text-anchor="middle" class="sm">biết partition → node</text>
+      <rect class="nd" x="20" y="214" width="100" height="48" rx="10"/><text x="70" y="236" text-anchor="middle">Node 0</text><text x="70" y="252" text-anchor="middle" class="sm">P0</text>
+      <rect class="nd" x="145" y="214" width="100" height="48" rx="10"/><text x="195" y="236" text-anchor="middle">Node 1</text><text x="195" y="252" text-anchor="middle" class="sm">P1</text>
+      <rect class="nd own" x="270" y="214" width="100" height="48" rx="10"/><text x="320" y="236" text-anchor="middle">Node 2</text><text x="320" y="252" text-anchor="middle" class="sm">P2 · owns “foo”</text>
+      <path class="pth p3" d="M240,82 L310,212" marker-end="url(#ah2)"/>
+      <g class="lab l3"><text x="195" y="300" text-anchor="middle" class="sm" style="fill:#be185d">connect thẳng, không qua intermediary</text></g>
+    </g>
+  </svg>
+  <span class="f ghost" data-act="#rt|r1" data-say="① Client gọi <b>bất kỳ node nào</b> (vd. qua round-robin load balancer). Node đó có partition thì xử lý; không thì <b>forward</b> tới node đúng và chuyển reply về client."></span>
+  <span class="f ghost" data-act="#rt|r2" data-say="② Mọi request đi qua <b>routing tier</b> — một <b>partition-aware load balancer</b> quyết định node nào xử lý."></span>
+  <span class="f ghost" data-act="#rt|r3" data-say="③ <b>Client</b> tự biết partitioning và assignment → connect thẳng tới node phù hợp."></span>
+  <span class="f ghost" data-say="Câu hỏi then chốt cho cả 3 cách: thành phần ra quyết định routing (node / routing tier / client) <b>biết về thay đổi assignment</b> bằng cách nào? Mọi participant phải <b>đồng thuận</b> — consensus protocols rất khó làm đúng (Chapter 9)."></span>
+  <p class="say" style="margin-top:4px">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== ZOOKEEPER ===================== -->
+<section class="slide" id="zk">
+  <div class="hdr in"><span class="qn">20</span><h2>Coordination service: <span class="grad">ZooKeeper</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr;gap:22px">
+    <div>
+      <svg class="rsv" id="zks" viewBox="0 0 620 380" style="width:100%;height:auto">
+        <defs><marker id="ah3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#ec4899"/></marker></defs>
+        <rect class="nd cl" x="30" y="14" width="150" height="46" rx="10"/><text x="105" y="35" text-anchor="middle">Client</text><text x="105" y="51" text-anchor="middle" class="sm">get “foo”</text>
+        <rect class="nd rt" x="20" y="160" width="230" height="52" rx="10"/><text x="135" y="184" text-anchor="middle">Routing tier</text><text x="135" y="201" text-anchor="middle" class="sm">giữ bản copy của mapping</text>
+        <rect class="zk" x="410" y="140" width="190" height="80" rx="14"/><text x="505" y="176" text-anchor="middle">ZooKeeper</text><text x="505" y="196" text-anchor="middle" class="sm">authoritative mapping</text>
+        <rect class="nd" x="20" y="306" width="120" height="50" rx="10"/><text x="80" y="329" text-anchor="middle">Node 0</text><text x="80" y="345" text-anchor="middle" class="sm">10.20.30.100</text>
+        <rect class="nd own" x="175" y="306" width="120" height="50" rx="10"/><text x="235" y="329" text-anchor="middle">Node 1</text><text x="235" y="345" text-anchor="middle" class="sm">10.20.30.101</text>
+        <rect class="nd" x="330" y="306" width="120" height="50" rx="10"/><text x="390" y="329" text-anchor="middle">Node 2</text><text x="390" y="345" text-anchor="middle" class="sm">10.20.30.102</text>
+        <path class="pth p1" d="M80,306 L440,222" marker-end="url(#ah3)"/>
+        <path class="pth p1" d="M235,306 L480,222" marker-end="url(#ah3)"/>
+        <path class="pth p1" d="M390,306 L520,222" marker-end="url(#ah3)"/>
+        <g class="lab l1"><text x="470" y="268" class="sm" style="fill:#be185d">register</text></g>
+        <path class="pth p2" d="M408,180 L254,186" marker-end="url(#ah3)"/>
+        <g class="lab l2"><text x="330" y="168" text-anchor="middle" class="sm" style="fill:#be185d">subscribe · notify</text></g>
+        <path class="pth p3" d="M105,60 L105,158" marker-end="url(#ah3)"/>
+        <path class="pth p3" d="M150,212 L225,304" marker-end="url(#ah3)"/>
+        <g class="lab l3"><text x="114" y="114" class="sm" style="fill:#be185d">“foo” ∈ al–ba → P1 → Node 1</text></g>
+      </svg>
+      <span class="f ghost" data-act="#zks|r1" data-say="Mỗi node <b>register</b> với ZooKeeper; ZooKeeper giữ <b>authoritative mapping</b> partitions → nodes."></span>
+      <span class="f ghost" data-act="#zks|r2" data-now="#zkt|hl" data-say="Routing tier (hoặc partition-aware client) <b>subscribe</b>. Khi partition đổi owner hay node thêm/bớt, ZooKeeper <b>notify</b> để cập nhật routing info."></span>
+      <span class="f ghost" data-act="#zks|r3" data-now="#zkr|hit" data-say="Request <code class='i'>get foo</code>: routing tier tra mapping → <b>Node 1</b> → forward."></span>
+      <p class="say" style="margin-top:0;font-size:18px">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <table class="tt" id="zkt" style="font-size:16px">
+        <tr><th>Key range</th><th>Partition</th><th>Node</th><th>IP</th></tr>
+        <tr><td>A – ak</td><td>P0</td><td>node 0</td><td>10.20.30.100</td></tr>
+        <tr id="zkr"><td>al – ba</td><td>P1</td><td>node 1</td><td>10.20.30.101</td></tr>
+        <tr><td>bb – ca</td><td>P2</td><td>node 2</td><td>10.20.30.102</td></tr>
+        <tr><td>…</td><td>…</td><td>…</td><td>…</td></tr>
+      </table>
+      <div class="stack" style="margin-top:10px;gap:6px">
+        <div class="leg a f zl"><b>🦓 Dùng ZooKeeper</b><p>LinkedIn <b>Espresso</b> (qua <b>Helix</b>), <b>HBase</b>, <b>SolrCloud</b>, <b>Kafka</b>. <b>MongoDB</b>: kiến trúc tương tự với <b>config server</b> riêng + <b>mongos</b> daemons làm routing tier.</p></div>
+        <div class="leg b f zl"><b>🗣️ Gossip protocol</b><p><b>Cassandra</b>, <b>Riak</b>: nodes lan truyền cluster state cho nhau; request gửi node bất kỳ rồi forward (cách ①). Phức tạp hơn ở DB nodes nhưng không phụ thuộc ZooKeeper.</p></div>
+        <div class="leg c f zl"><b>🧭 Couchbase · DNS</b><p>Couchbase không auto-rebalance; routing tier <b>moxi</b> học thay đổi từ cluster nodes. IP của routing tier/nodes ít đổi → dùng <b>DNS</b> là đủ.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MPP ===================== -->
+<section class="slide" id="mpp">
+  <div class="hdr in"><span class="qn">21</span><h2>Parallel Query Execution</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.15fr;gap:26px">
+    <div>
+      <p style="font-size:20px">Đến giờ ta chỉ xét query đơn giản: read/write <b>một key</b> (cộng scatter/gather cho document-partitioned secondary indexes) — mức truy cập của hầu hết NoSQL distributed datastores.</p>
+      <div class="card f" style="margin-top:12px"><h3>MPP databases</h3><p class="ps"><b>Massively parallel processing</b> relational databases (thường cho analytics) hỗ trợ query phức tạp hơn nhiều: nhiều <b>join</b>, <b>filtering</b>, <b>grouping</b>, <b>aggregation</b>.</p></div>
+      <div class="card f" style="margin-top:12px"><p class="ps"><b>MPP query optimizer</b> chia query thành nhiều <b>execution stages</b> và partitions, phần lớn chạy <b>song song</b> trên các node. Query scan phần lớn dataset hưởng lợi nhiều nhất.</p></div>
+      <div class="note blue f" style="font-size:17px">Chủ đề chuyên sâu, rất được quan tâm thương mại → một số kỹ thuật sẽ bàn ở <b>Chapter 10</b>.</div>
+    </div>
+    <div>
+      <div class="formula" style="font-size:16px;text-align:left">SELECT region, SUM(amount) FROM sales<br>JOIN stores USING (store_id)<br>WHERE year = 2026 GROUP BY region</div>
+      <div class="mpp" style="margin-top:18px">
+        <div class="stg"><div class="box" id="mp1">scan+filter<small>node 1</small></div><div class="box" id="mp2">scan+filter<small>node 2</small></div><div class="box" id="mp3">scan+filter<small>node 3</small></div></div>
+        <div class="ar">→</div>
+        <div class="stg"><div class="box" id="mp4">join<small>node 1</small></div><div class="box" id="mp5">join<small>node 2</small></div><div class="box" id="mp6">join<small>node 3</small></div></div>
+        <div class="ar">→</div>
+        <div class="stg"><div class="box" id="mp7">partial agg<small>per node</small></div><div class="box" id="mp8">final<br>GROUP BY<small>coordinator</small></div></div>
+      </div>
+      <p class="muted" style="font-size:14px;text-align:center;margin-top:6px">Minh hoạ: các stage có thể chạy song song trên nhiều node</p>
+      <span class="f ghost" data-act="#mp1|on;#mp2|on;#mp3|on" data-say="Stage 1: mỗi node <b>scan + filter</b> partition của mình, song song."></span>
+      <span class="f ghost" data-act="#mp4|on;#mp5|on;#mp6|on" data-say="Stage 2: <b>join</b> song song trên từng node."></span>
+      <span class="f ghost" data-act="#mp7|on;#mp8|on" data-say="Stage 3: aggregate cục bộ rồi gộp kết quả cuối."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="slide" id="summary">
+  <div class="hdr in"><span class="qn">22</span><h2>Summary</h2></div>
+  <p style="font-size:19px">Partitioning cần thiết khi data quá lớn để lưu &amp; xử lý trên một máy. Mục tiêu: chia data và query load <b>đều</b> trên nhiều máy, tránh <b>hot spots</b>.</p>
+  <div class="cols4" style="margin-top:14px">
+    <div class="card f"><h3>🔑 Key range</h3><p class="ps">Keys sorted; partition sở hữu một range min–max. <b>Range queries</b> hiệu quả, nhưng rủi ro hot spot khi truy cập keys gần nhau. Thường rebalance <b>dynamically</b> bằng split.</p></div>
+    <div class="card f"><h3>#️⃣ Hash</h3><p class="ps">Mỗi partition sở hữu một range of hashes. Mất thứ tự keys → range query kém, nhưng load <b>đều</b> hơn. Thường dùng <b>fixed number of partitions</b>, move nguyên partition. Hybrid: <b>compound key</b>.</p></div>
+    <div class="card f"><h3>📇 Secondary indexes</h3><p class="ps"><b>Local</b> (document-partitioned): write 1 partition, read scatter/gather. <b>Global</b> (term-partitioned): write nhiều partitions, read từ 1 partition.</p></div>
+    <div class="card f"><h3>🧭 Routing</h3><p class="ps">Từ partition-aware load balancing đơn giản (ZooKeeper, gossip, routing tier) đến <b>parallel query execution engines</b> phức tạp.</p></div>
+  </div>
+  <div class="note blue f" style="font-size:19px;margin-top:16px">Mỗi partition vận hành <b>gần như độc lập</b> — đó là điều cho phép scale ra nhiều máy. Nhưng operation ghi vào <b>nhiều partitions</b> thì khó lý giải: write vào partition này thành công, partition kia thất bại thì sao? → <b>Chapter 7: Transactions</b>.</div>
+</section>
+
+</div></div>
+<div id="bar"></div>
+<div id="hint">← → / Space: từng bước · Shift+→: qua slide · A: hiện hết · Home: đầu · F: toàn màn hình</div>
+<div id="nav"><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+<script>
+(function(){
+  // ---------- C++ highlighter (same as lec03) ----------
+  const KW=new Set("if else for while do return break continue switch case default struct class using namespace const static new delete true false sizeof public private include pragma auto".split(" "));
+  const TY=new Set("int double float char void bool long short unsigned string".split(" "));
+  const LIB=new Set("cout cin endl sqrt fabs std".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line){
+    if(/^\s*#/.test(line)) return '<span class="p">'+esc(line)+'</span>';
+    const re=/(\/\/.*$)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="n">'+m[3]+'</span>';
+      else if(m[4]){
+        const w=m[4];
+        let cls=KW.has(w)?"k":TY.has(w)?"t":LIB.has(w)?"fn":(m[5]?"fn":"");
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[5]?esc(m[5]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-cpp"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");const [a,b]=r.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+  // ---------- deck engine ----------
+  // .f fragments, shown one per step. Per fragment:
+  //   data-act  "sel|cls;…"   class kept while the fragment is shown
+  //   data-now  "sel|cls;…"   class only while it is the latest fragment
+  //   data-set  "sel::html;…" content set while shown (later fragments win)
+  //   data-say  narration for the .say line
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")].sort((x,y)=>(+x.dataset.o||0)-(+y.dataset.o||0)); // data-o: show later
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  const pairs=(v,sep)=>(v||"").split(";").filter(Boolean).map(p=>{const k=p.indexOf(sep);return [p.slice(0,k).trim(),p.slice(k+sep.length)]});
+  function tog(v,on){pairs(v,"|").forEach(([sel,cls])=>{document.querySelectorAll(sel).forEach(t=>t.classList.toggle(cls,on))})}
+  // remember original content of every data-set target
+  document.querySelectorAll("[data-set]").forEach(f=>pairs(f.dataset.set,"::").forEach(([sel])=>{document.querySelectorAll(sel).forEach(t=>{if(t.dataset.orig===undefined)t.dataset.orig=t.innerHTML})}));
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach(f=>{tog(f.dataset.now,false);tog(f.dataset.act,false)});
+      s.querySelectorAll("[data-orig]").forEach(t=>t.innerHTML=t.dataset.orig);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step);f.classList.toggle("on",on);if(on){tog(f.dataset.act,true);pairs(f.dataset.set,"::").forEach(([sel,val])=>document.querySelectorAll(sel).forEach(t=>t.innerHTML=val))}});
+      if(i===cur&&step>0)tog(fs[step-1].dataset.now,true);
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.innerHTML=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length;
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    try{history.replaceState(null,"","#"+slides[cur].id)}catch(e){}
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+  addEventListener("keydown",e=>{
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+
+</script>
+</body>
+</html>

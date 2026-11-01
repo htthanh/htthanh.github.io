@@ -1,0 +1,1256 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DDIA Chapter 11 · Stream Processing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+h1{font-size:70px;line-height:1.1;font-weight:800}
+h2{font-size:38px;line-height:1.2;font-weight:800}
+h3{font-size:23px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:22px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:26px;margin:6px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.88em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 6px;border-radius:6px;color:#be185d}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.cols.c64{grid-template-columns:1.25fr 1fr}.cols.c46{grid-template-columns:1fr 1.2fr}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.card.bad{border-color:#fecdd3;background:linear-gradient(180deg,#fff1f3,#fff)}
+.card.good{border-color:#a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff)}
+.lbl{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
+.icon{font-size:34px;margin-bottom:4px}
+.note{margin-top:12px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:20px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.code{font-family:var(--mono);font-size:18px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
+.code.sm{font-size:16.5px}.code.xs{font-size:15px;line-height:1.45}.code.xxs{font-size:13.6px;line-height:1.38;padding:8px 0}
+.code .ln{padding:0 14px 0 8px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.11);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.13);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
+.code-title{font-family:var(--mono);font-size:15px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+.f.zoom{transform:scale(.85)}.f.zoom.on{transform:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:19px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.legend{display:flex;flex-direction:column;gap:10px}
+.leg{border-radius:12px;padding:10px 16px;background:#fff;border:1px solid var(--line)}
+.leg b{display:block;font-size:21px;margin-bottom:2px}
+.leg p{font-size:19px}
+.leg.a{border-left:6px solid #7c3aed}.leg.b{border-left:6px solid #06b6d4}.leg.c{border-left:6px solid #f59e0b}
+.console{font-family:var(--mono);font-size:17px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.mem{display:flex;align-items:center;gap:16px;min-height:130px}
+.frame{border:2px solid #e4dcfb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
+.frame .fname{font-family:var(--mono);font-size:16px;color:var(--muted);margin-bottom:6px}
+.var{display:flex;align-items:center;gap:10px}
+.vn{font-family:var(--mono);font-size:21px;color:var(--t);font-weight:600}
+.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #c4b5fd;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
+.vb .new{display:none}
+.callee,.arw{opacity:0;transform:translateX(-14px);transition:all .5s}
+.mem.s1 .callee,.mem.s1 .arw{opacity:1;transform:none}
+.mem.s2 .chg .old{display:none}.mem.s2 .chg .new{display:inline;animation:pop .5s}
+.mem.s2 .chg{border-color:#f59e0b;box-shadow:0 0 18px rgba(245,158,11,.5)}
+.mem.s3 .callee,.mem.s3 .arw{opacity:.15;transform:translateY(10px)}
+.mem.s3 .result{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.5)}
+.arw{font-family:var(--mono);font-size:16px;color:var(--gold);text-align:center;line-height:1.2;font-weight:600}
+.arw .bar{display:block;font-size:30px}
+.alias{font-size:18px;color:var(--accent2);font-weight:600}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.25)}100%{transform:none;opacity:1}}
+.flow{display:flex;align-items:center;gap:12px;justify-content:center}
+.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:18px;border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:14px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.h{border-color:var(--gold)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#c4b5fd}.box.exe{border-color:#ec4899;background:#fdf2f8}
+.ar{color:var(--muted);font-size:26px;text-align:center}
+.stack{display:flex;flex-direction:column;gap:8px}
+svg text{font-family:var(--mono);font-weight:600}
+.draw{stroke-dasharray:400;stroke-dashoffset:400;transition:stroke-dashoffset 1s ease}
+svg.d1 .dr1,svg.d2 .dr2,svg.d3 .dr3{stroke-dashoffset:0}
+.fadein{opacity:0;transition:opacity .6s}
+svg.d1 .fd1,svg.d2 .fd2,svg.d3 .fd3{opacity:1}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:19px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05)}
+.ag:hover{border-color:#ec4899;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
+.ag b{color:#db2777;margin-right:6px;font-family:var(--mono)}
+.formula{font-family:var(--mono);font-size:23px;text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:16px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+@media (max-width:700px){#hint{display:none}}
+@media print{#nav,#bar,#hint{display:none}}
+
+/* lec03 additions */
+.chain{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pv{display:inline-flex;align-items:center;font-family:var(--mono);font-size:18px;font-weight:700;padding:5px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;white-space:nowrap}
+.pv.yes{background:#d1fae5;border-color:#34d399;color:#047857}
+.pv.no{background:#ffe4e6;border-color:#fb7185;color:#be123c}
+.pv.skip{background:#f1f5f9;border-color:#cbd5e1;color:#94a3b8;text-decoration:line-through;border-style:dashed}
+.op{font-family:var(--mono);font-size:26px;font-weight:800;color:var(--sa1)}
+.tt th,.tt td{text-align:center}.tt td:first-child{color:var(--text);font-weight:400}
+.tt tr.hit td{background:#fdf2f8;color:#be185d}
+tr.f{transform:none}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.code.show-s .mark-s{opacity:.3;text-decoration:line-through}
+.arr{display:flex;gap:12px;justify-content:center;margin-top:6px}
+.cell{width:84px;height:84px;border-radius:16px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:800;transition:all .45s;box-shadow:0 6px 16px -10px rgba(124,58,237,.4)}
+.cell small{font-size:13px;color:var(--muted);font-weight:600}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857;transform:translateY(-6px)}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;transform:translateY(-10px) scale(1.06);box-shadow:0 10px 24px -8px rgba(225,29,72,.5)}
+.cell.skip{opacity:.3;transform:scale(.92)}
+.syn{display:flex;gap:12px;align-items:center;justify-content:center;font-family:var(--mono);font-size:24px;font-weight:700}
+.sy{padding:8px 16px;border-radius:12px;color:#fff}
+.sy.c1{background:linear-gradient(135deg,#7c3aed,#a855f7)}.sy.c2{background:linear-gradient(135deg,#059669,#10b981)}.sy.c3{background:linear-gradient(135deg,#e11d48,#f97316)}
+.spin{display:inline-block;animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* lec04 arrays additions */
+.cell .v{display:block;line-height:1}
+.cell.max{border-color:#db2777;background:#fdf2f8;color:#be185d}
+.cell.empty{border-style:dashed;background:#f8fafc;color:#cbd5e1;box-shadow:none}
+.cell.done{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cell.new{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.cell.out{opacity:.4;border-style:dashed}
+.cell.gone{border-color:#e11d48;background:#fff1f3;color:#be123c;text-decoration:line-through}
+.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(245,158,11,.55)}
+.cell.cmp{border-color:#0891b2;background:#ecfeff;color:#0e7490;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(8,145,178,.5)}
+.cell.dots{border:none;box-shadow:none;background:none;width:40px;color:var(--muted)}
+.arr.sm .cell{width:70px;height:74px;font-size:24px;border-radius:14px}
+.arr.xs .cell{width:56px;height:62px;font-size:19px;border-radius:12px}
+.arr.xs .cell small{font-size:11.5px}
+.arr.left{justify-content:flex-start}
+.addr{display:flex;gap:12px;justify-content:center;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.addr span{width:84px;text-align:center}
+.vars{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.vc{font-family:var(--mono);font-size:19px;font-weight:700;padding:5px 14px;border-radius:12px;background:#fff;border:2px solid #e4dcfb;transition:all .35s}
+.vc b{color:var(--t)}
+.vc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.45)}
+.vc.res{border-color:#10b981;background:#ecfdf5;color:#047857}
+.ci{opacity:0;transition:opacity .4s}.ci.show{opacity:1}
+.say{font-size:20px;margin-top:12px;min-height:56px;color:var(--muted)}
+.say b{color:var(--text)}
+.rowlbl{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted);margin:10px 0 4px}
+.zone{display:flex;gap:6px;justify-content:center;margin-top:8px;font-size:15px;font-weight:700}
+.zone span{padding:3px 10px;border-radius:999px}
+.z1{background:#d1fae5;color:#047857}.z2{background:#f1f5f9;color:#64748b}.z3{background:#ffe4e6;color:#be123c}
+.brace{display:flex;gap:12px;justify-content:center;margin-top:4px}
+.brace div{border-top:3px solid currentColor;padding-top:4px;text-align:center;font-family:var(--mono);font-size:15px;font-weight:700}
+.mx{display:grid;gap:6px;justify-content:center}
+.mc{width:62px;height:52px;border-radius:10px;border:2px solid #e4dcfb;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .4s}
+.mx.sm .mc{width:44px;height:36px;font-size:14px;border-radius:8px}
+.mc.ix{border:none;background:none;color:var(--muted);font-size:14px;font-weight:600;box-shadow:none}
+.mc.unused{border-style:dashed;background:#f8fafc;color:#cbd5e1}
+.mc.used{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.mc.hl{background:#fffbeb;border-color:#fcd34d}
+.mc.cur{border-color:#f59e0b;background:#fde68a;color:#92400e;transform:scale(1.12);box-shadow:0 8px 20px -6px rgba(245,158,11,.6)}
+.mc.bd{border-color:#ec4899;border-width:3px}
+.mc.inr{opacity:.3}
+.mc.pos{border-color:#10b981;background:#d1fae5;color:#047857}
+.mc.neg{background:#fff1f3;color:#be123c}
+.mc.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;border-style:dashed}
+.strip{display:flex;gap:3px;font-family:var(--mono);font-size:12px;flex-wrap:nowrap;overflow:hidden}
+.strip span{padding:6px 5px;border-radius:5px;background:#f3edff;color:#6d28d9;white-space:nowrap}
+.strip span.r1{background:#e0f2fe;color:#0369a1}
+.strip span.gap{background:none;color:var(--muted)}
+.trace td,.trace th{font-size:17px;padding:5px 10px}
+.trace td:first-child{color:var(--text)}
+.trace tr.now td{background:#fffbeb}
+.sig{font-family:var(--mono);font-size:17px;background:#fff;border:1px dashed #c4b5fd;border-radius:10px;padding:6px 12px;color:#6d28d9;display:inline-block}
+
+.cols>*{min-width:0}
+
+/* ===== DDIA ch1 additions ===== */
+.sv{width:100%;height:auto;overflow:visible}
+.sv text{font-family:"Be Vietnam Pro",system-ui,sans-serif;font-weight:700;font-size:15px;fill:#1e1b3a}
+.sv text.sm{font-size:12.5px;fill:#64607d;font-weight:500}
+.sv text.lb{font-size:12.5px;fill:#7c3aed;font-weight:700}
+.sv .nd{fill:#fff;stroke:#c4b5fd;stroke-width:2}
+.sv .nd.c2{stroke:#0891b2}.sv .nd.c3{stroke:#ec4899}.sv .nd.c4{stroke:#f59e0b}.sv .nd.c5{stroke:#10b981}
+.sv .ln{stroke:#a78bfa;stroke-width:2.2;fill:none}
+.sv .g{opacity:0;transition:opacity .55s}
+.sv .g.hot .ln{stroke:#ec4899;stroke-dasharray:7 6;animation:dash .7s linear infinite}
+.sv .g.hot .nd{filter:drop-shadow(0 6px 10px rgba(236,72,153,.35))}
+@keyframes dash{to{stroke-dashoffset:-13}}
+.sv .box6{fill:none;stroke:#ec4899;stroke-width:2.5;stroke-dasharray:9 7}
+.chip{display:inline-flex;align-items:center;gap:8px;font-size:18px;font-weight:600;padding:6px 14px;border-radius:999px;background:#fff;border:2px solid #e4dcfb;white-space:nowrap}
+.chip.p{border-color:#c4b5fd;background:#f5f0ff;color:#6d28d9}.chip.c{border-color:#a5f3fc;background:#ecfeff;color:#0e7490}.chip.k{border-color:#fbcfe8;background:#fdf2f8;color:#be185d}.chip.y{border-color:#fde68a;background:#fffbeb;color:#b45309}.chip.g{border-color:#a7f3d0;background:#ecfdf5;color:#047857}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.cell.t{font-size:15px;font-weight:700;text-align:center;line-height:1.15;padding:4px}
+.cell.t .v{font-size:15px}
+.cell.big{font-size:30px}
+.stat{font-family:var(--mono);font-size:44px;font-weight:800;line-height:1;background:linear-gradient(90deg,var(--sa1),var(--sa2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat small{font-size:18px}
+.sysbox{border-radius:14px;padding:12px 16px;text-align:center;font-weight:700;font-size:20px;border:2px solid #e4dcfb;background:#fff;transition:all .45s}
+.sysbox.fail{border-color:#e11d48;background:#fff1f3;color:#be123c;box-shadow:0 0 22px rgba(225,29,72,.35)}
+.sysbox.ok{border-color:#10b981;background:#ecfdf5;color:#047857;box-shadow:0 0 22px rgba(16,185,129,.3)}
+.shield{opacity:0;transform:scale(.7);transition:all .45s;font-size:15px;font-weight:700;color:#7c3aed;text-align:center;border:2px dashed #a78bfa;border-radius:12px;padding:6px 10px;background:#f5f0ff}
+.shield.on{opacity:1;transform:none}
+.dots{display:grid;grid-template-columns:repeat(25,1fr);gap:5px;padding:12px;background:#fff;border:1px solid var(--line);border-radius:14px}
+.dots i{display:block;aspect-ratio:1;border-radius:4px;background:#e9e3fb;transition:all .4s}
+.dots i.x{background:#e11d48;transform:scale(1.35);box-shadow:0 0 10px rgba(225,29,72,.6)}
+.dots i.r{background:#10b981}
+.node{width:110px;border-radius:14px;border:2.5px solid #c4b5fd;background:#fff;text-align:center;padding:8px 4px;font-weight:700;transition:all .45s}
+.node .ver{display:block;font-family:var(--mono);font-size:22px;color:#6d28d9}
+.node small{display:block;font-size:13px;color:var(--muted);font-weight:600}
+.node.down{border-color:#f59e0b;background:#fffbeb;opacity:.55;transform:translateY(8px)}
+.node.v2{border-color:#10b981;background:#ecfdf5}.node.v2 .ver{color:#047857}
+.node.bad{border-color:#e11d48;background:#fff1f3;color:#be123c}.node.bad .ver{color:#be123c}
+.nodes{display:flex;gap:14px;justify-content:center}
+.casc{display:flex;align-items:center;gap:6px;justify-content:center}
+.casc .ar{font-size:22px}
+.tw{display:inline-block;font-size:13px;font-weight:700;padding:2px 8px;border-radius:6px;background:#fdf2f8;color:#be185d;border:1px solid #fbcfe8;margin:2px;opacity:0;transform:translateY(-10px) scale(.6);transition:all .45s}
+.tw.show{opacity:1;transform:none}
+.tw.b{background:#ecfeff;color:#0e7490;border-color:#a5f3fc}
+.tw.y{background:#fffbeb;color:#b45309;border-color:#fde68a}
+.mbox{border:2px solid #e4dcfb;border-radius:12px;background:#fff;padding:6px 8px;min-height:84px;transition:all .4s}
+.mbox h4{font-size:14px;color:var(--muted);margin-bottom:4px}
+.mbox.hot{border-color:#0891b2;box-shadow:0 0 16px rgba(8,145,178,.35)}
+.mboxes{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.who{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:18px;padding:8px 14px;border-radius:12px;background:#fff;border:2px solid #fbcfe8}
+.big-ar{font-size:30px;color:var(--muted);text-align:center;line-height:1}
+.rt{display:flex;height:58px;border-radius:12px;overflow:hidden;border:2px solid #e4dcfb;background:#fff}
+.rt>div{display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;opacity:0;transition:opacity .45s;white-space:nowrap}
+.rt>div.show{opacity:1}
+.rt .n1,.rt .n2{background:#94a3b8}.rt .q{background:#f59e0b}.rt .sv2{background:#7c3aed}
+.brk{position:relative;height:44px;margin-top:6px}
+.brk>div{position:absolute;top:0;border-top:3px solid;text-align:center;font-size:15px;font-weight:700;padding-top:4px;opacity:0;transition:opacity .45s}
+.brk>div.show{opacity:1}
+.pc rect.b{fill:#c4b5fd;transform:translateX(var(--x0));transition:transform 1.3s cubic-bezier(.6,0,.2,1) calc(var(--d)*7ms),fill .4s}
+.pc.sorted rect.b{transform:translateX(var(--x1))}
+.pc.p95 rect.t95{fill:#f472b6}.pc.p99 rect.t99{fill:#e11d48}
+.pc .mk{opacity:0;transition:opacity .5s}
+.pc.mean .mkm,.pc.p50 .mk50,.pc.p95 .mk95,.pc.p99 .mk99{opacity:1}
+.pc text{font-family:var(--mono);font-size:12px;font-weight:700}
+.q-row{display:flex;gap:8px;align-items:center}
+.rq{height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;font-weight:700;color:#fff;transition:all .5s}
+.rq.slow{width:190px;background:linear-gradient(135deg,#e11d48,#f97316)}
+.rq.fast{width:54px;background:linear-gradient(135deg,#0891b2,#7c3aed)}
+.rq.wait{box-shadow:0 0 0 3px #fde68a;animation:shake .5s infinite}
+.rq.done{opacity:.25}
+@keyframes shake{50%{transform:translateY(-3px)}}
+.srv{border:2.5px solid #7c3aed;border-radius:14px;padding:10px 14px;text-align:center;font-weight:800;background:#f5f0ff;min-width:120px}
+.be{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;margin:6px 0}
+.be .nm{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted)}
+.be .trk{height:26px;border-radius:8px;background:#f5f3ff;position:relative;overflow:hidden}
+.be .bb{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:8px;background:linear-gradient(90deg,#0891b2,#7c3aed);transition:width 1s ease}
+.be .bb.slow{background:linear-gradient(90deg,#f97316,#e11d48)}
+.run .be .bb{width:var(--w)}
+.mach{border:3px solid #7c3aed;border-radius:14px;background:#f5f0ff;display:flex;align-items:center;justify-content:center;font-weight:800;color:#6d28d9;transition:all .7s cubic-bezier(.2,.8,.2,1);width:90px;height:70px;font-size:15px;text-align:center}
+.mach.big{width:220px;height:170px;font-size:22px;border-width:5px;box-shadow:0 14px 30px -12px rgba(124,58,237,.6)}
+.mach.sm2{width:70px;height:56px;font-size:13px;border-color:#0891b2;background:#ecfeff;color:#0e7490;opacity:0;transform:scale(.5)}
+.mach.sm2.show{opacity:1;transform:none}
+.farm{display:grid;grid-template-columns:repeat(4,70px);gap:10px;justify-content:center}
+.layer{border-radius:12px;padding:10px 14px;font-weight:700;font-size:17px;text-align:center;transition:all .6s}
+.layer.top{background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;font-size:20px}
+.layer.hid{background:#f8fafc;border:2px dashed #cbd5e1;color:#64748b;font-weight:600;font-size:16px}
+.abs.cover .layer.hid{opacity:.25;filter:blur(1.5px)}
+.toggle{display:flex;gap:10px;align-items:center;justify-content:center}
+.pill{padding:8px 16px;border-radius:999px;font-weight:800;font-size:17px;border:2px solid #e4dcfb;background:#fff;transition:all .4s;color:var(--muted)}
+.pill.on{background:linear-gradient(135deg,var(--sa1),var(--sa2));color:#fff;border-color:transparent;transform:scale(1.06)}
+.quote{font-size:21px;line-height:1.45;font-style:italic;color:#4c4672;border-left:5px solid #ec4899;padding:8px 18px;background:rgba(255,255,255,.7);border-radius:8px}
+.quote b{font-style:normal}
+.mini li{font-size:18px;margin:3px 0;line-height:1.35}
+.card p.ps,p.ps{font-size:17px;line-height:1.4}
+.vs{font-weight:800;font-size:22px;color:var(--muted);align-self:center;text-align:center}
+.here{display:inline-block;font-size:13px;font-weight:800;color:#fff;background:#e11d48;border-radius:6px;padding:2px 8px;margin-left:6px;opacity:0;transition:opacity .4s}
+.here.show{opacity:1}
+.cols4>.card.lit{box-shadow:0 0 0 3px #ec4899,0 12px 26px -10px rgba(236,72,153,.5);transform:translateY(-4px)}
+.card{transition:all .4s}
+
+.chip.c,.leg.c{font-style:normal}.leg.c{color:var(--text)}.leg.c b{color:var(--text)}
+.leg p b{display:inline;font-size:inherit;margin:0}
+.toggle .pill{font-size:15px;white-space:nowrap}
+.abs.cover .layer.hid{opacity:.4;filter:blur(1px)}
+.mach.big{width:260px;font-size:21px}
+.sv text.lb,.pc text{paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+.sv.s1 .g1{opacity:1}.sv.s2 .g2{opacity:1}.sv.s3 .g3{opacity:1}.sv.s4 .g4{opacity:1}.sv.s5 .g5{opacity:1}.sv.s6 .g6{opacity:1}.sv.s7 .g7{opacity:1}.sv.s8 .g8{opacity:1}.who.hot{border-color:#ec4899;box-shadow:0 0 18px rgba(236,72,153,.45)}.toggle.flip #ev1{background:#fff;color:var(--muted);border-color:#e4dcfb;transform:none}.toggle.flip #ev2{background:linear-gradient(135deg,var(--sa1),var(--sa2));color:#fff;border-color:transparent;transform:scale(1.06)}.dots{grid-template-columns:repeat(50,1fr);gap:3px}.dots i{border-radius:2px}
+/* ===== DDIA ch11 additions ===== */
+.stg{position:relative;margin:0 auto}
+.wire{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.wl{stroke:#ddd3fb;stroke-width:2.2;fill:none;stroke-dasharray:6 6;transition:stroke .4s}
+.wl.hot{stroke:#ec4899;animation:dash .7s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-12}}
+.sn{position:absolute;border:2.5px solid #c4b5fd;border-radius:14px;background:#fff;padding:8px 12px;font-weight:700;text-align:center;font-size:16px;transition:all .45s;box-shadow:0 8px 20px -14px rgba(124,58,237,.6)}
+.sn small{display:block;font-size:12.5px;color:var(--muted);font-weight:600}
+.sn .val{display:block;font-family:var(--mono);font-size:24px;color:#6d28d9;margin-top:2px}
+.sn.c2{border-color:#0891b2}.sn.c3{border-color:#ec4899}.sn.c4{border-color:#f59e0b}.sn.c5{border-color:#10b981}
+.sn.hot{box-shadow:0 0 0 3px #fbcfe8,0 0 22px rgba(236,72,153,.45)}
+.sn.dead{border-color:#e11d48;background:#fff1f3;color:#be123c;opacity:.6;transform:rotate(-3deg)}
+.sn.ok{border-color:#10b981;background:#ecfdf5}
+.sn.bad{border-color:#e11d48;background:#fff1f3}.sn.bad .val{color:#be123c}
+.tk{position:absolute;left:var(--x0);top:var(--y0);opacity:var(--o,1);transition:left .75s cubic-bezier(.2,.8,.2,1),top .75s cubic-bezier(.2,.8,.2,1),opacity .45s,transform .45s,background .4s;font-family:var(--mono);font-size:14px;font-weight:700;padding:4px 10px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#7c3aed,#a855f7);white-space:nowrap;box-shadow:0 6px 14px -6px rgba(124,58,237,.6);z-index:2}
+.tk.p1{left:var(--x1);top:var(--y1)}
+.tk.p2{left:var(--x2);top:var(--y2)}
+.tk.p3{left:var(--x3);top:var(--y3)}
+.tk.vis{opacity:1}
+.tk.gone{opacity:0;transform:scale(.5)}
+.tk.c2{background:linear-gradient(135deg,#0891b2,#06b6d4)}.tk.c3{background:linear-gradient(135deg,#db2777,#ec4899)}.tk.c4{background:linear-gradient(135deg,#d97706,#f59e0b)}.tk.c5{background:linear-gradient(135deg,#059669,#10b981)}
+.tk.red{background:linear-gradient(135deg,#e11d48,#f97316)}
+.tk.ptr{background:none;box-shadow:none;color:#db2777;font-size:15px;padding:0}
+.tk.mv{border-radius:12px;width:136px;text-align:center;padding:8px 6px;font-size:18px}
+.tk.mv small{display:block;font-size:12px;font-weight:600;opacity:.85}
+.ap{opacity:0!important;transform:scale(.4)!important}
+.ap.show{opacity:1!important;transform:none!important}
+.cell.ap.show.cur{transform:translateY(-8px)!important}
+.lane{display:flex;align-items:center;gap:12px;margin:6px 0}
+.lane .ln2{width:150px;flex:none;font-weight:700;font-size:16px;text-align:right;color:var(--muted)}
+.lane .arr{margin-top:0}
+.relw{position:relative;height:92px}
+.dropk{display:inline-block}
+.f.on .dropk{animation:fall 1.6s ease-in infinite}
+.f.on .dropk:nth-child(2){animation-delay:.5s}.f.on .dropk:nth-child(3){animation-delay:1s}
+@keyframes fall{0%{transform:none;opacity:1}100%{transform:translateY(46px) rotate(50deg);opacity:0}}
+.qg{display:flex;gap:4px;height:28px;align-items:center}
+.qg i{display:block;width:16px;height:22px;border-radius:5px;background:#f59e0b;opacity:0}
+.f.on .qg i{animation:pop .4s both}
+.f.on .qg i:nth-child(2){animation-delay:.25s}.f.on .qg i:nth-child(3){animation-delay:.5s}.f.on .qg i:nth-child(4){animation-delay:.75s}.f.on .qg i:nth-child(5){animation-delay:1s}.f.on .qg i:nth-child(6){animation-delay:1.25s}.f.on .qg i:nth-child(7){animation-delay:1.5s}.f.on .qg i:nth-child(8){animation-delay:1.75s}
+.blk{display:inline-block}
+.f.on .blk{animation:shake .5s infinite}
+.mini3{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:15px;font-weight:700;margin:8px 0 2px;min-height:52px}
+.mini3 .pb{border:2px solid #c4b5fd;border-radius:10px;padding:5px 9px;background:#fff}
+.drw{stroke-dasharray:1600;stroke-dashoffset:1600;transition:stroke-dashoffset 1.6s ease}
+.drw.on{stroke-dashoffset:0}
+.kv{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:78px;height:58px;border-radius:12px;border:2.5px solid #e4dcfb;background:#fff;font-family:var(--mono);font-weight:800;font-size:17px;transition:all .45s}
+.kv small{font-size:11px;color:var(--muted);font-weight:600}
+.kv.k1{border-color:#c4b5fd}.kv.k2{border-color:#a5f3fc}.kv.k3{border-color:#fbcfe8}
+.kv.old{opacity:.3;text-decoration:line-through;transform:scale(.9)}
+.kv.tomb{background:#1e1b3a;color:#fff;border-color:#1e1b3a}
+.kvrow{display:flex;gap:8px;flex-wrap:nowrap;align-items:center}
+.seg{flex:1;height:46px;border-radius:8px;background:#ede9fe;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:700;color:#6d28d9;transition:all .5s}
+.seg.del{background:#f1f5f9;color:#cbd5e1;border:2px dashed #cbd5e1}
+.segs{display:flex;gap:4px;position:relative}
+.wnd{fill:rgba(124,58,237,.12);stroke:#7c3aed;stroke-width:2}
+.wnd.b{fill:rgba(8,145,178,.12);stroke:#0891b2}.wnd.p{fill:rgba(236,72,153,.12);stroke:#ec4899}.wnd.y{fill:rgba(245,158,11,.14);stroke:#f59e0b}.wnd.g2{fill:rgba(16,185,129,.14);stroke:#10b981}
+.sv circle.evd{fill:#1e1b3a}
+.sv.s9 .g9{opacity:1}
+.cmp2 td,.cmp2 th{font-size:17px;padding:7px 12px}
+.cmp2 td:first-child{white-space:normal}
+.sumgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.flow .box.on2{border-color:#ec4899;box-shadow:0 0 16px rgba(236,72,153,.35)}
+.ckpt{border:none!important;background:none!important;box-shadow:none!important;width:18px!important;color:#ec4899;font-size:30px!important}
+.ckpt.saved{color:#10b981}
+.zone span.on1{background:#d1fae5;color:#047857}.zone span.on3{background:#ffe4e6;color:#be123c}
+.dots.run i{background:#10b981;animation:pop .5s both}
+.dots.run i:nth-child(3n){animation-delay:.2s}.dots.run i:nth-child(3n+1){animation-delay:.4s}
+.tk.ptr.red{background:none;color:#e11d48}
+.sv .g.on{opacity:1}
+.relw{flex:1}
+.pill{font-size:14px!important;white-space:normal!important}
+
+.tk.mv{width:80px;font-size:15px;padding:6px 4px}
+#uses .ps{font-size:15px;line-height:1.35}#uses .icon{font-size:24px;margin-bottom:0}#uses h3{font-size:20px}#uses .card{padding:10px 14px}
+
+</style>
+</head>
+<body>
+<div id="viewport"><div id="deck">
+
+<!-- ===================== TITLE ===================== -->
+<section class="slide" id="title">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// DDIA · Part III: Derived Data · Chapter 11</div>
+    <h1 class="in" style="font-size:72px"><span class="grad">Stream Processing</span></h1>
+    <p class="in muted" style="font-size:24px;margin-top:18px;max-width:1040px"><i>Designing Data-Intensive Applications</i> — Martin Kleppmann. Từ batch trên input <b>bounded</b> sang xử lý liên tục trên <b>unbounded event streams</b>: message brokers, log-based messaging, change data capture, event sourcing, windows, stream joins và fault tolerance.</p>
+    <div class="quote in" style="margin-top:26px;max-width:1040px;font-size:19px">“A complex system that works is invariably found to have evolved from a simple system that works. The inverse proposition also appears to be true: A complex system designed from scratch never works and cannot be made to work.” <b>— John Gall, Systemantics (1975)</b></div>
+    <p class="in" style="margin-top:26px;font-size:18px;color:#8a91b4">Phím ← → hoặc Space: chạy từng bước · Shift+→: qua slide · A: hiện hết · F: toàn màn hình</p>
+  </div>
+</section>
+
+<!-- ===================== AGENDA ===================== -->
+<section class="slide" id="agenda">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:18px">· bấm vào mục để đi tới</span></div>
+  <div class="agenda in" style="gap:10px">
+    <div class="ag" data-goto="bvs"><b>01</b>Bounded vs unbounded data</div>
+    <div class="ag" data-goto="ev"><b>02</b>Events, producers, consumers</div>
+    <div class="ag" data-goto="msg"><b>03</b>Messaging systems: 2 câu hỏi</div>
+    <div class="ag" data-goto="broker"><b>04</b>Direct messaging vs message brokers</div>
+    <div class="ag" data-goto="multi"><b>05</b>Load balancing &amp; fan-out</div>
+    <div class="ag" data-goto="ack"><b>06</b>Acknowledgments &amp; redelivery</div>
+    <div class="ag" data-goto="logs"><b>07</b>Partitioned logs</div>
+    <div class="ag" data-goto="part"><b>08</b>Topic · partition · offset</div>
+    <div class="ag" data-goto="disk"><b>09</b>Disk space, lag &amp; replay</div>
+    <div class="ag" data-goto="dual"><b>10</b>Keeping systems in sync: dual writes</div>
+    <div class="ag" data-goto="cdc"><b>11</b>Change Data Capture</div>
+    <div class="ag" data-goto="es"><b>12</b>Event Sourcing</div>
+    <div class="ag" data-goto="state"><b>13</b>State, streams &amp; immutability</div>
+    <div class="ag" data-goto="proc"><b>14</b>Processing streams &amp; use cases</div>
+    <div class="ag" data-goto="time"><b>15</b>Reasoning about time</div>
+    <div class="ag" data-goto="win"><b>16</b>Types of windows</div>
+    <div class="ag" data-goto="join1"><b>17</b>Stream joins</div>
+    <div class="ag" data-goto="ft"><b>18</b>Fault tolerance · exactly-once</div>
+    <div class="ag" data-goto="ft2"><b>19</b>Idempotence &amp; rebuilding state</div>
+    <div class="ag" data-goto="sum"><b>20</b>Summary</div>
+  </div>
+</section>
+
+<!-- ===================== BOUNDED VS UNBOUNDED ===================== -->
+<section class="slide" id="bvs">
+  <div class="hdr in"><span class="qn">01</span><h2>Batch giả định input <span class="grad">bounded</span> — thực tế data là <span class="grad">unbounded</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.25fr;gap:26px">
+    <div>
+      <div class="card bad f"><span class="lbl bad">BATCH (Chapter 10)</span><p style="font-size:18px">Input có kích thước <b>known &amp; finite</b> → job biết khi nào đọc xong. Ví dụ sort trong MapReduce phải đọc <b>hết</b> input mới bắt đầu output được.</p></div>
+      <div class="card f" style="margin-top:12px"><span class="lbl info">THỰC TẾ</span><p style="font-size:18px">User tạo data hôm qua, hôm nay, ngày mai… dataset <b>không bao giờ “complete”</b>. Batch phải chia data thành chunk thời gian cố định: mỗi ngày, mỗi giờ.</p></div>
+      <div class="card good f" style="margin-top:12px"><span class="lbl good">STREAM PROCESSING</span><p style="font-size:18px">Bỏ hẳn fixed time slices: xử lý <b>từng event ngay khi nó xảy ra</b>. “Stream” = data được tạo ra <b>dần dần theo thời gian</b> (stdin/stdout, TCP, lazy lists, audio/video…).</p></div>
+    </div>
+    <div>
+      <div class="card" style="padding:14px 16px">
+        <p class="rowlbl" style="margin-top:0">Events đến liên tục theo thời gian →</p>
+        <div class="dots" id="evdots" style="grid-template-columns:repeat(24,1fr);gap:5px"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="zone" style="justify-content:space-between;margin-top:10px">
+          <span class="z2" id="bz1">Daily batch: output trễ ~1 ngày</span>
+          <span class="z2" id="bz2">Hourly batch: trễ ~1 giờ</span>
+          <span class="z2" id="bz3">Stream: trễ ~ms–s</span>
+        </div>
+      </div>
+      <div class="brace" style="margin-top:14px;justify-content:space-between">
+        <div class="ci" id="br1" style="width:100%;color:#e11d48">[──────── 1 chunk = 1 ngày ────────] → output</div>
+      </div>
+      <div class="brace" style="justify-content:space-between">
+        <div class="ci" id="br2" style="width:100%;color:#f59e0b">[─ 1h ─][─ 1h ─][─ 1h ─][─ 1h ─][─ 1h ─][─ 1h ─]</div>
+      </div>
+      <div class="brace">
+        <div class="ci" id="br3" style="width:100%;color:#10b981">● → ● → ● → ● → mỗi event được xử lý ngay</div>
+      </div>
+      <span class="f ghost" data-act="#br1|show;#bz1|on3" data-say="Batch theo ngày: thay đổi ở input chỉ thấy ở output <b>một ngày sau</b> — quá chậm cho nhiều user."></span>
+      <span class="f ghost" data-act="#br2|show;#bz2|on1" data-say="Chạy thường xuyên hơn (mỗi giờ, mỗi giây) để giảm delay…"></span>
+      <span class="f ghost" data-act="#br3|show;#bz3|on1;#evdots|run" data-say="…hoặc <b>continuously</b>: đó chính là ý tưởng của <b>stream processing</b>. Chương này xem event stream như một cơ chế <b>data management</b>."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== EVENTS ===================== -->
+<section class="slide" id="ev">
+  <div class="hdr in"><span class="qn">02</span><h2>Transmitting Event Streams: <span class="grad">event · producer · consumer · topic</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr;gap:26px">
+    <div>
+      <p style="font-size:19px">Trong stream processing, một <b>record</b> thường gọi là <b>event</b>: một object <b>nhỏ, self-contained, immutable</b> mô tả điều gì đó đã xảy ra tại một thời điểm, thường kèm <b>timestamp</b> (time-of-day clock).</p>
+      <div class="console f" style="margin-top:10px;font-size:15px">{ <span class="in">"type"</span>: "page_view",
+  <span class="in">"user_id"</span>: 42,
+  <span class="in">"url"</span>: "/checkout",
+  <span class="in">"timestamp"</span>: "2026-11-01T09:15:02Z" }</div>
+      <table class="f" style="margin-top:12px;font-size:17px">
+        <tr><th>Batch world</th><th>Streaming world</th></tr>
+        <tr><td>file viết 1 lần</td><td>event được <b>producer</b> (publisher/sender) tạo 1 lần</td></tr>
+        <tr><td>nhiều job đọc file</td><td>nhiều <b>consumer</b> (subscriber/recipient) xử lý</td></tr>
+        <tr><td>filename nhóm records</td><td><b>topic</b> / stream nhóm các event liên quan</td></tr>
+      </table>
+    </div>
+    <div>
+      <h3>Polling vs notification</h3>
+      <div class="card" style="padding:12px 16px">
+        <div class="mini3"><span class="pb">Consumer</span><span id="pl1" class="ci">→ “có gì mới?” ✗</span><span id="pl2" class="ci">→ ✗</span><span id="pl3" class="ci">→ ✗</span><span id="pl4" class="ci">→ ✓ 1 event</span></div>
+        <p class="ps muted ci" id="plt">Poll càng thường xuyên → tỉ lệ request có event mới càng thấp → <b>overhead càng cao</b>.</p>
+      </div>
+      <div class="card good" style="padding:12px 16px;margin-top:10px">
+        <div class="mini3"><span class="pb">Producer</span><span class="ci" id="nt1">— event mới →</span><span class="pb ci" id="nt2" style="border-color:#10b981">🔔 notify Consumer</span></div>
+        <p class="ps muted ci" id="ntt">Tốt hơn: consumer được <b>notified</b> khi có event. Database triggers làm được nhưng rất hạn chế — nên có các tool chuyên dụng.</p>
+      </div>
+      <span class="f ghost" data-act="#pl1|show" data-say="Về nguyên tắc, một file hay database là đủ: producer ghi, consumer định kỳ <b>poll</b>."></span>
+      <span class="f ghost" data-act="#pl2|show;#pl3|show;#pl4|show;#plt|show" data-say="Nhưng khi cần <b>low delay</b>, polling liên tục rất tốn kém nếu datastore không thiết kế cho việc này."></span>
+      <span class="f ghost" data-act="#nt1|show;#nt2|show;#ntt|show" data-say="→ cần <b>messaging system</b> chuyên để đẩy notification về event mới."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MESSAGING: 2 QUESTIONS ===================== -->
+<section class="slide" id="msg">
+  <div class="hdr in"><span class="qn">03</span><h2>Messaging Systems: <span class="grad">publish/subscribe</span> &amp; 2 câu hỏi</h2></div>
+  <p class="in" style="font-size:19px">Unix pipe / TCP nối đúng <b>1 sender ↔ 1 recipient</b>. Messaging system cho phép <b>nhiều producer</b> gửi vào cùng topic và <b>nhiều consumer</b> nhận từ topic đó.</p>
+  <h3 class="in" style="margin-top:12px">❶ Producer gửi nhanh hơn consumer xử lý thì sao?</h3>
+  <div class="cols3">
+    <div class="card f"><h3>🗑️ Drop messages</h3><div class="mini3"><span class="pb">P</span>→<span class="tk red dropk" style="position:static">m</span><span class="tk red dropk" style="position:static">m</span><span class="tk red dropk" style="position:static">m</span>→<span class="pb">C</span></div><p class="ps">Bỏ bớt message. Chấp nhận được với metrics/sensor gửi định kỳ, nhưng nguy hiểm khi <b>counting</b> events.</p></div>
+    <div class="card f"><h3>📦 Buffer in a queue</h3><div class="mini3"><span class="pb">P</span>→<span class="qg"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>→<span class="pb">C</span></div><p class="ps">Queue lớn dần: hết memory thì crash hay ghi xuống disk? Disk access ảnh hưởng performance ra sao?</p></div>
+    <div class="card f"><h3>✋ Backpressure</h3><div class="mini3"><span class="pb blk" style="border-color:#e11d48">P ⛔ blocked</span>→<span class="qg" style="width:60px"><i style="opacity:1"></i><i style="opacity:1"></i></span>→<span class="pb">C</span></div><p class="ps">Còn gọi là <b>flow control</b>: chặn producer đến khi buffer có chỗ. Unix pipes và TCP dùng cách này.</p></div>
+  </div>
+  <div class="cols" style="margin-top:14px;grid-template-columns:1fr 1fr">
+    <div class="card f"><h3>❷ Node crash / offline — có mất message không?</h3><p class="ps">Durability cần <b>ghi xuống disk</b> và/hoặc <b>replication</b> — có chi phí. Nếu chấp nhận đôi khi mất message → <b>throughput cao hơn, latency thấp hơn</b> trên cùng hardware.</p></div>
+    <div class="note blue f" style="margin-top:0">Batch (Chapter 10) có reliability guarantee mạnh: task fail được <b>retry</b>, partial output bị <b>discard</b> → output như thể không có failure. Cuối chương sẽ xem stream đạt được điều tương tự thế nào.</div>
+  </div>
+</section>
+
+<!-- ===================== DIRECT VS BROKER ===================== -->
+<section class="slide" id="broker">
+  <div class="hdr in"><span class="qn">04</span><h2>Direct messaging <span class="muted" style="font-weight:600">vs</span> <span class="grad">Message brokers</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.15fr;gap:24px">
+    <div>
+      <span class="lbl bad">DIRECT · không qua node trung gian</span>
+      <ul class="mini">
+        <li><b>UDP multicast</b>: stock market feeds, low latency; protocol tầng app tự retransmit packet bị mất.</li>
+        <li><b>ZeroMQ, nanomsg</b>: brokerless pub/sub trên TCP hoặc IP multicast.</li>
+        <li><b>StatsD, Brubeck</b>: thu metrics qua UDP không reliable → counter chỉ <i>xấp xỉ</i>.</li>
+        <li><b>Webhooks</b>: đăng ký callback URL, service kia gọi HTTP/RPC khi có event.</li>
+      </ul>
+      <div class="note" style="font-size:17px">Hạn chế: app phải biết có thể <b>mất message</b>; giả định producer &amp; consumer luôn online. Consumer offline → bỏ lỡ message; producer crash → mất buffer retry.</div>
+    </div>
+    <div>
+      <span class="lbl good">MESSAGE BROKER (message queue)</span>
+      <p class="ps" style="margin-bottom:8px">Một dạng <b>database tối ưu cho message streams</b>, chạy như server; producer &amp; consumer là clients.</p>
+      <div class="stg card" style="width:600px;height:220px;padding:0">
+        <svg class="wire" viewBox="0 0 600 220"><line class="wl" id="bw1" x1="120" y1="110" x2="230" y2="110"/><line class="wl" id="bw2" x1="370" y1="110" x2="470" y2="110"/></svg>
+        <div class="sn c3" style="left:14px;top:84px;width:106px">Producer</div>
+        <div class="sn" id="bkr" style="left:230px;top:56px;width:140px;height:110px">Broker<small>queue · disk?</small></div>
+        <div class="sn c2" id="bcons" style="left:470px;top:84px;width:116px">Consumer</div>
+        <div class="tk" id="bm1" style="--o:0;--x0:60px;--y0:40px;--x1:250px;--y1:122px;--x2:490px;--y2:140px">m1</div>
+        <div class="tk c3" id="bm2" style="--o:0;--x0:60px;--y0:40px;--x1:300px;--y1:122px;--x2:490px;--y2:175px">m2</div>
+        <div class="tk c4" id="bm3" style="--o:0;--x0:60px;--y0:40px;--x1:275px;--y1:150px;--x2:540px;--y2:175px">m3</div>
+      </div>
+      <span class="f ghost" data-act="#bcons|dead;#bm1|vis;#bm1|p1;#bm2|vis;#bm2|p1;#bm3|vis;#bm3|p1;#bw1|hot" data-say="Consumer <b>offline</b>? Không sao: broker <b>buffer</b> message (thường là <b>unbounded queueing</b>, có thể ghi disk). Producer chỉ chờ broker xác nhận đã buffer."></span>
+      <span class="f ghost" data-now="#bw2|hot" data-act="#bm1|p2;#bm2|p2;#bm3|p2" data-say="Consumer quay lại → nhận các message tồn đọng. Delivery là <b>asynchronous</b>: thường trong tích tắc, đôi khi trễ hơn nhiều nếu có <b>backlog</b>."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== BROKER VS DB ===================== -->
+<section class="slide" id="bdb">
+  <div class="hdr in"><span class="qn">04b</span><h2>Message brokers compared to databases</h2></div>
+  <p class="in muted" style="font-size:19px">Một số broker còn tham gia <b>two-phase commit</b> (XA/JTA) → giống database, nhưng vẫn có khác biệt thực tế quan trọng:</p>
+  <table class="cmp2 in" style="margin-top:10px">
+    <tr><th style="width:22%">Khía cạnh</th><th>🗄️ Database</th><th>📨 Message broker (truyền thống)</th></tr>
+    <tr class="f"><td>Lưu trữ</td><td>Giữ data đến khi bị <b>xoá tường minh</b></td><td>Tự động <b>xoá message</b> khi đã deliver thành công → không hợp cho long-term storage</td></tr>
+    <tr class="f"><td>Working set</td><td>Có thể rất lớn</td><td>Giả định queue <b>ngắn</b>; consumer chậm → buffer nhiều, spill ra disk → throughput giảm</td></tr>
+    <tr class="f"><td>Chọn data</td><td><b>Secondary indexes</b>, nhiều cách search</td><td>Subscribe vào subset các topic khớp <b>pattern</b></td></tr>
+    <tr class="f"><td>Query vs notify</td><td>Kết quả là <b>point-in-time snapshot</b>; không biết khi nó lỗi thời (trừ khi query/poll lại)</td><td>Không query tuỳ ý được, nhưng <b>notify</b> client khi có message mới</td></tr>
+  </table>
+  <div class="chips f" style="margin-top:14px"><span class="chip p">JMS</span><span class="chip p">AMQP</span><span class="chip c">RabbitMQ</span><span class="chip c">ActiveMQ</span><span class="chip c">HornetQ</span><span class="chip c">Qpid</span><span class="chip k">TIBCO EMS</span><span class="chip k">IBM MQ</span><span class="chip y">Azure Service Bus</span><span class="chip y">Google Cloud Pub/Sub</span></div>
+</section>
+
+<!-- ===================== MULTIPLE CONSUMERS ===================== -->
+<section class="slide" id="multi">
+  <div class="hdr in"><span class="qn">05</span><h2>Multiple consumers: <span class="grad">load balancing</span> vs <span class="grad">fan-out</span></h2></div>
+  <div class="cols" style="gap:20px">
+    <div class="card" style="padding:12px 14px">
+      <h3>(a) Load balancing</h3>
+      <div class="stg" style="width:560px;height:240px">
+        <svg class="wire" viewBox="0 0 560 240"><line class="wl" id="lbw" x1="110" y1="120" x2="200" y2="120"/><path class="wl" id="lbw2" d="M300 120 L430 40 M300 120 L430 120 M300 120 L430 200"/></svg>
+        <div class="sn c3" style="left:0;top:96px;width:110px">Producer</div>
+        <div class="sn" style="left:200px;top:80px;width:100px;height:80px">Topic</div>
+        <div class="sn c2" style="left:440px;top:16px;width:110px">C1</div>
+        <div class="sn c2" style="left:440px;top:96px;width:110px">C2</div>
+        <div class="sn c2" style="left:440px;top:176px;width:110px">C3</div>
+        <div class="tk" id="lb1" style="--x0:215px;--y0:92px;--x1:370px;--y1:24px">m1</div>
+        <div class="tk c3" id="lb2" style="--x0:215px;--y0:120px;--x1:370px;--y1:104px">m2</div>
+        <div class="tk c4" id="lb3" style="--x0:255px;--y0:106px;--x1:370px;--y1:184px">m3</div>
+      </div>
+      <p class="ps">Mỗi message tới <b>một</b> consumer → chia việc, thêm consumer để <b>parallelize</b>. (AMQP: nhiều client cùng 1 queue; JMS: <i>shared subscription</i>)</p>
+    </div>
+    <div class="card" style="padding:12px 14px">
+      <h3>(b) Fan-out</h3>
+      <div class="stg" style="width:560px;height:240px">
+        <svg class="wire" viewBox="0 0 560 240"><line class="wl" id="fow" x1="110" y1="120" x2="200" y2="120"/><path class="wl" id="fow2" d="M300 120 L430 40 M300 120 L430 120 M300 120 L430 200"/></svg>
+        <div class="sn c3" style="left:0;top:96px;width:110px">Producer</div>
+        <div class="sn" style="left:200px;top:80px;width:100px;height:80px">Topic</div>
+        <div class="sn c5" style="left:440px;top:16px;width:110px">C1</div>
+        <div class="sn c5" style="left:440px;top:96px;width:110px">C2</div>
+        <div class="sn c5" style="left:440px;top:176px;width:110px">C3</div>
+        <div class="tk" id="fo1" style="--x0:215px;--y0:100px;--x1:330px;--y1:24px">m1</div>
+        <div class="tk" id="fo2" style="--x0:215px;--y0:100px;--x1:330px;--y1:104px">m1</div>
+        <div class="tk" id="fo3" style="--x0:215px;--y0:100px;--x1:330px;--y1:184px">m1</div>
+        <div class="tk c3" id="fo4" style="--x0:240px;--y0:128px;--x1:380px;--y1:24px">m2</div>
+        <div class="tk c3" id="fo5" style="--x0:240px;--y0:128px;--x1:380px;--y1:104px">m2</div>
+        <div class="tk c3" id="fo6" style="--x0:240px;--y0:128px;--x1:380px;--y1:184px">m2</div>
+      </div>
+      <p class="ps">Mỗi message tới <b>tất cả</b> consumers — như nhiều batch job đọc cùng một input file. (JMS: topic subscriptions; AMQP: exchange bindings)</p>
+    </div>
+  </div>
+  <span class="f ghost" data-act="#lb1|p1;#lb2|p1;#lb3|p1;#lbw2|hot"></span>
+  <span class="f ghost" data-act="#fo1|p1;#fo2|p1;#fo3|p1;#fo4|p1;#fo5|p1;#fo6|p1;#fow2|hot"></span>
+  <div class="note blue f" style="margin-top:10px">Có thể <b>kết hợp</b>: hai nhóm consumer cùng subscribe một topic — mỗi nhóm nhận đủ mọi message, nhưng trong mỗi nhóm chỉ một node nhận mỗi message.</div>
+</section>
+
+<!-- ===================== ACK & REDELIVERY ===================== -->
+<section class="slide" id="ack">
+  <div class="hdr in"><span class="qn">06</span><h2>Acknowledgments &amp; redelivery → <span class="grad">message reordering</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.35fr 1fr;gap:24px">
+    <div class="card" style="padding:14px 16px">
+      <div class="lane"><span class="ln2">Producer 1 gửi</span><div class="arr xs left"><div class="cell"><span class="v">m1</span></div><div class="cell"><span class="v">m2</span></div><div class="cell" id="am3"><span class="v">m3</span></div><div class="cell"><span class="v">m4</span></div><div class="cell"><span class="v">m5</span></div></div></div>
+      <div class="lane"><span class="ln2" id="ac1l">Consumer 1</span><div class="arr xs left"><div class="cell ap done" id="c1a"><span class="v">m1</span><small>ack ✓</small></div><div class="cell ap" id="c1b"><span class="v">m4</span><small id="c1bs">…</small></div><div class="cell ap cur" id="c1c"><span class="v">m3</span><small>redeliv.</small></div><div class="cell ap" id="c1d"><span class="v">m5</span><small>ack ✓</small></div></div></div>
+      <div class="lane"><span class="ln2" id="ac2l">Consumer 2</span><div class="arr xs left"><div class="cell ap done" id="c2a"><span class="v">m2</span><small>ack ✓</small></div><div class="cell ap" id="c2b"><span class="v">m3</span><small id="c2bs">…</small></div></div><span class="here" id="crash" style="font-size:16px">💥 CRASH — không ack m3</span></div>
+      <div class="formula ci" id="aord" style="margin-top:12px;font-size:20px">Consumer 1 xử lý theo thứ tự: m1, <b style="color:#e11d48">m4, m3</b>, m5 ≠ thứ tự gửi</div>
+    </div>
+    <div>
+      <p style="font-size:18px">Consumer có thể crash bất cứ lúc nào. Để không mất message, client phải <b>acknowledge</b> tường minh khi xử lý xong → broker mới xoá khỏi queue.</p>
+      <p style="font-size:18px;margin-top:8px">Connection đóng/timeout mà chưa có ack → broker coi như chưa xử lý và <b>deliver lại</b> cho consumer khác.</p>
+      <div class="note" style="font-size:16px">Có thể message đã xử lý xong nhưng <b>ack bị mất</b> trên network → cần <b>atomic commit protocol</b> (Chapter 9).</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+  <span class="f ghost" data-act="#c1a|show;#c2a|show" data-say="Load balancing: m1 → Consumer 1, m2 → Consumer 2, cả hai <b>ack</b>."></span>
+  <span class="f ghost" data-act="#c2b|show;#c1b|show" data-say="Consumer 2 đang xử lý m3, cùng lúc Consumer 1 xử lý m4."></span>
+  <span class="f ghost" data-act="#crash|show;#c2b|bad;#am3|cur" data-set="#c2bs::✗ lost" data-say="Consumer 2 <b>crash</b> giữa chừng → m3 chưa được ack."></span>
+  <span class="f ghost" data-act="#c1c|show;#c1d|show;#aord|show" data-set="#c1bs::ack ✓" data-say="Broker <b>redeliver</b> m3 cho Consumer 1 → thứ tự thành m4, m3, m5. Load balancing + redelivery <b>chắc chắn</b> gây reordering (dù JMS/AMQP cố giữ thứ tự)."></span>
+  <div class="note blue f" style="margin-top:10px">Tránh bằng cách dùng <b>queue riêng cho mỗi consumer</b> (bỏ load balancing). Reordering không sao nếu message độc lập, nhưng quan trọng khi có <b>causal dependencies</b>.</div>
+</section>
+
+<!-- ===================== PARTITIONED LOGS ===================== -->
+<section class="slide" id="logs">
+  <div class="hdr in"><span class="qn">07</span><h2>Partitioned Logs: <span class="grad">durable storage</span> + <span class="grad">low-latency notification</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr auto 1fr;gap:18px">
+    <div class="card bad f"><span class="lbl bad">TRANSIENT MESSAGING MINDSET</span>
+      <ul class="mini"><li>Gửi packet/request: không để lại dấu vết lâu dài.</li><li>AMQP/JMS: nhận message là <b>destructive</b> — ack → bị xoá → chạy lại consumer không ra cùng kết quả.</li><li>Consumer mới chỉ thấy message gửi <b>sau</b> khi đăng ký; message cũ đã mất.</li></ul></div>
+    <div class="vs f">vs</div>
+    <div class="card good f"><span class="lbl good">DATABASE / FILESYSTEM MINDSET</span>
+      <ul class="mini"><li>Mọi thứ được ghi lại <b>vĩnh viễn</b> đến khi bị xoá tường minh.</li><li>Batch job chạy lặp lại thoải mái, input <b>read-only</b> không bị hỏng.</li><li>Client mới có thể đọc data ghi từ rất lâu trước.</li></ul></div>
+  </div>
+  <div class="note blue f" style="margin-top:16px;font-size:21px">Tại sao không lai cả hai? → <b>log-based message brokers</b>.</div>
+  <div class="cols f" style="margin-top:14px;grid-template-columns:1fr 1fr;gap:20px">
+    <div class="card"><h3>📜 Log = append-only sequence of records on disk</h3><p class="ps">Đã gặp ở log-structured storage &amp; write-ahead log (Ch.3), replication (Ch.5). Producer <b>append</b> vào cuối log; consumer <b>đọc tuần tự</b>; tới cuối log thì chờ notification — giống <code class="i">tail -f</code>.</p></div>
+    <div class="card"><h3>🧱 Partitioned để scale</h3><p class="ps">Log được chia <b>partitions</b> (Ch.6) trên nhiều máy. <b>Topic</b> = nhóm partitions cùng loại message. Ví dụ: <b>Apache Kafka</b>, <b>Amazon Kinesis Streams</b>, <b>Twitter DistributedLog</b> — hàng triệu msg/s, fault tolerance nhờ replication.</p></div>
+  </div>
+</section>
+
+<!-- ===================== TOPIC/PARTITION/OFFSET ===================== -->
+<section class="slide" id="part">
+  <div class="hdr in"><span class="qn">08</span><h2>Topic · partition · <span class="grad">offset</span> (Figure 11-3)</h2></div>
+  <div class="cols" style="grid-template-columns:1.75fr 1fr;gap:22px">
+    <div class="card" style="padding:14px 16px">
+      <p class="rowlbl" style="margin-top:0">Topic “page_views”</p>
+      <div class="lane"><span class="ln2">Partition 0</span><div class="relw"><div class="arr xs left"><div class="cell"><span class="v">0</span></div><div class="cell"><span class="v">1</span></div><div class="cell"><span class="v">2</span></div><div class="cell"><span class="v">3</span></div><div class="cell"><span class="v">4</span></div><div class="cell"><span class="v">5</span></div><div class="cell ap new" id="p0n1"><span class="v">6</span></div><div class="cell ap new" id="p0n2"><span class="v">7</span></div></div>
+        <div class="tk ptr" id="pa" style="--x0:158px;--y0:66px;--x1:362px;--y1:66px;--x2:498px;--y2:66px">▲ A</div></div></div>
+      <div class="lane"><span class="ln2">Partition 1</span><div class="relw"><div class="arr xs left"><div class="cell"><span class="v">0</span></div><div class="cell"><span class="v">1</span></div><div class="cell"><span class="v">2</span></div><div class="cell"><span class="v">3</span></div><div class="cell ap new" id="p1n1"><span class="v">4</span></div></div>
+        <div class="tk ptr" id="pb" style="--x0:22px;--y0:66px;--x1:226px;--y1:66px;--x2:294px;--y2:66px">▲ B</div></div></div>
+      <div class="lane"><span class="ln2">Partition 2</span><div class="relw"><div class="arr xs left"><div class="cell"><span class="v">0</span></div><div class="cell"><span class="v">1</span></div><div class="cell"><span class="v">2</span></div><div class="cell"><span class="v">3</span></div><div class="cell"><span class="v">4</span></div><div class="cell ap new" id="p2n1"><span class="v">5</span></div><div class="cell ap new" id="p2n2"><span class="v">6</span></div></div>
+        <div class="tk ptr" id="pc" style="--x0:90px;--y0:66px;--x1:294px;--y1:66px;--x2:430px;--y2:66px">▲ B</div></div></div>
+    </div>
+    <div>
+      <ul class="mini">
+        <li>Trong mỗi partition, broker gán <b>offset</b> tăng đơn điệu cho từng message → <b>total order</b> trong partition.</li>
+        <li><b>Không có</b> ordering guarantee giữa các partition.</li>
+        <li>Load balancing: broker gán <b>cả partition</b> cho một node trong <b>consumer group</b>; node đọc tuần tự, single-threaded.</li>
+        <li>Fan-out: miễn phí — đọc không xoá message.</li>
+      </ul>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+  <span class="f ghost" data-act="#p0n1|show;#p0n2|show;#p1n1|show;#p2n1|show;#p2n2|show" data-say="Producers <b>append</b> message mới vào cuối các partition (thường chọn partition theo key)."></span>
+  <span class="f ghost" data-act="#pa|p1;#pb|p1;#pc|p1" data-say="Consumers đọc tuần tự. Consumer A sở hữu partition 0; consumer B sở hữu partition 1 &amp; 2 (cùng consumer group)."></span>
+  <span class="f ghost" data-act="#pa|p2;#pb|p2;#pc|p2" data-say="Mọi message có offset &lt; offset hiện tại của consumer đều đã xử lý → broker chỉ cần lưu <b>consumer offset</b>, không cần track ack từng message."></span>
+</section>
+
+<!-- ===================== LOGS VS TRADITIONAL ===================== -->
+<section class="slide" id="lvt">
+  <div class="hdr in"><span class="qn">08b</span><h2>Logs compared to traditional messaging</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:22px">
+    <div>
+      <h3>Nhược điểm của coarse-grained load balancing</h3>
+      <ul class="mini">
+        <li>Số node chia nhau xử lý một topic ≤ <b>số partitions</b> của topic đó.</li>
+        <li>Một message xử lý chậm sẽ chặn các message sau nó trong cùng partition: <b>head-of-line blocking</b>.</li>
+      </ul>
+      <div class="card" style="margin-top:12px;padding:12px 14px" id="hol">
+        <p class="rowlbl" style="margin-top:0">Partition 2 → consumer B</p>
+        <div class="q-row"><div class="rq fast done">m4</div><div class="rq slow" id="hs">m5 (chậm!)</div><div class="rq fast" id="hf1">m6</div><div class="rq fast" id="hf2">m7</div><div class="rq fast" id="hf3">m8</div></div>
+      </div>
+      <span class="f ghost" data-act="#hs|wait;#hf1|wait;#hf2|wait;#hf3|wait"></span>
+      <div class="card f" style="margin-top:12px"><h3>🧭 Consumer offsets ~ log sequence number</h3><p class="ps">Rất giống <b>single-leader replication</b>: broker như leader, consumer như follower. Consumer chết → node khác nhận partition, bắt đầu từ <b>offset đã ghi cuối cùng</b> → có thể xử lý lại vài message.</p></div>
+    </div>
+    <div>
+      <div class="card bad f"><span class="lbl info">CHỌN JMS/AMQP-STYLE KHI</span><p class="ps">Message <b>tốn kém</b> để xử lý, muốn parallelize <b>từng message</b>, và <b>thứ tự không quan trọng</b>.</p></div>
+      <div class="card good f" style="margin-top:12px"><span class="lbl good">CHỌN LOG-BASED KHI</span><p class="ps"><b>Throughput cao</b>, mỗi message xử lý nhanh, và <b>ordering quan trọng</b>.</p></div>
+      <div class="note f" style="font-size:17px">Mẹo: muốn mọi update cho cùng một entity giữ thứ tự → dùng ID của entity làm <b>partition key</b>, cùng key ⇒ cùng partition.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DISK / LAG / REPLAY ===================== -->
+<section class="slide" id="disk">
+  <div class="hdr in"><span class="qn">09</span><h2>Disk space usage · consumer lag · <span class="grad">replaying old messages</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.3fr 1fr;gap:24px">
+    <div>
+      <div class="card" style="padding:14px 16px">
+        <p class="rowlbl" style="margin-top:0">Log trên disk: chia segments · <b>circular / ring buffer</b></p>
+        <div style="position:relative;height:110px">
+          <div class="segs"><div class="seg" id="sg1">seg 1</div><div class="seg" id="sg2">seg 2</div><div class="seg">seg 3</div><div class="seg">seg 4</div><div class="seg">seg 5</div><div class="seg">seg 6</div><div class="seg">seg 7</div><div class="seg">seg 8</div></div>
+          <div class="tk ptr" style="--x0:340px;--y0:56px;color:#7c3aed">▲ producer</div>
+          <div class="tk ptr" id="cA" style="--x0:250px;--y0:80px;--x1:300px;--y1:80px;color:#10b981">▲ A</div>
+          <div class="tk ptr" id="cB" style="--x0:70px;--y0:80px;--x1:6px;--y1:80px">▲ consumer B (lag)</div>
+        </div>
+      </div>
+      <span class="f ghost" data-act="#cA|p1;#cB|p1" data-say="Consumer A theo sát head. Consumer B <b>chậm</b> → offset tụt lại (consumer lag)."></span>
+      <span class="f ghost" data-act="#sg1|del;#sg2|del;#cB|red" data-say="Segment cũ bị discard/archive. Nếu B tụt quá xa, offset của B trỏ vào segment <b>đã bị xoá</b> → mất message. Chỉ B bị ảnh hưởng — nên <b>monitor lag</b> và cảnh báo."></span>
+      <div class="cols f" style="margin-top:14px;gap:14px">
+        <div class="card"><div class="stat">6 TB<small> / 150 MB/s</small></div><p class="ps">ghi tối đa tốc độ → <b>~11 giờ</b> mới đầy ổ đĩa</p></div>
+        <div class="card"><div class="stat">days–weeks</div><p class="ps">thực tế ít khi ghi hết bandwidth → buffer được <b>vài ngày, vài tuần</b></p></div>
+      </div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <div class="card f"><h3>🐢 Khi consumer không theo kịp</h3><p class="ps">Log-based = buffer cực lớn trên disk (dạng buffering). Throughput <b>gần như hằng số</b> vì mọi message đều ghi disk — khác broker in-memory chậm hẳn khi phải spill ra disk.</p></div>
+      <div class="card good f" style="margin-top:12px"><h3>⏪ Replaying old messages</h3><p class="ps">Đọc message <b>không xoá</b> nó — chỉ là read-only. Có thể copy output sang chỗ khác, rồi <b>reset offset</b> về hôm qua và xử lý lại với code mới.</p></div>
+      <div class="note blue f" style="font-size:17px">→ Log-based messaging giống batch ở chỗ: derived data tách bạch khỏi input qua một quá trình <b>lặp lại được</b> — thuận tiện để thử nghiệm và phục hồi từ lỗi/bug.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DUAL WRITES ===================== -->
+<section class="slide" id="dual">
+  <div class="hdr in"><span class="qn">10</span><h2>Keeping systems in sync: <span class="grad">dual writes</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr;gap:24px">
+    <div class="card" style="padding:12px 14px">
+      <div class="stg" style="width:640px;height:330px">
+        <div class="sn c3" style="left:0;top:30px;width:120px">Client 1</div>
+        <div class="sn c2" style="left:0;top:240px;width:120px">Client 2</div>
+        <div class="sn" id="dbn" style="left:470px;top:16px;width:160px">🗄️ Database<span class="val" id="dbv">X = ?</span></div>
+        <div class="sn c4" id="ixn" style="left:470px;top:226px;width:160px">🔍 Search index<span class="val" id="ixv">X = ?</span></div>
+        <div class="tk c3" id="d1" style="--o:0;--x0:135px;--y0:40px;--x1:340px;--y1:30px">set X=A</div>
+        <div class="tk c2" id="d2" style="--o:0;--x0:135px;--y0:250px;--x1:340px;--y1:70px">set X=B</div>
+        <div class="tk c2" id="d3" style="--o:0;--x0:135px;--y0:278px;--x1:340px;--y1:250px">set X=B</div>
+        <div class="tk c3" id="d4" style="--o:0;--x0:135px;--y0:76px;--x1:340px;--y1:210px">set X=A</div>
+      </div>
+      <p class="say" style="margin-top:4px">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <p style="font-size:18px">Một app thường cần nhiều nơi lưu cùng data: <b>OLTP database</b>, <b>cache</b>, <b>search index</b>, <b>data warehouse</b>. Cách cũ: dump DB định kỳ (batch ETL) — chậm. Cách khác: app ghi vào <b>từng hệ thống</b> = <b>dual writes</b>.</p>
+      <div class="card bad f" style="margin-top:12px"><span class="lbl bad">VẤN ĐỀ 1 · RACE CONDITION</span><p class="ps">Hai client ghi đồng thời, thứ tự đến hai hệ thống <b>khác nhau</b> → hai hệ thống <b>vĩnh viễn lệch nhau</b>, không ai báo lỗi. Cần cơ chế concurrency detection (version vectors…).</p></div>
+      <div class="card bad f" style="margin-top:12px"><span class="lbl bad">VẤN ĐỀ 2 · FAULT TOLERANCE</span><p class="ps">Một write thành công, write kia fail → inconsistent. Đảm bảo “cả hai hoặc không” cần <b>atomic commit</b> — đắt (2PC).</p></div>
+      <div class="note blue f" style="font-size:17px">Nếu chỉ có <b>một leader</b> (database) và search index là <b>follower</b> của nó thì sao? → Change Data Capture.</div>
+    </div>
+  </div>
+  <span class="f ghost" data-act="#d1|vis;#d1|p1;#dbn|hot" data-set="#dbv::X = A" data-say="Client 1 ghi <b>X = A</b> vào database."></span>
+  <span class="f ghost" data-act="#d2|vis;#d2|p1" data-set="#dbv::X = B" data-say="Client 2 ghi <b>X = B</b> vào database — ghi đè A."></span>
+  <span class="f ghost" data-act="#d3|vis;#d3|p1;#ixn|hot" data-set="#ixv::X = B" data-say="Client 2 ghi tiếp <b>X = B</b> vào search index."></span>
+  <span class="f ghost" data-act="#d4|vis;#d4|p1;#dbn|ok;#ixn|bad" data-set="#ixv::X = A" data-say="Write của Client 1 tới index <b>muộn</b> → index giữ <b>A</b>, database giữ <b>B</b>. ⚠️ Inconsistent vĩnh viễn!"></span>
+</section>
+
+<!-- ===================== CDC ===================== -->
+<section class="slide" id="cdc">
+  <div class="hdr in"><span class="qn">11</span><h2><span class="grad">Change Data Capture</span> (CDC) · Figure 11-5</h2></div>
+  <div class="card" style="padding:12px 16px">
+    <div class="stg" style="width:1150px;height:230px">
+      <svg class="wire" viewBox="0 0 1150 230"><line class="wl" id="cw1" x1="120" y1="115" x2="200" y2="115"/><line class="wl" id="cw2" x1="360" y1="115" x2="430" y2="115"/><path class="wl" id="cw3" d="M800 115 L900 35 M800 115 L900 115 M800 115 L900 195"/></svg>
+      <div class="sn c3" style="left:0;top:90px;width:120px">App</div>
+      <div class="sn" id="cdb" style="left:200px;top:70px;width:160px">🗄️ Database<small>leader · system of record</small><span class="val" id="cdbv">X = A</span></div>
+      <div style="position:absolute;left:430px;top:62px;width:370px">
+        <p class="rowlbl" style="margin:0 0 4px">replication log → log-based broker</p>
+        <div class="arr xs left"><div class="cell t"><span class="v">X=A</span></div><div class="cell t"><span class="v">Y=7</span></div><div class="cell t ap new" id="cl1"><span class="v">X=B</span></div><div class="cell t ap new" id="cl2"><span class="v">Z=1</span></div></div>
+      </div>
+      <div class="sn c4" id="cix" style="left:900px;top:6px;width:240px">🔍 Search index <span class="val" id="cixv" style="display:inline;font-size:18px">X = A</span></div>
+      <div class="sn c2" id="cca" style="left:900px;top:90px;width:240px">⚡ Cache <span class="val" id="ccav" style="display:inline;font-size:18px">X = A</span></div>
+      <div class="sn c5" id="cdw" style="left:900px;top:172px;width:240px">📊 Data warehouse <span class="val" id="cdwv" style="display:inline;font-size:18px">X = A</span></div>
+      <div class="tk c3" id="cw" style="--o:0;--x0:20px;--y0:52px;--x1:220px;--y1:30px">set X=B</div>
+    </div>
+  </div>
+  <span class="f ghost" data-act="#cw|vis;#cw|p1;#cdb|hot;#cw1|hot" data-set="#cdbv::X = B" data-say="App <b>chỉ ghi vào database</b> (leader duy nhất)."></span>
+  <span class="f ghost" data-act="#cl1|show;#cl2|show;#cw2|hot" data-say="CDC quan sát mọi thay đổi ghi vào DB và xuất ra dạng <b>stream</b> theo đúng thứ tự ghi (đọc từ replication log / WAL)."></span>
+  <span class="f ghost" data-act="#cw3|hot;#cix|ok;#cca|ok;#cdw|ok" data-set="#cixv::X = B;#ccav::X = B;#cdwv::X = B" data-say="Các <b>derived data systems</b> là consumers/followers: áp dụng change theo <b>cùng thứ tự</b> → nhất quán. (CDC thường <b>asynchronous</b> → có replication lag.)"></span>
+  <div class="cols f" style="margin-top:14px;grid-template-columns:1.2fr 1fr;gap:20px">
+    <div class="chips"><span class="chip p">LinkedIn Databus</span><span class="chip p">Facebook Wormhole</span><span class="chip p">Yahoo! Sherpa</span><span class="chip c">Bottled Water (PostgreSQL WAL)</span><span class="chip c">Maxwell, Debezium (MySQL binlog)</span><span class="chip k">Mongoriver (MongoDB oplog)</span><span class="chip y">GoldenGate (Oracle)</span><span class="chip g">Kafka Connect</span></div>
+    <p class="say" style="margin-top:0">Nhấn → để chạy từng bước.</p>
+  </div>
+  <div class="note f" style="font-size:17px">Database triggers cũng làm được CDC (ghi change vào changelog table) nhưng thường <b>fragile</b> và có overhead đáng kể. Parsing replication log robust hơn — nhưng phải xử lý khi schema thay đổi.</div>
+</section>
+
+<!-- ===================== SNAPSHOT / COMPACTION ===================== -->
+<section class="slide" id="snap">
+  <div class="hdr in"><span class="qn">11b</span><h2>Initial snapshot · <span class="grad">log compaction</span> · change stream APIs</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.25fr;gap:24px">
+    <div>
+      <div class="card f"><h3>📸 Initial snapshot</h3><p class="ps">Giữ toàn bộ log thay đổi thì tốn disk, replay quá lâu. Thay vào đó: bắt đầu từ một <b>consistent snapshot</b> của DB — snapshot phải ứng với một <b>vị trí/offset đã biết</b> trong change log để biết apply tiếp từ đâu.</p></div>
+      <div class="card f" style="margin-top:12px"><h3>🔌 API support for change streams</h3><p class="ps">Nhiều DB bắt đầu coi change stream là interface hạng nhất:</p>
+        <div class="chips" style="margin-top:6px"><span class="chip p">RethinkDB</span><span class="chip c">Firebase</span><span class="chip c">CouchDB</span><span class="chip k">Meteor (oplog)</span><span class="chip y">VoltDB</span><span class="chip g">Kafka Connect</span></div></div>
+    </div>
+    <div class="card" style="padding:14px 16px">
+      <h3>Log compaction</h3>
+      <p class="ps">Storage engine định kỳ tìm các record <b>cùng key</b>, bỏ bản cũ, chỉ giữ <b>bản mới nhất</b>. Delete = <b>tombstone</b> (value null).</p>
+      <p class="rowlbl">Log trước compaction</p>
+      <div class="kvrow"><div class="kv k1" id="k1"><small>key1</small>a</div><div class="kv k2" id="k2"><small>key2</small>b</div><div class="kv k1" id="k3"><small>key1</small>c</div><div class="kv k3" id="k4"><small>key3</small>x</div><div class="kv k2 tomb" id="k5"><small style="color:#cbd5e1">key2</small>null</div><div class="kv k1" id="k6"><small>key1</small>d</div><div class="kv k3" id="k7"><small>key3</small>y</div></div>
+      <p class="rowlbl ci" id="aflbl">Sau compaction</p>
+      <div class="kvrow ci" id="afrow"><div class="kv k1"><small>key1</small>d</div><div class="kv k3"><small>key3</small>y</div></div>
+      <div class="note blue ci" id="cmpn" style="font-size:17px">Kích thước log chỉ phụ thuộc <b>nội dung hiện tại</b> của DB, không phụ thuộc số lần ghi → consumer mới có thể bắt đầu từ offset 0 để có <b>full copy</b> của DB mà không cần snapshot riêng. Kafka hỗ trợ tính năng này.</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+  <span class="f ghost" data-act="#k1|old;#k3|old;#k4|old" data-say="Các bản ghi cũ của key1 và key3 bị <b>ghi đè</b> bởi bản mới hơn."></span>
+  <span class="f ghost" data-act="#k2|old;#k5|old" data-say="Tombstone cho key2 → key2 bị xoá khỏi log khi compaction."></span>
+  <span class="f ghost" data-act="#aflbl|show;#afrow|show;#cmpn|show" data-say="Kết quả: chỉ còn giá trị mới nhất cho mỗi key."></span>
+</section>
+
+<!-- ===================== EVENT SOURCING ===================== -->
+<section class="slide" id="es">
+  <div class="hdr in"><span class="qn">12</span><h2><span class="grad">Event Sourcing</span> — lưu mọi thay đổi như immutable events</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr;gap:24px">
+    <div>
+      <table class="cmp2">
+        <tr><th></th><th>CDC</th><th>Event sourcing</th></tr>
+        <tr><td>Mức</td><td>Database dùng <b>mutable</b>, update/delete tự do; change log trích xuất ở mức thấp</td><td>App logic xây <b>tường minh</b> trên immutable events; append-only, update/delete bị hạn chế</td></tr>
+        <tr><td>Event là</td><td>Low-level state change</td><td><b>Ý định của user</b> ở mức application</td></tr>
+        <tr><td>App có biết?</td><td>Không cần biết CDC tồn tại</td><td>Event store là <b>system of record</b></td></tr>
+      </table>
+      <div class="card f" style="margin-top:12px"><h3>🔁 Deriving current state</h3><p class="ps">User muốn thấy <b>state hiện tại</b> → replay event log một cách deterministic. Không compaction kiểu CDC được (event sau không ghi đè event trước) → dùng <b>snapshots</b> để tối ưu đọc.</p></div>
+    </div>
+    <div>
+      <h3>Commands vs events</h3>
+      <div class="stack">
+        <div class="flow f"><div class="box o">Command<small>“Đặt ghế 12A”</small></div><div class="ar">→</div><div class="box m">Validate<small>ghế còn trống?</small></div><div class="ar">→</div><div class="box exe">Event 🔒<small>SeatReserved(12A)</small></div></div>
+        <p class="ps f">Command là <b>request</b>, có thể bị reject. Khi validate xong và chấp nhận → thành <b>event</b>: một <b>fact</b> bất biến, durable.</p>
+        <div class="flow f"><div class="box o">Command<small>“Huỷ đặt ghế”</small></div><div class="ar">→</div><div class="box exe">Event 🔒<small>ReservationCancelled</small></div></div>
+        <p class="ps f">User đổi ý? Không sửa event cũ — <b>append</b> event mới. Consumer của stream <b>không được reject</b> event: khi nó tới, nó đã là sự thật. Validation phải diễn ra <b>đồng bộ trước</b> khi event thành fact (vd. bằng serializable transaction).</p>
+      </div>
+      <div class="note blue f" style="font-size:17px">Event sourcing giống chronicle data model; cũng tương tự <b>star schema</b> fact table ghi các events.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== STATE & IMMUTABILITY ===================== -->
+<section class="slide" id="state">
+  <div class="hdr in"><span class="qn">13</span><h2>State, Streams &amp; Immutability (Figure 11-6)</h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr;gap:24px">
+    <div class="card" style="padding:12px 16px">
+      <svg class="sv" id="integ" viewBox="0 0 640 330">
+        <text x="10" y="22" class="lb">event stream (changes)</text>
+        <line x1="40" y1="90" x2="630" y2="90" stroke="#e4dcfb" stroke-width="2"/>
+        <g class="g g1">
+          <rect x="60" y="45" width="40" height="45" rx="5" fill="#a78bfa"/><text x="80" y="40" text-anchor="middle" class="sm">+3</text>
+          <rect x="130" y="60" width="40" height="30" rx="5" fill="#a78bfa"/><text x="150" y="55" text-anchor="middle" class="sm">+2</text>
+          <rect x="200" y="90" width="40" height="15" rx="5" fill="#f472b6"/><text x="220" y="122" text-anchor="middle" class="sm">−1</text>
+          <rect x="270" y="30" width="40" height="60" rx="5" fill="#a78bfa"/><text x="290" y="25" text-anchor="middle" class="sm">+4</text>
+          <rect x="340" y="90" width="40" height="30" rx="5" fill="#f472b6"/><text x="360" y="137" text-anchor="middle" class="sm">−2</text>
+          <rect x="410" y="75" width="40" height="15" rx="5" fill="#a78bfa"/><text x="430" y="70" text-anchor="middle" class="sm">+1</text>
+          <rect x="480" y="45" width="40" height="45" rx="5" fill="#a78bfa"/><text x="500" y="40" text-anchor="middle" class="sm">+3</text>
+          <rect x="550" y="90" width="40" height="45" rx="5" fill="#f472b6"/><text x="570" y="152" text-anchor="middle" class="sm">−3</text>
+        </g>
+        <text x="10" y="182" class="lb">application state (current value)</text>
+        <line x1="40" y1="320" x2="630" y2="320" stroke="#e4dcfb" stroke-width="2"/>
+        <polyline class="drw" id="stl" points="40,320 80,320 80,275 150,275 150,245 220,245 220,260 290,260 290,200 360,200 360,230 430,230 430,215 500,215 500,170 570,170 570,215 630,215" fill="none" stroke="#0891b2" stroke-width="3.5"/>
+        <g class="g g2"><text x="600" y="205" text-anchor="end" style="font-size:20px;fill:#0891b2">state = 7</text></g>
+      </svg>
+      <div class="cols" style="margin-top:8px;gap:12px">
+        <div class="formula ci" id="fi1" style="font-size:19px">state(now) = ∫<sub>t=0</sub><sup>now</sup> stream(t) dt</div>
+        <div class="formula ci" id="fi2" style="font-size:19px">stream(t) = d state(t) / dt</div>
+      </div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <p style="font-size:18px">State thay đổi nào cũng là kết quả của các events đã làm nó thay đổi: ghế còn trống = kết quả các lần đặt chỗ; số dư = các khoản credit/debit. <b>Mutable state</b> và <b>append-only log of immutable events</b> là <b>hai mặt của một đồng xu</b>.</p>
+      <div class="quote f" style="margin-top:12px;font-size:17px">“Transaction logs record all the changes made to the database… <b>The truth is the log. The database is a cache of a subset of the log.</b> That cached subset happens to be the latest value of each record and index value from the log.” <b>— Pat Helland</b></div>
+      <div class="note blue f" style="font-size:17px">Coi event log là <b>system of record</b>, mọi mutable state là <b>derived</b> → dễ suy luận về dataflow. Log compaction là cầu nối giữa log và database state.</div>
+    </div>
+  </div>
+  <span class="f ghost" data-act="#integ|s1" data-say="Event stream: mỗi event là một <b>thay đổi</b> (+/−)."></span>
+  <span class="f ghost" data-act="#stl|on;#integ|s2;#fi1|show" data-say="<b>Integrate</b> stream theo thời gian → application state."></span>
+  <span class="f ghost" data-act="#fi2|show" data-say="Ngược lại, <b>differentiate</b> state theo thời gian → change stream. (Ẩn dụ có giới hạn: đạo hàm bậc 2 của state chẳng có nghĩa gì.)"></span>
+</section>
+
+<!-- ===================== IMMUTABLE EVENTS ===================== -->
+<section class="slide" id="imm">
+  <div class="hdr in"><span class="qn">13b</span><h2>Advantages &amp; limitations of <span class="grad">immutable events</span></h2></div>
+  <div class="cols4">
+    <div class="card f"><div class="icon">📒</div><h3>Ledger</h3><p class="ps">Kế toán dùng immutability hàng thế kỷ: append-only <b>ledger</b>. Ghi sai? Không xoá — thêm <b>compensating transaction</b>. Dễ <b>audit</b>, dễ recover khi code có bug.</p></div>
+    <div class="card f"><div class="icon">🛒</div><h3>Thêm thông tin</h3><p class="ps">User thêm món vào cart rồi bỏ ra: state hiện tại không còn dấu vết, nhưng event log giữ lại — hữu ích cho <b>analytics</b> (khách đã cân nhắc món đó).</p></div>
+    <div class="card f"><div class="icon">🪟</div><h3>Nhiều views · CQRS</h3><p class="ps">Từ <b>cùng một event log</b> derive nhiều read-optimized views. Tách nơi data được <b>ghi</b> khỏi cách nó được <b>đọc</b> = <b>Command Query Responsibility Segregation</b>. Tranh luận normalization vs denormalization bớt quan trọng.</p></div>
+    <div class="card f"><div class="icon">🔒</div><h3>Concurrency control</h3><p class="ps">Views cập nhật <b>asynchronously</b> → user có thể không đọc thấy write của mình. Nhưng một user action = <b>một event</b>, append atomic → giảm nhu cầu multi-object transactions.</p></div>
+  </div>
+  <div class="cols f" style="margin-top:16px;gap:20px">
+    <div class="card bad"><span class="lbl bad">LIMITATIONS</span><p class="ps">Workload nhiều update/delete trên dataset nhỏ → immutable history phình to, <b>fragmentation</b>, compaction &amp; GC phải tốt. Lý do pháp lý/privacy (vd. user xoá account) → <b>phải xoá thật</b> data.</p></div>
+    <div class="card"><span class="lbl info">REWRITE HISTORY</span><p class="ps"><b>Datomic</b>: <i>excision</i>. <b>Fossil</b> VCS: <i>shunning</i>. Xoá thật rất khó vì có nhiều bản copy (storage engine, filesystem, SSD, backups) — thường chỉ là “làm cho khó truy xuất hơn”.</p></div>
+  </div>
+</section>
+
+<!-- ===================== PROCESSING STREAMS ===================== -->
+<section class="slide" id="proc">
+  <div class="hdr in"><span class="qn">14</span><h2>Processing Streams: làm gì với một stream?</h2></div>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr;gap:24px">
+    <div class="card" style="padding:12px 14px">
+      <div class="stg" style="width:610px;height:300px">
+        <svg class="wire" viewBox="0 0 610 300"><line class="wl hot" x1="120" y1="150" x2="200" y2="150"/><path class="wl" id="pw1" d="M340 150 L400 45"/><path class="wl" id="pw2" d="M340 150 L400 150"/><path class="wl" id="pw3" d="M340 150 L400 255"/></svg>
+        <div class="sn c3" style="left:0;top:120px;width:120px">Input stream<small>events</small></div>
+        <div class="sn" style="left:200px;top:105px;width:140px;height:90px">⚙️ Operator / job<small>stream processor</small></div>
+        <div class="sn c4 ap" id="po1" style="left:400px;top:14px;width:210px">① Ghi vào DB / cache / search index<small>các client khác query</small></div>
+        <div class="sn c2 ap" id="po2" style="left:400px;top:120px;width:210px">② Push tới users<small>email, push notification, dashboard</small></div>
+        <div class="sn c5 ap" id="po3" style="left:400px;top:222px;width:210px">③ Output stream mới<small>→ pipeline nhiều stage</small></div>
+      </div>
+      <span class="f ghost" data-act="#po1|show;#pw1|hot"></span>
+      <span class="f ghost" data-act="#po2|show;#pw2|hot"></span>
+      <span class="f ghost" data-act="#po3|show;#pw3|hot"></span>
+    </div>
+    <div>
+      <p style="font-size:18px">Phần lớn chương này nói về option ③: xử lý stream để tạo ra stream khác. Code xử lý gọi là <b>operator</b> hoặc <b>job</b> — rất giống Unix process và MapReduce job (Chapter 10): input read-only, output append-only.</p>
+      <div class="card bad f" style="margin-top:12px"><span class="lbl bad">KHÁC BIỆT CỐT LÕI VỚI BATCH</span><ul class="mini"><li>Stream <b>không bao giờ kết thúc</b> → sort vô nghĩa → không dùng được <b>sort-merge joins</b>.</li><li>Fault tolerance khác hẳn: batch job 1 phút thì restart từ đầu; stream job chạy nhiều năm thì <b>không thể</b> replay từ đầu.</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== USES ===================== -->
+<section class="slide" id="uses" style="--ufs:1">
+  <div class="hdr in"><span class="qn">14b</span><h2>Uses of Stream Processing</h2></div>
+  <div class="cols3">
+    <div class="card f"><div class="icon">🕵️</div><h3>Complex event processing (CEP)</h3><p class="ps">Tìm <b>patterns</b> của events (như regex trên chuỗi events), khai báo bằng query language (SQL-like). Esper, IBM InfoSphere Streams, Apama, TIBCO StreamBase, SQLstream.</p>
+      <div class="toggle" id="cepT" style="margin-top:8px;justify-content:flex-start"><span class="pill" id="cep1">DB: data lâu dài, query thoáng qua</span></div>
+      <div class="toggle" style="margin-top:6px;justify-content:flex-start"><span class="pill" id="cep2">CEP: query lâu dài, data chảy qua</span></div></div>
+    <div class="card f"><div class="icon">📊</div><h3>Stream analytics</h3><p class="ps">Aggregation &amp; metrics: rate của event, rolling average, so sánh với cùng kỳ. Tính trên <b>window</b>. Hay dùng <b>probabilistic algorithms</b>: Bloom filters, HyperLogLog, percentile estimation. Apache Storm, Spark Streaming, Flink, Concord, Samza, Kafka Streams; Google Cloud Dataflow, Azure Stream Analytics.</p></div>
+    <div class="card f"><div class="icon">🪞</div><h3>Maintaining materialized views</h3><p class="ps">Giữ derived data (cache, search index, data warehouse) luôn cập nhật — event sourcing chính là view được maintain bởi stream processor. Cần <b>tất cả</b> events từ đầu (trừ khi compaction), không chỉ một window. Samza, Kafka Streams hỗ trợ.</p></div>
+    <div class="card f"><div class="icon">🔎</div><h3>Search on streams</h3><p class="ps">Lưu <b>search queries</b> trước, mỗi document đi qua sẽ được khớp với các query (vd. media monitoring, cảnh báo bất động sản mới). <b>Elasticsearch percolator</b>. Có thể index cả queries.</p></div>
+    <div class="card f"><div class="icon">✉️</div><h3>Message passing &amp; RPC</h3><p class="ps"><b>Actor frameworks</b> chủ yếu để quản lý concurrency &amp; phân tán module giao tiếp, không phải data management; giao tiếp thường ephemeral, one-to-one. Nhưng có điểm giao: vd. Apache Storm có <i>distributed RPC</i>.</p></div>
+    <div class="note blue f" style="margin-top:0;align-self:stretch">Điểm chung: stream processor là <b>long-running</b>, chạy mãi theo events đến — khác query một lần rồi xong.</div>
+  </div>
+  <span class="f ghost" data-act="#cep1|on" data-o="1"></span>
+  <span class="f ghost" data-now="#cep1|on" data-act="#cep2|on" data-o="1"></span>
+</section>
+
+<!-- ===================== TIME ===================== -->
+<section class="slide" id="time">
+  <div class="hdr in"><span class="qn">15</span><h2>Reasoning About Time: <span class="grad">event time</span> vs <span class="grad">processing time</span></h2></div>
+  <p class="in" style="font-size:18px">Batch dùng timestamp trong event (deterministic khi chạy lại). Nhiều stream framework lại dùng <b>local system clock</b> của máy xử lý (processing time) — chỉ đúng khi delay giữa lúc event xảy ra và lúc được xử lý không đáng kể. Delay có thể lớn: queueing, network faults, broker contention, consumer restart, replay…</p>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr;gap:22px;margin-top:10px">
+    <div class="card" style="padding:12px 14px">
+      <h3>🎬 Star Wars: thứ tự xem ≠ thứ tự cốt truyện</h3>
+      <div class="stg" style="width:620px;height:64px;margin:6px 0 0">
+        <div class="tk mv"     id="sw4" style="--x0:0px;--y0:6px;--x1:264px;--y1:6px">Ep IV<small>1977</small></div>
+        <div class="tk mv c2"  id="sw5" style="--x0:88px;--y0:6px;--x1:352px;--y1:6px">Ep V<small>1980</small></div>
+        <div class="tk mv c3"  id="sw6" style="--x0:176px;--y0:6px;--x1:440px;--y1:6px">Ep VI<small>1983</small></div>
+        <div class="tk mv c4"  id="sw1" style="--x0:264px;--y0:6px;--x1:0px;--y1:6px">Ep I<small>1999</small></div>
+        <div class="tk mv c4"  id="sw2" style="--x0:352px;--y0:6px;--x1:88px;--y1:6px">Ep II<small>2002</small></div>
+        <div class="tk mv c4"  id="sw3" style="--x0:440px;--y0:6px;--x1:176px;--y1:6px">Ep III<small>2005</small></div>
+        <div class="tk mv c5"  id="sw7" style="--x0:528px;--y0:6px;--x1:528px;--y1:6px">Ep VII<small>2015</small></div>
+      </div>
+      <p class="ps" id="swl" style="margin-top:6px">Thứ tự phát hành = <b>processing time</b> (lúc bạn xem).</p>
+      <p class="ps" style="margin-top:8px">Số episode = <b>event timestamp</b>. Con người tự xử lý được sự “lộn xộn” này; thuật toán stream phải được viết để <b>chủ động</b> xử lý timing &amp; ordering.</p>
+      <span class="f ghost" data-act="#sw1|p1;#sw2|p1;#sw3|p1;#sw4|p1;#sw5|p1;#sw6|p1;#sw7|p1" data-set="#swl::Sắp lại theo số episode = <b>event time</b> (thứ tự cốt truyện)."></span>
+    </div>
+    <div class="card" style="padding:12px 14px">
+      <h3>📉 Nhầm lẫn hai loại time → bad data</h3>
+      <svg class="sv" viewBox="0 0 470 230">
+        <line x1="30" y1="190" x2="460" y2="190" stroke="#e4dcfb" stroke-width="2"/>
+        <rect x="170" y="10" width="70" height="180" fill="#fff1f3"/><text x="205" y="208" text-anchor="middle" class="sm">redeploy</text>
+        <polyline class="drw" id="rt1" points="30,120 170,120 172,188 240,188 245,25 262,40 285,100 300,120 460,120" fill="none" stroke="#e11d48" stroke-width="3"/>
+        <polyline class="drw" id="rt2" points="30,128 460,128" fill="none" stroke="#10b981" stroke-width="3" stroke-dasharray="8 5"/>
+        <g class="g g1" id="rtl1"><text x="250" y="20" class="lb" style="fill:#e11d48">processing time: spike giả!</text></g>
+      </svg>
+      <p class="ps" id="rtp">Đo <b>requests/second</b>. Stream processor bị redeploy, tắt 1 phút rồi xử lý <b>backlog</b>…</p>
+      <span class="f ghost" data-act="#rt1|on;#rtl1|on" data-set="#rtp::Theo <b>processing time</b>: tụt về 0 rồi <b>spike bất thường</b> — trong khi lượng request thật vẫn ổn định."></span>
+      <span class="f ghost" data-act="#rt2|on" data-set="#rtp::Theo <b>event time</b> (đường xanh): rate thật vẫn đều. ✔"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== READY / CLOCKS ===================== -->
+<section class="slide" id="ready">
+  <div class="hdr in"><span class="qn">15b</span><h2>Knowing when you're ready · Whose clock are you using?</h2></div>
+  <div class="cols" style="gap:24px">
+    <div>
+      <h3>⏳ Straggler events</h3>
+      <p style="font-size:18px">Đang đếm window 10:37 theo event time. Khi nào thì chắc chắn đã nhận <b>hết</b> events của window đó? Không bao giờ chắc — có event bị delay ở node khác, đến muộn sau khi đã <b>declare window complete</b>.</p>
+      <div class="card f" style="margin-top:10px"><h3>Option 1 · Ignore</h3><p class="ps">Bỏ qua straggler (thường chỉ là tỉ lệ nhỏ); track số event bị drop làm metric, <b>alert</b> nếu tăng nhiều.</p></div>
+      <div class="card f" style="margin-top:10px"><h3>Option 2 · Publish a correction</h3><p class="ps">Phát lại giá trị đã cập nhật cho window kèm stragglers; có thể phải <b>retract</b> output trước đó.</p></div>
+      <div class="note f" style="font-size:16px">Producer có thể gửi message đặc biệt “từ giờ không còn message nào có timestamp &lt; t” — nhưng nhiều producer, mỗi cái một threshold riêng → phức tạp.</div>
+    </div>
+    <div>
+      <h3>📱 Device clock không đáng tin</h3>
+      <p class="ps">Mobile app có thể dùng offline, buffer events hàng giờ/ngày rồi mới gửi. Device clock có thể sai (cố tình hoặc vô tình). Server clock đúng hơn nhưng ít ý nghĩa với hành động của user.</p>
+      <p class="rowlbl">Log ba timestamps:</p>
+      <div class="stack">
+        <div class="leg a f"><b>t₁ · event occurred</b><p>theo <b>device clock</b></p></div>
+        <div class="leg b f"><b>t₂ · event sent to server</b><p>theo <b>device clock</b></p></div>
+        <div class="leg c f"><b>t₃ · event received by server</b><p>theo <b>server clock</b></p></div>
+      </div>
+      <div class="formula f" style="margin-top:10px;font-size:19px">offset ≈ t₃ − t₂ &nbsp;⇒&nbsp; true time ≈ t₁ + (t₃ − t₂)</div>
+      <p class="ps muted f" style="margin-top:6px">Giả định network delay nhỏ so với độ chính xác cần thiết, và offset của device clock không đổi giữa t₁ và t₂.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== WINDOWS ===================== -->
+<section class="slide" id="win">
+  <div class="hdr in"><span class="qn">16</span><h2>Types of windows</h2></div>
+  <div class="cols" style="grid-template-columns:1.6fr 1fr;gap:20px">
+    <div class="card" style="padding:10px 12px">
+      <svg class="sv" id="wsv" viewBox="0 0 760 400">
+        <g>
+          <line x1="40" y1="44" x2="750" y2="44" stroke="#c4b5fd" stroke-width="2"/>
+          <text x="40" y="18" class="sm">10:03</text><text x="125" y="18" class="sm">10:04</text><text x="210" y="18" class="sm">10:05</text><text x="295" y="18" class="sm">10:06</text><text x="380" y="18" class="sm">10:07</text><text x="465" y="18" class="sm">10:08</text><text x="550" y="18" class="sm">10:09</text><text x="635" y="18" class="sm">10:10</text>
+          <circle class="evd" cx="53" cy="44" r="6"/><circle class="evd" cx="95" cy="44" r="6" style="fill:#ec4899"/><circle class="evd" cx="150" cy="44" r="6"/><circle class="evd" cx="193" cy="44" r="6"/><circle class="evd" cx="244" cy="44" r="6"/><circle class="evd" cx="371" cy="44" r="6"/><circle class="evd" cx="422" cy="44" r="6"/><circle class="evd" cx="482" cy="44" r="6" style="fill:#ec4899"/><circle class="evd" cx="558" cy="44" r="6"/><circle class="evd" cx="584" cy="44" r="6"/><circle class="evd" cx="686" cy="44" r="6"/>
+        </g>
+        <g class="g g1"><text x="0" y="80" class="lb">Tumbling · 1 min</text>
+          <rect class="wnd" x="40" y="88" width="83" height="30" rx="6"/><rect class="wnd b" x="125" y="88" width="83" height="30" rx="6"/><rect class="wnd" x="210" y="88" width="83" height="30" rx="6"/><rect class="wnd b" x="295" y="88" width="83" height="30" rx="6"/><rect class="wnd" x="380" y="88" width="83" height="30" rx="6"/><rect class="wnd b" x="465" y="88" width="83" height="30" rx="6"/><rect class="wnd" x="550" y="88" width="83" height="30" rx="6"/><rect class="wnd b" x="635" y="88" width="83" height="30" rx="6"/></g>
+        <g class="g g2"><text x="0" y="146" class="lb" style="fill:#db2777">Hopping · 5 min, hop 1 min</text>
+          <rect class="wnd p" x="40" y="154" width="425" height="18" rx="5"/><rect class="wnd p" x="125" y="176" width="425" height="18" rx="5"/><rect class="wnd p" x="210" y="198" width="425" height="18" rx="5"/></g>
+        <g class="g g3"><text x="0" y="246" class="lb" style="fill:#d97706">Sliding · 5 min</text>
+          <rect class="wnd y" x="95" y="254" width="387" height="30" rx="6"/><text x="288" y="274" text-anchor="middle" class="sm" style="fill:#92400e">10:03:39 ↔ 10:08:12 &lt; 5 min → cùng window</text></g>
+        <g class="g g4"><text x="0" y="318" class="lb" style="fill:#059669">Session · gap timeout</text>
+          <rect class="wnd g2" x="45" y="326" width="207" height="30" rx="6"/><rect class="wnd g2" x="363" y="326" width="229" height="30" rx="6"/><rect class="wnd g2" x="678" y="326" width="16" height="30" rx="6"/>
+          <text x="308" y="380" text-anchor="middle" class="sm">inactive &gt; timeout</text><text x="635" y="380" text-anchor="middle" class="sm">inactive &gt; timeout</text></g>
+      </svg>
+    </div>
+    <div>
+      <div class="stack">
+        <div class="leg a f" data-act="#wsv|s1"><b>Tumbling</b><p>Độ dài cố định, mỗi event thuộc <b>đúng một</b> window. Cài đặt: làm tròn timestamp xuống phút gần nhất.</p></div>
+        <div class="leg f" data-act="#wsv|s2" style="border-left:6px solid #ec4899"><b>Hopping</b><p>Độ dài cố định nhưng <b>overlap</b> để smoothing. Tính tumbling 1 phút rồi aggregate nhiều window liền kề.</p></div>
+        <div class="leg c f" data-act="#wsv|s3"><b>Sliding</b><p>Gồm mọi event nằm trong một khoảng của nhau; không có biên cố định. Giữ buffer sort theo time, bỏ event hết hạn.</p></div>
+        <div class="leg b f" data-act="#wsv|s4" style="border-left-color:#10b981"><b>Session</b><p>Không có duration cố định: gom events của <b>cùng user</b> gần nhau, kết thúc khi user inactive (vd. 30 phút). Dùng cho website analytics.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== STREAM JOINS 1 ===================== -->
+<section class="slide" id="join1">
+  <div class="hdr in"><span class="qn">17</span><h2>Stream Joins ①: <span class="grad">stream-stream</span> &amp; <span class="grad">stream-table</span></h2></div>
+  <div class="cols" style="gap:22px">
+    <div class="card" style="padding:12px 16px">
+      <h3>Stream-stream join (window join)</h3>
+      <p class="ps">Ví dụ: tính <b>click-through rate</b> của search — join <i>search events</i> với <i>click events</i> cùng <b>session ID</b> trong một window (vd. 1 giờ). Click có thể không bao giờ đến, hoặc đến sau vài giây… vài ngày.</p>
+      <div class="lane" style="margin-top:8px"><span class="ln2" style="width:110px">search</span><span class="tw" id="j1s1">s1: “ddia”</span><span class="tw b" id="j1s2">s2: “kafka”</span></div>
+      <div class="lane"><span class="ln2" style="width:110px">click</span><span class="tw y" id="j1c1">s1 → result #2</span></div>
+      <div class="mbox" id="j1st" style="margin-top:6px"><h4>join state · index theo session ID (giữ trong window)</h4><span class="tw" id="j1x1">s1</span><span class="tw b" id="j1x2">s2</span></div>
+      <div class="lane" style="margin-top:6px"><span class="ln2" style="width:110px">output</span><span class="tw" id="j1o1" style="background:#d1fae5;color:#047857;border-color:#a7f3d0">s1 ✓ clicked</span><span class="tw" id="j1o2" style="background:#f1f5f9;color:#64748b;border-color:#cbd5e1">s2 ✗ not clicked</span></div>
+      <p class="say" style="min-height:44px;font-size:18px">Nhấn → để chạy từng bước.</p>
+      <span class="f ghost" data-act="#j1s1|show;#j1x1|show;#j1st|hot" data-say="Search event s1 đến → lưu vào state, index theo session ID."></span>
+      <span class="f ghost" data-act="#j1s2|show;#j1x2|show" data-say="Search s2 đến → cũng lưu lại."></span>
+      <span class="f ghost" data-act="#j1c1|show;#j1o1|show" data-say="Click của s1 đến <b>trong window</b> → match → emit event “search s1 đã được click”."></span>
+      <span class="f ghost" data-act="#j1o2|show" data-say="Window của s2 hết hạn mà không có click → emit “<b>not clicked</b>”, dọn state."></span>
+    </div>
+    <div class="card" style="padding:12px 16px">
+      <h3>Stream-table join (stream enrichment)</h3>
+      <p class="ps">Enrich <b>activity events</b> bằng thông tin <b>user profile</b>. Query DB remote cho mỗi event thì chậm &amp; dễ quá tải → giữ <b>local copy</b> của bảng trong stream processor, cập nhật qua <b>CDC</b>.</p>
+      <div class="flow" style="margin-top:12px;gap:8px;justify-content:flex-start">
+        <div class="box o" id="j2e">view /pricing<small>user_id=42</small></div><div class="ar">⨝</div>
+        <div class="box m" id="j2t">users (local)<small id="j2tv">42 → plan: free</small></div><div class="ar">→</div>
+        <div class="box exe ci" id="j2o">enriched<small id="j2ov">42 · free · /pricing</small></div>
+      </div>
+      <div class="flow ci" id="j2c" style="margin-top:10px;justify-content:flex-start"><div class="box h">CDC changelog<small>UPDATE users SET plan='pro' WHERE id=42</small></div></div>
+      <p class="ps" style="margin-top:10px">Giống hash join ở batch, nhưng bảng thay đổi theo thời gian: thực chất là join giữa một <b>activity stream</b> (window) và một <b>changelog stream</b> (window “từ đầu đến giờ”, bản mới ghi đè bản cũ).</p>
+      <span class="f ghost" data-act="#j2o|show;#j2e|on2" data-say="Event đến → lookup local table → output enriched event."></span>
+      <span class="f ghost" data-act="#j2c|show;#j2t|on2" data-set="#j2tv::42 → plan: <b>pro</b>;#j2ov::42 · <b>pro</b> · /pricing" data-say="Profile thay đổi → CDC cập nhật local copy → các event sau được enrich bằng dữ liệu mới."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== STREAM JOINS 2 ===================== -->
+<section class="slide" id="join2">
+  <div class="hdr in"><span class="qn">17b</span><h2>Stream Joins ②: <span class="grad">table-table join</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr;gap:22px">
+    <div>
+      <p style="font-size:18px">Ví dụ Twitter <b>home timeline cache</b> (Chapter 1): thay vì query khi đọc, giữ cache theo user, cập nhật bằng stream:</p>
+      <div class="stack" style="margin-top:8px">
+        <div class="leg a f"><b>✍️ tweet</b><p>user gửi tweet mới → thêm vào timeline của <b>mọi follower</b>.</p></div>
+        <div class="leg c f"><b>🗑️ delete tweet</b><p>xoá khỏi timeline của mọi follower.</p></div>
+        <div class="leg b f"><b>➕ follow</b><p>u₁ follow u₂ → các tweet gần đây của u₂ thêm vào timeline u₁.</p></div>
+        <div class="leg f" style="border-left:6px solid #ec4899"><b>➖ unfollow</b><p>tweet của u₂ bị gỡ khỏi timeline u₁.</p></div>
+      </div>
+      <p class="ps" style="margin-top:8px">Stream processor cần giữ DB gồm tập followers của mỗi user — join hai stream (tweets &amp; follows) = maintain <b>materialized view</b> của query:</p>
+    </div>
+    <div>
+      <div class="code xxs f">
+        <div class="ln"><span class="no">1</span><span><span class="k">SELECT</span> follows.follower_id <span class="k">AS</span> timeline_id,</span></div>
+        <div class="ln"><span class="no">2</span><span>  array_agg(tweets.* <span class="k">ORDER BY</span> tweets.timestamp <span class="k">DESC</span>)</span></div>
+        <div class="ln"><span class="no">3</span><span><span class="k">FROM</span> tweets</span></div>
+        <div class="ln"><span class="no">4</span><span><span class="k">JOIN</span> follows</span></div><div class="ln"><span class="no">5</span><span>  <span class="k">ON</span> follows.followee_id = tweets.sender_id</span></div>
+        <div class="ln"><span class="no">6</span><span><span class="k">GROUP BY</span> follows.follower_id</span></div>
+      </div>
+      <p class="ps f" style="margin-top:6px">Mọi thay đổi ở một bên được join với <b>state mới nhất</b> của bên kia → output là stream các thay đổi của view (giống product rule: (u·v)′ = u′v + uv′).</p>
+      <div class="card bad f" style="margin-top:12px"><span class="lbl bad">TIME-DEPENDENCE OF JOINS</span><p class="ps">Cả ba loại join đều cần giữ state; nếu state thay đổi theo thời gian, join với <b>phiên bản nào</b>? Vd. bán hàng cần tax rate <b>tại thời điểm bán</b>, không phải hiện tại. Thứ tự giữa các stream không xác định → join <b>nondeterministic</b>.</p></div>
+      <div class="note blue f" style="font-size:16px">Data warehouse gọi đây là <b>slowly changing dimension (SCD)</b>: gắn <b>version ID</b> cho mỗi phiên bản record (mỗi lần tax rate đổi → ID mới), invoice ghi ID đó → join deterministic, đổi lại không dùng được log compaction.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FAULT TOLERANCE 1 ===================== -->
+<section class="slide" id="ft">
+  <div class="hdr in"><span class="qn">18</span><h2>Fault Tolerance: <span class="grad">exactly-once</span> (effectively-once) semantics</h2></div>
+  <p class="in" style="font-size:18px">Batch: task fail → restart, discard partial output → output như thể mỗi record được xử lý đúng một lần. Stream vô hạn → <b>không thể</b> đợi task xong mới công bố output. Mục tiêu: kết quả như thể không có fault — dù thực tế record có thể được xử lý lại.</p>
+  <div class="cols" style="grid-template-columns:1.3fr 1fr;gap:22px;margin-top:12px">
+    <div class="card" style="padding:12px 16px">
+      <h3>Microbatching &amp; checkpointing</h3>
+      <div class="arr xs left" style="gap:6px;flex-wrap:nowrap">
+        <div class="cell done" id="fe1"><span class="v">e1</span></div><div class="cell done" id="fe2"><span class="v">e2</span></div><div class="cell done" id="fe3"><span class="v">e3</span></div>
+        <div class="cell ckpt" id="bar1">┃</div>
+        <div class="cell" id="fe4"><span class="v">e4</span></div><div class="cell" id="fe5"><span class="v">e5</span></div><div class="cell" id="fe6"><span class="v">e6</span></div>
+        <div class="cell ckpt" id="bar2">┃</div>
+        <div class="cell" id="fe7"><span class="v">e7</span></div><div class="cell" id="fe8"><span class="v">e8</span></div><div class="cell" id="fe9"><span class="v">e9</span></div>
+      </div>
+      <div class="formula" id="ftmsg" style="margin-top:12px;font-size:18px">stream được chia bởi các <b>barriers</b> ┃</div>
+      <p class="say" style="font-size:18px">Nhấn → để chạy từng bước.</p>
+      <span class="f ghost" data-act="#bar1|saved;#fe4|done;#fe5|done;#fe6|done;#bar2|saved" data-set="#ftmsg::✓ checkpoint state tại barrier → ghi durable storage" data-say="Đến mỗi barrier, operator ghi <b>checkpoint</b> state xuống durable storage."></span>
+      <span class="f ghost" data-act="#fe7|done;#fe8|bad" data-set="#ftmsg::💥 operator crash khi đang xử lý e8" data-say="Operator crash giữa chừng sau barrier 2."></span>
+      <span class="f ghost" data-act="#fe7|cur;#fe8|cur;#fe9|cur" data-set="#ftmsg::↺ restart từ checkpoint gần nhất, discard output sau đó" data-say="Restart từ <b>checkpoint gần nhất</b>, bỏ output sinh ra giữa checkpoint và crash, xử lý lại e7–e9."></span>
+    </div>
+    <div>
+      <div class="card f"><h3>📦 Microbatching · Spark Streaming</h3><p class="ps">Chia stream thành block nhỏ (~<b>1 giây</b>) và xử lý như mini batch. Batch nhỏ → overhead scheduling; batch lớn → delay. Ngầm tạo một <b>tumbling window</b> bằng batch size (theo processing time).</p></div>
+      <div class="card f" style="margin-top:12px"><h3>🚩 Checkpointing · Apache Flink</h3><p class="ps">Định kỳ tạo <b>rolling checkpoints</b> của state, trigger bởi <b>barriers</b> trong message stream — như ranh giới microbatch nhưng không ép window size.</p></div>
+      <div class="note f" style="font-size:16px">Trong phạm vi stream framework thì đủ exactly-once. Nhưng output đã rời khỏi framework (ghi DB, gửi email…) thì <b>không thu hồi được</b> → restart sẽ gây side effect hai lần.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FAULT TOLERANCE 2 ===================== -->
+<section class="slide" id="ft2">
+  <div class="hdr in"><span class="qn">19</span><h2>Atomic commit · <span class="grad">idempotence</span> · rebuilding state</h2></div>
+  <div class="cols3">
+    <div class="card f"><div class="icon">⚛️</div><h3>Atomic commit revisited</h3><p class="ps">Mọi output &amp; side effect (ghi downstream, message tới broker, ack/offset input) xảy ra <b>khi và chỉ khi</b> xử lý thành công. Không phải XA heterogeneous: giữ transaction <b>nội bộ</b> framework, tận dụng gom nhiều message vào một transaction. Google Cloud Dataflow, VoltDB, Apache Kafka.</p></div>
+    <div class="card f"><div class="icon">🔁</div><h3>Idempotence</h3><p class="ps">Làm nhiều lần = làm một lần.</p>
+      <div class="cols" style="gap:8px;margin-top:6px"><div class="pv yes" style="font-size:14px;white-space:normal">SET x = 5 ✓</div><div class="pv no" style="font-size:14px;white-space:normal">counter += 1 ✗</div></div>
+      <p class="ps" style="margin-top:6px">Biến write không-idempotent thành idempotent: lưu kèm <b>Kafka offset</b> của message đã ghi → thấy offset đã áp dụng thì bỏ qua. Cần replay đúng thứ tự, processing deterministic, và <b>fencing</b> khi failover (chặn node bị coi là đã chết).</p></div>
+    <div class="card f"><div class="icon">🧱</div><h3>Rebuilding state after failure</h3><p class="ps">Window aggregations, local table cho join… cần state phục hồi được.</p>
+      <ul class="mini" style="margin-top:4px"><li>Remote datastore + replicate (chậm nếu query mỗi message)</li><li>Local state + <b>periodic snapshot</b> (Flink)</li><li>Gửi thay đổi state lên <b>changelog topic</b> có log compaction (Samza, Kafka Streams)</li><li>Xử lý dư thừa trên nhiều node (VoltDB)</li><li>Hoặc <b>rebuild</b> từ input stream (window ngắn)</li></ul></div>
+  </div>
+  <div class="note blue f" style="margin-top:14px">Chọn cách nào tuỳ performance của infrastructure: đôi khi network nhanh hơn disk, đôi khi ngược lại — <b>không có lựa chọn lý tưởng chung</b>.</div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="slide" id="sum">
+  <div class="hdr in"><span class="qn">20</span><h2>Summary</h2></div>
+  <div class="cols in" style="gap:18px">
+    <div class="card"><h3>📨 AMQP/JMS-style message broker</h3><p class="ps">Broker gán <b>từng message</b> cho consumer, consumer <b>ack</b> từng message, ack xong thì xoá. Hợp với <b>asynchronous RPC</b>, task queue: thứ tự không quan trọng, không cần đọc lại message cũ.</p></div>
+    <div class="card"><h3>📜 Log-based message broker</h3><p class="ps">Broker gán <b>cả partition</b> cho một consumer node, luôn deliver theo <b>cùng thứ tự</b>. Parallelism qua partitioning; consumer track <b>offset</b>. Message giữ trên disk → <b>replay</b> được. Hợp cho derived state &amp; output streams.</p></div>
+  </div>
+  <div class="cols4 f" style="margin-top:14px">
+    <div class="card"><h3>🔄 Databases as streams</h3><p class="ps"><b>CDC</b> (ngầm) hoặc <b>event sourcing</b> (tường minh). Log compaction giữ full copy của DB.</p></div>
+    <div class="card"><h3>🎯 Uses</h3><p class="ps">CEP, stream analytics (windowed aggregation), maintaining materialized views, search on streams.</p></div>
+    <div class="card"><h3>⏱️ Time</h3><p class="ps">Event time vs processing time; <b>straggler events</b>; tumbling · hopping · sliding · session windows.</p></div>
+    <div class="card"><h3>🛡️ Fault tolerance</h3><p class="ps">Exactly-once qua <b>microbatching</b>, <b>checkpointing</b>, <b>transactions</b>, hoặc <b>idempotent writes</b>.</p></div>
+  </div>
+  <table class="cmp2 f" style="margin-top:14px">
+    <tr><th>Join</th><th>Inputs</th><th>Kết quả</th></tr>
+    <tr><td>Stream-stream</td><td>Hai activity streams (có thể self-join)</td><td>Tìm event liên quan trong cùng <b>window</b> thời gian</td></tr>
+    <tr><td>Stream-table</td><td>Activity stream + DB changelog</td><td><b>Enriched</b> activity events</td></tr>
+    <tr><td>Table-table</td><td>Hai DB changelogs</td><td>Stream các thay đổi của <b>materialized view</b> join</td></tr>
+  </table>
+</section>
+
+</div></div>
+<div id="bar"></div>
+<div id="hint">← → / Space: từng bước · Shift+→: qua slide · A: hiện hết · Home: đầu · F: toàn màn hình</div>
+<div id="nav"><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+<script>
+(function(){
+  // ---------- C++ highlighter (same as lec03) ----------
+  const KW=new Set("if else for while do return break continue switch case default struct class using namespace const static new delete true false sizeof public private include pragma auto".split(" "));
+  const TY=new Set("int double float char void bool long short unsigned string".split(" "));
+  const LIB=new Set("cout cin endl sqrt fabs std".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line){
+    if(/^\s*#/.test(line)) return '<span class="p">'+esc(line)+'</span>';
+    const re=/(\/\/.*$)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="n">'+m[3]+'</span>';
+      else if(m[4]){
+        const w=m[4];
+        let cls=KW.has(w)?"k":TY.has(w)?"t":LIB.has(w)?"fn":(m[5]?"fn":"");
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[5]?esc(m[5]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-cpp"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");const [a,b]=r.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+  // ---------- deck engine ----------
+  // .f fragments, shown one per step. Per fragment:
+  //   data-act  "sel|cls;…"   class kept while the fragment is shown
+  //   data-now  "sel|cls;…"   class only while it is the latest fragment
+  //   data-set  "sel::html;…" content set while shown (later fragments win)
+  //   data-say  narration for the .say line
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")].sort((x,y)=>(+x.dataset.o||0)-(+y.dataset.o||0)); // data-o: show later
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  const pairs=(v,sep)=>(v||"").split(";").filter(Boolean).map(p=>{const k=p.indexOf(sep);return [p.slice(0,k).trim(),p.slice(k+sep.length)]});
+  function tog(v,on){pairs(v,"|").forEach(([sel,cls])=>{document.querySelectorAll(sel).forEach(t=>t.classList.toggle(cls,on))})}
+  // remember original content of every data-set target
+  document.querySelectorAll("[data-set]").forEach(f=>pairs(f.dataset.set,"::").forEach(([sel])=>{document.querySelectorAll(sel).forEach(t=>{if(t.dataset.orig===undefined)t.dataset.orig=t.innerHTML})}));
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach(f=>{tog(f.dataset.now,false);tog(f.dataset.act,false)});
+      s.querySelectorAll("[data-orig]").forEach(t=>t.innerHTML=t.dataset.orig);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step);f.classList.toggle("on",on);if(on){tog(f.dataset.act,true);pairs(f.dataset.set,"::").forEach(([sel,val])=>document.querySelectorAll(sel).forEach(t=>t.innerHTML=val))}});
+      if(i===cur&&step>0)tog(fs[step-1].dataset.now,true);
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.innerHTML=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length;
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    try{history.replaceState(null,"","#"+slides[cur].id)}catch(e){}
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+  addEventListener("keydown",e=>{
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+
+</script>
+</body>
+</html>

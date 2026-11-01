@@ -1,0 +1,1513 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DDIA Chapter 3 · Storage and Retrieval</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+h1{font-size:70px;line-height:1.1;font-weight:800}
+h2{font-size:38px;line-height:1.2;font-weight:800}
+h3{font-size:23px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:22px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:26px;margin:6px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.88em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 6px;border-radius:6px;color:#be185d}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.cols.c64{grid-template-columns:1.25fr 1fr}.cols.c46{grid-template-columns:1fr 1.2fr}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.card.bad{border-color:#fecdd3;background:linear-gradient(180deg,#fff1f3,#fff)}
+.card.good{border-color:#a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff)}
+.lbl{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
+.icon{font-size:34px;margin-bottom:4px}
+.note{margin-top:12px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:20px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.code{font-family:var(--mono);font-size:18px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
+.code.sm{font-size:16.5px}.code.xs{font-size:15px;line-height:1.45}.code.xxs{font-size:13.6px;line-height:1.38;padding:8px 0}
+.code .ln{padding:0 14px 0 8px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.11);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.13);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
+.code-title{font-family:var(--mono);font-size:15px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+.f.zoom{transform:scale(.85)}.f.zoom.on{transform:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:19px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.legend{display:flex;flex-direction:column;gap:10px}
+.leg{border-radius:12px;padding:10px 16px;background:#fff;border:1px solid var(--line)}
+.leg b{display:block;font-size:21px;margin-bottom:2px}
+.leg p{font-size:19px}
+.leg.a{border-left:6px solid #7c3aed}.leg.b{border-left:6px solid #06b6d4}.leg.c{border-left:6px solid #f59e0b}
+.console{font-family:var(--mono);font-size:17px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.mem{display:flex;align-items:center;gap:16px;min-height:130px}
+.frame{border:2px solid #e4dcfb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
+.frame .fname{font-family:var(--mono);font-size:16px;color:var(--muted);margin-bottom:6px}
+.var{display:flex;align-items:center;gap:10px}
+.vn{font-family:var(--mono);font-size:21px;color:var(--t);font-weight:600}
+.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #c4b5fd;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
+.vb .new{display:none}
+.callee,.arw{opacity:0;transform:translateX(-14px);transition:all .5s}
+.mem.s1 .callee,.mem.s1 .arw{opacity:1;transform:none}
+.mem.s2 .chg .old{display:none}.mem.s2 .chg .new{display:inline;animation:pop .5s}
+.mem.s2 .chg{border-color:#f59e0b;box-shadow:0 0 18px rgba(245,158,11,.5)}
+.mem.s3 .callee,.mem.s3 .arw{opacity:.15;transform:translateY(10px)}
+.mem.s3 .result{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.5)}
+.arw{font-family:var(--mono);font-size:16px;color:var(--gold);text-align:center;line-height:1.2;font-weight:600}
+.arw .bar{display:block;font-size:30px}
+.alias{font-size:18px;color:var(--accent2);font-weight:600}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.25)}100%{transform:none;opacity:1}}
+.flow{display:flex;align-items:center;gap:12px;justify-content:center}
+.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:18px;border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:14px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.h{border-color:var(--gold)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#c4b5fd}.box.exe{border-color:#ec4899;background:#fdf2f8}
+.ar{color:var(--muted);font-size:26px;text-align:center}
+.stack{display:flex;flex-direction:column;gap:8px}
+svg text{font-family:var(--mono);font-weight:600}
+.draw{stroke-dasharray:400;stroke-dashoffset:400;transition:stroke-dashoffset 1s ease}
+svg.d1 .dr1,svg.d2 .dr2,svg.d3 .dr3{stroke-dashoffset:0}
+.fadein{opacity:0;transition:opacity .6s}
+svg.d1 .fd1,svg.d2 .fd2,svg.d3 .fd3{opacity:1}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:19px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05)}
+.ag:hover{border-color:#ec4899;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
+.ag b{color:#db2777;margin-right:6px;font-family:var(--mono)}
+.formula{font-family:var(--mono);font-size:23px;text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:16px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+@media (max-width:700px){#hint{display:none}}
+@media print{#nav,#bar,#hint{display:none}}
+
+/* lec03 additions */
+.chain{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pv{display:inline-flex;align-items:center;font-family:var(--mono);font-size:18px;font-weight:700;padding:5px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;white-space:nowrap}
+.pv.yes{background:#d1fae5;border-color:#34d399;color:#047857}
+.pv.no{background:#ffe4e6;border-color:#fb7185;color:#be123c}
+.pv.skip{background:#f1f5f9;border-color:#cbd5e1;color:#94a3b8;text-decoration:line-through;border-style:dashed}
+.op{font-family:var(--mono);font-size:26px;font-weight:800;color:var(--sa1)}
+.tt th,.tt td{text-align:center}.tt td:first-child{color:var(--text);font-weight:400}
+.tt tr.hit td{background:#fdf2f8;color:#be185d}
+tr.f{transform:none}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.code.show-s .mark-s{opacity:.3;text-decoration:line-through}
+.arr{display:flex;gap:12px;justify-content:center;margin-top:6px}
+.cell{width:84px;height:84px;border-radius:16px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:800;transition:all .45s;box-shadow:0 6px 16px -10px rgba(124,58,237,.4)}
+.cell small{font-size:13px;color:var(--muted);font-weight:600}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857;transform:translateY(-6px)}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;transform:translateY(-10px) scale(1.06);box-shadow:0 10px 24px -8px rgba(225,29,72,.5)}
+.cell.skip{opacity:.3;transform:scale(.92)}
+.syn{display:flex;gap:12px;align-items:center;justify-content:center;font-family:var(--mono);font-size:24px;font-weight:700}
+.sy{padding:8px 16px;border-radius:12px;color:#fff}
+.sy.c1{background:linear-gradient(135deg,#7c3aed,#a855f7)}.sy.c2{background:linear-gradient(135deg,#059669,#10b981)}.sy.c3{background:linear-gradient(135deg,#e11d48,#f97316)}
+.spin{display:inline-block;animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* lec04 arrays additions */
+.cell .v{display:block;line-height:1}
+.cell.max{border-color:#db2777;background:#fdf2f8;color:#be185d}
+.cell.empty{border-style:dashed;background:#f8fafc;color:#cbd5e1;box-shadow:none}
+.cell.done{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cell.new{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.cell.out{opacity:.4;border-style:dashed}
+.cell.gone{border-color:#e11d48;background:#fff1f3;color:#be123c;text-decoration:line-through}
+.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(245,158,11,.55)}
+.cell.cmp{border-color:#0891b2;background:#ecfeff;color:#0e7490;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(8,145,178,.5)}
+.cell.dots{border:none;box-shadow:none;background:none;width:40px;color:var(--muted)}
+.arr.sm .cell{width:70px;height:74px;font-size:24px;border-radius:14px}
+.arr.xs .cell{width:56px;height:62px;font-size:19px;border-radius:12px}
+.arr.xs .cell small{font-size:11.5px}
+.arr.left{justify-content:flex-start}
+.addr{display:flex;gap:12px;justify-content:center;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.addr span{width:84px;text-align:center}
+.vars{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.vc{font-family:var(--mono);font-size:19px;font-weight:700;padding:5px 14px;border-radius:12px;background:#fff;border:2px solid #e4dcfb;transition:all .35s}
+.vc b{color:var(--t)}
+.vc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.45)}
+.vc.res{border-color:#10b981;background:#ecfdf5;color:#047857}
+.ci{opacity:0;transition:opacity .4s}.ci.show{opacity:1}
+.say{font-size:20px;margin-top:12px;min-height:56px;color:var(--muted)}
+.say b{color:var(--text)}
+.rowlbl{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted);margin:10px 0 4px}
+.zone{display:flex;gap:6px;justify-content:center;margin-top:8px;font-size:15px;font-weight:700}
+.zone span{padding:3px 10px;border-radius:999px}
+.z1{background:#d1fae5;color:#047857}.z2{background:#f1f5f9;color:#64748b}.z3{background:#ffe4e6;color:#be123c}
+.brace{display:flex;gap:12px;justify-content:center;margin-top:4px}
+.brace div{border-top:3px solid currentColor;padding-top:4px;text-align:center;font-family:var(--mono);font-size:15px;font-weight:700}
+.mx{display:grid;gap:6px;justify-content:center}
+.mc{width:62px;height:52px;border-radius:10px;border:2px solid #e4dcfb;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .4s}
+.mx.sm .mc{width:44px;height:36px;font-size:14px;border-radius:8px}
+.mc.ix{border:none;background:none;color:var(--muted);font-size:14px;font-weight:600;box-shadow:none}
+.mc.unused{border-style:dashed;background:#f8fafc;color:#cbd5e1}
+.mc.used{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.mc.hl{background:#fffbeb;border-color:#fcd34d}
+.mc.cur{border-color:#f59e0b;background:#fde68a;color:#92400e;transform:scale(1.12);box-shadow:0 8px 20px -6px rgba(245,158,11,.6)}
+.mc.bd{border-color:#ec4899;border-width:3px}
+.mc.inr{opacity:.3}
+.mc.pos{border-color:#10b981;background:#d1fae5;color:#047857}
+.mc.neg{background:#fff1f3;color:#be123c}
+.mc.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;border-style:dashed}
+.strip{display:flex;gap:3px;font-family:var(--mono);font-size:12px;flex-wrap:nowrap;overflow:hidden}
+.strip span{padding:6px 5px;border-radius:5px;background:#f3edff;color:#6d28d9;white-space:nowrap}
+.strip span.r1{background:#e0f2fe;color:#0369a1}
+.strip span.gap{background:none;color:var(--muted)}
+.trace td,.trace th{font-size:17px;padding:5px 10px}
+.trace td:first-child{color:var(--text)}
+.trace tr.now td{background:#fffbeb}
+.sig{font-family:var(--mono);font-size:17px;background:#fff;border:1px dashed #c4b5fd;border-radius:10px;padding:6px 12px;color:#6d28d9;display:inline-block}
+
+.cols>*{min-width:0}
+
+/* ===== DDIA ch1 additions ===== */
+.sv{width:100%;height:auto;overflow:visible}
+.sv text{font-family:"Be Vietnam Pro",system-ui,sans-serif;font-weight:700;font-size:15px;fill:#1e1b3a}
+.sv text.sm{font-size:12.5px;fill:#64607d;font-weight:500}
+.sv text.lb{font-size:12.5px;fill:#7c3aed;font-weight:700}
+.sv .nd{fill:#fff;stroke:#c4b5fd;stroke-width:2}
+.sv .nd.c2{stroke:#0891b2}.sv .nd.c3{stroke:#ec4899}.sv .nd.c4{stroke:#f59e0b}.sv .nd.c5{stroke:#10b981}
+.sv .ln{stroke:#a78bfa;stroke-width:2.2;fill:none}
+.sv .g{opacity:0;transition:opacity .55s}
+.sv .g.hot .ln{stroke:#ec4899;stroke-dasharray:7 6;animation:dash .7s linear infinite}
+.sv .g.hot .nd{filter:drop-shadow(0 6px 10px rgba(236,72,153,.35))}
+@keyframes dash{to{stroke-dashoffset:-13}}
+.sv .box6{fill:none;stroke:#ec4899;stroke-width:2.5;stroke-dasharray:9 7}
+.chip{display:inline-flex;align-items:center;gap:8px;font-size:18px;font-weight:600;padding:6px 14px;border-radius:999px;background:#fff;border:2px solid #e4dcfb;white-space:nowrap}
+.chip.p{border-color:#c4b5fd;background:#f5f0ff;color:#6d28d9}.chip.c{border-color:#a5f3fc;background:#ecfeff;color:#0e7490}.chip.k{border-color:#fbcfe8;background:#fdf2f8;color:#be185d}.chip.y{border-color:#fde68a;background:#fffbeb;color:#b45309}.chip.g{border-color:#a7f3d0;background:#ecfdf5;color:#047857}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.cell.t{font-size:15px;font-weight:700;text-align:center;line-height:1.15;padding:4px}
+.cell.t .v{font-size:15px}
+.cell.big{font-size:30px}
+.stat{font-family:var(--mono);font-size:44px;font-weight:800;line-height:1;background:linear-gradient(90deg,var(--sa1),var(--sa2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat small{font-size:18px}
+.sysbox{border-radius:14px;padding:12px 16px;text-align:center;font-weight:700;font-size:20px;border:2px solid #e4dcfb;background:#fff;transition:all .45s}
+.sysbox.fail{border-color:#e11d48;background:#fff1f3;color:#be123c;box-shadow:0 0 22px rgba(225,29,72,.35)}
+.sysbox.ok{border-color:#10b981;background:#ecfdf5;color:#047857;box-shadow:0 0 22px rgba(16,185,129,.3)}
+.shield{opacity:0;transform:scale(.7);transition:all .45s;font-size:15px;font-weight:700;color:#7c3aed;text-align:center;border:2px dashed #a78bfa;border-radius:12px;padding:6px 10px;background:#f5f0ff}
+.shield.on{opacity:1;transform:none}
+.dots{display:grid;grid-template-columns:repeat(25,1fr);gap:5px;padding:12px;background:#fff;border:1px solid var(--line);border-radius:14px}
+.dots i{display:block;aspect-ratio:1;border-radius:4px;background:#e9e3fb;transition:all .4s}
+.dots i.x{background:#e11d48;transform:scale(1.35);box-shadow:0 0 10px rgba(225,29,72,.6)}
+.dots i.r{background:#10b981}
+.node{width:110px;border-radius:14px;border:2.5px solid #c4b5fd;background:#fff;text-align:center;padding:8px 4px;font-weight:700;transition:all .45s}
+.node .ver{display:block;font-family:var(--mono);font-size:22px;color:#6d28d9}
+.node small{display:block;font-size:13px;color:var(--muted);font-weight:600}
+.node.down{border-color:#f59e0b;background:#fffbeb;opacity:.55;transform:translateY(8px)}
+.node.v2{border-color:#10b981;background:#ecfdf5}.node.v2 .ver{color:#047857}
+.node.bad{border-color:#e11d48;background:#fff1f3;color:#be123c}.node.bad .ver{color:#be123c}
+.nodes{display:flex;gap:14px;justify-content:center}
+.casc{display:flex;align-items:center;gap:6px;justify-content:center}
+.casc .ar{font-size:22px}
+.tw{display:inline-block;font-size:13px;font-weight:700;padding:2px 8px;border-radius:6px;background:#fdf2f8;color:#be185d;border:1px solid #fbcfe8;margin:2px;opacity:0;transform:translateY(-10px) scale(.6);transition:all .45s}
+.tw.show{opacity:1;transform:none}
+.tw.b{background:#ecfeff;color:#0e7490;border-color:#a5f3fc}
+.tw.y{background:#fffbeb;color:#b45309;border-color:#fde68a}
+.mbox{border:2px solid #e4dcfb;border-radius:12px;background:#fff;padding:6px 8px;min-height:84px;transition:all .4s}
+.mbox h4{font-size:14px;color:var(--muted);margin-bottom:4px}
+.mbox.hot{border-color:#0891b2;box-shadow:0 0 16px rgba(8,145,178,.35)}
+.mboxes{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.who{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:18px;padding:8px 14px;border-radius:12px;background:#fff;border:2px solid #fbcfe8}
+.big-ar{font-size:30px;color:var(--muted);text-align:center;line-height:1}
+.rt{display:flex;height:58px;border-radius:12px;overflow:hidden;border:2px solid #e4dcfb;background:#fff}
+.rt>div{display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;opacity:0;transition:opacity .45s;white-space:nowrap}
+.rt>div.show{opacity:1}
+.rt .n1,.rt .n2{background:#94a3b8}.rt .q{background:#f59e0b}.rt .sv2{background:#7c3aed}
+.brk{position:relative;height:44px;margin-top:6px}
+.brk>div{position:absolute;top:0;border-top:3px solid;text-align:center;font-size:15px;font-weight:700;padding-top:4px;opacity:0;transition:opacity .45s}
+.brk>div.show{opacity:1}
+.pc rect.b{fill:#c4b5fd;transform:translateX(var(--x0));transition:transform 1.3s cubic-bezier(.6,0,.2,1) calc(var(--d)*7ms),fill .4s}
+.pc.sorted rect.b{transform:translateX(var(--x1))}
+.pc.p95 rect.t95{fill:#f472b6}.pc.p99 rect.t99{fill:#e11d48}
+.pc .mk{opacity:0;transition:opacity .5s}
+.pc.mean .mkm,.pc.p50 .mk50,.pc.p95 .mk95,.pc.p99 .mk99{opacity:1}
+.pc text{font-family:var(--mono);font-size:12px;font-weight:700}
+.q-row{display:flex;gap:8px;align-items:center}
+.rq{height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;font-weight:700;color:#fff;transition:all .5s}
+.rq.slow{width:190px;background:linear-gradient(135deg,#e11d48,#f97316)}
+.rq.fast{width:54px;background:linear-gradient(135deg,#0891b2,#7c3aed)}
+.rq.wait{box-shadow:0 0 0 3px #fde68a;animation:shake .5s infinite}
+.rq.done{opacity:.25}
+@keyframes shake{50%{transform:translateY(-3px)}}
+.srv{border:2.5px solid #7c3aed;border-radius:14px;padding:10px 14px;text-align:center;font-weight:800;background:#f5f0ff;min-width:120px}
+.be{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;margin:6px 0}
+.be .nm{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted)}
+.be .trk{height:26px;border-radius:8px;background:#f5f3ff;position:relative;overflow:hidden}
+.be .bb{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:8px;background:linear-gradient(90deg,#0891b2,#7c3aed);transition:width 1s ease}
+.be .bb.slow{background:linear-gradient(90deg,#f97316,#e11d48)}
+.run .be .bb{width:var(--w)}
+.mach{border:3px solid #7c3aed;border-radius:14px;background:#f5f0ff;display:flex;align-items:center;justify-content:center;font-weight:800;color:#6d28d9;transition:all .7s cubic-bezier(.2,.8,.2,1);width:90px;height:70px;font-size:15px;text-align:center}
+.mach.big{width:220px;height:170px;font-size:22px;border-width:5px;box-shadow:0 14px 30px -12px rgba(124,58,237,.6)}
+.mach.sm2{width:70px;height:56px;font-size:13px;border-color:#0891b2;background:#ecfeff;color:#0e7490;opacity:0;transform:scale(.5)}
+.mach.sm2.show{opacity:1;transform:none}
+.farm{display:grid;grid-template-columns:repeat(4,70px);gap:10px;justify-content:center}
+.layer{border-radius:12px;padding:10px 14px;font-weight:700;font-size:17px;text-align:center;transition:all .6s}
+.layer.top{background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;font-size:20px}
+.layer.hid{background:#f8fafc;border:2px dashed #cbd5e1;color:#64748b;font-weight:600;font-size:16px}
+.abs.cover .layer.hid{opacity:.25;filter:blur(1.5px)}
+.toggle{display:flex;gap:10px;align-items:center;justify-content:center}
+.pill{padding:8px 16px;border-radius:999px;font-weight:800;font-size:17px;border:2px solid #e4dcfb;background:#fff;transition:all .4s;color:var(--muted)}
+.pill.on{background:linear-gradient(135deg,var(--sa1),var(--sa2));color:#fff;border-color:transparent;transform:scale(1.06)}
+.quote{font-size:21px;line-height:1.45;font-style:italic;color:#4c4672;border-left:5px solid #ec4899;padding:8px 18px;background:rgba(255,255,255,.7);border-radius:8px}
+.quote b{font-style:normal}
+.mini li{font-size:18px;margin:3px 0;line-height:1.35}
+.card p.ps,p.ps{font-size:17px;line-height:1.4}
+.vs{font-weight:800;font-size:22px;color:var(--muted);align-self:center;text-align:center}
+.here{display:inline-block;font-size:13px;font-weight:800;color:#fff;background:#e11d48;border-radius:6px;padding:2px 8px;margin-left:6px;opacity:0;transition:opacity .4s}
+.here.show{opacity:1}
+.cols4>.card.lit{box-shadow:0 0 0 3px #ec4899,0 12px 26px -10px rgba(236,72,153,.5);transform:translateY(-4px)}
+.card{transition:all .4s}
+
+.chip.c,.leg.c{font-style:normal}.leg.c{color:var(--text)}.leg.c b{color:var(--text)}
+.leg p b{display:inline;font-size:inherit;margin:0}
+.toggle .pill{font-size:15px;white-space:nowrap}
+.abs.cover .layer.hid{opacity:.4;filter:blur(1px)}
+.mach.big{width:260px;font-size:21px}
+.sv text.lb,.pc text{paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+.sv.s1 .g1{opacity:1}.sv.s2 .g2{opacity:1}.sv.s3 .g3{opacity:1}.sv.s4 .g4{opacity:1}.sv.s5 .g5{opacity:1}.sv.s6 .g6{opacity:1}.sv.s7 .g7{opacity:1}.sv.s8 .g8{opacity:1}.who.hot{border-color:#ec4899;box-shadow:0 0 18px rgba(236,72,153,.45)}.toggle.flip #ev1{background:#fff;color:var(--muted);border-color:#e4dcfb;transform:none}.toggle.flip #ev2{background:linear-gradient(135deg,var(--sa1),var(--sa2));color:#fff;border-color:transparent;transform:scale(1.06)}.dots{grid-template-columns:repeat(50,1fr);gap:3px}.dots i{border-radius:2px}
+/* ===== DDIA ch3 additions ===== */
+.ag.sm{font-size:15.5px;padding:9px 12px}
+.pend{opacity:0;transform:translateY(10px);transition:opacity .45s,transform .45s}
+.pend.show{opacity:1;transform:none}
+.glow{border-color:#ec4899!important;box-shadow:0 0 0 3px rgba(236,72,153,.22),0 10px 22px -8px rgba(236,72,153,.55)!important}
+.dim{opacity:.28!important}
+.okc{border-color:#10b981!important;background:#ecfdf5!important;color:#047857!important}
+.badc{border-color:#e11d48!important;background:#fff1f3!important;color:#be123c!important}
+.pill.on.off{background:#fff;color:var(--muted);border-color:#e4dcfb;transform:none}
+.logf{font-family:var(--mono);font-size:15px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.logf .r{display:flex;gap:12px;padding:6px 12px;border-bottom:1px solid var(--line);transition:all .4s;white-space:nowrap;border-left:0 solid transparent}
+.logf .r:last-child{border-bottom:none}
+.logf .of{color:#94a3b8;min-width:40px;text-align:right}
+.logf .kk{color:#7c3aed;font-weight:700}
+.logf .vv{color:#475569;overflow:hidden;text-overflow:ellipsis}
+.logf .r.hot{background:#fffbeb;box-shadow:inset 5px 0 #f59e0b}
+.logf .r.scan{background:#ecfeff;box-shadow:inset 5px 0 #0891b2}
+.logf .r.old{opacity:.38;text-decoration:line-through}
+.logf .r.okc{box-shadow:inset 5px 0 #10b981}.logf .r.badc{box-shadow:inset 5px 0 #e11d48}
+.logf .hd{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700;color:var(--muted);font-size:13px;padding:5px 12px}
+.kv{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:14px;font-weight:700;min-width:70px;padding:5px 6px;border-radius:10px;border:2px solid #e4dcfb;background:#fff;transition:all .4s;line-height:1.15;color:var(--text)}
+.kv small{font-size:12px;color:var(--muted);font-weight:600}
+.kv.dead{opacity:.22;text-decoration:line-through;transform:scale(.92)}
+.kv.hot{border-color:#f59e0b;background:#fffbeb;transform:translateY(-4px);box-shadow:0 8px 18px -8px rgba(245,158,11,.6)}
+.kv.keep{border-color:#10b981;background:#ecfdf5;color:#047857}
+.kv.glow{transform:translateY(-4px)}
+.kvs{display:flex;flex-wrap:wrap;gap:6px}
+.seg{border:2px dashed #c4b5fd;border-radius:14px;padding:8px 10px;background:rgba(255,255,255,.75)}
+.seg h4{font-size:14px;color:var(--muted);margin-bottom:6px;font-family:var(--mono)}
+.seg .stack .kv{flex-direction:row;justify-content:space-between;gap:8px;padding:3px 10px}
+.page{display:inline-flex;align-items:stretch;border:2.5px solid #c4b5fd;border-radius:10px;background:#fff;overflow:hidden;transition:all .45s;font-family:var(--mono);font-weight:700}
+.page .pk{padding:7px 10px;font-size:17px;border-right:1px solid #ede9fe;transition:all .4s;display:flex;flex-direction:column;align-items:center;line-height:1.1}
+.page .pk small{font-size:10px;color:var(--muted)}
+.page .pr{width:20px;background:#f5f3ff;border-right:1px solid #ede9fe;position:relative;transition:all .4s}
+.page .pr::after{content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;margin:-3.5px;border-radius:50%;background:#a78bfa}
+.page>:last-child{border-right:none}
+.page .pr.hit{background:#fce7f3}.page .pr.hit::after{background:#db2777;box-shadow:0 0 0 4px rgba(219,39,119,.25)}
+.page .pk.hit{background:#d1fae5;color:#047857}
+.page .pk.nw{background:#fef3c7;color:#b45309}
+.page .nwk{display:none}
+.page.grow .nwk{display:flex}.page.grow .pr.nwk{display:block}
+.plbl{font-size:13px;color:var(--muted);font-family:var(--mono);margin:4px 0;text-align:center}
+.swp{position:relative;min-height:80px}
+.swp .aft{position:absolute;inset:0;opacity:0;transform:translateY(10px);transition:all .5s}
+.swp .bef{transition:all .5s}
+.swp.split .bef{opacity:0;transform:translateY(-10px)}.swp.split .aft{opacity:1;transform:none}
+.box.sm2{min-width:0;font-size:15px;padding:6px 10px}.box.sm2 small{font-size:12px}
+.box{transition:all .45s}
+/* memtable diagram */
+.lsmd{position:relative;display:grid;grid-template-columns:1fr 1.35fr;gap:18px;margin-top:20px;padding-top:34px}
+.lz{border-radius:16px;padding:30px 16px 16px;position:relative;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;min-height:300px}
+.lz.mem{background:linear-gradient(180deg,#f5f0ff,#fff);border:2px solid #ddd6fe}
+.lz.disk{background:linear-gradient(180deg,#ecfeff,#fff);border:2px solid #a5f3fc}
+.zl{position:absolute;top:8px;left:14px;font-family:var(--mono);font-size:13px;font-weight:800;color:var(--muted);letter-spacing:.08em}
+.ssts{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.ssts .box{min-width:110px;font-size:16px}
+.wq,.rq2,.cmpb2{position:absolute;font-weight:800;font-size:16px;padding:5px 14px;border-radius:999px;opacity:0;transform:translateY(-8px);transition:all .45s;white-space:nowrap}
+.wq{top:0;left:0;background:#fdf2f8;color:#be185d;border:2px solid #fbcfe8}
+.rq2{top:0;left:200px;background:#ecfeff;color:#0e7490;border:2px solid #a5f3fc}
+.cmpb2{bottom:-14px;right:20px;background:#fffbeb;color:#b45309;border:2px solid #fde68a}
+.wq.show,.rq2.show,.cmpb2.show{opacity:1;transform:none}
+.lsmd.rd #mt::before,.lsmd.rd #ss0::before,.lsmd.rd #ss1::before,.lsmd.rd #ss2::before{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#0891b2;color:#fff;font-size:13px;margin-right:6px;vertical-align:middle}
+.lsmd.rd #mt::before{content:"1"}.lsmd.rd #ss0::before{content:"2"}.lsmd.rd #ss1::before{content:"3"}.lsmd.rd #ss2::before{content:"4"}
+/* bloom */
+.bits{display:flex;gap:4px;justify-content:center}
+.bit{width:32px;height:40px;border-radius:8px;border:2px solid #e4dcfb;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:800;font-size:16px;color:#cbd5e1;transition:all .4s}
+.bit::after{content:"0"}.bit.on::after{content:"1"}
+.bit.on{background:#ede9fe;border-color:#7c3aed;color:#6d28d9}
+.bit.q{border-color:#f59e0b;box-shadow:0 0 0 3px rgba(245,158,11,.35);transform:translateY(-4px)}
+.bit.miss{border-color:#e11d48;background:#fff1f3;color:#be123c;box-shadow:0 0 0 3px rgba(225,29,72,.3)}
+.bidx{display:flex;gap:4px;justify-content:center;font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:3px}.bidx span{width:32px;text-align:center}
+.tiers{display:flex;align-items:flex-end;gap:6px;margin-top:8px}
+.tiers i{display:block;height:22px;border-radius:6px;background:linear-gradient(135deg,#c4b5fd,#7c3aed)}
+.tiers span{color:var(--muted);font-weight:800}
+.lvls{display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.lvls div{display:flex;gap:4px;align-items:center}
+.lvls b{font-family:var(--mono);font-size:13px;width:26px;color:var(--muted)}
+.lvls i{display:block;width:34px;height:14px;border-radius:4px;background:linear-gradient(135deg,#6ee7b7,#059669)}
+/* kitty dots */
+#kdots i{transition:all .5s}
+#kdots.scatter i.kt{background:#ec4899;transform:scale(1.4);box-shadow:0 0 8px rgba(236,72,153,.6)}
+/* b-tree reliability */
+.pgw{display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:14px;position:relative}
+.pgr{display:flex;gap:40px}
+.pg{font-family:var(--mono);font-weight:800;font-size:17px;padding:14px 22px;border-radius:12px;border:2.5px solid #c4b5fd;background:#fff;transition:all .45s}
+.pg.orph{border-style:dashed;transform:translateY(8px) rotate(-3deg)}
+.pg.fixd{border-color:#10b981!important;background:#ecfdf5!important;color:#047857!important}
+.pg.fixd~*{}
+#walsh.on~* .pg.orph{transform:none}
+/* write amp */
+.wa{margin-top:10px;display:flex;flex-direction:column;gap:10px}
+.war{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.war .nm{font-family:var(--mono);font-weight:800;width:84px;font-size:15px;color:var(--muted)}
+.wb{font-size:14px;font-weight:700;padding:6px 10px;border-radius:8px;color:#fff;opacity:0;transform:scale(.6);transition:all .45s}
+.wb.a{background:#7c3aed}.wb.b{background:#0891b2;transition-delay:.2s}.wb.c{background:#ec4899;transition-delay:.4s}
+.wa.go .wb{opacity:1;transform:none}
+.bwr{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.bwl{display:grid;grid-template-columns:70px 1fr;gap:8px;align-items:center;font-size:14px;font-weight:700;color:var(--muted)}
+.bwb{display:flex;height:30px;border-radius:8px;overflow:hidden;background:#f5f3ff}
+.bwb i{display:flex;align-items:center;justify-content:center;font-style:normal;font-size:13px;color:#fff;white-space:nowrap;transform:scaleX(0);transform-origin:left;transition:transform .8s}
+.bwb .iw{background:linear-gradient(90deg,#0891b2,#7c3aed)}.bwb .ic{background:linear-gradient(90deg,#f97316,#e11d48)}
+.bw.go .bwb i,#bw.go .bwb i{transform:none}
+/* index types */
+.ix3{display:flex;flex-direction:column;gap:10px}
+.ixc{border:2px solid var(--line);border-radius:14px;padding:10px 14px;background:#fff;opacity:0;transform:translateX(16px);transition:all .45s}
+.ixc.show{opacity:1;transform:none}
+.ixc>b{font-size:18px}
+.ixc .flow{justify-content:flex-start}
+.ixc .ps{margin-top:6px;font-size:16px}
+/* geo */
+#geo .g{opacity:0;transition:opacity .5s}
+#geo.s1 .g1,#geo.s2 .g2,#geo.s3 .g3{opacity:1}
+/* tables */
+.grid-t{width:100%;font-size:13.5px;font-family:var(--mono)}
+.grid-t th,.grid-t td{padding:5px 6px;text-align:center;transition:all .4s;font-size:13px}
+.grid-t th{font-size:11.5px;white-space:nowrap}
+.grid-t td:first-child{color:var(--text);font-weight:400}
+#cs.rowread td{background:#fffbeb}
+#cs.colread td:not(.u),#cs.colread th:not(.u){opacity:.22}
+#cs.colread td.u{background:#ecfeff;color:#0e7490;font-weight:700}
+.strip b{font-size:12px;color:var(--muted);min-width:94px;display:inline-block}
+/* bitmap */
+.bm{display:grid;grid-template-columns:96px repeat(18,1fr);gap:3px;font-family:var(--mono);font-size:13px}
+.bm>span{display:flex;align-items:center;justify-content:center;height:24px;border-radius:5px}
+.bm .lb2{justify-content:flex-start;font-weight:700;color:var(--muted);font-size:12px}
+.bm .ix{color:#94a3b8;font-size:11px}
+.bm .vl{background:#f3edff;color:#6d28d9;font-weight:700}
+.bm .b0{background:#f8fafc;color:#cbd5e1}
+.bm .b1{background:#ede9fe;color:#6d28d9;font-weight:800}
+.bm .bmr{display:contents}
+.bmrow{display:contents}
+.bm .h{opacity:0;transition:opacity .4s}
+.bm.sb .h.rb{opacity:1}
+.bm.so .h.ro{opacity:1}
+.bm .glowr{background:#fde68a!important;color:#92400e!important}
+.bm .res1{background:#10b981;color:#fff;font-weight:800}
+.bm .res0{background:#f1f5f9;color:#cbd5e1}
+.rle{display:grid;grid-template-columns:repeat(3,1fr);gap:4px 10px;font-family:var(--mono);font-size:12.5px;margin-top:8px;opacity:0;transition:opacity .45s}
+.rle.show{opacity:1}
+.rle span b{color:#7c3aed}
+/* pipeline / simd */
+.pipe{display:flex;align-items:center;gap:6px;margin-top:12px}
+.pz{border:2px solid #e4dcfb;border-radius:12px;padding:8px 10px;font-weight:700;font-size:15px;text-align:center;background:#fff}
+.pz small{display:block;font-size:11.5px;color:var(--muted);font-weight:500}
+.pz.l1{border-color:#f59e0b;background:#fffbeb}.pz.cpu{border-color:#7c3aed;background:#f5f0ff}
+.lanes{display:flex;gap:4px}
+.lanes i{flex:1;height:26px;border-radius:6px;background:#e9e3fb;animation:lane 2.4s infinite;animation-delay:calc(var(--k,0)*.3s)}
+.lanes i:nth-child(1){--k:0}.lanes i:nth-child(2){--k:1}.lanes i:nth-child(3){--k:2}.lanes i:nth-child(4){--k:3}.lanes i:nth-child(5){--k:4}.lanes i:nth-child(6){--k:5}.lanes i:nth-child(7){--k:6}.lanes i:nth-child(8){--k:7}
+.lanes.v i{animation:lanev 2.4s infinite;animation-delay:0s}
+@keyframes lane{0%,100%{background:#e9e3fb}8%{background:#7c3aed}}
+@keyframes lanev{0%,100%{background:#e9e3fb}8%,20%{background:#10b981}}
+/* cube */
+.cube td,.cube th{text-align:center}
+#cubet td.cv,#cubet td.rtot,#cubet td.ctot,#cubet td.gt{opacity:0;transition:opacity .45s}
+#cubet.c1 td.cv{opacity:1}
+#cubet.c2 td.rtot{opacity:1;background:#fdf2f8;color:#be185d;font-weight:700}
+#cubet.c3 td.ctot,#cubet.c3 td.gt{opacity:1;background:#ecfeff;color:#0e7490;font-weight:700}
+#cubet td:first-child{color:var(--muted)}
+.code .ln{min-height:1.2em}
+#tb .bb.r{width:12%;background:linear-gradient(90deg,#10b981,#0891b2)}#tb.idx .bb.r{width:88%}
+#tb .bb.w{width:92%;background:linear-gradient(90deg,#0891b2,#7c3aed)}#tb.idx .bb.w{width:62%;background:linear-gradient(90deg,#f97316,#e11d48)}#tb.idx2 .bb.w{width:30%}
+#tb .bb.sp{width:35%;background:linear-gradient(90deg,#a78bfa,#7c3aed)}#tb.idx .bb.sp{width:52%}#tb.idx2 .bb.sp{width:85%}
+#tb .be{grid-template-columns:110px 1fr;margin:14px 0}#tb .be .trk{height:34px}
+#compact .kv,#merge .kv{font-size:17px;min-width:86px;padding:8px 8px}#compact .kv small,#merge .kv small{font-size:14px}
+#compact .seg h4,#merge .seg h4{font-size:15px}
+.bm{font-size:15px;gap:4px}.bm>span{height:30px}.bm .lb2{font-size:14px}.rle{font-size:14px;margin-top:12px}
+
+</style>
+</head>
+<body>
+<div id="viewport"><div id="deck">
+
+<!-- ===================== TITLE ===================== -->
+<section class="slide" id="title">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// DDIA · Part I · Chapter 3</div>
+    <h1 class="in" style="font-size:72px">Storage &amp;<br><span class="grad">Retrieval</span></h1>
+    <p class="in muted" style="font-size:24px;margin-top:18px;max-width:1000px"><i>Designing Data-Intensive Applications</i> — Martin Kleppmann. Nhìn database từ <b>bên trong</b>: data được lưu thế nào, và làm sao tìm lại khi được hỏi — từ <b>log-structured</b> storage, <b>B-trees</b> đến <b>column-oriented storage</b> cho analytics.</p>
+    <div class="quote in" style="margin-top:26px;max-width:980px;font-size:19px">“Wer Ordnung hält, ist nur zu faul zum Suchen.” <span class="muted">(If you keep things tidily ordered, you’re just too lazy to go searching.)</span> <b>— German proverb</b></div>
+    <p class="in" style="margin-top:26px;font-size:18px;color:#8a91b4">Phím ← → hoặc Space: chạy từng bước · Shift+→: qua slide · A: hiện hết · F: toàn màn hình</p>
+  </div>
+</section>
+
+<!-- ===================== AGENDA ===================== -->
+<section class="slide" id="agenda">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:18px">· bấm vào mục để đi tới</span></div>
+  <div class="agenda in" style="gap:8px">
+    <div class="ag sm" data-goto="why"><b>00</b>Vì sao cần hiểu storage engine?</div>
+    <div class="ag sm" data-goto="simple"><b>01</b>World’s simplest database</div>
+    <div class="ag sm" data-goto="index"><b>02</b>Index &amp; trade-off read/write</div>
+    <div class="ag sm" data-goto="hash"><b>03</b>Hash Indexes</div>
+    <div class="ag sm" data-goto="compact"><b>04</b>Segments &amp; compaction</div>
+    <div class="ag sm" data-goto="merge"><b>05</b>Segment merging</div>
+    <div class="ag sm" data-goto="impl"><b>06</b>Chi tiết implementation</div>
+    <div class="ag sm" data-goto="append"><b>07</b>Vì sao append-only?</div>
+    <div class="ag sm" data-goto="sst"><b>08</b>SSTables &amp; merge</div>
+    <div class="ag sm" data-goto="sparse"><b>09</b>Sparse in-memory index</div>
+    <div class="ag sm" data-goto="memtable"><b>10</b>Memtable &amp; LSM-Tree</div>
+    <div class="ag sm" data-goto="lsm"><b>11</b>LSM storage engines</div>
+    <div class="ag sm" data-goto="bloom"><b>12</b>Bloom filters &amp; compaction</div>
+    <div class="ag sm" data-goto="btree"><b>13</b>B-Trees: lookup</div>
+    <div class="ag sm" data-goto="split"><b>14</b>B-Trees: page split</div>
+    <div class="ag sm" data-goto="brel"><b>15</b>Making B-trees reliable</div>
+    <div class="ag sm" data-goto="bopt"><b>16</b>B-tree optimizations</div>
+    <div class="ag sm" data-goto="lsmadv"><b>17</b>Advantages of LSM-trees</div>
+    <div class="ag sm" data-goto="lsmdown"><b>18</b>Downsides of LSM-trees</div>
+    <div class="ag sm" data-goto="secidx"><b>19</b>Secondary &amp; clustered index</div>
+    <div class="ag sm" data-goto="multi"><b>20</b>Multi-column indexes</div>
+    <div class="ag sm" data-goto="fuzzy"><b>21</b>Full-text &amp; fuzzy indexes</div>
+    <div class="ag sm" data-goto="inmem"><b>22</b>Keeping everything in memory</div>
+    <div class="ag sm" data-goto="oltp"><b>23</b>OLTP vs OLAP</div>
+    <div class="ag sm" data-goto="dw"><b>24</b>Data Warehousing &amp; ETL</div>
+    <div class="ag sm" data-goto="diverge"><b>25</b>OLTP DB vs data warehouse</div>
+    <div class="ag sm" data-goto="star"><b>26</b>Star &amp; snowflake schema</div>
+    <div class="ag sm" data-goto="colstore"><b>27</b>Column-Oriented Storage</div>
+    <div class="ag sm" data-goto="colcomp"><b>28</b>Column compression · bitmap</div>
+    <div class="ag sm" data-goto="vector"><b>29</b>Vectorized processing</div>
+    <div class="ag sm" data-goto="sort"><b>30</b>Sort order · writing</div>
+    <div class="ag sm" data-goto="cube"><b>31</b>Data cubes · Summary</div>
+  </div>
+</section>
+
+<!-- ===================== WHY ===================== -->
+<section class="slide" id="why">
+  <div class="hdr in"><span class="qn">00</span><h2>Database cần làm đúng <span class="grad">2 việc</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:26px">
+    <div>
+      <div class="flow" style="justify-content:flex-start;margin:6px 0 14px">
+        <div class="box cpp f zoom">store<small>“đây là data, giữ giùm”</small></div>
+        <div class="ar">⇄</div>
+        <div class="box m f zoom">retrieve<small>“đưa lại data cho tôi”</small></div>
+      </div>
+      <p style="font-size:19px">Chapter 2 nhìn từ phía <b>application developer</b> (data model, query language). Chapter 3 nhìn từ phía <b>database</b>: lưu data thế nào, tìm lại ra sao.</p>
+      <div class="note f" style="font-size:18px">Bạn sẽ không tự viết <b>storage engine</b>, nhưng cần <b>chọn</b> engine phù hợp và <b>tune</b> nó cho workload của mình → phải hiểu sơ storage engine làm gì <i>under the hood</i>.</div>
+    </div>
+    <div>
+      <h3>Hai “ngã rẽ” lớn trong chương</h3>
+      <div class="stack">
+        <div class="leg a f"><b>⚡ Transactional workloads (OLTP)</b><p>Hai họ storage engine: <b>log-structured</b> (Bitcask, SSTables, LSM-trees) và <b>page-oriented</b> (B-trees).</p></div>
+        <div class="leg b f"><b>📊 Analytics (OLAP)</b><p>Data warehouse, star schema, và <b>column-oriented storage</b> tối ưu cho scan lượng data khổng lồ.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SIMPLEST DB ===================== -->
+<section class="slide" id="simple">
+  <div class="hdr in"><span class="qn">01</span><h2>The world’s simplest database</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.15fr;gap:22px">
+    <div>
+      <div class="code-title">db.sh — một key-value store bằng 2 hàm Bash</div>
+<script type="text/x-sh" id="shdb" class="xs" data-mark="2-4:a;6-8:b">
+#!/bin/bash
+db_set () {
+  echo "$1,$2" >> database
+}
+
+db_get () {
+  grep "^$1," database | sed -e "s/^$1,//" | tail -n 1
+}
+</script>
+      <div class="console" id="cons" style="margin-top:12px;font-size:14px;min-height:118px;white-space:pre-wrap">$ <span class="in">./db.sh</span> sẵn sàng…</div>
+      <p class="say" style="font-size:18px">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <div class="logf" id="dbf">
+        <div class="hd">📄 file: database  (append-only)</div>
+        <div class="r pend" id="db1"><span class="kk">123456</span><span class="vv">{"name":"London","attractions":["Big Ben","London Eye"]}</span></div>
+        <div class="r pend" id="db2"><span class="kk">42</span><span class="vv">{"name":"San Francisco","attractions":["Golden Gate Bridge"]}</span></div>
+        <div class="r pend" id="db3"><span class="kk">42</span><span class="vv">{"name":"San Francisco","attractions":["Exploratorium"]}</span></div>
+      </div>
+      <div class="cols" style="margin-top:14px;gap:14px">
+        <div class="card good f" data-o="5"><span class="lbl good">db_set · O(1)</span><p class="ps">Append vào cuối file — thao tác write đơn giản và nhanh nhất có thể. Nhiều database cũng dùng một <b>log</b> (append-only sequence of records) bên trong.</p></div>
+        <div class="card bad f" data-o="6"><span class="lbl bad">db_get · O(n)</span><p class="ps">Mỗi lần lookup phải <b>scan cả file</b>. Gấp đôi số records → lookup lâu gấp đôi. Cần một <b>index</b>.</p></div>
+      </div>
+      <span class="f ghost" data-o="1" data-act="#shdb|show-a;#db1|show;#db2|show" data-set="#cons::$ &lt;span class=&quot;in&quot;&gt;db_set 123456 '{&quot;name&quot;:&quot;London&quot;,…}'&lt;/span&gt;&#10;$ &lt;span class=&quot;in&quot;&gt;db_set 42 '{&quot;name&quot;:&quot;San Francisco&quot;,…}'&lt;/span&gt;" data-say="<b>db_set</b> chỉ <b>append</b> một dòng <code class='i'>key,value</code> vào cuối file (giống CSV)."></span>
+      <span class="f ghost" data-o="2" data-act="#db3|show;#db2|old" data-set="#cons::$ &lt;span class=&quot;in&quot;&gt;db_set 42 '{…&quot;Exploratorium&quot;…}'&lt;/span&gt;&#10;$ &lt;span class=&quot;in&quot;&gt;cat database&lt;/span&gt;  → 3 dòng, key 42 xuất hiện 2 lần" data-say="Update key 42: giá trị cũ <b>không bị overwrite</b> — dòng mới được append, bản cũ vẫn nằm trong file."></span>
+      <span class="f ghost" data-o="3" data-now="#db1|scan;#db2|scan;#db3|scan" data-act="#shdb|show-b" data-set="#cons::$ &lt;span class=&quot;in&quot;&gt;db_get 42&lt;/span&gt;   # grep đọc toàn bộ file…" data-say="<b>db_get</b> phải <b>grep cả file</b> từ đầu tới cuối: chi phí lookup là <b>O(n)</b>."></span>
+      <span class="f ghost" data-o="4" data-act="#db3|hot" data-set="#cons::$ &lt;span class=&quot;in&quot;&gt;db_get 42&lt;/span&gt;&#10;{&quot;name&quot;:&quot;San Francisco&quot;,&quot;attractions&quot;:[&quot;Exploratorium&quot;]}" data-say="<code class='i'>tail -n 1</code> lấy lần xuất hiện <b>cuối cùng</b> của key → giá trị mới nhất."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== INDEX TRADE-OFF ===================== -->
+<section class="slide" id="index">
+  <div class="hdr in"><span class="qn">02</span><h2>Index: <span class="grad">read nhanh hơn</span>, write chậm hơn</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:28px">
+    <div>
+      <p style="font-size:20px">Một <b>index</b> là cấu trúc <b>phụ</b>, được <b>derived</b> từ primary data — giữ thêm metadata “bên lề”, đóng vai trò <b>signpost</b> giúp tìm data nhanh.</p>
+      <ul class="mini" style="margin-top:10px">
+        <li>Thêm/xoá index <b>không đổi nội dung</b> database — chỉ ảnh hưởng performance của query.</li>
+        <li>Muốn search cùng data theo nhiều cách → có thể cần <b>nhiều index</b> trên các phần khác nhau.</li>
+        <li>Mỗi lần write, index cũng phải được <b>update</b> → overhead.</li>
+      </ul>
+      <div class="note blue f" style="font-size:18px">Đây là <b>trade-off</b> quan trọng: index chọn đúng giúp read nhanh, nhưng <b>mọi index đều làm chậm write</b>. Vì vậy database không tự index mọi thứ — <b>developer/DBA</b> chọn index dựa trên <b>query patterns</b> của app.</div>
+    </div>
+    <div class="card" id="tb" style="padding:20px 22px">
+      <div class="toggle" style="margin-bottom:16px"><span class="pill on" id="tb0">no index</span><span class="pill" id="tb1">+1 index</span><span class="pill" id="tb2">+3 indexes</span></div>
+      <div class="be"><span class="nm">read</span><div class="trk"><div class="bb r"></div></div></div>
+      <div class="be"><span class="nm">write</span><div class="trk"><div class="bb slow w"></div></div></div>
+      <div class="be"><span class="nm">disk/space</span><div class="trk"><div class="bb sp"></div></div></div>
+      <p class="say" style="font-size:18px">Nhấn → để chạy từng bước.</p>
+      <span class="f ghost" data-act="#tb|idx;#tb1|on" data-now="#tb0|off" data-say="Thêm 1 index: read <b>nhanh vọt</b> (không phải scan cả file), write chậm đi một chút vì phải update index."></span>
+      <span class="f ghost" data-act="#tb|idx2;#tb2|on" data-now="#tb0|off;#tb1|off" data-say="Càng nhiều index: write càng tốn, tốn thêm storage. Khó có gì đánh bại tốc độ <b>append vào file</b>."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== HASH INDEX ===================== -->
+<section class="slide" id="hash">
+  <div class="hdr in"><span class="qn">03</span><h2>Hash Indexes <span class="muted" style="font-weight:600;font-size:24px">· Figure 3-1</span></h2></div>
+  <p class="in muted" style="font-size:19px;margin-bottom:12px">Giữ một <b>in-memory hash map</b>: mỗi key → <b>byte offset</b> trong data file. Append record mới thì update luôn hash map.</p>
+  <div class="cols" style="grid-template-columns:.62fr 1.38fr;gap:20px">
+    <div>
+      <div class="logf" id="hm">
+        <div class="hd">🧠 in-memory hash map</div>
+        <div class="r pend" id="hm1"><span class="kk">123456</span><span class="vv">→ 0</span></div>
+        <div class="r pend" id="hm2"><span class="kk">42</span><span class="vv" id="hm2v">→ 64</span></div>
+      </div>
+      <div class="note f" data-o="5" style="font-size:17px"><b>Bitcask</b> (storage engine mặc định của <b>Riak</b>) làm đúng như vậy: read/write rất nhanh, với điều kiện <b>tất cả keys vừa RAM</b>. Value có thể lớn hơn RAM — đọc bằng <b>một disk seek</b> (hoặc 0 nếu đã nằm trong filesystem cache).</div>
+    </div>
+    <div>
+      <div class="logf" id="hf">
+        <div class="hd">💾 log-structured file on disk</div>
+        <div class="r pend" id="hf1"><span class="of">0</span><span class="kk">123456,</span><span class="vv">{"name":"London","attractions":["Big Ben","London Eye"]}</span></div>
+        <div class="r pend" id="hf2"><span class="of">64</span><span class="kk">42,</span><span class="vv">{"name":"San Francisco","attractions":["Golden Gate Bridge"]}</span></div>
+        <div class="r pend" id="hf3"><span class="of">129</span><span class="kk">42,</span><span class="vv">{"name":"San Francisco","attractions":["Exploratorium"]}</span></div>
+      </div>
+      <div class="card f" data-o="6" style="margin-top:12px"><h3>Workload phù hợp</h3><p class="ps">Value của mỗi key bị update <b>rất thường xuyên</b>, nhưng số key khác nhau không quá nhiều. Ví dụ: key = URL của một cat video, value = số lần được play (tăng mỗi lần ai đó bấm play).</p></div>
+      <p class="say" style="font-size:18px">Nhấn → để chạy từng bước.</p>
+      <span class="f ghost" data-o="1" data-act="#hf1|show;#hm1|show" data-say="Append <code class='i'>123456</code> tại offset <b>0</b> → hash map ghi <code class='i'>123456 → 0</code>."></span>
+      <span class="f ghost" data-o="2" data-act="#hf2|show;#hm2|show" data-say="Append <code class='i'>42</code> tại offset <b>64</b> → hash map ghi <code class='i'>42 → 64</code>."></span>
+      <span class="f ghost" data-o="3" data-act="#hf3|show;#hf2|old" data-now="#hm2|hot" data-set="#hm2v::→ 129" data-say="Update key 42: append bản mới ở offset <b>129</b>, hash map trỏ sang offset mới (áp dụng cho cả insert lẫn update)."></span>
+      <span class="f ghost" data-o="4" data-now="#hm2|hot;#hf3|hot" data-say="Lookup <code class='i'>42</code>: tra hash map → offset 129 → <b>seek</b> thẳng tới đó và đọc value. Không còn scan O(n)."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== COMPACTION ===================== -->
+<section class="slide" id="compact">
+  <div class="hdr in"><span class="qn">04</span><h2>Segments &amp; <span class="grad">compaction</span> <span class="muted" style="font-weight:600;font-size:24px">· Figure 3-2</span></h2></div>
+  <p class="in muted" style="font-size:19px">Chỉ append thì disk sẽ hết chỗ. Giải pháp: chia log thành các <b>segment</b> có kích thước giới hạn — đầy thì đóng file, write tiếp vào segment mới.</p>
+  <div class="seg" style="margin-top:16px"><h4>Data file segment (đếm số lần play mỗi cat video)</h4>
+    <div class="kvs"><span class="kv cpd">mew<small>1078</small></span><span class="kv cpd">purr<small>2103</small></span><span class="kv cpd">purr<small>2104</small></span><span class="kv cpd">mew<small>1079</small></span><span class="kv cpd">mew<small>1080</small></span><span class="kv cpd">mew<small>1081</small></span><span class="kv cpd">purr<small>2105</small></span><span class="kv cpd">purr<small>2106</small></span><span class="kv cpd">purr<small>2107</small></span><span class="kv ">yawn<small>511</small></span><span class="kv ">purr<small>2108</small></span><span class="kv ">mew<small>1082</small></span></div>
+  </div>
+  <div class="big-ar" style="margin:10px 0">↓ <span style="font-size:18px;font-weight:700">compaction</span></div>
+  <div class="seg pend" id="cpout" style="border-color:#10b981"><h4>Compacted segment</h4>
+    <div class="kvs"><span class="kv keep">yawn<small>511</small></span><span class="kv keep">mew<small>1082</small></span><span class="kv keep">purr<small>2108</small></span></div>
+  </div>
+  <div class="note blue f" data-o="3" style="font-size:18px"><b>Compaction</b> = vứt bỏ các key trùng lặp trong log, chỉ giữ lại <b>update mới nhất</b> của mỗi key. Segment thường nhỏ đi rất nhiều.</div>
+  <p class="say" style="font-size:18px">Nhấn → để chạy từng bước.</p>
+  <span class="f ghost" data-o="1" data-act=".cpd|dead" data-say="Với mỗi key, mọi giá trị <b>trước</b> lần ghi cuối cùng đều đã lỗi thời."></span>
+  <span class="f ghost" data-o="2" data-act="#cpout|show" data-say="Ghi ra segment mới chỉ chứa <b>giá trị mới nhất</b>: <code class='i'>yawn:511</code>, <code class='i'>mew:1082</code>, <code class='i'>purr:2108</code>."></span>
+</section>
+
+<!-- ===================== MERGE ===================== -->
+<section class="slide" id="merge">
+  <div class="hdr in"><span class="qn">05</span><h2>Compaction + segment merging <span class="muted" style="font-weight:600;font-size:24px">· Figure 3-3</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.35fr 1fr;gap:20px">
+    <div>
+      <div class="seg" id="mg1"><h4>Segment 1 (cũ hơn)</h4><div class="kvs"><span class="kv mgd">mew<small>1078</small></span><span class="kv mgd">purr<small>2103</small></span><span class="kv mgd">purr<small>2104</small></span><span class="kv mgd">mew<small>1079</small></span><span class="kv mgd">mew<small>1080</small></span><span class="kv mgd">mew<small>1081</small></span><span class="kv mgd">purr<small>2105</small></span><span class="kv mgd">purr<small>2106</small></span><span class="kv mgd">purr<small>2107</small></span><span class="kv ">yawn<small>511</small></span><span class="kv mgx">purr<small>2108</small></span><span class="kv mgx">mew<small>1082</small></span></div></div>
+      <div class="seg" id="mg2" style="margin-top:8px"><h4>Segment 2 (mới hơn)</h4><div class="kvs"><span class="kv mgd">purr<small>2109</small></span><span class="kv mgd">purr<small>2110</small></span><span class="kv mgd">mew<small>1083</small></span><span class="kv ">scratch<small>252</small></span><span class="kv mgd">mew<small>1084</small></span><span class="kv mgd">mew<small>1085</small></span><span class="kv mgd">purr<small>2111</small></span><span class="kv mgd">mew<small>1086</small></span><span class="kv mgd">purr<small>2112</small></span><span class="kv mgd">purr<small>2113</small></span><span class="kv ">mew<small>1087</small></span><span class="kv ">purr<small>2114</small></span></div></div>
+      <div class="big-ar" style="margin:6px 0">↓ <span style="font-size:17px;font-weight:700">compaction &amp; merging (background thread)</span></div>
+      <div class="seg pend" id="mgout" style="border-color:#10b981"><h4>Merged segment (file mới)</h4><div class="kvs"><span class="kv keep">yawn<small>511</small></span><span class="kv keep">scratch<small>252</small></span><span class="kv keep">mew<small>1087</small></span><span class="kv keep">purr<small>2114</small></span></div></div>
+    </div>
+    <div>
+      <ul class="mini">
+        <li>Segment <b>không bao giờ bị sửa</b> sau khi ghi → merged segment được ghi ra <b>file mới</b>.</li>
+        <li>Merge chạy ở <b>background thread</b>; trong lúc đó vẫn phục vụ read/write bằng segment cũ.</li>
+        <li>Merge xong: chuyển read sang segment mới, rồi <b>xoá</b> segment cũ.</li>
+      </ul>
+      <div class="card f" data-o="4" style="margin-top:10px"><h3>Lookup với nhiều segment</h3>
+        <p class="ps">Mỗi segment có <b>hash map riêng</b>. Tìm key: check hash map của segment <b>mới nhất</b> trước, không có thì sang segment cũ hơn… Merging giữ số segment nhỏ nên không phải check nhiều.</p>
+        <div class="casc" style="margin-top:8px"><span class="chip k">newest</span><span class="ar">→</span><span class="chip p">older</span><span class="ar">→</span><span class="chip c">oldest</span></div>
+      </div>
+      <p class="say" style="font-size:18px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+  <span class="f ghost" data-o="1" data-act=".mgd|dead" data-say="Hai segment đã đóng băng (<b>frozen</b>). Bỏ các giá trị bị ghi đè trong <b>cả hai</b>."></span>
+  <span class="f ghost" data-o="2" data-act=".mgx|dead" data-say="Key xuất hiện ở cả hai segment: giá trị trong segment <b>mới hơn</b> thắng (ví dụ <code class='i'>mew</code>, <code class='i'>purr</code>)."></span>
+  <span class="f ghost" data-o="3" data-act="#mgout|show" data-say="Kết quả: một merged segment gọn gàng — compaction và merging được làm <b>cùng lúc</b>."></span>
+</section>
+
+<!-- ===================== IMPLEMENTATION ===================== -->
+<section class="slide" id="impl">
+  <div class="hdr in"><span class="qn">06</span><h2>Biến ý tưởng đơn giản thành thực tế</h2></div>
+  <p class="in muted" style="font-size:19px">Những vấn đề quan trọng trong một implementation thật:</p>
+  <div class="cols3" style="margin-top:14px;grid-template-columns:repeat(3,1fr)">
+    <div class="card f zoom"><div class="icon">🧾</div><h3>File format</h3><p class="ps">CSV không phải format tốt cho log. Dùng <b>binary format</b>: encode độ dài string (bytes) rồi tới raw string — không cần escaping.</p></div>
+    <div class="card f zoom"><div class="icon">🪦</div><h3>Deleting records</h3><p class="ps">Muốn xoá key thì append một <b>deletion record</b> đặc biệt — <b>tombstone</b>. Khi merge, tombstone báo bỏ mọi giá trị trước đó của key.</p></div>
+    <div class="card f zoom"><div class="icon">♻️</div><h3>Crash recovery</h3><p class="ps">Restart thì mất in-memory hash map. Đọc lại cả segment rất chậm → Bitcask lưu <b>snapshot</b> hash map của mỗi segment trên disk để load nhanh.</p></div>
+  </div>
+  <div class="cols" style="margin-top:14px;gap:16px">
+    <div class="card f zoom" style="border-top:5px solid #f59e0b"><h3 style="color:#d97706">✂️ Partially written records</h3><p class="ps">DB có thể crash giữa lúc đang append. File Bitcask có <b>checksums</b> để phát hiện và bỏ qua phần log bị corrupt.</p></div>
+    <div class="card f zoom" style="border-top:5px solid #10b981"><h3 style="color:#059669">🔒 Concurrency control</h3><p class="ps">Write được append tuần tự nghiêm ngặt → thường chỉ có <b>một writer thread</b>. Segment là append-only và <b>immutable</b> → nhiều thread đọc đồng thời thoải mái.</p></div>
+  </div>
+</section>
+
+<!-- ===================== APPEND-ONLY ===================== -->
+<section class="slide" id="append">
+  <div class="hdr in"><span class="qn">07</span><h2>Append-only: lãng phí hay <span class="grad">thông minh</span>?</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:24px">
+    <div>
+      <span class="lbl good">TẠI SAO KHÔNG UPDATE IN PLACE?</span>
+      <div class="stack" style="margin-top:6px">
+        <div class="leg a f"><b>🚀 Sequential writes</b><p>Append và merge segment là <b>sequential write</b> — nhanh hơn nhiều so với random write, đặc biệt trên <b>magnetic spinning-disk</b>; ở mức độ nào đó cũng tốt hơn trên <b>SSD</b>.</p></div>
+        <div class="leg b f"><b>🧯 Concurrency &amp; crash recovery đơn giản</b><p>Không lo trường hợp crash giữa lúc overwrite, để lại file nửa giá trị cũ nửa giá trị mới “dính” vào nhau.</p></div>
+        <div class="leg c f"><b>🧹 Không bị fragmentation</b><p>Merge segment cũ tránh việc data file bị phân mảnh theo thời gian.</p></div>
+      </div>
+    </div>
+    <div>
+      <span class="lbl bad">GIỚI HẠN CỦA HASH TABLE INDEX</span>
+      <div class="card bad f" style="margin-top:6px"><h3 style="color:#be123c">🧠 Phải vừa memory</h3><p class="ps">Quá nhiều key là hết cách. Hash map <b>on disk</b> thì khó làm nhanh: nhiều <b>random access I/O</b>, tốn kém khi grow, xử lý <b>hash collision</b> rắc rối.</p></div>
+      <div class="card bad f" style="margin-top:10px"><h3 style="color:#be123c">📏 Range queries kém</h3><p class="ps">Không thể scan hiệu quả mọi key giữa <code class="i">kitty00000</code> và <code class="i">kitty99999</code> — phải lookup <b>từng key</b> một trong hash map.</p>
+        <div class="dots" id="kdots" style="grid-template-columns:repeat(40,1fr);margin-top:8px;padding:8px"><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class="kt"></i><i class="kt"></i><i class=""></i><i class="kt"></i><i class=""></i><i class=""></i><i class="kt"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class="kt"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class="kt"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class="kt"></i><i class=""></i><i class=""></i><i class=""></i><i class="kt"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class="kt"></i><i class=""></i><i class=""></i><i class=""></i><i class="kt"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class="kt"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class="kt"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class="kt"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class="kt"></i><i class=""></i><i class=""></i><i class=""></i></div></div>
+      <span class="f ghost" data-act="#kdots|scatter" data-say="Hash function rải các key <b>kitty…</b> ngẫu nhiên khắp bảng → không có thứ tự để scan một dải."></span>
+      <p class="say" style="font-size:18px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SSTABLES ===================== -->
+<section class="slide" id="sst">
+  <div class="hdr in"><span class="qn">08</span><h2>SSTables: <span class="grad">Sorted String Table</span> <span class="muted" style="font-weight:600;font-size:24px">· Figure 3-4</span></h2></div>
+  <p class="in muted" style="font-size:18px">Thay đổi nhỏ: yêu cầu các key-value pair trong segment <b>được sort theo key</b>, mỗi key chỉ xuất hiện <b>một lần</b> trong mỗi merged segment. Merge giống <b>mergesort</b> — kể cả khi file lớn hơn memory.</p>
+  <div class="cols" style="grid-template-columns:1.5fr 1fr;gap:16px;margin-top:10px">
+    <div>
+      <div class="cols3" style="gap:8px"><div class="seg" style="padding:6px 8px"><h4>Segment 1 · cũ nhất</h4><div class="stack" style="gap:4px"><span class="kv" id="ss0_handbag">handbag<small>8786</small></span><span class="kv" id="ss0_handful">handful<small>40308</small></span><span class="kv" id="ss0_handicap">handicap<small>65995</small></span><span class="kv" id="ss0_handkerchief">handkerchief<small>16324</small></span><span class="kv" id="ss0_handlebars">handlebars<small>3869</small></span><span class="kv" id="ss0_handprinted">handprinted<small>11150</small></span></div></div><div class="seg" style="padding:6px 8px"><h4>Segment 2</h4><div class="stack" style="gap:4px"><span class="kv" id="ss1_handcuffs">handcuffs<small>2729</small></span><span class="kv" id="ss1_handful">handful<small>42307</small></span><span class="kv" id="ss1_handicap">handicap<small>67884</small></span><span class="kv" id="ss1_handiwork">handiwork<small>16912</small></span><span class="kv" id="ss1_handkerchief">handkerchief<small>20952</small></span><span class="kv" id="ss1_handprinted">handprinted<small>15725</small></span></div></div><div class="seg" style="padding:6px 8px"><h4>Segment 3 · mới nhất</h4><div class="stack" style="gap:4px"><span class="kv" id="ss2_handful">handful<small>44662</small></span><span class="kv" id="ss2_handicap">handicap<small>70836</small></span><span class="kv" id="ss2_handiwork">handiwork<small>45521</small></span><span class="kv" id="ss2_handlebars">handlebars<small>3869</small></span><span class="kv" id="ss2_handoff">handoff<small>5741</small></span><span class="kv" id="ss2_handprinted">handprinted<small>33632</small></span></div></div></div>
+    </div>
+    <div>
+      <div class="seg" style="border-color:#10b981"><h4>Merged output (sorted)</h4><div class="stack" style="gap:4px"><span class="kv pend" id="so_handbag">handbag<small>8786</small></span><span class="kv pend" id="so_handcuffs">handcuffs<small>2729</small></span><span class="kv pend" id="so_handful">handful<small>44662</small></span><span class="kv pend" id="so_handicap">handicap<small>70836</small></span><span class="kv pend" id="so_handiwork">handiwork<small>45521</small></span><span class="kv pend" id="so_handkerchief">handkerchief<small>20952</small></span><span class="kv pend" id="so_handlebars">handlebars<small>3869</small></span><span class="kv pend" id="so_handoff">handoff<small>5741</small></span><span class="kv pend" id="so_handprinted">handprinted<small>33632</small></span></div></div>
+    </div>
+  </div>
+  <p class="say" style="font-size:17px;margin-top:8px">Nhấn → để chạy từng bước.</p>
+  <span class="f ghost" data-now="#ss0_handbag|glow" data-act="#so_handbag|show;#ss0_handbag|keep" data-say="Đọc các file &lt;b&gt;song song&lt;/b&gt;, nhìn key đầu tiên của mỗi file, copy key &lt;b&gt;nhỏ nhất&lt;/b&gt; ra output: &lt;code class=&#x27;i&#x27;&gt;handbag&lt;/code&gt;."></span>
+  <span class="f ghost" data-now="#ss1_handcuffs|glow" data-act="#so_handcuffs|show;#ss1_handcuffs|keep" data-say="Key nhỏ nhất kế tiếp: &lt;code class=&#x27;i&#x27;&gt;handcuffs&lt;/code&gt; → copy sang output."></span>
+  <span class="f ghost" data-now="#ss0_handful,#ss1_handful,#ss2_handful|glow" data-act="#so_handful|show;#ss2_handful|keep;#ss0_handful|dead;#ss1_handful|dead" data-say="&lt;code class=&#x27;i&#x27;&gt;handful&lt;/code&gt; có ở 3 segment → giữ giá trị từ segment &lt;b&gt;mới nhất&lt;/b&gt; (44662), bỏ bản cũ."></span>
+  <span class="f ghost" data-now="#ss0_handicap,#ss1_handicap,#ss2_handicap|glow" data-act="#so_handicap|show;#ss2_handicap|keep;#ss0_handicap|dead;#ss1_handicap|dead" data-say="&lt;code class=&#x27;i&#x27;&gt;handicap&lt;/code&gt; có ở 3 segment → giữ giá trị từ segment &lt;b&gt;mới nhất&lt;/b&gt; (70836), bỏ bản cũ."></span>
+  <span class="f ghost" data-now="#ss1_handiwork,#ss2_handiwork|glow" data-act="#so_handiwork|show;#ss2_handiwork|keep;#ss1_handiwork|dead" data-say="&lt;code class=&#x27;i&#x27;&gt;handiwork&lt;/code&gt; có ở 2 segment → giữ giá trị từ segment &lt;b&gt;mới nhất&lt;/b&gt; (45521), bỏ bản cũ."></span>
+  <span class="f ghost" data-now="#ss0_handkerchief,#ss1_handkerchief|glow" data-act="#so_handkerchief|show;#ss1_handkerchief|keep;#ss0_handkerchief|dead" data-say="&lt;code class=&#x27;i&#x27;&gt;handkerchief&lt;/code&gt; có ở 2 segment → giữ giá trị từ segment &lt;b&gt;mới nhất&lt;/b&gt; (20952), bỏ bản cũ."></span>
+  <span class="f ghost" data-now="#ss0_handlebars,#ss2_handlebars|glow" data-act="#so_handlebars|show;#ss2_handlebars|keep;#ss0_handlebars|dead" data-say="&lt;code class=&#x27;i&#x27;&gt;handlebars&lt;/code&gt; có ở 2 segment → giữ giá trị từ segment &lt;b&gt;mới nhất&lt;/b&gt; (3869), bỏ bản cũ."></span>
+  <span class="f ghost" data-now="#ss2_handoff|glow" data-act="#so_handoff|show;#ss2_handoff|keep" data-say="Key nhỏ nhất kế tiếp: &lt;code class=&#x27;i&#x27;&gt;handoff&lt;/code&gt; → copy sang output."></span>
+  <span class="f ghost" data-now="#ss0_handprinted,#ss1_handprinted,#ss2_handprinted|glow" data-act="#so_handprinted|show;#ss2_handprinted|keep;#ss0_handprinted|dead;#ss1_handprinted|dead" data-say="&lt;code class=&#x27;i&#x27;&gt;handprinted&lt;/code&gt; có ở 3 segment → giữ giá trị từ segment &lt;b&gt;mới nhất&lt;/b&gt; (33632), bỏ bản cũ."></span>
+  <span class="f ghost" data-say="Kết quả: một merged segment mới, <b>vẫn sorted theo key</b>. Mỗi segment chứa mọi write trong một khoảng thời gian → segment mới hơn luôn thắng."></span>
+</section>
+
+<!-- ===================== SPARSE INDEX ===================== -->
+<section class="slide" id="sparse">
+  <div class="hdr in"><span class="qn">09</span><h2>Sparse in-memory index <span class="muted" style="font-weight:600;font-size:24px">· Figure 3-5</span></h2></div>
+  <div class="cols" style="grid-template-columns:.55fr 1.45fr;gap:20px">
+    <div>
+      <div class="logf" id="spi">
+        <div class="hd">🧠 sparse index</div>
+        <div class="r" id="spi1"><span class="kk">handbag</span><span class="vv">102134</span></div>
+        <div class="r" id="spi2"><span class="kk">handsome</span><span class="vv">104667</span></div>
+        <div class="r" id="spi3"><span class="kk">hangout</span><span class="vv">106782</span></div>
+        <div class="r" id="spi4"><span class="kk">hara-kiri</span><span class="vv">108317</span></div>
+      </div>
+      <div class="formula" style="margin-top:12px;font-size:19px">lookup: <span style="color:#db2777">handiwork</span></div>
+    </div>
+    <div>
+      <div class="seg"><h4>SSTable segment file · <span style="color:#db2777">compressed blocks</span></h4>
+        <div class="kvs" id="spblk1" style="padding:6px;border-radius:10px;background:#f5f3ff"><span class="kv" id="sp_handbag">handbag<small>8786</small></span><span class="kv" id="sp_handcuffs">handcuffs<small>2729</small></span><span class="kv" id="sp_handful">handful<small>44662</small></span><span class="kv" id="sp_handicap">handicap<small>70836</small></span><span class="kv" id="sp_handiwork">handiwork<small>45521</small></span><span class="kv" id="sp_handkerchief">handkerchief<small>20952</small></span><span class="kv" id="sp_handlebars">handlebars<small>3869</small></span><span class="kv" id="sp_handoff">handoff<small>5741</small></span><span class="kv" id="sp_handprinted">handprinted<small>33632</small></span></div>
+        <div class="kvs" id="spblk2" style="padding:6px;border-radius:10px;background:#ecfeff;margin-top:6px"><span class="kv ">handsome<small>86478</small></span><span class="kv ">handstand<small>41346</small></span><span class="kv ">handwritten<small>53190</small></span><span class="kv ">handyman<small>72445</small></span><span class="kv ">hangar<small>76201</small></span><span class="kv ">hangout<small>8810</small></span></div>
+      </div>
+      <p class="say" style="font-size:18px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+  <div class="cols" style="gap:14px;margin-top:4px">
+    <div class="note f" data-o="6" style="font-size:17px;margin-top:0">Index vẫn cần, nhưng chỉ <b>sparse</b>: một key cho mỗi <b>vài kilobytes</b> segment file là đủ — scan vài KB rất nhanh.</div>
+    <div class="note blue f" data-o="7" style="font-size:17px;margin-top:0">Read cần scan nhiều record trong một range → gom records thành <b>block</b> và <b>compress</b> trước khi ghi. Tiết kiệm disk space và <b>I/O bandwidth</b>.</div>
+  </div>
+  <span class="f ghost" data-o="1" data-say="<code class='i'>handiwork</code> <b>không có</b> trong index — ta không biết offset chính xác của nó."></span>
+  <span class="f ghost" data-o="2" data-act="#spi1|hot;#spi2|hot" data-say="Nhưng nhờ sort: <code class='i'>handbag</code> ≤ handiwork &lt; <code class='i'>handsome</code> → nó phải nằm <b>giữa</b> hai offset này."></span>
+  <span class="f ghost" data-o="3" data-now="#sp_handbag|hot" data-act="#spi1|hot;#spi2|hot" data-say="Jump tới offset &lt;b&gt;102134&lt;/b&gt; (handbag) và &lt;b&gt;scan tuần tự&lt;/b&gt;…"></span>
+  <span class="f ghost" data-o="3" data-now="#sp_handcuffs|hot" data-act="#spi1|hot;#spi2|hot" data-say="…handcuffs: chưa phải, scan tiếp."></span>
+  <span class="f ghost" data-o="3" data-now="#sp_handful|hot" data-act="#spi1|hot;#spi2|hot" data-say="…handful: chưa phải, scan tiếp."></span>
+  <span class="f ghost" data-o="3" data-now="#sp_handicap|hot" data-act="#spi1|hot;#spi2|hot" data-say="…handicap: chưa phải, scan tiếp."></span>
+  <span class="f ghost" data-o="4" data-act="#sp_handiwork|keep;#spi1|hot;#spi2|hot" data-say="Tìm thấy <code class='i'>handiwork</code> ✓ (nếu không có thì biết chắc key không tồn tại)."></span>
+  <span class="f ghost" data-o="5" data-act="#spblk1|glow" data-say="Mỗi entry của sparse index trỏ tới <b>đầu một compressed block</b>."></span>
+</section>
+
+<!-- ===================== MEMTABLE ===================== -->
+<section class="slide" id="memtable">
+  <div class="hdr in"><span class="qn">10</span><h2>Constructing &amp; maintaining SSTables</h2></div>
+  <p class="in muted" style="font-size:18px">Write đến theo thứ tự bất kỳ — làm sao có data sorted? Giữ cấu trúc sorted <b>trong memory</b> dễ hơn nhiều: <b>red-black tree</b>, <b>AVL tree</b>… insert tuỳ ý, đọc ra theo thứ tự.</p>
+  <div class="lsmd" id="lsmd">
+    <div class="lz mem"><span class="zl">MEMORY</span>
+      <div class="box o" id="mt" style="min-width:250px"><span id="mtt">memtable</span><small>balanced tree (red-black tree) · sorted</small></div>
+    </div>
+    <div class="lz disk"><span class="zl">DISK</span>
+      <div class="box h" id="wal" style="min-width:200px">write-ahead log<small>append-only, không sort — chỉ để restore memtable</small></div>
+      <div class="ssts">
+        <div class="box m pend" id="ss0">SSTable #4<small>mới nhất</small></div>
+        <div class="box m" id="ss1">SSTable #3</div>
+        <div class="box m" id="ss2">SSTable #2</div>
+        <div class="box m" id="ss3">SSTable #1<small>cũ nhất</small></div>
+      </div>
+    </div>
+    <div class="wq" id="wq">✍️ write</div>
+    <div class="rq2" id="rq">🔎 read</div>
+    <div class="cmpb2" id="cmpb">⚙️ background merging &amp; compaction</div>
+  </div>
+  <p class="say" style="font-size:18px;margin-top:10px">Nhấn → để chạy từng bước.</p>
+  <span class="f ghost" data-act="#wq|show" data-now="#mt|glow;#wal|glow" data-say="Write đến: thêm vào <b>memtable</b> (in-memory balanced tree), đồng thời append vào một <b>log riêng trên disk</b> để không mất data khi crash."></span>
+  <span class="f ghost" data-act="#ss0|show;#wal|dim" data-now="#ss0|glow" data-set="#mtt::memtable (mới, rỗng)" data-say="Memtable vượt <b>threshold</b> (vài MB) → ghi ra disk thành <b>SSTable</b> — hiệu quả vì tree đã sorted sẵn. Write tiếp tục vào memtable mới; log tương ứng có thể bỏ."></span>
+  <span class="f ghost" data-act="#rq|show;#lsmd|rd" data-say="Read: tìm trong <b>memtable</b> → SSTable <b>mới nhất</b> → cũ hơn → … cho đến khi thấy key."></span>
+  <span class="f ghost" data-act="#cmpb|show;#ss2|dim;#ss3|dim" data-say="Thỉnh thoảng chạy <b>merging &amp; compaction</b> ở background: gộp segment, bỏ giá trị bị overwrite hoặc đã xoá."></span>
+</section>
+
+<!-- ===================== LSM ===================== -->
+<section class="slide" id="lsm">
+  <div class="hdr in"><span class="qn">11</span><h2>Making an <span class="grad">LSM-tree</span> out of SSTables</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr;gap:24px">
+    <div>
+      <p style="font-size:19px">Thuật toán trên chính là <b>Log-Structured Merge-Tree (LSM-Tree)</b> — Patrick O’Neil et al. (1996), dựa trên <b>log-structured filesystems</b>. Engine dựa trên nguyên lý <i>merge &amp; compact sorted files</i> gọi là <b>LSM storage engines</b>.</p>
+      <div class="chips" style="margin-top:14px">
+        <span class="chip p f">LevelDB</span><span class="chip p f">RocksDB</span><span class="chip c f">Cassandra</span><span class="chip c f">HBase</span><span class="chip k f">Google Bigtable</span><span class="chip y f">Lucene</span>
+      </div>
+      <ul class="mini" style="margin-top:14px">
+        <li><b>LevelDB</b>, <b>RocksDB</b>: key-value storage engine library để <b>embed</b> vào app khác (LevelDB có thể thay Bitcask trong Riak).</li>
+        <li><b>Cassandra</b>, <b>HBase</b>: lấy cảm hứng từ paper <b>Bigtable</b> — nơi khai sinh thuật ngữ <i>SSTable</i> và <i>memtable</i>.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="card f"><h3>🔍 Lucene: full-text search</h3><p class="ps">Engine của <b>Elasticsearch</b> và <b>Solr</b>. Key = một <b>term</b> (từ), value = danh sách ID document chứa từ đó (<b>postings list</b>). Mapping term → postings list nằm trong các file sorted kiểu SSTable, merge ở background.</p>
+        <div class="logf" style="margin-top:10px;font-size:14px">
+          <div class="r"><span class="kk">“database”</span><span class="vv">→ [doc3, doc17, doc42]</span></div>
+          <div class="r"><span class="kk">“kitten”</span><span class="vv">→ [doc5, doc17]</span></div>
+          <div class="r"><span class="kk">“storage”</span><span class="vv">→ [doc3, doc8, doc99]</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== BLOOM ===================== -->
+<section class="slide" id="bloom">
+  <div class="hdr in"><span class="qn">12</span><h2>Performance optimizations</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr;gap:24px">
+    <div>
+      <h3>🌸 Bloom filters</h3>
+      <p class="ps">LSM-tree chậm khi lookup key <b>không tồn tại</b>: phải check memtable rồi từng segment về tận cái cũ nhất (mỗi cái có thể là một lần đọc disk). <b>Bloom filter</b> — cấu trúc tiết kiệm memory để <i>xấp xỉ</i> nội dung một set — trả lời chắc chắn “key <b>không có</b>”.</p>
+      <div class="card" style="margin-top:10px;padding:12px">
+        <div class="bits" id="bf"><span class="bit " id="b0"></span><span class="bit " id="b1"></span><span class="bit bfa bfc" id="b2"></span><span class="bit " id="b3"></span><span class="bit bfb" id="b4"></span><span class="bit " id="b5"></span><span class="bit " id="b6"></span><span class="bit bfa" id="b7"></span><span class="bit " id="b8"></span><span class="bit bfb bfc" id="b9"></span><span class="bit " id="b10"></span><span class="bit bfc" id="b11"></span><span class="bit " id="b12"></span><span class="bit bfa bfb" id="b13"></span><span class="bit " id="b14"></span><span class="bit " id="b15"></span></div>
+        <div class="bidx"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span></div>
+        <div class="say" style="font-size:17px;min-height:50px">Nhấn → để chạy từng bước.</div>
+      </div>
+      <span class="f ghost" data-act=".bfa|on" data-now=".bfa|q" data-say="Insert <code class='i'>mew</code>: 3 hash function → set bit 2, 7, 13."></span>
+      <span class="f ghost" data-act=".bfb|on" data-now=".bfb|q" data-say="Insert <code class='i'>purr</code>: set bit 4, 9, 13."></span>
+      <span class="f ghost" data-now=".bfc|q;#b11|miss" data-say="Lookup <code class='i'>woof</code>: bit 2, 9, <b>11</b> — bit 11 = 0 → <b>chắc chắn không tồn tại</b>, bỏ qua mọi disk read."></span>
+      <span class="f ghost" data-now=".bfa|q" data-say="Lookup <code class='i'>mew</code>: cả 3 bit = 1 → <b>có thể</b> tồn tại (có false positive) → mới đi đọc segment."></span>
+    </div>
+    <div>
+      <h3>🗂️ Compaction strategies</h3>
+      <div class="card f" style="margin-top:6px"><span class="lbl info">SIZE-TIERED</span><p class="ps">SSTable <b>mới &amp; nhỏ</b> lần lượt được merge vào SSTable <b>cũ &amp; lớn</b> hơn. Dùng bởi <b>HBase</b>.</p>
+        <div class="tiers"><i style="width:22px"></i><i style="width:22px"></i><i style="width:22px"></i><span>→</span><i style="width:60px"></i><span>→</span><i style="width:150px"></i></div></div>
+      <div class="card f" style="margin-top:10px"><span class="lbl good">LEVELED</span><p class="ps">Key range chia thành nhiều SSTable nhỏ, data cũ chuyển sang các <b>“level”</b> riêng → compaction <b>incremental</b> hơn, ít disk space hơn. Dùng bởi <b>LevelDB</b> (nên mới có tên đó) và <b>RocksDB</b>. <b>Cassandra</b> hỗ trợ cả hai.</p>
+        <div class="lvls"><div><b>L0</b><i></i><i></i></div><div><b>L1</b><i></i><i></i><i></i><i></i></div><div><b>L2</b><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div>
+      <div class="note blue f" style="font-size:17px">Ý tưởng cốt lõi: một <b>cascade of SSTables</b> merge ở background. Data sorted → <b>range query</b> hiệu quả; disk write tuần tự → <b>write throughput</b> rất cao.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== B-TREE LOOKUP ===================== -->
+<section class="slide" id="btree">
+  <div class="hdr in"><span class="qn">13</span><h2>B-Trees <span class="muted" style="font-weight:600;font-size:24px">· Figure 3-6</span></h2></div>
+  <div class="cols" style="grid-template-columns:.85fr 1.15fr;gap:22px">
+    <div>
+      <p class="ps" style="font-size:18px">Ra đời năm <b>1970</b>, được gọi là <i>“ubiquitous”</i> chưa đầy 10 năm sau. Là index chuẩn của gần như mọi <b>relational database</b> và nhiều nonrelational database.</p>
+      <table style="margin-top:10px;font-size:16px">
+        <tr><th></th><th>Log-structured</th><th>B-tree</th></tr>
+        <tr><td>Đơn vị</td><td>segment, vài MB, kích thước thay đổi</td><td><b>page</b> cố định, ~<b>4 KB</b></td></tr>
+        <tr><td>Ghi</td><td>tuần tự cả segment</td><td>đọc/ghi <b>một page</b> mỗi lần</td></tr>
+        <tr><td>Sort</td><td colspan="2" style="text-align:center">cả hai giữ key <b>sorted</b> → lookup &amp; range query hiệu quả</td></tr>
+      </table>
+      <p class="ps" style="margin-top:10px">Page có <b>address</b> → page này trỏ tới page khác (giống pointer nhưng <b>on disk</b>) → dựng thành <b>tree of pages</b>. Thiết kế khớp với hardware: disk cũng chia thành fixed-size blocks.</p>
+    </div>
+    <div class="card" style="padding:14px 16px">
+      <div class="formula" style="font-size:18px;margin-bottom:8px">look up user_id = <span style="color:#db2777">251</span></div>
+      <div class="plbl">root page</div>
+      <div style="text-align:center"><div class="page" id="bp0"><span class="pr"></span><span class="pk">100</span><span class="pr"></span><span class="pk">200</span><span class="pr" id="bp0r"></span><span class="pk">300</span><span class="pr"></span><span class="pk">400</span><span class="pr"></span><span class="pk">500</span><span class="pr"></span></div></div>
+      <div class="pend" id="bl1"><div class="big-ar" style="font-size:22px">↓</div><div class="plbl">page cho range 200–300</div>
+      <div style="text-align:center"><div class="page" id="bp1"><span class="pr"></span><span class="pk">210</span><span class="pr"></span><span class="pk">230</span><span class="pr"></span><span class="pk">250</span><span class="pr" id="bp1r"></span><span class="pk">270</span><span class="pr"></span><span class="pk">290</span><span class="pr"></span></div></div></div>
+      <div class="pend" id="bl2"><div class="big-ar" style="font-size:22px">↓</div><div class="plbl">leaf page (250–270)</div>
+      <div style="text-align:center"><div class="page" id="bp2"><span class="pk">250<small>val</small></span><span class="pk" id="k251">251<small>val</small></span><span class="pk">252<small>val</small></span><span class="pk">255<small>val</small></span><span class="pk">261<small>val</small></span><span class="pk">267<small>val</small></span></div></div></div>
+      <p class="say" style="font-size:17px;min-height:48px">Nhấn → để chạy từng bước.</p>
+      <span class="f ghost" data-now="#bp0|glow" data-act="#bp0r|hit" data-say="Bắt đầu ở <b>root</b>. Mỗi child phụ trách một range liên tục; 251 nằm giữa boundary <b>200</b> và <b>300</b> → đi theo ref đó."></span>
+      <span class="f ghost" data-act="#bl1|show;#bp1r|hit" data-now="#bp1|glow" data-say="Page con chia nhỏ range 200–300. 251 nằm giữa <b>250</b> và <b>270</b>."></span>
+      <span class="f ghost" data-act="#bl2|show;#k251|hit" data-now="#bp2|glow" data-say="Tới <b>leaf page</b>: chứa từng key cùng value <b>inline</b> (hoặc ref tới page chứa value). Tìm thấy 251 ✓. Ở đây <b>branching factor</b> = 6; thực tế thường là <b>vài trăm</b>."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== B-TREE SPLIT ===================== -->
+<section class="slide" id="split">
+  <div class="hdr in"><span class="qn">14</span><h2>Growing a B-tree by <span class="grad">splitting a page</span> <span class="muted" style="font-weight:600;font-size:24px">· Figure 3-7</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr;gap:22px">
+    <div class="card" style="padding:16px">
+      <div class="formula" style="font-size:18px;margin-bottom:10px">insert key <span style="color:#d97706">334</span></div>
+      <div class="plbl">parent page</div>
+      <div style="text-align:center"><div class="page" id="sp0"><span class="pr"></span><span class="pk">300</span><span class="pr"></span><span class="pk">333</span><span class="pr"></span><span class="pk nwk" id="sp337">337</span><span class="pr nwk"></span><span class="pk">345</span><span class="pr"></span></div></div>
+      <div class="big-ar" style="font-size:22px;margin:6px 0">↓</div>
+      <div class="swp" id="swp">
+        <div class="bef"><div class="plbl">leaf page (333–345) — đã đầy</div><div style="text-align:center"><div class="page" id="lf0"><span class="pk">333</span><span class="pk">335</span><span class="pk">337</span><span class="pk">340</span><span class="pk">342</span><span class="pk">344</span></div></div></div>
+        <div class="aft"><div class="plbl">sau khi split: hai page half-full</div><div style="text-align:center;display:flex;gap:14px;justify-content:center"><div class="page"><span class="pk">333</span><span class="pk nw">334</span><span class="pk">335</span></div><div class="page"><span class="pk">337</span><span class="pk">340</span><span class="pk">342</span><span class="pk">344</span></div></div></div>
+      </div>
+      <p class="say" style="font-size:17px;min-height:48px">Nhấn → để chạy từng bước.</p>
+      <span class="f ghost" data-now="#lf0|badc" data-say="Tìm page có range chứa 334 — nhưng page này <b>không còn chỗ trống</b>."></span>
+      <span class="f ghost" data-act="#swp|split" data-say="<b>Split</b> thành hai page <b>half-full</b>, 334 vào page bên trái."></span>
+      <span class="f ghost" data-act="#sp0|grow" data-now="#sp337|nw" data-say="Update <b>parent page</b> với boundary mới <b>337</b> để phản ánh cách chia range mới."></span>
+    </div>
+    <div>
+      <ul class="mini">
+        <li><b>Update</b> key có sẵn: tìm leaf page, sửa value, ghi page lại disk — mọi ref tới page vẫn hợp lệ.</li>
+        <li><b>Insert</b>: tìm page có range bao key mới; hết chỗ thì <b>split</b>.</li>
+        <li>Thuật toán giữ tree luôn <b>balanced</b>: n keys → depth <b>O(log n)</b>.</li>
+      </ul>
+      <div class="card f zoom" style="margin-top:12px;text-align:center"><div class="stat">256 <small>TB</small></div><p class="ps" style="margin-top:6px">4 levels · page 4 KB · branching factor 500. Hầu hết database chỉ cần tree <b>3–4 levels</b>.</p>
+        <div class="formula" style="font-size:16px;margin-top:8px">500⁴ × 4 KB ≈ 256 TB</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== B-TREE RELIABLE ===================== -->
+<section class="slide" id="brel">
+  <div class="hdr in"><span class="qn">15</span><h2>Making B-trees reliable</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:24px">
+    <div>
+      <p class="ps" style="font-size:18px">Write cơ bản của B-tree là <b>overwrite một page</b> trên disk, page giữ nguyên vị trí — trái ngược hẳn với LSM-tree (chỉ append, không bao giờ sửa file tại chỗ).</p>
+      <ul class="mini" style="margin-top:8px">
+        <li><b>HDD</b>: di chuyển disk head, chờ platter quay tới đúng vị trí, ghi đè sector.</li>
+        <li><b>SSD</b>: phức tạp hơn — phải erase &amp; rewrite cả block lớn của chip.</li>
+      </ul>
+      <div class="card good f" style="margin-top:10px"><span class="lbl good">WRITE-AHEAD LOG (WAL)</span><p class="ps">Còn gọi là <b>redo log</b>: file append-only, mọi thay đổi B-tree phải ghi vào đây <b>trước</b> khi áp vào page. Sau crash, dùng WAL để đưa B-tree về trạng thái <b>consistent</b>.</p></div>
+      <div class="card f" style="margin-top:10px"><h3>🔐 Latches</h3><p class="ps">Nhiều thread truy cập cùng lúc → bảo vệ cấu trúc tree bằng <b>latches</b> (lightweight locks). Log-structured đơn giản hơn: merge ở background và <b>atomically swap</b> segment.</p></div>
+    </div>
+    <div class="card" style="padding:16px">
+      <h3>Split = ghi nhiều page cùng lúc ⚠️</h3>
+      <div class="pgw">
+        <div class="pg" id="pgP">parent</div>
+        <div class="pgr"><div class="pg" id="pgA">page A</div><div class="pg" id="pgB">page B</div></div>
+      </div>
+      <div class="shield" id="walsh" style="margin:12px auto 0;max-width:380px">📜 WAL: replay các thay đổi còn dang dở</div>
+      <p class="say" style="font-size:17px;min-height:70px">Nhấn → để chạy từng bước.</p>
+      <span class="f ghost" data-act="#pgA|okc" data-say="Split: ghi page A (nửa trái)… ✓"></span>
+      <span class="f ghost" data-act="#pgB|okc" data-say="…ghi page B (nửa phải) ✓"></span>
+      <span class="f ghost" data-act="#pgP|badc;#pgB|orph" data-say="💥 <b>Crash</b> trước khi kịp overwrite <b>parent</b>! Index bị corrupt — có thể có <b>orphan page</b> không là con của page nào."></span>
+      <span class="f ghost" data-act="#walsh|on;#pgP|fixd" data-say="Có <b>WAL</b>: khi khởi động lại, replay log → parent được update, tree trở lại consistent."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== B-TREE OPT ===================== -->
+<section class="slide" id="bopt">
+  <div class="hdr in"><span class="qn">16</span><h2>B-tree optimizations</h2></div>
+  <p class="in muted" style="font-size:19px">B-tree đã tồn tại rất lâu nên có vô số tối ưu. Một vài ví dụ:</p>
+  <div class="cols3" style="margin-top:14px">
+    <div class="card f zoom"><div class="icon">🐄</div><h3>Copy-on-write</h3><p class="ps">Thay vì overwrite + WAL, một số DB (như <b>LMDB</b>) ghi page sửa đổi ra <b>vị trí mới</b>, tạo version mới của các parent page trỏ tới đó. Hữu ích cả cho concurrency control (snapshot isolation).</p></div>
+    <div class="card f zoom"><div class="icon">✂️</div><h3>Abbreviated keys</h3><p class="ps">Page ở interior chỉ cần đủ thông tin làm <b>boundary</b> giữa các range → rút gọn key. Nhiều key/page hơn → <b>branching factor</b> cao hơn → ít level hơn. (Biến thể này đôi khi gọi là <b>B+ tree</b>.)</p></div>
+    <div class="card f zoom"><div class="icon">📐</div><h3>Sequential leaf layout</h3><p class="ps">Cố xếp leaf page <b>tuần tự trên disk</b> để range scan khỏi seek mỗi page — khó giữ khi tree lớn lên. LSM-tree rewrite cả segment khi merge nên dễ giữ key gần nhau hơn.</p></div>
+  </div>
+  <div class="cols" style="margin-top:14px;gap:16px">
+    <div class="card f zoom" style="border-top:5px solid #f59e0b"><h3 style="color:#d97706">↔️ Sibling pointers</h3><p class="ps">Mỗi leaf page có ref tới page anh em bên trái/phải → scan key theo thứ tự mà không phải quay lại parent.</p>
+      <div style="display:flex;gap:6px;align-items:center;justify-content:center;margin-top:6px"><div class="page"><span class="pk">10</span><span class="pk">12</span></div><span class="op" style="font-size:20px">⇄</span><div class="page"><span class="pk">15</span><span class="pk">18</span></div><span class="op" style="font-size:20px">⇄</span><div class="page"><span class="pk">21</span><span class="pk">27</span></div></div></div>
+    <div class="card f zoom" style="border-top:5px solid #10b981"><h3 style="color:#059669">🌀 Fractal trees</h3><p class="ps">Biến thể B-tree mượn ý tưởng <b>log-structured</b> để giảm disk seek (và chẳng liên quan gì tới fractals 😄).</p></div>
+  </div>
+</section>
+
+<!-- ===================== LSM ADV ===================== -->
+<section class="slide" id="lsmadv">
+  <div class="hdr in"><span class="qn">17</span><h2>Comparing: <span class="grad">Advantages of LSM-trees</span></h2></div>
+  <div class="formula in" style="font-size:19px;margin-bottom:12px">Rule of thumb: LSM-trees thường <b style="color:#7c3aed">nhanh hơn cho writes</b> · B-trees thường <b style="color:#0891b2">nhanh hơn cho reads</b> — nhưng benchmark phải test với <b>workload của chính bạn</b>.</div>
+  <div class="cols" style="grid-template-columns:1.05fr 1fr;gap:22px">
+    <div class="card" style="padding:14px 18px">
+      <h3>Write amplification</h3>
+      <p class="ps">1 write vào database → <b>nhiều write xuống disk</b> trong suốt vòng đời data. Đặc biệt đáng lo với <b>SSD</b> (block chỉ overwrite được số lần hữu hạn).</p>
+      <div class="wa" id="wa">
+        <div class="war"><span class="nm">B-tree</span><span class="wb a">WAL</span><span class="wb b">page</span><span class="wb c">split?</span><span class="wb c">full page dù chỉ đổi vài byte</span></div>
+        <div class="war"><span class="nm">LSM-tree</span><span class="wb a">log</span><span class="wb b">flush SSTable</span><span class="wb c">compaction ×N</span></div>
+      </div>
+      <span class="f ghost" data-act="#wa|go" data-say="Cả hai đều ghi lại data nhiều lần. Nếu bottleneck là tốc độ ghi disk, write amplification là <b>chi phí performance trực tiếp</b>."></span>
+      <p class="say" style="font-size:17px;min-height:44px">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div class="stack">
+      <div class="leg a f"><b>📈 Write throughput cao hơn</b><p>Đôi khi write amplification thấp hơn, và ghi <b>tuần tự</b> các file SSTable gọn thay vì overwrite nhiều page — quan trọng nhất trên magnetic HDD.</p></div>
+      <div class="leg b f"><b>🗜️ Nén tốt hơn, file nhỏ hơn</b><p>B-tree để lại khoảng trống do <b>fragmentation</b> (page split, row không vừa page). LSM không page-oriented, định kỳ rewrite SSTable → storage overhead thấp (nhất là <b>leveled compaction</b>).</p></div>
+      <div class="leg c f"><b>💽 Trên SSD</b><p>Firmware SSD vốn dùng thuật toán log-structured để biến random write thành sequential, nhưng write amplification thấp và data gọn vẫn giúp phục vụ nhiều request hơn trong cùng I/O bandwidth.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== LSM DOWNSIDES ===================== -->
+<section class="slide" id="lsmdown">
+  <div class="hdr in"><span class="qn">18</span><h2>Downsides of LSM-trees <span class="muted" style="font-weight:600">&amp;</span> điểm mạnh của B-trees</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:22px">
+    <div>
+      <div class="card bad f"><span class="lbl bad">COMPACTION INTERFERENCE</span><p class="ps">Disk có tài nguyên hữu hạn → request có thể phải <b>chờ</b> compaction tốn kém. Throughput trung bình ít ảnh hưởng, nhưng <b>high percentiles</b> response time có thể rất cao; B-tree <b>predictable</b> hơn.</p></div>
+      <div class="card bad f" style="margin-top:10px"><span class="lbl bad">COMPACTION KHÔNG THEO KỊP</span><p class="ps">Disk write bandwidth chia giữa initial write và compaction threads. DB càng lớn, compaction càng tốn. Cấu hình không cẩn thận → segment chưa merge tăng mãi, <b>hết disk</b>, read chậm dần. SSTable engine thường <b>không throttle</b> write → cần <b>monitoring</b>.</p></div>
+    </div>
+    <div>
+      <div class="card" style="padding:14px 16px">
+        <h3>Disk bandwidth theo thời gian</h3>
+        <div class="bwr" id="bw">
+          <div class="bwl"><span>DB nhỏ</span><div class="bwb"><i class="iw" style="width:85%">initial writes</i><i class="ic" style="width:15%"></i></div></div>
+          <div class="bwl"><span>DB lớn</span><div class="bwb"><i class="iw" style="width:45%">writes</i><i class="ic" style="width:55%">compaction</i></div></div>
+          <div class="bwl"><span>quá tải</span><div class="bwb"><i class="iw" style="width:30%"></i><i class="ic" style="width:70%">compaction tụt lại ⚠️</i></div></div>
+        </div>
+        <span class="f ghost" data-act="#bw|go" data-say="Bandwidth dành cho compaction tăng dần theo kích thước database."></span>
+        <p class="say" style="font-size:17px;min-height:40px">Nhấn → để chạy từng bước.</p>
+      </div>
+      <div class="card good f" style="margin-top:10px"><span class="lbl good">B-TREE: MỖI KEY Ở ĐÚNG MỘT CHỖ</span><p class="ps">LSM có thể có nhiều bản copy của cùng key ở các segment. B-tree hấp dẫn cho <b>strong transactional semantics</b>: transaction isolation dùng <b>locks on ranges of keys</b> gắn trực tiếp vào tree (Chapter 7).</p></div>
+      <div class="note blue f" style="font-size:16px">B-trees đã ăn sâu vào kiến trúc DB và sẽ không biến mất; log-structured index ngày càng phổ biến ở datastore mới. Không có rule nhanh — hãy <b>test empirically</b>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SECONDARY / CLUSTERED ===================== -->
+<section class="slide" id="secidx">
+  <div class="hdr in"><span class="qn">19</span><h2>Other Indexing Structures</h2></div>
+  <div class="cols" style="grid-template-columns:.9fr 1.1fr;gap:22px">
+    <div>
+      <h3>Primary key vs secondary index</h3>
+      <ul class="mini">
+        <li><b>Primary key</b> định danh duy nhất một row / document / vertex; record khác tham chiếu tới nó qua key.</li>
+        <li><b>Secondary index</b> (<code class="i">CREATE INDEX</code>) rất quan trọng cho <b>join</b>. Khác biệt: key <b>không unique</b> → value là list row ID (như postings list) hoặc nối thêm row ID vào key cho unique.</li>
+        <li>Cả B-tree lẫn log-structured index đều làm được secondary index.</li>
+      </ul>
+      <div class="note f" style="font-size:17px">Clustered &amp; covering index tăng tốc read, nhưng tốn thêm storage, thêm overhead khi write, và DB phải cố gắng hơn để giữ <b>transactional guarantees</b> khi data bị duplicate.</div>
+    </div>
+    <div>
+      <h3>Lưu value ở đâu trong index?</h3>
+      <div class="ix3" id="ix3">
+        <div class="ixc" id="ixh"><b>Nonclustered + heap file</b>
+          <div class="flow" style="gap:6px;margin-top:6px"><span class="box o sm2">index<small>key → ref</small></span><span class="ar">→</span><span class="box h sm2">heap file<small>rows, không thứ tự</small></span></div>
+          <p class="ps">Nhiều secondary index cùng trỏ vào heap → data chỉ ở <b>một chỗ</b>. Value mới lớn hơn → phải dời row: update mọi index hoặc để lại <b>forwarding pointer</b>.</p></div>
+        <div class="ixc" id="ixc"><b>Clustered index</b>
+          <div class="flow" style="gap:6px;margin-top:6px"><span class="box m sm2">index<small>key → cả row</small></span></div>
+          <p class="ps">Bỏ “extra hop” sang heap. <b>InnoDB</b> (MySQL): primary key luôn là clustered index, secondary index trỏ về primary key. <b>SQL Server</b>: chọn được một clustered index mỗi table.</p></div>
+        <div class="ixc" id="ixv"><b>Covering index</b> <span class="muted">(index with included columns)</span>
+          <div class="flow" style="gap:6px;margin-top:6px"><span class="box cpp sm2">index<small>key → vài cột</small></span></div>
+          <p class="ps">Lưu <b>một số cột</b> trong index → vài query được trả lời chỉ bằng index (“index <b>covers</b> the query”).</p></div>
+      </div>
+      <span class="f ghost" data-act="#ixh|show" data-now="#ixh|glow" data-say=""></span>
+      <span class="f ghost" data-act="#ixc|show" data-now="#ixc|glow"></span>
+      <span class="f ghost" data-act="#ixv|show" data-now="#ixv|glow"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MULTI-COLUMN ===================== -->
+<section class="slide" id="multi">
+  <div class="hdr in"><span class="qn">20</span><h2>Multi-column indexes</h2></div>
+  <div class="cols" style="grid-template-columns:.95fr 1.05fr;gap:22px">
+    <div>
+      <h3>Concatenated index</h3>
+      <p class="ps">Ghép nhiều field thành một key, như danh bạ giấy: <b>(lastname, firstname)</b> → phone number.</p>
+      <div class="logf" id="pb" style="margin-top:8px;font-size:14px">
+        <div class="hd">📒 index on (lastname, firstname)</div>
+        <div class="r" id="pb1"><span class="kk">Le</span><span class="vv">An</span></div>
+        <div class="r" id="pb2"><span class="kk">Le</span><span class="vv">Binh</span></div>
+        <div class="r" id="pb3"><span class="kk">Nguyen</span><span class="vv">An</span></div>
+        <div class="r" id="pb4"><span class="kk">Nguyen</span><span class="vv">Chi</span></div>
+        <div class="r" id="pb5"><span class="kk">Nguyen</span><span class="vv">Dung</span></div>
+        <div class="r" id="pb6"><span class="kk">Tran</span><span class="vv">An</span></div>
+        <div class="r" id="pb7"><span class="kk">Tran</span><span class="vv">Hoa</span></div>
+      </div>
+      <p class="say" style="font-size:17px;min-height:48px">Nhấn → để chạy từng bước.</p>
+      <span class="f ghost" data-now="#pb3|okc;#pb4|okc;#pb5|okc" data-say="<code class='i'>lastname = 'Nguyen'</code>: các entry nằm <b>liền nhau</b> → index dùng tốt."></span>
+      <span class="f ghost" data-now="#pb1|badc;#pb3|badc;#pb6|badc" data-say="<code class='i'>firstname = 'An'</code>: rải rác khắp nơi → index <b>vô dụng</b>."></span>
+    </div>
+    <div>
+      <h3>Multi-dimensional indexes</h3>
+<script type="text/x-sql" class="xs">
+SELECT * FROM restaurants
+WHERE latitude  > 51.4946 AND latitude  < 51.5079
+  AND longitude > -0.1162 AND longitude < -0.1004;
+</script>
+      <div class="cols" style="grid-template-columns:200px 1fr;gap:12px;margin-top:8px;align-items:center">
+        <svg class="sv" id="geo" viewBox="0 0 200 170"><rect x="1" y="1" width="198" height="168" rx="12" fill="#fff" stroke="#e4dcfb" stroke-width="2"/><g class="g g1"><rect x="2" y="55" width="196" height="50" fill="rgba(124,58,237,.12)" stroke="#7c3aed" stroke-dasharray="5 4"/><text x="8" y="50" class="lb">latitude range</text></g><g class="g g2"><rect x="80" y="2" width="55" height="166" fill="rgba(8,145,178,.12)" stroke="#0891b2" stroke-dasharray="5 4"/><text x="138" y="164" class="lb" style="fill:#0891b2">longitude</text></g><circle cx="47.5" cy="21.2" r="3.6" fill="#c4b5fd"/><circle cx="84.9" cy="45.1" r="3.6" fill="#c4b5fd"/><circle cx="109.4" cy="17.1" r="3.6" fill="#c4b5fd"/><circle cx="112.0" cy="153.9" r="3.6" fill="#c4b5fd"/><circle cx="124.0" cy="97.8" r="3.6" fill="#c4b5fd"/><circle cx="19.4" cy="98.2" r="3.6" fill="#c4b5fd"/><circle cx="17.1" cy="42.0" r="3.6" fill="#c4b5fd"/><circle cx="110.4" cy="28.5" r="3.6" fill="#c4b5fd"/><circle cx="85.1" cy="91.3" r="3.6" fill="#c4b5fd"/><circle cx="113.0" cy="94.3" r="3.6" fill="#c4b5fd"/><circle cx="133.5" cy="23.9" r="3.6" fill="#c4b5fd"/><circle cx="113.1" cy="36.9" r="3.6" fill="#c4b5fd"/><circle cx="25.9" cy="117.7" r="3.6" fill="#c4b5fd"/><circle cx="111.8" cy="103.3" r="3.6" fill="#c4b5fd"/><circle cx="99.3" cy="89.9" r="3.6" fill="#c4b5fd"/><circle cx="151.0" cy="79.7" r="3.6" fill="#c4b5fd"/><circle cx="177.9" cy="63.7" r="3.6" fill="#c4b5fd"/><circle cx="53.7" cy="35.7" r="3.6" fill="#c4b5fd"/><circle cx="151.5" cy="20.6" r="3.6" fill="#c4b5fd"/><circle cx="63.2" cy="84.2" r="3.6" fill="#c4b5fd"/><circle cx="71.2" cy="77.1" r="3.6" fill="#c4b5fd"/><circle cx="120.0" cy="19.3" r="3.6" fill="#c4b5fd"/><circle cx="102.2" cy="33.4" r="3.6" fill="#c4b5fd"/><circle cx="70.9" cy="151.7" r="3.6" fill="#c4b5fd"/><circle cx="85.6" cy="156.2" r="3.6" fill="#c4b5fd"/><circle cx="22.3" cy="93.9" r="3.6" fill="#c4b5fd"/><circle cx="153.2" cy="134.0" r="3.6" fill="#c4b5fd"/><circle cx="70.6" cy="61.9" r="3.6" fill="#c4b5fd"/><circle cx="99.4" cy="130.7" r="3.6" fill="#c4b5fd"/><circle cx="20.7" cy="22.4" r="3.6" fill="#c4b5fd"/><circle cx="57.7" cy="115.3" r="3.6" fill="#c4b5fd"/><circle cx="20.0" cy="120.6" r="3.6" fill="#c4b5fd"/><circle cx="65.0" cy="97.0" r="3.6" fill="#c4b5fd"/><circle cx="133.3" cy="76.6" r="3.6" fill="#c4b5fd"/><circle cx="139.9" cy="144.6" r="3.6" fill="#c4b5fd"/><circle cx="71.8" cy="152.9" r="3.6" fill="#c4b5fd"/><circle cx="73.4" cy="102.1" r="3.6" fill="#c4b5fd"/><circle cx="98.8" cy="41.6" r="3.6" fill="#c4b5fd"/><circle cx="60.9" cy="121.7" r="3.6" fill="#c4b5fd"/><circle cx="81.2" cy="149.2" r="3.6" fill="#c4b5fd"/><circle cx="99.4" cy="33.6" r="3.6" fill="#c4b5fd"/><circle cx="81.9" cy="50.8" r="3.6" fill="#c4b5fd"/><circle cx="33.2" cy="74.3" r="3.6" fill="#c4b5fd"/><circle cx="109.2" cy="116.8" r="3.6" fill="#c4b5fd"/><circle cx="189.5" cy="113.1" r="3.6" fill="#c4b5fd"/><circle cx="78.0" cy="43.5" r="3.6" fill="#c4b5fd"/><g class="g g3"><rect x="80" y="55" width="55" height="50" fill="rgba(16,185,129,.18)" stroke="#10b981" stroke-width="2.5"/><circle cx="124.0" cy="97.8" r="4.5" fill="#10b981"/><circle cx="85.1" cy="91.3" r="4.5" fill="#10b981"/><circle cx="113.0" cy="94.3" r="4.5" fill="#10b981"/><circle cx="111.8" cy="103.3" r="4.5" fill="#10b981"/><circle cx="99.3" cy="89.9" r="4.5" fill="#10b981"/><circle cx="133.3" cy="76.6" r="4.5" fill="#10b981"/></g></svg>
+        <div>
+          <p class="ps">B-tree / LSM-tree chỉ cho <b>một</b> dải: hoặc theo latitude (mọi longitude), hoặc theo longitude — <b>không cả hai</b>.</p>
+          <p class="ps" style="margin-top:6px">Giải pháp: <b>space-filling curve</b> + B-tree thường, hoặc phổ biến hơn là <b>R-trees</b> (PostGIS dùng GiST của PostgreSQL).</p>
+        </div>
+      </div>
+      <span class="f ghost" data-act="#geo|s1" data-say="Index theo <b>latitude</b>: lấy cả một dải ngang."></span>
+      <span class="f ghost" data-act="#geo|s2" data-say="Index theo <b>longitude</b>: một dải dọc. Phần cần tìm chỉ là <b>giao</b> của hai dải."></span>
+      <span class="f ghost" data-act="#geo|s3" data-say="<b>2D index</b> thu hẹp đồng thời cả hai chiều. Không chỉ cho bản đồ: (red, green, blue) cho màu sản phẩm, (date, temperature) cho dữ liệu thời tiết — kỹ thuật của <b>HyperDex</b>."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FUZZY ===================== -->
+<section class="slide" id="fuzzy">
+  <div class="hdr in"><span class="qn">21</span><h2>Full-text search &amp; <span class="grad">fuzzy indexes</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:24px">
+    <div>
+      <p class="ps" style="font-size:18px">Các index trước giả định data <b>exact</b>: query đúng giá trị key hoặc một range. Muốn tìm key <b>tương tự</b> (vd. từ viết sai) cần kỹ thuật khác — <b>fuzzy querying</b>.</p>
+      <ul class="mini" style="margin-top:8px">
+        <li>Full-text search engine mở rộng query sang <b>synonyms</b>, bỏ qua biến thể ngữ pháp, tìm các từ <b>gần nhau</b> trong cùng document…</li>
+        <li><b>Lucene</b> tìm được từ trong một <b>edit distance</b> nhất định (distance 1 = thêm, xoá hoặc thay một chữ).</li>
+        <li>In-memory index của Lucene là một <b>finite state automaton</b> trên các ký tự của key (giống <b>trie</b>), biến đổi được thành <b>Levenshtein automaton</b>.</li>
+        <li>Hướng khác: document classification, machine learning.</li>
+      </ul>
+    </div>
+    <div class="card" style="padding:16px">
+      <h3>Edit distance demo</h3>
+      <div class="formula" style="font-size:20px">query: <span style="color:#be123c" id="fq">handbga</span></div>
+      <div class="kvs" style="margin-top:12px;justify-content:center" id="fz">
+        <span class="kv" id="fz1">handbag<small>d = 2</small></span><span class="kv" id="fz2">handbags<small>d = 3</small></span><span class="kv" id="fz3">hangar<small>d = 4</small></span><span class="kv" id="fz4">handgun<small>d = 4</small></span>
+      </div>
+      <div class="formula" style="font-size:20px;margin-top:14px">query: <span style="color:#be123c">handbg</span></div>
+      <div class="kvs" style="margin-top:12px;justify-content:center">
+        <span class="kv" id="fy1">handbag<small>d = 1 ✓</small></span><span class="kv" id="fy2">handbags<small>d = 2</small></span><span class="kv" id="fy3">hangar<small>d = 3</small></span>
+      </div>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+      <span class="f ghost" data-act="#fz1|hot" data-say="<code class='i'>handbga</code> → <code class='i'>handbag</code>: đổi chỗ 2 chữ = <b>2</b> thao tác thay thế."></span>
+      <span class="f ghost" data-act="#fy1|keep;#fy2|dead;#fy3|dead" data-say="<code class='i'>handbg</code> + thêm “a” = <code class='i'>handbag</code> → edit distance <b>1</b> → khớp với fuzzy query distance ≤ 1."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== IN-MEMORY ===================== -->
+<section class="slide" id="inmem">
+  <div class="hdr in"><span class="qn">22</span><h2>Keeping everything in memory</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:24px">
+    <div>
+      <p class="ps" style="font-size:18px">Mọi cấu trúc ở trên đều là câu trả lời cho <b>giới hạn của disk</b>. Ta chịu đựng disk vì: <b>durable</b> (mất điện không mất data) và <b>rẻ hơn RAM</b> mỗi GB. RAM ngày càng rẻ, nhiều dataset không lớn lắm → <b>in-memory databases</b>.</p>
+      <table style="margin-top:12px;font-size:16px">
+        <tr><th>Loại</th><th>Ví dụ</th></tr>
+        <tr class="f"><td>Cache only</td><td><b>Memcached</b> — mất data khi restart là chấp nhận được</td></tr>
+        <tr class="f"><td>Relational</td><td><b>VoltDB</b>, <b>MemSQL</b>, <b>Oracle TimesTen</b></td></tr>
+        <tr class="f"><td>Durable KV</td><td><b>RAMCloud</b> (log-structured cả trong memory lẫn disk)</td></tr>
+        <tr class="f"><td>Weak durability</td><td><b>Redis</b>, <b>Couchbase</b> — ghi disk <b>asynchronously</b></td></tr>
+      </table>
+      <p class="ps" style="margin-top:8px">Durability đạt được nhờ: battery-powered RAM, <b>log</b> thay đổi ra disk, <b>snapshot</b> định kỳ, hoặc <b>replicate</b> sang máy khác.</p>
+    </div>
+    <div>
+      <div class="card good f"><span class="lbl good">COUNTERINTUITIVE</span><p class="ps">Nhanh hơn <b>không phải</b> vì khỏi đọc disk — disk-based engine có đủ RAM thì OS cũng cache block rồi. Mà vì tránh được overhead <b>encode in-memory data structure</b> thành dạng ghi được ra disk.</p></div>
+      <div class="card f" style="margin-top:10px"><h3>🧩 Data model khó làm trên disk</h3><p class="ps"><b>Redis</b> cung cấp interface kiểu database cho <b>priority queues</b>, <b>sets</b>… — implementation đơn giản vì mọi thứ nằm trong memory.</p></div>
+      <div class="card f" style="margin-top:10px"><h3>🔮 Anti-caching &amp; NVM</h3><p class="ps"><b>Anti-caching</b>: hết memory thì evict data <b>least recently used</b> ra disk, load lại khi cần — như virtual memory/swap nhưng ở granularity từng <b>record</b> (index vẫn phải vừa RAM). <b>Non-volatile memory (NVM)</b> có thể thay đổi thiết kế storage engine.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== OLTP vs OLAP ===================== -->
+<section class="slide" id="oltp">
+  <div class="hdr in"><span class="qn">23</span><h2>Transaction Processing <span class="muted" style="font-weight:600">or</span> <span class="grad">Analytics?</span></h2></div>
+  <p class="in muted" style="font-size:18px"><b>Transaction</b> ban đầu gắn với giao dịch thương mại; nay chỉ một nhóm read/write tạo thành <b>logical unit</b> (không nhất thiết ACID). App tương tác → access pattern gọi là <b>online transaction processing (OLTP)</b>. Analytics thì khác hẳn → <b>online analytic processing (OLAP)</b>.</p>
+  <table class="tt" style="margin-top:12px;font-size:17.5px">
+    <tr><th style="text-align:left">Property · Table 3-1</th><th>Transaction processing (OLTP)</th><th>Analytic systems (OLAP)</th></tr>
+    <tr class="f"><td style="text-align:left;font-weight:700">Main read pattern</td><td>Ít record mỗi query, fetch theo <b>key</b></td><td><b>Aggregate</b> trên rất nhiều record</td></tr>
+    <tr class="f"><td style="text-align:left;font-weight:700">Main write pattern</td><td>Random-access, <b>low-latency</b> write từ user input</td><td><b>Bulk import (ETL)</b> hoặc event stream</td></tr>
+    <tr class="f"><td style="text-align:left;font-weight:700">Primarily used by</td><td>End user/customer qua web app</td><td>Internal analyst, cho <b>decision support</b></td></tr>
+    <tr class="f"><td style="text-align:left;font-weight:700">What data represents</td><td><b>Latest state</b> của data</td><td><b>History</b> các event theo thời gian</td></tr>
+    <tr class="f"><td style="text-align:left;font-weight:700">Dataset size</td><td>Gigabytes → terabytes</td><td>Terabytes → <b>petabytes</b></td></tr>
+  </table>
+  <div class="note blue f" style="font-size:17px">Analytic query điển hình: “Tổng doanh thu mỗi store trong tháng 1?”, “Khuyến mãi vừa rồi bán thêm bao nhiêu chuối?”, “Brand baby food nào hay được mua cùng tã brand X?” → phục vụ <b>business intelligence</b>.</div>
+</section>
+
+<!-- ===================== DATA WAREHOUSE ===================== -->
+<section class="slide" id="dw">
+  <div class="hdr in"><span class="qn">24</span><h2>Data Warehousing &amp; <span class="grad">ETL</span> <span class="muted" style="font-weight:600;font-size:24px">· Figure 3-8</span></h2></div>
+  <div class="cols" style="grid-template-columns:.8fr 1.2fr;gap:20px">
+    <div>
+      <p class="ps" style="font-size:18px">Doanh nghiệp có hàng chục hệ thống OLTP (website, point of sale, inventory, routing, suppliers, HR…). DBA <b>canh giữ</b> OLTP database — không muốn analyst chạy <b>ad hoc analytic query</b> đắt đỏ làm chậm transaction.</p>
+      <div class="card good f" style="margin-top:10px"><span class="lbl good">DATA WAREHOUSE</span><p class="ps">Database <b>riêng</b>, chứa <b>read-only copy</b> của data từ mọi hệ OLTP — analyst query thoải mái mà không ảnh hưởng OLTP, và được <b>tối ưu cho analytic access patterns</b>.</p></div>
+      <div class="note f" style="font-size:16px">Gần như mọi doanh nghiệp lớn đều có; công ty nhỏ hầu như không cần — data đủ nhỏ để query bằng SQL DB thường, hay thậm chí spreadsheet.</div>
+    </div>
+    <div>
+      <svg class="sv" id="etl" viewBox="0 0 660 400">
+        <defs><marker id="ah3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#a78bfa"/></marker></defs>
+        <g class="g g1">
+          <text x="80" y="22" text-anchor="middle" class="lb">OLTP systems</text>
+          <rect class="nd c3" x="10" y="40" width="140" height="60" rx="12"/><text x="80" y="67" text-anchor="middle">🛒 Sales DB</text><text x="80" y="86" text-anchor="middle" class="sm">customers mua hàng</text>
+          <rect class="nd c2" x="10" y="170" width="140" height="60" rx="12"/><text x="80" y="197" text-anchor="middle">📦 Inventory DB</text><text x="80" y="216" text-anchor="middle" class="sm">nhân viên kho</text>
+          <rect class="nd c4" x="10" y="300" width="140" height="60" rx="12"/><text x="80" y="327" text-anchor="middle">🚚 Geo DB</text><text x="80" y="346" text-anchor="middle" class="sm">lái xe giao hàng</text>
+        </g>
+        <g class="g g2">
+          <line class="ln" x1="150" y1="70" x2="250" y2="190" marker-end="url(#ah3)"/><line class="ln" x1="150" y1="200" x2="250" y2="200" marker-end="url(#ah3)"/><line class="ln" x1="150" y1="330" x2="250" y2="210" marker-end="url(#ah3)"/>
+          <rect class="nd" x="252" y="165" width="100" height="70" rx="12"/><text x="302" y="198" text-anchor="middle">Extract</text><text x="302" y="217" text-anchor="middle" class="sm">dump / stream</text>
+        </g>
+        <g class="g g3"><line class="ln" x1="352" y1="200" x2="390" y2="200" marker-end="url(#ah3)"/>
+          <rect class="nd c2" x="392" y="165" width="104" height="70" rx="12"/><text x="444" y="198" text-anchor="middle">Transform</text><text x="444" y="217" text-anchor="middle" class="sm">schema + clean</text></g>
+        <g class="g g4"><line class="ln" x1="496" y1="200" x2="530" y2="200" marker-end="url(#ah3)"/>
+          <rect class="nd c5" x="532" y="140" width="120" height="120" rx="14"/><text x="592" y="190" text-anchor="middle">🏛️ Data</text><text x="592" y="210" text-anchor="middle">warehouse</text><text x="592" y="235" text-anchor="middle" class="lb">Load</text></g>
+        <g class="g g5"><line class="ln" x1="592" y1="330" x2="592" y2="264" marker-end="url(#ah3)"/>
+          <rect class="nd c3" x="527" y="330" width="130" height="56" rx="12"/><text x="592" y="355" text-anchor="middle">📊 Analyst</text><text x="592" y="374" text-anchor="middle" class="sm">SQL · BI tools</text></g>
+      </svg>
+      <p class="say" style="font-size:17px;margin-top:0">Nhấn → để chạy từng bước.</p>
+      <span class="f ghost" data-act="#etl|s1" data-say="Mỗi hệ thống OLTP phục vụ một nhóm user, vận hành gần như <b>độc lập</b>."></span>
+      <span class="f ghost" data-act="#etl|s2" data-now="#etl .g2|hot" data-say="<b>Extract</b>: lấy data ra bằng periodic data dump hoặc continuous stream of updates."></span>
+      <span class="f ghost" data-act="#etl|s3" data-now="#etl .g3|hot" data-say="<b>Transform</b>: chuyển sang schema thân thiện cho analysis, làm sạch."></span>
+      <span class="f ghost" data-act="#etl|s4" data-now="#etl .g4|hot" data-say="<b>Load</b> vào data warehouse — toàn bộ quy trình gọi là <b>Extract–Transform–Load (ETL)</b>."></span>
+      <span class="f ghost" data-act="#etl|s5" data-now="#etl .g5|hot" data-say="Analyst query warehouse thoả thích (drill-down, slicing &amp; dicing) mà không đụng tới OLTP."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DIVERGENCE ===================== -->
+<section class="slide" id="diverge">
+  <div class="hdr in"><span class="qn">25</span><h2>OLTP databases <span class="muted" style="font-weight:600">vs</span> data warehouses</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:26px">
+    <div>
+      <p class="ps" style="font-size:19px">Bề ngoài giống nhau — cùng <b>SQL query interface</b>. Bên trong rất khác vì tối ưu cho <b>query patterns</b> khác nhau. Index ở nửa đầu chương tốt cho OLTP, nhưng <b>không giỏi</b> trả lời analytic query.</p>
+      <div class="flow f" style="margin-top:18px;justify-content:flex-start">
+        <div class="box cpp">OLTP engine</div><div class="ar">⟵</div><div class="box exe">SQL</div><div class="ar">⟶</div><div class="box m">Analytics engine</div>
+      </div>
+      <p class="ps f" style="margin-top:14px"><b>Microsoft SQL Server</b>, <b>SAP HANA</b> hỗ trợ cả hai trong một sản phẩm — nhưng ngày càng thành <b>hai storage &amp; query engine riêng</b>, chỉ chung SQL interface. Nhiều vendor chọn tập trung vào <b>một</b> trong hai.</p>
+    </div>
+    <div>
+      <h3>Commercial data warehouse</h3>
+      <div class="chips"><span class="chip p f">Teradata</span><span class="chip p f">Vertica</span><span class="chip p f">SAP HANA</span><span class="chip p f">ParAccel</span><span class="chip k f">Amazon RedShift <small>(hosted ParAccel)</small></span></div>
+      <h3 style="margin-top:16px">Open source SQL-on-Hadoop</h3>
+      <div class="chips"><span class="chip c f">Apache Hive</span><span class="chip c f">Spark SQL</span><span class="chip c f">Cloudera Impala</span><span class="chip c f">Facebook Presto</span><span class="chip c f">Apache Tajo</span><span class="chip c f">Apache Drill</span></div>
+      <div class="note blue f" style="font-size:17px">Một số dựa trên ý tưởng từ <b>Google Dremel</b>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== STAR SCHEMA ===================== -->
+<section class="slide" id="star">
+  <div class="hdr in"><span class="qn">26</span><h2>Stars &amp; Snowflakes: <span class="grad">Schemas for Analytics</span> <span class="muted" style="font-weight:600;font-size:22px">· Figure 3-9</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.25fr .9fr;gap:20px">
+    <div>
+      <svg class="sv" id="starsv" viewBox="0 0 680 440"><g class="g g1"><rect class="nd c3" x="255" y="95" width="170" height="190" rx="10"/><text x="265" y="116">fact_sales</text><line x1="255" y1="124" x2="425" y2="124" stroke="#ece8f7"/><text x="265" y="142" class="sm">date_key</text><text x="265" y="161" class="sm">product_sk</text><text x="265" y="180" class="sm">store_sk</text><text x="265" y="199" class="sm">promotion_sk</text><text x="265" y="218" class="sm">customer_sk</text><text x="265" y="237" class="sm">quantity</text><text x="265" y="256" class="sm">net_price</text><text x="265" y="275" class="sm">discount_price</text></g><g class="g g2"><line class="ln" x1="255" y1="165" x2="185" y2="90"/><rect class="nd " x="10" y="10" width="175" height="133" rx="10"/><text x="20" y="31">dim_product</text><line x1="10" y1="39" x2="185" y2="39" stroke="#ece8f7"/><text x="20" y="57" class="sm">product_sk</text><text x="20" y="76" class="sm">sku</text><text x="20" y="95" class="sm">description</text><text x="20" y="114" class="sm">brand</text><text x="20" y="133" class="sm">category</text></g><g class="g g3"><line class="ln" x1="425" y1="175" x2="495" y2="90"/><rect class="nd c2" x="495" y="10" width="175" height="114" rx="10"/><text x="505" y="31">dim_store</text><line x1="495" y1="39" x2="670" y2="39" stroke="#ece8f7"/><text x="505" y="57" class="sm">store_sk</text><text x="505" y="76" class="sm">state</text><text x="505" y="95" class="sm">city</text><text x="505" y="114" class="sm">has_bakery</text></g><g class="g g4"><line class="ln" x1="255" y1="230" x2="185" y2="330"/><rect class="nd c4" x="10" y="270" width="175" height="133" rx="10"/><text x="20" y="291">dim_date</text><line x1="10" y1="299" x2="185" y2="299" stroke="#ece8f7"/><text x="20" y="317" class="sm">date_key</text><text x="20" y="336" class="sm">year</text><text x="20" y="355" class="sm">month</text><text x="20" y="374" class="sm">weekday</text><text x="20" y="393" class="sm">is_holiday</text></g><g class="g g5"><line class="ln" x1="425" y1="250" x2="495" y2="270"/><rect class="nd c5" x="495" y="240" width="175" height="95" rx="10"/><text x="505" y="261">dim_customer</text><line x1="495" y1="269" x2="670" y2="269" stroke="#ece8f7"/><text x="505" y="287" class="sm">customer_sk</text><text x="505" y="306" class="sm">name</text><text x="505" y="325" class="sm">date_of_birth</text><line class="ln" x1="340" y1="365" x2="340" y2="372"/><rect class="nd c2" x="250" y="372" width="180" height="57" rx="10"/><text x="260" y="393">dim_promotion</text><line x1="250" y1="401" x2="430" y2="401" stroke="#ece8f7"/><text x="260" y="419" class="sm">promotion_sk · name</text></g><g class="g g6"><text x="340" y="80" text-anchor="middle" class="lb" style="fill:#db2777">⭐ star schema</text></g></svg>
+    </div>
+    <div>
+      <ul class="mini">
+        <li><b>Star schema</b> (dimensional modeling): ở giữa là <b>fact table</b> — mỗi row là một <b>event</b> (một lần mua hàng, page view, click…).</li>
+        <li>Một số cột là <b>attributes</b> (price, cost → profit margin); số khác là <b>foreign key</b> tới <b>dimension tables</b>: <i>who, what, where, when, how, why</i>.</li>
+        <li>Fact table có thể cực lớn: Apple, Walmart, eBay — <b>hàng chục petabytes</b>.</li>
+        <li>Cả date/time cũng là dimension → encode thêm thông tin như ngày lễ.</li>
+      </ul>
+      <div class="note blue f" style="font-size:16px"><b>Snowflake schema</b>: dimension bị chia tiếp thành <b>subdimensions</b> (vd. dim_product → brand, category). Normalized hơn, nhưng star schema được ưa chuộng vì <b>dễ dùng</b> cho analyst.</div>
+      <div class="note f" style="font-size:16px">Table rất <b>wide</b>: fact table thường &gt; 100 cột, đôi khi vài trăm.</div>
+      <p class="say" style="font-size:16px;min-height:40px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+  <span class="f ghost" data-o="0" data-act="#starsv|s1" data-say="<b>fact_sales</b>: mỗi row = một khách mua một sản phẩm."></span>
+  <span class="f ghost" data-o="0" data-act="#starsv|s2" data-now="#starsv .g2|hot" data-say="<b>dim_product</b>: SKU, description, brand, category…"></span>
+  <span class="f ghost" data-o="0" data-act="#starsv|s3" data-now="#starsv .g3|hot" data-say="<b>dim_store</b>: có bakery không, diện tích, ngày khai trương…"></span>
+  <span class="f ghost" data-o="0" data-act="#starsv|s4" data-now="#starsv .g4|hot" data-say="<b>dim_date</b>: weekday, is_holiday…"></span>
+  <span class="f ghost" data-o="0" data-act="#starsv|s5" data-now="#starsv .g5|hot" data-say="<b>dim_customer</b> và <b>dim_promotion</b>…"></span>
+  <span class="f ghost" data-o="0" data-act="#starsv|s6" data-say="Vẽ ra thì fact table ở giữa, dimension xung quanh như <b>tia của ngôi sao</b> → “star schema”."></span>
+</section>
+
+<!-- ===================== COLUMN STORAGE ===================== -->
+<section class="slide" id="colstore">
+  <div class="hdr in"><span class="qn">27</span><h2>Column-Oriented Storage <span class="muted" style="font-weight:600;font-size:22px">· Example 3-1 &amp; Figure 3-10</span></h2></div>
+  <div class="cols" style="grid-template-columns:.85fr 1.15fr;gap:18px">
+    <div>
+<script type="text/x-sql" class="xxs" id="q31" data-mark="3:a;5:a;7:a;10-11:a">
+SELECT
+  dim_date.weekday, dim_product.category,
+  SUM(fact_sales.quantity) AS quantity_sold
+FROM fact_sales
+  JOIN dim_date
+    ON fact_sales.date_key = dim_date.date_key
+  JOIN dim_product
+    ON fact_sales.product_sk = dim_product.product_sk
+WHERE
+  dim_date.year = 2013 AND
+  dim_product.category IN ('Fresh fruit', 'Candy')
+GROUP BY
+  dim_date.weekday, dim_product.category;
+</script>
+      <p class="ps" style="margin-top:8px">Fact table &gt; 100 cột, nhưng query chỉ đụng <b>3 cột</b>: <code class="i">date_key</code>, <code class="i">product_sk</code>, <code class="i">quantity</code>. Query analytics hiếm khi cần <code class="i">SELECT *</code>.</p>
+      <p class="say" style="font-size:17px;min-height:70px">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <table class="grid-t" id="cs"><tr><th class="u">date_key</th><th class="u">product_sk</th><th class="">store_sk</th><th class="">promotion_sk</th><th class="">customer_sk</th><th class="u">quantity</th><th class="">net_price</th><th class="">discount_price</th></tr><tr><td class="u">140102</td><td class="u">69</td><td class="">4</td><td class="">NULL</td><td class="">NULL</td><td class="u">1</td><td class="">13.99</td><td class="">13.99</td></tr><tr><td class="u">140102</td><td class="u">69</td><td class="">5</td><td class="">19</td><td class="">NULL</td><td class="u">3</td><td class="">14.99</td><td class="">9.99</td></tr><tr><td class="u">140102</td><td class="u">69</td><td class="">5</td><td class="">NULL</td><td class="">191</td><td class="u">1</td><td class="">14.99</td><td class="">14.99</td></tr><tr><td class="u">140102</td><td class="u">74</td><td class="">3</td><td class="">23</td><td class="">202</td><td class="u">5</td><td class="">0.99</td><td class="">0.89</td></tr><tr><td class="u">140103</td><td class="u">31</td><td class="">2</td><td class="">NULL</td><td class="">NULL</td><td class="u">1</td><td class="">2.49</td><td class="">2.49</td></tr><tr><td class="u">140103</td><td class="u">31</td><td class="">3</td><td class="">NULL</td><td class="">NULL</td><td class="u">3</td><td class="">14.99</td><td class="">9.99</td></tr><tr><td class="u">140103</td><td class="u">31</td><td class="">3</td><td class="">21</td><td class="">123</td><td class="u">1</td><td class="">49.99</td><td class="">39.99</td></tr><tr><td class="u">140103</td><td class="u">31</td><td class="">8</td><td class="">NULL</td><td class="">233</td><td class="u">1</td><td class="">0.99</td><td class="">0.99</td></tr></table>
+      <div class="stack pend" id="csfiles" style="margin-top:10px;gap:5px"><div class="strip"><b>date_key file:</b><span class="">140102</span><span class="">140102</span><span class="">140102</span><span class="">140102</span><span class="">140103</span><span class="">140103</span><span class="">140103</span><span class="">140103</span><span class="gap">…</span></div><div class="strip"><b>product_sk file:</b><span class="r1">69</span><span class="r1">69</span><span class="r1">69</span><span class="r1">74</span><span class="r1">31</span><span class="r1">31</span><span class="r1">31</span><span class="r1">31</span><span class="gap">…</span></div><div class="strip"><b>quantity file:</b><span class="r1">1</span><span class="r1">3</span><span class="r1">1</span><span class="r1">5</span><span class="r1">1</span><span class="r1">3</span><span class="r1">1</span><span class="r1">1</span><span class="gap">…</span></div></div>
+    </div>
+  </div>
+  <span class="f ghost" data-now="#cs|rowread" data-say="<b>Row-oriented</b> (đa số OLTP, cả document DB): mọi giá trị của một row nằm cạnh nhau. Dù có index, vẫn phải load <b>cả row</b> (100+ attributes) từ disk, parse, rồi filter."></span>
+  <span class="f ghost" data-act="#cs|colread;#q31|show-a" data-say="<b>Column-oriented</b>: lưu mọi giá trị của <b>mỗi cột</b> cùng nhau, mỗi cột một file → query chỉ đọc &amp; parse đúng các cột nó dùng."></span>
+  <span class="f ghost" data-act="#csfiles|show" data-say="Mỗi column file giữ row <b>cùng thứ tự</b>: muốn dựng lại row thứ 23 thì lấy entry thứ 23 của mọi column file. (<b>Parquet</b> là columnar format hỗ trợ cả document data model, dựa trên Dremel.)"></span>
+</section>
+
+<!-- ===================== COLUMN COMPRESSION ===================== -->
+<section class="slide" id="colcomp">
+  <div class="hdr in"><span class="qn">28</span><h2>Column Compression: <span class="grad">bitmap encoding</span> <span class="muted" style="font-weight:600;font-size:22px">· Figure 3-11</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.45fr .85fr;gap:18px">
+    <div class="card" style="padding:12px 14px">
+      <div class="bm" id="bm"><span class="lb2">row</span><span class="ix">0</span><span class="ix">1</span><span class="ix">2</span><span class="ix">3</span><span class="ix">4</span><span class="ix">5</span><span class="ix">6</span><span class="ix">7</span><span class="ix">8</span><span class="ix">9</span><span class="ix">10</span><span class="ix">11</span><span class="ix">12</span><span class="ix">13</span><span class="ix">14</span><span class="ix">15</span><span class="ix">16</span><span class="ix">17</span><span class="lb2">product_sk</span><span class="vl">69</span><span class="vl">69</span><span class="vl">69</span><span class="vl">69</span><span class="vl">74</span><span class="vl">31</span><span class="vl">31</span><span class="vl">31</span><span class="vl">31</span><span class="vl">29</span><span class="vl">30</span><span class="vl">30</span><span class="vl">31</span><span class="vl">31</span><span class="vl">31</span><span class="vl">68</span><span class="vl">69</span><span class="vl">69</span><span class="lb2 h rb">= 29</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b1 o29">1</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="lb2 h rb">= 30</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b1 o30">1</span><span class="h rb b1 o30">1</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="lb2 h rb">= 31</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b1 o31">1</span><span class="h rb b1 o31">1</span><span class="h rb b1 o31">1</span><span class="h rb b1 o31">1</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b1 o31">1</span><span class="h rb b1 o31">1</span><span class="h rb b1 o31">1</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="lb2 h rb">= 68</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b1 o68">1</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="lb2 h rb">= 69</span><span class="h rb b1 o69">1</span><span class="h rb b1 o69">1</span><span class="h rb b1 o69">1</span><span class="h rb b1 o69">1</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b1 o69">1</span><span class="h rb b1 o69">1</span><span class="lb2 h rb">= 74</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b1 o74">1</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="h rb b0">0</span><span class="lb2 h ro" style="color:#047857">OR 30,68,69</span><span class="h ro res1">1</span><span class="h ro res1">1</span><span class="h ro res1">1</span><span class="h ro res1">1</span><span class="h ro res0">0</span><span class="h ro res0">0</span><span class="h ro res0">0</span><span class="h ro res0">0</span><span class="h ro res0">0</span><span class="h ro res0">0</span><span class="h ro res1">1</span><span class="h ro res1">1</span><span class="h ro res0">0</span><span class="h ro res0">0</span><span class="h ro res0">0</span><span class="h ro res1">1</span><span class="h ro res1">1</span><span class="h ro res1">1</span></div><div class="rle" id="rle"><span><b>29:</b> 9, 1 (rest 0s)</span><span><b>30:</b> 10, 2 (rest 0s)</span><span><b>31:</b> 5, 4, 3, 3 (rest 0s)</span><span><b>68:</b> 15, 1 (rest 0s)</span><span><b>69:</b> 0, 4, 12, 2 (rest 0s)</span><span><b>74:</b> 4, 1 (rest 0s)</span></div>
+    </div>
+    <div>
+      <p class="ps">Số <b>distinct values</b> thường nhỏ so với số row (tỉ giao dịch nhưng chỉ ~100.000 sản phẩm). Cột có n giá trị khác nhau → <b>n bitmap</b>, mỗi row một bit: 1 nếu row có giá trị đó.</p>
+      <p class="ps" style="margin-top:8px">n nhỏ (vd. ~200 quốc gia) → 1 bit/row. n lớn → bitmap <b>sparse</b> (nhiều số 0) → thêm <b>run-length encoding</b>, cực kỳ gọn.</p>
+      <p class="say" style="font-size:16px;min-height:88px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+  <span class="f ghost" data-act="#bm|sb" data-say="Mỗi distinct value của <code class='i'>product_sk</code> → một <b>bitmap</b>, mỗi row một bit."></span>
+  <span class="f ghost" data-act="#rle|show" data-say="Bitmap sparse → <b>run-length encoding</b>: đếm luân phiên số 0, số 1… Ví dụ <b>29: 9, 1</b> = 9 số 0, 1 số 1, còn lại 0."></span>
+  <span class="f ghost" data-now=".o30,.o68,.o69|glowr" data-say="<code class='i'>WHERE product_sk IN (30, 68, 69)</code>: load 3 bitmap…"></span>
+  <span class="f ghost" data-act="#bm|so" data-say="…tính <b>bitwise OR</b> — cực nhanh. Còn <code class='i'>product_sk = 31 AND store_sk = 3</code> thì <b>bitwise AND</b> hai bitmap: bit thứ k ở mọi cột đều ứng với cùng row k."></span>
+</section>
+
+<!-- ===================== VECTORIZED ===================== -->
+<section class="slide" id="vector">
+  <div class="hdr in"><span class="qn">29</span><h2>Memory bandwidth &amp; <span class="grad">vectorized processing</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.05fr 1fr;gap:24px">
+    <div>
+      <p class="ps" style="font-size:18px">Scan hàng triệu row: bottleneck lớn là bandwidth <b>disk → memory</b>. Nhưng dev analytical DB còn lo bandwidth <b>main memory → CPU cache</b>, tránh <b>branch mispredictions</b> và “bubbles” trong CPU pipeline, tận dụng <b>SIMD</b> instructions.</p>
+      <div class="pipe" id="pipe">
+        <div class="pz">💾 disk<small>compressed columns</small></div><span class="ar">→</span>
+        <div class="pz">🧠 RAM</div><span class="ar">→</span>
+        <div class="pz l1">⚡ L1 cache<small>chunk vừa khít</small></div><span class="ar">→</span>
+        <div class="pz cpu">CPU · SIMD<small>tight loop</small></div>
+      </div>
+      <div class="stack" style="margin-top:12px">
+        <div class="leg a f"><b>Tight loop</b><p>Lấy một chunk compressed column vừa <b>L1 cache</b>, lặp qua trong vòng lặp không có function call — nhanh hơn nhiều so với code gọi hàm và rẽ nhánh cho mỗi record.</p></div>
+        <div class="leg b f"><b>Vectorized processing</b><p>Operator như bitwise <b>AND</b>/<b>OR</b> chạy <b>trực tiếp</b> trên chunk compressed data. Compression giúp nhét được nhiều row hơn vào cùng L1 cache.</p></div>
+      </div>
+    </div>
+    <div>
+      <div class="card bad f"><span class="lbl bad">CẨN THẬN: COLUMN FAMILIES</span><p class="ps"><b>Cassandra</b> và <b>HBase</b> có khái niệm <b>column families</b> (thừa kế từ <b>Bigtable</b>). Gọi chúng là column-oriented là <b>rất misleading</b>: trong mỗi column family, chúng lưu mọi cột của một row cùng nhau kèm row key, và <b>không</b> dùng column compression.</p>
+        <div class="formula" style="font-size:16px;margin-top:8px">Bigtable model ≈ vẫn chủ yếu <b>row-oriented</b></div></div>
+      <div class="simd f" id="simd" style="margin-top:14px">
+        <div class="rowlbl">scalar: 1 phần tử / lệnh</div>
+        <div class="lanes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="rowlbl">SIMD: cả vector / lệnh</div>
+        <div class="lanes v"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SORT ORDER ===================== -->
+<section class="slide" id="sort">
+  <div class="hdr in"><span class="qn">30</span><h2>Sort Order in Column Storage <span class="muted" style="font-weight:600">&amp;</span> Writing</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr;gap:22px">
+    <div>
+      <p class="ps">Không thể sort <b>từng cột độc lập</b> (sẽ mất liên kết entry thứ k ↔ row k). Phải sort <b>cả row</b> dù lưu theo cột. Admin chọn sort key theo query thường gặp — vd. <code class="i">date_key</code> trước, <code class="i">product_sk</code> sau.</p>
+      <div class="card" style="margin-top:10px;padding:12px">
+        <div class="rowlbl">date_key (insertion order)</div>
+        <div class="arr xs left" id="so1"><div class="cell">03<small>140103</small></div><div class="cell">01<small>140101</small></div><div class="cell">02<small>140102</small></div><div class="cell">01<small>140101</small></div><div class="cell">03<small>140103</small></div><div class="cell">02<small>140102</small></div><div class="cell">01<small>140101</small></div><div class="cell">01<small>140101</small></div><div class="cell">03<small>140103</small></div></div>
+        <div class="rowlbl">date_key (sorted — first sort key)</div>
+        <div class="arr xs left pend" id="so2"><div class="cell done" style="transform:none">01<small>140101</small></div><div class="cell done" style="transform:none">01<small>140101</small></div><div class="cell done" style="transform:none">01<small>140101</small></div><div class="cell done" style="transform:none">01<small>140101</small></div><div class="cell new" style="transform:none">02<small>140102</small></div><div class="cell new" style="transform:none">02<small>140102</small></div><div class="cell cmp" style="transform:none">03<small>140103</small></div><div class="cell cmp" style="transform:none">03<small>140103</small></div><div class="cell cmp" style="transform:none">03<small>140103</small></div></div>
+        <div class="rowlbl pend" id="so3l">run-length encoded</div>
+        <div class="chips pend" id="so3"><span class="chip g">140101 × 4</span><span class="chip p">140102 × 2</span><span class="chip c">140103 × 3</span></div>
+      </div>
+      <p class="say" style="font-size:16px;min-height:48px">Nhấn → để chạy từng bước.</p>
+      <span class="f ghost" data-act="#so2|show" data-say="Sort theo <b>first sort key</b>: query theo khoảng ngày chỉ scan đúng các row tháng cần."></span>
+      <span class="f ghost" data-act="#so3|show;#so3l|show" data-say="Cột sort đầu tiên có <b>chuỗi lặp dài</b> → run-length encoding nén còn vài KB dù table có hàng tỉ row. Cột sort thứ 2, 3 lộn xộn hơn, nén kém hơn."></span>
+    </div>
+    <div>
+      <div class="card f"><h3>🔀 Several different sort orders</h3><p class="ps"><b>C-Store</b>, rồi <b>Vertica</b>: data vốn phải <b>replicate</b> sang nhiều máy, vậy lưu mỗi bản sao theo <b>sort order khác nhau</b> — query dùng bản hợp nhất. Giống nhiều secondary index, nhưng column store <b>không có pointer</b>, chỉ có cột chứa value.</p></div>
+      <div class="card f" style="margin-top:10px"><h3>✍️ Writing to Column-Oriented Storage</h3><p class="ps">Compression + sort giúp read nhanh nhưng làm write khó: <b>update-in-place</b> kiểu B-tree là bất khả; insert giữa table phải rewrite mọi column file.</p>
+        <div class="flow" style="margin-top:8px;gap:8px"><div class="box o sm2">in-memory store<small>sorted (row hay column đều được)</small></div><div class="ar">→</div><div class="box m sm2">merge vào column files<small>ghi file mới, bulk</small></div></div>
+        <p class="ps" style="margin-top:6px">Đúng ý tưởng <b>LSM-tree</b> — Vertica làm vậy. Query optimizer kết hợp data trên disk và write mới trong memory; analyst thấy thay đổi <b>ngay lập tức</b>.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DATA CUBE ===================== -->
+<section class="slide" id="cube">
+  <div class="hdr in"><span class="qn">31</span><h2>Aggregation: <span class="grad">Data Cubes &amp; Materialized Views</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:22px">
+    <div>
+      <p class="ps">Query warehouse hay dùng <code class="i">COUNT</code>, <code class="i">SUM</code>, <code class="i">AVG</code>, <code class="i">MIN</code>, <code class="i">MAX</code>. Cùng aggregate dùng đi dùng lại → sao không <b>cache</b>?</p>
+      <table style="margin-top:10px;font-size:16px">
+        <tr><th></th><th>Virtual view</th><th>Materialized view</th></tr>
+        <tr><td>Bản chất</td><td>shortcut viết query, expand on the fly</td><td><b>bản copy thật</b> của kết quả, ghi ra disk</td></tr>
+        <tr><td>Data đổi</td><td>—</td><td>phải update (denormalized copy) → write đắt</td></tr>
+        <tr><td>Hợp với</td><td>mọi nơi</td><td><b>read-heavy</b> warehouse, hiếm trong OLTP</td></tr>
+      </table>
+      <div class="cols" style="margin-top:12px;gap:12px">
+        <div class="card good f"><span class="lbl good">ƯU</span><p class="ps">Query kiểu “tổng sales mỗi store hôm qua” đã <b>precomputed</b> — khỏi scan triệu row.</p></div>
+        <div class="card bad f"><span class="lbl bad">NHƯỢC</span><p class="ps">Kém linh hoạt: không tính được tỉ lệ sales của item &gt; $100 vì price không phải dimension → vẫn giữ <b>raw data</b>.</p></div>
+      </div>
+    </div>
+    <div class="card" style="padding:14px 16px">
+      <h3>Data cube / OLAP cube <span class="muted" style="font-size:15px;font-weight:600">· SUM(net_price) · số liệu minh hoạ</span></h3>
+      <table class="tt cube" id="cubet" style="font-size:16px;margin-top:6px"><tr><th>date ＼ product_sk</th><th>32</th><th>33</th><th>34</th><th>35</th><th>total</th></tr><tr><td>140101</td><td class="cv">149.60</td><td class="cv">31.01</td><td class="cv">84.58</td><td class="cv">28.40</td><td class="rtot">293.59</td></tr><tr><td>140102</td><td class="cv">132.18</td><td class="cv">19.36</td><td class="cv">82.91</td><td class="cv">10.99</td><td class="rtot">245.44</td></tr><tr><td>140103</td><td class="cv">196.75</td><td class="cv">0.00</td><td class="cv">23.12</td><td class="cv">49.98</td><td class="rtot">269.85</td></tr><tr><td>total</td><td class="ctot">478.53</td><td class="ctot">50.37</td><td class="ctot">190.61</td><td class="ctot">89.37</td><td class="gt">808.88</td></tr></table>
+      <p class="say" style="font-size:16px;min-height:66px">Nhấn → để chạy từng bước.</p>
+      <span class="f ghost" data-act="#cubet|c1" data-say="Mỗi cell = <b>SUM(net_price)</b> của mọi fact có tổ hợp date × product đó."></span>
+      <span class="f ghost" data-act="#cubet|c2" data-say="Aggregate theo từng <b>row</b>: sales theo date, bất kể product — giảm đi một dimension."></span>
+      <span class="f ghost" data-act="#cubet|c3" data-say="Aggregate theo từng <b>column</b>: sales theo product, bất kể date. Thực tế thường nhiều dimension hơn (date, product, store, promotion, customer → <b>hypercube 5 chiều</b>)."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="slide" id="end">
+  <div class="title-wrap" style="align-items:center;text-align:center">
+    <div class="orb" style="width:360px;height:360px;background:#f9a8d4;left:10%;top:10%"></div>
+    <h1 class="in" style="font-size:56px">Tóm tắt <span class="grad">Chapter 3</span></h1>
+    <p class="in muted" style="font-size:19px;margin-top:8px;max-width:1080px">Storage engine chia làm hai nhóm lớn: tối ưu cho <b>transaction processing (OLTP)</b> và tối ưu cho <b>analytics (OLAP)</b>.</p>
+    <div class="cols3 in" style="margin-top:18px;text-align:left;max-width:1200px">
+      <div class="card"><h3>📝 Log-structured school</h3><p class="ps">Chỉ append và xoá file lỗi thời, <b>không bao giờ update</b> file đã ghi: Bitcask, SSTables, LSM-trees, LevelDB, Cassandra, HBase, Lucene. Biến random write thành <b>sequential write</b> → write throughput cao.</p></div>
+      <div class="card"><h3>📄 Update-in-place school</h3><p class="ps">Disk = tập <b>fixed-size pages</b> được overwrite. <b>B-trees</b> là đại diện lớn nhất — có trong mọi relational DB lớn và nhiều nonrelational DB.</p></div>
+      <div class="card"><h3>📊 Analytics</h3><p class="ps">OLTP: user-facing, ít record/query, bottleneck là <b>disk seek time</b>. OLAP: ít query nhưng mỗi query scan hàng triệu row, bottleneck là <b>disk bandwidth</b> → <b>column-oriented storage</b>, compression.</p></div>
+    </div>
+    <p class="in muted" style="font-size:18px;margin-top:18px;max-width:1080px">Hiểu internals giúp chọn tool phù hợp, hình dung tác động của tuning parameters, và đọc hiểu documentation của database bạn chọn. Chapter 4 → <b>Encoding &amp; Evolution</b>.</p>
+  </div>
+</section>
+
+</div></div>
+<div id="bar"></div>
+<div id="hint">← → / Space: từng bước · Shift+→: qua slide · A: hiện hết · Home: đầu · F: toàn màn hình</div>
+<div id="nav"><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+<script>
+(function(){
+  // ---------- highlighter (sql / sh) ----------
+  const LANG={
+    sql:{kw:new Set("SELECT FROM JOIN ON WHERE AND OR IN GROUP BY AS ORDER LIMIT NOT NULL".split(" ")),fn:new Set("SUM COUNT AVG MIN MAX".split(" ")),cm:/--.*$/,ci:true},
+    sh:{kw:new Set("echo grep sed tail cat".split(" ")),fn:new Set(),cm:/#.*$/,ci:false}
+  };
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line,L){
+    const cm=line.match(L.cm);let tailC="";
+    if(cm&&!/["']/.test(line.slice(0,cm.index))){tailC='<span class="c">'+esc(cm[0])+'</span>';line=line.slice(0,cm.index)}
+    const re=/("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(\$\w+)|\b(-?\d+(?:\.\d+)?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="s">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="n">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="n">'+m[3]+'</span>';
+      else if(m[4]){
+        const w=m[4],W=L.ci?w.toUpperCase():w;
+        let cls=L.kw.has(W)?"k":L.fn.has(W)?"fn":(m[5]?"fn":"");
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[5]?esc(m[5]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last))+tailC;
+  }
+  document.querySelectorAll('script[type^="text/x-"]').forEach(sc=>{
+    const L=LANG[sc.type.slice(7)]||LANG.sql;
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");const [a,b]=r.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l,L)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+  // ---------- deck engine ----------
+  // .f fragments, shown one per step. Per fragment:
+  //   data-act  "sel|cls;…"   class kept while the fragment is shown
+  //   data-now  "sel|cls;…"   class only while it is the latest fragment
+  //   data-set  "sel::html;…" content set while shown (later fragments win)
+  //   data-say  narration for the .say line
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")].sort((x,y)=>(+x.dataset.o||0)-(+y.dataset.o||0)); // data-o: show later
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  const pairs=(v,sep)=>(v||"").split(";").filter(Boolean).map(p=>{const k=p.indexOf(sep);return [p.slice(0,k).trim(),p.slice(k+sep.length)]});
+  function tog(v,on){pairs(v,"|").forEach(([sel,cls])=>{document.querySelectorAll(sel).forEach(t=>t.classList.toggle(cls,on))})}
+  // remember original content of every data-set target
+  document.querySelectorAll("[data-set]").forEach(f=>pairs(f.dataset.set,"::").forEach(([sel])=>{document.querySelectorAll(sel).forEach(t=>{if(t.dataset.orig===undefined)t.dataset.orig=t.innerHTML})}));
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach(f=>{tog(f.dataset.now,false);tog(f.dataset.act,false)});
+      s.querySelectorAll("[data-orig]").forEach(t=>t.innerHTML=t.dataset.orig);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step);f.classList.toggle("on",on);if(on){tog(f.dataset.act,true);pairs(f.dataset.set,"::").forEach(([sel,val])=>document.querySelectorAll(sel).forEach(t=>t.innerHTML=val))}});
+      if(i===cur&&step>0)tog(fs[step-1].dataset.now,true);
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.innerHTML=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length;
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    try{history.replaceState(null,"","#"+slides[cur].id)}catch(e){}
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+  addEventListener("keydown",e=>{
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+
+</script>
+</body>
+</html>

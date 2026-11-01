@@ -1,0 +1,1662 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DDIA Chapter 9 · Consistency &amp; Consensus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+h1{font-size:70px;line-height:1.1;font-weight:800}
+h2{font-size:38px;line-height:1.2;font-weight:800}
+h3{font-size:23px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:22px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:26px;margin:6px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.88em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 6px;border-radius:6px;color:#be185d}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.cols.c64{grid-template-columns:1.25fr 1fr}.cols.c46{grid-template-columns:1fr 1.2fr}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.card.bad{border-color:#fecdd3;background:linear-gradient(180deg,#fff1f3,#fff)}
+.card.good{border-color:#a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff)}
+.lbl{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
+.icon{font-size:34px;margin-bottom:4px}
+.note{margin-top:12px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:20px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.code{font-family:var(--mono);font-size:18px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
+.code.sm{font-size:16.5px}.code.xs{font-size:15px;line-height:1.45}.code.xxs{font-size:13.6px;line-height:1.38;padding:8px 0}
+.code .ln{padding:0 14px 0 8px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.11);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.13);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
+.code-title{font-family:var(--mono);font-size:15px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+.f.zoom{transform:scale(.85)}.f.zoom.on{transform:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:19px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.legend{display:flex;flex-direction:column;gap:10px}
+.leg{border-radius:12px;padding:10px 16px;background:#fff;border:1px solid var(--line)}
+.leg b{display:block;font-size:21px;margin-bottom:2px}
+.leg p{font-size:19px}
+.leg.a{border-left:6px solid #7c3aed}.leg.b{border-left:6px solid #06b6d4}.leg.c{border-left:6px solid #f59e0b}
+.console{font-family:var(--mono);font-size:17px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.mem{display:flex;align-items:center;gap:16px;min-height:130px}
+.frame{border:2px solid #e4dcfb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
+.frame .fname{font-family:var(--mono);font-size:16px;color:var(--muted);margin-bottom:6px}
+.var{display:flex;align-items:center;gap:10px}
+.vn{font-family:var(--mono);font-size:21px;color:var(--t);font-weight:600}
+.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #c4b5fd;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
+.vb .new{display:none}
+.callee,.arw{opacity:0;transform:translateX(-14px);transition:all .5s}
+.mem.s1 .callee,.mem.s1 .arw{opacity:1;transform:none}
+.mem.s2 .chg .old{display:none}.mem.s2 .chg .new{display:inline;animation:pop .5s}
+.mem.s2 .chg{border-color:#f59e0b;box-shadow:0 0 18px rgba(245,158,11,.5)}
+.mem.s3 .callee,.mem.s3 .arw{opacity:.15;transform:translateY(10px)}
+.mem.s3 .result{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.5)}
+.arw{font-family:var(--mono);font-size:16px;color:var(--gold);text-align:center;line-height:1.2;font-weight:600}
+.arw .bar{display:block;font-size:30px}
+.alias{font-size:18px;color:var(--accent2);font-weight:600}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.25)}100%{transform:none;opacity:1}}
+.flow{display:flex;align-items:center;gap:12px;justify-content:center}
+.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:18px;border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:14px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.h{border-color:var(--gold)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#c4b5fd}.box.exe{border-color:#ec4899;background:#fdf2f8}
+.ar{color:var(--muted);font-size:26px;text-align:center}
+.stack{display:flex;flex-direction:column;gap:8px}
+svg text{font-family:var(--mono);font-weight:600}
+.draw{stroke-dasharray:400;stroke-dashoffset:400;transition:stroke-dashoffset 1s ease}
+svg.d1 .dr1,svg.d2 .dr2,svg.d3 .dr3{stroke-dashoffset:0}
+.fadein{opacity:0;transition:opacity .6s}
+svg.d1 .fd1,svg.d2 .fd2,svg.d3 .fd3{opacity:1}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:19px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05)}
+.ag:hover{border-color:#ec4899;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
+.ag b{color:#db2777;margin-right:6px;font-family:var(--mono)}
+.formula{font-family:var(--mono);font-size:23px;text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:16px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+@media (max-width:700px){#hint{display:none}}
+@media print{#nav,#bar,#hint{display:none}}
+
+/* lec03 additions */
+.chain{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pv{display:inline-flex;align-items:center;font-family:var(--mono);font-size:18px;font-weight:700;padding:5px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;white-space:nowrap}
+.pv.yes{background:#d1fae5;border-color:#34d399;color:#047857}
+.pv.no{background:#ffe4e6;border-color:#fb7185;color:#be123c}
+.pv.skip{background:#f1f5f9;border-color:#cbd5e1;color:#94a3b8;text-decoration:line-through;border-style:dashed}
+.op{font-family:var(--mono);font-size:26px;font-weight:800;color:var(--sa1)}
+.tt th,.tt td{text-align:center}.tt td:first-child{color:var(--text);font-weight:400}
+.tt tr.hit td{background:#fdf2f8;color:#be185d}
+tr.f{transform:none}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.code.show-s .mark-s{opacity:.3;text-decoration:line-through}
+.arr{display:flex;gap:12px;justify-content:center;margin-top:6px}
+.cell{width:84px;height:84px;border-radius:16px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:800;transition:all .45s;box-shadow:0 6px 16px -10px rgba(124,58,237,.4)}
+.cell small{font-size:13px;color:var(--muted);font-weight:600}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857;transform:translateY(-6px)}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;transform:translateY(-10px) scale(1.06);box-shadow:0 10px 24px -8px rgba(225,29,72,.5)}
+.cell.skip{opacity:.3;transform:scale(.92)}
+.syn{display:flex;gap:12px;align-items:center;justify-content:center;font-family:var(--mono);font-size:24px;font-weight:700}
+.sy{padding:8px 16px;border-radius:12px;color:#fff}
+.sy.c1{background:linear-gradient(135deg,#7c3aed,#a855f7)}.sy.c2{background:linear-gradient(135deg,#059669,#10b981)}.sy.c3{background:linear-gradient(135deg,#e11d48,#f97316)}
+.spin{display:inline-block;animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* lec04 arrays additions */
+.cell .v{display:block;line-height:1}
+.cell.max{border-color:#db2777;background:#fdf2f8;color:#be185d}
+.cell.empty{border-style:dashed;background:#f8fafc;color:#cbd5e1;box-shadow:none}
+.cell.done{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cell.new{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.cell.out{opacity:.4;border-style:dashed}
+.cell.gone{border-color:#e11d48;background:#fff1f3;color:#be123c;text-decoration:line-through}
+.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(245,158,11,.55)}
+.cell.cmp{border-color:#0891b2;background:#ecfeff;color:#0e7490;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(8,145,178,.5)}
+.cell.dots{border:none;box-shadow:none;background:none;width:40px;color:var(--muted)}
+.arr.sm .cell{width:70px;height:74px;font-size:24px;border-radius:14px}
+.arr.xs .cell{width:56px;height:62px;font-size:19px;border-radius:12px}
+.arr.xs .cell small{font-size:11.5px}
+.arr.left{justify-content:flex-start}
+.addr{display:flex;gap:12px;justify-content:center;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.addr span{width:84px;text-align:center}
+.vars{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.vc{font-family:var(--mono);font-size:19px;font-weight:700;padding:5px 14px;border-radius:12px;background:#fff;border:2px solid #e4dcfb;transition:all .35s}
+.vc b{color:var(--t)}
+.vc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.45)}
+.vc.res{border-color:#10b981;background:#ecfdf5;color:#047857}
+.ci{opacity:0;transition:opacity .4s}.ci.show{opacity:1}
+.say{font-size:20px;margin-top:12px;min-height:56px;color:var(--muted)}
+.say b{color:var(--text)}
+.rowlbl{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted);margin:10px 0 4px}
+.zone{display:flex;gap:6px;justify-content:center;margin-top:8px;font-size:15px;font-weight:700}
+.zone span{padding:3px 10px;border-radius:999px}
+.z1{background:#d1fae5;color:#047857}.z2{background:#f1f5f9;color:#64748b}.z3{background:#ffe4e6;color:#be123c}
+.brace{display:flex;gap:12px;justify-content:center;margin-top:4px}
+.brace div{border-top:3px solid currentColor;padding-top:4px;text-align:center;font-family:var(--mono);font-size:15px;font-weight:700}
+.mx{display:grid;gap:6px;justify-content:center}
+.mc{width:62px;height:52px;border-radius:10px;border:2px solid #e4dcfb;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .4s}
+.mx.sm .mc{width:44px;height:36px;font-size:14px;border-radius:8px}
+.mc.ix{border:none;background:none;color:var(--muted);font-size:14px;font-weight:600;box-shadow:none}
+.mc.unused{border-style:dashed;background:#f8fafc;color:#cbd5e1}
+.mc.used{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.mc.hl{background:#fffbeb;border-color:#fcd34d}
+.mc.cur{border-color:#f59e0b;background:#fde68a;color:#92400e;transform:scale(1.12);box-shadow:0 8px 20px -6px rgba(245,158,11,.6)}
+.mc.bd{border-color:#ec4899;border-width:3px}
+.mc.inr{opacity:.3}
+.mc.pos{border-color:#10b981;background:#d1fae5;color:#047857}
+.mc.neg{background:#fff1f3;color:#be123c}
+.mc.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;border-style:dashed}
+.strip{display:flex;gap:3px;font-family:var(--mono);font-size:12px;flex-wrap:nowrap;overflow:hidden}
+.strip span{padding:6px 5px;border-radius:5px;background:#f3edff;color:#6d28d9;white-space:nowrap}
+.strip span.r1{background:#e0f2fe;color:#0369a1}
+.strip span.gap{background:none;color:var(--muted)}
+.trace td,.trace th{font-size:17px;padding:5px 10px}
+.trace td:first-child{color:var(--text)}
+.trace tr.now td{background:#fffbeb}
+.sig{font-family:var(--mono);font-size:17px;background:#fff;border:1px dashed #c4b5fd;border-radius:10px;padding:6px 12px;color:#6d28d9;display:inline-block}
+
+.cols>*{min-width:0}
+
+/* ===== DDIA ch1 additions ===== */
+.sv{width:100%;height:auto;overflow:visible}
+.sv text{font-family:"Be Vietnam Pro",system-ui,sans-serif;font-weight:700;font-size:15px;fill:#1e1b3a}
+.sv text.sm{font-size:12.5px;fill:#64607d;font-weight:500}
+.sv text.lb{font-size:12.5px;fill:#7c3aed;font-weight:700}
+.sv .nd{fill:#fff;stroke:#c4b5fd;stroke-width:2}
+.sv .nd.c2{stroke:#0891b2}.sv .nd.c3{stroke:#ec4899}.sv .nd.c4{stroke:#f59e0b}.sv .nd.c5{stroke:#10b981}
+.sv .ln{stroke:#a78bfa;stroke-width:2.2;fill:none}
+.sv .g{opacity:0;transition:opacity .55s}
+.sv .g.hot .ln{stroke:#ec4899;stroke-dasharray:7 6;animation:dash .7s linear infinite}
+.sv .g.hot .nd{filter:drop-shadow(0 6px 10px rgba(236,72,153,.35))}
+@keyframes dash{to{stroke-dashoffset:-13}}
+.sv .box6{fill:none;stroke:#ec4899;stroke-width:2.5;stroke-dasharray:9 7}
+.chip{display:inline-flex;align-items:center;gap:8px;font-size:18px;font-weight:600;padding:6px 14px;border-radius:999px;background:#fff;border:2px solid #e4dcfb;white-space:nowrap}
+.chip.p{border-color:#c4b5fd;background:#f5f0ff;color:#6d28d9}.chip.c{border-color:#a5f3fc;background:#ecfeff;color:#0e7490}.chip.k{border-color:#fbcfe8;background:#fdf2f8;color:#be185d}.chip.y{border-color:#fde68a;background:#fffbeb;color:#b45309}.chip.g{border-color:#a7f3d0;background:#ecfdf5;color:#047857}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.cell.t{font-size:15px;font-weight:700;text-align:center;line-height:1.15;padding:4px}
+.cell.t .v{font-size:15px}
+.cell.big{font-size:30px}
+.stat{font-family:var(--mono);font-size:44px;font-weight:800;line-height:1;background:linear-gradient(90deg,var(--sa1),var(--sa2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat small{font-size:18px}
+.sysbox{border-radius:14px;padding:12px 16px;text-align:center;font-weight:700;font-size:20px;border:2px solid #e4dcfb;background:#fff;transition:all .45s}
+.sysbox.fail{border-color:#e11d48;background:#fff1f3;color:#be123c;box-shadow:0 0 22px rgba(225,29,72,.35)}
+.sysbox.ok{border-color:#10b981;background:#ecfdf5;color:#047857;box-shadow:0 0 22px rgba(16,185,129,.3)}
+.shield{opacity:0;transform:scale(.7);transition:all .45s;font-size:15px;font-weight:700;color:#7c3aed;text-align:center;border:2px dashed #a78bfa;border-radius:12px;padding:6px 10px;background:#f5f0ff}
+.shield.on{opacity:1;transform:none}
+.dots{display:grid;grid-template-columns:repeat(25,1fr);gap:5px;padding:12px;background:#fff;border:1px solid var(--line);border-radius:14px}
+.dots i{display:block;aspect-ratio:1;border-radius:4px;background:#e9e3fb;transition:all .4s}
+.dots i.x{background:#e11d48;transform:scale(1.35);box-shadow:0 0 10px rgba(225,29,72,.6)}
+.dots i.r{background:#10b981}
+.node{width:110px;border-radius:14px;border:2.5px solid #c4b5fd;background:#fff;text-align:center;padding:8px 4px;font-weight:700;transition:all .45s}
+.node .ver{display:block;font-family:var(--mono);font-size:22px;color:#6d28d9}
+.node small{display:block;font-size:13px;color:var(--muted);font-weight:600}
+.node.down{border-color:#f59e0b;background:#fffbeb;opacity:.55;transform:translateY(8px)}
+.node.v2{border-color:#10b981;background:#ecfdf5}.node.v2 .ver{color:#047857}
+.node.bad{border-color:#e11d48;background:#fff1f3;color:#be123c}.node.bad .ver{color:#be123c}
+.nodes{display:flex;gap:14px;justify-content:center}
+.casc{display:flex;align-items:center;gap:6px;justify-content:center}
+.casc .ar{font-size:22px}
+.tw{display:inline-block;font-size:13px;font-weight:700;padding:2px 8px;border-radius:6px;background:#fdf2f8;color:#be185d;border:1px solid #fbcfe8;margin:2px;opacity:0;transform:translateY(-10px) scale(.6);transition:all .45s}
+.tw.show{opacity:1;transform:none}
+.tw.b{background:#ecfeff;color:#0e7490;border-color:#a5f3fc}
+.tw.y{background:#fffbeb;color:#b45309;border-color:#fde68a}
+.mbox{border:2px solid #e4dcfb;border-radius:12px;background:#fff;padding:6px 8px;min-height:84px;transition:all .4s}
+.mbox h4{font-size:14px;color:var(--muted);margin-bottom:4px}
+.mbox.hot{border-color:#0891b2;box-shadow:0 0 16px rgba(8,145,178,.35)}
+.mboxes{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.who{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:18px;padding:8px 14px;border-radius:12px;background:#fff;border:2px solid #fbcfe8}
+.big-ar{font-size:30px;color:var(--muted);text-align:center;line-height:1}
+.rt{display:flex;height:58px;border-radius:12px;overflow:hidden;border:2px solid #e4dcfb;background:#fff}
+.rt>div{display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;opacity:0;transition:opacity .45s;white-space:nowrap}
+.rt>div.show{opacity:1}
+.rt .n1,.rt .n2{background:#94a3b8}.rt .q{background:#f59e0b}.rt .sv2{background:#7c3aed}
+.brk{position:relative;height:44px;margin-top:6px}
+.brk>div{position:absolute;top:0;border-top:3px solid;text-align:center;font-size:15px;font-weight:700;padding-top:4px;opacity:0;transition:opacity .45s}
+.brk>div.show{opacity:1}
+.pc rect.b{fill:#c4b5fd;transform:translateX(var(--x0));transition:transform 1.3s cubic-bezier(.6,0,.2,1) calc(var(--d)*7ms),fill .4s}
+.pc.sorted rect.b{transform:translateX(var(--x1))}
+.pc.p95 rect.t95{fill:#f472b6}.pc.p99 rect.t99{fill:#e11d48}
+.pc .mk{opacity:0;transition:opacity .5s}
+.pc.mean .mkm,.pc.p50 .mk50,.pc.p95 .mk95,.pc.p99 .mk99{opacity:1}
+.pc text{font-family:var(--mono);font-size:12px;font-weight:700}
+.q-row{display:flex;gap:8px;align-items:center}
+.rq{height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;font-weight:700;color:#fff;transition:all .5s}
+.rq.slow{width:190px;background:linear-gradient(135deg,#e11d48,#f97316)}
+.rq.fast{width:54px;background:linear-gradient(135deg,#0891b2,#7c3aed)}
+.rq.wait{box-shadow:0 0 0 3px #fde68a;animation:shake .5s infinite}
+.rq.done{opacity:.25}
+@keyframes shake{50%{transform:translateY(-3px)}}
+.srv{border:2.5px solid #7c3aed;border-radius:14px;padding:10px 14px;text-align:center;font-weight:800;background:#f5f0ff;min-width:120px}
+.be{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;margin:6px 0}
+.be .nm{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted)}
+.be .trk{height:26px;border-radius:8px;background:#f5f3ff;position:relative;overflow:hidden}
+.be .bb{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:8px;background:linear-gradient(90deg,#0891b2,#7c3aed);transition:width 1s ease}
+.be .bb.slow{background:linear-gradient(90deg,#f97316,#e11d48)}
+.run .be .bb{width:var(--w)}
+.mach{border:3px solid #7c3aed;border-radius:14px;background:#f5f0ff;display:flex;align-items:center;justify-content:center;font-weight:800;color:#6d28d9;transition:all .7s cubic-bezier(.2,.8,.2,1);width:90px;height:70px;font-size:15px;text-align:center}
+.mach.big{width:220px;height:170px;font-size:22px;border-width:5px;box-shadow:0 14px 30px -12px rgba(124,58,237,.6)}
+.mach.sm2{width:70px;height:56px;font-size:13px;border-color:#0891b2;background:#ecfeff;color:#0e7490;opacity:0;transform:scale(.5)}
+.mach.sm2.show{opacity:1;transform:none}
+.farm{display:grid;grid-template-columns:repeat(4,70px);gap:10px;justify-content:center}
+.layer{border-radius:12px;padding:10px 14px;font-weight:700;font-size:17px;text-align:center;transition:all .6s}
+.layer.top{background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;font-size:20px}
+.layer.hid{background:#f8fafc;border:2px dashed #cbd5e1;color:#64748b;font-weight:600;font-size:16px}
+.abs.cover .layer.hid{opacity:.25;filter:blur(1.5px)}
+.toggle{display:flex;gap:10px;align-items:center;justify-content:center}
+.pill{padding:8px 16px;border-radius:999px;font-weight:800;font-size:17px;border:2px solid #e4dcfb;background:#fff;transition:all .4s;color:var(--muted)}
+.pill.on{background:linear-gradient(135deg,var(--sa1),var(--sa2));color:#fff;border-color:transparent;transform:scale(1.06)}
+.quote{font-size:21px;line-height:1.45;font-style:italic;color:#4c4672;border-left:5px solid #ec4899;padding:8px 18px;background:rgba(255,255,255,.7);border-radius:8px}
+.quote b{font-style:normal}
+.mini li{font-size:18px;margin:3px 0;line-height:1.35}
+.card p.ps,p.ps{font-size:17px;line-height:1.4}
+.vs{font-weight:800;font-size:22px;color:var(--muted);align-self:center;text-align:center}
+.here{display:inline-block;font-size:13px;font-weight:800;color:#fff;background:#e11d48;border-radius:6px;padding:2px 8px;margin-left:6px;opacity:0;transition:opacity .4s}
+.here.show{opacity:1}
+.cols4>.card.lit{box-shadow:0 0 0 3px #ec4899,0 12px 26px -10px rgba(236,72,153,.5);transform:translateY(-4px)}
+.card{transition:all .4s}
+
+.chip.c,.leg.c{font-style:normal}.leg.c{color:var(--text)}.leg.c b{color:var(--text)}
+.leg p b{display:inline;font-size:inherit;margin:0}
+.toggle .pill{font-size:15px;white-space:nowrap}
+.abs.cover .layer.hid{opacity:.4;filter:blur(1px)}
+.mach.big{width:260px;font-size:21px}
+.sv text.lb,.pc text{paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+.sv.s1 .g1{opacity:1}.sv.s2 .g2{opacity:1}.sv.s3 .g3{opacity:1}.sv.s4 .g4{opacity:1}.sv.s5 .g5{opacity:1}.sv.s6 .g6{opacity:1}.sv.s7 .g7{opacity:1}.sv.s8 .g8{opacity:1}.who.hot{border-color:#ec4899;box-shadow:0 0 18px rgba(236,72,153,.45)}.toggle.flip #ev1{background:#fff;color:var(--muted);border-color:#e4dcfb;transform:none}.toggle.flip #ev2{background:linear-gradient(135deg,var(--sa1),var(--sa2));color:#fff;border-color:transparent;transform:scale(1.06)}.dots{grid-template-columns:repeat(50,1fr);gap:3px}.dots i{border-radius:2px}
+/* ===== DDIA ch9 additions ===== */
+.sv .g.on{opacity:1}
+.sv .dl{stroke-dasharray:900;stroke-dashoffset:900;transition:stroke-dashoffset 1.1s ease}
+.sv .g.on .dl{stroke-dashoffset:0}
+.sv .lane{stroke:#d9d3ef;stroke-width:2;stroke-dasharray:3 6}
+.sv .lane.s{stroke-dasharray:none;stroke:#c4b5fd;stroke-width:2.5}
+.sv text.ll{font-size:14px;fill:#64607d}
+.sv .m{stroke:#a78bfa;stroke-width:2.2;fill:none}
+.sv .m.k{stroke:#ec4899}.sv .m.c{stroke:#0891b2}.sv .m.y{stroke:#f59e0b}.sv .m.gr{stroke:#10b981}.sv .m.x{stroke:#e11d48}
+.sv .m.dash{stroke-dasharray:6 5}
+.sv .bar{fill:#f5f0ff;stroke:#a78bfa;stroke-width:2}
+.sv .bar.c{fill:#ecfeff;stroke:#0891b2}.sv .bar.k{fill:#fdf2f8;stroke:#ec4899}.sv .bar.ok{fill:#ecfdf5;stroke:#10b981}.sv .bar.bad{fill:#fff1f3;stroke:#e11d48}.sv .bar.y{fill:#fffbeb;stroke:#f59e0b}.sv .bar.gy{fill:#f8fafc;stroke:#cbd5e1}
+.sv text.r{fill:#be123c}.sv text.gn{fill:#047857}.sv text.cy{fill:#0e7490}.sv text.pk{fill:#be185d}.sv text.am{fill:#b45309}.sv text.pu{fill:#6d28d9}.sv text.mu{fill:#64607d}
+.sv text.mono{font-family:var(--mono)}
+.sv text.xl{font-size:18px}.sv text.xs{font-size:12px}
+.sv .dot{fill:#7c3aed}.sv .dot.k{fill:#ec4899}.sv .dot.c{fill:#0891b2}.sv .dot.x{fill:#e11d48}.sv .dot.gr{fill:#10b981}.sv .dot.y{fill:#f59e0b}
+.sv .hz{fill:#fde68a;opacity:.5}
+.sv .lockz{fill:#fecdd3;opacity:.55}
+.sv text.lb,.sv text.sm,.sv text.ll{paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+.sv .nd.hot{stroke:#ec4899;stroke-width:3;filter:drop-shadow(0 6px 10px rgba(236,72,153,.35))}
+.sv .nd.bad{stroke:#e11d48;fill:#fff1f3}.sv .nd.ok{stroke:#10b981;fill:#ecfdf5}.sv .nd.wait{stroke:#f59e0b;fill:#fffbeb}
+.sv .nd,.sv .bar{transition:all .4s}
+.hid{opacity:0;transform:translateY(8px);transition:opacity .45s,transform .45s}
+.hid.on{opacity:1;transform:none}
+.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.grid5>.card:nth-child(5n+1){border-top:5px solid #7c3aed}.grid5>.card:nth-child(5n+2){border-top:5px solid #0891b2}.grid5>.card:nth-child(5n+3){border-top:5px solid #ec4899}.grid5>.card:nth-child(5n+4){border-top:5px solid #f59e0b}.grid5>.card:nth-child(5n){border-top:5px solid #10b981}
+.grid5>.card:nth-child(5n+2) h3{color:#0891b2}.grid5>.card:nth-child(5n+3) h3{color:#db2777}.grid5>.card:nth-child(5n+4) h3{color:#d97706}.grid5>.card:nth-child(5n) h3{color:#059669}.grid5>.card:nth-child(5n+1) h3{color:#7c3aed}
+.cols2x3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.card.lit{box-shadow:0 0 0 3px #ec4899,0 12px 26px -10px rgba(236,72,153,.5);transform:translateY(-4px)}
+.card.dim{opacity:.35}
+.card h3{font-size:20px}
+.pv.maybe{background:#fffbeb;border-color:#fcd34d;color:#b45309}
+.pv.sm{font-size:15px;padding:3px 10px}
+.pv.info{background:#f3edff;border-color:#c4b5fd;color:#6d28d9}
+.vrow{display:grid;grid-template-columns:240px 190px 1fr;gap:14px;align-items:center;padding:9px 16px;background:#fff;border:1px solid var(--line);border-radius:12px;margin:8px 0;box-shadow:0 6px 18px -12px rgba(124,58,237,.3)}
+.vrow b.nm{font-size:19px}
+.vrow p{font-size:17px;line-height:1.38}
+.log{display:flex;gap:6px;align-items:center;margin:6px 0}
+.lgn{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted);width:96px;flex:none}
+.ent{min-width:62px;height:40px;padding:0 8px;border-radius:9px;border:2px dashed #e4dcfb;background:#faf8ff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;font-weight:700;color:#d4cfe6;transition:all .45s;white-space:nowrap}
+.ent.on{border-style:solid;border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.ent.on.k{border-color:#ec4899;background:#fdf2f8;color:#be185d}
+.ent.on.c{border-color:#0891b2;background:#ecfeff;color:#0e7490}
+.ent.on.y{border-color:#f59e0b;background:#fffbeb;color:#b45309}
+.ent.win{border-color:#10b981!important;background:#d1fae5!important;color:#047857!important;transform:translateY(-4px)}
+.ent.lose{border-color:#e11d48!important;background:#fff1f3!important;color:#be123c!important;text-decoration:line-through}
+.ent.ghost{border-color:#e11d48;border-style:dashed;color:#e11d48;background:#fff1f3;opacity:0;transform:translateY(-16px)}
+.ent.ghost.on{opacity:1;transform:translateY(-6px) rotate(-4deg)}
+.node.lead{border-color:#7c3aed;background:#f3edff;box-shadow:0 0 18px rgba(124,58,237,.35)}
+.node.lead .ver{color:#6d28d9}
+.node.hot{box-shadow:0 0 0 3px #f59e0b,0 10px 22px -8px rgba(245,158,11,.5)}
+.node.wait{border-color:#f59e0b;background:#fffbeb}.node.wait .ver{color:#b45309}
+.node.ok{border-color:#10b981;background:#ecfdf5}.node.ok .ver{color:#047857}
+.node .ver{font-size:20px}
+ol.steps{list-style:none;counter-reset:s}
+ol.steps li{counter-increment:s;position:relative;padding:6px 10px 6px 46px;margin:5px 0;font-size:17.5px;line-height:1.38;border-radius:10px;transition:all .35s;background:#fff;border:1px solid var(--line)}
+ol.steps li::before{content:counter(s);position:absolute;left:10px;top:7px;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--sa1),var(--sa2));color:#fff;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center}
+ol.steps li.cur{background:#fffbeb;border-color:#fcd34d;box-shadow:inset 5px 0 #f59e0b;transform:translateX(4px)}
+ol.steps li.pnr{background:#fdf2f8;border-color:#f9a8d4;box-shadow:inset 5px 0 #ec4899}
+.badge{display:inline-block;font-size:13px;font-weight:800;color:#fff;background:#e11d48;border-radius:6px;padding:2px 8px;margin-left:6px;vertical-align:middle}
+.badge.p{background:#7c3aed}.badge.g{background:#059669}.badge.y{background:#d97706}
+.dc{border:2px solid #e4dcfb;border-radius:16px;padding:10px 12px;background:#fff;transition:all .45s}
+.dc h4{font-size:15px;color:var(--muted);margin-bottom:6px;font-family:var(--mono)}
+.link{display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:14px;color:var(--muted);transition:all .4s}
+.link .wire{width:100%;height:5px;border-radius:3px;background:linear-gradient(90deg,#a78bfa,#0891b2);transition:all .4s}
+.link.cut .wire{background:repeating-linear-gradient(90deg,#e11d48 0 10px,transparent 10px 18px)}
+.link.cut{color:#be123c}
+.mini2 li{font-size:16.5px;margin:3px 0;line-height:1.36}
+.tiny{font-size:14.5px;color:var(--muted);line-height:1.35}
+.kv{font-family:var(--mono);font-weight:700}
+.tbl2 td,.tbl2 th{font-size:16.5px;padding:7px 11px}
+.tbl2 td:first-child{white-space:normal}
+.prop{border-radius:14px;padding:10px 14px;background:#fff;border:1px solid var(--line);transition:all .4s}
+.prop>b{font-size:19px;display:block}
+.prop .tag{font-size:12.5px;font-weight:800;letter-spacing:.06em;padding:2px 8px;border-radius:6px;float:right}
+.prop .tag.sf{background:#e3e6fb;color:#3341b0}.prop .tag.lv{background:#d1fae5;color:#047857}
+.prop.lit{box-shadow:0 0 0 3px #ec4899;transform:translateY(-3px)}
+.rowc{display:flex;gap:10px;align-items:center}
+.vbox{font-family:var(--mono);font-weight:800;font-size:28px;min-width:74px;height:58px;border-radius:12px;border:3px solid #c4b5fd;background:#fff;display:inline-flex;align-items:center;justify-content:center;transition:all .4s}
+.vbox.chg{border-color:#f59e0b;box-shadow:0 0 18px rgba(245,158,11,.5);animation:pop .5s}
+.opc{border-radius:12px;padding:6px 8px;border:2px solid #e4dcfb;background:#fff;font-family:var(--mono);font-size:14px;font-weight:700;text-align:center;min-width:104px;transition:all .4s}
+.opc small{display:block;font-family:"Be Vietnam Pro";font-size:12px;color:var(--muted);font-weight:600}
+.opc .rv{display:block;font-size:20px;color:#6d28d9;margin-top:2px}
+.opc.okc{border-color:#10b981;background:#ecfdf5}.opc.badc{border-color:#e11d48;background:#fff1f3}.opc.badc .rv{color:#be123c}.opc.errc{border-color:#f59e0b;background:#fffbeb}.opc.errc .rv{color:#b45309}
+.seqarr{color:var(--muted);font-weight:800}
+.cpu{border:2px solid #e4dcfb;border-radius:12px;padding:8px;background:#fff;text-align:center;font-weight:700;font-size:16px;transition:all .4s}
+.cpu .cache{margin-top:6px;font-family:var(--mono);font-size:15px;border:2px dashed #c4b5fd;border-radius:8px;padding:4px;background:#faf8ff;transition:all .4s}
+.cpu .cache.hot{border-color:#f59e0b;border-style:solid;background:#fffbeb}
+.cpu .cache.bad{border-color:#e11d48;border-style:solid;background:#fff1f3;color:#be123c}
+.ram{border:3px solid #0891b2;border-radius:12px;padding:8px;text-align:center;font-weight:800;background:#ecfeff;color:#0e7490;font-family:var(--mono);transition:all .4s}
+.ram.hot{box-shadow:0 0 18px rgba(8,145,178,.45)}
+.spk{font-size:15px;font-weight:700;padding:4px 10px;border-radius:999px;background:#fff;border:2px solid #e4dcfb;display:inline-block;margin:3px}
+
+.sv .bar.y.ok{fill:#ecfdf5;stroke:#10b981}.sv .bar.y.bad{fill:#fff1f3;stroke:#e11d48}
+.pill.x{text-decoration:line-through;background:#fff1f3!important;color:#be123c!important;border-color:#fb7185!important;transform:none!important}
+#ctog.flip #cp1{background:#fff;color:var(--muted);border-color:#e4dcfb;transform:none}
+#ctog.flip #cp2{background:linear-gradient(135deg,var(--sa1),var(--sa2));color:#fff;border-color:transparent;transform:scale(1.06)}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<marker id="ap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#a78bfa"/></marker>
+<marker id="ak" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#ec4899"/></marker>
+<marker id="ac" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#0891b2"/></marker>
+<marker id="ay" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#f59e0b"/></marker>
+<marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#10b981"/></marker>
+<marker id="ax" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#e11d48"/></marker>
+</defs></svg>
+<div id="viewport"><div id="deck">
+
+<!-- ===================== TITLE ===================== -->
+<section class="slide" id="title">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// DDIA · Part II · Chapter 9</div>
+    <h1 class="in" style="font-size:72px">Consistency &amp;<br><span class="grad">Consensus</span></h1>
+    <p class="in muted" style="font-size:24px;margin-top:18px;max-width:1000px"><i>Designing Data-Intensive Applications</i> — Martin Kleppmann. Chương khép lại Part II: tìm các <b>abstraction</b> với guarantee hữu ích để application “quên” bớt các vấn đề của distributed systems — từ <b>linearizability</b>, <b>ordering</b> tới <b>consensus</b>.</p>
+    <div class="quote in" style="margin-top:26px;max-width:980px;font-size:21px">“Is it better to be alive and wrong or right and dead?” <b>— Jay Kreps, <i>A Few Notes on Kafka and Jepsen</i> (2013)</b></div>
+    <p class="in" style="margin-top:26px;font-size:18px;color:#8a91b4">Phím ← → hoặc Space: chạy từng bước · Shift+→: qua slide · A: hiện hết · F: toàn màn hình</p>
+  </div>
+</section>
+
+<!-- ===================== AGENDA ===================== -->
+<section class="slide" id="agenda">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:18px">· bấm vào mục để đi tới</span></div>
+  <div class="agenda in" style="gap:10px">
+    <div class="ag" data-goto="part2"><b>01</b>Part II &amp; mục tiêu chương</div>
+    <div class="ag" data-goto="ec"><b>02</b>Consistency Guarantees</div>
+    <div class="ag" data-goto="lin"><b>03</b>Linearizability là gì?</div>
+    <div class="ag" data-goto="reg"><b>04</b>What makes a system linearizable</div>
+    <div class="ag" data-goto="linser"><b>05</b>Linearizability vs Serializability</div>
+    <div class="ag" data-goto="rely"><b>06</b>Relying on linearizability</div>
+    <div class="ag" data-goto="impl"><b>07</b>Implementing linearizable systems</div>
+    <div class="ag" data-goto="cost"><b>08</b>Cost of linearizability &amp; CAP</div>
+    <div class="ag" data-goto="order"><b>09</b>Ordering &amp; causality</div>
+    <div class="ag" data-goto="seq"><b>10</b>Sequence numbers &amp; Lamport timestamps</div>
+    <div class="ag" data-goto="tob"><b>11</b>Total Order Broadcast</div>
+    <div class="ag" data-goto="dtc"><b>12</b>Distributed transactions &amp; consensus</div>
+    <div class="ag" data-goto="tpc"><b>13</b>Two-Phase Commit (2PC)</div>
+    <div class="ag" data-goto="practice"><b>14</b>Distributed transactions in practice · XA</div>
+    <div class="ag" data-goto="consensus"><b>15</b>Fault-tolerant consensus</div>
+    <div class="ag" data-goto="epoch"><b>16</b>Epoch numbering &amp; quorums</div>
+    <div class="ag" data-goto="limits"><b>17</b>Limitations of consensus</div>
+    <div class="ag" data-goto="zk"><b>18</b>Membership &amp; coordination services</div>
+    <div class="ag" data-goto="equiv"><b>19</b>Summary: mọi thứ quy về consensus</div>
+    <div class="ag" data-goto="end"><b>20</b>Kết thúc Part II</div>
+  </div>
+</section>
+
+<!-- ===================== PART II ===================== -->
+<section class="slide" id="part2">
+  <div class="hdr in"><span class="qn">PART II</span><h2>Distributed Data</h2></div>
+  <p class="in muted" style="font-size:21px;max-width:1150px">Part II đi từ “copy và chia data ra nhiều máy” đến “làm sao để các máy <b>đồng ý</b> với nhau”. Chapter 9 là điểm hội tụ của cả phần.</p>
+  <div class="grid5" style="margin-top:22px">
+    <div class="card f zoom"><div class="icon">🪞</div><h3>Chapter 5</h3><p class="ps"><b>Replication.</b> Leader/follower, multi-leader, leaderless; replication lag.</p></div>
+    <div class="card f zoom"><div class="icon">🧩</div><h3>Chapter 6</h3><p class="ps"><b>Partitioning.</b> Chia dataset lớn (sharding), secondary indexes, rebalancing.</p></div>
+    <div class="card f zoom"><div class="icon">🔒</div><h3>Chapter 7</h3><p class="ps"><b>Transactions.</b> ACID, isolation levels, serializability.</p></div>
+    <div class="card f zoom"><div class="icon">⚡</div><h3>Chapter 8</h3><p class="ps"><b>The Trouble with Distributed Systems.</b> Network, clocks, process pauses.</p></div>
+    <div class="card f zoom" id="p2c9"><div class="icon">🤝</div><h3>Chapter 9</h3><p class="ps"><b>Consistency &amp; Consensus.</b> Abstractions để vượt qua tất cả những thứ trên.</p><span class="here" id="p2here">BẠN Ở ĐÂY</span></div>
+  </div>
+  <div class="note blue f" style="margin-top:22px" data-act="#p2c9|lit;#p2here|show">Chapter 9 giả định <b>mọi</b> vấn đề của Chapter 8 đều có thể xảy ra: packets bị <b>lost, reordered, duplicated</b> hay <b>delayed</b> tùy ý; clocks chỉ gần đúng; node có thể <b>pause</b> (GC) hoặc <b>crash</b> bất cứ lúc nào.</div>
+</section>
+
+<!-- ===================== INTRO ===================== -->
+<section class="slide" id="intro">
+  <div class="hdr in"><span class="qn">00</span><h2>Ý tưởng: <span class="grad">general-purpose abstractions</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr;gap:28px">
+    <div>
+      <p style="font-size:19px">Cách đơn giản nhất để xử lý fault: để cả service fail và hiện error. Không chấp nhận được? → phải <b>tolerate faults</b>: service vẫn chạy đúng dù có component bị lỗi.</p>
+      <div class="note blue f" style="font-size:18px">Cách tốt nhất: tìm <b>abstraction</b> có guarantee hữu ích, implement <b>một lần</b>, rồi để application dựa vào nó — giống <b>transactions</b> ở Chapter 7:</div>
+      <div class="chips f" style="margin-top:10px"><span class="chip p">Atomicity → “không có crash”</span><span class="chip c">Isolation → “không ai chạy concurrent”</span><span class="chip k">Durability → “storage hoàn hảo”</span></div>
+      <div class="card f" style="margin-top:14px"><h3>🤝 Consensus</h3><p class="ps">Một trong những abstraction quan trọng nhất: <b>getting all of the nodes to agree on something</b>. Đạt được consensus một cách reliable khi có network faults và process failures là bài toán <b>khó bất ngờ</b>.</p></div>
+    </div>
+    <div>
+      <h3>Ví dụ: failover trong single-leader replication</h3>
+      <div class="nodes" style="margin-top:16px">
+        <div class="node lead" id="sb1"><span class="ver">👑</span><small>node 1</small></div>
+        <div class="node" id="sb2"><span class="ver">–</span><small>node 2</small></div>
+        <div class="node" id="sb3"><span class="ver">–</span><small>node 3</small></div>
+      </div>
+      <div class="sysbox" id="sbmsg" style="margin-top:18px">Cluster bình thường: 1 leader</div>
+      <span class="f ghost" data-act="#sb1|down" data-set="#sb1 .ver::💀;#sbmsg::Leader chết → cần failover sang node khác" data-say="Leader die → các node còn lại phải chọn leader mới."></span>
+      <span class="f ghost" data-now="#sb2|bad;#sb3|bad;#sbmsg|fail" data-set="#sb2 .ver::👑;#sb3 .ver::👑;#sbmsg::❌ Split brain: 2 node cùng nghĩ mình là leader" data-say="Không đồng ý được với nhau → <b>split brain</b>: cả hai cùng nhận writes, data diverge → thường dẫn tới <b>data loss</b>."></span>
+      <span class="f ghost" data-act="#sb2|lead;#sbmsg|ok" data-set="#sb2 .ver::👑;#sb3 .ver::✓;#sbmsg::✅ Consensus: mọi node đồng ý node 2 là leader" data-say="Implementation đúng của <b>consensus</b>: các node còn lại bầu và <b>cùng đồng ý</b> chỉ một leader duy nhất."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+      <div class="note f" style="font-size:17px">Trước khi tới consensus, cần hiểu phạm vi những gì <b>có thể</b> và <b>không thể</b> làm được — các giới hạn đã được nghiên cứu sâu, cả bằng chứng minh lý thuyết lẫn implementation thực tế.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== EVENTUAL CONSISTENCY ===================== -->
+<section class="slide" id="ec">
+  <div class="hdr in"><span class="qn">01</span><h2>Consistency Guarantees</h2></div>
+  <div class="cols" style="grid-template-columns:1.05fr 1fr;gap:26px">
+    <div>
+      <h3>Eventual consistency = “convergence”</h3>
+      <ul class="mini">
+        <li>Hầu hết replicated DB cung cấp ít nhất <b>eventual consistency</b>: ngừng write và đợi một khoảng <i>không xác định</i> → mọi read sẽ trả cùng value.</li>
+        <li>Guarantee rất <b>yếu</b>: không nói <b>khi nào</b> replicas hội tụ. Trước đó, read có thể trả bất cứ gì — kể cả không thấy value vừa write.</li>
+        <li>Database trông như một <b>variable</b>, nhưng semantics phức tạp hơn nhiều. Bug khó thấy, chỉ lộ khi có <b>fault</b> hoặc <b>high concurrency</b>.</li>
+      </ul>
+      <div class="note f" style="font-size:17px">Consistency model <b>mạnh hơn</b> không miễn phí: performance kém hơn hoặc kém fault-tolerant hơn — đổi lại <b>dễ dùng đúng</b>. Khác với transaction isolation (tránh race giữa transactions), distributed consistency là về <b>điều phối state của replicas</b> khi có delay và fault.</div>
+    </div>
+    <div>
+      <div class="nodes">
+        <div class="node lead" id="ecl"><span class="ver">x=1</span><small>leader</small></div>
+        <div class="node" id="ecf1"><span class="ver">x=1</span><small>follower 1</small></div>
+        <div class="node" id="ecf2"><span class="ver">x=1</span><small>follower 2</small></div>
+      </div>
+      <div class="sysbox" id="ecmsg" style="margin-top:16px;font-size:18px">👤 Client</div>
+      <span class="f ghost" data-act="#ecl|hot" data-set="#ecl .ver::x=2;#ecmsg::👤 write(x, 2) → leader ⇒ ok" data-say="Client write <code class='i'>x = 2</code> vào leader."></span>
+      <span class="f ghost" data-act="#ecf1|v2" data-set="#ecf1 .ver::x=2" data-say="Follower 1 đã nhận replication log. Follower 2 vẫn đang <b>lag</b>."></span>
+      <span class="f ghost" data-now="#ecf2|bad;#ecmsg|fail" data-set="#ecmsg::👤 read(x) → follower 2 ⇒ 1 😕" data-say="Đọc ngay sau đó, request bị route sang follower 2 → nhận value <b>cũ</b>. Không có <b>read-your-writes</b>."></span>
+      <span class="f ghost" data-act="#ecf2|v2;#ecmsg|ok" data-set="#ecf2 .ver::x=2;#ecmsg::✅ “Eventually”: mọi replica converge về x=2" data-say="Cuối cùng mọi replica <b>converge</b> — nhưng không ai nói trước được là bao lâu."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+      <h3 style="margin-top:6px">Lộ trình chương</h3>
+      <div class="chain f" style="flex-wrap:nowrap;gap:6px"><span class="pv info sm">① Linearizability</span><span class="op">→</span><span class="pv info sm">② Ordering</span><span class="op">→</span><span class="pv info sm">③ Consensus</span></div>
+      <p class="tiny f" style="margin-top:6px">Ba chủ đề tưởng rời rạc — thực ra liên kết sâu với nhau.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== LINEARIZABILITY ===================== -->
+<section class="slide" id="lin">
+  <div class="hdr in"><span class="qn">02</span><h2>Linearizability: ảo giác <span class="grad">chỉ có một copy</span></h2></div>
+  <div class="cols" style="grid-template-columns:.9fr 1.2fr;gap:24px">
+    <div>
+      <p style="font-size:19px">Làm cho hệ thống <b>trông như</b> chỉ có <b>một copy</b> của data, và mọi operation trên nó đều <b>atomic</b>. Application không cần lo về replicas.</p>
+      <p class="muted" style="font-size:16px;margin:10px 0 6px">Còn được gọi là:</p>
+      <div class="chips"><span class="chip p">atomic consistency</span><span class="chip c">strong consistency</span><span class="chip k">immediate consistency</span><span class="chip y">external consistency</span></div>
+      <div class="formula" style="margin-top:14px;font-size:19px">Linearizability = <span class="grad">recency guarantee</span></div>
+      <p class="ps" style="margin-top:8px">Ngay khi một client <b>write xong</b>, mọi client đọc sau đó phải thấy value vừa write — không lấy từ stale cache hay replica bị lag.</p>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <div class="code-title">Figure 9-1 · sports website không linearizable</div>
+      <svg class="sv" id="f91" viewBox="0 0 660 400">
+        <line class="lane s" x1="120" y1="50" x2="650" y2="50"/><text x="8" y="55" class="ll">Leader</text>
+        <line class="lane" x1="120" y1="125" x2="650" y2="125"/><text x="8" y="130" class="ll">Follower 1</text>
+        <line class="lane" x1="120" y1="200" x2="650" y2="200"/><text x="8" y="205" class="ll">Follower 2</text>
+        <line class="lane" x1="120" y1="290" x2="650" y2="290"/><text x="8" y="295" class="ll">👩 Alice</text>
+        <line class="lane" x1="120" y1="365" x2="650" y2="365"/><text x="8" y="370" class="ll">👨 Bob</text>
+        <g class="g" id="f91a"><circle class="dot" cx="150" cy="50" r="7"/><text x="160" y="36" class="lb">final score: Germany 1–0 Argentina</text>
+          <path class="m dl" d="M152,52 L235,123" marker-end="url(#ap)"/></g>
+        <g class="g" id="f91b"><path class="m c dl" d="M260,288 L300,128" marker-end="url(#ac)"/><path class="m c dl" d="M310,128 L350,288" marker-end="url(#ac)"/>
+          <rect class="bar ok" x="300" y="300" width="170" height="26" rx="8"/><text x="385" y="318" text-anchor="middle" class="gn" style="font-size:13px">🏆 Final: 1–0</text></g>
+        <g class="g" id="f91c"><path class="m y dl" d="M370,292 L405,362" marker-end="url(#ay)"/><text x="190" y="340" class="lb" style="fill:#b45309">💬 “Germany thắng rồi!”</text></g>
+        <g class="g" id="f91d"><path class="m k dl" d="M430,363 L470,203" marker-end="url(#ak)"/><path class="m k dl" d="M480,203 L520,363" marker-end="url(#ak)"/>
+          <rect class="bar bad" x="470" y="230" width="176" height="26" rx="8"/><text x="558" y="248" text-anchor="middle" class="r" style="font-size:13px">⏱ Game still ongoing ❌</text></g>
+        <g class="g" id="f91e"><path class="m dash dl" d="M155,55 L590,198" marker-end="url(#ap)"/><text x="565" y="185" class="lb">lag!</text></g>
+      </svg>
+      <span class="f ghost" data-act="#f91a|on" data-say="Tỉ số chung cuộc World Cup 2014 được ghi vào <b>leader</b>, replicate sang follower 1."></span>
+      <span class="f ghost" data-act="#f91b|on" data-say="Alice refresh: request tới follower 1 → thấy kết quả chung cuộc."></span>
+      <span class="f ghost" data-act="#f91c|on" data-say="Alice reo lên báo tỉ số cho Bob — một <b>communication channel</b> thứ hai."></span>
+      <span class="f ghost" data-act="#f91d|on;#f91e|on" data-say="Bob reload <b>sau khi</b> nghe Alice, nhưng request tới follower 2 đang lag → “game still ongoing”. Bob kỳ vọng kết quả ít nhất mới bằng của Alice → <b>vi phạm linearizability</b>."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== REGISTER ===================== -->
+<section class="slide" id="reg">
+  <div class="hdr in"><span class="qn">03</span><h2>What Makes a System Linearizable?</h2></div>
+  <div class="cols" style="grid-template-columns:.78fr 1.3fr;gap:22px">
+    <div>
+      <p style="font-size:18px">3 clients cùng đọc/ghi key <code class="i">x</code> — trong literature gọi là một <b>register</b> (một key trong KV store, một row, một document…).</p>
+      <ul class="mini" style="margin-top:6px">
+        <li><code class="i">read(x) ⇒ v</code></li>
+        <li><code class="i">write(x, v) ⇒ r</code> (r = ok / error)</li>
+      </ul>
+      <p class="ps" style="margin-top:8px">Mỗi thanh là một request: đầu thanh = lúc gửi, cuối thanh = lúc nhận response. Do network delay, client chỉ biết request được xử lý <b>đâu đó</b> trong khoảng đó.</p>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <div class="code-title">Figure 9-2 / 9-3 · x ban đầu = 0, client C write x = 1</div>
+      <svg class="sv" id="f92" viewBox="0 0 700 330">
+        <line class="lane" x1="90" y1="60" x2="690" y2="60"/><text x="8" y="65" class="ll">Client A</text>
+        <line class="lane" x1="90" y1="135" x2="690" y2="135"/><text x="8" y="140" class="ll">Client B</text>
+        <line class="lane" x1="90" y1="210" x2="690" y2="210"/><text x="8" y="215" class="ll">Client C</text>
+        <line class="lane s" x1="90" y1="290" x2="690" y2="290"/><text x="8" y="295" class="ll">DB: x</text>
+        <text x="100" y="282" class="lb">x = 0</text>
+        <g class="g" id="r1"><rect class="bar c" x="230" y="196" width="250" height="28" rx="8"/><text x="355" y="215" text-anchor="middle" class="cy" style="font-size:14px">write(x, 1) ⇒ ok</text></g>
+        <g class="g" id="r2"><rect class="bar ok" x="100" y="46" width="105" height="28" rx="8"/><text x="152" y="65" text-anchor="middle" class="gn" style="font-size:14px">read ⇒ 0</text></g>
+        <g class="g" id="r3"><rect class="bar ok" x="520" y="46" width="110" height="28" rx="8"/><text x="575" y="65" text-anchor="middle" class="gn" style="font-size:14px">read ⇒ 1</text></g>
+        <g class="g" id="r4"><rect class="bar y" x="250" y="46" width="110" height="28" rx="8"/><text x="305" y="65" text-anchor="middle" class="am" style="font-size:14px" id="r4t">0 hoặc 1?</text>
+          <rect class="bar y" x="270" y="121" width="105" height="28" rx="8"/><text x="322" y="140" text-anchor="middle" class="am" style="font-size:14px">0 hoặc 1?</text>
+          <rect class="bar y" x="395" y="121" width="105" height="28" rx="8" id="r4b"/><text x="447" y="140" text-anchor="middle" class="am" style="font-size:14px" id="r4bt">0 hoặc 1?</text></g>
+        <g class="g" id="r5"><text x="420" y="105" class="lb" style="fill:#be123c">flip 1 → 0 ?!</text></g>
+        <g class="g" id="r6"><line x1="300" y1="250" x2="300" y2="300" stroke="#ec4899" stroke-width="3"/><text x="306" y="282" class="lb" style="fill:#db2777">x = 1 (atomic flip)</text>
+          <path class="m k dl" d="M362,74 L395,122" marker-end="url(#ak)"/></g>
+      </svg>
+      <span class="f ghost" data-act="#r1|on" data-say="Client C gửi <code class='i'>write(x, 1)</code>. Write có hiệu lực tại một thời điểm nào đó giữa đầu và cuối thanh."></span>
+      <span class="f ghost" data-act="#r2|on" data-say="Read đầu tiên của A <b>kết thúc trước khi</b> write bắt đầu → chắc chắn trả <b>0</b>."></span>
+      <span class="f ghost" data-act="#r3|on" data-say="Read cuối của A <b>bắt đầu sau khi</b> write xong → nếu linearizable, chắc chắn trả <b>1</b>."></span>
+      <span class="f ghost" data-act="#r4|on" data-say="Các read <b>overlap</b> với write là <b>concurrent</b> — có thể trả 0 hoặc 1."></span>
+      <span class="f ghost" data-now="#r5|on;#r4b|bad" data-set="#r4t::read ⇒ 1;#r4bt::read ⇒ 0" data-say="Nhưng chỉ vậy thì chưa đủ: value có thể “nhảy qua lại” giữa cũ và mới — đó chỉ là <b>regular register</b>, không giống “single copy”."></span>
+      <span class="f ghost" data-act="#r6|on;#r4b|ok" data-set="#r4t::read ⇒ 1;#r4bt::read ⇒ 1" data-say="Ràng buộc thêm: có một thời điểm x <b>atomically flip</b> 0 → 1. Khi đã có <b>một</b> read trả value mới, <b>mọi read sau đó</b> (bất kể client) cũng phải trả value mới — kể cả khi write chưa xong."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CAS / FIG 9-4 ===================== -->
+<section class="slide" id="cas">
+  <div class="hdr in"><span class="qn">04</span><h2>Thêm <code class="i" style="font-size:.8em">cas</code> &amp; thứ tự tuyến tính hóa</h2></div>
+  <p class="in" style="font-size:18px"><code class="i">cas(x, v<sub>old</sub>, v<sub>new</sub>) ⇒ r</code>: nếu x = v<sub>old</sub> thì atomically set x = v<sub>new</sub>, ngược lại trả error. Mỗi operation có một “điểm thực thi”; nối các điểm đó lại phải thành một sequence hợp lệ <b>và luôn đi tiến theo thời gian</b>.</p>
+  <div class="rowc" style="margin-top:14px;flex-wrap:nowrap;gap:8px">
+    <div style="text-align:center"><div class="tiny">register x</div><div class="vbox" id="cx">0</div></div>
+    <span class="seqarr">▶</span>
+    <div class="opc hid" id="o1"><small>D</small>write(x,0)<span class="rv">ok</span></div>
+    <div class="opc hid" id="o2"><small>A</small>write(x,1)<span class="rv">ok</span></div>
+    <div class="opc hid" id="o3"><small>B</small>read(x)<span class="rv">⇒ 1</span></div>
+    <div class="opc hid" id="o4"><small>B</small>cas(x,1,2)<span class="rv">ok</span></div>
+    <div class="opc hid" id="o5"><small>C</small>read(x)<span class="rv">⇒ 2</span></div>
+    <div class="opc hid" id="o6"><small>D</small>cas(x,0,3)<span class="rv">error</span></div>
+    <div class="opc hid" id="o7"><small>C</small>cas(x,2,4)<span class="rv">ok</span></div>
+    <div class="opc hid" id="o8"><small>A</small>read(x)<span class="rv">⇒ 4</span></div>
+    <div class="opc hid" id="o9"><small>B</small>read(x)<span class="rv">⇒ 2</span></div>
+  </div>
+  <span class="f ghost" data-act="#o1|on;#o2|on;#o3|on;#o3|okc" data-set="#cx::1" data-say="B gửi read trước, rồi D write 0, rồi A write 1 — nhưng DB xử lý D → A → B, nên B đọc được <b>1</b>. Hợp lệ vì 3 request <b>concurrent</b> (có thể B bị delay trên network)."></span>
+  <span class="f ghost" data-act="#o3|okc" data-say="B nhận 1 <b>trước khi</b> A nhận ok cho write của mình — cũng hợp lệ: chỉ là response “ok” tới A bị delay."></span>
+  <span class="f ghost" data-act="#o4|on;#o5|on;#o5|okc" data-set="#cx::2" data-say="Không có transaction isolation: C đọc 1 rồi 2 vì B đã <b>cas</b> 1 → 2 giữa hai lần đọc."></span>
+  <span class="f ghost" data-act="#o6|on;#o6|errc" data-set="#cx::2" data-say="<b>cas</b> giúp kiểm tra value không bị đổi concurrent: cas của D <b>fail</b> vì lúc DB xử lý, x đã ≠ 0."></span>
+  <span class="f ghost" data-act="#o7|on;#o8|on;#o8|okc" data-set="#cx::4" data-say="C cas 2 → 4 thành công; A đọc được <b>4</b>."></span>
+  <span class="f ghost" data-act="#o9|on;#o9|badc" data-set="#cx::4" data-say="Read cuối của B (concurrent với cas của C) trả <b>2</b> → <b>không linearizable</b>: A đã thấy 4 <b>trước khi</b> read của B bắt đầu, nên B không được thấy value cũ hơn. Lại là chuyện Alice &amp; Bob!"></span>
+  <p class="say" style="margin-top:18px;min-height:84px">Nhấn → để chạy từng bước.</p>
+  <div class="note blue f" style="font-size:17px">Có thể <b>test</b> linearizability (dù tốn kém về tính toán): ghi lại timing của mọi request/response rồi kiểm tra xem có sắp xếp được thành một sequential order hợp lệ hay không.</div>
+</section>
+
+<!-- ===================== LIN VS SER ===================== -->
+<section class="slide" id="linser">
+  <div class="hdr in"><span class="qn">05</span><h2>Linearizability <span class="muted" style="font-weight:600">vs</span> Serializability</h2></div>
+  <p class="in muted" style="font-size:19px">Cả hai nghe như “có thể sắp xếp theo thứ tự tuần tự” — nhưng là hai guarantee <b>rất khác nhau</b>.</p>
+  <div class="cols" style="margin-top:14px;gap:22px">
+    <div class="card f"><span class="lbl info">SERIALIZABILITY</span><h3>Isolation property của transactions</h3>
+      <ul class="mini"><li>Mỗi transaction có thể read/write <b>nhiều object</b> (rows, documents, records).</li><li>Đảm bảo các transaction chạy <b>như thể</b> theo một serial order nào đó.</li><li>Serial order đó <b>được phép khác</b> thứ tự thực tế.</li></ul></div>
+    <div class="card f"><span class="lbl good">LINEARIZABILITY</span><h3>Recency guarantee trên một register</h3>
+      <ul class="mini"><li>Áp dụng cho read/write của <b>một object riêng lẻ</b>.</li><li>Không gom operation thành transaction → <b>không</b> ngăn được <b>write skew</b>…</li><li>…trừ khi dùng thêm biện pháp như <b>materializing conflicts</b>.</li></ul></div>
+  </div>
+  <div class="formula f" style="margin-top:16px">Serializability + Linearizability = <span class="grad">strict serializability</span> <span class="muted" style="font-size:17px">(strong one-copy serializability, strong-1SR)</span></div>
+  <div class="cols3" style="margin-top:14px">
+    <div class="card f"><h3>Two-Phase Locking (2PL)</h3><span class="pv yes">✓ linearizable</span><p class="ps" style="margin-top:6px">Implementation serializability điển hình là linearizable.</p></div>
+    <div class="card f"><h3>Actual Serial Execution</h3><span class="pv yes">✓ linearizable</span><p class="ps" style="margin-top:6px">Chạy thật sự tuần tự trên một thread.</p></div>
+    <div class="card f"><h3>Serializable Snapshot Isolation</h3><span class="pv no">✗ not linearizable</span><p class="ps" style="margin-top:6px">Read từ <b>consistent snapshot</b> — cố ý không chứa write mới hơn snapshot.</p></div>
+  </div>
+</section>
+
+<!-- ===================== RELYING ===================== -->
+<section class="slide" id="rely">
+  <div class="hdr in"><span class="qn">06</span><h2>Relying on Linearizability</h2></div>
+  <p class="in muted" style="font-size:19px">Xem tỉ số bóng đá chậm vài giây thì chẳng sao. Nhưng có những chỗ linearizability là <b>yêu cầu bắt buộc</b> để hệ thống chạy đúng:</p>
+  <div class="cols3" style="margin-top:16px">
+    <div class="card f zoom"><div class="icon">🔐</div><h3>Locking &amp; leader election</h3>
+      <ul class="mini2"><li>Single-leader cần đảm bảo chỉ có <b>một</b> leader (tránh split brain) → dùng <b>lock</b>: ai acquire được thì làm leader.</li><li>Lock phải <b>linearizable</b> — mọi node đồng ý ai đang giữ lock.</li><li><b>ZooKeeper</b>, <b>etcd</b> dùng consensus để làm điều này; <b>Apache Curator</b> cung cấp recipes cấp cao.</li><li><b>Oracle RAC</b>: lock per disk page, nằm trên critical path.</li></ul></div>
+    <div class="card f zoom"><div class="icon">🆔</div><h3>Constraints &amp; uniqueness</h3>
+      <ul class="mini2"><li>Username/email là duy nhất; không có 2 file cùng path.</li><li>Giống acquire “lock” trên username, hay một <b>compare-and-set</b>.</li><li>Balance không âm, không bán quá stock, không double-book ghế → cần <b>một value up-to-date</b> mà mọi node đồng ý.</li><li><b>Hard</b> uniqueness constraint cần linearizability; foreign key / attribute constraints thì không.</li></ul></div>
+    <div class="card f zoom"><div class="icon">📡</div><h3>Cross-channel timing dependencies</h3>
+      <ul class="mini2"><li>Alice &amp; Bob: vi phạm chỉ bị phát hiện vì có <b>kênh thứ hai</b> (giọng Alice → tai Bob).</li><li>Hệ thống máy tính cũng có tình huống tương tự — ví dụ image resizer (slide sau).</li></ul></div>
+  </div>
+  <div class="note f" style="font-size:17px">ZooKeeper/etcd: write linearizable, nhưng read mặc định có thể <b>stale</b> (serve từ bất kỳ replica). Muốn linearizable read: etcd dùng <b>quorum read</b>, ZooKeeper gọi <code class="i">sync()</code> trước khi read. Overbooking chấp nhận được? → có thể xử lý “lỏng” (bồi thường), không cần linearizability.</div>
+</section>
+
+<!-- ===================== CROSS CHANNEL ===================== -->
+<section class="slide" id="xchan">
+  <div class="hdr in"><span class="qn">07</span><h2>Cross-channel race: image resizer</h2></div>
+  <div class="cols" style="grid-template-columns:.8fr 1.25fr;gap:22px">
+    <div>
+      <p style="font-size:18px">Website cho upload ảnh; background process resize thành thumbnail. Ảnh có thể vài MB → không đặt vào queue, mà ghi vào <b>file storage</b> trước, rồi mới gửi instruction vào <b>message queue</b>.</p>
+      <p class="say" style="font-size:17px;min-height:110px">Nhấn → để chạy từng bước.</p>
+      <div class="note f" style="font-size:16.5px">Có <b>2 communication channels</b> giữa web server và resizer: file storage và message queue. Thiếu recency guarantee của linearizability → race condition giữa hai kênh. Linearizability không phải cách duy nhất, nhưng <b>dễ hiểu nhất</b>; nếu kiểm soát được kênh phụ, có thể dùng cách như read-your-writes (phức tạp hơn).</div>
+    </div>
+    <div>
+      <div class="code-title">Figure 9-5</div>
+      <svg class="sv" id="f95" viewBox="0 0 680 400">
+        <rect class="nd c3" x="10" y="170" width="100" height="56" rx="12"/><text x="60" y="203" text-anchor="middle">👤 User</text>
+        <rect class="nd" x="170" y="160" width="130" height="76" rx="12"/><text x="235" y="195" text-anchor="middle">Web server</text><text x="235" y="214" text-anchor="middle" class="sm">upload handler</text>
+        <rect class="nd c2" x="400" y="14" width="270" height="140" rx="14"/><text x="535" y="38" text-anchor="middle">File storage service</text>
+        <rect class="nd" x="420" y="58" width="110" height="70" rx="10" id="fsA"/><text x="475" y="90" text-anchor="middle" style="font-size:13px">replica A</text><text x="475" y="110" text-anchor="middle" class="sm" id="fsAt">empty</text>
+        <rect class="nd" x="545" y="58" width="110" height="70" rx="10" id="fsB"/><text x="600" y="90" text-anchor="middle" style="font-size:13px">replica B</text><text x="600" y="110" text-anchor="middle" class="sm" id="fsBt">empty</text>
+        <rect class="nd c5" x="330" y="300" width="150" height="56" rx="12"/><text x="405" y="333" text-anchor="middle">Message queue</text>
+        <rect class="nd c4" x="545" y="240" width="125" height="76" rx="12"/><text x="607" y="275" text-anchor="middle">Image</text><text x="607" y="294" text-anchor="middle">resizer</text>
+        <g class="g" id="x1"><path class="m k dl" d="M110,198 L168,198" marker-end="url(#ak)"/><text x="116" y="188" class="lb">①</text></g>
+        <g class="g" id="x2"><path class="m dl" d="M290,160 L418,100" marker-end="url(#ap)"/><text x="250" y="112" class="lb">② store full-size</text></g>
+        <g class="g" id="x3"><path class="m gr dl" d="M260,236 L340,298" marker-end="url(#ag)"/><text x="190" y="280" class="lb" style="fill:#059669">③ “resize #123”</text></g>
+        <g class="g" id="x4"><path class="m gr dl" d="M480,320 L543,295" marker-end="url(#ag)"/><text x="488" y="336" class="lb" style="fill:#059669">④</text></g>
+        <g class="g" id="x5"><path class="m y dl" d="M600,238 L600,132" marker-end="url(#ay)"/><text x="608" y="200" class="lb" style="fill:#b45309">⑤ fetch</text></g>
+        <g class="g" id="x6"><path class="m c dl" d="M640,238 L640,132" marker-end="url(#ac)"/><text x="610" y="226" class="lb" style="fill:#0e7490">⑥</text></g>
+        <g class="g" id="x7"><path class="m dash dl" d="M530,93 L543,93" marker-end="url(#ap)"/><text x="520" y="174" text-anchor="middle" class="lb" style="fill:#be123c">replication nội bộ chậm hơn queue!</text></g>
+      </svg>
+      <span class="f ghost" data-act="#x1|on" data-say="① User upload ảnh lên web server."></span>
+      <span class="f ghost" data-act="#x2|on;#fsA|ok" data-set="#fsAt::photo v1 ✓" data-say="② Web server ghi ảnh full-size vào file storage (replica A đã có)."></span>
+      <span class="f ghost" data-act="#x3|on;#x4|on" data-say="③ Ghi xong → đặt message “resize #123” vào queue. ④ Resizer nhận message."></span>
+      <span class="f ghost" data-act="#x5|on;#x7|on;#fsB|bad" data-set="#fsBt::⏳ chưa có" data-say="⑤ Resizer fetch ảnh, nhưng request rơi vào <b>replica B</b> chưa được replicate: queue <b>nhanh hơn</b> replication nội bộ của storage → thấy ảnh cũ hoặc không thấy gì."></span>
+      <span class="f ghost" data-act="#x6|on" data-say="⑥ Nếu resize bản cũ rồi lưu lại → ảnh full-size và thumbnail <b>vĩnh viễn inconsistent</b>. Nếu file storage linearizable thì không có vấn đề này."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== IMPLEMENTING ===================== -->
+<section class="slide" id="impl">
+  <div class="hdr in"><span class="qn">08</span><h2>Implementing Linearizable Systems</h2></div>
+  <p class="in" style="font-size:19px">Đơn giản nhất: thật sự chỉ dùng <b>một copy</b> — nhưng không fault-tolerant. Cách phổ biến để chịu lỗi là <b>replication</b>. Vậy các phương pháp replication ở Chapter 5 có linearizable được không?</p>
+  <div style="margin-top:12px">
+    <div class="vrow f"><b class="nm">Single-leader</b><span class="pv maybe">≈ potentially</span><p>Read từ leader hoặc synchronous follower <i>có thể</i> linearizable. Nhưng: dùng snapshot isolation, bug, <b>“delusional leader”</b> tưởng mình còn là leader, hoặc async failover làm mất committed writes.</p></div>
+    <div class="vrow f"><b class="nm">Consensus algorithms</b><span class="pv yes">✓ linearizable</span><p>Giống single-leader nhưng có cơ chế chống <b>split brain</b> và stale replicas → implement linearizable storage an toàn. Đây là cách <b>ZooKeeper</b> và <b>etcd</b> hoạt động.</p></div>
+    <div class="vrow f"><b class="nm">Multi-leader</b><span class="pv no">✗ not</span><p>Xử lý write concurrent trên nhiều node rồi replicate asynchronously → conflicting writes cần resolution — hệ quả của việc <b>không có single copy</b>.</p></div>
+    <div class="vrow f"><b class="nm">Leaderless (Dynamo-style)</b><span class="pv no">✗ probably not</span><p>“Strong consistency” nhờ quorum <code class="i">w + r &gt; n</code>? Không hẳn. <b>LWW</b> dựa trên time-of-day clock (Cassandra) gần như chắc chắn không linearizable vì clock skew; <b>sloppy quorums</b> phá hết.</p></div>
+  </div>
+  <p class="tiny f" style="margin-top:6px">Partition (shard) một single-leader DB không ảnh hưởng linearizability — vì đây là guarantee trên <b>single object</b>. Cross-partition transactions là chuyện khác.</p>
+</section>
+
+<!-- ===================== QUORUM ===================== -->
+<section class="slide" id="quorum">
+  <div class="hdr in"><span class="qn">09</span><h2>Linearizability &amp; quorums</h2></div>
+  <div class="cols" style="grid-template-columns:.78fr 1.3fr;gap:22px">
+    <div>
+      <div class="formula" style="font-size:20px">n = 3, w = 3, r = 2<br><span class="muted" style="font-size:16px">w + r &gt; n ✓ (strict quorum)</span></div>
+      <p class="say" style="font-size:17px;min-height:120px">Nhấn → để chạy từng bước.</p>
+      <div class="card f" style="padding:10px 14px"><h3 style="font-size:18px">Sửa được — nhưng tốn performance</h3>
+        <ul class="mini2"><li>Reader làm <b>read repair synchronously</b> trước khi trả kết quả.</li><li>Writer phải đọc state mới nhất của một quorum trước khi write.</li><li><b>Riak</b> không làm sync read repair; <b>Cassandra</b> có đợi, nhưng mất linearizability khi concurrent writes do <b>LWW</b>.</li><li><b>Linearizable compare-and-set</b> thì không làm được kiểu này — cần <b>consensus</b>.</li></ul></div>
+    </div>
+    <div>
+      <div class="code-title">Figure 9-6 · nonlinearizable dù dùng strict quorum</div>
+      <svg class="sv" id="f96" viewBox="0 0 700 440">
+        <line class="lane" x1="110" y1="40" x2="690" y2="40"/><text x="8" y="45" class="ll">Writer</text>
+        <line class="lane s" x1="110" y1="115" x2="690" y2="115"/><text x="8" y="120" class="ll">Replica 1</text>
+        <line class="lane s" x1="110" y1="185" x2="690" y2="185"/><text x="8" y="190" class="ll">Replica 2</text>
+        <line class="lane s" x1="110" y1="255" x2="690" y2="255"/><text x="8" y="260" class="ll">Replica 3</text>
+        <line class="lane" x1="110" y1="330" x2="690" y2="330"/><text x="8" y="335" class="ll">Reader A</text>
+        <line class="lane" x1="110" y1="395" x2="690" y2="395"/><text x="8" y="400" class="ll">Reader B</text>
+        <g class="g" id="q1"><circle class="dot" cx="140" cy="40" r="6"/><text x="120" y="26" class="lb">set x = 1</text>
+          <path class="m dl" d="M142,44 L215,112" marker-end="url(#ap)"/>
+          <path class="m dash dl" d="M142,44 L590,182" marker-end="url(#ap)"/>
+          <path class="m dash dl" d="M142,44 L640,252" marker-end="url(#ap)"/>
+          <text x="222" y="104" class="lb">x=1 ✓</text><text x="560" y="172" class="lb">x=1 (muộn)</text><text x="615" y="243" class="lb">x=1 (muộn)</text></g>
+        <g class="g" id="q2"><path class="m c dl" d="M250,328 L275,118" marker-end="url(#ac)"/><path class="m c dl" d="M258,328 L290,188" marker-end="url(#ac)"/>
+          <path class="m c dl" d="M285,118 L330,326" marker-end="url(#ac)"/><path class="m c dl" d="M300,188 L338,326" marker-end="url(#ac)"/>
+          <text x="232" y="148" class="lb" style="fill:#0e7490">1</text><text x="300" y="206" class="lb" style="fill:#0e7490">0</text>
+          <rect class="bar ok" x="240" y="342" width="150" height="24" rx="8"/><text x="315" y="359" text-anchor="middle" class="gn" style="font-size:13px">{1, 0} ⇒ 1</text></g>
+        <g class="g" id="q3"><path class="m k dl" d="M410,393 L440,190" marker-end="url(#ak)"/><path class="m k dl" d="M418,393 L455,260" marker-end="url(#ak)"/>
+          <path class="m k dl" d="M450,190 L490,391" marker-end="url(#ak)"/><path class="m k dl" d="M465,260 L498,391" marker-end="url(#ak)"/>
+          <text x="455" y="206" class="lb" style="fill:#be185d">0</text><text x="470" y="276" class="lb" style="fill:#be185d">0</text>
+          <rect class="bar bad" x="505" y="370" width="165" height="24" rx="8"/><text x="587" y="387" text-anchor="middle" class="r" style="font-size:13px">{0, 0} ⇒ 0 ❌</text></g>
+        <g class="g" id="q4"><line x1="390" y1="300" x2="390" y2="410" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="5 4"/><text x="396" y="434" class="lb" style="fill:#b45309">↑ A xong → B bắt đầu</text></g>
+      </svg>
+      <span class="f ghost" data-act="#q1|on" data-say="Writer gửi <code class='i'>x = 1</code> tới cả 3 replicas. Tới replica 1 nhanh, tới replica 2 và 3 <b>chậm</b> (variable network delay)."></span>
+      <span class="f ghost" data-act="#q2|on" data-say="Reader A đọc quorum {1, 2}: thấy 1 và 0 → lấy value mới hơn: <b>1</b>."></span>
+      <span class="f ghost" data-act="#q3|on;#q4|on" data-say="Reader B bắt đầu <b>sau khi</b> A xong, đọc quorum {2, 3}: cả hai vẫn là 0 → <b>0</b>. Quorum condition thỏa mãn nhưng <b>không linearizable</b> — lại là Alice &amp; Bob."></span>
+      <span class="f ghost" data-say="Kết luận: an toàn nhất là giả định <b>leaderless Dynamo-style</b> replication <b>không</b> cung cấp linearizability."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== COST ===================== -->
+<section class="slide" id="cost">
+  <div class="hdr in"><span class="qn">10</span><h2>The Cost of Linearizability</h2></div>
+  <p class="in muted" style="font-size:19px">Multi-datacenter deployment (Figure 9-7). Điều gì xảy ra khi network <b>giữa hai datacenter</b> bị đứt (trong từng DC vẫn ổn, client vẫn tới được DC của mình)?</p>
+  <div class="toggle in" style="margin:12px 0 14px" id="ctog"><span class="pill on" id="cp1">Single-leader</span><span class="pill" id="cp2">Multi-leader</span></div>
+  <div style="display:grid;grid-template-columns:1fr 230px 1fr;gap:16px;align-items:center">
+    <div class="dc" id="dc1"><h4>Datacenter 1</h4>
+      <div class="sysbox" id="db1" style="font-size:18px">👑 Leader DB</div>
+      <div class="sysbox" id="cl1" style="margin-top:10px;font-size:17px">👥 Clients DC1: read/write OK</div></div>
+    <div class="link" id="clink"><span id="clinkt">replication</span><div class="wire"></div><span id="clinkb">sync requests →</span></div>
+    <div class="dc" id="dc2"><h4>Datacenter 2</h4>
+      <div class="sysbox" id="db2" style="font-size:18px">Follower DB</div>
+      <div class="sysbox" id="cl2" style="margin-top:10px;font-size:17px">👥 Clients DC2: write &amp; linearizable read → gửi sang leader</div></div>
+  </div>
+  <span class="f ghost" data-act="#clink|cut" data-set="#clinkt::✂ network interruption;#clinkb::DC không nói chuyện được" data-say="Network giữa 2 DC bị đứt."></span>
+  <span class="f ghost" data-act="#clink|cut;#cl2|fail;#cl1|ok" data-set="#clinkt::✂ network interruption;#clinkb::DC không nói chuyện được;#cl2::❌ Không write, không linearizable read được (chỉ còn stale read từ follower);#cl1::✅ DC1 vẫn chạy bình thường" data-say="<b>Single-leader</b>: client ở DC2 không tới được leader → không write, không linearizable read → <b>unavailable</b> cho tới khi link được sửa."></span>
+  <span class="f ghost" data-act="#clink|cut;#cp1|x;#ctog|flip;#cl1|ok;#cl2|ok" data-set="#clinkt::✂ network interruption;#clinkb::writes được queue lại;#db1::👑 Leader DB;#db2::👑 Leader DB;#cl1::✅ DC1 hoạt động bình thường;#cl2::✅ DC2 hoạt động bình thường" data-say="<b>Multi-leader</b>: mỗi DC có leader riêng, write được replicate <b>asynchronously</b> → cứ queue lại và trao đổi khi network phục hồi. Available — nhưng <b>không linearizable</b>."></span>
+  <p class="say">Nhấn → để chạy từng bước.</p>
+  <div class="note f" style="font-size:17px">Đây không phải chuyện riêng của single- vs multi-leader hay multi-DC: <b>bất kỳ</b> linearizable database nào cũng gặp vấn đề này, trên <b>bất kỳ</b> unreliable network nào, kể cả trong một datacenter.</div>
+</section>
+
+<!-- ===================== CAP ===================== -->
+<section class="slide" id="cap">
+  <div class="hdr in"><span class="qn">11</span><h2>The CAP theorem <span class="muted" style="font-weight:600;font-size:26px">(và vì sao nên tránh nó)</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:24px">
+    <div>
+      <div class="card bad f"><span class="lbl info">CẦN LINEARIZABILITY</span><p class="ps">Replicas bị ngắt khỏi phần còn lại vì network problem → <b>không xử lý request</b> được: phải đợi hoặc trả error → <b>unavailable</b>.</p></div>
+      <div class="card good f" style="margin-top:10px"><span class="lbl good">KHÔNG CẦN LINEARIZABILITY</span><p class="ps">Mỗi replica xử lý request <b>độc lập</b> (vd. multi-leader) → vẫn <b>available</b> khi network có vấn đề, nhưng hành vi không linearizable.</p></div>
+      <p class="ps f" style="margin-top:10px">Được Eric Brewer đặt tên năm <b>2000</b> (dù trade-off đã được biết từ 1970s). Ban đầu là <b>rule of thumb</b> để mở thảo luận → khuyến khích khám phá <b>shared-nothing</b> systems, góp phần vào làn sóng <b>NoSQL</b>.</p>
+      <p class="tiny f">CP / AP là cách phân loại có nhiều lỗi — tốt nhất nên tránh.</p>
+    </div>
+    <div>
+      <h3>The Unhelpful CAP Theorem</h3>
+      <div class="rowc f" style="justify-content:center;margin:8px 0" id="captri">
+        <span class="pill on">C</span><span class="pill on">A</span><span class="pill on" id="capP">P</span><span class="muted" style="font-weight:700" id="capPick">“pick 2 out of 3”</span>
+      </div>
+      <span class="f ghost" data-act="#capP|x" data-set="#capPick::❌ misleading!" data-say="Network partition là một loại <b>fault</b> — không phải thứ bạn được chọn. Nó sẽ xảy ra dù bạn muốn hay không."></span>
+      <div class="formula f" style="font-size:20px;margin-top:6px">Either <span class="grad">Consistent</span> or <span class="grad">Available</span><br>when <span class="grad">Partitioned</span></div>
+      <ul class="mini" style="margin-top:10px">
+        <li class="f">Network ổn → có thể có cả linearizability lẫn total availability. Chỉ khi có fault mới phải chọn.</li>
+        <li class="f">Định nghĩa <b>availability</b> trong CAP mâu thuẫn, không khớp nghĩa thông thường.</li>
+        <li class="f">Phạm vi <b>rất hẹp</b>: chỉ 1 consistency model (linearizability) + 1 loại fault (network partition). Không nói gì về network delays, dead nodes… → đã bị thay thế bởi kết quả chính xác hơn, giờ chủ yếu mang <b>ý nghĩa lịch sử</b>.</li>
+      </ul>
+      <p class="say" style="font-size:16px;min-height:44px"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== NETWORK DELAYS ===================== -->
+<section class="slide" id="delay">
+  <div class="hdr in"><span class="qn">12</span><h2>Linearizability &amp; network delays</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:26px">
+    <div>
+      <h3>Ngay cả RAM trên multi-core CPU cũng không linearizable</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px">
+        <div class="cpu"><div>⚙️ Core 1</div><div class="cache" id="c1">cache: x=0</div></div>
+        <div class="cpu"><div>⚙️ Core 2</div><div class="cache" id="c2">cache: x=0</div></div>
+      </div>
+      <div class="big-ar" style="margin:6px 0;font-size:22px">⇅ async</div>
+      <div class="ram" id="ram">Main memory: x = 0</div>
+      <span class="f ghost" data-act="#c1|hot" data-set="#c1::cache/store buffer: x=1" data-say="Thread trên core 1 write <code class='i'>x = 1</code> — đi vào <b>cache &amp; store buffer</b> của core 1 trước."></span>
+      <span class="f ghost" data-now="#c2|bad" data-set="#c1::cache/store buffer: x=1;#c2::read x ⇒ 0 😕" data-say="Thread trên core 2 đọc x ngay sau đó → vẫn thấy <b>0</b> (trừ khi dùng <b>memory barrier / fence</b>)."></span>
+      <span class="f ghost" data-act="#ram|hot" data-set="#c1::cache: x=1;#ram::Main memory: x = 1;#c2::cache: x=1" data-say="Thay đổi được ghi ra main memory <b>asynchronously</b>. Nhiều copy, cập nhật async → mất linearizability."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <div class="card f"><h3>Vì sao chấp nhận?</h3><p class="ps">Trong một máy, ta không kỳ vọng core tiếp tục chạy khi bị ngắt khỏi phần còn lại → không phải vì CAP. Lý do bỏ linearizability là <b>performance</b>, không phải fault tolerance. Nhiều distributed DB cũng vậy.</p></div>
+      <div class="formula f" style="margin-top:12px;font-size:19px">Linearizability is <span class="grad">slow</span> — <b>all the time</b>,<br>không chỉ khi có network fault</div>
+      <div class="card f" style="margin-top:12px"><h3>Attiya &amp; Welch</h3><p class="ps">Chứng minh: muốn linearizability thì response time của read/write <b>tối thiểu tỉ lệ với độ bất định của network delay</b>. Network delay biến động mạnh → linearizable read/write chắc chắn chậm. Không tồn tại thuật toán nhanh hơn; nhưng consistency model <b>yếu hơn</b> có thể nhanh hơn nhiều.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ORDERING ===================== -->
+<section class="slide" id="order">
+  <div class="hdr in"><span class="qn">13</span><h2>Ordering Guarantees</h2></div>
+  <p class="in muted" style="font-size:19px">Linearizable register: mọi operation có hiệu lực atomically tại một thời điểm → ngầm định một <b>thứ tự</b> rõ ràng. “Ordering” xuất hiện lặp đi lặp lại trong sách:</p>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:24px;margin-top:10px">
+    <div class="stack">
+      <div class="leg a f"><b>Chapter 5 · Replication</b><p>Mục đích chính của leader: quyết định <b>thứ tự writes</b> trong replication log. Không có single leader → conflicts do concurrent operations.</p></div>
+      <div class="leg b f"><b>Chapter 7 · Serializability</b><p>Transaction chạy như thể theo một <b>sequential order</b> — thực thi tuần tự thật, hoặc concurrent nhưng ngăn serialization conflicts.</p></div>
+      <div class="leg c f"><b>Chapter 8 · Timestamps &amp; clocks</b><p>Một nỗ lực khác để đưa trật tự vào thế giới hỗn loạn, vd. xác định write nào xảy ra sau.</p></div>
+    </div>
+    <div>
+      <svg class="sv" id="tri" viewBox="0 0 520 330">
+        <g class="g" id="tr1"><path class="m k dl" d="M260,70 L95,260"/><path class="m k dl" d="M260,70 L425,260"/><path class="m k dl" d="M95,265 L425,265"/></g>
+        <rect class="nd" x="180" y="30" width="160" height="56" rx="14"/><text x="260" y="64" text-anchor="middle" class="xl">Ordering</text>
+        <rect class="nd c2" x="10" y="240" width="190" height="56" rx="14"/><text x="105" y="274" text-anchor="middle" class="xl">Linearizability</text>
+        <rect class="nd c3" x="330" y="240" width="180" height="56" rx="14"/><text x="420" y="274" text-anchor="middle" class="xl">Consensus</text>
+        <g class="g" id="tr2"><text x="260" y="190" text-anchor="middle" class="lb" style="font-size:16px;fill:#db2777">deep connections</text></g>
+      </svg>
+      <span class="f ghost" data-act="#tr1|on;#tr2|on"></span>
+      <p class="ps f" style="text-align:center">Lý thuyết hơn phần còn lại của sách — nhưng giúp hiểu rõ hệ thống <b>làm được gì và không làm được gì</b>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CAUSALITY ===================== -->
+<section class="slide" id="causal">
+  <div class="hdr in"><span class="qn">14</span><h2>Ordering &amp; <span class="grad">Causality</span></h2></div>
+  <p class="in muted" style="font-size:19px">Ordering quan trọng vì nó giữ được <b>causality</b> (nhân quả) — đã gặp nhiều lần trong sách:</p>
+  <div class="cols2x3" style="margin-top:10px">
+    <div class="card f"><h3>💬 Consistent prefix reads</h3><p class="ps">Thấy câu trả lời <b>trước</b> câu hỏi → vi phạm nhân quả. Có <b>causal dependency</b> giữa question và answer.</p></div>
+    <div class="card f"><h3>🔀 Multi-leader overtaking</h3><p class="ps">Một update “vượt” insert do network delay → update một row chưa tồn tại. Row phải được <b>tạo trước</b> khi update.</p></div>
+    <div class="card f"><h3>⏩ Happened-before</h3><p class="ps">A trước B, B trước A, hoặc <b>concurrent</b>. Nếu A happened before B → B có thể đã biết/dựa vào A.</p></div>
+    <div class="card f"><h3>📸 Snapshot isolation</h3><p class="ps">“Consistent snapshot” = <b>consistent with causality</b>: snapshot có answer thì phải có question. Read skew = vi phạm causality.</p></div>
+    <div class="card f"><h3>🩺 Write skew</h3><p class="ps">Alice off-call vì tưởng Bob vẫn on-call: hành động phụ thuộc nhân quả vào việc <b>quan sát</b> ai đang on-call. SSI theo dõi causal deps.</p></div>
+    <div class="card f"><h3>⚽ Alice &amp; Bob</h3><p class="ps">Bob nhận stale result <b>sau khi</b> nghe Alice: lời Alice phụ thuộc nhân quả vào tỉ số → vi phạm causality (giống image resizer).</p></div>
+  </div>
+  <div class="note blue f" style="font-size:17.5px">Causality áp đặt thứ tự: cause trước effect, message gửi trước khi nhận, question trước answer. Chuỗi phụ thuộc đó tạo thành <b>causal order</b>. Hệ thống tuân theo nó gọi là <b>causally consistent</b> — vd. snapshot isolation.</div>
+</section>
+
+<!-- ===================== PARTIAL ORDER ===================== -->
+<section class="slide" id="partial">
+  <div class="hdr in"><span class="qn">15</span><h2>The causal order is <span class="grad">not a total order</span></h2></div>
+  <div class="cols" style="grid-template-columns:.9fr 1.2fr;gap:24px">
+    <div>
+      <div class="card f"><h3>Total order</h3><p class="ps">So sánh được <b>bất kỳ</b> hai phần tử: <code class="i">5 &lt; 13</code>. Natural numbers totally ordered.</p></div>
+      <div class="card f" style="margin-top:10px"><h3>Partial order</h3><p class="ps"><code class="i">{a, b}</code> vs <code class="i">{b, c}</code>? Không cái nào là subset của cái kia → <b>incomparable</b>. Sets chỉ partially ordered.</p></div>
+      <table class="tbl2 f" style="margin-top:12px">
+        <tr><th>Model</th><th>Thứ tự</th></tr>
+        <tr><td>Linearizability</td><td><b>Total order</b>: luôn nói được op nào trước. Không có concurrency — một timeline duy nhất.</td></tr>
+        <tr><td>Causality</td><td><b>Partial order</b>: có quan hệ nhân quả thì có thứ tự; <b>concurrent</b> thì incomparable.</td></tr>
+      </table>
+    </div>
+    <div>
+      <svg class="sv" id="po" viewBox="0 0 640 400">
+        <text x="10" y="30" class="lb">Linearizability: một timeline thẳng</text>
+        <g class="g" id="po1"><path class="m dl" d="M40,80 L610,80" marker-end="url(#ap)"/>
+          <circle class="dot" cx="70" cy="80" r="11"/><circle class="dot" cx="160" cy="80" r="11"/><circle class="dot" cx="250" cy="80" r="11"/><circle class="dot" cx="340" cy="80" r="11"/><circle class="dot" cx="430" cy="80" r="11"/><circle class="dot" cx="520" cy="80" r="11"/>
+          <text x="70" y="112" text-anchor="middle" class="sm">op1</text><text x="160" y="112" text-anchor="middle" class="sm">op2</text><text x="250" y="112" text-anchor="middle" class="sm">op3</text><text x="340" y="112" text-anchor="middle" class="sm">op4</text><text x="430" y="112" text-anchor="middle" class="sm">op5</text><text x="520" y="112" text-anchor="middle" class="sm">op6</text></g>
+        <text x="10" y="170" class="lb" style="fill:#db2777">Causality: branch &amp; merge (giống Git history)</text>
+        <g class="g" id="po2"><path class="m k dl" d="M70,280 L160,280 L250,215 L360,215 L470,280 L600,280" marker-end="url(#ak)"/><path class="m k dl" d="M160,280 L270,330 L380,330 L470,282"/>
+          <circle class="dot k" cx="70" cy="280" r="11"/><circle class="dot k" cx="160" cy="280" r="11"/><circle class="dot k" cx="250" cy="215" r="11"/><circle class="dot k" cx="360" cy="215" r="11"/><circle class="dot c" cx="270" cy="330" r="11"/><circle class="dot c" cx="380" cy="330" r="11"/><circle class="dot k" cx="470" cy="280" r="13"/><circle class="dot k" cx="560" cy="280" r="11"/>
+          <text x="470" y="312" text-anchor="middle" class="sm">merge</text></g>
+        <g class="g" id="po3"><rect x="225" y="190" width="170" height="165" rx="14" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="7 5"/><text x="310" y="385" text-anchor="middle" class="lb" style="fill:#b45309">concurrent → incomparable</text></g>
+      </svg>
+      <span class="f ghost" data-act="#po1|on" data-say="Trong linearizable datastore <b>không có concurrent operations</b>: có thể có nhiều request đang đợi, nhưng mỗi request được xử lý atomically tại một điểm trên <b>một timeline</b>."></span>
+      <span class="f ghost" data-act="#po2|on" data-say="Concurrency nghĩa là timeline <b>rẽ nhánh rồi hợp lại</b>; mũi tên thể hiện causal dependency — chính là partial order."></span>
+      <span class="f ghost" data-act="#po3|on" data-say="Các operation trên hai nhánh khác nhau là <b>concurrent</b> — không thể so sánh. Giống commit trên hai branch Git trước khi merge."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== LIN > CAUSAL ===================== -->
+<section class="slide" id="causalvs">
+  <div class="hdr in"><span class="qn">16</span><h2>Linearizability <span class="muted" style="font-weight:600">⊃</span> causal consistency</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:24px">
+    <div>
+      <svg class="sv" id="nest" viewBox="0 0 540 300">
+        <g class="g" id="ns1"><rect x="10" y="10" width="520" height="280" rx="22" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/><text x="30" y="40" class="lb" style="fill:#64748b">Eventual consistency (convergence)</text></g>
+        <g class="g" id="ns2"><rect x="60" y="60" width="420" height="210" rx="20" fill="#fdf2f8" stroke="#ec4899" stroke-width="2.5"/><text x="80" y="90" class="lb" style="fill:#be185d">Causal consistency</text><text x="80" y="110" class="sm">mạnh nhất mà không chậm vì network delay</text></g>
+        <g class="g" id="ns3"><rect x="120" y="130" width="300" height="115" rx="18" fill="#f3edff" stroke="#7c3aed" stroke-width="2.5"/><text x="270" y="182" text-anchor="middle" class="xl" style="fill:#6d28d9">Linearizability</text><text x="270" y="206" text-anchor="middle" class="sm">implies causality · nhưng chậm</text></g>
+      </svg>
+      <span class="f ghost" data-act="#ns1|on;#ns2|on;#ns3|on" data-say="Linearizability <b>implies</b> causality: mọi hệ linearizable đều giữ đúng causality — kể cả khi có nhiều communication channels, không cần truyền timestamps."></span>
+      <span class="f ghost" data-act="#ns3|on;#ns2|on;#ns1|on" data-say="Nhưng linearizable tốn performance &amp; availability (nhất là geo-distributed). <b>Causal consistency</b> là middle ground: không chịu hit đó, và <b>CAP không áp dụng</b>."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+      <p class="ps f">Nhiều hệ thống tưởng cần linearizability, thực ra chỉ cần <b>causal consistency</b>. Research mới đang hướng tới DB giữ causality với performance gần eventual consistency — còn ít trong production.</p>
+    </div>
+    <div>
+      <h3>Capturing causal dependencies</h3>
+      <ul class="mini">
+        <li class="f">Partial order: op concurrent xử lý thứ tự nào cũng được; nhưng nếu A happened before B thì <b>mọi replica</b> phải xử lý A trước B → replica phải <b>đợi</b> các op đứng trước.</li>
+        <li class="f">Cần mô tả <b>“knowledge”</b> của node: lúc issue write Y, node đã thấy X chưa? — giống điều tra gian lận: <i>CEO có biết X khi ra quyết định Y?</i></li>
+        <li class="f">Mở rộng <b>version vectors</b> để theo dõi causal deps trên <b>toàn database</b>, không chỉ một key.</li>
+        <li class="f">DB cần biết application đã <b>đọc version nào</b>: version number được gửi lại khi write (Figure 5-13); SSI cũng kiểm tra data đã đọc còn up to date khi commit.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SEQUENCE NUMBERS ===================== -->
+<section class="slide" id="seq">
+  <div class="hdr in"><span class="qn">17</span><h2>Sequence Number Ordering</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:24px">
+    <div>
+      <p style="font-size:18px">Theo dõi mọi causal dependency là không thực tế (client đọc nhiều thứ trước khi write). Thay vào đó: dùng <b>sequence numbers</b> / <b>timestamps</b> từ <b>logical clock</b> (counter tăng mỗi operation), không phải time-of-day clock.</p>
+      <ul class="mini" style="margin-top:6px">
+        <li>Gọn (vài bytes), tạo <b>total order</b>.</li>
+        <li>Mục tiêu: total order <b>consistent with causality</b>: A happened before B ⇒ seq(A) &lt; seq(B). Concurrent ops xếp tùy ý.</li>
+        <li><b>Single-leader</b>: leader tăng counter cho mỗi op trong replication log → follower áp dụng theo thứ tự luôn causally consistent.</li>
+      </ul>
+      <p class="tiny" style="margin-top:8px">Total order <i>không</i> consistent với causality thì dễ tạo nhưng vô dụng — vd. random UUID so sánh lexicographic.</p>
+    </div>
+    <div>
+      <h3>Noncausal sequence number generators</h3>
+      <p class="ps" style="margin-bottom:6px">Không có single leader (multi-leader, leaderless, partitioned)? Ba cách phổ biến — nhanh và scalable hơn, nhưng <b>không consistent with causality</b>:</p>
+      <div class="vrow f" style="grid-template-columns:1fr;padding:8px 14px"><p><b>① Mỗi node một dải riêng</b> (odd/even, hoặc node ID trong bits). Node xử lý nhanh chậm khác nhau → counter lệch nhau.</p></div>
+      <div class="log f" style="margin-left:6px"><span class="lgn">Node A (odd)</span><span class="ent on">95</span><span class="ent on">97</span><span class="ent on" id="sqA">99</span></div>
+      <div class="log f" style="margin-left:6px"><span class="lgn">Node B (even)</span><span class="ent on c">2</span><span class="ent on c" id="sqB">4</span><span class="badge hid" id="sqX">B đọc 99 rồi mới write “4” → 4 &lt; 99 ❌</span></div>
+      <span class="f ghost" data-act="#sqA|win;#sqB|lose;#sqX|on"></span>
+      <div class="vrow f" style="grid-template-columns:1fr;padding:8px 14px;margin-top:8px"><p><b>② Physical timestamps</b> (resolution đủ cao): bị <b>clock skew</b> → op xảy ra sau có thể nhận timestamp nhỏ hơn (dùng trong LWW).</p></div>
+      <div class="vrow f" style="grid-template-columns:1fr;padding:8px 14px"><p><b>③ Preallocate blocks</b>: A lấy 1–1,000, B lấy 1,001–2,000 → op sau theo causality có thể nhận số nhỏ hơn.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== LAMPORT ===================== -->
+<section class="slide" id="lamport">
+  <div class="hdr in"><span class="qn">18</span><h2>Lamport timestamps <span class="muted" style="font-weight:600;font-size:24px">(Leslie Lamport, 1978)</span></h2></div>
+  <div class="cols" style="grid-template-columns:.82fr 1.25fr;gap:22px">
+    <div>
+      <div class="formula" style="font-size:22px">timestamp = (counter, node ID)</div>
+      <ul class="mini" style="margin-top:8px">
+        <li>So sánh: counter lớn hơn thì lớn hơn; bằng nhau → node ID lớn hơn thì lớn hơn → <b>total order</b>.</li>
+        <li><b>Key idea</b>: mọi node &amp; client nhớ <b>max counter</b> đã thấy, gửi kèm mỗi request. Node nhận được max lớn hơn counter của mình → <b>nhảy lên ngay</b>.</li>
+      </ul>
+      <p class="say" style="font-size:17px;min-height:100px">Nhấn → để chạy từng bước.</p>
+      <div class="note blue f" style="font-size:16px"><b>vs version vectors</b>: version vectors phân biệt được hai op là concurrent hay có quan hệ nhân quả; Lamport timestamps luôn ép total order → <b>không</b> biết được điều đó. Bù lại Lamport timestamps <b>gọn hơn</b>.</div>
+    </div>
+    <div>
+      <div class="code-title">Figure 9-8 · total ordering consistent with causality</div>
+      <svg class="sv" id="f98" viewBox="0 0 700 440">
+        <line class="lane" x1="110" y1="50" x2="690" y2="50"/><text x="8" y="55" class="ll">Client A</text>
+        <line class="lane s" x1="110" y1="160" x2="690" y2="160"/><text x="8" y="165" class="ll">Node 1</text>
+        <line class="lane s" x1="110" y1="270" x2="690" y2="270"/><text x="8" y="275" class="ll">Node 2</text>
+        <line class="lane" x1="110" y1="375" x2="690" y2="375"/><text x="8" y="380" class="ll">Client B</text>
+        <text x="120" y="148" class="lb mono" id="n1c">c = 0</text>
+        <text x="120" y="258" class="lb mono" id="n2c">c = 4</text>
+        <g class="g" id="l1"><path class="m k dl" d="M140,373 L180,163" marker-end="url(#ak)"/><text x="100" y="330" class="lb" style="fill:#be185d">write, max=0</text>
+          <rect class="bar k" x="185" y="170" width="70" height="24" rx="8"/><text x="220" y="187" text-anchor="middle" class="pk mono" style="font-size:14px">(1,1)</text>
+          <path class="m k dl" d="M200,196 L240,372" marker-end="url(#ak)"/><text x="232" y="352" class="lb" style="fill:#be185d">max=1</text></g>
+        <g class="g" id="l2"><path class="m c dl" d="M230,53 L300,267" marker-end="url(#ac)"/><text x="245" y="100" text-anchor="end" class="lb" style="fill:#0e7490">write, max=0</text>
+          <rect class="bar c" x="300" y="276" width="70" height="24" rx="8"/><text x="335" y="293" text-anchor="middle" class="cy mono" style="font-size:14px">(5,2)</text>
+          <path class="m c dl" d="M315,267 L350,54" marker-end="url(#ac)"/><text x="340" y="80" class="lb" style="fill:#0e7490">max=5</text></g>
+        <g class="g" id="l3"><path class="m c dl" d="M380,53 L440,157" marker-end="url(#ac)"/><text x="400" y="100" class="lb" style="fill:#0e7490">write, max=5</text>
+          <rect class="bar y" x="440" y="168" width="70" height="24" rx="8"/><text x="475" y="185" text-anchor="middle" class="am mono" style="font-size:14px">(6,1)</text>
+          <text x="440" y="214" class="lb" style="fill:#b45309">1 → 5 → 6 !</text></g>
+        <g class="g" id="l4"><path class="m k dl" d="M470,373 L560,273" marker-end="url(#ak)"/><text x="470" y="352" class="lb" style="fill:#be185d">write, max=1</text>
+          <rect class="bar k" x="560" y="280" width="70" height="24" rx="8"/><text x="595" y="297" text-anchor="middle" class="pk mono" style="font-size:14px">(6,2)</text></g>
+        <g class="g" id="l5"><rect x="200" y="396" width="270" height="34" rx="10" fill="#fff" stroke="#7c3aed" stroke-width="2"/><text x="335" y="418" text-anchor="middle" class="mono" style="font-size:14px;fill:#6d28d9">(1,1) &lt; (5,2) &lt; (6,1) &lt; (6,2)</text></g>
+      </svg>
+      <span class="f ghost" data-set="#n1c::c = 1" data-act="#l1|on" data-say="Client B write vào node 1 (max=0). Node 1: counter 0 → 1 → timestamp <b>(1,1)</b>; trả về max=1."></span>
+      <span class="f ghost" data-set="#n1c::c = 1;#n2c::c = 5" data-act="#l2|on" data-say="Client A write vào node 2. Node 2 đang bận (counter 4) → <b>(5,2)</b>; client A giờ biết max=5."></span>
+      <span class="f ghost" data-set="#n1c::c = 6;#n2c::c = 5" data-act="#l3|on" data-say="Client A gửi max=5 tới node 1. Counter node 1 chỉ là 1 → <b>nhảy lên 5</b>, op tiếp theo là <b>(6,1)</b>. Phụ thuộc nhân quả → timestamp tăng."></span>
+      <span class="f ghost" data-set="#n1c::c = 6;#n2c::c = 6" data-act="#l4|on" data-say="Client B write tới node 2 (max=1) → <b>(6,2)</b>. Cùng counter 6 với (6,1) → node ID phá hòa."></span>
+      <span class="f ghost" data-set="#n1c::c = 6;#n2c::c = 6" data-act="#l5|on" data-say="Kết quả: một <b>total order</b> nhất quán với causality, vì mọi causal dependency đều làm timestamp tăng."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TIMESTAMP NOT SUFFICIENT ===================== -->
+<section class="slide" id="tsnot">
+  <div class="hdr in"><span class="qn">19</span><h2>Timestamp ordering is <span class="grad">not sufficient</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:24px">
+    <div>
+      <p style="font-size:19px">Bài toán: username phải <b>duy nhất</b>. Hai user cùng lúc đăng ký <code class="i">@alice</code> → một thành công, một fail.</p>
+      <p class="ps" style="margin-top:8px">Ý tưởng: chọn op có Lamport timestamp <b>nhỏ hơn</b> làm winner. Vì timestamps totally ordered, phép so sánh luôn hợp lệ…</p>
+      <p class="say" style="font-size:17.5px;min-height:110px">Nhấn → để chạy từng bước.</p>
+      <div class="formula f" style="font-size:18px">Không chỉ cần <b>total order</b> — còn phải biết<br>khi nào order đó được <span class="grad">finalized</span></div>
+      <p class="ps f" style="margin-top:8px;text-align:center">→ Đây chính là ý tưởng của <b>total order broadcast</b>.</p>
+    </div>
+    <div>
+      <div style="display:grid;grid-template-columns:1fr 70px 1fr;gap:10px;align-items:center;margin-top:6px">
+        <div class="sysbox" id="tn1" style="font-size:17px">🖥️ Node 1<br><span class="kv" style="font-size:15px">user X: create @alice</span></div>
+        <div class="big-ar" id="tnq">⇄</div>
+        <div class="sysbox" id="tn2" style="font-size:17px">🖥️ Node 2<br><span class="kv" style="font-size:15px">user Y: create @alice</span></div>
+      </div>
+      <div class="log" style="justify-content:center;margin-top:18px"><span class="ent hid" id="te1">(7,1) X</span><span class="ent hid" id="te2">(5,2) Y</span></div>
+      <div class="sysbox hid" id="tres" style="margin-top:14px;font-size:17px">Sau khi gom hết: (5,2) &lt; (7,1) → Y thắng</div>
+      <span class="f ghost" data-act="#te1|on;#te1|on;#te2|on" data-say="Hai node <b>concurrently</b> nhận request, mỗi node gán một Lamport timestamp."></span>
+      <span class="f ghost" data-act="#te1|on;#te2|on;#tres|on;#te2|win;#te1|lose" data-say="<b>Sau khi</b> gom đủ mọi operation thì dễ: Y có timestamp nhỏ hơn → Y thắng. Nhưng đây là xác định winner <b>after the fact</b>."></span>
+      <span class="f ghost" data-act="#te1|on;#te2|on;#tn1|fail" data-set="#tn1::🖥️ Node 1<br><span class='kv' style='font-size:15px'>phải trả lời user X NGAY?</span>;#tnq::❓" data-say="Node 1 phải quyết định <b>ngay bây giờ</b> — nhưng không biết node khác có đang tạo @alice với timestamp nhỏ hơn không."></span>
+      <span class="f ghost" data-act="#te1|on;#te2|on;#tn1|fail;#tn2|fail" data-set="#tn1::🖥️ Node 1<br><span class='kv' style='font-size:15px'>hỏi mọi node khác…</span>;#tn2::💀 Node 2<br><span class='kv' style='font-size:15px'>unreachable</span>;#tnq::✂" data-say="Phải hỏi <b>mọi</b> node khác. Một node chết hoặc network lỗi → cả hệ thống <b>đứng</b>. Không fault-tolerant chút nào."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TOTAL ORDER BROADCAST ===================== -->
+<section class="slide" id="tob">
+  <div class="hdr in"><span class="qn">20</span><h2>Total Order Broadcast</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:24px">
+    <div>
+      <p style="font-size:18px">Single-leader xác định total order bằng cách tuần tự hóa mọi op trên <b>một CPU core</b> của leader. Thách thức: scale khi throughput vượt một leader, và failover khi leader chết → bài toán <b>total order broadcast</b> (a.k.a. <b>atomic broadcast</b>).</p>
+      <p class="muted" style="font-size:16px;margin:10px 0 6px">Protocol trao đổi message, luôn thỏa 2 <b>safety properties</b>:</p>
+      <div class="prop f" id="pp1"><span class="tag sf">SAFETY</span><b>Reliable delivery</b><p class="ps">Không message nào bị mất: deliver tới một node thì deliver tới <b>mọi</b> node.</p></div>
+      <div class="prop f" id="pp2" style="margin-top:8px"><span class="tag sf">SAFETY</span><b>Totally ordered delivery</b><p class="ps">Message được deliver tới mọi node theo <b>cùng một thứ tự</b>.</p></div>
+      <p class="tiny f" style="margin-top:8px">“Atomic broadcast” là tên gây nhầm lẫn — chẳng liên quan atomicity của ACID. Partitioned DB một leader/partition thường chỉ giữ order <b>per partition</b>.</p>
+    </div>
+    <div>
+      <div class="log"><span class="lgn">Node A</span><span class="ent" id="ta1">–</span><span class="ent" id="ta2">–</span><span class="ent" id="ta3">–</span><span class="ent" id="ta4">–</span></div>
+      <div class="log"><span class="lgn">Node B</span><span class="ent" id="tb1">–</span><span class="ent" id="tb2">–</span><span class="ent" id="tb3">–</span><span class="ent" id="tb4">–</span></div>
+      <div class="log"><span class="lgn">Node C</span><span class="ent" id="tc1">–</span><span class="ent" id="tc2">–</span><span class="ent" id="tc3">–</span><span class="ent" id="tc4">–</span><span class="badge hid y" id="tclag">network lỗi → lag</span></div>
+      <span class="f ghost" data-act="#ta1|on;#tb1|on;#tc1|on" data-set="#ta1::m1;#tb1::m1;#tc1::m1" data-say="m1 được deliver tới mọi node."></span>
+      <span class="f ghost" data-act="#ta2|on;#tb2|on;#ta2|k;#tb2|k;#ta3|on;#tb3|on;#ta3|c;#tb3|c;#tclag|on" data-set="#ta2::m2;#tb2::m2;#ta3::m3;#tb3::m3" data-say="m2, m3 tới A và B. Node C bị network interruption → chưa nhận được; algorithm cứ <b>retry</b>."></span>
+      <span class="f ghost" data-act="#tc2|on;#tc2|k;#tc3|on;#tc3|c" data-set="#tc2::m2;#tc3::m3" data-say="Network phục hồi: C nhận m2, m3 — và vẫn phải đúng <b>thứ tự</b> m2 rồi m3."></span>
+      <span class="f ghost" data-act="#ta4|on;#tb4|on;#tc4|on;#ta4|y;#tb4|y;#tc4|y" data-set="#ta4::m4;#tb4::m4;#tc4::m4" data-say="Mọi node có <b>cùng một log</b>. Deliver message ≈ <b>append vào log</b>."></span>
+      <span class="f ghost" data-act="#ghost1|on" data-say="Order được <b>chốt tại thời điểm deliver</b>: không được chèn hồi tố vào vị trí trước nếu message sau đã được deliver → mạnh hơn timestamp ordering."></span>
+      <div class="log" style="margin-top:14px"><span class="lgn"></span><span class="ent ghost" id="ghost1">m0' ✗</span><span class="tiny" style="margin-left:8px">không được chèn hồi tố</span></div>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== USING TOB ===================== -->
+<section class="slide" id="tobuse">
+  <div class="hdr in"><span class="qn">21</span><h2>Using total order broadcast</h2></div>
+  <div class="cols4" style="margin-top:8px">
+    <div class="card f zoom"><div class="icon">🐘</div><h3>Coordination services</h3><p class="ps"><b>ZooKeeper</b> và <b>etcd</b> thực chất implement total order broadcast — gợi ý về mối liên hệ chặt với <b>consensus</b>.</p></div>
+    <div class="card f zoom"><div class="icon">🪞</div><h3>Database replication</h3><p class="ps">Mỗi message = một write; mọi replica xử lý cùng writes theo cùng thứ tự → luôn consistent. Gọi là <b>state machine replication</b>.</p></div>
+    <div class="card f zoom"><div class="icon">🧾</div><h3>Serializable transactions</h3><p class="ps">Mỗi message = một deterministic transaction (stored procedure); mọi node xử lý cùng thứ tự → partitions &amp; replicas consistent.</p></div>
+    <div class="card f zoom"><div class="icon">🎫</div><h3>Lock + fencing tokens</h3><p class="ps">Mỗi request acquire lock là một message trong log; sequence number tăng đơn điệu → dùng làm <b>fencing token</b>. ZooKeeper gọi là <code class="i">zxid</code>.</p></div>
+  </div>
+  <div class="note blue f" style="margin-top:20px">Một cách nhìn khác: total order broadcast là cách tạo ra một <b>log</b> (replication log, transaction log, write-ahead log). Deliver message = append vào log; mọi node đọc log và thấy <b>cùng một sequence</b>.</div>
+</section>
+
+<!-- ===================== TOB -> LIN ===================== -->
+<section class="slide" id="tob2lin">
+  <div class="hdr in"><span class="qn">22</span><h2>Linearizable storage <span class="muted" style="font-weight:600">từ</span> total order broadcast</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:24px">
+    <div>
+      <p class="ps" style="font-size:17.5px">TOB là <b>asynchronous</b>: đảm bảo thứ tự, không đảm bảo <b>khi nào</b> deliver. Linearizability là <b>recency</b> guarantee. Khác nhau — nhưng có thể xây cái này trên cái kia.</p>
+      <p class="ps" style="margin-top:6px">Mỗi username ~ một linearizable register (ban đầu <code class="i">null</code>). Đăng ký = <b>compare-and-set</b> từ null → user ID. Dùng log append-only:</p>
+      <ol class="steps" style="margin-top:6px">
+        <li id="ts1">Append message vào log: “tôi muốn claim username này”.</li>
+        <li id="ts2">Đọc log, <b>đợi</b> message của mình được deliver lại.</li>
+        <li id="ts3">Message <b>đầu tiên</b> claim username đó là của mình → commit &amp; ack. Của người khác → abort.</li>
+      </ol>
+    </div>
+    <div>
+      <div class="log"><span class="lgn">log</span><span class="ent" id="tl1">…</span><span class="ent" id="tl2">…</span><span class="ent" id="tl3">…</span></div>
+      <div class="log"><span class="lgn">Node 1</span><span class="tiny" id="tn1s">client u42 muốn @alice</span></div>
+      <div class="log"><span class="lgn">Node 2</span><span class="tiny" id="tn2s">client u77 muốn @alice</span></div>
+      <span class="f ghost" data-now="#ts1|cur" data-act="#tl1|on;#tl2|on;#tl2|k" data-set="#tl1::u42→@alice;#tl2::u77→@alice" data-say="Cả hai node concurrently append claim vào log. TOB quyết định thứ tự: u42 trước, u77 sau."></span>
+      <span class="f ghost" data-now="#ts2|cur" data-act="#tl1|on;#tl2|on;#tl2|k" data-set="#tl1::u42→@alice;#tl2::u77→@alice;#tn1s::đợi message của mình được deliver…;#tn2s::đợi message của mình được deliver…" data-say="Mỗi node đọc log và đợi message của mình quay về."></span>
+      <span class="f ghost" data-now="#ts3|cur" data-act="#tl1|on;#tl2|on;#tl1|win;#tl2|lose" data-set="#tl1::u42→@alice;#tl2::u77→@alice;#tn1s::✅ claim đầu tiên là của mình → commit;#tn2s::❌ claim đầu tiên là của u42 → abort" data-say="Log được deliver theo <b>cùng thứ tự</b> ở mọi node → mọi node đồng ý claim nào thắng. Linearizable writes ✓."></span>
+      <p class="say" style="font-size:17px;min-height:78px">Nhấn → để chạy từng bước.</p>
+      <div class="card f" style="padding:10px 14px"><h3 style="font-size:18px">Còn reads?</h3><p class="ps">Read từ store cập nhật async có thể stale → mới chỉ là <b>sequential consistency</b> (timeline consistency). Muốn linearizable read:</p>
+        <ul class="mini2"><li>Sequence read qua log: append message, đọc khi nó quay về (etcd <b>quorum reads</b>).</li><li>Lấy vị trí log mới nhất (linearizable), đợi deliver tới đó rồi đọc (ZooKeeper <code class="i">sync()</code>).</li><li>Đọc từ replica được update synchronously (<b>chain replication</b>).</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== LIN -> TOB ===================== -->
+<section class="slide" id="lin2tob">
+  <div class="hdr in"><span class="qn">23</span><h2>Total order broadcast <span class="muted" style="font-weight:600">từ</span> linearizable storage</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:24px">
+    <div>
+      <p style="font-size:18px">Ngược lại: giả sử có linearizable register lưu một integer với <b>atomic increment-and-get</b> (hoặc CAS).</p>
+      <ul class="mini" style="margin-top:6px"><li>Mỗi message: increment-and-get → gắn value làm <b>sequence number</b>.</li><li>Gửi tới mọi node (resend nếu mất); bên nhận deliver <b>liên tiếp</b> theo sequence number.</li></ul>
+      <div class="log" style="margin-top:16px;justify-content:center"><span class="ent on">1</span><span class="ent on">2</span><span class="ent on">3</span><span class="ent on" id="gp4">4</span><span class="ent" id="gp5">5?</span><span class="ent on c hid" id="gp6">6</span></div>
+      <span class="f ghost" data-act="#gp6|on" data-now="#gp5|lose" data-say="Đã deliver 4, nhận được 6 → biết chắc phải <b>đợi 5</b>. Sequence <b>không có gap</b> — Lamport timestamps không làm được điều này. Đây là khác biệt cốt lõi giữa TOB và timestamp ordering."></span>
+      <span class="f ghost" data-act="#gp6|on;#gp5|on;#gp5|y" data-set="#gp5::5" data-say="5 tới → deliver 5 rồi 6."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+      <div class="note f" style="font-size:16.5px">Khó ở đâu? Nếu không bao giờ fail: chỉ cần một biến trên một node. Khó khi network tới node đó đứt, hay node chết cần khôi phục value… Nghĩ đủ kỹ về linearizable sequence number generator → bạn sẽ <b>luôn</b> đi tới một consensus algorithm.</div>
+    </div>
+    <div>
+      <svg class="sv" id="eqv" viewBox="0 0 540 360">
+        <g class="g" id="eq1"><path class="m k dl" d="M150,110 L380,110" marker-end="url(#ak)" marker-start="url(#ak)"/><path class="m k dl" d="M120,140 L240,265" marker-end="url(#ak)" marker-start="url(#ak)"/><path class="m k dl" d="M410,140 L300,265" marker-end="url(#ak)" marker-start="url(#ak)"/>
+          <text x="265" y="98" text-anchor="middle" class="lb">⇔</text></g>
+        <rect class="nd" x="10" y="70" width="190" height="72" rx="14"/><text x="105" y="100" text-anchor="middle">Linearizable</text><text x="105" y="122" text-anchor="middle">CAS / incr-and-get</text>
+        <rect class="nd c2" x="330" y="70" width="200" height="72" rx="14"/><text x="430" y="100" text-anchor="middle">Total order</text><text x="430" y="122" text-anchor="middle">broadcast</text>
+        <rect class="nd c3" x="175" y="265" width="190" height="64" rx="14"/><text x="270" y="303" text-anchor="middle" class="xl">Consensus</text>
+        <g class="g" id="eq2"><text x="270" y="215" text-anchor="middle" class="lb" style="font-size:15px;fill:#db2777">equivalent problems!</text></g>
+      </svg>
+      <span class="f ghost" data-act="#eq1|on;#eq2|on" data-say="Có thể chứng minh: linearizable CAS (hoặc increment-and-get) register và total order broadcast đều <b>tương đương với consensus</b>. Giải được một bài → biến đổi thành lời giải cho bài kia. Một insight sâu sắc và bất ngờ!"></span>
+      <p class="ps f" style="text-align:center">Đã đến lúc đối mặt trực tiếp với <b>consensus</b>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DTC ===================== -->
+<section class="slide" id="dtc">
+  <div class="hdr in"><span class="qn">24</span><h2>Distributed Transactions &amp; Consensus</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:24px">
+    <div>
+      <p style="font-size:19px">Mục tiêu nghe đơn giản: <b>làm cho nhiều node đồng ý một điều</b>. Nhưng rất nhiều hệ thống hỏng đã được xây với niềm tin sai rằng bài toán này dễ.</p>
+      <div class="card f" style="margin-top:12px"><h3>👑 Leader election</h3><p class="ps">Mọi node phải đồng ý ai là leader. Network fault có thể làm leadership bị tranh chấp → consensus tránh <b>bad failover</b> và <b>split brain</b> (hai leader cùng nhận write → diverge, mất data).</p></div>
+      <div class="card f" style="margin-top:10px"><h3>⚛️ Atomic commit</h3><p class="ps">Transaction trải trên nhiều node/partition có thể fail ở node này, thành công ở node kia. Muốn giữ atomicity → mọi node đồng ý <b>cùng commit</b> hoặc <b>cùng abort</b>: bài toán <b>atomic commit</b>.</p></div>
+    </div>
+    <div>
+      <div class="card bad f"><span class="lbl bad">THE IMPOSSIBILITY OF CONSENSUS</span><h3 style="color:#be123c">FLP result <span class="muted" style="font-size:15px">(Fischer, Lynch, Paterson)</span></h3><p class="ps">Không có thuật toán nào <b>luôn</b> đạt được consensus nếu có rủi ro một node crash.</p></div>
+      <div class="card good f" style="margin-top:10px"><span class="lbl good">NHƯNG…</span><p class="ps">FLP được chứng minh trong <b>asynchronous system model</b>: thuật toán deterministic, <b>không được dùng clocks hay timeouts</b>. Cho phép timeouts (để nghi ngờ node crash, dù đôi khi sai) — hoặc chỉ cần <b>random numbers</b> — là giải được. Thực tế, distributed systems thường đạt consensus được.</p></div>
+      <div class="chain f" style="margin-top:16px;justify-content:center"><span class="pv info">2PC</span><span class="op">→</span><span class="pv info">Zab (ZooKeeper)</span><span class="pv info">Raft (etcd)</span></div>
+      <p class="tiny f" style="text-align:center;margin-top:6px">2PC là một dạng consensus algorithm — nhưng không tốt lắm. Học từ nó để tiến tới thuật toán tốt hơn.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ATOMIC COMMIT ===================== -->
+<section class="slide" id="atomic">
+  <div class="hdr in"><span class="qn">25</span><h2>From single-node to distributed atomic commit</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:26px">
+    <div>
+      <h3>Single node: storage engine lo</h3>
+      <p class="ps">Ghi data durable (write-ahead log), rồi append <b>commit record</b>. Thứ tự: <b>data trước, commit record sau</b>.</p>
+      <div class="log" style="margin-top:12px"><span class="ent on">write a</span><span class="ent on">write b</span><span class="ent" id="ac1">COMMIT</span></div>
+      <div class="sysbox" id="acs" style="margin-top:10px;font-size:17px">💾 Disk</div>
+      <span class="f ghost" data-now="#acs|fail" data-set="#acs::💥 Crash trước khi ghi commit record → rollback khi recover" data-say="Crash trước khoảnh khắc đó → khi restart, transaction bị <b>rollback</b>."></span>
+      <span class="f ghost" data-act="#ac1|on;#ac1|win;#acs|ok" data-set="#acs::✅ Commit record đã xuống disk → committed (kể cả crash sau đó)" data-say="Khoảnh khắc quyết định: disk ghi xong commit record. Chính <b>một thiết bị</b> (disk controller của một node) làm cho commit atomic."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+      <div class="note f" style="font-size:16.5px">Commit phải <b>irrevocable</b>: data đã commit sẽ visible cho transaction khác (read committed) → không được abort hồi tố. Muốn “undo” → <b>compensating transaction</b> riêng (vấn đề của application).</div>
+    </div>
+    <div>
+      <h3>Nhiều node: gửi commit tới từng node?</h3>
+      <div class="nodes" style="margin-top:12px">
+        <div class="node" id="an1"><span class="ver">?</span><small>node 1</small></div>
+        <div class="node" id="an2"><span class="ver">?</span><small>node 2</small></div>
+        <div class="node" id="an3"><span class="ver">?</span><small>node 3</small></div>
+      </div>
+      <span class="f ghost" data-act="#an1|v2" data-set="#an1 .ver::✓ commit" data-say="Node 1 commit thành công."></span>
+      <span class="f ghost" data-act="#an2|bad" data-set="#an2 .ver::✗ abort" data-say="Node 2 phát hiện <b>constraint violation</b> hoặc conflict → phải abort."></span>
+      <span class="f ghost" data-act="#an3|down" data-set="#an3 .ver::⌛ abort" data-say="Commit request tới node 3 bị <b>mất trên network</b> → timeout abort. (Hoặc node crash trước khi ghi xong commit record.)"></span>
+      <div class="sysbox hid" id="anr" style="margin-top:14px">❌ Nodes inconsistent — node 1 không thể rút lại commit</div>
+      <span class="f ghost" data-act="#anr|on;#anr|fail" data-say="Kết quả: một số node commit, số khác abort → <b>vi phạm atomicity</b>. Một node chỉ được commit khi <b>chắc chắn</b> mọi node khác cũng sẽ commit."></span>
+      <p class="tiny" style="margin-top:12px">Phần lớn “NoSQL” distributed datastores không hỗ trợ distributed transactions; nhiều clustered relational systems thì có.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 2PC ===================== -->
+<section class="slide" id="tpc">
+  <div class="hdr in"><span class="qn">26</span><h2>Two-Phase Commit (2PC)</h2></div>
+  <div class="cols" style="grid-template-columns:.8fr 1.25fr;gap:22px">
+    <div>
+      <p class="ps" style="font-size:17.5px">Thuật toán cổ điển để đạt atomic commit trên nhiều node. Dùng nội bộ trong DB, hoặc mở cho app qua <b>XA transactions</b> (Java Transaction API) hay WS-AtomicTransaction.</p>
+      <p class="ps" style="margin-top:8px">Thành phần mới: <b>coordinator</b> (a.k.a. <b>transaction manager</b>) — thường là library trong app process; vd. Narayana, JOTM, BTM, MSDTC. Các DB node là <b>participants</b>.</p>
+      <p class="say" style="font-size:16.5px;min-height:96px">Nhấn → để chạy từng bước.</p>
+      <div class="note blue f" style="font-size:16px"><b>Đừng nhầm 2PC với 2PL!</b> 2PC = atomic commit trong distributed DB; 2PL (two-phase locking) = serializable isolation. Hai khái niệm hoàn toàn khác nhau.</div>
+    </div>
+    <div>
+      <div class="code-title">Figure 9-9 · successful 2PC</div>
+      <svg class="sv" id="f99" viewBox="0 0 700 380">
+        <g class="g" id="t6"><rect class="lockz" x="140" y="150" width="440" height="36" rx="6"/><rect class="lockz" x="140" y="275" width="440" height="36" rx="6"/><text x="150" y="146" class="lb" style="fill:#be123c">🔒 locks held</text></g>
+        <line class="lane s" x1="120" y1="60" x2="690" y2="60"/><text x="8" y="65" class="ll">Coordinator</text>
+        <line class="lane s" x1="120" y1="168" x2="690" y2="168"/><text x="8" y="173" class="ll">Database 1</text>
+        <line class="lane s" x1="120" y1="293" x2="690" y2="293"/><text x="8" y="298" class="ll">Database 2</text>
+        <g class="g" id="t1"><path class="m dl" d="M140,62 L170,165" marker-end="url(#ap)"/><path class="m dl" d="M140,62 L180,290" marker-end="url(#ap)"/><text x="125" y="24" class="lb">read / write data (txid)</text></g>
+        <g class="g" id="t2"><path class="m c dl" d="M260,62 L300,165" marker-end="url(#ac)"/><path class="m c dl" d="M260,62 L310,290" marker-end="url(#ac)"/><text x="262" y="44" class="lb" style="fill:#0e7490">① prepare</text></g>
+        <g class="g" id="t3"><path class="m gr dl" d="M305,168 L350,64" marker-end="url(#ag)"/><path class="m gr dl" d="M315,293 L362,64" marker-end="url(#ag)"/><text x="330" y="125" class="lb" style="fill:#047857">yes</text><text x="345" y="240" class="lb" style="fill:#047857">yes</text></g>
+        <g class="g" id="t4"><circle cx="400" cy="60" r="11" fill="#f59e0b"/><text x="380" y="34" class="lb" style="fill:#b45309">💾 commit point</text></g>
+        <g class="g" id="t5"><path class="m k dl" d="M412,62 L455,165" marker-end="url(#ak)"/><path class="m k dl" d="M412,62 L470,290" marker-end="url(#ak)"/><text x="432" y="100" class="lb" style="fill:#be185d">② commit</text>
+          <path class="m gr dl" d="M580,168 L620,64" marker-end="url(#ag)"/><path class="m gr dl" d="M580,293 L630,64" marker-end="url(#ag)"/><text x="600" y="120" class="lb" style="fill:#047857">ok</text><text x="560" y="335" class="lb" style="fill:#047857">✓ committed</text></g>
+      </svg>
+      <span class="f ghost" data-act="#t1|on" data-say="App đọc/ghi data trên nhiều DB node như bình thường — mỗi node một single-node transaction gắn <b>global transaction ID</b>."></span>
+      <span class="f ghost" data-act="#t2|on" data-say="Sẵn sàng commit → coordinator bắt đầu <b>phase 1</b>: gửi <b>prepare</b> hỏi từng participant “có commit được không?”."></span>
+      <span class="f ghost" data-act="#t3|on" data-say="Tất cả trả lời <b>“yes”</b>. (Nếu có participant nói “no” → phase 2 gửi <b>abort</b> tới mọi node.)"></span>
+      <span class="f ghost" data-act="#t4|on" data-say="Coordinator ghi quyết định vào transaction log trên disk: <b>commit point</b>."></span>
+      <span class="f ghost" data-act="#t5|on" data-say="<b>Phase 2</b>: gửi <b>commit</b> tới mọi participant → commit thực sự diễn ra."></span>
+      <span class="f ghost" data-act="#t6|on" data-say="Trong suốt quá trình, mỗi participant <b>giữ locks</b> trên các row đã sửa cho tới khi commit/abort (vùng tô màu)."></span>
+      <div class="quote f" style="font-size:16.5px;margin-top:4px">Giống lễ cưới: chủ lễ hỏi riêng cô dâu và chú rể, cả hai nói <b>“I do”</b> → tuyên bố thành vợ chồng (commit). Một người không nói “yes” → hủy (abort).</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PROMISES ===================== -->
+<section class="slide" id="promise">
+  <div class="hdr in"><span class="qn">27</span><h2>A system of promises</h2></div>
+  <p class="in muted" style="font-size:18px">Prepare và commit request cũng có thể bị mất như ở one-phase commit — vậy vì sao 2PC đảm bảo được atomicity? Phân rã chi tiết:</p>
+  <div class="cols" style="grid-template-columns:1.35fr .9fr;gap:22px;margin-top:6px">
+    <ol class="steps">
+      <li id="pm1">App xin coordinator một <b>transaction ID</b> globally unique.</li>
+      <li id="pm2">App mở single-node transaction trên từng participant, gắn global txid. Có lỗi ở giai đoạn này → coordinator hoặc participant đều có thể abort.</li>
+      <li id="pm3">Sẵn sàng commit → coordinator gửi <b>prepare</b> (kèm txid). Request nào fail/timeout → abort cho mọi participant.</li>
+      <li id="pm4">Participant đảm bảo <b>chắc chắn commit được trong mọi tình huống</b> (ghi data xuống disk, kiểm tra conflicts/constraints) rồi mới trả “yes” → <b>từ bỏ quyền abort</b>.</li>
+      <li id="pm5">Coordinator nhận đủ phản hồi → quyết định dứt khoát (commit chỉ khi mọi “yes”), ghi vào transaction log trên disk: <b>commit point</b>.</li>
+      <li id="pm6">Gửi commit/abort tới mọi participant. Fail/timeout → <b>retry mãi mãi</b>. Participant crash → commit khi nó recover.</li>
+    </ol>
+    <div>
+      <span class="f ghost" data-now="#pm1|cur"></span><span class="f ghost" data-now="#pm2|cur"></span><span class="f ghost" data-now="#pm3|cur"></span>
+      <span class="f ghost" data-now="#pm4|cur" data-act="#pm4|pnr;#pnr1|on"></span>
+      <span class="f ghost" data-now="#pm5|cur" data-act="#pm5|pnr;#pnr2|on"></span>
+      <span class="f ghost" data-now="#pm6|cur" data-act="#pm6|pnr"></span>
+      <h3>Hai “points of no return”</h3>
+      <div class="card hid" id="pnr1" style="margin-top:8px"><span class="lbl bad">① PARTICIPANT VOTE “YES”</span><p class="ps">Hứa chắc chắn commit được sau này (dù coordinator vẫn có thể chọn abort).</p></div>
+      <div class="card hid" id="pnr2" style="margin-top:10px"><span class="lbl bad">② COORDINATOR QUYẾT ĐỊNH</span><p class="ps">Quyết định là <b>irrevocable</b> — phải được thực thi, bao nhiêu lần retry cũng được.</p></div>
+      <p class="tiny f" style="margin-top:10px">Single-node commit gộp hai sự kiện này làm một: ghi commit record. Lễ cưới: ngất đi sau khi nói “I do” cũng không thay đổi việc đã kết hôn — tỉnh dậy hỏi chủ lễ về txid của mình, hoặc đợi lần retry tiếp theo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== COORDINATOR FAILURE ===================== -->
+<section class="slide" id="coordfail">
+  <div class="hdr in"><span class="qn">28</span><h2>Coordinator failure</h2></div>
+  <div class="cols" style="grid-template-columns:.8fr 1.25fr;gap:22px">
+    <div>
+      <ul class="mini2">
+        <li>Coordinator chết <b>trước</b> khi gửi prepare → participant abort an toàn.</li>
+        <li>Đã vote “yes” → <b>không được</b> tự ý abort; chỉ có thể <b>đợi</b>. Trạng thái này gọi là <b>in doubt</b> / <b>uncertain</b>.</li>
+      </ul>
+      <p class="say" style="font-size:16.5px;min-height:120px">Nhấn → để chạy từng bước.</p>
+      <div class="card f" style="padding:10px 14px"><h3 style="font-size:18px">Three-phase commit (3PC)?</h3><p class="ps">2PC là <b>blocking</b> atomic commit protocol. 3PC muốn nonblocking nhưng giả định <b>bounded delay</b> &amp; bounded response time — không đúng trong hệ thực tế. Nonblocking atomic commit cần <b>perfect failure detector</b>; timeout thì không phải. Vì thế 2PC vẫn được dùng.</p></div>
+    </div>
+    <div>
+      <div class="code-title">Figure 9-10 · coordinator crash sau khi participants vote “yes”</div>
+      <svg class="sv" id="f910" viewBox="0 0 700 360">
+        <line class="lane s" x1="120" y1="60" x2="690" y2="60" id="cfl"/><text x="8" y="65" class="ll">Coordinator</text>
+        <line class="lane s" x1="120" y1="168" x2="690" y2="168"/><text x="8" y="173" class="ll">Database 1</text>
+        <line class="lane s" x1="120" y1="290" x2="690" y2="290"/><text x="8" y="295" class="ll">Database 2</text>
+        <g class="g" id="cf1"><path class="m c dl" d="M150,62 L190,165" marker-end="url(#ac)"/><path class="m c dl" d="M150,62 L200,287" marker-end="url(#ac)"/><text x="130" y="44" class="lb" style="fill:#0e7490">prepare</text>
+          <path class="m gr dl" d="M195,168 L240,64" marker-end="url(#ag)"/><path class="m gr dl" d="M205,290 L252,64" marker-end="url(#ag)"/><text x="222" y="125" class="lb" style="fill:#047857">yes</text><text x="236" y="230" class="lb" style="fill:#047857">yes</text></g>
+        <g class="g" id="cf2"><circle cx="300" cy="60" r="10" fill="#f59e0b"/><text x="270" y="36" class="lb" style="fill:#b45309">decide: commit</text>
+          <path class="m k dl" d="M312,62 L380,287" marker-end="url(#ak)"/><text x="352" y="250" class="lb" style="fill:#be185d">commit</text><text x="385" y="320" class="lb" style="fill:#047857">✓ committed</text></g>
+        <g class="g" id="cf3"><text x="350" y="68" style="font-size:30px">💥</text><text x="400" y="50" class="lb" style="fill:#be123c">coordinator crash</text>
+          <path class="m x dash dl" d="M330,64 L420,165"/><text x="410" y="120" class="lb" style="fill:#be123c">✗ commit (chưa gửi)</text></g>
+        <g class="g" id="cf4"><rect class="bar y" x="200" y="180" width="460" height="30" rx="8"/><text x="430" y="200" text-anchor="middle" class="am" style="font-size:14px">❓ in doubt — commit hay abort? (vẫn giữ locks)</text></g>
+        <g class="g" id="cf5"><text x="560" y="40" class="lb" style="fill:#047857">♻ recover: đọc log</text><path class="m gr dl" d="M600,62 L640,165" marker-end="url(#ag)"/><text x="610" y="130" class="lb" style="fill:#047857">commit</text></g>
+      </svg>
+      <span class="f ghost" data-act="#cf1|on" data-say="Coordinator gửi prepare; cả hai DB vote “yes”."></span>
+      <span class="f ghost" data-act="#cf2|on" data-say="Coordinator quyết định commit; Database 2 đã nhận commit request."></span>
+      <span class="f ghost" data-act="#cf3|on;#cf4|on" data-say="Coordinator crash <b>trước khi</b> gửi commit tới Database 1 → DB1 <b>in doubt</b>. Timeout cũng không cứu: tự abort → lệch với DB2 đã commit; tự commit → có thể participant khác đã abort."></span>
+      <span class="f ghost" data-act="#cf5|on" data-say="Cách duy nhất: <b>đợi coordinator recover</b> và đọc transaction log. Không có commit record → abort. Commit point của 2PC rốt cuộc là một single-node atomic commit trên coordinator."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== IN PRACTICE ===================== -->
+<section class="slide" id="practice">
+  <div class="hdr in"><span class="qn">29</span><h2>Distributed Transactions in Practice</h2></div>
+  <p class="in" style="font-size:18px">Danh tiếng lẫn lộn: một safety guarantee quan trọng, nhưng bị chê vì gây vấn đề vận hành, giết performance, hứa nhiều hơn làm được. Distributed transactions trong MySQL được báo cáo <b>chậm hơn 10 lần</b> — do thêm <b>fsync</b> cho crash recovery và thêm network round-trips.</p>
+  <div class="cols" style="margin-top:12px;gap:20px">
+    <div class="card f"><span class="lbl good">DATABASE-INTERNAL</span><h3>Cùng một database software</h3><p class="ps">Distributed DB hỗ trợ transaction giữa các node của chính nó (vd. <b>VoltDB</b>, <b>MySQL Cluster NDB</b>). Dùng protocol riêng, tối ưu được → thường chạy khá tốt.</p></div>
+    <div class="card f"><span class="lbl bad">HETEROGENEOUS</span><h3>Nhiều công nghệ khác nhau</h3><p class="ps">Hai DB khác vendor, hoặc cả hệ thống không phải DB như <b>message brokers</b>. Vẫn phải atomic commit dù bên trong khác hẳn nhau → <b>khó hơn nhiều</b>.</p></div>
+  </div>
+  <h3 class="f" style="margin-top:14px">Exactly-once message processing</h3>
+  <div class="rowc" style="gap:12px;justify-content:center;margin-top:6px">
+    <div class="sysbox" id="eo1" style="font-size:17px">📨 Message queue<br><span class="tiny">ack message</span></div>
+    <span class="op">+</span>
+    <div class="sysbox" id="eo2" style="font-size:17px">🗄️ Database<br><span class="tiny">ghi kết quả xử lý</span></div>
+    <span class="op">=</span>
+    <div class="sysbox" id="eo3" style="font-size:17px">⚛️ một distributed transaction</div>
+    <div class="sysbox hid" id="eo4" style="font-size:17px">✉️ Email server<br><span class="tiny">không hỗ trợ 2PC</span></div>
+  </div>
+  <span class="f ghost" data-act="#eo1|ok;#eo2|ok;#eo3|ok" data-say="Ack message <b>khi và chỉ khi</b> transaction xử lý message commit thành công — commit atomically cả hai."></span>
+  <span class="f ghost" data-now="#eo1|fail;#eo2|fail" data-act="#eo3|ok" data-set="#eo3::↩ cả hai abort → broker redeliver an toàn" data-say="Một bên fail → cả hai abort → broker redeliver an toàn. Kết quả: message được xử lý <b>effectively exactly once</b>."></span>
+  <span class="f ghost" data-act="#eo4|on;#eo4|fail" data-say="Nhưng chỉ khi <b>mọi</b> hệ thống bị ảnh hưởng dùng chung atomic commit protocol. Side effect là gửi email (không hỗ trợ 2PC) → retry có thể gửi email <b>2 lần</b>."></span>
+  <p class="say" style="font-size:17px;text-align:center;min-height:40px">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== XA ===================== -->
+<section class="slide" id="xa">
+  <div class="hdr in"><span class="qn">30</span><h2>XA transactions &amp; holding locks while in doubt</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:24px">
+    <div>
+      <p class="ps" style="font-size:17.5px"><b>X/Open XA</b> (eXtended Architecture, 1991): standard implement 2PC trên heterogeneous technologies. Hỗ trợ bởi PostgreSQL, MySQL, DB2, SQL Server, Oracle; ActiveMQ, HornetQ, MSMQ, IBM MQ.</p>
+      <ul class="mini2" style="margin-top:6px">
+        <li>XA <b>không phải network protocol</b> — chỉ là <b>C API</b> để giao tiếp với transaction coordinator. Java: <b>JTA</b>, qua drivers <b>JDBC</b> / <b>JMS</b>.</li>
+        <li>Driver expose callbacks để coordinator yêu cầu participant prepare / commit / abort.</li>
+        <li>Coordinator thường là <b>library trong cùng process</b> với app; log nằm trên <b>local disk</b> của app server.</li>
+        <li>App process crash → coordinator chết theo → participants <b>in doubt</b>. Phải restart server, đọc log; DB server không tự liên lạc được với coordinator.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Vì sao in doubt lại nghiêm trọng? → <span style="color:#be123c">locks</span></h3>
+      <table class="tbl2" style="margin-top:6px">
+        <tr><th>row</th><th>giá trị</th><th>lock</th></tr>
+        <tr><td class="kv">#17</td><td>balance = 500</td><td id="lk1">–</td></tr>
+        <tr><td class="kv">#42</td><td>balance = 120</td><td id="lk2">–</td></tr>
+        <tr><td class="kv">#88</td><td>stock = 3</td><td id="lk3">–</td></tr>
+      </table>
+      <div class="sysbox" id="lkm" style="margin-top:12px;font-size:17px">Transaction T1 (2PC) đang chạy</div>
+      <div class="sysbox hid" id="lkq" style="margin-top:10px;font-size:16px">⏳ T2, T3, T4… blocked</div>
+      <span class="f ghost" data-set="#lk1::🔒 T1;#lk2::🔒 T1" data-say="T1 sửa row → giữ <b>row-level exclusive lock</b> (chống dirty writes; với 2PL còn có shared lock trên row đã đọc)."></span>
+      <span class="f ghost" data-set="#lk1::🔒 T1;#lk2::🔒 T1;#lkm::💥 Coordinator crash — T1 in doubt" data-act="#lkm|fail" data-say="Coordinator crash, T1 in doubt → locks <b>không được release</b> cho tới khi commit/abort."></span>
+      <span class="f ghost" data-set="#lk1::🔒 T1;#lk2::🔒 T1;#lkm::💥 T1 in doubt: 20 phút… hoặc mãi mãi" data-act="#lkm|fail;#lkq|on;#lkq|fail" data-say="Coordinator mất 20 phút để lên → locks bị giữ 20 phút. Mất log → giữ <b>mãi mãi</b> (tới khi admin can thiệp). Transaction khác chạm vào các row này bị <b>block</b> → nhiều phần app thành unavailable."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== RECOVER + LIMITATIONS ===================== -->
+<section class="slide" id="recover">
+  <div class="hdr in"><span class="qn">31</span><h2>Recovering from coordinator failure &amp; limitations</h2></div>
+  <div class="cols" style="grid-template-columns:.95fr 1.2fr;gap:24px">
+    <div>
+      <ul class="mini2">
+        <li><b>Orphaned in-doubt transactions</b> có xảy ra thực tế (log mất/hỏng do bug) → nằm mãi trong DB, giữ locks.</li>
+        <li><b>Reboot</b> DB cũng không giúp: 2PC đúng phải giữ locks của in-doubt txn qua cả restart.</li>
+        <li>Lối thoát duy nhất: <b>administrator</b> tự xem từng participant rồi quyết định commit hay rollback — thường giữa lúc outage căng thẳng.</li>
+      </ul>
+      <div class="card bad f" style="margin-top:12px"><span class="lbl bad">HEURISTIC DECISIONS</span><p class="ps">Cửa thoát hiểm của nhiều XA implementation: participant tự quyết commit/abort. “Heuristic” ở đây là uyển ngữ cho <b>“probably breaking atomicity”</b> — chỉ dùng cho tình huống thảm họa.</p></div>
+    </div>
+    <div>
+      <h3>Limitations of distributed transactions</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px">
+        <div class="card f"><h3 style="font-size:17px">🗄️ Coordinator là một database</h3><p class="ps">Không replicate → <b>single point of failure</b>. Nhiều implementation mặc định không highly available.</p></div>
+        <div class="card f"><h3 style="font-size:17px">📦 App server hết stateless</h3><p class="ps">Coordinator log trở thành durable state quan trọng ngang database.</p></div>
+        <div class="card f"><h3 style="font-size:17px">📉 Lowest common denominator</h3><p class="ps">XA không detect được <b>deadlock</b> xuyên hệ thống, không làm việc với <b>SSI</b>.</p></div>
+        <div class="card f"><h3 style="font-size:17px">💣 Amplifying failures</h3><p class="ps">Mọi participant phải trả lời → một phần hỏng là cả transaction fail. Ngược với mục tiêu fault-tolerant.</p></div>
+      </div>
+      <p class="tiny f" style="margin-top:10px">Có cách khác để giữ nhiều hệ thống consistent mà không cần heterogeneous distributed transactions — xem Chapter 11 &amp; 12.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CONSENSUS PROPERTIES ===================== -->
+<section class="slide" id="consensus">
+  <div class="hdr in"><span class="qn">32</span><h2>Fault-Tolerant Consensus</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:24px">
+    <div>
+      <p class="ps" style="font-size:17.5px">Hình thức hóa: một hoặc nhiều node <b>propose</b> values, thuật toán <b>decide</b> một trong số đó. Ví dụ: nhiều khách cùng mua <b>ghế cuối cùng</b> — mỗi node propose ID khách của mình.</p>
+      <div class="nodes" style="margin-top:12px">
+        <div class="node" id="cn1"><span class="ver">#17</span><small>node 1</small></div>
+        <div class="node" id="cn2"><span class="ver">#42</span><small>node 2</small></div>
+        <div class="node" id="cn3"><span class="ver">#9</span><small>node 3</small></div>
+      </div>
+      <div class="sysbox" id="cnm" style="margin-top:10px;font-size:17px">propose: #17, #42, #9</div>
+      <span class="f ghost" data-act="#cn1|ok;#cn2|ok;#cn3|ok;#cp1x|lit;#cp2x|lit" data-set="#cn1 .ver::#42;#cn3 .ver::#42;#cnm::✅ decide: #42 nhận ghế" data-say="Mọi node quyết định <b>cùng một</b> value, và không đổi ý."></span>
+      <span class="f ghost" data-act="#cp3x|lit" data-say="Validity loại các lời giải tầm thường: một thuật toán luôn decide <code class='i'>null</code> thỏa agreement &amp; integrity nhưng không thỏa validity."></span>
+      <span class="f ghost" data-act="#cp4x|lit;#cn3|down" data-set="#cn1 .ver::#42;#cn2 .ver::#42;#cn3 .ver::💀;#cnm::✅ node chết nhưng phần còn lại vẫn decide" data-say="Termination = fault tolerance: dù có node fail, các node còn lại vẫn phải đi tới quyết định. “Dictator” node thỏa 3 tính chất đầu nhưng chết là hết; <b>2PC không thỏa termination</b>."></span>
+      <p class="say" style="font-size:16.5px;min-height:76px">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <div class="prop" id="cp1x"><span class="tag sf">SAFETY</span><b>Uniform agreement</b><p class="ps">Không có hai node decide khác nhau.</p></div>
+      <div class="prop" id="cp2x" style="margin-top:8px"><span class="tag sf">SAFETY</span><b>Integrity</b><p class="ps">Không node nào decide hai lần.</p></div>
+      <div class="prop" id="cp3x" style="margin-top:8px"><span class="tag sf">SAFETY</span><b>Validity</b><p class="ps">Node decide v thì v phải do một node nào đó propose.</p></div>
+      <div class="prop" id="cp4x" style="margin-top:8px"><span class="tag lv">LIVENESS</span><b>Termination</b><p class="ps">Mọi node không crash cuối cùng đều decide một value.</p></div>
+      <ul class="mini2 f" style="margin-top:10px">
+        <li>Model: node crash là <b>biến mất vĩnh viễn</b> (“chôn dưới 30 feet bùn”).</li>
+        <li>Termination cần <b>đa số</b> node hoạt động (quorum). Safety luôn được giữ kể cả khi đa số fail.</li>
+        <li>Đa số thuật toán giả định không có <b>Byzantine faults</b>; chịu được Byzantine nếu &lt; 1/3 node lỗi.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ALGORITHMS + TOB ===================== -->
+<section class="slide" id="algos">
+  <div class="hdr in"><span class="qn">33</span><h2>Consensus algorithms &amp; total order broadcast</h2></div>
+  <div class="chips in" style="margin-top:4px"><span class="chip p">Viewstamped Replication (VSR)</span><span class="chip c">Paxos</span><span class="chip k">Raft</span><span class="chip y">Zab</span><span class="muted" style="font-size:16px;align-self:center">· giống nhau nhiều nhưng không hoàn toàn</span></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr;gap:24px;margin-top:14px">
+    <div>
+      <p style="font-size:18.5px">Phần lớn không decide <b>một</b> value, mà decide một <b>sequence of values</b> → chúng là <b>total order broadcast algorithms</b>.</p>
+      <div class="formula f" style="margin-top:12px;font-size:19px">Total order broadcast =<br><span class="grad">repeated rounds of consensus</span></div>
+      <p class="ps f" style="margin-top:10px">Mỗi round: các node propose message muốn gửi tiếp theo, rồi decide message kế tiếp được deliver. VSR, Raft, Zab implement TOB trực tiếp (hiệu quả hơn); với Paxos tối ưu này gọi là <b>Multi-Paxos</b>.</p>
+      <div class="note f" style="font-size:16.5px">Không cần biết chi tiết từng thuật toán — trừ khi bạn tự implement consensus system (không nên: <b>rất khó</b>).</div>
+    </div>
+    <div>
+      <table class="tbl2">
+        <tr><th>Consensus property</th><th>⇒ Total order broadcast</th></tr>
+        <tr class="f"><td><b>Agreement</b></td><td>Mọi node deliver cùng messages theo cùng thứ tự</td></tr>
+        <tr class="f"><td><b>Integrity</b></td><td>Messages không bị duplicate</td></tr>
+        <tr class="f"><td><b>Validity</b></td><td>Messages không bị corrupt hay bịa ra</td></tr>
+        <tr class="f"><td><b>Termination</b></td><td>Messages không bị mất</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== EPOCH ===================== -->
+<section class="slide" id="epoch">
+  <div class="hdr in"><span class="qn">34</span><h2>Epoch numbering &amp; quorums</h2></div>
+  <div class="cols" style="grid-template-columns:.95fr 1.15fr;gap:22px">
+    <div>
+      <p class="ps" style="font-size:17px">Single-leader replication chẳng phải là TOB sao? Leader chọn <b>thủ công</b> = consensus kiểu “độc tài”, không thỏa termination. Tự động failover thì cần consensus để bầu leader… mà consensus lại cần leader?! <b>Để bầu leader, trước hết cần một leader.</b></p>
+      <div class="chips" style="margin-top:10px"><span class="chip c">ballot number · Paxos</span><span class="chip p">view number · VSR</span><span class="chip k">term number · Raft</span></div>
+      <ul class="mini2" style="margin-top:8px">
+        <li>Không đảm bảo leader duy nhất tuyệt đối — chỉ duy nhất <b>trong mỗi epoch</b>. Epoch tăng đơn điệu; xung đột → epoch <b>cao hơn thắng</b>.</li>
+        <li><b>Hai vòng vote</b>: bầu leader, rồi vote cho từng proposal của leader. Hai quorum phải <b>overlap</b>.</li>
+      </ul>
+      <p class="say" style="font-size:16.5px;min-height:96px">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <div class="nodes" style="gap:10px">
+        <div class="node lead" id="e1"><span class="ver">👑 e1</span><small>N1</small></div>
+        <div class="node" id="e2"><span class="ver">e1</span><small>N2</small></div>
+        <div class="node" id="e3"><span class="ver">e1</span><small>N3</small></div>
+        <div class="node" id="e4"><span class="ver">e1</span><small>N4</small></div>
+        <div class="node" id="e5"><span class="ver">e1</span><small>N5</small></div>
+      </div>
+      <div class="sysbox" id="em" style="margin-top:14px;font-size:17px">Epoch 1 · N1 là leader</div>
+      <span class="f ghost" data-now="#e1|down" data-set="#e1 .ver::😴 e1;#em::N1 bị GC pause / network ngắt → bị nghi là đã chết" data-say="Leader hiện tại bị nghi là chết (có thể chỉ đang pause)."></span>
+      <span class="f ghost" data-now="#e1|down" data-act="#e3|lead;#e4|ok;#e5|ok" data-set="#e1 .ver::😴 e1;#e3 .ver::👑 e2;#e4 .ver::e2 ✓;#e5 .ver::e2 ✓;#em::Bầu cử epoch 2: N3, N4, N5 (đa số) chọn N3" data-say="Bầu leader mới với <b>epoch number tăng lên</b> = 2. N3 nhận phiếu từ quorum {N3, N4, N5}."></span>
+      <span class="f ghost" data-act="#e3|lead;#e4|ok;#e5|ok;#e1|wait;#e2|hot;#e3|hot" data-set="#e1 .ver::👑? e1;#e3 .ver::👑 e2;#e4 .ver::e2 ✓;#e5 .ver::e2 ✓;#em::❌ N1 (epoch 1) propose → quorum {N1,N2,N3}: N3 biết epoch 2 → từ chối" data-say="N1 tỉnh lại, vẫn tưởng mình là leader, propose với epoch 1. Quorum của nó <b>overlap</b> với quorum đã bầu N3 → N3 báo có epoch cao hơn → proposal bị <b>từ chối</b>. N1 biết mình đã bị phế."></span>
+      <span class="f ghost" data-act="#e3|lead;#e4|ok;#e5|ok;#e1|ok;#e2|ok" data-set="#e1 .ver::e2;#e2 .ver::e2;#e3 .ver::👑 e2;#e4 .ver::e2 ✓;#e5 .ver::e2 ✓;#em::✅ N3 (epoch 2) propose → quorum chấp nhận → decided" data-say="N3 gửi proposal, quorum trả lời đồng ý, không thấy epoch nào cao hơn → chắc chắn vẫn là leader → <b>decide</b> an toàn."></span>
+      <table class="tbl2 f" style="margin-top:12px">
+        <tr><th></th><th>2PC</th><th>Consensus</th></tr>
+        <tr><td>Leader/coordinator</td><td>Không được bầu</td><td>Được bầu (epoch)</td></tr>
+        <tr><td>Votes cần</td><td><b>Tất cả</b> participants “yes”</td><td><b>Đa số</b> (quorum)</td></tr>
+        <tr><td>Recovery</td><td>Đợi coordinator</td><td>Có quy trình đưa node về state nhất quán khi có leader mới</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== LIMITS ===================== -->
+<section class="slide" id="limits">
+  <div class="hdr in"><span class="qn">35</span><h2>Limitations of consensus</h2></div>
+  <p class="in" style="font-size:18.5px">Một bước đột phá: mang <b>safety properties</b> (agreement, integrity, validity) vào nơi mọi thứ đều bất định, vẫn fault-tolerant; cung cấp TOB → linearizable atomic ops. Nhưng lợi ích đi kèm chi phí:</p>
+  <div class="cols" style="grid-template-columns:1.25fr .9fr;gap:22px;margin-top:10px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="card f"><h3 style="font-size:17px">🐢 Synchronous replication</h3><p class="ps">Vote trước khi decide = một dạng sync replication. Nhiều DB chọn async vì performance, chấp nhận mất data khi failover.</p></div>
+      <div class="card f"><h3 style="font-size:17px">🗳️ Strict majority</h3><p class="ps">Network chia cắt → chỉ phần <b>đa số</b> tiến triển, phần còn lại bị block.</p></div>
+      <div class="card f"><h3 style="font-size:17px">📌 Fixed membership</h3><p class="ps">Không tùy tiện thêm/bớt node. <b>Dynamic membership</b> extensions ít được hiểu rõ hơn.</p></div>
+      <div class="card f"><h3 style="font-size:17px">⏱️ Dựa vào timeouts</h3><p class="ps">Network delay biến động (geo-distributed) → nghi nhầm leader chết → bầu cử liên tục → performance tệ.</p></div>
+      <div class="card f" style="grid-column:span 2"><h3 style="font-size:17px">🔁 Nhạy cảm với network problems</h3><p class="ps">Raft có edge case: chỉ <b>một link</b> chập chờn → leadership nhảy qua lại giữa hai node, hoặc leader liên tục bị buộc từ chức → hệ thống gần như không tiến triển. Thiết kế thuật toán robust hơn vẫn là open research problem.</p></div>
+    </div>
+    <div>
+      <h3>Cần bao nhiêu node?</h3>
+      <div class="arr sm" style="margin-top:10px"><div class="cell" id="m1">✓</div><div class="cell" id="m2">✓</div><div class="cell" id="m3">✓</div></div>
+      <p class="tiny" style="text-align:center;margin-top:6px">3 nodes → chịu được <b>1</b> failure</p>
+      <div class="arr sm" style="margin-top:12px"><div class="cell" id="m4">✓</div><div class="cell" id="m5">✓</div><div class="cell" id="m6">✓</div><div class="cell" id="m7">✓</div><div class="cell" id="m8">✓</div></div>
+      <p class="tiny" style="text-align:center;margin-top:6px">5 nodes → chịu được <b>2</b> failures</p>
+      <span class="f ghost" data-act="#m3|bad;#m1|ok;#m2|ok" data-set="#m3::✗" data-say="3 node, chết 1: còn 2/3 là đa số → vẫn chạy."></span>
+      <span class="f ghost" data-act="#m7|bad;#m8|bad;#m4|ok;#m5|ok;#m6|ok" data-set="#m3::✗;#m7::✗;#m8::✗" data-say="5 node, chết 2: còn 3/5 là đa số → vẫn chạy."></span>
+      <span class="f ghost" data-act="#m6|bad" data-set="#m3::✗;#m7::✗;#m8::✗;#m6::✗" data-say="Chết node thứ 3: còn 2/5 &lt; đa số → <b>dừng</b> (nhưng không bao giờ ra quyết định sai)."></span>
+      <p class="say" style="font-size:16.5px;text-align:center">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ZOOKEEPER ===================== -->
+<section class="slide" id="zk">
+  <div class="hdr in"><span class="qn">36</span><h2>Membership &amp; Coordination Services</h2></div>
+  <p class="in" style="font-size:18px"><b>ZooKeeper</b>, <b>etcd</b>: “distributed key-value stores” hay “coordination and configuration services”. API giống DB — vậy sao phải chạy consensus? Ít khi dùng trực tiếp; thường gián tiếp qua <b>HBase</b>, <b>Hadoop YARN</b>, <b>OpenStack Nova</b>, <b>Kafka</b>. Giữ lượng data <b>nhỏ, vừa trong memory</b>, replicate bằng fault-tolerant TOB. Mô phỏng theo <b>Google Chubby</b>.</p>
+  <div class="cols4" style="margin-top:14px">
+    <div class="card f zoom" id="zf1"><div class="icon">🔐</div><h3>Linearizable atomic ops</h3><p class="ps">Atomic <b>compare-and-set</b> → implement lock. Distributed lock thường là <b>lease</b> có expiry để tự release khi client fail.</p></div>
+    <div class="card f zoom"><div class="icon">🔢</div><h3>Total ordering</h3><p class="ps">Mọi op được sắp thứ tự, có <code class="i">zxid</code> và version <code class="i">cversion</code> tăng đơn điệu → dùng làm <b>fencing token</b>.</p></div>
+    <div class="card f zoom"><div class="icon">💓</div><h3>Failure detection</h3><p class="ps">Client giữ long-lived <b>session</b>, trao đổi heartbeats. Quá session timeout → session chết; locks có thể tự release: <b>ephemeral nodes</b>.</p></div>
+    <div class="card f zoom"><div class="icon">🔔</div><h3>Change notifications</h3><p class="ps">Client <b>watch</b> thay đổi: biết khi có client mới join hay client fail (ephemeral nodes biến mất) mà không cần poll.</p></div>
+  </div>
+  <div class="note blue f" style="margin-top:16px" data-act="#zf1|lit">Trong 4 tính năng, chỉ <b>linearizable atomic operations</b> thật sự cần consensus — nhưng chính <b>sự kết hợp</b> cả 4 làm ZooKeeper hữu ích cho distributed coordination.</div>
+</section>
+
+<!-- ===================== ZK USES ===================== -->
+<section class="slide" id="zkuse">
+  <div class="hdr in"><span class="qn">37</span><h2>ZooKeeper được dùng vào việc gì?</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:24px">
+    <div>
+      <div class="leg a f"><b>🧑‍✈️ Allocating work to nodes</b><p>Chọn leader/primary cho DB, job scheduler…; gán partition cho node, <b>rebalance</b> khi node join/fail. Kết hợp atomic ops + ephemeral nodes + notifications (Apache Curator giúp) — vẫn hơn hẳn tự viết consensus.</p></div>
+      <div class="leg b f" style="margin-top:10px"><b>🧭 Service discovery</b><p>ZooKeeper, etcd, <b>Consul</b>: service đăng ký endpoint khi khởi động. Nhưng service discovery <b>không thật sự cần</b> consensus — DNS không linearizable vẫn ổn. Có thể dùng <b>read-only caching replicas</b> (nhận log async, không vote).</p></div>
+      <div class="leg c f" style="margin-top:10px"><b>👥 Membership services</b><p>Lịch sử từ 1980s (vd. air traffic control). Failure detection + consensus → các node <b>đồng ý</b> ai còn sống; vd. leader = member có số nhỏ nhất.</p></div>
+    </div>
+    <div>
+      <svg class="sv" id="zkd" viewBox="0 0 540 380">
+        <g class="g" id="zk2"><path class="m dash" d="M270,190 L70,60"/><path class="m dash" d="M270,190 L200,30"/><path class="m dash" d="M270,190 L340,30"/><path class="m dash" d="M270,190 L470,60"/><path class="m dash" d="M270,190 L500,190"/><path class="m dash" d="M270,190 L470,320"/><path class="m dash" d="M270,190 L340,350"/><path class="m dash" d="M270,190 L200,350"/><path class="m dash" d="M270,190 L70,320"/><path class="m dash" d="M270,190 L40,190"/>
+          <g style="font-size:22px"><text x="55" y="68">🖥️</text><text x="185" y="38">🖥️</text><text x="325" y="38">🖥️</text><text x="455" y="68">🖥️</text><text x="485" y="198">🖥️</text><text x="455" y="330">🖥️</text><text x="325" y="365">🖥️</text><text x="185" y="365">🖥️</text><text x="55" y="330">🖥️</text><text x="25" y="198">🖥️</text></g>
+          <text x="400" y="128" class="lb">hàng nghìn clients</text></g>
+        <circle cx="270" cy="190" r="92" fill="#f5f0ff" stroke="#7c3aed" stroke-width="2.5"/>
+        <circle class="nd" cx="270" cy="140" r="24"/><circle class="nd c2" cx="225" cy="215" r="24"/><circle class="nd c3" cx="315" cy="215" r="24"/>
+        <text x="270" y="146" text-anchor="middle" style="font-size:13px">ZK</text><text x="225" y="221" text-anchor="middle" style="font-size:13px">ZK</text><text x="315" y="221" text-anchor="middle" style="font-size:13px">ZK</text>
+        <text x="270" y="180" text-anchor="middle" class="sm">ensemble 3 hoặc 5 node</text>
+        <g class="g" id="zk3"><rect x="120" y="268" width="300" height="34" rx="10" fill="#fff" stroke="#f59e0b" stroke-width="2"/><text x="270" y="290" text-anchor="middle" class="mono" style="font-size:12.5px;fill:#b45309">“10.1.1.23 là leader của partition 7”</text></g>
+      </svg>
+      <span class="f ghost" data-act="#zk2|on" data-say="ZooKeeper chạy trên số node <b>cố định</b> (3 hoặc 5), vote đa số giữa các node đó, phục vụ số lượng client rất lớn → <b>“outsource”</b> consensus, ordering, failure detection."></span>
+      <span class="f ghost" data-act="#zk2|on;#zk3|on" data-say="Data trong ZooKeeper thay đổi <b>chậm</b> (phút, giờ) — không dùng để lưu runtime state thay đổi hàng triệu lần/giây (dùng công cụ như <b>Apache BookKeeper</b>)."></span>
+      <p class="say" style="font-size:16.5px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SUMMARY: EQUIVALENCE ===================== -->
+<section class="slide" id="equiv">
+  <div class="hdr in"><span class="qn">SUM</span><h2>Summary: mọi thứ quy về <span class="grad">consensus</span></h2></div>
+  <div class="cols" style="grid-template-columns:.85fr 1.25fr;gap:22px">
+    <div>
+      <div class="leg a"><b>Linearizability</b><p>Làm data replicated trông như <b>một copy</b>, ops atomic. Dễ hiểu (như biến trong single-threaded program) nhưng <b>chậm</b>, nhất là khi network delay lớn.</p></div>
+      <div class="leg b" style="margin-top:8px"><b>Causality</b><p>Thứ tự theo nhân quả — <b>partial order</b>, có branch &amp; merge. Không tốn coordination như linearizability, ít nhạy cảm với network.</p></div>
+      <div class="leg c" style="margin-top:8px"><b>Consensus</b><p>Mọi node đồng ý một quyết định, và quyết định là <b>irrevocable</b>. Lamport timestamps không đủ cho uniqueness → cần consensus.</p></div>
+    </div>
+    <div>
+      <svg class="sv" id="hub" viewBox="0 0 640 410">
+        <g class="g" id="h1"><path class="m k dl" d="M320,205 L120,60"/><rect class="nd" x="10" y="30" width="220" height="54" rx="12"/><text x="120" y="55" text-anchor="middle" style="font-size:14px">Linearizable CAS registers</text><text x="120" y="73" text-anchor="middle" class="sm">set value nếu current = param?</text></g>
+        <g class="g" id="h2"><path class="m k dl" d="M320,205 L520,60"/><rect class="nd c2" x="410" y="30" width="220" height="54" rx="12"/><text x="520" y="55" text-anchor="middle" style="font-size:14px">Atomic transaction commit</text><text x="520" y="73" text-anchor="middle" class="sm">commit hay abort?</text></g>
+        <g class="g" id="h3"><path class="m k dl" d="M320,205 L120,205"/><rect class="nd c3" x="10" y="178" width="220" height="54" rx="12"/><text x="120" y="203" text-anchor="middle" style="font-size:14px">Total order broadcast</text><text x="120" y="221" text-anchor="middle" class="sm">deliver message theo thứ tự nào?</text></g>
+        <g class="g" id="h4"><path class="m k dl" d="M320,205 L520,205"/><rect class="nd c4" x="410" y="178" width="220" height="54" rx="12"/><text x="520" y="203" text-anchor="middle" style="font-size:14px">Locks &amp; leases</text><text x="520" y="221" text-anchor="middle" class="sm">client nào giành được lock?</text></g>
+        <g class="g" id="h5"><path class="m k dl" d="M320,205 L120,350"/><rect class="nd c5" x="10" y="326" width="220" height="54" rx="12"/><text x="120" y="351" text-anchor="middle" style="font-size:14px">Membership / coordination</text><text x="120" y="369" text-anchor="middle" class="sm">node nào sống, node nào chết?</text></g>
+        <g class="g" id="h6"><path class="m k dl" d="M320,205 L520,350"/><rect class="nd" x="410" y="326" width="220" height="54" rx="12"/><text x="520" y="351" text-anchor="middle" style="font-size:14px">Uniqueness constraint</text><text x="520" y="369" text-anchor="middle" class="sm">record conflict nào được phép?</text></g>
+        <circle cx="320" cy="205" r="56" fill="url(#hg)"/>
+        <defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c3aed"/><stop offset="1" stop-color="#ec4899"/></linearGradient></defs>
+        <text x="320" y="211" text-anchor="middle" style="fill:#fff;font-size:17px">Consensus</text>
+      </svg>
+      <span class="f ghost" data-act="#h1|on;#h2|on"></span>
+      <span class="f ghost" data-act="#h3|on;#h4|on"></span>
+      <span class="f ghost" data-act="#h5|on;#h6|on"></span>
+      <p class="tiny" style="text-align:center">Tất cả đều <b>tương đương</b>: giải được một bài là chuyển được thành lời giải cho bài khác. Dễ nếu chỉ có một node (hoặc giao quyền quyết định cho một node — như single-leader DB).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== THREE WAYS ===================== -->
+<section class="slide" id="ways">
+  <div class="hdr in"><span class="qn">SUM</span><h2>Khi single leader fail: 3 lựa chọn</h2></div>
+  <div class="cols3" style="margin-top:8px">
+    <div class="card f zoom"><div class="icon">⏳</div><h3>1 · Wait</h3><p class="ps">Đợi leader recover, chấp nhận hệ thống bị <b>block</b>. Nhiều XA/JTA coordinators chọn cách này. Không thỏa <b>termination</b> — có thể block mãi.</p></div>
+    <div class="card f zoom"><div class="icon">🙋</div><h3>2 · Manual failover</h3><p class="ps">Con người chọn leader mới và cấu hình lại. Nhiều relational DB làm vậy — consensus kiểu <b>“act of God”</b>; tốc độ failover bằng tốc độ con người.</p></div>
+    <div class="card f zoom"><div class="icon">🤖</div><h3>3 · Algorithm</h3><p class="ps">Tự động chọn leader mới bằng <b>consensus algorithm</b> — nên dùng thuật toán <b>đã được chứng minh</b>, xử lý đúng network điều kiện xấu.</p></div>
+  </div>
+  <div class="note blue f" style="margin-top:16px">Single-leader DB không cần chạy consensus cho mỗi write, nhưng <b>vẫn cần</b> consensus để giữ và đổi leadership. Có leader chỉ là <b>“kicks the can down the road”</b>: consensus vẫn cần — ở chỗ khác, ít thường xuyên hơn.</div>
+  <div class="cols" style="margin-top:12px;gap:18px">
+    <div class="card good f"><span class="lbl good">DÙNG ZOOKEEPER</span><p class="ps">“Outsourced” consensus, failure detection, membership. Không dễ dùng, nhưng tốt hơn nhiều so với tự viết thuật toán chịu được mọi vấn đề của Chapter 8.</p></div>
+    <div class="card f"><span class="lbl info">KHÔNG PHẢI LÚC NÀO CŨNG CẦN</span><p class="ps">Leaderless &amp; multi-leader thường không dùng global consensus. Conflicts là hệ quả — có lẽ không sao: học cách sống với version history <b>branch &amp; merge</b>.</p></div>
+  </div>
+</section>
+
+<!-- ===================== END ===================== -->
+<section class="slide" id="end">
+  <div class="orb" style="width:340px;height:340px;background:#c4b5fd;right:-80px;bottom:-100px"></div>
+  <div class="hdr in"><span class="qn">END</span><h2>Kết thúc Part II</h2></div>
+  <div class="chain in" style="margin-top:6px;flex-wrap:nowrap;gap:6px"><span class="pv info sm">Ch5 Replication</span><span class="op">→</span><span class="pv info sm">Ch6 Partitioning</span><span class="op">→</span><span class="pv info sm">Ch7 Transactions</span><span class="op">→</span><span class="pv info sm">Ch8 Failure models</span><span class="op">→</span><span class="pv yes sm">Ch9 Consistency &amp; Consensus</span></div>
+  <div class="cols3" style="margin-top:20px">
+    <div class="card f"><h3>🎯 Linearizability</h3><p class="ps">“Single copy” + recency guarantee. Cần cho locks, leader election, uniqueness. Trả giá bằng latency &amp; availability khi network có vấn đề.</p></div>
+    <div class="card f"><h3>🧭 Ordering</h3><p class="ps">Causality = partial order. Lamport timestamps cho total order consistent with causality, nhưng chưa đủ — cần <b>total order broadcast</b>.</p></div>
+    <div class="card f"><h3>🤝 Consensus</h3><p class="ps">2PC là consensus “kém” (blocking). Paxos, Raft, Zab, VSR: epoch + quorum. Dùng qua ZooKeeper / etcd.</p></div>
+  </div>
+  <div class="quote f" style="margin-top:18px;font-size:18px">Lý thuyết distributed systems không phải lúc nào cũng dễ đọc, nhưng giúp ta biết <b>điều gì làm được và không làm được</b> — và tìm ra những cách phản trực giác mà hệ thống phân tán thường bị lỗi.</div>
+  <p class="in muted" style="font-size:18px;margin-top:16px">Tiếp theo → <b>Part III: Derived Data</b>: xây dựng ứng dụng mạnh mẽ từ các <b>heterogeneous building blocks</b>.</p>
+</section>
+
+</div></div>
+<div id="bar"></div>
+<div id="hint">← → / Space: từng bước · Shift+→: qua slide · A: hiện hết · Home: đầu · F: toàn màn hình</div>
+<div id="nav"><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+
+<script>
+(function(){
+  // ---------- C++ highlighter (same as lec03) ----------
+  const KW=new Set("if else for while do return break continue switch case default struct class using namespace const static new delete true false sizeof public private include pragma auto".split(" "));
+  const TY=new Set("int double float char void bool long short unsigned string".split(" "));
+  const LIB=new Set("cout cin endl sqrt fabs std".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line){
+    if(/^\s*#/.test(line)) return '<span class="p">'+esc(line)+'</span>';
+    const re=/(\/\/.*$)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="n">'+m[3]+'</span>';
+      else if(m[4]){
+        const w=m[4];
+        let cls=KW.has(w)?"k":TY.has(w)?"t":LIB.has(w)?"fn":(m[5]?"fn":"");
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[5]?esc(m[5]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-cpp"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");const [a,b]=r.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+  // ---------- deck engine ----------
+  // .f fragments, shown one per step. Per fragment:
+  //   data-act  "sel|cls;…"   class kept while the fragment is shown
+  //   data-now  "sel|cls;…"   class only while it is the latest fragment
+  //   data-set  "sel::html;…" content set while shown (later fragments win)
+  //   data-say  narration for the .say line
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")].sort((x,y)=>(+x.dataset.o||0)-(+y.dataset.o||0)); // data-o: show later
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  const pairs=(v,sep)=>(v||"").split(";").filter(Boolean).map(p=>{const k=p.indexOf(sep);return [p.slice(0,k).trim(),p.slice(k+sep.length)]});
+  function tog(v,on){pairs(v,"|").forEach(([sel,cls])=>{document.querySelectorAll(sel).forEach(t=>t.classList.toggle(cls,on))})}
+  // remember original content of every data-set target
+  document.querySelectorAll("[data-set]").forEach(f=>pairs(f.dataset.set,"::").forEach(([sel])=>{document.querySelectorAll(sel).forEach(t=>{if(t.dataset.orig===undefined)t.dataset.orig=t.innerHTML})}));
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach(f=>{tog(f.dataset.now,false);tog(f.dataset.act,false)});
+      s.querySelectorAll("[data-orig]").forEach(t=>t.innerHTML=t.dataset.orig);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step);f.classList.toggle("on",on);if(on){tog(f.dataset.act,true);pairs(f.dataset.set,"::").forEach(([sel,val])=>document.querySelectorAll(sel).forEach(t=>t.innerHTML=val))}});
+      if(i===cur&&step>0)tog(fs[step-1].dataset.now,true);
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.innerHTML=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length;
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    try{history.replaceState(null,"","#"+slides[cur].id)}catch(e){}
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+  addEventListener("keydown",e=>{
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,1205 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DDIA Chapter 4 · Encoding and Evolution</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+h1{font-size:70px;line-height:1.1;font-weight:800}
+h2{font-size:38px;line-height:1.2;font-weight:800}
+h3{font-size:23px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:22px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:26px;margin:6px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.88em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 6px;border-radius:6px;color:#be185d}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.cols.c64{grid-template-columns:1.25fr 1fr}.cols.c46{grid-template-columns:1fr 1.2fr}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.card.bad{border-color:#fecdd3;background:linear-gradient(180deg,#fff1f3,#fff)}
+.card.good{border-color:#a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff)}
+.lbl{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
+.icon{font-size:34px;margin-bottom:4px}
+.note{margin-top:12px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:20px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.code{font-family:var(--mono);font-size:18px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
+.code.sm{font-size:16.5px}.code.xs{font-size:15px;line-height:1.45}.code.xxs{font-size:13.6px;line-height:1.38;padding:8px 0}
+.code .ln{padding:0 14px 0 8px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.11);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.13);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
+.code-title{font-family:var(--mono);font-size:15px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+.f.zoom{transform:scale(.85)}.f.zoom.on{transform:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:19px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.legend{display:flex;flex-direction:column;gap:10px}
+.leg{border-radius:12px;padding:10px 16px;background:#fff;border:1px solid var(--line)}
+.leg b{display:block;font-size:21px;margin-bottom:2px}
+.leg p{font-size:19px}
+.leg.a{border-left:6px solid #7c3aed}.leg.b{border-left:6px solid #06b6d4}.leg.c{border-left:6px solid #f59e0b}
+.console{font-family:var(--mono);font-size:17px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.mem{display:flex;align-items:center;gap:16px;min-height:130px}
+.frame{border:2px solid #e4dcfb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
+.frame .fname{font-family:var(--mono);font-size:16px;color:var(--muted);margin-bottom:6px}
+.var{display:flex;align-items:center;gap:10px}
+.vn{font-family:var(--mono);font-size:21px;color:var(--t);font-weight:600}
+.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #c4b5fd;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
+.vb .new{display:none}
+.callee,.arw{opacity:0;transform:translateX(-14px);transition:all .5s}
+.mem.s1 .callee,.mem.s1 .arw{opacity:1;transform:none}
+.mem.s2 .chg .old{display:none}.mem.s2 .chg .new{display:inline;animation:pop .5s}
+.mem.s2 .chg{border-color:#f59e0b;box-shadow:0 0 18px rgba(245,158,11,.5)}
+.mem.s3 .callee,.mem.s3 .arw{opacity:.15;transform:translateY(10px)}
+.mem.s3 .result{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.5)}
+.arw{font-family:var(--mono);font-size:16px;color:var(--gold);text-align:center;line-height:1.2;font-weight:600}
+.arw .bar{display:block;font-size:30px}
+.alias{font-size:18px;color:var(--accent2);font-weight:600}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.25)}100%{transform:none;opacity:1}}
+.flow{display:flex;align-items:center;gap:12px;justify-content:center}
+.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:18px;border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:14px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.h{border-color:var(--gold)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#c4b5fd}.box.exe{border-color:#ec4899;background:#fdf2f8}
+.ar{color:var(--muted);font-size:26px;text-align:center}
+.stack{display:flex;flex-direction:column;gap:8px}
+svg text{font-family:var(--mono);font-weight:600}
+.draw{stroke-dasharray:400;stroke-dashoffset:400;transition:stroke-dashoffset 1s ease}
+svg.d1 .dr1,svg.d2 .dr2,svg.d3 .dr3{stroke-dashoffset:0}
+.fadein{opacity:0;transition:opacity .6s}
+svg.d1 .fd1,svg.d2 .fd2,svg.d3 .fd3{opacity:1}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:19px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05)}
+.ag:hover{border-color:#ec4899;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
+.ag b{color:#db2777;margin-right:6px;font-family:var(--mono)}
+.formula{font-family:var(--mono);font-size:23px;text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:16px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+@media (max-width:700px){#hint{display:none}}
+@media print{#nav,#bar,#hint{display:none}}
+
+/* lec03 additions */
+.chain{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pv{display:inline-flex;align-items:center;font-family:var(--mono);font-size:18px;font-weight:700;padding:5px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;white-space:nowrap}
+.pv.yes{background:#d1fae5;border-color:#34d399;color:#047857}
+.pv.no{background:#ffe4e6;border-color:#fb7185;color:#be123c}
+.pv.skip{background:#f1f5f9;border-color:#cbd5e1;color:#94a3b8;text-decoration:line-through;border-style:dashed}
+.op{font-family:var(--mono);font-size:26px;font-weight:800;color:var(--sa1)}
+.tt th,.tt td{text-align:center}.tt td:first-child{color:var(--text);font-weight:400}
+.tt tr.hit td{background:#fdf2f8;color:#be185d}
+tr.f{transform:none}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.code.show-s .mark-s{opacity:.3;text-decoration:line-through}
+.arr{display:flex;gap:12px;justify-content:center;margin-top:6px}
+.cell{width:84px;height:84px;border-radius:16px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:800;transition:all .45s;box-shadow:0 6px 16px -10px rgba(124,58,237,.4)}
+.cell small{font-size:13px;color:var(--muted);font-weight:600}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857;transform:translateY(-6px)}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;transform:translateY(-10px) scale(1.06);box-shadow:0 10px 24px -8px rgba(225,29,72,.5)}
+.cell.skip{opacity:.3;transform:scale(.92)}
+.syn{display:flex;gap:12px;align-items:center;justify-content:center;font-family:var(--mono);font-size:24px;font-weight:700}
+.sy{padding:8px 16px;border-radius:12px;color:#fff}
+.sy.c1{background:linear-gradient(135deg,#7c3aed,#a855f7)}.sy.c2{background:linear-gradient(135deg,#059669,#10b981)}.sy.c3{background:linear-gradient(135deg,#e11d48,#f97316)}
+.spin{display:inline-block;animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* lec04 arrays additions */
+.cell .v{display:block;line-height:1}
+.cell.max{border-color:#db2777;background:#fdf2f8;color:#be185d}
+.cell.empty{border-style:dashed;background:#f8fafc;color:#cbd5e1;box-shadow:none}
+.cell.done{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cell.new{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.cell.out{opacity:.4;border-style:dashed}
+.cell.gone{border-color:#e11d48;background:#fff1f3;color:#be123c;text-decoration:line-through}
+.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(245,158,11,.55)}
+.cell.cmp{border-color:#0891b2;background:#ecfeff;color:#0e7490;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(8,145,178,.5)}
+.cell.dots{border:none;box-shadow:none;background:none;width:40px;color:var(--muted)}
+.arr.sm .cell{width:70px;height:74px;font-size:24px;border-radius:14px}
+.arr.xs .cell{width:56px;height:62px;font-size:19px;border-radius:12px}
+.arr.xs .cell small{font-size:11.5px}
+.arr.left{justify-content:flex-start}
+.addr{display:flex;gap:12px;justify-content:center;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.addr span{width:84px;text-align:center}
+.vars{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.vc{font-family:var(--mono);font-size:19px;font-weight:700;padding:5px 14px;border-radius:12px;background:#fff;border:2px solid #e4dcfb;transition:all .35s}
+.vc b{color:var(--t)}
+.vc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.45)}
+.vc.res{border-color:#10b981;background:#ecfdf5;color:#047857}
+.ci{opacity:0;transition:opacity .4s}.ci.show{opacity:1}
+.say{font-size:20px;margin-top:12px;min-height:56px;color:var(--muted)}
+.say b{color:var(--text)}
+.rowlbl{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted);margin:10px 0 4px}
+.zone{display:flex;gap:6px;justify-content:center;margin-top:8px;font-size:15px;font-weight:700}
+.zone span{padding:3px 10px;border-radius:999px}
+.z1{background:#d1fae5;color:#047857}.z2{background:#f1f5f9;color:#64748b}.z3{background:#ffe4e6;color:#be123c}
+.brace{display:flex;gap:12px;justify-content:center;margin-top:4px}
+.brace div{border-top:3px solid currentColor;padding-top:4px;text-align:center;font-family:var(--mono);font-size:15px;font-weight:700}
+.mx{display:grid;gap:6px;justify-content:center}
+.mc{width:62px;height:52px;border-radius:10px;border:2px solid #e4dcfb;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .4s}
+.mx.sm .mc{width:44px;height:36px;font-size:14px;border-radius:8px}
+.mc.ix{border:none;background:none;color:var(--muted);font-size:14px;font-weight:600;box-shadow:none}
+.mc.unused{border-style:dashed;background:#f8fafc;color:#cbd5e1}
+.mc.used{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.mc.hl{background:#fffbeb;border-color:#fcd34d}
+.mc.cur{border-color:#f59e0b;background:#fde68a;color:#92400e;transform:scale(1.12);box-shadow:0 8px 20px -6px rgba(245,158,11,.6)}
+.mc.bd{border-color:#ec4899;border-width:3px}
+.mc.inr{opacity:.3}
+.mc.pos{border-color:#10b981;background:#d1fae5;color:#047857}
+.mc.neg{background:#fff1f3;color:#be123c}
+.mc.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;border-style:dashed}
+.strip{display:flex;gap:3px;font-family:var(--mono);font-size:12px;flex-wrap:nowrap;overflow:hidden}
+.strip span{padding:6px 5px;border-radius:5px;background:#f3edff;color:#6d28d9;white-space:nowrap}
+.strip span.r1{background:#e0f2fe;color:#0369a1}
+.strip span.gap{background:none;color:var(--muted)}
+.trace td,.trace th{font-size:17px;padding:5px 10px}
+.trace td:first-child{color:var(--text)}
+.trace tr.now td{background:#fffbeb}
+.sig{font-family:var(--mono);font-size:17px;background:#fff;border:1px dashed #c4b5fd;border-radius:10px;padding:6px 12px;color:#6d28d9;display:inline-block}
+
+.cols>*{min-width:0}
+
+/* ===== DDIA ch1 additions ===== */
+.sv{width:100%;height:auto;overflow:visible}
+.sv text{font-family:"Be Vietnam Pro",system-ui,sans-serif;font-weight:700;font-size:15px;fill:#1e1b3a}
+.sv text.sm{font-size:12.5px;fill:#64607d;font-weight:500}
+.sv text.lb{font-size:12.5px;fill:#7c3aed;font-weight:700}
+.sv .nd{fill:#fff;stroke:#c4b5fd;stroke-width:2}
+.sv .nd.c2{stroke:#0891b2}.sv .nd.c3{stroke:#ec4899}.sv .nd.c4{stroke:#f59e0b}.sv .nd.c5{stroke:#10b981}
+.sv .ln{stroke:#a78bfa;stroke-width:2.2;fill:none}
+.sv .g{opacity:0;transition:opacity .55s}
+.sv .g.hot .ln{stroke:#ec4899;stroke-dasharray:7 6;animation:dash .7s linear infinite}
+.sv .g.hot .nd{filter:drop-shadow(0 6px 10px rgba(236,72,153,.35))}
+@keyframes dash{to{stroke-dashoffset:-13}}
+.sv .box6{fill:none;stroke:#ec4899;stroke-width:2.5;stroke-dasharray:9 7}
+.chip{display:inline-flex;align-items:center;gap:8px;font-size:18px;font-weight:600;padding:6px 14px;border-radius:999px;background:#fff;border:2px solid #e4dcfb;white-space:nowrap}
+.chip.p{border-color:#c4b5fd;background:#f5f0ff;color:#6d28d9}.chip.c{border-color:#a5f3fc;background:#ecfeff;color:#0e7490}.chip.k{border-color:#fbcfe8;background:#fdf2f8;color:#be185d}.chip.y{border-color:#fde68a;background:#fffbeb;color:#b45309}.chip.g{border-color:#a7f3d0;background:#ecfdf5;color:#047857}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.cell.t{font-size:15px;font-weight:700;text-align:center;line-height:1.15;padding:4px}
+.cell.t .v{font-size:15px}
+.cell.big{font-size:30px}
+.stat{font-family:var(--mono);font-size:44px;font-weight:800;line-height:1;background:linear-gradient(90deg,var(--sa1),var(--sa2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat small{font-size:18px}
+.sysbox{border-radius:14px;padding:12px 16px;text-align:center;font-weight:700;font-size:20px;border:2px solid #e4dcfb;background:#fff;transition:all .45s}
+.sysbox.fail{border-color:#e11d48;background:#fff1f3;color:#be123c;box-shadow:0 0 22px rgba(225,29,72,.35)}
+.sysbox.ok{border-color:#10b981;background:#ecfdf5;color:#047857;box-shadow:0 0 22px rgba(16,185,129,.3)}
+.shield{opacity:0;transform:scale(.7);transition:all .45s;font-size:15px;font-weight:700;color:#7c3aed;text-align:center;border:2px dashed #a78bfa;border-radius:12px;padding:6px 10px;background:#f5f0ff}
+.shield.on{opacity:1;transform:none}
+.dots{display:grid;grid-template-columns:repeat(25,1fr);gap:5px;padding:12px;background:#fff;border:1px solid var(--line);border-radius:14px}
+.dots i{display:block;aspect-ratio:1;border-radius:4px;background:#e9e3fb;transition:all .4s}
+.dots i.x{background:#e11d48;transform:scale(1.35);box-shadow:0 0 10px rgba(225,29,72,.6)}
+.dots i.r{background:#10b981}
+.node{width:110px;border-radius:14px;border:2.5px solid #c4b5fd;background:#fff;text-align:center;padding:8px 4px;font-weight:700;transition:all .45s}
+.node .ver{display:block;font-family:var(--mono);font-size:22px;color:#6d28d9}
+.node small{display:block;font-size:13px;color:var(--muted);font-weight:600}
+.node.down{border-color:#f59e0b;background:#fffbeb;opacity:.55;transform:translateY(8px)}
+.node.v2{border-color:#10b981;background:#ecfdf5}.node.v2 .ver{color:#047857}
+.node.bad{border-color:#e11d48;background:#fff1f3;color:#be123c}.node.bad .ver{color:#be123c}
+.nodes{display:flex;gap:14px;justify-content:center}
+.casc{display:flex;align-items:center;gap:6px;justify-content:center}
+.casc .ar{font-size:22px}
+.tw{display:inline-block;font-size:13px;font-weight:700;padding:2px 8px;border-radius:6px;background:#fdf2f8;color:#be185d;border:1px solid #fbcfe8;margin:2px;opacity:0;transform:translateY(-10px) scale(.6);transition:all .45s}
+.tw.show{opacity:1;transform:none}
+.tw.b{background:#ecfeff;color:#0e7490;border-color:#a5f3fc}
+.tw.y{background:#fffbeb;color:#b45309;border-color:#fde68a}
+.mbox{border:2px solid #e4dcfb;border-radius:12px;background:#fff;padding:6px 8px;min-height:84px;transition:all .4s}
+.mbox h4{font-size:14px;color:var(--muted);margin-bottom:4px}
+.mbox.hot{border-color:#0891b2;box-shadow:0 0 16px rgba(8,145,178,.35)}
+.mboxes{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.who{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:18px;padding:8px 14px;border-radius:12px;background:#fff;border:2px solid #fbcfe8}
+.big-ar{font-size:30px;color:var(--muted);text-align:center;line-height:1}
+.rt{display:flex;height:58px;border-radius:12px;overflow:hidden;border:2px solid #e4dcfb;background:#fff}
+.rt>div{display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;opacity:0;transition:opacity .45s;white-space:nowrap}
+.rt>div.show{opacity:1}
+.rt .n1,.rt .n2{background:#94a3b8}.rt .q{background:#f59e0b}.rt .sv2{background:#7c3aed}
+.brk{position:relative;height:44px;margin-top:6px}
+.brk>div{position:absolute;top:0;border-top:3px solid;text-align:center;font-size:15px;font-weight:700;padding-top:4px;opacity:0;transition:opacity .45s}
+.brk>div.show{opacity:1}
+.pc rect.b{fill:#c4b5fd;transform:translateX(var(--x0));transition:transform 1.3s cubic-bezier(.6,0,.2,1) calc(var(--d)*7ms),fill .4s}
+.pc.sorted rect.b{transform:translateX(var(--x1))}
+.pc.p95 rect.t95{fill:#f472b6}.pc.p99 rect.t99{fill:#e11d48}
+.pc .mk{opacity:0;transition:opacity .5s}
+.pc.mean .mkm,.pc.p50 .mk50,.pc.p95 .mk95,.pc.p99 .mk99{opacity:1}
+.pc text{font-family:var(--mono);font-size:12px;font-weight:700}
+.q-row{display:flex;gap:8px;align-items:center}
+.rq{height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;font-weight:700;color:#fff;transition:all .5s}
+.rq.slow{width:190px;background:linear-gradient(135deg,#e11d48,#f97316)}
+.rq.fast{width:54px;background:linear-gradient(135deg,#0891b2,#7c3aed)}
+.rq.wait{box-shadow:0 0 0 3px #fde68a;animation:shake .5s infinite}
+.rq.done{opacity:.25}
+@keyframes shake{50%{transform:translateY(-3px)}}
+.srv{border:2.5px solid #7c3aed;border-radius:14px;padding:10px 14px;text-align:center;font-weight:800;background:#f5f0ff;min-width:120px}
+.be{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;margin:6px 0}
+.be .nm{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted)}
+.be .trk{height:26px;border-radius:8px;background:#f5f3ff;position:relative;overflow:hidden}
+.be .bb{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:8px;background:linear-gradient(90deg,#0891b2,#7c3aed);transition:width 1s ease}
+.be .bb.slow{background:linear-gradient(90deg,#f97316,#e11d48)}
+.run .be .bb{width:var(--w)}
+.mach{border:3px solid #7c3aed;border-radius:14px;background:#f5f0ff;display:flex;align-items:center;justify-content:center;font-weight:800;color:#6d28d9;transition:all .7s cubic-bezier(.2,.8,.2,1);width:90px;height:70px;font-size:15px;text-align:center}
+.mach.big{width:220px;height:170px;font-size:22px;border-width:5px;box-shadow:0 14px 30px -12px rgba(124,58,237,.6)}
+.mach.sm2{width:70px;height:56px;font-size:13px;border-color:#0891b2;background:#ecfeff;color:#0e7490;opacity:0;transform:scale(.5)}
+.mach.sm2.show{opacity:1;transform:none}
+.farm{display:grid;grid-template-columns:repeat(4,70px);gap:10px;justify-content:center}
+.layer{border-radius:12px;padding:10px 14px;font-weight:700;font-size:17px;text-align:center;transition:all .6s}
+.layer.top{background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;font-size:20px}
+.layer.hid{background:#f8fafc;border:2px dashed #cbd5e1;color:#64748b;font-weight:600;font-size:16px}
+.abs.cover .layer.hid{opacity:.25;filter:blur(1.5px)}
+.toggle{display:flex;gap:10px;align-items:center;justify-content:center}
+.pill{padding:8px 16px;border-radius:999px;font-weight:800;font-size:17px;border:2px solid #e4dcfb;background:#fff;transition:all .4s;color:var(--muted)}
+.pill.on{background:linear-gradient(135deg,var(--sa1),var(--sa2));color:#fff;border-color:transparent;transform:scale(1.06)}
+.quote{font-size:21px;line-height:1.45;font-style:italic;color:#4c4672;border-left:5px solid #ec4899;padding:8px 18px;background:rgba(255,255,255,.7);border-radius:8px}
+.quote b{font-style:normal}
+.mini li{font-size:18px;margin:3px 0;line-height:1.35}
+.card p.ps,p.ps{font-size:17px;line-height:1.4}
+.vs{font-weight:800;font-size:22px;color:var(--muted);align-self:center;text-align:center}
+.here{display:inline-block;font-size:13px;font-weight:800;color:#fff;background:#e11d48;border-radius:6px;padding:2px 8px;margin-left:6px;opacity:0;transition:opacity .4s}
+.here.show{opacity:1}
+.cols4>.card.lit{box-shadow:0 0 0 3px #ec4899,0 12px 26px -10px rgba(236,72,153,.5);transform:translateY(-4px)}
+.card{transition:all .4s}
+
+.chip.c,.leg.c{font-style:normal}.leg.c{color:var(--text)}.leg.c b{color:var(--text)}
+.leg p b{display:inline;font-size:inherit;margin:0}
+.toggle .pill{font-size:15px;white-space:nowrap}
+.abs.cover .layer.hid{opacity:.4;filter:blur(1px)}
+.mach.big{width:260px;font-size:21px}
+.sv text.lb,.pc text{paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+.sv.s1 .g1{opacity:1}.sv.s2 .g2{opacity:1}.sv.s3 .g3{opacity:1}.sv.s4 .g4{opacity:1}.sv.s5 .g5{opacity:1}.sv.s6 .g6{opacity:1}.sv.s7 .g7{opacity:1}.sv.s8 .g8{opacity:1}.who.hot{border-color:#ec4899;box-shadow:0 0 18px rgba(236,72,153,.45)}.toggle.flip #ev1{background:#fff;color:var(--muted);border-color:#e4dcfb;transform:none}.toggle.flip #ev2{background:linear-gradient(135deg,var(--sa1),var(--sa2));color:#fff;border-color:transparent;transform:scale(1.06)}.dots{grid-template-columns:repeat(50,1fr);gap:3px}.dots i{border-radius:2px}
+/* ===== DDIA ch4 additions ===== */
+.bstrip{display:flex;flex-wrap:wrap;gap:4px 2px;align-items:flex-start;padding:12px;background:#fff;border:1px solid var(--line);border-radius:14px}
+.seg{display:contents}
+.seg span{opacity:.13;transition:opacity .45s}
+.seg span:last-child{margin-right:8px}
+.seg span{font-family:var(--mono);font-size:14.5px;font-weight:700;min-width:25px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:5px;padding:0 3px}
+.seg .m{background:#ede9fe;color:#6d28d9}
+.seg .t{background:#fce7f3;color:#be185d;box-shadow:inset 0 -3px #ec4899}
+.seg .n{background:#fef3c7;color:#b45309}
+.seg .v{background:#d1fae5;color:#047857}
+.seg .l{background:#e0f2fe;color:#0369a1}
+.seg .e{background:#f1f5f9;color:#64748b}
+.bstrip.s1 .q1 span,.bstrip.s2 .q2 span,.bstrip.s3 .q3 span,.bstrip.s4 .q4 span,.bstrip.s5 .q5 span{opacity:1}
+.bleg{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.bleg span{font-size:14px;font-weight:700;padding:3px 10px;border-radius:6px}
+.bleg .m{background:#ede9fe;color:#6d28d9}.bleg .t{background:#fce7f3;color:#be185d}.bleg .n{background:#fef3c7;color:#b45309}.bleg .v{background:#d1fae5;color:#047857}.bleg .l{background:#e0f2fe;color:#0369a1}.bleg .e{background:#f1f5f9;color:#64748b}
+.bcount{font-family:var(--mono);font-weight:800;font-size:20px;color:#db2777}
+.be .bb b{position:absolute;right:8px;top:3px;color:#fff;font-family:var(--mono);font-size:14px}
+.be .bb.gr{background:linear-gradient(90deg,#059669,#10b981)}
+.be .bb.am{background:linear-gradient(90deg,#f59e0b,#f97316)}
+.flowrow{display:flex;align-items:center;gap:10px}
+.flowrow .ar{font-size:24px;color:var(--muted)}
+.vtag{display:inline-block;font-family:var(--mono);font-weight:800;font-size:14px;padding:2px 8px;border-radius:6px;margin-left:6px}
+.vtag.o{background:#e0e7ff;color:#3730a3}.vtag.nw{background:#d1fae5;color:#047857}
+.res{font-weight:800;font-size:17px;padding:4px 12px;border-radius:8px;white-space:nowrap}
+.res.ok{background:#d1fae5;color:#047857}.res.no{background:#ffe4e6;color:#be123c}
+.fld{display:flex;flex-direction:column;gap:6px;border:2px solid #e4dcfb;border-radius:12px;padding:10px 12px;background:#fff;min-width:170px;transition:all .45s}
+.fld h4{font-size:14px;color:var(--muted);margin-bottom:2px}
+.fld .pv{font-size:15px;padding:3px 10px;transition:all .45s}
+.fld.hot{border-color:#ec4899;box-shadow:0 0 18px rgba(236,72,153,.35)}
+.pv.lost{background:#ffe4e6;border-color:#fb7185;color:#be123c;text-decoration:line-through;border-style:dashed}
+.pv.newf{background:#d1fae5;border-color:#34d399;color:#047857}
+.hide{opacity:0;transition:opacity .45s}.hide.show{opacity:1}
+.ctable td:first-child{white-space:normal}
+.ctable td,.ctable th{font-size:16.5px;padding:7px 11px}
+.bigval{font-family:var(--mono);font-size:30px;font-weight:800;color:#6d28d9;transition:all .4s}
+.bigval.bad{color:#e11d48}
+.cmp2{display:grid;grid-template-columns:1fr 60px 1fr;gap:10px;align-items:center}
+.fld.show-op{opacity:1!important}
+#olddots i{background:#c4b5fd}
+#olddots.mix i.nw{background:#10b981;transform:scale(1.15)}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="deck">
+
+<!-- ===================== TITLE ===================== -->
+<section class="slide" id="title">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// DDIA · Part I · Chapter 4</div>
+    <h1 class="in" style="font-size:70px">Encoding <span class="grad">&amp; Evolution</span></h1>
+    <p class="in muted" style="font-size:24px;margin-top:18px;max-width:1000px"><i>Designing Data-Intensive Applications</i> — Martin Kleppmann. Làm sao biến data structure thành <b>bytes</b> (trên disk, trên network), và làm sao để hệ thống vẫn chạy khi <b>schema</b> và <b>code</b> thay đổi theo thời gian.</p>
+    <div class="quote in" style="margin-top:26px;max-width:980px">“Everything changes and nothing stands still.” <b>— Heraclitus of Ephesus</b>, as quoted by Plato in <i>Cratylus</i> (360 BCE)</div>
+    <p class="in" style="margin-top:26px;font-size:18px;color:#8a91b4">Phím ← → hoặc Space: chạy từng bước · Shift+→: qua slide · A: hiện hết · F: toàn màn hình</p>
+  </div>
+</section>
+
+<!-- ===================== AGENDA ===================== -->
+<section class="slide" id="agenda">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:18px">· bấm vào mục để đi tới</span></div>
+  <div class="agenda in" style="gap:10px">
+    <div class="ag" data-goto="why"><b>01</b>Vì sao cần evolvability</div>
+    <div class="ag" data-goto="compat"><b>02</b>Backward vs Forward compatibility</div>
+    <div class="ag" data-goto="enc"><b>03</b>Encoding / Decoding</div>
+    <div class="ag" data-goto="lang"><b>04</b>Language-Specific Formats</div>
+    <div class="ag" data-goto="json"><b>05</b>JSON, XML, CSV</div>
+    <div class="ag" data-goto="mp"><b>06</b>Binary encoding: MessagePack</div>
+    <div class="ag" data-goto="idl"><b>07</b>Thrift &amp; Protocol Buffers</div>
+    <div class="ag" data-goto="tbin"><b>08</b>BinaryProtocol · CompactProtocol · protobuf</div>
+    <div class="ag" data-goto="tags"><b>09</b>Field tags &amp; schema evolution</div>
+    <div class="ag" data-goto="avro"><b>10</b>Avro</div>
+    <div class="ag" data-goto="wr"><b>11</b>Writer’s vs Reader’s schema</div>
+    <div class="ag" data-goto="dyn"><b>12</b>Dynamic schemas · code generation</div>
+    <div class="ag" data-goto="merits"><b>13</b>The Merits of Schemas</div>
+    <div class="ag" data-goto="modes"><b>14</b>Modes of Dataflow · Databases</div>
+    <div class="ag" data-goto="svc"><b>15</b>Services: REST &amp; RPC</div>
+    <div class="ag" data-goto="msg"><b>16</b>Message-Passing · Actors · Summary</div>
+  </div>
+</section>
+
+<!-- ===================== WHY ===================== -->
+<section class="slide" id="why">
+  <div class="hdr in"><span class="qn">01</span><h2>Application thay đổi → data cũng thay đổi</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr;gap:26px">
+    <div>
+      <p style="font-size:19px">Chapter 1: hãy xây hệ thống dễ thích nghi với thay đổi — <b>evolvability</b>. Thêm feature thường kéo theo thay đổi data: thêm field, thêm record type, trình bày data theo cách mới.</p>
+      <div class="cols" style="gap:12px;margin-top:12px">
+        <div class="card"><span class="lbl info">RELATIONAL</span><p class="ps">Mọi data tuân theo <b>một schema</b>. Có thể đổi bằng <b>schema migration</b> (<code class="i">ALTER</code>), nhưng tại mỗi thời điểm chỉ có đúng một schema.</p></div>
+        <div class="card"><span class="lbl info">SCHEMA-ON-READ</span><p class="ps">“Schemaless” DB không enforce schema → chứa lẫn <b>data format cũ và mới</b>, ghi ở các thời điểm khác nhau.</p></div>
+      </div>
+      <div class="note blue" style="font-size:18px">Ở app lớn, thay đổi code <b>không thể xảy ra tức thì</b>. Old/new code và old/new data format sẽ <b>cùng tồn tại</b> trong hệ thống.</div>
+    </div>
+    <div>
+      <h3>Server-side: rolling upgrade (staged rollout)</h3>
+      <div class="nodes" style="margin-top:12px">
+        <div class="node" id="n1"><span class="ver" id="n1v">v1</span><small>node 1</small></div>
+        <div class="node" id="n2"><span class="ver" id="n2v">v1</span><small>node 2</small></div>
+        <div class="node" id="n3"><span class="ver" id="n3v">v1</span><small>node 3</small></div>
+        <div class="node" id="n4"><span class="ver" id="n4v">v1</span><small>node 4</small></div>
+      </div>
+      <span class="f ghost" data-now="#n1|down" data-say="Deploy version mới lên <b>vài node một lúc</b>, bắt đầu từ node 1."></span>
+      <span class="f ghost" data-act="#n1|v2" data-set="#n1v::v2" data-now="#n2|down" data-say="Node 1 chạy <b>v2</b> ổn → tiếp node 2. Lúc này <b>v1 và v2 cùng phục vụ</b> và cùng đọc/ghi một data."></span>
+      <span class="f ghost" data-act="#n2|v2" data-set="#n2v::v2" data-now="#n3|down" data-say="Kiểm tra version mới chạy trơn tru rồi mới đi tiếp…"></span>
+      <span class="f ghost" data-act="#n3|v2;#n4|v2" data-set="#n3v::v2;#n4v::v2" data-say="Toàn bộ node lên v2 <b>không có downtime</b> → release thường xuyên hơn, evolvability tốt hơn."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+      <div class="card f" style="margin-top:6px"><h3>📱 Client-side applications</h3><p class="ps">Phụ thuộc vào user — họ có thể <b>không cài update</b> trong một thời gian dài.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== COMPAT ===================== -->
+<section class="slide" id="compat">
+  <div class="hdr in"><span class="qn">02</span><h2>Compatibility theo cả <span class="grad">hai chiều</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:26px">
+    <div class="card f" style="border-top:5px solid #7c3aed">
+      <h3>⬅️ Backward compatibility</h3>
+      <p style="font-size:21px"><b>Newer code</b> đọc được data do <b>older code</b> ghi.</p>
+      <div class="flowrow" style="margin:16px 0">
+        <div class="box o">old code<small>writes</small></div><span class="ar">→</span>
+        <div class="box">data<span class="vtag o">v1</span></div><span class="ar">→</span>
+        <div class="box cpp">new code<small>reads</small></div>
+      </div>
+      <p class="ps"><span class="res ok">thường dễ</span> Là tác giả của code mới, bạn <b>biết</b> format cũ và xử lý tường minh được (cùng lắm giữ lại code cũ để đọc data cũ).</p>
+    </div>
+    <div class="card f" style="border-top:5px solid #ec4899">
+      <h3 style="color:#db2777">➡️ Forward compatibility</h3>
+      <p style="font-size:21px"><b>Older code</b> đọc được data do <b>newer code</b> ghi.</p>
+      <div class="flowrow" style="margin:16px 0">
+        <div class="box exe">new code<small>writes</small></div><span class="ar">→</span>
+        <div class="box">data<span class="vtag nw">v2</span></div><span class="ar">→</span>
+        <div class="box o">old code<small>reads</small></div>
+      </div>
+      <p class="ps"><span class="res no">khó hơn</span> Code cũ phải biết <b>bỏ qua (ignore)</b> những phần được thêm vào bởi version mới — mà nó chưa từng biết tới.</p>
+    </div>
+  </div>
+  <div class="note f" style="margin-top:20px">Chương này: các format <b>JSON, XML, Protocol Buffers, Thrift, Avro</b> xử lý schema change ra sao; rồi chúng được dùng thế nào cho data storage và communication: <b>web services, REST, RPC</b>, và <b>message-passing</b> (actors, message queues).</div>
+</section>
+
+<!-- ===================== ENCODING ===================== -->
+<section class="slide" id="enc">
+  <div class="hdr in"><span class="qn">03</span><h2>Hai cách biểu diễn data</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 150px 1fr;gap:16px;align-items:center">
+    <div class="card" style="border-top:5px solid #7c3aed">
+      <h3>🧠 In memory</h3>
+      <p class="ps">objects, structs, lists, arrays, hash tables, trees… tối ưu cho CPU truy cập &amp; thao tác — thường dùng <b>pointers</b>.</p>
+      <svg class="sv" viewBox="0 0 330 150" style="margin-top:8px">
+        <defs><marker id="ah4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#a78bfa"/></marker></defs>
+        <rect class="nd" x="110" y="6" width="110" height="40" rx="10"/><text x="165" y="31" text-anchor="middle">Person</text>
+        <line class="ln" x1="140" y1="46" x2="60" y2="96" marker-end="url(#ah4)"/><line class="ln" x1="165" y1="46" x2="165" y2="96" marker-end="url(#ah4)"/><line class="ln" x1="190" y1="46" x2="270" y2="96" marker-end="url(#ah4)"/>
+        <rect class="nd c2" x="6" y="98" width="104" height="40" rx="10"/><text x="58" y="123" text-anchor="middle" class="sm">"Martin"</text>
+        <rect class="nd c4" x="120" y="98" width="90" height="40" rx="10"/><text x="165" y="123" text-anchor="middle" class="sm">1337</text>
+        <rect class="nd c3" x="220" y="98" width="104" height="40" rx="10"/><text x="272" y="123" text-anchor="middle" class="sm">[ … , … ]</text>
+      </svg>
+    </div>
+    <div class="stack" style="text-align:center">
+      <div class="f"><div class="pill on" style="font-size:15px">encoding →</div><p class="ps muted" style="font-size:13px;margin-top:4px">serialization<br>marshalling</p></div>
+      <div class="f" style="margin-top:14px"><div class="pill" style="font-size:15px;border-color:#0891b2;color:#0e7490">← decoding</div><p class="ps muted" style="font-size:13px;margin-top:4px">parsing, deserialization<br>unmarshalling</p></div>
+    </div>
+    <div class="card" style="border-top:5px solid #0891b2">
+      <h3 style="color:#0891b2">📦 Sequence of bytes</h3>
+      <p class="ps">Ghi ra file hoặc gửi qua network cần một chuỗi bytes <b>self-contained</b> (vd. một JSON document). Pointer không có nghĩa gì với process khác.</p>
+      <div class="strip" style="margin-top:14px;flex-wrap:wrap;gap:3px"><span>83</span><span>a8</span><span class="r1">u</span><span class="r1">s</span><span class="r1">e</span><span class="r1">r</span><span class="r1">N</span><span class="r1">a</span><span class="r1">m</span><span class="r1">e</span><span>a6</span><span class="r1">M</span><span class="r1">a</span><span class="r1">r</span><span class="r1">t</span><span class="r1">i</span><span class="r1">n</span><span class="gap">…</span></div>
+    </div>
+  </div>
+  <div class="cols" style="margin-top:18px;gap:18px">
+    <div class="note f" style="margin-top:0"><b>Terminology clash:</b> <i>serialization</i> còn được dùng trong ngữ cảnh <b>transactions</b> (Chapter 7) với nghĩa hoàn toàn khác → sách dùng từ <b>encoding</b>.</div>
+    <div class="note blue f" style="margin-top:0">Lưu ý: <b>encoding</b> không liên quan gì tới <b>encryption</b>. Sách không bàn về encryption.</div>
+  </div>
+</section>
+
+<!-- ===================== LANGUAGE-SPECIFIC ===================== -->
+<section class="slide" id="lang">
+  <div class="hdr in"><span class="qn">04</span><h2>Language-Specific Formats</h2></div>
+  <div class="chips in" style="margin-bottom:12px"><span class="chip p">Java · java.io.Serializable</span><span class="chip k">Ruby · Marshal</span><span class="chip c">Python · pickle</span><span class="chip y">Kryo (3rd-party, Java)</span></div>
+  <p class="in" style="font-size:19px">Rất <b>tiện</b>: lưu và khôi phục in-memory object với rất ít code. Nhưng có những vấn đề sâu xa:</p>
+  <div class="cols4" style="margin-top:14px">
+    <div class="card f zoom"><div class="icon">🔒</div><h3>Language lock-in</h3><p class="ps">Gắn chặt với một ngôn ngữ — đọc bằng ngôn ngữ khác rất khó. Khó tích hợp với hệ thống của tổ chức khác.</p></div>
+    <div class="card f zoom"><div class="icon">☠️</div><h3>Security</h3><p class="ps">Decode phải <b>instantiate arbitrary classes</b>. Attacker gửi byte sequence tùy ý → có thể dẫn tới <b>remote code execution</b>.</p></div>
+    <div class="card f zoom"><div class="icon">🧬</div><h3>Versioning</h3><p class="ps">Thường là “afterthought”: bỏ qua bài toán <b>forward &amp; backward compatibility</b>.</p></div>
+    <div class="card f zoom"><div class="icon">🐢</div><h3>Efficiency</h3><p class="ps">CPU time và kích thước encoding cũng là afterthought. Java built-in serialization nổi tiếng chậm và <b>bloated</b>.</p></div>
+  </div>
+  <div class="note f" style="margin-top:18px">⇒ Dùng built-in encoding của ngôn ngữ cho bất cứ thứ gì ngoài mục đích <b>rất tạm thời (transient)</b> nhìn chung là một ý tồi.</div>
+</section>
+
+<!-- ===================== JSON XML CSV ===================== -->
+<section class="slide" id="json">
+  <div class="hdr in"><span class="qn">05</span><h2>JSON, XML &amp; CSV: textual formats</h2></div>
+  <p class="in muted" style="font-size:19px">Chuẩn hóa, nhiều ngôn ngữ đọc/ghi được, khá human-readable — “widely known, widely supported, and almost as widely disliked”. Nhưng có những vấn đề tinh tế:</p>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr;gap:22px;margin-top:10px">
+    <div>
+      <div class="card f"><h3>🔢 Ambiguity về numbers</h3>
+        <p class="ps">XML/CSV: không phân biệt number và string toàn chữ số. JSON: phân biệt string/number nhưng <b>không phân biệt integer vs floating-point</b>, không quy định precision.</p>
+        <div class="console" style="margin-top:8px;font-size:15px"><span class="in">&gt;</span> JSON.parse('{"id": 9007199254740993}').id
+<span id="twout">…</span></div>
+        <p class="ps muted" style="margin-top:6px" id="twnote">Integer &gt; 2<sup>53</sup> không biểu diễn chính xác được bằng IEEE 754 double.</p>
+      </div>
+      <span class="f ghost" data-set="#twout::<span style='color:#fb7185'>9007199254740992</span>   ← sai 1 đơn vị!" data-say="Twitter dùng 64-bit ID cho tweet → API trả ID <b>hai lần</b>: dạng JSON number và dạng decimal string (<code class='i'>id_str</code>) để JavaScript app đọc đúng."></span>
+      <p class="say" style="min-height:40px;font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div class="stack">
+      <div class="leg a f"><b>🧱 Binary strings</b><p>JSON/XML hỗ trợ Unicode tốt nhưng không có binary string → phải encode <b>Base64</b>: hacky và tăng size <b>33%</b>.</p></div>
+      <div class="leg b f"><b>📐 Optional schema</b><p>XML Schema, JSON Schema rất mạnh nhưng phức tạp. Nhiều tool JSON không dùng schema → phải <b>hardcode</b> logic encode/decode.</p></div>
+      <div class="leg c f"><b>📄 CSV</b><p>Không có schema; app tự định nghĩa ý nghĩa row/column. Format mơ hồ (value chứa dấu phẩy, newline?) — nhiều parser escape sai.</p></div>
+    </div>
+  </div>
+  <div class="note blue f" style="font-size:18px">Dù vậy vẫn <b>đủ tốt</b> cho rất nhiều mục đích, nhất là <b>data interchange</b> giữa các tổ chức: khó nhất là khiến các tổ chức <i>đồng ý</i> với nhau về bất cứ thứ gì.</div>
+</section>
+
+<!-- ===================== MESSAGEPACK ===================== -->
+<section class="slide" id="mp">
+  <div class="hdr in"><span class="qn">06</span><h2>Binary encoding cho JSON: MessagePack</h2></div>
+  <div class="cols" style="grid-template-columns:.8fr 1.4fr;gap:22px">
+    <div>
+      <div class="code-title">Example 4-1 · record mẫu dùng xuyên suốt chương</div>
+      <script type="text/x-cpp" class="xs">
+{
+  "userName": "Martin",
+  "favoriteNumber": 1337,
+  "interests": ["daydreaming", "hacking"]
+}
+</script>
+      <p class="ps" style="margin-top:10px">Dữ liệu nội bộ tổ chức → ít áp lực phải dùng format “mẫu số chung”. Ở quy mô <b>terabytes</b>, lựa chọn format ảnh hưởng lớn.</p>
+      <div class="chips" style="margin-top:8px"><span class="chip p">MessagePack</span><span class="chip c">BSON</span><span class="chip k">BJSON</span><span class="chip y">UBJSON</span><span class="chip g">Smile</span><span class="chip c">WBXML</span><span class="chip k">Fast Infoset</span></div>
+      <div class="note" style="font-size:17px">Không có schema ⇒ vẫn phải nhét <b>tất cả field names</b> (<code class="i">userName</code>, <code class="i">favoriteNumber</code>, <code class="i">interests</code>) vào encoded data.</div>
+    </div>
+    <div>
+      <div class="bleg"><span class="m">type / marker</span><span class="l">length</span><span class="n">field name</span><span class="v">value</span></div>
+      <div class="bstrip" id="bs-mp"><div class="seg q1"><span class="m">83</span></div><div class="seg q2"><span class="l">a8</span><span class="n">u</span><span class="n">s</span><span class="n">e</span><span class="n">r</span><span class="n">N</span><span class="n">a</span><span class="n">m</span><span class="n">e</span></div><div class="seg q3"><span class="l">a6</span><span class="v">M</span><span class="v">a</span><span class="v">r</span><span class="v">t</span><span class="v">i</span><span class="v">n</span></div><div class="seg q4"><span class="l">ae</span><span class="n">f</span><span class="n">a</span><span class="n">v</span><span class="n">o</span><span class="n">r</span><span class="n">i</span><span class="n">t</span><span class="n">e</span><span class="n">N</span><span class="n">u</span><span class="n">m</span><span class="n">b</span><span class="n">e</span><span class="n">r</span><span class="m">cd</span><span class="v">05</span><span class="v">39</span></div><div class="seg q5"><span class="l">a9</span><span class="n">i</span><span class="n">n</span><span class="n">t</span><span class="n">e</span><span class="n">r</span><span class="n">e</span><span class="n">s</span><span class="n">t</span><span class="n">s</span><span class="m">92</span><span class="l">ab</span><span class="v">d</span><span class="v">a</span><span class="v">y</span><span class="v">d</span><span class="v">r</span><span class="v">e</span><span class="v">a</span><span class="v">m</span><span class="v">i</span><span class="v">n</span><span class="v">g</span><span class="l">a7</span><span class="v">h</span><span class="v">a</span><span class="v">c</span><span class="v">k</span><span class="v">i</span><span class="v">n</span><span class="v">g</span></div></div>
+      <p style="margin-top:10px;font-size:18px">Đã encode: <span class="bcount" id="mpc">0</span> <span class="muted">/ 66 bytes</span></p>
+      <span class="f ghost" data-act="#bs-mp|s1" data-set="#mpc::1" data-say="<code class='i'>0x83</code>: object (4 bit trên = <code class='i'>0x80</code>) với <b>3 fields</b> (4 bit dưới = <code class='i'>0x03</code>)."></span>
+      <span class="f ghost" data-act="#bs-mp|s2" data-set="#mpc::10" data-say="<code class='i'>0xa8</code>: string (<code class='i'>0xa0</code>) dài <b>8 bytes</b> → 8 bytes ASCII <code class='i'>userName</code>. Đã biết length nên không cần marker kết thúc hay escaping."></span>
+      <span class="f ghost" data-act="#bs-mp|s3" data-set="#mpc::17" data-say="<code class='i'>0xa6</code> + 6 bytes: value <code class='i'>Martin</code>."></span>
+      <span class="f ghost" data-act="#bs-mp|s4" data-set="#mpc::35" data-say="Field name <code class='i'>favoriteNumber</code> (14 bytes!), rồi <code class='i'>0xcd</code> = uint16, <code class='i'>05 39</code> = 1337."></span>
+      <span class="f ghost" data-act="#bs-mp|s5" data-set="#mpc::66" data-say="<code class='i'>interests</code>, <code class='i'>0x92</code> = array 2 phần tử, rồi 2 strings. Tổng <b>66 bytes</b> vs <b>81 bytes</b> JSON (bỏ whitespace) — tiết kiệm rất ít, mà mất human-readability."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== THRIFT & PROTOBUF IDL ===================== -->
+<section class="slide" id="idl">
+  <div class="hdr in"><span class="qn">07</span><h2>Thrift &amp; Protocol Buffers</h2></div>
+  <p class="in muted" style="font-size:19px"><b>Protocol Buffers</b> (Google) và <b>Apache Thrift</b> (Facebook), open source 2007–08. Cùng nguyên lý: binary encoding <b>bắt buộc có schema</b>, mô tả bằng <b>interface definition language (IDL)</b>.</p>
+  <div class="cols" style="margin-top:12px;gap:22px">
+    <div class="f"><div class="code-title">Thrift IDL</div>
+<script type="text/x-cpp" class="sm">
+struct Person {
+  1: required string       userName,
+  2: optional i64          favoriteNumber,
+  3: optional list<string> interests
+}
+</script></div>
+    <div class="f"><div class="code-title">Protocol Buffers</div>
+<script type="text/x-cpp" class="sm">
+message Person {
+  required string user_name       = 1;
+  optional int64  favorite_number = 2;
+  repeated string interests       = 3;
+}
+</script></div>
+  </div>
+  <div class="flow f" style="margin-top:20px">
+    <div class="box h">schema<small>.thrift / .proto</small></div><span class="ar">→</span>
+    <div class="box cpp">code generation tool</div><span class="ar">→</span>
+    <div class="box m">generated classes<small>Java, C++, Go, Python…</small></div><span class="ar">→</span>
+    <div class="box exe">app encode / decode</div>
+  </div>
+  <div class="note blue f" style="margin-top:18px">Các con số <code class="i">1, 2, 3</code> là <b>field tags</b> — chìa khóa của cả encoding lẫn schema evolution. <code class="i">required</code>/<code class="i">optional</code> <b>không ảnh hưởng</b> cách encode; <code class="i">required</code> chỉ bật runtime check (fail nếu field chưa set) để bắt bug.</div>
+</section>
+
+<!-- ===================== THRIFT BINARY ===================== -->
+<section class="slide" id="tbin">
+  <div class="hdr in"><span class="qn">08</span><h2>Thrift <span class="grad">BinaryProtocol</span> · 59 bytes</h2></div>
+  <div class="bleg in"><span class="m">type</span><span class="t">field tag</span><span class="l">length / count</span><span class="v">value</span><span class="e">end of struct</span></div>
+  <div class="bstrip" id="bs-tb"><div class="seg q1"><span class="m">0b</span><span class="t">00</span><span class="t">01</span><span class="l">00</span><span class="l">00</span><span class="l">00</span><span class="l">06</span><span class="v">M</span><span class="v">a</span><span class="v">r</span><span class="v">t</span><span class="v">i</span><span class="v">n</span></div><div class="seg q2"><span class="m">0a</span><span class="t">00</span><span class="t">02</span><span class="v">00</span><span class="v">00</span><span class="v">00</span><span class="v">00</span><span class="v">00</span><span class="v">00</span><span class="v">05</span><span class="v">39</span></div><div class="seg q3"><span class="m">0f</span><span class="t">00</span><span class="t">03</span><span class="m">0b</span><span class="l">00</span><span class="l">00</span><span class="l">00</span><span class="l">02</span><span class="l">00</span><span class="l">00</span><span class="l">00</span><span class="l">0b</span><span class="v">d</span><span class="v">a</span><span class="v">y</span><span class="v">d</span><span class="v">r</span><span class="v">e</span><span class="v">a</span><span class="v">m</span><span class="v">i</span><span class="v">n</span><span class="v">g</span><span class="l">00</span><span class="l">00</span><span class="l">00</span><span class="l">07</span><span class="v">h</span><span class="v">a</span><span class="v">c</span><span class="v">k</span><span class="v">i</span><span class="v">n</span><span class="v">g</span></div><div class="seg q4"><span class="e">00</span></div></div>
+  <p style="margin-top:8px;font-size:18px">Đã encode: <span class="bcount" id="tbc">0</span> <span class="muted">/ 59 bytes</span></p>
+  <span class="f ghost" data-act="#bs-tb|s1" data-set="#tbc::13" data-say="<code class='i'>0b</code> = type string, <code class='i'>00 01</code> = <b>field tag 1</b>, <code class='i'>00 00 00 06</code> = length, rồi <code class='i'>Martin</code> (UTF-8)."></span>
+  <span class="f ghost" data-act="#bs-tb|s2" data-set="#tbc::24" data-say="<code class='i'>0a</code> = i64, tag 2, value 1337 chiếm trọn <b>8 bytes</b>."></span>
+  <span class="f ghost" data-act="#bs-tb|s3" data-set="#tbc::58" data-say="<code class='i'>0f</code> = list, tag 3, element type string, count 2, rồi từng string có length prefix."></span>
+  <span class="f ghost" data-act="#bs-tb|s4" data-set="#tbc::59" data-say="Khác biệt lớn so với MessagePack: <b>không có field names</b>. Thay vào đó là <b>field tags</b> (1, 2, 3) — như “alias” gọn cho field."></span>
+  <p class="say">Nhấn → để chạy từng bước.</p>
+  <div class="note f" style="font-size:17px">Thrift có tới 2 binary format (thật ra là 3, DenseProtocol chỉ có ở C++) — và còn 2 format dựa trên JSON. <i>“What fun!”</i></div>
+</section>
+
+<!-- ===================== COMPACT + PROTOBUF ===================== -->
+<section class="slide" id="tcomp">
+  <div class="hdr in"><span class="qn">08</span><h2>CompactProtocol <span class="muted" style="font-weight:600">(34 bytes)</span> &amp; Protocol Buffers <span class="muted" style="font-weight:600">(33 bytes)</span></h2></div>
+  <div class="bleg in"><span class="t">field tag + type (1 byte)</span><span class="l">length / count</span><span class="v">value</span><span class="e">end</span></div>
+  <div class="rowlbl in">Thrift CompactProtocol</div>
+  <div class="bstrip" id="bs-tc"><div class="seg q1"><span class="t">18</span><span class="l">06</span><span class="v">M</span><span class="v">a</span><span class="v">r</span><span class="v">t</span><span class="v">i</span><span class="v">n</span></div><div class="seg q2"><span class="t">16</span><span class="v">f2</span><span class="v">14</span></div><div class="seg q3"><span class="t">19</span><span class="l">28</span><span class="l">0b</span><span class="v">d</span><span class="v">a</span><span class="v">y</span><span class="v">d</span><span class="v">r</span><span class="v">e</span><span class="v">a</span><span class="v">m</span><span class="v">i</span><span class="v">n</span><span class="v">g</span><span class="l">07</span><span class="v">h</span><span class="v">a</span><span class="v">c</span><span class="v">k</span><span class="v">i</span><span class="v">n</span><span class="v">g</span></div><div class="seg q4"><span class="e">00</span></div></div>
+  <div class="rowlbl in" style="margin-top:12px">Protocol Buffers</div>
+  <div class="bstrip" id="bs-pb"><div class="seg q1"><span class="t">0a</span><span class="l">06</span><span class="v">M</span><span class="v">a</span><span class="v">r</span><span class="v">t</span><span class="v">i</span><span class="v">n</span></div><div class="seg q2"><span class="t">10</span><span class="v">b9</span><span class="v">0a</span></div><div class="seg q3"><span class="t">1a</span><span class="l">0b</span><span class="v">d</span><span class="v">a</span><span class="v">y</span><span class="v">d</span><span class="v">r</span><span class="v">e</span><span class="v">a</span><span class="v">m</span><span class="v">i</span><span class="v">n</span><span class="v">g</span><span class="t">1a</span><span class="l">07</span><span class="v">h</span><span class="v">a</span><span class="v">c</span><span class="v">k</span><span class="v">i</span><span class="v">n</span><span class="v">g</span></div></div>
+  <span class="f ghost" data-act="#bs-tc|s1;#bs-pb|s1" data-say="Gộp <b>field tag + type</b> vào <b>1 byte</b> (CompactProtocol: <code class='i'>0x18</code>; protobuf: <code class='i'>0x0a</code>), theo sau là length và <code class='i'>Martin</code>."></span>
+  <span class="f ghost" data-act="#bs-tc|s2;#bs-pb|s2" data-say="<b>Variable-length integer</b>: 1337 chỉ còn <b>2 bytes</b> thay vì 8. Bit cao nhất của mỗi byte báo còn byte tiếp theo hay không."></span>
+  <span class="f ghost" data-act="#bs-tc|s3;#bs-pb|s3" data-say="List: Thrift ghi count + element type; protobuf dùng <code class='i'>repeated</code> — <b>cùng tag 3 xuất hiện nhiều lần</b>."></span>
+  <span class="f ghost" data-act="#bs-tc|s4;#bs-pb|s4" data-say="Kết quả: Compact <b>34 bytes</b>, protobuf <b>33 bytes</b>. Protobuf chỉ có một binary format, bit packing hơi khác nhưng rất giống Compact."></span>
+  <div class="cols" style="margin-top:6px;grid-template-columns:1.3fr 1fr;gap:18px">
+    <p class="say">Nhấn → để chạy từng bước.</p>
+    <table class="ctable f" style="margin-top:10px"><tr><th>varint (Thrift zigzag)</th><th>bytes</th></tr><tr><td>–64 … 63</td><td>1 byte</td></tr><tr><td>–8192 … 8191</td><td>2 bytes</td></tr><tr><td>lớn hơn</td><td>nhiều bytes hơn</td></tr></table>
+  </div>
+</section>
+
+<!-- ===================== FIELD TAGS ===================== -->
+<section class="slide" id="tags">
+  <div class="hdr in"><span class="qn">09</span><h2>Field tags &amp; <span class="grad">schema evolution</span></h2></div>
+  <p class="in muted" style="font-size:19px">Encoded record = nối các field đã encode. Mỗi field nhận diện bằng <b>tag number</b> + <b>datatype annotation</b>; field không set thì bị bỏ qua. ⇒ <b>Đổi tên</b> field được (data không chứa tên), nhưng <b>không được đổi tag</b>.</p>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr;gap:24px;margin-top:10px">
+    <div>
+      <div class="cols" style="gap:10px">
+        <div class="fld" id="sv1"><h4>schema v1 <span class="vtag o">old</span></h4><span class="pv">1: userName</span><span class="pv">2: favoriteNumber</span><span class="pv">3: interests</span></div>
+        <div class="fld" id="sv2"><h4>schema v2 <span class="vtag nw">new</span></h4><span class="pv">1: userName</span><span class="pv">2: favoriteNumber</span><span class="pv">3: interests</span><span class="pv newf hide" id="tag4">4: photoURL</span></div>
+      </div>
+      <span class="f ghost" data-act="#tag4|show;#sv2|hot" data-say="Thêm field mới với <b>tag number mới</b> (4)."></span>
+      <span class="f ghost" data-act="#fwd|lit" data-say="<b>Forward:</b> old code gặp tag 4 lạ → <b>bỏ qua</b>. Datatype annotation cho parser biết cần <b>skip bao nhiêu bytes</b>."></span>
+      <span class="f ghost" data-act="#bwd|lit" data-say="<b>Backward:</b> tag giữ nguyên nghĩa nên new code đọc được data cũ. Nhưng field mới <b>không được required</b> — data cũ không có nó → check sẽ fail."></span>
+      <span class="f ghost" data-act="#rmv|lit" data-say="<b>Xoá field</b>: ngược lại với thêm. Chỉ xoá được field <b>optional</b>, và <b>không bao giờ dùng lại tag number</b> đó."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div class="stack" style="gap:10px">
+      <div class="card" id="fwd"><span class="lbl info">FORWARD COMPAT</span><p class="ps">Old code đọc record do new code ghi: tag lạ ⇒ <b>ignore</b>.</p></div>
+      <div class="card" id="bwd"><span class="lbl good">BACKWARD COMPAT</span><p class="ps">Mọi field thêm sau lần deploy đầu tiên phải là <b>optional</b> hoặc có <b>default value</b>.</p></div>
+      <div class="card" id="rmv"><span class="lbl bad">REMOVE FIELD</span><p class="ps">Không xoá được field <code class="i">required</code>. Tag cũ có thể vẫn nằm trong data đâu đó → new code phải ignore nó.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DATATYPES ===================== -->
+<section class="slide" id="dtype">
+  <div class="hdr in"><span class="qn">09</span><h2>Datatypes &amp; schema evolution</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:26px">
+    <div class="card">
+      <h3>Đổi <code class="i">int32</code> → <code class="i">int64</code>?</h3>
+      <p class="ps">Có thể được (xem documentation), nhưng có rủi ro <b>mất precision</b> hoặc <b>truncated</b>.</p>
+      <div class="cmp2" style="margin-top:14px">
+        <div class="sysbox" style="font-size:16px">new code ghi (64-bit)<div class="bigval">4294967298</div></div>
+        <div class="big-ar">→</div>
+        <div class="sysbox" id="trunc" style="font-size:16px">old code đọc vào biến 32-bit<div class="bigval" id="truncv">?</div></div>
+      </div>
+      <span class="f ghost" data-act="#trunc|fail;#truncv|bad" data-set="#truncv::2" data-say="New đọc old: dễ — parser điền các bit thiếu bằng 0. Old đọc new: giá trị không vừa 32 bit ⇒ <b>bị truncate</b> (2<sup>32</sup> + 2 → 2)."></span>
+      <p class="say" style="font-size:18px">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div class="stack">
+      <div class="card f"><h3 style="color:#db2777">protobuf: <code class="i">repeated</code></h3><p class="ps">Không có list/array datatype; có marker <code class="i">repeated</code> (cạnh <code class="i">required</code>/<code class="i">optional</code>): cùng tag xuất hiện nhiều lần.</p>
+        <p class="ps" style="margin-top:6px">⇒ Đổi <b>optional (single-valued)</b> thành <b>repeated (multi-valued)</b> là OK: new code đọc data cũ thấy list 0 hoặc 1 phần tử; old code đọc data mới chỉ thấy <b>phần tử cuối</b>.</p></div>
+      <div class="card f"><h3 style="color:#0891b2">Thrift: <code class="i">list&lt;T&gt;</code></h3><p class="ps">Có list datatype riêng, parameterized theo element type. Không evolve single → multi-valued được như protobuf, nhưng hỗ trợ <b>nested lists</b>.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== AVRO ===================== -->
+<section class="slide" id="avro">
+  <div class="hdr in"><span class="qn">10</span><h2>Apache Avro · <span class="grad">32 bytes</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.15fr;gap:22px">
+    <div>
+      <p class="ps" style="font-size:18px">Bắt đầu 2009 như subproject của <b>Hadoop</b>, vì Thrift không hợp use case của Hadoop. Hai schema language: <b>Avro IDL</b> (cho người) và <b>JSON</b> (cho máy).</p>
+      <div class="code-title" style="margin-top:8px">Avro IDL</div>
+<script type="text/x-cpp" class="xs">
+record Person {
+  string                userName;
+  union { null, long }  favoriteNumber = null;
+  array<string>         interests;
+}
+</script>
+      <div class="code-title" style="margin-top:8px">JSON schema</div>
+<script type="text/x-cpp" class="xxs">
+{ "type": "record", "name": "Person",
+  "fields": [
+    {"name": "userName", "type": "string"},
+    {"name": "favoriteNumber",
+     "type": ["null", "long"], "default": null},
+    {"name": "interests",
+     "type": {"type": "array", "items": "string"}}
+  ] }
+</script>
+    </div>
+    <div>
+      <div class="bleg"><span class="l">length / count / union index</span><span class="v">value</span><span class="e">end of array</span></div>
+      <div class="bstrip" id="bs-av"><div class="seg q1"><span class="l">0c</span><span class="v">M</span><span class="v">a</span><span class="v">r</span><span class="v">t</span><span class="v">i</span><span class="v">n</span></div><div class="seg q2"><span class="l">02</span><span class="v">f2</span><span class="v">14</span></div><div class="seg q3"><span class="l">04</span><span class="l">16</span><span class="v">d</span><span class="v">a</span><span class="v">y</span><span class="v">d</span><span class="v">r</span><span class="v">e</span><span class="v">a</span><span class="v">m</span><span class="v">i</span><span class="v">n</span><span class="v">g</span><span class="l">0e</span><span class="v">h</span><span class="v">a</span><span class="v">c</span><span class="v">k</span><span class="v">i</span><span class="v">n</span><span class="v">g</span><span class="e">00</span></div></div>
+      <span class="f ghost" data-act="#bs-av|s1" data-say="<code class='i'>0c</code> (zigzag của 6) + <code class='i'>Martin</code>. Chỉ là length prefix + UTF-8 bytes — <b>không có gì cho biết đây là string</b>."></span>
+      <span class="f ghost" data-act="#bs-av|s2" data-say="<code class='i'>02</code>: union branch #1 (<code class='i'>long</code>), rồi varint <code class='i'>f2 14</code> = 1337 (giống CompactProtocol)."></span>
+      <span class="f ghost" data-act="#bs-av|s3" data-say="Array: block count 2, hai strings, <code class='i'>00</code> kết thúc. <b>Không có tag, không có type</b> — chỉ là các value nối nhau."></span>
+      <p class="say" style="font-size:18px">Nhấn → để chạy từng bước.</p>
+      <div class="note f" style="font-size:17px">Schema <b>không có tag numbers</b>. Parse = đi qua các field <b>theo thứ tự trong schema</b>, dùng schema để biết datatype ⇒ chỉ decode đúng nếu reader dùng <b>đúng schema</b> mà writer đã dùng. Vậy Avro hỗ trợ schema evolution thế nào?</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SIZE COMPARISON ===================== -->
+<section class="slide" id="size">
+  <div class="hdr in"><span class="qn">10</span><h2>Cùng một record, sáu cách encode</h2></div>
+  <div class="cols" style="grid-template-columns:1.4fr 1fr;gap:26px;align-items:center">
+    <div class="card f" id="szc" data-act="#szc|run">
+      <div class="be"><span class="nm">JSON (textual)</span><div class="trk"><div class="bb am" style="--w:100%"><b>81</b></div></div></div>
+      <div class="be"><span class="nm">MessagePack</span><div class="trk"><div class="bb slow" style="--w:81.5%"><b>66</b></div></div></div>
+      <div class="be"><span class="nm">Thrift Binary</span><div class="trk"><div class="bb" style="--w:72.8%"><b>59</b></div></div></div>
+      <div class="be"><span class="nm">Thrift Compact</span><div class="trk"><div class="bb" style="--w:42%"><b>34</b></div></div></div>
+      <div class="be"><span class="nm">Protobuf</span><div class="trk"><div class="bb" style="--w:40.7%"><b>33</b></div></div></div>
+      <div class="be"><span class="nm">Avro</span><div class="trk"><div class="bb gr" style="--w:39.5%"><b>32</b></div></div></div>
+      <p class="ps muted" style="margin-top:6px">bytes · Example 4-1, JSON đã bỏ whitespace</p>
+    </div>
+    <div class="stack">
+      <div class="leg c f"><b>Field names trong data</b><p>JSON, MessagePack: tự mô tả nhưng tốn chỗ.</p></div>
+      <div class="leg a f"><b>Field tags + types</b><p>Thrift, protobuf: gọn, evolve bằng tag numbers.</p></div>
+      <div class="leg b f" style="border-left-color:#10b981"><b>Chỉ values</b><p>Avro: gọn nhất, dựa hoàn toàn vào schema.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== WRITER / READER ===================== -->
+<section class="slide" id="wr">
+  <div class="hdr in"><span class="qn">11</span><h2>The <span class="grad">writer’s schema</span> &amp; the <span class="grad">reader’s schema</span></h2></div>
+  <div class="cols" style="grid-template-columns:.9fr 1.2fr;gap:22px">
+    <div>
+      <ul class="mini">
+        <li><b>Writer’s schema</b>: schema version app dùng khi <b>encode</b> (ghi file/DB, gửi network) — vd. compile sẵn trong app.</li>
+        <li><b>Reader’s schema</b>: schema app <b>mong đợi</b> khi decode — code có thể được generate từ nó lúc build.</li>
+      </ul>
+      <div class="formula" style="margin-top:12px;font-size:19px">writer’s ≠ reader’s → OK,<br>miễn là <span style="color:#db2777">compatible</span></div>
+      <p class="say" style="font-size:18px">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <svg class="sv" id="figwr" viewBox="0 0 640 330">
+        <defs><marker id="ahw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#a78bfa"/></marker></defs>
+        <text x="120" y="22" text-anchor="middle" style="fill:#7c3aed">Writer’s schema</text>
+        <text x="520" y="22" text-anchor="middle" style="fill:#0891b2">Reader’s schema</text>
+        <rect class="nd" x="20" y="40" width="200" height="46" rx="10"/><text x="120" y="68" text-anchor="middle">userName</text>
+        <rect class="nd" x="20" y="104" width="200" height="46" rx="10"/><text x="120" y="132" text-anchor="middle">favoriteNumber</text>
+        <rect class="nd" x="20" y="168" width="200" height="46" rx="10"/><text x="120" y="196" text-anchor="middle">interests</text>
+        <rect class="nd c3" x="20" y="232" width="200" height="46" rx="10"/><text x="120" y="260" text-anchor="middle">photoURL</text>
+        <rect class="nd c2" x="420" y="40" width="200" height="46" rx="10"/><text x="520" y="68" text-anchor="middle">favoriteNumber</text>
+        <rect class="nd c2" x="420" y="104" width="200" height="46" rx="10"/><text x="520" y="132" text-anchor="middle">userName</text>
+        <rect class="nd c2" x="420" y="168" width="200" height="46" rx="10"/><text x="520" y="196" text-anchor="middle">interests</text>
+        <rect class="nd c4" x="420" y="232" width="200" height="46" rx="10"/><text x="520" y="252" text-anchor="middle">lang</text><text x="520" y="270" text-anchor="middle" class="sm">default = "en"</text>
+        <g class="g g1" id="wg1"><line class="ln" x1="220" y1="63" x2="420" y2="127" marker-end="url(#ahw)"/><line class="ln" x1="220" y1="127" x2="420" y2="63" marker-end="url(#ahw)"/><text x="320" y="84" text-anchor="middle" class="lb">match by name</text></g>
+        <g class="g g2" id="wg2"><line class="ln" x1="220" y1="191" x2="420" y2="191" marker-end="url(#ahw)"/></g>
+        <g class="g g3" id="wg3"><line class="ln" x1="220" y1="255" x2="300" y2="255" style="stroke:#e11d48"/><text x="312" y="262" style="fill:#e11d48;font-size:22px">✕</text><text x="332" y="244" class="lb" style="fill:#e11d48">ignored</text></g>
+        <g class="g g4" id="wg4"><text x="400" y="300" text-anchor="end" class="lb" style="fill:#b45309">filled with default</text><line class="ln" x1="405" y1="290" x2="440" y2="280" marker-end="url(#ahw)" style="stroke:#f59e0b"/></g>
+      </svg>
+      <span class="f ghost" data-act="#figwr|s1" data-now="#wg1|hot" data-say="Avro library đặt hai schema <b>cạnh nhau</b> và dịch data từ writer’s sang reader’s schema. Thứ tự field khác nhau không sao: <b>match theo field name</b>."></span>
+      <span class="f ghost" data-act="#figwr|s2" data-now="#wg2|hot" data-say="Field có ở cả hai bên → giá trị được chuyển sang."></span>
+      <span class="f ghost" data-act="#figwr|s3" data-now="#wg3|hot" data-say="Field có trong writer’s schema nhưng <b>không có trong reader’s schema</b> → <b>ignored</b>."></span>
+      <span class="f ghost" data-act="#figwr|s4" data-now="#wg4|hot" data-say="Reader mong đợi field mà writer không có → điền <b>default value</b> khai báo trong reader’s schema."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== AVRO RULES ===================== -->
+<section class="slide" id="arules">
+  <div class="hdr in"><span class="qn">11</span><h2>Schema evolution rules trong Avro</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr;gap:24px">
+    <div>
+      <div class="cols" style="gap:10px">
+        <div class="card"><span class="lbl info">FORWARD</span><p class="ps">writer = <b>new</b> schema<br>reader = <b>old</b> schema</p></div>
+        <div class="card"><span class="lbl good">BACKWARD</span><p class="ps">writer = <b>old</b> schema<br>reader = <b>new</b> schema</p></div>
+      </div>
+      <div class="formula" style="margin-top:12px;font-size:19px">Chỉ add / remove field <span style="color:#db2777">có default value</span></div>
+      <table class="ctable" style="margin-top:12px">
+        <tr><th>Thay đổi</th><th>Hệ quả</th></tr>
+        <tr class="f"><td>Add field có default</td><td><span class="res ok">✓ cả hai chiều</span> reader mới điền default</td></tr>
+        <tr class="f"><td>Add field không default</td><td><span class="res no">✗ backward</span> reader mới không đọc được data cũ</td></tr>
+        <tr class="f"><td>Remove field không default</td><td><span class="res no">✗ forward</span> reader cũ không đọc được data mới</td></tr>
+        <tr class="f"><td>Đổi tên field (alias)</td><td>backward ✓ · forward ✗</td></tr>
+        <tr class="f"><td>Thêm branch vào union</td><td>backward ✓ · forward ✗</td></tr>
+      </table>
+    </div>
+    <div class="stack">
+      <div class="card f"><h3>🚫 null không phải default</h3><p class="ps">Muốn field nullable phải dùng <b>union type</b>: <code class="i">union { null, long, string } field;</code>. Chỉ dùng <code class="i">null</code> làm default nếu nó là một branch của union (chính xác: branch <b>đầu tiên</b>).</p></div>
+      <div class="card f"><h3 style="color:#0891b2">Không có optional / required</h3><p class="ps">Avro dùng <b>union types</b> + <b>default values</b> thay vì marker như protobuf/Thrift. Dài dòng hơn, nhưng tường minh về cái gì được null ⇒ ngăn bug.</p></div>
+      <div class="card f"><h3 style="color:#db2777">Đổi datatype</h3><p class="ps">Được, nếu Avro <b>convert</b> được kiểu đó.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== WHAT IS WRITER SCHEMA ===================== -->
+<section class="slide" id="wsch">
+  <div class="hdr in"><span class="qn">11</span><h2>Nhưng reader lấy <span class="grad">writer’s schema</span> ở đâu?</h2></div>
+  <p class="in muted" style="font-size:19px">Không thể nhét cả schema vào mỗi record — schema thường <b>lớn hơn</b> data, mất hết lợi ích của binary encoding. Câu trả lời tùy ngữ cảnh:</p>
+  <div class="cols3" style="margin-top:14px">
+    <div class="card f zoom"><div class="icon">🗃️</div><h3>Large file, nhiều records</h3><p class="ps">Phổ biến với Hadoop: hàng triệu record cùng một schema → ghi writer’s schema <b>một lần ở đầu file</b>. Avro có format riêng: <b>object container files</b>.</p></div>
+    <div class="card f zoom"><div class="icon">🗄️</div><h3>Database, records ghi riêng lẻ</h3><p class="ps">Mỗi record có thể ghi bằng schema khác nhau → thêm <b>version number</b> ở đầu mỗi record, lưu danh sách schema versions trong DB. (<b>Espresso</b> của LinkedIn làm vậy.)</p></div>
+    <div class="card f zoom"><div class="icon">🔌</div><h3>Gửi qua network connection</h3><p class="ps">Hai process <b>negotiate</b> schema version khi setup connection, dùng suốt lifetime của connection. <b>Avro RPC</b> hoạt động như vậy.</p></div>
+  </div>
+  <div class="note blue f" style="margin-top:18px">Một <b>database of schema versions</b> luôn hữu ích: vừa là documentation, vừa cho phép <b>check compatibility</b> trước khi deploy. Version number: integer tăng dần, hoặc <b>hash</b> của schema.</div>
+</section>
+
+<!-- ===================== DYNAMIC SCHEMAS ===================== -->
+<section class="slide" id="dyn">
+  <div class="hdr in"><span class="qn">12</span><h2>Dynamically generated schemas</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr;gap:24px">
+    <div>
+      <p style="font-size:19px">Không có tag numbers thì có gì quan trọng? Avro <b>thân thiện</b> hơn với schema được <b>generate tự động</b>.</p>
+      <p class="ps" style="margin-top:8px">Ví dụ: dump một relational DB ra file binary. Mỗi <b>table</b> → một record schema; mỗi <b>column</b> → một field, column name = field name.</p>
+      <div class="card bad f" style="margin-top:12px"><span class="lbl bad">THRIFT / PROTOBUF</span><p class="ps">Field tags gán <b>bằng tay</b>: mỗi lần DB schema đổi, admin phải cập nhật mapping column → tag, và cẩn thận không dùng lại tag cũ. Dynamic schema không phải design goal của chúng.</p></div>
+    </div>
+    <div>
+      <div class="flowrow" style="justify-content:center">
+        <div class="fld" id="dt"><h4>table users</h4><span class="pv">id</span><span class="pv">name</span><span class="pv" id="dcol">fax</span><span class="pv newf hide" id="dnew">email</span></div>
+        <span class="ar">→</span>
+        <div class="fld" id="ds"><h4>Avro schema <span id="dver" class="vtag o">v1</span></h4><span class="pv">"id"</span><span class="pv">"name"</span><span class="pv" id="dscol">"fax"</span><span class="pv newf hide" id="dsnew">"email"</span></div>
+      </div>
+      <span class="f ghost" data-act="#dcol|lost;#dnew|show;#dt|hot" data-say="DB schema đổi: thêm column <code class='i'>email</code>, bỏ column <code class='i'>fax</code>."></span>
+      <span class="f ghost" data-act="#dscol|lost;#dsnew|show;#ds|hot;#dver|nw" data-set="#dver::v2" data-say="Chỉ cần <b>generate lại</b> Avro schema từ DB schema mới rồi export. Export process không cần quan tâm schema change — fields match theo <b>name</b>, nên writer’s schema mới vẫn khớp được với reader’s schema cũ."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CODE GEN ===================== -->
+<section class="slide" id="codegen">
+  <div class="hdr in"><span class="qn">12</span><h2>Code generation &amp; dynamically typed languages</h2></div>
+  <div class="cols" style="gap:24px">
+    <div class="card good f"><span class="lbl good">STATICALLY TYPED</span><h3>Java, C++, C#</h3><p class="ps">Code generation từ schema rất hữu ích: in-memory structure hiệu quả cho data đã decode, <b>type checking</b> và <b>autocompletion</b> trong IDE.</p></div>
+    <div class="card bad f"><span class="lbl bad">DYNAMICALLY TYPED</span><h3>JavaScript, Ruby, Python</h3><p class="ps">Không có compile-time type checker để thỏa mãn → generate code ít ý nghĩa, thường bị “frowned upon” vì thêm bước compile. Với dynamically generated schema, code generation là <b>vật cản</b> không cần thiết.</p></div>
+  </div>
+  <div class="note blue f" style="margin-top:18px">Avro: code generation là <b>optional</b>. Object container file (đã nhúng writer’s schema) là <b>self-describing</b> — mở bằng Avro library và xem data như một file JSON.</div>
+  <div class="flow f" style="margin-top:18px">
+    <div class="box m">Avro files</div><span class="ar">→</span><div class="box h">Apache Pig<small>analyze</small></div><span class="ar">→</span><div class="box exe">derived datasets<small>Avro output</small></div>
+  </div>
+  <p class="f muted" style="text-align:center;margin-top:8px;font-size:18px">…mà không cần nghĩ tới schema.</p>
+</section>
+
+<!-- ===================== MERITS ===================== -->
+<section class="slide" id="merits">
+  <div class="hdr in"><span class="qn">13</span><h2>The Merits of Schemas</h2></div>
+  <div class="cols" style="grid-template-columns:.95fr 1.2fr;gap:24px">
+    <div>
+      <p class="ps" style="font-size:18px">Schema language của protobuf/Thrift/Avro <b>đơn giản hơn nhiều</b> so với XML Schema / JSON Schema (vốn hỗ trợ validation như regex, range 0–100) → dễ implement, hỗ trợ nhiều ngôn ngữ.</p>
+      <div class="card" style="margin-top:12px"><h3>📜 Ý tưởng không mới: ASN.1</h3><p class="ps">Chuẩn hóa từ <b>1984</b>; binary encoding <b>DER</b> vẫn dùng cho <b>SSL certificates (X.509)</b>. Cũng evolve bằng tag numbers — nhưng rất phức tạp, tài liệu kém.</p></div>
+      <p class="ps muted" style="margin-top:10px">Nhiều data system cũng có <b>proprietary binary encoding</b>: network protocol của relational DB, driver (ODBC/JDBC) decode thành in-memory structures.</p>
+    </div>
+    <div class="stack">
+      <div class="leg a f"><b>📉 Compact hơn</b><p>Bỏ được field names khỏi encoded data — gọn hơn các “binary JSON”.</p></div>
+      <div class="leg b f"><b>📘 Documentation luôn đúng</b><p>Schema bắt buộc để decode ⇒ chắc chắn up to date (docs viết tay thì dễ lệch thực tế).</p></div>
+      <div class="leg c f"><b>✅ Check compatibility trước khi deploy</b><p>Giữ database of schemas để kiểm tra forward/backward compatibility.</p></div>
+      <div class="leg a f" style="border-left-color:#ec4899"><b>🧰 Code generation</b><p>Type checking lúc compile cho statically typed languages.</p></div>
+    </div>
+  </div>
+  <div class="note f" style="font-size:18px">Schema evolution cho sự <b>linh hoạt</b> như schemaless/schema-on-read JSON DB, đồng thời cho <b>guarantees</b> tốt hơn về data và tooling tốt hơn.</div>
+</section>
+
+<!-- ===================== MODES ===================== -->
+<section class="slide" id="modes">
+  <div class="hdr in"><span class="qn">14</span><h2>Modes of Dataflow</h2></div>
+  <p class="in muted" style="font-size:20px">Gửi data cho một process <b>không share memory</b> ⇒ phải encode thành bytes. Compatibility là quan hệ giữa process <b>encode</b> và process <b>decode</b>. Vậy ai encode, ai decode?</p>
+  <div class="cols3" style="margin-top:22px">
+    <div class="card f zoom"><div class="icon">🗄️</div><h3>Via databases</h3><p class="ps">Process ghi DB <b>encode</b>, process đọc DB <b>decode</b>.</p></div>
+    <div class="card f zoom"><div class="icon">🔁</div><h3>Via service calls</h3><p class="ps"><b>REST</b> &amp; <b>RPC</b>: client encode request, server decode request rồi encode response, client decode response.</p></div>
+    <div class="card f zoom"><div class="icon">📨</div><h3>Via async message passing</h3><p class="ps"><b>Message brokers</b> &amp; <b>actors</b>: sender encode, recipient decode.</p></div>
+  </div>
+  <div class="note blue f" style="margin-top:20px">Evolvability = upgrade từng phần của hệ thống <b>độc lập</b>, không phải đổi mọi thứ cùng lúc.</div>
+</section>
+
+<!-- ===================== DATABASES ===================== -->
+<section class="slide" id="db">
+  <div class="hdr in"><span class="qn">14</span><h2>Dataflow Through Databases</h2></div>
+  <div class="cols" style="grid-template-columns:.85fr 1.3fr;gap:22px">
+    <div>
+      <ul class="mini">
+        <li>Lưu vào DB như <b>gửi message cho “future self”</b> ⇒ cần <b>backward compatibility</b>.</li>
+        <li>Nhiều process truy cập cùng lúc; khi rolling upgrade, có instance chạy code mới, có instance chạy code cũ ⇒ value ghi bởi code mới có thể bị code cũ đọc ⇒ cần cả <b>forward compatibility</b>.</li>
+      </ul>
+      <div class="note" style="font-size:17px">Các encoding format ở trên đều <b>giữ được unknown fields</b> — nhưng đôi khi phải cẩn thận ở <b>application level</b>.</div>
+    </div>
+    <div>
+      <h3>Figure 4-7 · Mất data khi old code update record</h3>
+      <div class="flowrow" style="margin-top:10px;align-items:stretch">
+        <div class="fld" id="d47a"><h4>new code <span class="vtag nw">v2</span> ghi</h4><span class="pv">userName</span><span class="pv">favoriteNumber</span><span class="pv newf">photoURL</span></div>
+        <span class="ar" style="align-self:center">→</span>
+        <div class="fld" id="d47b" style="opacity:.25"><h4>old code <span class="vtag o">v1</span> decode → model object</h4><span class="pv">userName</span><span class="pv" id="d47fn">favoriteNumber</span><span class="pv lost">photoURL</span></div>
+        <span class="ar" style="align-self:center">→</span>
+        <div class="fld" id="d47c" style="opacity:.25"><h4>DB sau khi ghi lại</h4><span class="pv">userName</span><span class="pv">favoriteNumber</span><span class="pv lost" id="d47lost">photoURL ??</span></div>
+      </div>
+      <span class="f ghost" data-act="#d47a|hot" data-say="Code mới thêm field <code class='i'>photoURL</code> và ghi record vào DB."></span>
+      <span class="f ghost" data-act="#d47b|show-op" data-now="#d47b|hot" data-say="Code cũ đọc record, <b>decode thành model object</b> của app — object này không có chỗ cho <code class='i'>photoURL</code>."></span>
+      <span class="f ghost" data-act="#d47c|show-op" data-now="#d47c|hot" data-say="Code cũ update rồi <b>re-encode</b> và ghi lại → field mới <b>bị mất</b>. Mong muốn: code cũ giữ nguyên field mới dù không hiểu nó. Không khó, chỉ cần <b>ý thức</b> về nó."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DATA OUTLIVES CODE ===================== -->
+<section class="slide" id="outlive">
+  <div class="hdr in"><span class="qn">14</span><h2><span class="grad">Data outlives code</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr;gap:24px">
+    <div>
+      <p style="font-size:19px">Trong cùng một DB có value ghi <b>5 ms trước</b> và value ghi <b>5 năm trước</b>. Deploy version mới thay code cũ trong vài phút — nhưng data 5 năm tuổi vẫn nằm đó với <b>encoding gốc</b>.</p>
+      <div class="dots" id="olddots" style="margin-top:14px"><i class="nw"></i><i class="nw"></i><i></i><i class="nw"></i><i class="nw"></i><i></i><i></i><i></i><i></i><i class="nw"></i><i></i><i class="nw"></i><i class="nw"></i><i class="nw"></i><i class="nw"></i><i></i><i></i><i></i><i></i><i class="nw"></i><i></i><i></i><i></i><i></i><i></i><i class="nw"></i><i></i><i></i><i></i><i class="nw"></i><i></i><i class="nw"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="nw"></i><i></i><i></i><i class="nw"></i><i class="nw"></i><i></i><i class="nw"></i><i></i><i></i><i></i><i></i><i class="nw"></i><i></i><i class="nw"></i><i></i><i class="nw"></i><i></i><i></i><i></i><i></i><i></i><i class="nw"></i><i class="nw"></i><i class="nw"></i><i></i><i></i><i class="nw"></i><i></i><i class="nw"></i><i></i><i class="nw"></i><i></i><i></i><i></i><i></i><i></i><i class="nw"></i><i class="nw"></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="nw"></i><i class="nw"></i><i></i><i class="nw"></i><i></i><i></i><i></i><i class="nw"></i><i class="nw"></i><i class="nw"></i><i></i><i></i><i class="nw"></i><i class="nw"></i><i></i><i></i><i class="nw"></i><i class="nw"></i><i class="nw"></i><i class="nw"></i><i></i><i class="nw"></i><i class="nw"></i><i></i><i class="nw"></i><i></i><i class="nw"></i><i></i><i></i><i></i><i></i><i></i><i class="nw"></i><i></i><i class="nw"></i><i></i><i class="nw"></i><i></i><i></i><i></i><i class="nw"></i><i class="nw"></i><i class="nw"></i><i class="nw"></i><i class="nw"></i><i></i><i class="nw"></i><i class="nw"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="nw"></i><i class="nw"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="nw"></i><i></i><i></i><i class="nw"></i><i></i><i></i><i></i><i class="nw"></i><i></i><i class="nw"></i><i></i><i></i><i class="nw"></i><i class="nw"></i><i></i><i></i><i></i><i></i><i class="nw"></i><i class="nw"></i><i></i><i class="nw"></i><i></i><i class="nw"></i><i></i><i></i><i></i><i></i><i></i><i class="nw"></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="nw"></i><i class="nw"></i><i></i><i></i><i></i><i></i></div>
+      <div class="toggle" style="margin-top:8px;justify-content:flex-start"><span class="chip p">● schema v1 (cũ)</span><span class="chip g" id="olg">● schema mới</span></div>
+      <span class="f ghost" data-act="#olddots|mix" data-say="Ghi mới dùng schema mới, nhưng bản ghi cũ không tự đổi. <b>Migrate</b> (rewrite) cả dataset lớn thì rất <b>tốn kém</b> → hầu hết DB tránh làm vậy."></span>
+      <p class="say" style="font-size:18px">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div class="stack">
+      <div class="card f"><h3>Schema change không rewrite</h3><p class="ps">Phần lớn relational DB cho phép thêm column với default <code class="i">null</code> mà không rewrite data; khi đọc row cũ, DB <b>điền null</b> cho column thiếu (MySQL là ngoại lệ hay rewrite cả table). <b>Espresso</b> dùng Avro để tận dụng evolution rules.</p></div>
+      <div class="note blue f" style="margin-top:0;font-size:18px">⇒ Schema evolution khiến cả DB <b>trông như</b> được encode bằng một schema duy nhất, dù storage chứa nhiều version lịch sử.</div>
+      <div class="card f"><h3 style="color:#0891b2">🧊 Archival storage</h3><p class="ps">Snapshot cho backup hoặc data warehouse: encode <b>nhất quán</b> bằng schema mới nhất. Dump ghi một lần, <b>immutable</b> → hợp với <b>Avro object container files</b>, hoặc column-oriented như <b>Parquet</b>.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SERVICES ===================== -->
+<section class="slide" id="svc">
+  <div class="hdr in"><span class="qn">15</span><h2>Dataflow Through Services: REST &amp; RPC</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.15fr;gap:22px">
+    <div>
+      <p class="ps" style="font-size:18px">Hai vai trò: <b>clients</b> và <b>servers</b>. Server expose một API qua network — gọi là <b>service</b>. Web: browser gửi <code class="i">GET</code>/<code class="i">POST</code>; native app, hay JavaScript app dùng <code class="i">XMLHttpRequest</code> (<b>Ajax</b>) nhận JSON.</p>
+      <div class="card" style="margin-top:10px"><h3>Service ≈ database có giới hạn</h3><p class="ps">DB cho phép arbitrary queries; service chỉ expose API theo <b>business logic</b> ⇒ <b>encapsulation</b>, kiểm soát chặt client được làm gì.</p></div>
+      <div class="note blue" style="font-size:17px"><b>SOA / microservices</b>: mỗi service do một team sở hữu, <b>deploy &amp; evolve độc lập</b> ⇒ old/new version của server và client chạy cùng lúc ⇒ encoding phải compatible qua các version của API.</div>
+    </div>
+    <div>
+      <svg class="sv" id="figsvc" viewBox="0 0 620 330">
+        <defs><marker id="ahs" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#a78bfa"/></marker></defs>
+        <g class="g g1" id="sg1"><rect class="nd c3" x="10" y="30" width="150" height="56" rx="12"/><text x="85" y="55" text-anchor="middle">Mobile / Web</text><text x="85" y="74" text-anchor="middle" class="sm">client app</text>
+          <line class="ln" x1="160" y1="58" x2="250" y2="58" marker-end="url(#ahs)"/><text x="205" y="48" text-anchor="middle" class="lb">HTTP</text>
+          <rect class="nd" x="250" y="30" width="150" height="56" rx="12"/><text x="325" y="62" text-anchor="middle">Service A</text></g>
+        <g class="g g2" id="sg2"><line class="ln" x1="325" y1="86" x2="325" y2="150" marker-end="url(#ahs)"/><text x="333" y="122" class="lb">middleware</text>
+          <rect class="nd c2" x="250" y="150" width="150" height="56" rx="12"/><text x="325" y="182" text-anchor="middle">Service B</text>
+          <line class="ln" x1="400" y1="178" x2="460" y2="178" marker-end="url(#ahs)"/>
+          <rect class="nd c5" x="460" y="150" width="150" height="56" rx="12"/><text x="535" y="182" text-anchor="middle">Database</text></g>
+        <g class="g g3" id="sg3"><rect class="box6" x="230" y="14" width="390" height="210" rx="16"/><text x="610" y="240" text-anchor="end" class="lb" style="fill:#db2777">cùng tổ chức · cùng datacenter</text>
+          <line class="ln" x1="325" y1="206" x2="325" y2="270" marker-end="url(#ahs)"/><text x="333" y="254" class="lb">internet</text>
+          <rect class="nd c4" x="230" y="270" width="190" height="52" rx="12"/><text x="325" y="293" text-anchor="middle">Payment API · OAuth</text><text x="325" y="311" text-anchor="middle" class="sm">tổ chức khác</text></g>
+      </svg>
+      <span class="f ghost" data-act="#figsvc|s1" data-now="#sg1|hot" data-say="① Client app trên thiết bị user gọi service qua HTTP, thường qua <b>public internet</b>."></span>
+      <span class="f ghost" data-act="#figsvc|s2" data-now="#sg2|hot" data-say="② Service gọi service khác của <b>cùng tổ chức</b> (SOA/microservices). Một server có thể là <b>client</b> của service khác (vd. của database)."></span>
+      <span class="f ghost" data-act="#figsvc|s3" data-now="#sg3|hot" data-say="③ Service gọi service của <b>tổ chức khác</b> qua internet: public APIs, credit card processing, OAuth. Dùng HTTP ⇒ gọi là <b>web service</b> (dù không chỉ dùng trên web)."></span>
+      <p class="say" style="font-size:18px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== REST vs SOAP ===================== -->
+<section class="slide" id="rest">
+  <div class="hdr in"><span class="qn">15</span><h2>Web services: <span class="grad">REST</span> vs <span class="grad">SOAP</span></h2></div>
+  <p class="in muted" style="font-size:19px">Hai triết lý gần như đối lập — và thường là chủ đề tranh cãi nảy lửa.</p>
+  <div class="cols" style="gap:24px;margin-top:12px">
+    <div class="card good f"><span class="lbl good">REST</span><h3>Design philosophy, không phải protocol</h3>
+      <ul class="mini"><li>Xây trên nguyên lý của <b>HTTP</b>: URL định danh <b>resources</b>; dùng HTTP features cho cache control, authentication, content type negotiation.</li><li>Data format đơn giản; gắn với <b>microservices</b>, phổ biến cho cross-organizational integration.</li><li>API theo REST = <b>RESTful</b>. Mô tả bằng <b>OpenAPI (Swagger)</b>.</li></ul></div>
+    <div class="card bad f"><span class="lbl bad">SOAP</span><h3>XML-based protocol</h3>
+      <ul class="mini"><li>Muốn độc lập với HTTP, tránh dùng HTTP features; kèm cả “hệ sinh thái” chuẩn phức tạp <b>WS-*</b>.</li><li>API mô tả bằng <b>WSDL</b> → code generation; không human-readable ⇒ phụ thuộc nặng vào tooling, IDE.</li><li>Interoperability giữa các vendor hay có vấn đề → vẫn dùng ở enterprise lớn, nhưng <b>hết thời</b> ở công ty nhỏ.</li></ul></div>
+  </div>
+  <div class="note f" style="font-size:17px">Lưu ý: <b>SOAP</b> không bắt buộc cho <b>SOA</b>. SOAP là một technology cụ thể; SOA là cách tiếp cận chung để xây hệ thống.</div>
+</section>
+
+<!-- ===================== RPC PROBLEMS ===================== -->
+<section class="slide" id="rpc">
+  <div class="hdr in"><span class="qn">15</span><h2>The problems with <span class="grad">RPC</span></h2></div>
+  <div class="cols" style="grid-template-columns:.75fr 1.4fr;gap:22px">
+    <div>
+      <p class="ps" style="font-size:18px"><b>Remote procedure call</b> (từ 1970s) cố làm request tới remote service trông giống <b>gọi function local</b> — abstraction gọi là <b>location transparency</b>.</p>
+      <div class="chips" style="margin-top:10px"><span class="chip p">EJB</span><span class="chip c">Java RMI</span><span class="chip k">DCOM</span><span class="chip y">CORBA</span></div>
+      <p class="ps muted" style="margin-top:8px">EJB/RMI chỉ cho Java, DCOM chỉ cho Microsoft, CORBA quá phức tạp và không có backward/forward compatibility.</p>
+      <div class="note" style="font-size:17px">Cách tiếp cận này <b>fundamentally flawed</b>: network request khác hẳn local function call.</div>
+    </div>
+    <table class="ctable">
+      <tr><th style="width:24%"></th><th>Local function call</th><th>Network request</th></tr>
+      <tr class="f"><td>Predictability</td><td>Thành/bại tùy tham số bạn kiểm soát</td><td>Request/response có thể <b>mất</b>, máy remote chậm/chết — ngoài tầm kiểm soát</td></tr>
+      <tr class="f"><td>Kết quả</td><td>return · throw · không bao giờ return</td><td>Thêm khả năng <b>timeout</b>: không biết request đã tới hay chưa</td></tr>
+      <tr class="f"><td>Retry</td><td>Không có vấn đề</td><td>Có thể chỉ <b>response</b> bị mất → retry thực hiện action nhiều lần, trừ khi có <b>idempotence</b></td></tr>
+      <tr class="f"><td>Latency</td><td>Gần như cố định</td><td>Chậm hơn nhiều và <b>biến động</b> mạnh: &lt;1 ms đến vài giây</td></tr>
+      <tr class="f"><td>Parameters</td><td>Truyền <b>pointer</b> tới object</td><td>Phải encode thành bytes — khổ với object lớn</td></tr>
+      <tr class="f"><td>Ngôn ngữ</td><td>Một ngôn ngữ</td><td>Client/server khác ngôn ngữ ⇒ dịch datatype (nhớ vụ số &gt; 2<sup>53</sup> trong JS)</td></tr>
+    </table>
+  </div>
+  <div class="note blue f" style="font-size:17px">Đừng cố làm remote service trông giống local object. Một phần sức hút của <b>REST</b>: nó <b>không giấu</b> việc mình là network protocol.</div>
+</section>
+
+<!-- ===================== RPC DIRECTIONS ===================== -->
+<section class="slide" id="rpcnow">
+  <div class="hdr in"><span class="qn">15</span><h2>Current directions for RPC</h2></div>
+  <p class="in muted" style="font-size:19px">RPC không biến mất. Thế hệ framework mới <b>thừa nhận</b> remote request khác local call:</p>
+  <div class="cols4" style="margin-top:12px">
+    <div class="card f zoom"><h3>gRPC</h3><p class="ps">RPC trên <b>Protocol Buffers</b>. Hỗ trợ <b>streams</b>: một call là chuỗi request và response theo thời gian.</p></div>
+    <div class="card f zoom"><h3>Finagle</h3><p class="ps">Dùng <b>Thrift</b>; <b>futures (promises)</b> bọc async action có thể fail, dễ gọi song song nhiều service và gộp kết quả.</p></div>
+    <div class="card f zoom"><h3>Rest.li</h3><p class="ps"><b>JSON over HTTP</b>, cũng dùng futures.</p></div>
+    <div class="card f zoom"><h3>Thrift · Avro RPC</h3><p class="ps">RPC đi kèm sẵn. Một số framework có <b>service discovery</b>: tìm IP + port của service.</p></div>
+  </div>
+  <div class="cols" style="margin-top:18px;gap:20px">
+    <div class="card f"><span class="lbl info">CUSTOM RPC + BINARY</span><p class="ps">Performance tốt hơn JSON over REST. Chủ yếu dùng cho request giữa các service <b>cùng tổ chức</b>, thường cùng datacenter.</p></div>
+    <div class="card f"><span class="lbl good">RESTful API</span><p class="ps">Dễ thử nghiệm &amp; debug (browser, <code class="i">curl</code>), mọi ngôn ngữ hỗ trợ, ecosystem khổng lồ: caches, load balancers, proxies, firewalls, monitoring… ⇒ phong cách thống trị cho <b>public APIs</b>.</p></div>
+  </div>
+</section>
+
+<!-- ===================== RPC EVOLUTION ===================== -->
+<section class="slide" id="rpcevo">
+  <div class="hdr in"><span class="qn">15</span><h2>Data encoding &amp; evolution cho RPC</h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr;gap:24px">
+    <div>
+      <p class="ps" style="font-size:18px">Giả định hợp lý: <b>servers được update trước</b>, clients sau.</p>
+      <div class="cmp2" style="grid-template-columns:1fr 1.2fr 1fr;margin-top:14px">
+        <div class="sysbox">💻 Client <span class="vtag o">old</span></div>
+        <div class="stack" style="gap:16px">
+          <div class="hide" id="rq1"><div class="pill on" style="font-size:14px;text-align:center">request →</div><p class="ps" style="text-align:center;font-size:14px;margin-top:3px">new server đọc data cũ<br><b style="color:#7c3aed">backward compat</b></p></div>
+          <div class="hide" id="rq2"><div class="pill on" style="font-size:14px;text-align:center;background:linear-gradient(135deg,#ec4899,#f97316)">← response</div><p class="ps" style="text-align:center;font-size:14px;margin-top:3px">old client đọc data mới<br><b style="color:#db2777">forward compat</b></p></div>
+        </div>
+        <div class="sysbox ok">🖥️ Server <span class="vtag nw">new</span></div>
+      </div>
+      <span class="f ghost" data-act="#rq1|show" data-say="Chỉ cần <b>backward compatibility cho requests</b>…"></span>
+      <span class="f ghost" data-act="#rq2|show" data-say="…và <b>forward compatibility cho responses</b>. Compatibility kế thừa từ encoding đang dùng."></span>
+      <p class="say" style="font-size:18px">Nhấn → để chạy từng bước.</p>
+      <ul class="mini f"><li><b>Thrift, gRPC, Avro RPC</b>: theo rules của encoding format.</li><li><b>SOAP</b>: XML schemas — evolve được nhưng có pitfalls.</li><li><b>RESTful</b>: JSON; thêm optional request parameter hoặc field mới vào response thường giữ được compatibility.</li></ul>
+    </div>
+    <div class="stack">
+      <div class="card f"><h3>Không kiểm soát được clients</h3><p class="ps">RPC thường vượt <b>ranh giới tổ chức</b> → provider không ép client upgrade được ⇒ compatibility phải giữ rất lâu, có khi mãi mãi. Breaking change ⇒ chạy song song <b>nhiều version API</b>.</p></div>
+      <div class="card f"><h3 style="color:#0891b2">API versioning</h3><p class="ps">Chưa có đồng thuận. Với RESTful:</p>
+        <div class="chips" style="margin-top:6px"><span class="chip p">/v2/ trong URL</span><span class="chip c">HTTP Accept header</span><span class="chip k">version gắn với API key, chỉnh qua admin interface</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MESSAGE PASSING ===================== -->
+<section class="slide" id="msg">
+  <div class="hdr in"><span class="qn">16</span><h2>Message-Passing Dataflow</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.15fr;gap:22px">
+    <div>
+      <p class="ps" style="font-size:18px">Nằm <b>giữa RPC và databases</b>: như RPC — message tới process khác với <b>low latency</b>; như DB — không đi qua connection trực tiếp mà qua <b>message broker</b> (message queue, message-oriented middleware) lưu tạm message.</p>
+      <h3 style="margin-top:10px">Ưu điểm so với direct RPC</h3>
+      <ul class="mini">
+        <li class="f">Làm <b>buffer</b> khi recipient unavailable/overloaded → reliability.</li>
+        <li class="f">Tự <b>redeliver</b> message cho process đã crash → không mất message.</li>
+        <li class="f">Sender không cần biết <b>IP + port</b> của recipient (cloud: VM đến rồi đi).</li>
+        <li class="f">Một message gửi tới <b>nhiều recipients</b>.</li>
+        <li class="f"><b>Decouple</b> sender và recipient: chỉ publish, không quan tâm ai consume.</li>
+      </ul>
+    </div>
+    <div>
+      <svg class="sv" id="figmq" viewBox="0 0 620 320">
+        <defs><marker id="ahm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#a78bfa"/></marker></defs>
+        <g class="g g1" id="mg1"><rect class="nd c3" x="6" y="60" width="120" height="50" rx="12"/><text x="66" y="90" text-anchor="middle">Producer</text>
+          <rect class="nd c3" x="6" y="140" width="120" height="50" rx="12"/><text x="66" y="170" text-anchor="middle">Producer</text>
+          <line class="ln" x1="126" y1="85" x2="220" y2="130" marker-end="url(#ahm)"/><line class="ln" x1="126" y1="165" x2="220" y2="145" marker-end="url(#ahm)"/>
+          <rect class="nd" x="220" y="95" width="160" height="80" rx="14"/><text x="300" y="128" text-anchor="middle">Message broker</text><text x="300" y="150" text-anchor="middle" class="sm">queue / topic</text></g>
+        <g class="g g2" id="mg2"><line class="ln" x1="380" y1="115" x2="470" y2="55" marker-end="url(#ahm)"/><line class="ln" x1="380" y1="135" x2="470" y2="135" marker-end="url(#ahm)"/><line class="ln" x1="380" y1="155" x2="470" y2="215" marker-end="url(#ahm)"/>
+          <rect class="nd c2" x="470" y="30" width="140" height="50" rx="12"/><text x="540" y="60" text-anchor="middle">Consumer</text>
+          <rect class="nd c2" x="470" y="110" width="140" height="50" rx="12"/><text x="540" y="140" text-anchor="middle">Consumer</text>
+          <rect class="nd c2" x="470" y="190" width="140" height="50" rx="12"/><text x="540" y="220" text-anchor="middle">Subscriber</text></g>
+        <g class="g g3" id="mg3"><path class="ln" d="M540,240 C540,300 66,300 66,190" marker-end="url(#ahm)"/><text x="300" y="300" text-anchor="middle" class="lb">reply queue → request/response như RPC</text></g>
+      </svg>
+      <span class="f ghost" data-act="#figmq|s1" data-now="#mg1|hot" data-say="Process gửi message tới một <b>named queue</b> hoặc <b>topic</b>. Thường là <b>one-way</b> &amp; <b>asynchronous</b>: gửi rồi quên, không chờ."></span>
+      <span class="f ghost" data-act="#figmq|s2" data-now="#mg2|hot" data-say="Broker đảm bảo message tới <b>một hoặc nhiều consumers/subscribers</b>. Nhiều producers và consumers trên cùng topic."></span>
+      <span class="f ghost" data-act="#figmq|s3" data-now="#mg3|hot" data-say="Consumer có thể publish sang topic khác (chain), hoặc tới <b>reply queue</b> mà sender gốc consume."></span>
+      <p class="say" style="font-size:18px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== BROKERS ===================== -->
+<section class="slide" id="broker">
+  <div class="hdr in"><span class="qn">16</span><h2>Message brokers</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:24px">
+    <div>
+      <div class="card"><span class="lbl bad">TRƯỚC ĐÂY · COMMERCIAL</span><div class="chips" style="margin-top:6px"><span class="chip">TIBCO</span><span class="chip">IBM WebSphere</span><span class="chip">webMethods</span></div></div>
+      <div class="card f" style="margin-top:12px"><span class="lbl good">GẦN ĐÂY · OPEN SOURCE</span><div class="chips" style="margin-top:6px"><span class="chip p">RabbitMQ</span><span class="chip c">ActiveMQ</span><span class="chip k">HornetQ</span><span class="chip y">NATS</span><span class="chip g">Apache Kafka</span></div><p class="ps muted" style="margin-top:8px">So sánh chi tiết ở Chapter 11.</p></div>
+    </div>
+    <div class="stack">
+      <div class="leg a f"><b>Không enforce data model</b><p>Message chỉ là <b>sequence of bytes + metadata</b> → dùng encoding format nào cũng được.</p></div>
+      <div class="leg b f"><b>Backward + forward compatible</b><p>⇒ linh hoạt nhất: đổi publishers và consumers <b>độc lập</b>, deploy theo <b>bất kỳ thứ tự</b> nào.</p></div>
+      <div class="leg c f"><b>Cẩn thận khi republish</b><p>Consumer republish sang topic khác cần <b>giữ unknown fields</b> — tránh lỗi như Figure 4-7.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ACTORS ===================== -->
+<section class="slide" id="actors">
+  <div class="hdr in"><span class="qn">16</span><h2>Distributed actor frameworks</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr;gap:24px">
+    <div>
+      <p class="ps" style="font-size:18px"><b>Actor model</b>: programming model cho concurrency trong một process. Thay vì threads (race conditions, locking, deadlock), logic nằm trong <b>actors</b> — mỗi actor có local state riêng, giao tiếp bằng <b>asynchronous messages</b>, xử lý <b>một message một lúc</b>. Message delivery <b>không được đảm bảo</b>.</p>
+      <div class="note blue" style="font-size:17px"><b>Distributed</b>: cùng cơ chế message-passing dù sender/recipient cùng node hay khác node. <b>Location transparency</b> hợp với actor model hơn RPC, vì actor model vốn đã giả định message có thể mất.</div>
+      <p class="ps muted" style="margin-top:8px">Rolling upgrade vẫn cần forward &amp; backward compatibility: message có thể đi từ node mới sang node cũ và ngược lại.</p>
+    </div>
+    <div class="stack">
+      <div class="card f"><h3>Akka</h3><p class="ps">Mặc định dùng Java built-in serialization — <b>không</b> forward/backward compat. Thay bằng <b>Protocol Buffers</b> ⇒ rolling upgrade được.</p></div>
+      <div class="card f"><h3 style="color:#0891b2">Orleans</h3><p class="ps">Custom encoding mặc định không hỗ trợ rolling upgrade: phải dựng <b>cluster mới</b>, chuyển traffic, tắt cluster cũ. Có custom serialization plug-ins.</p></div>
+      <div class="card f"><h3 style="color:#db2777">Erlang OTP</h3><p class="ps">Đổi record schema <b>khó bất ngờ</b>; rolling upgrade được nhưng phải lên kế hoạch kỹ. <b>maps</b> datatype (R17, 2014) có thể giúp.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="slide" id="end">
+  <div class="title-wrap" style="align-items:center;text-align:center">
+    <div class="orb" style="width:360px;height:360px;background:#f9a8d4;left:10%;top:10%"></div>
+    <h1 class="in" style="font-size:56px">Tóm tắt <span class="grad">Chapter 4</span></h1>
+    <p class="in muted" style="font-size:18px;margin-top:8px;max-width:1080px"><b>Rolling upgrades</b> cho phép release không downtime và ít rủi ro ⇒ mọi data trong hệ thống cần <b>backward</b> (new code đọc old data) và <b>forward</b> (old code đọc new data) compatibility.</p>
+    <div class="cols3 in" style="margin-top:18px;text-align:left;max-width:1200px">
+      <div class="card"><h3>🔒 Language-specific</h3><p class="ps">Bó buộc một ngôn ngữ, thường không có forward/backward compatibility.</p></div>
+      <div class="card"><h3>📝 JSON · XML · CSV</h3><p class="ps">Phổ biến; compatibility tùy cách dùng. Schema optional; mơ hồ về numbers và binary strings.</p></div>
+      <div class="card"><h3>⚡ Thrift · protobuf · Avro</h3><p class="ps">Compact, compatibility semantics rõ ràng, schema = docs + code gen. Nhược điểm: phải decode mới đọc được.</p></div>
+    </div>
+    <div class="chips in" style="margin-top:16px;justify-content:center"><span class="chip p">🗄️ Databases: writer encode · reader decode</span><span class="chip c">🔁 RPC / REST: client ⇄ server</span><span class="chip k">📨 Async messages: sender → recipient</span></div>
+    <p class="in muted" style="font-size:18px;margin-top:16px">“May your application’s evolution be rapid and your deployments be frequent.” · Part II → Distributed Data</p>
+  </div>
+</section>
+
+</div></div>
+<div id="bar"></div>
+<div id="hint">← → / Space: từng bước · Shift+→: qua slide · A: hiện hết · Home: đầu · F: toàn màn hình</div>
+<div id="nav"><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+<script>
+(function(){
+  // ---------- IDL highlighter ----------
+  const KW=new Set("if else for while do return break continue switch case default struct class using namespace const static new delete true false sizeof public private include pragma auto message required optional repeated record union null".split(" "));
+  const TY=new Set("int double float char void bool long short unsigned string i64 int64 list array".split(" "));
+  const LIB=new Set("cout cin endl sqrt fabs std".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line){
+    if(/^\s*#/.test(line)) return '<span class="p">'+esc(line)+'</span>';
+    const re=/(\/\/.*$)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="n">'+m[3]+'</span>';
+      else if(m[4]){
+        const w=m[4];
+        let cls=KW.has(w)?"k":TY.has(w)?"t":LIB.has(w)?"fn":(m[5]?"fn":"");
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[5]?esc(m[5]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-cpp"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");const [a,b]=r.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+  // ---------- deck engine ----------
+  // .f fragments, shown one per step. Per fragment:
+  //   data-act  "sel|cls;…"   class kept while the fragment is shown
+  //   data-now  "sel|cls;…"   class only while it is the latest fragment
+  //   data-set  "sel::html;…" content set while shown (later fragments win)
+  //   data-say  narration for the .say line
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")].sort((x,y)=>(+x.dataset.o||0)-(+y.dataset.o||0)); // data-o: show later
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  const pairs=(v,sep)=>(v||"").split(";").filter(Boolean).map(p=>{const k=p.indexOf(sep);return [p.slice(0,k).trim(),p.slice(k+sep.length)]});
+  function tog(v,on){pairs(v,"|").forEach(([sel,cls])=>{document.querySelectorAll(sel).forEach(t=>t.classList.toggle(cls,on))})}
+  // remember original content of every data-set target
+  document.querySelectorAll("[data-set]").forEach(f=>pairs(f.dataset.set,"::").forEach(([sel])=>{document.querySelectorAll(sel).forEach(t=>{if(t.dataset.orig===undefined)t.dataset.orig=t.innerHTML})}));
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach(f=>{tog(f.dataset.now,false);tog(f.dataset.act,false)});
+      s.querySelectorAll("[data-orig]").forEach(t=>t.innerHTML=t.dataset.orig);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step);f.classList.toggle("on",on);if(on){tog(f.dataset.act,true);pairs(f.dataset.set,"::").forEach(([sel,val])=>document.querySelectorAll(sel).forEach(t=>t.innerHTML=val))}});
+      if(i===cur&&step>0)tog(fs[step-1].dataset.now,true);
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.innerHTML=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length;
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    try{history.replaceState(null,"","#"+slides[cur].id)}catch(e){}
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+  addEventListener("keydown",e=>{
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+
+</script>
+</body>
+</html>

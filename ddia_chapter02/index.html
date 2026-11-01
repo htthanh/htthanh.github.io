@@ -1,0 +1,1859 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DDIA Chapter 2 · Data Models and Query Languages</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+h1{font-size:70px;line-height:1.1;font-weight:800}
+h2{font-size:38px;line-height:1.2;font-weight:800}
+h3{font-size:23px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:22px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:26px;margin:6px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.88em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 6px;border-radius:6px;color:#be185d}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.cols.c64{grid-template-columns:1.25fr 1fr}.cols.c46{grid-template-columns:1fr 1.2fr}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.card.bad{border-color:#fecdd3;background:linear-gradient(180deg,#fff1f3,#fff)}
+.card.good{border-color:#a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff)}
+.lbl{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
+.icon{font-size:34px;margin-bottom:4px}
+.note{margin-top:12px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:20px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.code{font-family:var(--mono);font-size:18px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
+.code.sm{font-size:16.5px}.code.xs{font-size:15px;line-height:1.45}.code.xxs{font-size:13.6px;line-height:1.38;padding:8px 0}
+.code .ln{padding:0 14px 0 8px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.11);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.13);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
+.code-title{font-family:var(--mono);font-size:15px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+.f.zoom{transform:scale(.85)}.f.zoom.on{transform:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:19px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.legend{display:flex;flex-direction:column;gap:10px}
+.leg{border-radius:12px;padding:10px 16px;background:#fff;border:1px solid var(--line)}
+.leg b{display:block;font-size:21px;margin-bottom:2px}
+.leg p{font-size:19px}
+.leg.a{border-left:6px solid #7c3aed}.leg.b{border-left:6px solid #06b6d4}.leg.c{border-left:6px solid #f59e0b}
+.console{font-family:var(--mono);font-size:17px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.mem{display:flex;align-items:center;gap:16px;min-height:130px}
+.frame{border:2px solid #e4dcfb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
+.frame .fname{font-family:var(--mono);font-size:16px;color:var(--muted);margin-bottom:6px}
+.var{display:flex;align-items:center;gap:10px}
+.vn{font-family:var(--mono);font-size:21px;color:var(--t);font-weight:600}
+.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #c4b5fd;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
+.vb .new{display:none}
+.callee,.arw{opacity:0;transform:translateX(-14px);transition:all .5s}
+.mem.s1 .callee,.mem.s1 .arw{opacity:1;transform:none}
+.mem.s2 .chg .old{display:none}.mem.s2 .chg .new{display:inline;animation:pop .5s}
+.mem.s2 .chg{border-color:#f59e0b;box-shadow:0 0 18px rgba(245,158,11,.5)}
+.mem.s3 .callee,.mem.s3 .arw{opacity:.15;transform:translateY(10px)}
+.mem.s3 .result{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.5)}
+.arw{font-family:var(--mono);font-size:16px;color:var(--gold);text-align:center;line-height:1.2;font-weight:600}
+.arw .bar{display:block;font-size:30px}
+.alias{font-size:18px;color:var(--accent2);font-weight:600}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.25)}100%{transform:none;opacity:1}}
+.flow{display:flex;align-items:center;gap:12px;justify-content:center}
+.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:18px;border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:14px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.h{border-color:var(--gold)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#c4b5fd}.box.exe{border-color:#ec4899;background:#fdf2f8}
+.ar{color:var(--muted);font-size:26px;text-align:center}
+.stack{display:flex;flex-direction:column;gap:8px}
+svg text{font-family:var(--mono);font-weight:600}
+.draw{stroke-dasharray:400;stroke-dashoffset:400;transition:stroke-dashoffset 1s ease}
+svg.d1 .dr1,svg.d2 .dr2,svg.d3 .dr3{stroke-dashoffset:0}
+.fadein{opacity:0;transition:opacity .6s}
+svg.d1 .fd1,svg.d2 .fd2,svg.d3 .fd3{opacity:1}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:19px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05)}
+.ag:hover{border-color:#ec4899;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
+.ag b{color:#db2777;margin-right:6px;font-family:var(--mono)}
+.formula{font-family:var(--mono);font-size:23px;text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:16px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+@media (max-width:700px){#hint{display:none}}
+@media print{#nav,#bar,#hint{display:none}}
+
+/* lec03 additions */
+.chain{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pv{display:inline-flex;align-items:center;font-family:var(--mono);font-size:18px;font-weight:700;padding:5px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;white-space:nowrap}
+.pv.yes{background:#d1fae5;border-color:#34d399;color:#047857}
+.pv.no{background:#ffe4e6;border-color:#fb7185;color:#be123c}
+.pv.skip{background:#f1f5f9;border-color:#cbd5e1;color:#94a3b8;text-decoration:line-through;border-style:dashed}
+.op{font-family:var(--mono);font-size:26px;font-weight:800;color:var(--sa1)}
+.tt th,.tt td{text-align:center}.tt td:first-child{color:var(--text);font-weight:400}
+.tt tr.hit td{background:#fdf2f8;color:#be185d}
+tr.f{transform:none}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.code.show-s .mark-s{opacity:.3;text-decoration:line-through}
+.arr{display:flex;gap:12px;justify-content:center;margin-top:6px}
+.cell{width:84px;height:84px;border-radius:16px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:800;transition:all .45s;box-shadow:0 6px 16px -10px rgba(124,58,237,.4)}
+.cell small{font-size:13px;color:var(--muted);font-weight:600}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857;transform:translateY(-6px)}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;transform:translateY(-10px) scale(1.06);box-shadow:0 10px 24px -8px rgba(225,29,72,.5)}
+.cell.skip{opacity:.3;transform:scale(.92)}
+.syn{display:flex;gap:12px;align-items:center;justify-content:center;font-family:var(--mono);font-size:24px;font-weight:700}
+.sy{padding:8px 16px;border-radius:12px;color:#fff}
+.sy.c1{background:linear-gradient(135deg,#7c3aed,#a855f7)}.sy.c2{background:linear-gradient(135deg,#059669,#10b981)}.sy.c3{background:linear-gradient(135deg,#e11d48,#f97316)}
+.spin{display:inline-block;animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* lec04 arrays additions */
+.cell .v{display:block;line-height:1}
+.cell.max{border-color:#db2777;background:#fdf2f8;color:#be185d}
+.cell.empty{border-style:dashed;background:#f8fafc;color:#cbd5e1;box-shadow:none}
+.cell.done{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cell.new{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.cell.out{opacity:.4;border-style:dashed}
+.cell.gone{border-color:#e11d48;background:#fff1f3;color:#be123c;text-decoration:line-through}
+.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(245,158,11,.55)}
+.cell.cmp{border-color:#0891b2;background:#ecfeff;color:#0e7490;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(8,145,178,.5)}
+.cell.dots{border:none;box-shadow:none;background:none;width:40px;color:var(--muted)}
+.arr.sm .cell{width:70px;height:74px;font-size:24px;border-radius:14px}
+.arr.xs .cell{width:56px;height:62px;font-size:19px;border-radius:12px}
+.arr.xs .cell small{font-size:11.5px}
+.arr.left{justify-content:flex-start}
+.addr{display:flex;gap:12px;justify-content:center;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.addr span{width:84px;text-align:center}
+.vars{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.vc{font-family:var(--mono);font-size:19px;font-weight:700;padding:5px 14px;border-radius:12px;background:#fff;border:2px solid #e4dcfb;transition:all .35s}
+.vc b{color:var(--t)}
+.vc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.45)}
+.vc.res{border-color:#10b981;background:#ecfdf5;color:#047857}
+.ci{opacity:0;transition:opacity .4s}.ci.show{opacity:1}
+.say{font-size:20px;margin-top:12px;min-height:56px;color:var(--muted)}
+.say b{color:var(--text)}
+.rowlbl{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted);margin:10px 0 4px}
+.zone{display:flex;gap:6px;justify-content:center;margin-top:8px;font-size:15px;font-weight:700}
+.zone span{padding:3px 10px;border-radius:999px}
+.z1{background:#d1fae5;color:#047857}.z2{background:#f1f5f9;color:#64748b}.z3{background:#ffe4e6;color:#be123c}
+.brace{display:flex;gap:12px;justify-content:center;margin-top:4px}
+.brace div{border-top:3px solid currentColor;padding-top:4px;text-align:center;font-family:var(--mono);font-size:15px;font-weight:700}
+.mx{display:grid;gap:6px;justify-content:center}
+.mc{width:62px;height:52px;border-radius:10px;border:2px solid #e4dcfb;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .4s}
+.mx.sm .mc{width:44px;height:36px;font-size:14px;border-radius:8px}
+.mc.ix{border:none;background:none;color:var(--muted);font-size:14px;font-weight:600;box-shadow:none}
+.mc.unused{border-style:dashed;background:#f8fafc;color:#cbd5e1}
+.mc.used{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.mc.hl{background:#fffbeb;border-color:#fcd34d}
+.mc.cur{border-color:#f59e0b;background:#fde68a;color:#92400e;transform:scale(1.12);box-shadow:0 8px 20px -6px rgba(245,158,11,.6)}
+.mc.bd{border-color:#ec4899;border-width:3px}
+.mc.inr{opacity:.3}
+.mc.pos{border-color:#10b981;background:#d1fae5;color:#047857}
+.mc.neg{background:#fff1f3;color:#be123c}
+.mc.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;border-style:dashed}
+.strip{display:flex;gap:3px;font-family:var(--mono);font-size:12px;flex-wrap:nowrap;overflow:hidden}
+.strip span{padding:6px 5px;border-radius:5px;background:#f3edff;color:#6d28d9;white-space:nowrap}
+.strip span.r1{background:#e0f2fe;color:#0369a1}
+.strip span.gap{background:none;color:var(--muted)}
+.trace td,.trace th{font-size:17px;padding:5px 10px}
+.trace td:first-child{color:var(--text)}
+.trace tr.now td{background:#fffbeb}
+.sig{font-family:var(--mono);font-size:17px;background:#fff;border:1px dashed #c4b5fd;border-radius:10px;padding:6px 12px;color:#6d28d9;display:inline-block}
+
+.cols>*{min-width:0}
+
+/* ===== DDIA ch1 additions ===== */
+.sv{width:100%;height:auto;overflow:visible}
+.sv text{font-family:"Be Vietnam Pro",system-ui,sans-serif;font-weight:700;font-size:15px;fill:#1e1b3a}
+.sv text.sm{font-size:12.5px;fill:#64607d;font-weight:500}
+.sv text.lb{font-size:12.5px;fill:#7c3aed;font-weight:700}
+.sv .nd{fill:#fff;stroke:#c4b5fd;stroke-width:2}
+.sv .nd.c2{stroke:#0891b2}.sv .nd.c3{stroke:#ec4899}.sv .nd.c4{stroke:#f59e0b}.sv .nd.c5{stroke:#10b981}
+.sv .ln{stroke:#a78bfa;stroke-width:2.2;fill:none}
+.sv .g{opacity:0;transition:opacity .55s}
+.sv .g.hot .ln{stroke:#ec4899;stroke-dasharray:7 6;animation:dash .7s linear infinite}
+.sv .g.hot .nd{filter:drop-shadow(0 6px 10px rgba(236,72,153,.35))}
+@keyframes dash{to{stroke-dashoffset:-13}}
+.sv .box6{fill:none;stroke:#ec4899;stroke-width:2.5;stroke-dasharray:9 7}
+.chip{display:inline-flex;align-items:center;gap:8px;font-size:18px;font-weight:600;padding:6px 14px;border-radius:999px;background:#fff;border:2px solid #e4dcfb;white-space:nowrap}
+.chip.p{border-color:#c4b5fd;background:#f5f0ff;color:#6d28d9}.chip.c{border-color:#a5f3fc;background:#ecfeff;color:#0e7490}.chip.k{border-color:#fbcfe8;background:#fdf2f8;color:#be185d}.chip.y{border-color:#fde68a;background:#fffbeb;color:#b45309}.chip.g{border-color:#a7f3d0;background:#ecfdf5;color:#047857}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.cell.t{font-size:15px;font-weight:700;text-align:center;line-height:1.15;padding:4px}
+.cell.t .v{font-size:15px}
+.cell.big{font-size:30px}
+.stat{font-family:var(--mono);font-size:44px;font-weight:800;line-height:1;background:linear-gradient(90deg,var(--sa1),var(--sa2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat small{font-size:18px}
+.sysbox{border-radius:14px;padding:12px 16px;text-align:center;font-weight:700;font-size:20px;border:2px solid #e4dcfb;background:#fff;transition:all .45s}
+.sysbox.fail{border-color:#e11d48;background:#fff1f3;color:#be123c;box-shadow:0 0 22px rgba(225,29,72,.35)}
+.sysbox.ok{border-color:#10b981;background:#ecfdf5;color:#047857;box-shadow:0 0 22px rgba(16,185,129,.3)}
+.shield{opacity:0;transform:scale(.7);transition:all .45s;font-size:15px;font-weight:700;color:#7c3aed;text-align:center;border:2px dashed #a78bfa;border-radius:12px;padding:6px 10px;background:#f5f0ff}
+.shield.on{opacity:1;transform:none}
+.dots{display:grid;grid-template-columns:repeat(25,1fr);gap:5px;padding:12px;background:#fff;border:1px solid var(--line);border-radius:14px}
+.dots i{display:block;aspect-ratio:1;border-radius:4px;background:#e9e3fb;transition:all .4s}
+.dots i.x{background:#e11d48;transform:scale(1.35);box-shadow:0 0 10px rgba(225,29,72,.6)}
+.dots i.r{background:#10b981}
+.node{width:110px;border-radius:14px;border:2.5px solid #c4b5fd;background:#fff;text-align:center;padding:8px 4px;font-weight:700;transition:all .45s}
+.node .ver{display:block;font-family:var(--mono);font-size:22px;color:#6d28d9}
+.node small{display:block;font-size:13px;color:var(--muted);font-weight:600}
+.node.down{border-color:#f59e0b;background:#fffbeb;opacity:.55;transform:translateY(8px)}
+.node.v2{border-color:#10b981;background:#ecfdf5}.node.v2 .ver{color:#047857}
+.node.bad{border-color:#e11d48;background:#fff1f3;color:#be123c}.node.bad .ver{color:#be123c}
+.nodes{display:flex;gap:14px;justify-content:center}
+.casc{display:flex;align-items:center;gap:6px;justify-content:center}
+.casc .ar{font-size:22px}
+.tw{display:inline-block;font-size:13px;font-weight:700;padding:2px 8px;border-radius:6px;background:#fdf2f8;color:#be185d;border:1px solid #fbcfe8;margin:2px;opacity:0;transform:translateY(-10px) scale(.6);transition:all .45s}
+.tw.show{opacity:1;transform:none}
+.tw.b{background:#ecfeff;color:#0e7490;border-color:#a5f3fc}
+.tw.y{background:#fffbeb;color:#b45309;border-color:#fde68a}
+.mbox{border:2px solid #e4dcfb;border-radius:12px;background:#fff;padding:6px 8px;min-height:84px;transition:all .4s}
+.mbox h4{font-size:14px;color:var(--muted);margin-bottom:4px}
+.mbox.hot{border-color:#0891b2;box-shadow:0 0 16px rgba(8,145,178,.35)}
+.mboxes{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.who{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:18px;padding:8px 14px;border-radius:12px;background:#fff;border:2px solid #fbcfe8}
+.big-ar{font-size:30px;color:var(--muted);text-align:center;line-height:1}
+.rt{display:flex;height:58px;border-radius:12px;overflow:hidden;border:2px solid #e4dcfb;background:#fff}
+.rt>div{display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;opacity:0;transition:opacity .45s;white-space:nowrap}
+.rt>div.show{opacity:1}
+.rt .n1,.rt .n2{background:#94a3b8}.rt .q{background:#f59e0b}.rt .sv2{background:#7c3aed}
+.brk{position:relative;height:44px;margin-top:6px}
+.brk>div{position:absolute;top:0;border-top:3px solid;text-align:center;font-size:15px;font-weight:700;padding-top:4px;opacity:0;transition:opacity .45s}
+.brk>div.show{opacity:1}
+.pc rect.b{fill:#c4b5fd;transform:translateX(var(--x0));transition:transform 1.3s cubic-bezier(.6,0,.2,1) calc(var(--d)*7ms),fill .4s}
+.pc.sorted rect.b{transform:translateX(var(--x1))}
+.pc.p95 rect.t95{fill:#f472b6}.pc.p99 rect.t99{fill:#e11d48}
+.pc .mk{opacity:0;transition:opacity .5s}
+.pc.mean .mkm,.pc.p50 .mk50,.pc.p95 .mk95,.pc.p99 .mk99{opacity:1}
+.pc text{font-family:var(--mono);font-size:12px;font-weight:700}
+.q-row{display:flex;gap:8px;align-items:center}
+.rq{height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;font-weight:700;color:#fff;transition:all .5s}
+.rq.slow{width:190px;background:linear-gradient(135deg,#e11d48,#f97316)}
+.rq.fast{width:54px;background:linear-gradient(135deg,#0891b2,#7c3aed)}
+.rq.wait{box-shadow:0 0 0 3px #fde68a;animation:shake .5s infinite}
+.rq.done{opacity:.25}
+@keyframes shake{50%{transform:translateY(-3px)}}
+.srv{border:2.5px solid #7c3aed;border-radius:14px;padding:10px 14px;text-align:center;font-weight:800;background:#f5f0ff;min-width:120px}
+.be{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;margin:6px 0}
+.be .nm{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted)}
+.be .trk{height:26px;border-radius:8px;background:#f5f3ff;position:relative;overflow:hidden}
+.be .bb{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:8px;background:linear-gradient(90deg,#0891b2,#7c3aed);transition:width 1s ease}
+.be .bb.slow{background:linear-gradient(90deg,#f97316,#e11d48)}
+.run .be .bb{width:var(--w)}
+.mach{border:3px solid #7c3aed;border-radius:14px;background:#f5f0ff;display:flex;align-items:center;justify-content:center;font-weight:800;color:#6d28d9;transition:all .7s cubic-bezier(.2,.8,.2,1);width:90px;height:70px;font-size:15px;text-align:center}
+.mach.big{width:220px;height:170px;font-size:22px;border-width:5px;box-shadow:0 14px 30px -12px rgba(124,58,237,.6)}
+.mach.sm2{width:70px;height:56px;font-size:13px;border-color:#0891b2;background:#ecfeff;color:#0e7490;opacity:0;transform:scale(.5)}
+.mach.sm2.show{opacity:1;transform:none}
+.farm{display:grid;grid-template-columns:repeat(4,70px);gap:10px;justify-content:center}
+.layer{border-radius:12px;padding:10px 14px;font-weight:700;font-size:17px;text-align:center;transition:all .6s}
+.layer.top{background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;font-size:20px}
+.layer.hid{background:#f8fafc;border:2px dashed #cbd5e1;color:#64748b;font-weight:600;font-size:16px}
+.abs.cover .layer.hid{opacity:.25;filter:blur(1.5px)}
+.toggle{display:flex;gap:10px;align-items:center;justify-content:center}
+.pill{padding:8px 16px;border-radius:999px;font-weight:800;font-size:17px;border:2px solid #e4dcfb;background:#fff;transition:all .4s;color:var(--muted)}
+.pill.on{background:linear-gradient(135deg,var(--sa1),var(--sa2));color:#fff;border-color:transparent;transform:scale(1.06)}
+.quote{font-size:21px;line-height:1.45;font-style:italic;color:#4c4672;border-left:5px solid #ec4899;padding:8px 18px;background:rgba(255,255,255,.7);border-radius:8px}
+.quote b{font-style:normal}
+.mini li{font-size:18px;margin:3px 0;line-height:1.35}
+.card p.ps,p.ps{font-size:17px;line-height:1.4}
+.vs{font-weight:800;font-size:22px;color:var(--muted);align-self:center;text-align:center}
+.here{display:inline-block;font-size:13px;font-weight:800;color:#fff;background:#e11d48;border-radius:6px;padding:2px 8px;margin-left:6px;opacity:0;transition:opacity .4s}
+.here.show{opacity:1}
+.cols4>.card.lit{box-shadow:0 0 0 3px #ec4899,0 12px 26px -10px rgba(236,72,153,.5);transform:translateY(-4px)}
+.card{transition:all .4s}
+
+.chip.c,.leg.c{font-style:normal}.leg.c{color:var(--text)}.leg.c b{color:var(--text)}
+.leg p b{display:inline;font-size:inherit;margin:0}
+.toggle .pill{font-size:15px;white-space:nowrap}
+.abs.cover .layer.hid{opacity:.4;filter:blur(1px)}
+.mach.big{width:260px;font-size:21px}
+.sv text.lb,.pc text{paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+.sv.s1 .g1{opacity:1}.sv.s2 .g2{opacity:1}.sv.s3 .g3{opacity:1}.sv.s4 .g4{opacity:1}.sv.s5 .g5{opacity:1}.sv.s6 .g6{opacity:1}.sv.s7 .g7{opacity:1}.sv.s8 .g8{opacity:1}.who.hot{border-color:#ec4899;box-shadow:0 0 18px rgba(236,72,153,.45)}.toggle.flip #ev1{background:#fff;color:var(--muted);border-color:#e4dcfb;transform:none}.toggle.flip #ev2{background:linear-gradient(135deg,var(--sa1),var(--sa2));color:#fff;border-color:transparent;transform:scale(1.06)}.dots{grid-template-columns:repeat(50,1fr);gap:3px}.dots i{border-radius:2px}
+/* ===== DDIA ch2 additions ===== */
+.lay{display:flex;flex-direction:column;gap:10px}
+.lyr{display:grid;grid-template-columns:54px 1fr;gap:14px;align-items:center;border-radius:14px;padding:10px 16px;background:#fff;border:2px solid #e4dcfb;transition:all .5s;opacity:.25;transform:translateX(-12px)}
+.lyr.on{opacity:1;transform:none}
+.lyr .ix{font-family:var(--mono);font-size:26px;font-weight:800;color:#fff;border-radius:12px;width:54px;height:54px;display:flex;align-items:center;justify-content:center}
+.lyr b{font-size:20px;display:block}.lyr p{font-size:16.5px;color:var(--muted);line-height:1.35}
+.lyr.l1 .ix{background:linear-gradient(135deg,#7c3aed,#a855f7)}.lyr.l2 .ix{background:linear-gradient(135deg,#ec4899,#f97316)}.lyr.l3 .ix{background:linear-gradient(135deg,#0891b2,#06b6d4)}.lyr.l4 .ix{background:linear-gradient(135deg,#059669,#10b981)}
+.lyr.l2.on{border-color:#ec4899;box-shadow:0 0 0 3px rgba(236,72,153,.18),0 14px 30px -14px rgba(236,72,153,.6)}
+.lyr.hl{border-color:#f59e0b;box-shadow:0 0 18px rgba(245,158,11,.4)}
+.tl{position:relative;display:grid;grid-template-columns:repeat(7,1fr);gap:8px;padding-top:34px}
+.tl::before{content:"";position:absolute;left:0;right:0;top:15px;height:4px;border-radius:4px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316)}
+.tli{position:relative;text-align:center;opacity:.18;transition:all .5s;transform:translateY(10px)}
+.tli.on{opacity:1;transform:none}
+.tli::before{content:"";position:absolute;top:-27px;left:50%;width:18px;height:18px;margin-left:-9px;border-radius:50%;background:#fff;border:4px solid var(--c,#7c3aed)}
+.tli .yr{font-family:var(--mono);font-weight:800;font-size:17px;color:var(--c,#7c3aed)}
+.tli .ev{font-size:15px;line-height:1.3;font-weight:600;margin-top:4px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 6px}
+.tli.dead .ev{text-decoration:line-through;color:#94a3b8}
+.tli.win .ev{border-color:#7c3aed;background:#f5f0ff}
+.dt{border-collapse:separate;border-spacing:0;font-size:14px;border:2px solid #e4dcfb;border-radius:10px;overflow:hidden;background:#fff;width:auto;transition:all .45s}
+.dt caption{font-family:var(--mono);font-weight:800;font-size:14px;text-align:left;padding:0 0 3px 2px;color:#6d28d9}
+.dt th,.dt td{padding:3px 8px;font-size:13.5px;border-bottom:1px solid var(--line);font-family:var(--mono);white-space:nowrap;line-height:1.3}
+.dt td:first-child{color:var(--text);font-weight:400}
+.dt th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+.dt .fk{color:#db2777;font-weight:700}.dt .pk{color:#7c3aed;font-weight:800}
+.dt.hot{border-color:#ec4899;box-shadow:0 0 18px rgba(236,72,153,.35)}
+.dt.dim{opacity:.3}
+.dt tr.hot td{background:#fdf2f8}
+.dts{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}
+.qbadge{display:inline-flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:800;color:#fff;background:#e11d48;border-radius:999px;padding:2px 9px;margin-left:6px;opacity:0;transform:scale(.4);transition:all .35s}
+.qbadge.show{opacity:1;transform:none}
+.qbadge.g{background:#10b981}
+.spec{position:relative;height:64px;border-radius:14px;background:linear-gradient(90deg,#ecfeff,#f5f0ff 50%,#fdf2f8);border:2px solid #e4dcfb}
+.spec .mk{position:absolute;top:50%;transform:translate(-50%,-50%) scale(.6);opacity:0;transition:all .5s;font-weight:800;font-size:16px;padding:7px 14px;border-radius:999px;color:#fff;white-space:nowrap}
+.spec .mk.show{opacity:1;transform:translate(-50%,-50%)}
+.spec-ax{display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:var(--muted);margin-top:6px}
+.navdemo{display:flex;flex-direction:column;gap:4px;font-size:16px}
+.navdemo .it{padding:5px 10px;border-radius:8px;border:2px solid var(--line);background:#fff;transition:all .35s;font-weight:600}
+.navdemo .it small{display:block;font-weight:400;font-size:12.5px;color:var(--muted)}
+.navdemo .it.sel{border-color:#c4b5fd}
+.navdemo .it.blue{background:#2563eb;color:#fff;border-color:#2563eb}.navdemo .it.blue small{color:#dbeafe}
+.navdemo .it.stuck{background:#2563eb;color:#fff;border-color:#e11d48;box-shadow:0 0 0 3px rgba(225,29,72,.3)}.navdemo .it.stuck small{color:#dbeafe}
+.mr{display:grid;grid-template-columns:1.15fr 30px 1fr 30px .9fr 30px .7fr;align-items:center;gap:6px}
+.mr .col{display:flex;flex-direction:column;gap:8px}
+.doc{font-family:var(--mono);font-size:12.5px;line-height:1.35;background:#fff;border:2px solid #e4dcfb;border-radius:10px;padding:6px 9px;transition:all .45s;white-space:pre}
+.doc.hot{border-color:#0891b2;box-shadow:0 0 14px rgba(8,145,178,.35)}
+.kv{font-family:var(--mono);font-size:15px;font-weight:700;padding:6px 10px;border-radius:10px;background:#fffbeb;border:2px solid #fde68a;color:#b45309;text-align:center;opacity:0;transform:scale(.6);transition:all .45s}
+.kv.show{opacity:1;transform:none}
+.kv.res{background:#ecfdf5;border-color:#34d399;color:#047857;font-size:20px}
+.mr .ar{opacity:.25;transition:opacity .4s}.mr .ar.show{opacity:1;color:var(--sa1)}
+.tri{display:flex;gap:8px;align-items:center;font-family:var(--mono);font-size:17px;font-weight:700}
+.tri span{padding:6px 12px;border-radius:10px;border:2px solid}
+.tri .s1{background:#f5f0ff;border-color:#c4b5fd;color:#6d28d9}.tri .p1{background:#fdf2f8;border-color:#fbcfe8;color:#be185d}.tri .o1{background:#ecfeff;border-color:#a5f3fc;color:#0e7490}.tri .o2{background:#ecfdf5;border-color:#a7f3d0;color:#047857}
+.tri-l{font-size:12px;font-family:"Be Vietnam Pro",system-ui,sans-serif;font-weight:700;color:var(--muted);text-align:center;margin-top:2px}
+.fact{font-family:var(--mono);font-size:15px;padding:4px 10px;border-radius:8px;background:#fff;border:1.5px solid var(--line);margin:3px 0;transition:all .4s}
+.fact.use{border-color:#0891b2;background:#ecfeff}
+.fact.der{opacity:0;transform:translateX(-10px);border-color:#a7f3d0;background:#ecfdf5;color:#047857;font-weight:700}
+.fact.der.show{opacity:1;transform:none}
+.fact.der.hot{box-shadow:0 0 0 3px rgba(16,185,129,.3)}
+.fact.ans{border-color:#ec4899;background:#fdf2f8;color:#be185d;font-weight:800}
+.rule{font-family:var(--mono);font-size:12.6px;padding:5px 10px;border-radius:8px;border:1.5px dashed #c4b5fd;background:#faf8ff;transition:all .35s;line-height:1.35;white-space:pre}
+.rule.hot{border-style:solid;border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.35)}
+.sv .e{stroke:#a78bfa;stroke-width:2;fill:none;transition:stroke .4s,opacity .4s}
+.sv .e.bi{stroke:#ec4899}
+.sv .e.li{stroke:#0891b2}
+.sv .e.mr{stroke:#f59e0b;stroke-dasharray:5 4}
+.sv text.el{font-size:11px;font-weight:700;fill:#7c3aed;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+.sv text.el.bi{fill:#db2777}.sv text.el.li{fill:#0e7490}.sv text.el.mr{fill:#b45309}
+.sv .nd.per{fill:#fdf2f8;stroke:#ec4899}
+.sv text.ty{font-size:10.5px;fill:#64607d;font-weight:500}
+.sv .pth{transition:all .4s}
+.sv.dimall .e,.sv.dimall .nd,.sv.dimall text{opacity:.28}
+.sv.hp1 .p1,.sv.hp2 .p2,.sv.hp3 .p3{opacity:1!important}
+.sv.hp1 .e.p1,.sv.hp2 .e.p2,.sv.hp3 .e.p3{stroke:#e11d48;stroke-width:3.2;stroke-dasharray:7 6;animation:dash .7s linear infinite}
+.sv.hp1 .nd.p1,.sv.hp2 .nd.p2,.sv.hp3 .nd.p3{stroke:#e11d48;stroke-width:3;fill:#fff1f3}
+.setbox{display:flex;flex-wrap:wrap;gap:6px;min-height:40px;padding:6px 8px;border:2px dashed #c4b5fd;border-radius:10px;background:#faf8ff}
+.setbox .tw{font-size:13px}
+.vs2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lines-big{font-family:var(--mono);font-weight:800;font-size:46px;line-height:1}
+.diff td{font-size:16.5px}
+.diff td:nth-child(2){color:#be123c}.diff td:nth-child(3){color:#047857}
+.diff tr.f{transform:none}
+.cores{display:flex;gap:8px}
+.core{flex:1;border:2px solid #e4dcfb;border-radius:10px;padding:6px;text-align:center;font-family:var(--mono);font-size:13px;font-weight:700;background:#fff;transition:all .4s}
+.core.busy{border-color:#10b981;background:#ecfdf5;color:#047857}
+.core.idle{color:#cbd5e1;border-style:dashed}
+.recs{display:flex;gap:6px;flex-wrap:wrap}
+.rec{font-size:13.5px;font-weight:700;padding:5px 9px;border-radius:8px;background:#fff;border:2px solid #e4dcfb;transition:all .6s cubic-bezier(.2,.8,.2,1)}
+.rec.sh{border-color:#0891b2;background:#ecfeff;color:#0e7490}
+.recs.shuf .rec:nth-child(1){order:4}.recs.shuf .rec:nth-child(2){order:1}.recs.shuf .rec:nth-child(3){order:6}.recs.shuf .rec:nth-child(4){order:2}.recs.shuf .rec:nth-child(5){order:5}.recs.shuf .rec:nth-child(6){order:3}
+.recs.hit .rec.sh{box-shadow:0 0 0 3px rgba(8,145,178,.3);transform:translateY(-4px)}
+.ptr{font-family:var(--mono);font-size:14px;font-weight:700}
+.cur-dot{fill:#f59e0b;opacity:0;transition:all .6s cubic-bezier(.4,0,.2,1)}
+.mini-q{font-family:var(--mono);font-size:14px;padding:6px 10px;border-radius:8px;background:#fff;border:1.5px solid var(--line);margin:4px 0;opacity:.3;transition:all .4s}
+.mini-q.on{opacity:1;border-color:#e11d48;background:#fff1f3}
+.mini-q.ok{opacity:1;border-color:#10b981;background:#ecfdf5}
+.disk{display:flex;gap:6px;align-items:flex-end;height:70px}
+.disk i{flex:1;background:#e9e3fb;border-radius:6px 6px 0 0;transition:all .45s;height:30%}
+.loc.s1 .disk.a i:nth-child(2),.loc.s1 .disk.a i:nth-child(5),.loc.s1 .disk.a i:nth-child(9),.loc.s1 .disk.a i:nth-child(12){background:#e11d48;height:90%}
+.loc.s2 .disk.b i:nth-child(n+5):nth-child(-n+8){background:#10b981;height:90%}
+.ex{font-size:15px;line-height:1.35}
+.lyr p b{display:inline;font-size:inherit}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="deck">
+
+<!-- ===================== TITLE ===================== -->
+<section class="slide" id="title">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// DDIA · Part I · Chapter 2</div>
+    <h1 class="in" style="font-size:66px">Data Models &amp;<br><span class="grad">Query Languages</span></h1>
+    <p class="in muted" style="font-size:24px;margin-top:18px;max-width:1000px"><i>Designing Data-Intensive Applications</i> — Martin Kleppmann. So sánh các <b>general-purpose data model</b>: <b>relational</b>, <b>document</b>, <b>graph</b> — và các <b>query language</b> đi kèm: SQL, MapReduce, Cypher, SPARQL, Datalog.</p>
+    <div class="quote in" style="margin-top:26px;max-width:980px;font-size:21px">“The limits of my language mean the limits of my world.” <b>— Ludwig Wittgenstein, <i>Tractatus Logico-Philosophicus</i> (1922)</b></div>
+    <p class="in" style="margin-top:26px;font-size:18px;color:#8a91b4">Phím ← → hoặc Space: chạy từng bước · Shift+→: qua slide · A: hiện hết · F: toàn màn hình</p>
+  </div>
+</section>
+
+<!-- ===================== AGENDA ===================== -->
+<section class="slide" id="agenda">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:18px">· bấm vào mục để đi tới</span></div>
+  <div class="agenda in" style="gap:10px">
+    <div class="ag" data-goto="layers"><b>01</b>Data model là các layer chồng lên nhau</div>
+    <div class="ag" data-goto="hist"><b>02</b>Relational model &amp; các đối thủ</div>
+    <div class="ag" data-goto="nosql"><b>03</b>The Birth of NoSQL</div>
+    <div class="ag" data-goto="orm"><b>04</b>Object-Relational Mismatch</div>
+    <div class="ag" data-goto="json"><b>05</b>JSON document &amp; locality</div>
+    <div class="ag" data-goto="m2o"><b>06</b>Many-to-One · normalization</div>
+    <div class="ag" data-goto="m2m"><b>07</b>Many-to-Many relationships</div>
+    <div class="ag" data-goto="ims"><b>08</b>Document DB lặp lại lịch sử? (IMS)</div>
+    <div class="ag" data-goto="codasyl"><b>09</b>Network model (CODASYL)</div>
+    <div class="ag" data-goto="relm"><b>10</b>Relational model &amp; query optimizer</div>
+    <div class="ag" data-goto="today"><b>11</b>Relational vs Document today</div>
+    <div class="ag" data-goto="schema"><b>13</b>Schema-on-read vs schema-on-write</div>
+    <div class="ag" data-goto="loc"><b>14</b>Data locality · Convergence</div>
+    <div class="ag" data-goto="decl"><b>16</b>Declarative vs Imperative</div>
+    <div class="ag" data-goto="web"><b>18</b>Declarative queries on the Web</div>
+    <div class="ag" data-goto="mr"><b>19</b>MapReduce querying</div>
+    <div class="ag" data-goto="graph"><b>21</b>Graph-Like Data Models</div>
+    <div class="ag" data-goto="pg"><b>23</b>Property graphs · Cypher</div>
+    <div class="ag" data-goto="sqlg"><b>25</b>Graph queries in SQL</div>
+    <div class="ag" data-goto="triple"><b>26</b>Triple-stores · RDF · SPARQL</div>
+    <div class="ag" data-goto="gvn"><b>29</b>Graph DB vs Network model</div>
+    <div class="ag" data-goto="dl"><b>30</b>The Foundation: Datalog</div>
+    <div class="ag" data-goto="end"><b>★</b>Summary</div>
+  </div>
+</section>
+
+<!-- ===================== LAYERS ===================== -->
+<section class="slide" id="layers">
+  <div class="hdr in"><span class="qn">01</span><h2>Data model: mỗi layer ẩn đi <span class="grad">complexity</span> của layer bên dưới</h2></div>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr;gap:26px">
+    <div class="lay">
+      <div class="lyr l1" id="ly1"><div class="ix">1</div><div><b>Application developer</b><p>Nhìn thế giới thực (people, organizations, goods, money flows, sensors…) và model thành <b>objects / data structures</b> + API thao tác chúng.</p></div></div>
+      <div class="lyr l2" id="ly2"><div class="ix">2</div><div><b>General-purpose data model</b><p>Để lưu trữ, biểu diễn data structures bằng <b>JSON / XML documents</b>, <b>tables</b> trong relational database, hoặc <b>graph model</b>.</p></div></div>
+      <div class="lyr l3" id="ly3"><div class="ix">3</div><div><b>Database engineers</b><p>Quyết định biểu diễn JSON/XML/relational/graph data thành <b>bytes</b> trong memory, trên disk, qua network — để query, search, xử lý.</p></div></div>
+      <div class="lyr l4" id="ly4"><div class="ix">4</div><div><b>Hardware engineers</b><p>Biểu diễn bytes bằng electrical currents, pulses of light, magnetic fields…</p></div></div>
+    </div>
+    <div>
+      <div class="card"><h3>Vì sao data model quan trọng?</h3><p class="ps">Data model ảnh hưởng sâu sắc không chỉ tới <b>cách viết software</b>, mà cả <b>cách ta suy nghĩ về bài toán</b>.</p></div>
+      <div class="card f" style="margin-top:12px"><h3>Abstraction giúp phối hợp</h3><p class="ps">Mỗi layer cung cấp một <b>clean data model</b> → các nhóm người khác nhau (database vendor vs application developer) làm việc hiệu quả với nhau.</p></div>
+      <div class="card f" style="margin-top:12px"><h3>Mỗi model đều có assumptions</h3><p class="ps">Có usage dễ, có usage không hỗ trợ; có operation nhanh, có operation chậm; có transformation tự nhiên, có cái gượng ép → phải <b>chọn model phù hợp</b> với application.</p></div>
+      <span class="f ghost" data-act="#ly1|on" data-say="Layer 1: thế giới thực → <b>objects</b> trong application code."></span>
+      <span class="f ghost" data-act="#ly2|on" data-say="Layer 2: lưu objects bằng một <b>general-purpose data model</b>."></span>
+      <span class="f ghost" data-act="#ly3|on" data-say="Layer 3: storage engine biến model thành <b>bytes</b>."></span>
+      <span class="f ghost" data-act="#ly4|on" data-say="Layer 4: bytes thành tín hiệu vật lý."></span>
+      <span class="f ghost" data-now="#ly2|hl" data-say="<b>Chapter 2</b> tập trung vào <b>point 2</b>: relational, document, graph + query languages. <b>Chapter 3</b> sẽ nói về point 3 (storage engines)."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== HISTORY ===================== -->
+<section class="slide" id="hist">
+  <div class="hdr in"><span class="qn">02</span><h2>Relational Model: thống trị <span class="grad">25–30 năm</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:22px">
+    <div class="card"><h3>Edgar Codd · 1970</h3><p class="ps">Data được tổ chức thành <b>relations</b> (SQL gọi là <b>tables</b>), mỗi relation là một tập không thứ tự các <b>tuples</b> (<b>rows</b>). Lúc đầu chỉ là đề xuất lý thuyết — nhiều người nghi ngờ có implement hiệu quả được không.</p></div>
+    <div class="card"><h3>Gốc rễ: business data processing</h3><p class="ps">Trên mainframe những năm 1960–70: <b>transaction processing</b> (sales, banking, airline reservations, stock-keeping) và <b>batch processing</b> (invoicing, payroll, reporting). Mục tiêu: <b>ẩn implementation detail</b> sau một interface sạch hơn.</p></div>
+  </div>
+  <div class="tl" style="margin-top:22px">
+    <div class="tli" id="t1" style="--c:#0891b2"><div class="yr">1960s–70s</div><div class="ev">network model &amp; hierarchical model</div></div>
+    <div class="tli win" id="t2" style="--c:#7c3aed"><div class="yr">1970</div><div class="ev">Codd đề xuất relational model</div></div>
+    <div class="tli win" id="t3" style="--c:#7c3aed"><div class="yr">mid-1980s</div><div class="ev">RDBMS + SQL thành “tool of choice”</div></div>
+    <div class="tli" id="t4" style="--c:#94a3b8"><div class="yr">late 80s–90s</div><div class="ev">Object databases</div></div>
+    <div class="tli" id="t5" style="--c:#94a3b8"><div class="yr">early 2000s</div><div class="ev">XML databases · niche</div></div>
+    <div class="tli" id="t6" style="--c:#ec4899"><div class="yr">2009 →</div><div class="ev">#NoSQL</div></div>
+    <div class="tli win" id="t7" style="--c:#059669"><div class="yr">hôm nay</div><div class="ev">web: publishing, social, e-commerce, games, SaaS…</div></div>
+  </div>
+  <span class="f ghost" data-act="#t1|on" data-say="Thập niên 1970–đầu 80: các lựa chọn chính là <b>network model</b> và <b>hierarchical model</b>."></span>
+  <span class="f ghost" data-act="#t2|on;#t3|on;#t1|dead" data-say="Relational model thắng thế — tới giữa 1980s RDBMS &amp; SQL là lựa chọn mặc định cho data có cấu trúc."></span>
+  <span class="f ghost" data-act="#t4|on;#t4|dead" data-say="Mỗi đối thủ đều tạo nhiều <b>hype</b>… nhưng không kéo dài: object databases đến rồi đi."></span>
+  <span class="f ghost" data-act="#t5|on;#t5|dead" data-say="XML databases chỉ được dùng ở mức niche."></span>
+  <span class="f ghost" data-act="#t6|on;#t7|on" data-say="Relational DB <b>generalize rất tốt</b> ra ngoài business data processing — phần lớn web hôm nay vẫn chạy trên nó. Đối thủ mới nhất: <b>NoSQL</b>."></span>
+  <p class="say">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== NOSQL ===================== -->
+<section class="slide" id="nosql">
+  <div class="hdr in"><span class="qn">03</span><h2>The Birth of <span class="grad">NoSQL</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.6fr;gap:24px">
+    <div>
+      <p style="font-size:19px">Cái tên “NoSQL” không chỉ một công nghệ cụ thể nào — ban đầu chỉ là một <b>Twitter hashtag</b> cho một meetup năm 2009 về <i>open source, distributed, nonrelational databases</i>.</p>
+      <div style="margin:16px 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="chip k" style="font-size:22px">#NoSQL</span><span class="ar">→</span><span class="chip g" style="font-size:20px">Not Only SQL</span></div>
+      <p class="ps muted">Về sau được diễn giải lại (retroactively) thành <b>Not Only SQL</b>.</p>
+      <div class="note blue f" data-o="5" style="font-size:18px"><b>Polyglot persistence</b>: relational databases sẽ tiếp tục được dùng <b>song song</b> với nhiều loại nonrelational datastore — mỗi use case một lựa chọn tốt nhất.</div>
+    </div>
+    <div>
+      <h3 style="color:var(--muted);font-size:18px">Động lực thúc đẩy NoSQL</h3>
+      <div class="cols" style="gap:12px">
+        <div class="card f"><div class="icon">📈</div><h3>Scalability</h3><p class="ps">Cần scale hơn mức relational DB dễ đạt được: dataset rất lớn hoặc <b>write throughput</b> rất cao.</p></div>
+        <div class="card f"><div class="icon">🆓</div><h3>Open source</h3><p class="ps">Ưa chuộng <b>free &amp; open source software</b> hơn các commercial database product.</p></div>
+        <div class="card f"><div class="icon">🔎</div><h3>Specialized queries</h3><p class="ps">Những query operation đặc thù mà relational model hỗ trợ không tốt.</p></div>
+        <div class="card f"><div class="icon">🧩</div><h3>Schema linh hoạt</h3><p class="ps">Khó chịu với tính gò bó của <b>relational schema</b>; muốn data model <b>dynamic &amp; expressive</b> hơn.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ORM ===================== -->
+<section class="slide" id="orm">
+  <div class="hdr in"><span class="qn">04</span><h2>The Object-Relational Mismatch</h2></div>
+  <div class="cols" style="grid-template-columns:.85fr 1.15fr;gap:22px">
+    <div>
+      <p style="font-size:18px">Code viết bằng OOP, data nằm trong tables/rows/columns → cần một <b>translation layer</b> vụng về ở giữa. Sự lệch pha này gọi là <b>impedance mismatch</b> <span class="muted" style="font-size:15px">(mượn từ điện tử)</span>.</p>
+      <p class="ps" style="margin-top:8px"><b>ORM</b> frameworks như <code class="i">ActiveRecord</code>, <code class="i">Hibernate</code> giảm boilerplate, nhưng <b>không thể ẩn hoàn toàn</b> khác biệt giữa hai model.</p>
+      <h3 style="margin-top:12px;font-size:19px">Résumé (LinkedIn profile): one-to-many</h3>
+      <div class="stack" style="gap:8px">
+        <div class="leg a f" data-o="1" data-act="#tp|hot;#te|hot;#tc|hot;#tu|hot" style="padding:8px 12px"><b style="font-size:17px">① Normalized tables (trước SQL:1999)</b><p class="ps">positions, education, contact_info ở <b>bảng riêng</b>, có <b>foreign key</b> trỏ về users.</p></div>
+        <div class="leg b f" data-o="2" data-act="#tp|dim;#te|dim;#tc|dim" style="padding:8px 12px"><b style="font-size:17px">② Structured datatypes / XML / JSON</b><p class="ps">SQL mới hơn cho lưu multi-valued data trong <b>một row</b>, query &amp; index được (Oracle, DB2, SQL Server, PostgreSQL; JSON: DB2, MySQL, PostgreSQL).</p></div>
+        <div class="leg c f" data-o="3" style="padding:8px 12px"><b style="font-size:17px">③ Encode JSON/XML vào text column</b><p class="ps">Application tự diễn giải — thường <b>không query được</b> giá trị bên trong.</p></div>
+      </div>
+    </div>
+    <div>
+      <p class="rowlbl" style="margin-top:0">Figure 2-1 · LinkedIn profile trong relational schema</p>
+      <div class="dts">
+        <table class="dt" id="tu"><caption>users</caption><tr><th class="pk">user_id</th><th>first_name</th><th>last_name</th><th>summary</th><th class="fk">region_id</th><th class="fk">industry_id</th></tr><tr><td class="pk">251</td><td>Bill</td><td>Gates</td><td>Co-chair of…</td><td>us:91</td><td>131</td></tr></table>
+        <table class="dt" id="tr"><caption>regions</caption><tr><th>id</th><th>region_name</th></tr><tr><td>us:91</td><td>Greater Seattle Area</td></tr></table>
+        <table class="dt" id="ti"><caption>industries</caption><tr><th>id</th><th>industry_name</th></tr><tr><td>131</td><td>Philanthropy</td></tr></table>
+        <table class="dt" id="tp"><caption>positions</caption><tr><th>id</th><th class="fk">user_id</th><th>job_title</th><th>organization</th></tr><tr><td>458</td><td class="fk">251</td><td>Co-chair</td><td>Bill &amp; Melinda Gates F.</td></tr><tr><td>457</td><td class="fk">251</td><td>Co-founder, Chairman</td><td>Microsoft</td></tr></table>
+        <table class="dt" id="te"><caption>education</caption><tr><th>id</th><th class="fk">user_id</th><th>school_name</th><th>start</th><th>end</th></tr><tr><td>807</td><td class="fk">251</td><td>Harvard University</td><td>1973</td><td>1975</td></tr><tr><td>806</td><td class="fk">251</td><td>Lakeside School, Seattle</td><td>NULL</td><td>NULL</td></tr></table>
+        <table class="dt" id="tc"><caption>contact_info</caption><tr><th>id</th><th class="fk">user_id</th><th>type</th><th>url</th></tr><tr><td>155</td><td class="fk">251</td><td>blog</td><td>http://thegatesnotes.com</td></tr><tr><td>156</td><td class="fk">251</td><td>twitter</td><td>http://twitter.com/BillGates</td></tr></table>
+      </div>
+      <div class="code xs f" data-o="2" data-act="#orm2|show-a" id="orm2" style="margin-top:10px;padding:6px 0"><div class="ln"><span class="no">⟶</span><span><span class="k">users</span>(user_id, …, positions <span class="t">json</span>, education <span class="t">json</span>, contact_info <span class="t">json</span>)</span></div></div>
+      <span class="f ghost" data-o="1" data-act="#tp|hot;#te|hot;#tc|hot;#tu|hot" data-say="Mỗi user có <b>nhiều</b> positions/education/contact → bảng con với <b>foreign key</b> <code class='i'>user_id</code>."></span>
+      <span class="f ghost" data-o="2" data-act="#tp|dim;#te|dim;#tc|dim" data-say="Hoặc gộp multi-valued data vào cột có cấu trúc trong <b>một row</b>."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== JSON ===================== -->
+<section class="slide" id="json">
+  <div class="hdr in"><span class="qn">05</span><h2>Résumé dạng <span class="grad">JSON document</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.3fr 1fr;gap:20px">
+    <div>
+      <div class="code-title">Example 2-1 · LinkedIn profile as a JSON document</div>
+<script type="text/x-code" data-lang="js" class="xxs" id="jdoc" data-style="font-size:12.4px" data-mark="2-8:a;9-12:b;13-16:c;17-20:d">
+{
+  "user_id": 251,
+  "first_name": "Bill",
+  "last_name": "Gates",
+  "summary": "Co-chair of the Bill & Melinda Gates... Active blogger.",
+  "region_id": "us:91",
+  "industry_id": 131,
+  "photo_url": "/p/7/000/253/05b/308dd6e.jpg",
+  "positions": [
+    {"job_title": "Co-chair", "organization": "Bill & Melinda Gates Foundation"},
+    {"job_title": "Co-founder, Chairman", "organization": "Microsoft"}
+  ],
+  "education": [
+    {"school_name": "Harvard University", "start": 1973, "end": 1975},
+    {"school_name": "Lakeside School, Seattle", "start": null, "end": null}
+  ],
+  "contact_info": {
+    "blog":    "http://thegatesnotes.com",
+    "twitter": "http://twitter.com/BillGates"
+  }
+}
+</script>
+      <p class="ps muted" style="margin-top:8px">Document DB hỗ trợ model này: <b>MongoDB</b>, <b>RethinkDB</b>, <b>CouchDB</b>, <b>Espresso</b>. JSON đơn giản hơn XML nhiều.</p>
+    </div>
+    <div>
+      <p class="rowlbl" style="margin-top:0">Figure 2-2 · one-to-many tạo thành tree structure</p>
+      <svg class="sv" id="jtree" viewBox="0 0 520 210">
+        <rect class="nd" x="190" y="6" width="140" height="40" rx="10"/><text x="260" y="31" text-anchor="middle">user 251</text>
+        <line class="ln" x1="220" y1="46" x2="90" y2="86"/><line class="ln" x1="260" y1="46" x2="260" y2="86"/><line class="ln" x1="300" y1="46" x2="430" y2="86"/>
+        <rect class="nd c3" x="25" y="86" width="130" height="36" rx="9"/><text x="90" y="109" text-anchor="middle">positions</text>
+        <rect class="nd c2" x="195" y="86" width="130" height="36" rx="9"/><text x="260" y="109" text-anchor="middle">education</text>
+        <rect class="nd c4" x="365" y="86" width="130" height="36" rx="9"/><text x="430" y="109" text-anchor="middle">contact_info</text>
+        <line class="ln" x1="70" y1="122" x2="45" y2="158"/><line class="ln" x1="110" y1="122" x2="135" y2="158"/>
+        <line class="ln" x1="240" y1="122" x2="215" y2="158"/><line class="ln" x1="280" y1="122" x2="305" y2="158"/>
+        <line class="ln" x1="410" y1="122" x2="395" y2="158"/><line class="ln" x1="450" y1="122" x2="470" y2="158"/>
+        <text class="sm" x="45" y="176" text-anchor="middle">Co-chair</text><text class="sm" x="135" y="176" text-anchor="middle">Co-founder</text>
+        <text class="sm" x="215" y="176" text-anchor="middle">Harvard</text><text class="sm" x="305" y="176" text-anchor="middle">Lakeside</text>
+        <text class="sm" x="395" y="176" text-anchor="middle">blog</text><text class="sm" x="470" y="176" text-anchor="middle">twitter</text>
+        <rect class="box6" x="8" y="2" width="504" height="190" rx="14" style="opacity:0;transition:opacity .5s" id="jbox"/>
+      </svg>
+      <div class="vs2" style="margin-top:6px">
+        <div class="card" style="padding:10px 12px"><span class="lbl bad">Relational</span>
+          <div class="mini-q" id="q1">SELECT … FROM users</div><div class="mini-q" id="q2">… FROM positions</div><div class="mini-q" id="q3">… FROM education</div><div class="mini-q" id="q4">… FROM contact_info</div>
+          <p class="ps muted" style="font-size:14px">hoặc một multi-way join lộn xộn</p></div>
+        <div class="card" style="padding:10px 12px"><span class="lbl good">JSON</span>
+          <div class="mini-q" id="q5">db.users.find({user_id: 251})</div>
+          <p class="ps" style="font-size:15px;margin-top:6px">Mọi thông tin ở <b>một chỗ</b> → <b>1 query là đủ</b>. Đó là <b>locality</b> tốt hơn.</p></div>
+      </div>
+      <span class="f ghost" data-act="#jdoc|show-a" data-say="Các field xuất hiện đúng 1 lần mỗi user (first_name, last_name…) — giống cột của bảng users."></span>
+      <span class="f ghost" data-act="#jdoc|show-b;#jdoc|show-c;#jdoc|show-d" data-say="positions, education, contact_info được <b>nest</b> ngay trong document thay vì ở bảng riêng."></span>
+      <span class="f ghost" data-act="#q1|on;#q2|on;#q3|on;#q4|on" data-say="Relational: muốn lấy cả profile phải query từng bảng theo <code class='i'>user_id</code>…"></span>
+      <span class="f ghost" data-act="#q5|ok;#jbox|on" data-say="JSON: một query, cả tree. Có người cho rằng JSON <b>giảm impedance mismatch</b> — nhưng JSON cũng có vấn đề riêng (Chapter 4)."></span>
+    </div>
+  </div>
+  <style>#jbox.on{opacity:1!important}</style>
+</section>
+
+<!-- ===================== MANY-TO-ONE ===================== -->
+<section class="slide" id="m2o">
+  <div class="hdr in"><span class="qn">06</span><h2>Many-to-One: lưu <span class="grad">ID</span> hay lưu <span class="grad">text</span>?</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr;gap:24px">
+    <div>
+      <p style="font-size:18px">Vì sao <code class="i">region_id</code> và <code class="i">industry_id</code> là ID, không phải chuỗi <code class="i">"Greater Seattle Area"</code>, <code class="i">"Philanthropy"</code>? Đổi tên region thử xem:</p>
+      <div class="vs2" style="margin-top:10px">
+        <div class="card" style="padding:10px 12px"><span class="lbl bad">Lưu text (duplicate)</span>
+          <div class="fact" id="d1">user 251 · <b id="dt1">Greater Seattle Area</b></div>
+          <div class="fact" id="d2">user 252 · <b id="dt2">Greater Seattle Area</b></div>
+          <div class="fact" id="d3">user 253 · <b id="dt3">Greater Seattle Area</b></div>
+          <div class="fact" id="d4">user 254 · <b id="dt4">Greater Seattle Area</b></div>
+        </div>
+        <div class="card" style="padding:10px 12px"><span class="lbl good">Lưu ID (normalized)</span>
+          <div class="fact">user 251 · <b>us:91</b></div><div class="fact">user 252 · <b>us:91</b></div><div class="fact">user 253 · <b>us:91</b></div><div class="fact">user 254 · <b>us:91</b></div>
+          <div class="fact" id="rg" style="margin-top:8px;border-color:#c4b5fd">regions · us:91 → <b id="rgt">Greater Seattle Area</b></div>
+        </div>
+      </div>
+      <span class="f ghost" data-set="#dt1::Seattle Metro;#dt2::Seattle Metro" data-act="#d1|use;#d2|use" data-say="Đổi tên: phải update <b>mọi bản copy</b> → write overhead…"></span>
+      <span class="f ghost" data-set="#dt1::Seattle Metro;#dt2::Seattle Metro;#dt4::Seattle Metro" data-act="#d1|use;#d2|use;#d4|use;#d3|ans" data-say="…và rủi ro <b>inconsistency</b>: có bản được update, có bản thì không (user 253)."></span>
+      <span class="f ghost" data-set="#rgt::Seattle Metro" data-act="#rg|use" data-say="Với ID: thông tin có nghĩa với con người chỉ ở <b>một chỗ</b>. ID không có nghĩa với người nên <b>không bao giờ cần đổi</b>."></span>
+      <div class="note f" style="font-size:17px">Loại bỏ duplication chính là ý tưởng cốt lõi của <b>normalization</b>. Rule of thumb: nếu đang duplicate giá trị có thể lưu ở một chỗ → schema chưa normalized.</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <h3>Lợi ích của standardized lists (drop-down / autocompleter)</h3>
+      <ul class="mini">
+        <li><b>Consistent</b> style &amp; spelling giữa các profile</li>
+        <li><b>Tránh ambiguity</b> (nhiều thành phố trùng tên)</li>
+        <li><b>Dễ update</b> — tên chỉ lưu một chỗ (vd. đổi tên thành phố vì sự kiện chính trị)</li>
+        <li><b>Localization</b> — dịch danh sách chuẩn sang ngôn ngữ của người xem</li>
+        <li><b>Better search</b> — tìm philanthropists ở bang Washington khớp profile này vì list biết Seattle ∈ Washington</li>
+      </ul>
+      <div class="card f" style="margin-top:12px"><h3>Nhưng: many-to-one không hợp document model</h3><p class="ps">Nhiều người sống ở một region, nhiều người làm một industry. Relational: refer theo ID là bình thường vì <b>join dễ</b>. Document DB: join yếu → phải <b>emulate join trong application code</b> bằng nhiều query.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MANY-TO-MANY ===================== -->
+<section class="slide" id="m2m">
+  <div class="hdr in"><span class="qn">07</span><h2>Data có xu hướng ngày càng <span class="grad">interconnected</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.15fr;gap:24px">
+    <div>
+      <p style="font-size:18px">Version đầu có thể vừa vặn với join-free document model… rồi feature mới xuất hiện:</p>
+      <div class="card f" data-o="1" style="margin-top:10px"><h3>🏢 Organizations &amp; schools as entities</h3><p class="ps"><code class="i">organization</code>, <code class="i">school_name</code> không còn là string mà là <b>reference</b> tới entity — mỗi công ty/trường có web page riêng (logo, news feed); résumé link tới và hiển thị logo.</p></div>
+      <div class="card f" data-o="2" style="margin-top:10px"><h3>⭐ Recommendations</h3><p class="ps">User A viết recommendation cho user B, hiện trên résumé của B kèm <b>tên &amp; ảnh</b> của A. A đổi ảnh → mọi recommendation phải phản ánh → cần <b>reference</b> tới profile của A.</p></div>
+      <div class="note blue f" data-o="3" style="font-size:17px">Dữ liệu trong mỗi khung đứt nét gom thành một document được, nhưng references tới organizations, schools, users cần <b>joins</b> khi query. <span class="muted">(Lúc sách viết: RethinkDB hỗ trợ join, MongoDB không, CouchDB chỉ qua predeclared views.)</span></div>
+    </div>
+    <div>
+      <p class="rowlbl" style="margin-top:0">Figure 2-4 · mở rộng résumé với many-to-many</p>
+      <svg class="sv" id="m2msv" viewBox="0 0 600 380">
+        <rect class="box6" x="10" y="10" width="270" height="200" rx="14"/>
+        <text class="lb" x="22" y="32">résumé · Bill Gates (user 251)</text>
+        <rect class="nd" x="30" y="48" width="230" height="36" rx="9"/><text x="145" y="71" text-anchor="middle">position: Co-founder</text>
+        <rect class="nd c2" x="30" y="98" width="230" height="36" rx="9"/><text x="145" y="121" text-anchor="middle">education: Harvard</text>
+        <rect class="nd c3" x="30" y="148" width="230" height="40" rx="9"/><text x="145" y="166" text-anchor="middle">recommendation</text><text class="sm" x="145" y="181" text-anchor="middle">“Great leader…”</text>
+        <rect class="box6" x="320" y="10" width="270" height="200" rx="14" style="stroke:#0891b2"/>
+        <text class="lb" x="332" y="32" style="fill:#0891b2">résumé · user 300</text>
+        <rect class="nd c3" x="340" y="48" width="230" height="44" rx="9"/><text x="455" y="68" text-anchor="middle">name + photo</text><text class="sm" x="455" y="84" text-anchor="middle">(tác giả recommendation)</text>
+        <rect class="nd" x="340" y="108" width="230" height="36" rx="9"/><text x="455" y="131" text-anchor="middle">position: Engineer</text>
+        <rect class="nd c2" x="340" y="156" width="230" height="36" rx="9"/><text x="455" y="179" text-anchor="middle">education: Harvard</text>
+        <g class="g g1"><rect class="nd c4" x="60" y="290" width="200" height="56" rx="12"/><text x="160" y="314" text-anchor="middle">🏢 Microsoft</text><text class="sm" x="160" y="333" text-anchor="middle">organization entity</text></g>
+        <g class="g g1"><rect class="nd c5" x="340" y="290" width="200" height="56" rx="12"/><text x="440" y="314" text-anchor="middle">🎓 Harvard University</text><text class="sm" x="440" y="333" text-anchor="middle">school entity</text></g>
+        <g class="g g1 hot"><path class="ln" d="M145 84 C 145 200, 160 230, 160 290"/><path class="ln" d="M200 134 C 300 220, 420 230, 430 290"/><path class="ln" d="M455 192 C 455 240, 450 260, 450 290"/><path class="ln" d="M380 144 C 300 220, 220 250, 200 290"/></g>
+        <g class="g g2 hot"><path class="ln" d="M260 168 C 300 168, 300 70, 340 70"/></g>
+      </svg>
+      <span class="f ghost" data-act="#m2msv|s1" data-o="1" data-say="Mỗi résumé trỏ tới organization/school entity — <b>many-to-many</b>: nhiều người ↔ nhiều tổ chức."></span>
+      <span class="f ghost" data-act="#m2msv|s2" data-o="2" data-say="Recommendation trên résumé của Bill tham chiếu tới profile của tác giả (user 300)."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== IMS ===================== -->
+<section class="slide" id="ims">
+  <div class="hdr in"><span class="qn">08</span><h2>Are Document Databases <span class="grad">Repeating History?</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:24px">
+    <div>
+      <div class="card"><h3>IBM IMS · 1968</h3><p class="ps">Information Management System — database phổ biến nhất cho business data processing thập niên 1970. Ban đầu dùng cho <b>stock-keeping</b> trong chương trình <b>Apollo</b>. Đến nay vẫn chạy trên OS/390 trên IBM mainframes.</p></div>
+      <div class="card f" style="margin-top:12px"><h3>Hierarchical model ≈ JSON</h3><p class="ps">Mọi data là <b>tree of records nested within records</b> — rất giống JSON của document DB. Tốt cho <b>one-to-many</b>; nhưng <b>many-to-many</b> khó và <b>không có joins</b>.</p></div>
+      <div class="card f" style="margin-top:12px"><h3>Developer phải chọn…</h3><p class="ps"><b>duplicate (denormalize)</b> data, hoặc <b>tự resolve reference</b> từ record này sang record khác bằng tay. Vấn đề của 1960–70s giống hệt vấn đề với document DB ngày nay.</p></div>
+    </div>
+    <div>
+      <svg class="sv" id="imssv" viewBox="0 0 520 300">
+        <rect class="nd" x="190" y="10" width="140" height="40" rx="10"/><text x="260" y="35" text-anchor="middle">root</text>
+        <line class="ln" x1="230" y1="50" x2="120" y2="96"/><line class="ln" x1="290" y1="50" x2="400" y2="96"/>
+        <rect class="nd c3" x="55" y="96" width="130" height="40" rx="10"/><text x="120" y="121" text-anchor="middle">user Lucy</text>
+        <rect class="nd c3" x="335" y="96" width="130" height="40" rx="10"/><text x="400" y="121" text-anchor="middle">user Alain</text>
+        <line class="ln" x1="120" y1="136" x2="120" y2="186"/>
+        <rect class="nd c2" x="40" y="186" width="160" height="40" rx="10"/><text x="120" y="211" text-anchor="middle">region: Seattle</text>
+        <g class="g g1 hot"><path class="ln" d="M400 136 C 400 180, 260 180, 200 200"/><text class="lb" x="300" y="175" text-anchor="middle" style="fill:#e11d48">2 parents? ✗</text></g>
+        <g class="g g2"><line class="ln" x1="400" y1="136" x2="400" y2="186"/><rect class="nd" x="320" y="186" width="160" height="40" rx="10" style="stroke:#e11d48;stroke-dasharray:6 5"/><text x="400" y="211" text-anchor="middle" style="fill:#be123c">region: Seattle (copy)</text></g>
+        <text class="sm" x="260" y="270" text-anchor="middle">Hierarchical: mỗi record có đúng MỘT parent</text>
+      </svg>
+      <span class="f ghost" data-o="1" data-act="#imssv|s1" data-say="Alain cũng ở Seattle — nhưng record chỉ được có <b>một parent</b>…"></span>
+      <span class="f ghost" data-o="2" data-act="#imssv|s2" data-say="…nên thường phải <b>duplicate</b> record (denormalize)."></span>
+      <div class="f" data-o="3" style="margin-top:6px"><p class="rowlbl">Hai giải pháp nổi bật — “great debate” suốt 1970s</p>
+        <div class="toggle" style="flex-direction:column;align-items:stretch"><span class="pill on">relational model → SQL, chinh phục thế giới</span><span class="pill">network model → dần chìm vào quên lãng</span></div></div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CODASYL ===================== -->
+<section class="slide" id="codasyl">
+  <div class="hdr in"><span class="qn">09</span><h2>The Network Model <span class="muted" style="font-size:24px">(CODASYL)</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr;gap:24px">
+    <div>
+      <p style="font-size:18px">Chuẩn hóa bởi <b>Conference on Data Systems Languages</b>. Là generalization của hierarchical model: một record có thể có <b>nhiều parent</b> → model được many-to-one &amp; many-to-many.</p>
+      <ul class="mini" style="margin-top:8px">
+        <li>Links giữa records không phải foreign keys mà giống <b>pointers</b> (dù lưu trên disk)</li>
+        <li>Cách duy nhất truy cập record: đi theo đường từ <b>root record</b> dọc chuỗi links — gọi là <b>access path</b></li>
+        <li>Query = di chuyển một <b>cursor</b> qua database, iterate lists, follow access paths</li>
+      </ul>
+      <div class="quote f" style="margin-top:10px;font-size:17px">Ngay cả thành viên CODASYL committee cũng thừa nhận: như đang “navigating around an <b>n-dimensional data space</b>”.</div>
+      <div class="card bad f" style="margin-top:10px"><span class="lbl bad">Vấn đề</span><p class="ps">Tối ưu được phần cứng 1970s (tape drives, seek cực chậm), nhưng code query/update <b>phức tạp, kém linh hoạt</b>. Không có path tới data cần → đổi access path → viết lại hàng loạt handwritten query code.</p></div>
+    </div>
+    <div>
+      <svg class="sv" id="cdsv" viewBox="0 0 540 380">
+        <defs><marker id="cdah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#a78bfa"/></marker></defs>
+        <rect class="nd" x="20" y="20" width="120" height="40" rx="10"/><text x="80" y="45" text-anchor="middle">ROOT</text>
+        <rect class="nd c3" x="20" y="110" width="120" height="40" rx="10"/><text x="80" y="135" text-anchor="middle">Lucy</text>
+        <rect class="nd c3" x="210" y="110" width="120" height="40" rx="10"/><text x="270" y="135" text-anchor="middle">Alain</text>
+        <rect class="nd c3" x="400" y="110" width="120" height="40" rx="10"/><text x="460" y="135" text-anchor="middle">Bill</text>
+        <rect class="nd c2" x="60" y="250" width="190" height="44" rx="10"/><text x="155" y="270" text-anchor="middle">Greater Seattle Area</text><text class="sm" x="155" y="286" text-anchor="middle">region · nhiều parents</text>
+        <rect class="nd c4" x="300" y="250" width="190" height="44" rx="10"/><text x="395" y="270" text-anchor="middle">Philanthropy</text><text class="sm" x="395" y="286" text-anchor="middle">industry</text>
+        <line class="ln" x1="80" y1="60" x2="80" y2="108" marker-end="url(#cdah)"/>
+        <line class="ln" x1="140" y1="130" x2="208" y2="130" marker-end="url(#cdah)"/><line class="ln" x1="330" y1="130" x2="398" y2="130" marker-end="url(#cdah)"/>
+        <line class="ln" x1="80" y1="150" x2="130" y2="248" marker-end="url(#cdah)"/>
+        <line class="ln" x1="440" y1="150" x2="200" y2="248" marker-end="url(#cdah)"/>
+        <line class="ln" x1="290" y1="150" x2="370" y2="248" marker-end="url(#cdah)"/>
+        <line class="ln" x1="470" y1="150" x2="430" y2="248" marker-end="url(#cdah)"/>
+        <text class="lb" x="175" y="122">next</text><text class="lb" x="364" y="122">next</text>
+        <circle class="cur-dot" id="cdot" r="11" cx="0" cy="0"/>
+        <text class="sm" x="270" y="345" text-anchor="middle" id="cdlbl">cursor 🟠 đi theo access path</text>
+      </svg>
+      <style>
+        #cdsv.c1 .cur-dot{opacity:1;transform:translate(20px,40px)}
+        #cdsv.c2 .cur-dot{opacity:1;transform:translate(20px,130px)}
+        #cdsv.c3 .cur-dot{opacity:1;transform:translate(210px,130px)}
+        #cdsv.c4 .cur-dot{opacity:1;transform:translate(400px,130px)}
+        #cdsv.c5 .cur-dot{opacity:1;transform:translate(60px,272px)}
+        #cdsv.c6 .cur-dot{opacity:1;transform:translate(20px,130px)}
+        #cdsv.c7 .cur-dot{opacity:1;transform:translate(60px,272px);fill:#e11d48}
+      </style>
+      <span class="f ghost" data-o="1" data-now="#cdsv|c1" data-say="Bắt đầu tại <b>root record</b>."></span>
+      <span class="f ghost" data-o="1" data-now="#cdsv|c2" data-say="Đi xuống list users — như duyệt <b>linked list</b>…"></span>
+      <span class="f ghost" data-o="1" data-now="#cdsv|c3" data-say="…từng record một (next)…"></span>
+      <span class="f ghost" data-o="1" data-now="#cdsv|c4" data-say="…tới Bill."></span>
+      <span class="f ghost" data-o="1" data-now="#cdsv|c5" data-say="Follow pointer của Bill tới region <b>Greater Seattle Area</b>."></span>
+      <span class="f ghost" data-o="1" data-now="#cdsv|c6" data-say="Nhưng có path khác: ROOT → Lucy → …"></span>
+      <span class="f ghost" data-o="1" data-now="#cdsv|c7" data-say="…cũng dẫn tới <b>cùng record</b>. Programmer phải nhớ hết các access path trong đầu."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== RELATIONAL MODEL ===================== -->
+<section class="slide" id="relm">
+  <div class="hdr in"><span class="qn">10</span><h2>The Relational Model: <span class="grad">data bày ra công khai</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:24px">
+    <div>
+      <p style="font-size:18px">Một <b>relation (table)</b> chỉ đơn giản là tập các <b>tuples (rows)</b>. Không có nested structure mê cung, không có access path phức tạp.</p>
+      <ul class="mini" style="margin-top:8px">
+        <li>Đọc bất kỳ / tất cả rows, lọc theo điều kiện tùy ý</li>
+        <li>Đọc một row cụ thể bằng cách chọn vài cột làm <b>key</b></li>
+        <li>Insert row mới vào bất kỳ table nào, không lo foreign key tới/từ bảng khác</li>
+      </ul>
+      <div class="card f" style="margin-top:12px"><h3>Query optimizer</h3><p class="ps">Tự quyết định thực thi phần nào trước, dùng <b>index</b> nào — đó thực chất là “access path”, nhưng được chọn <b>tự động</b>, không phải bởi developer.</p></div>
+      <div class="note blue f" style="font-size:17px"><b>Key insight</b>: chỉ cần build query optimizer <b>một lần</b>, mọi application dùng database đều hưởng lợi. General-purpose solution thắng trong dài hạn.</div>
+      <p class="ps muted f" style="margin-top:8px;font-size:15px">Ghi chú: join trên foreign key diễn ra lúc <b>query time</b>; trong CODASYL, join thực chất xảy ra lúc <b>insert time</b>.</p>
+    </div>
+    <div>
+      <div class="code sm" id="rq"><div class="ln mark-a"><span class="no">1</span><span><span class="k">SELECT</span> * <span class="k">FROM</span> users <span class="k">WHERE</span> region_id = <span class="s">'us:91'</span>;</span></div></div>
+      <div class="big-ar" style="margin:10px 0">↓</div>
+      <div class="srv" style="margin:0 auto;width:260px" id="qopt">⚙️ Query optimizer</div>
+      <div class="flow" style="margin-top:14px;gap:16px">
+        <div class="sysbox" id="ap1">🐢 full table scan</div>
+        <div class="sysbox" id="ap2">⚡ index on region_id</div>
+      </div>
+      <div class="code xs f" style="margin-top:14px" id="ci"><div class="ln mark-b"><span class="no">+</span><span><span class="k">CREATE INDEX</span> users_region <span class="k">ON</span> users (region_id);</span></div></div>
+      <span class="f ghost" data-act="#ap1|ok;#rq|show-a" data-say="Chưa có index: optimizer chọn <b>full table scan</b>."></span>
+      <span class="f ghost" data-act="#ci|show-b;#ap2|ok;#ap1|dim" data-say="Thêm index mới → query <b>tự động</b> dùng index phù hợp nhất. <b>Không cần sửa query</b>. Thêm feature dễ hơn nhiều."></span>
+      <style>.sysbox.dim{opacity:.35;border-color:#e4dcfb!important;background:#fff!important;box-shadow:none!important;color:var(--muted)!important}</style>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TODAY ===================== -->
+<section class="slide" id="today">
+  <div class="hdr in"><span class="qn">11</span><h2>Relational vs Document <span class="grad">Databases Today</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:22px">
+    <div class="card"><h3>Document DB ↔ hierarchical model</h3><p class="ps">Giống hierarchical ở <b>một điểm</b>: nested records (one-to-many như positions, education, contact_info) nằm <b>trong parent record</b> thay vì bảng riêng.</p></div>
+    <div class="card"><h3>Many-to-one &amp; many-to-many: không khác bản chất</h3><p class="ps">Cả hai đều refer bằng unique identifier — <b>foreign key</b> (relational) / <b>document reference</b> (document), resolve lúc đọc bằng join hoặc follow-up query. Document DB <b>không đi theo con đường CODASYL</b>.</p></div>
+  </div>
+  <p class="rowlbl" style="margin-top:16px">Chỉ xét khác biệt về data model (fault-tolerance → Chapter 5, concurrency → Chapter 7)</p>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:22px">
+    <div class="card good f"><span class="lbl good">Document model ủng hộ</span>
+      <div class="chips" style="margin-top:4px"><span class="chip g">schema flexibility</span><span class="chip g">performance nhờ locality</span><span class="chip g">gần data structures của app</span></div></div>
+    <div class="card f" style="border-color:#c4b5fd;background:linear-gradient(180deg,#f5f0ff,#fff)"><span class="lbl info">Relational model đáp lại</span>
+      <div class="chips" style="margin-top:4px"><span class="chip p">hỗ trợ joins tốt hơn</span><span class="chip p">many-to-one</span><span class="chip p">many-to-many</span></div></div>
+  </div>
+</section>
+
+<!-- ===================== SIMPLER CODE ===================== -->
+<section class="slide" id="simple">
+  <div class="hdr in"><span class="qn">12</span><h2>Model nào cho <span class="grad">application code đơn giản hơn?</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:22px">
+    <div>
+      <div class="card"><h3>Data dạng document → dùng document model</h3><p class="ps">Tree of one-to-many, thường load cả tree một lần. Kỹ thuật <b>shredding</b> của relational (xé document thành nhiều bảng) → schema cồng kềnh, code phức tạp không cần thiết.</p></div>
+      <div class="card f" style="margin-top:10px"><h3>Giới hạn của document model</h3><p class="ps">Không refer trực tiếp tới nested item được, phải nói kiểu <i>“item thứ 2 trong list positions của user 251”</i> (giống access path). Không sao nếu document không nest quá sâu.</p></div>
+      <div class="card bad f" style="margin-top:10px"><span class="lbl bad">Many-to-many</span><p class="ps">Denormalize → app phải giữ data <b>consistent</b>. Emulate join bằng nhiều request → complexity dồn vào app, <b>chậm hơn</b> join trong database. (Analytics ghi events có thể không cần many-to-many.)</p></div>
+    </div>
+    <div>
+      <h3>Phụ thuộc vào loại relationship giữa các data item</h3>
+      <div class="spec" style="margin-top:46px">
+        <span class="mk" id="sp1" style="left:16%;background:linear-gradient(135deg,#0891b2,#06b6d4)">📄 document: natural</span>
+        <span class="mk" id="sp2" style="left:50%;background:linear-gradient(135deg,#7c3aed,#a855f7)">🗃️ relational: acceptable</span>
+        <span class="mk" id="sp3" style="left:84%;background:linear-gradient(135deg,#ec4899,#f97316)">🕸️ graph: most natural</span>
+      </div>
+      <div class="spec-ax"><span>tree · self-contained</span><span>→ mức độ interconnected →</span><span>anything ↔ everything</span></div>
+      <div class="f" data-o="5" style="margin-top:22px"><div class="note" style="font-size:17px">Với data <b>highly interconnected</b>: document model <b>awkward</b>, relational <b>acceptable</b>, graph model <b>natural nhất</b>. Không thể nói chung chung model nào đơn giản hơn.</div></div>
+      <span class="f ghost" data-o="4" data-act="#sp1|show" data-say="Self-contained documents, ít relationship → document."></span>
+      <span class="f ghost" data-o="4" data-act="#sp2|show" data-say="Có many-to-one / many-to-many đơn giản → relational ổn."></span>
+      <span class="f ghost" data-o="4" data-act="#sp3|show" data-say="Mọi thứ đều có thể liên quan tới mọi thứ → graph."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SCHEMA ===================== -->
+<section class="slide" id="schema">
+  <div class="hdr in"><span class="qn">13</span><h2>Schema flexibility: <span class="grad">schema-on-read</span> vs <span class="grad">schema-on-write</span></h2></div>
+  <div class="cols" style="grid-template-columns:.92fr 1.08fr;gap:20px">
+    <div>
+      <p style="font-size:17px">Document DB thường bị gọi là <b>schemaless</b> — dễ gây hiểu lầm: code đọc data vẫn giả định một cấu trúc nào đó → có <b>implicit schema</b>, chỉ là database không enforce.</p>
+      <div class="cols" style="gap:10px;margin-top:10px">
+        <div class="card" id="sor"><h3 style="font-size:19px">📖 schema-on-read</h3><p class="ps">Cấu trúc implicit, chỉ được diễn giải <b>khi đọc</b>. ≈ <b>dynamic (runtime) type checking</b>.</p></div>
+        <div class="card" id="sow"><h3 style="font-size:19px">✍️ schema-on-write</h3><p class="ps">Schema explicit, database đảm bảo mọi data ghi vào <b>tuân thủ</b>. ≈ <b>static (compile-time) type checking</b>.</p></div>
+      </div>
+      <div class="card f" data-o="3" style="margin-top:10px"><h3 style="font-size:19px">Schema change có chậm không?</h3><p class="ps"><code class="i">ALTER TABLE</code> chạy trong vài ms ở hầu hết RDBMS. Ngoại lệ: <b>MySQL</b> copy cả table → có thể downtime hàng phút/giờ (có tools để né). <code class="i">UPDATE</code> bảng lớn thì chậm ở mọi DB → có thể để <code class="i">NULL</code> rồi fill lúc đọc, như document DB.</p></div>
+      <div class="note f" data-o="4" style="font-size:16px"><b>Schema-on-read</b> có lợi khi data <b>heterogeneous</b>: quá nhiều loại object để mỗi loại một table, hoặc cấu trúc do <b>external system</b> quyết định và có thể đổi bất kỳ lúc nào. Còn khi mọi record cùng cấu trúc → schema là cơ chế hữu ích để document &amp; enforce.</div>
+    </div>
+    <div>
+      <p class="rowlbl" style="margin-top:0">Ví dụ: tách full name thành first_name + last_name</p>
+      <div class="code-title">Document DB · xử lý document cũ trong app code</div>
+<script type="text/x-code" data-lang="js" class="xs" id="sjs" data-mark="1-4:a">
+if (user && user.name && !user.first_name) {
+  // Docs written before Dec 8, 2013 don't have first_name
+  user.first_name = user.name.split(" ")[0];
+}
+</script>
+      <div class="code-title" style="margin-top:12px">Relational · migration</div>
+<script type="text/x-code" data-lang="sql" class="xs" id="ssql" data-mark="1:b;2-5:c">
+ALTER TABLE users ADD COLUMN first_name text;
+-- PostgreSQL
+UPDATE users SET first_name = split_part(name, ' ', 1);
+-- MySQL
+UPDATE users SET first_name = substring_index(name, ' ', 1);
+</script>
+      <span class="f ghost" data-o="1" data-act="#sjs|show-a;#sor|lit" data-say="Document DB: cứ ghi document mới với field mới; code xử lý trường hợp đọc phải document cũ."></span>
+      <span class="f ghost" data-o="2" data-act="#ssql|show-b;#ssql|show-c;#sow|lit" data-say="Schema “statically typed”: chạy <b>migration</b>. Giống tranh luận static vs dynamic typing — <b>không có đúng sai tuyệt đối</b>."></span>
+      <style>.card.lit{box-shadow:0 0 0 3px var(--sa1),0 12px 26px -10px rgba(124,58,237,.5);transform:translateY(-3px)}</style>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== LOCALITY ===================== -->
+<section class="slide" id="loc">
+  <div class="hdr in"><span class="qn">14</span><h2>Data locality for queries</h2></div>
+  <div class="cols" style="grid-template-columns:1.05fr 1fr;gap:24px">
+    <div>
+      <p style="font-size:18px">Document thường lưu thành <b>một chuỗi liên tục</b>: JSON, XML hoặc binary variant (vd. <b>BSON</b> của MongoDB). Cần cả document (vd. render web page) → lợi thế <b>storage locality</b>.</p>
+      <div class="loc card" id="locv" style="margin-top:12px">
+        <p class="rowlbl" style="margin-top:0">Relational (Figure 2-1): nhiều index lookups → nhiều disk seeks</p>
+        <div class="disk a"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <p class="rowlbl">Document: một lần đọc tuần tự</p>
+        <div class="disk b"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <span class="f ghost" data-act="#locv|s1" data-say="users, positions, education, contact_info nằm rải rác → <b>4 vị trí</b> trên disk."></span>
+      <span class="f ghost" data-act="#locv|s2" data-say="Document: các block liền nhau, đọc một lần."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <div class="card bad f"><span class="lbl bad">Nhưng locality chỉ có lợi khi…</span><p class="ps">cần <b>phần lớn</b> document cùng lúc. DB thường load <b>cả document</b> dù chỉ cần một phần nhỏ. Update → thường phải <b>rewrite toàn bộ</b> document (trừ khi không đổi encoded size). → Nên giữ document <b>nhỏ</b>, tránh write làm document to ra.</p></div>
+      <div class="card f" style="margin-top:12px"><h3>Locality không chỉ của document model</h3>
+        <ul class="mini">
+          <li><b>Google Spanner</b>: schema khai báo rows của table được <b>interleaved (nested)</b> trong parent table</li>
+          <li><b>Oracle</b>: <b>multi-table index cluster tables</b></li>
+          <li><b>Bigtable</b> (Cassandra, HBase): khái niệm <b>column-family</b> để quản lý locality</li>
+        </ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CONVERGENCE ===================== -->
+<section class="slide" id="conv">
+  <div class="hdr in"><span class="qn">15</span><h2>Convergence of <span class="grad">document &amp; relational</span> databases</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 70px 1fr;gap:12px;align-items:center">
+    <div class="card" style="border-top:5px solid #7c3aed"><h3>🗃️ Relational → document</h3>
+      <ul class="mini">
+        <li class="f">Hỗ trợ <b>XML</b> từ giữa 2000s (trừ MySQL): sửa cục bộ, index &amp; query bên trong XML document</li>
+        <li class="f"><b>JSON</b>: PostgreSQL 9.3, MySQL 5.7, IBM DB2 10.5 — JSON phổ biến cho web APIs nên DB khác sẽ theo</li>
+      </ul></div>
+    <div class="big-ar"><span class="spin" style="font-size:40px">⇄</span></div>
+    <div class="card" style="border-top:5px solid #0891b2"><h3 style="color:#0891b2">📄 Document → relational</h3>
+      <ul class="mini">
+        <li class="f"><b>RethinkDB</b> hỗ trợ relational-like joins trong query language</li>
+        <li class="f">Vài <b>MongoDB drivers</b> tự resolve database references (client-side join — chậm hơn vì thêm network round-trips)</li>
+      </ul></div>
+  </div>
+  <div class="cols f" style="margin-top:18px;gap:22px">
+    <div class="note blue" style="font-size:18px;margin-top:0">Hai model <b>bổ sung cho nhau</b>. DB xử lý được document-like data <b>và</b> chạy relational queries → app dùng tổ hợp feature phù hợp nhất. <b>Hybrid</b> là hướng đi tốt.</div>
+    <div class="quote" style="font-size:17px">Footnote: mô tả gốc của <b>Codd</b> đã cho phép thứ gần giống JSON trong relational schema — <b>nonsimple domains</b>: giá trị trong row có thể là một nested relation, sớm hơn JSON/XML support của SQL <b>30 năm</b>.</div>
+  </div>
+</section>
+
+<!-- ===================== DECLARATIVE ===================== -->
+<section class="slide" id="decl">
+  <div class="hdr in"><span class="qn">16</span><h2>Query Languages: <span class="grad">imperative</span> vs <span class="grad">declarative</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.05fr 1fr;gap:22px">
+    <div>
+      <p style="font-size:17px">SQL là <b>declarative</b>; IMS &amp; CODASYL query bằng <b>imperative code</b>. Ví dụ: lấy các loài cá mập trong list animals.</p>
+      <div class="code-title" style="margin-top:8px">Imperative · JavaScript</div>
+<script type="text/x-code" data-lang="js" class="xs" id="gsh" data-mark="3:a;4:b;5:c;8:d">
+function getSharks() {
+  var sharks = [];
+  for (var i = 0; i < animals.length; i++) {
+    if (animals[i].family === "Sharks") {
+      sharks.push(animals[i]);
+    }
+  }
+  return sharks;
+}
+</script>
+      <div class="code-title" style="margin-top:10px">Relational algebra</div>
+      <div class="formula f" data-o="7" style="font-size:22px">sharks = σ<sub style="font-size:14px">family = “Sharks”</sub> (animals)</div>
+      <div class="f" data-o="8"><div class="code-title" style="margin-top:10px">SQL · theo sát relational algebra</div>
+      <div class="code sm"><div class="ln"><span class="no">1</span><span><span class="k">SELECT</span> * <span class="k">FROM</span> animals <span class="k">WHERE</span> family = <span class="s">'Sharks'</span>;</span></div></div></div>
+    </div>
+    <div>
+      <p class="rowlbl" style="margin-top:0">animals</p>
+      <div class="arr xs left" style="gap:8px">
+        <div class="cell t" id="an0" style="width:92px"><span class="v">Great White</span><small>Sharks</small></div>
+        <div class="cell t" id="an1" style="width:92px"><span class="v">Blue Whale</span><small>Whales</small></div>
+        <div class="cell t" id="an2" style="width:92px"><span class="v">Tiger</span><small>Sharks</small></div>
+        <div class="cell t" id="an3" style="width:92px"><span class="v">Orca</span><small>Dolphins</small></div>
+        <div class="cell t" id="an4" style="width:92px"><span class="v">Hammer-head</span><small>Sharks</small></div>
+      </div>
+      <div class="vars"><span class="vc" id="vi"><b>i</b> = <span id="vival">–</span></span><span class="vc" id="vs"><b>sharks</b> = <span id="vsval">[]</span></span></div>
+      <span class="f ghost" data-o="1" data-act="#an0|cur;#gsh|show-a;#gsh|show-b" data-set="#vival::0" data-now="#vi|hot" data-say="Imperative: bảo máy tính làm <b>từng thao tác theo thứ tự</b>. i = 0, kiểm tra điều kiện…"></span>
+      <span class="f ghost" data-o="2" data-act="#an0|ok;#an1|cur;#gsh|show-c" data-set="#vival::1;#vsval::[Great White]" data-now="#vs|hot" data-say="Sharks → <b>push</b>. Sang i = 1…"></span>
+      <span class="f ghost" data-o="3" data-act="#an0|ok;#an1|skip;#an2|cur" data-set="#vival::2;#vsval::[Great White]" data-now="#vi|hot" data-say="Whale → bỏ qua. i = 2…"></span>
+      <span class="f ghost" data-o="4" data-act="#an0|ok;#an1|skip;#an2|ok;#an3|cur" data-set="#vival::3;#vsval::[Great White, Tiger]" data-now="#vs|hot" data-say="Tiger shark → push. i = 3…"></span>
+      <span class="f ghost" data-o="5" data-act="#an0|ok;#an1|skip;#an2|ok;#an3|skip;#an4|cur" data-set="#vival::4;#vsval::[Great White, Tiger]" data-now="#vi|hot" data-say="Orca → bỏ qua. i = 4…"></span>
+      <span class="f ghost" data-o="6" data-act="#an0|ok;#an1|skip;#an2|ok;#an3|skip;#an4|ok;#gsh|show-d" data-set="#vival::5;#vsval::[Great White, Tiger, Hammerhead]" data-now="#vs|res" data-say="Có thể hình dung bước qua code từng dòng, cập nhật biến, quyết định có lặp tiếp không."></span>
+      <div class="card f" data-o="9" style="margin-top:14px"><h3>Declarative</h3><p class="ps">Chỉ mô tả <b>pattern</b> của data mong muốn — điều kiện, cách transform (sort, group, aggregate) — <b>không nói cách làm</b>. Query optimizer quyết định index nào, join method nào, thứ tự nào.</p></div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== WHY DECLARATIVE ===================== -->
+<section class="slide" id="why">
+  <div class="hdr in"><span class="qn">17</span><h2>Vì sao <span class="grad">declarative</span> hấp dẫn?</h2></div>
+  <div class="cols3">
+    <div class="card"><div class="icon">✂️</div><h3>Ngắn gọn, dễ dùng</h3><p class="ps">Thường concise và dễ làm việc hơn một imperative API.</p></div>
+    <div class="card"><div class="icon">🙈</div><h3>Ẩn implementation</h3><p class="ps">Ẩn chi tiết của database engine → DB có thể <b>cải thiện performance</b> mà không cần đổi query.</p></div>
+    <div class="card"><div class="icon">⚡</div><h3>Parallel execution</h3><p class="ps">CPU nhanh lên nhờ thêm <b>cores</b>, không phải tăng clock speed. Declarative chỉ nêu pattern kết quả → DB tự do song song hóa.</p></div>
+  </div>
+  <div class="cols" style="margin-top:16px;gap:22px">
+    <div class="card"><h3 style="font-size:19px">Ví dụ: DB muốn dồn lại disk space</h3>
+      <div class="recs" id="recs"><span class="rec sh">Great White</span><span class="rec">Blue Whale</span><span class="rec sh">Tiger</span><span class="rec">Orca</span><span class="rec sh">Hammerhead</span><span class="rec">Dugong</span></div>
+      <p class="ps muted" id="recmsg" style="margin-top:8px">Records nằm theo một thứ tự nào đó…</p>
+      <span class="f ghost" data-act="#recs|shuf" data-set="#recmsg::DB di chuyển records → <b>thứ tự thay đổi</b>. Imperative code có đang dựa vào thứ tự không? DB <b>không thể chắc chắn</b>."></span>
+      <span class="f ghost" data-act="#recs|shuf;#recs|hit" data-set="#recmsg::SQL <b>không đảm bảo</b> thứ tự nào → không bận tâm. SQL bị giới hạn chức năng hơn → DB có <b>nhiều chỗ</b> để tự động tối ưu."></span>
+    </div>
+    <div class="card"><h3 style="font-size:19px">Song song hóa trên nhiều cores</h3>
+      <p class="rowlbl" style="margin-top:0">Imperative · instructions theo thứ tự cố định</p>
+      <div class="cores"><div class="core busy">core 1 ▶</div><div class="core idle" id="c2">core 2</div><div class="core idle" id="c3">core 3</div><div class="core idle" id="c4">core 4</div></div>
+      <p class="rowlbl">Declarative · chỉ pattern của kết quả</p>
+      <div class="cores"><div class="core busy">core 1 ▶</div><div class="core" id="d2">core 2</div><div class="core" id="d3">core 3</div><div class="core" id="d4">core 4</div></div>
+      <span class="f ghost" data-act="#d2|busy;#d3|busy;#d4|busy" data-set="#d2::core 2 ▶;#d3::core 3 ▶;#d4::core 4 ▶"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== WEB ===================== -->
+<section class="slide" id="web">
+  <div class="hdr in"><span class="qn">18</span><h2>Declarative Queries <span class="grad">on the Web</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr;gap:20px">
+    <div>
+      <p style="font-size:16.5px">Trang về sinh vật biển; user đang xem trang Sharks → <code class="i">&lt;li class="selected"&gt;</code>. Muốn title của trang đang chọn có <b>nền xanh</b>.</p>
+      <div class="code-title" style="margin-top:6px">CSS</div>
+<script type="text/x-code" data-lang="css" class="xxs" id="wcss" data-mark="1-3:a">
+li.selected > p {
+  background-color: blue;
+}
+</script>
+      <div class="code-title" style="margin-top:6px">XSL · XPath <code class="i">li[@class='selected']/p</code> ≡ CSS selector</div>
+<script type="text/x-code" data-lang="xml" class="xxs">
+<xsl:template match="li[@class='selected']/p">
+  <fo:block background-color="blue">
+    <xsl:apply-templates/>
+  </fo:block>
+</xsl:template>
+</script>
+      <div class="code-title" style="margin-top:8px">Imperative · JavaScript DOM API 😩</div>
+<script type="text/x-code" data-lang="js" class="xxs" id="wjs" data-style="font-size:12.6px" data-mark="1-12:d">
+var liElements = document.getElementsByTagName("li");
+for (var i = 0; i < liElements.length; i++) {
+  if (liElements[i].className === "selected") {
+    var children = liElements[i].childNodes;
+    for (var j = 0; j < children.length; j++) {
+      var child = children[j];
+      if (child.nodeType === Node.ELEMENT_NODE && child.tagName === "P") {
+        child.setAttribute("style", "background-color: blue");
+      }
+    }
+  }
+}
+</script>
+    </div>
+    <div>
+      <div class="vs2">
+        <div class="card" style="padding:10px"><span class="lbl info">CSS (declarative)</span>
+          <div class="navdemo"><div class="it" id="cs1">Sharks<small>Great White · Tiger · Hammerhead</small></div><div class="it" id="cs2">Whales<small>Blue · Humpback · Fin</small></div></div></div>
+        <div class="card" style="padding:10px"><span class="lbl bad">JS (imperative)</span>
+          <div class="navdemo"><div class="it" id="js1">Sharks<small>Great White · Tiger · Hammerhead</small></div><div class="it" id="js2">Whales<small>Blue · Humpback · Fin</small></div></div></div>
+      </div>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+      <span class="f ghost" data-now="#cs1|sel;#js1|sel" data-say="Trạng thái đầu: <code class='i'>Sharks</code> có <code class='i'>class=&quot;selected&quot;</code>."></span>
+      <span class="f ghost" data-now="#cs1|sel;#js1|sel;#cs1|blue;#js1|blue" data-act="#wcss|show-a;#wjs|show-d" data-say="Cả hai đều tô xanh <code class='i'>&lt;p&gt;Sharks&lt;/p&gt;</code> (Whales không khớp vì parent thiếu <code class='i'>selected</code>). Nhưng JS dài &amp; khó hiểu hơn hẳn."></span>
+      <span class="f ghost" data-act="#cs2|sel;#js2|sel;#cs2|blue;#js1|stuck" data-say="User bấm sang Whales: CSS <b>tự phát hiện</b> rule không còn áp dụng → bỏ nền xanh của Sharks. JS: màu xanh <b>kẹt lại</b> ở Sharks cho tới khi reload trang (dù chạy lại code)."></span>
+      <div class="card f" style="margin-top:6px"><p class="ps">Muốn dùng API mới nhanh hơn (<code class="i">getElementsByClassName("selected")</code>, <code class="i">document.evaluate()</code>) → JS phải <b>viết lại</b>. Browser vendors thì cải thiện CSS/XPath <b>không phá compatibility</b>.</p></div>
+      <div class="note blue f" style="font-size:16px">Trong browser, declarative CSS tốt hơn thao tác style bằng JS. Tương tự, trong database, <b>SQL</b> tốt hơn hẳn imperative query APIs (IMS, CODASYL dùng COBOL iterate từng record).</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MAPREDUCE ===================== -->
+<section class="slide" id="mr">
+  <div class="hdr in"><span class="qn">19</span><h2>MapReduce Querying</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr;gap:22px">
+    <div>
+      <p style="font-size:17px"><b>MapReduce</b>: programming model xử lý lượng data lớn theo bulk trên nhiều máy, phổ biến bởi Google. Một dạng giới hạn có trong <b>MongoDB</b>, <b>CouchDB</b> để chạy read-only queries trên nhiều documents (chi tiết ở Chapter 10).</p>
+      <div class="card" style="margin-top:10px"><h3 style="font-size:19px">Nằm ở giữa</h3><p class="ps">Không declarative hoàn toàn, cũng không imperative hoàn toàn: logic viết bằng <b>snippets of code</b>, được framework gọi lặp lại. Dựa trên <code class="i">map</code> (aka <i>collect</i>) và <code class="i">reduce</code> (aka <i>fold</i>, <i>inject</i>) của functional programming.</p></div>
+      <p class="ps" style="margin-top:10px">🦈 Bài toán: nhà sinh vật biển ghi một <b>observation</b> mỗi lần thấy động vật. Báo cáo: <b>mỗi tháng thấy bao nhiêu cá mập</b>?</p>
+      <div class="code-title" style="margin-top:8px">PostgreSQL</div>
+<script type="text/x-code" data-lang="sql" class="xxs" id="mrsql" data-mark="5:a;1-2:b;6:b;3:c">
+SELECT date_trunc('month', observation_timestamp)
+         AS observation_month,
+       sum(num_animals) AS total_animals
+FROM observations
+WHERE family = 'Sharks'
+GROUP BY observation_month;
+</script>
+    </div>
+    <div>
+      <div class="code-title">MongoDB MapReduce</div>
+<script type="text/x-code" data-lang="js" class="xs" id="mrjs" data-mark="2-6:b;7-9:c;11:a;12:d">
+db.observations.mapReduce(
+  function map() {
+    var year  = this.observationTimestamp.getFullYear();
+    var month = this.observationTimestamp.getMonth() + 1;
+    emit(year + "-" + month, this.numAnimals);
+  },
+  function reduce(key, values) {
+    return Array.sum(values);
+  },
+  {
+    query: { family: "Sharks" },
+    out: "monthlySharkReport"
+  }
+);
+</script>
+      <div class="legend" style="margin-top:10px;gap:6px">
+        <div class="leg a f" data-act="#mrjs|show-a;#mrsql|show-a" style="padding:6px 12px"><p><b>query</b>: filter khai báo declarative (extension riêng của MongoDB) ↔ <code class="i">WHERE</code></p></div>
+        <div class="leg b f" data-act="#mrjs|show-b;#mrsql|show-b" style="padding:6px 12px"><p><b>map</b>: gọi 1 lần cho mỗi document khớp, <code class="i">this</code> = document; <code class="i">emit</code> key "year-month" + value</p></div>
+        <div class="leg c f" data-act="#mrjs|show-c;#mrsql|show-c" style="padding:6px 12px"><p><b>reduce</b>: gọi 1 lần cho mỗi key, cộng số động vật ↔ <code class="i">sum</code>. Output → <code class="i">monthlySharkReport</code></p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MAPREDUCE FLOW ===================== -->
+<section class="slide" id="mr2">
+  <div class="hdr in"><span class="qn">19b</span><h2>MapReduce <span class="grad">chạy từng bước</span></h2></div>
+  <div class="mr" style="margin-top:6px">
+    <div class="col"><p class="rowlbl" style="margin:0">observations</p>
+      <div class="doc" id="o1">{ observationTimestamp:
+    "Mon, 25 Dec 1995 12:34:56 GMT",
+  family: "Sharks",
+  species: "Carcharodon carcharias",
+  numAnimals: 3 }</div>
+      <div class="doc" id="o2">{ observationTimestamp:
+    "Tue, 12 Dec 1995 16:17:18 GMT",
+  family: "Sharks",
+  species: "Carcharias taurus",
+  numAnimals: 4 }</div></div>
+    <div class="ar" id="ar1">→</div>
+    <div class="col"><p class="rowlbl" style="margin:0">map()</p><div class="kv" id="e1">emit("1995-12", 3)</div><div class="kv" id="e2">emit("1995-12", 4)</div></div>
+    <div class="ar" id="ar2">→</div>
+    <div class="col"><p class="rowlbl" style="margin:0">group by key</p><div class="kv" id="gk">"1995-12" → [3, 4]</div></div>
+    <div class="ar" id="ar3">→</div>
+    <div class="col"><p class="rowlbl" style="margin:0">reduce()</p><div class="kv res" id="rs">7</div></div>
+  </div>
+  <span class="f ghost" data-act="#o1|hot;#ar1|show;#e1|show" data-say="map được gọi cho document 1 → <code class='i'>emit(&quot;1995-12&quot;, 3)</code>"></span>
+  <span class="f ghost" data-act="#o1|hot;#o2|hot;#ar1|show;#e1|show;#e2|show" data-say="…và document 2 → <code class='i'>emit(&quot;1995-12&quot;, 4)</code>"></span>
+  <span class="f ghost" data-act="#e1|show;#e2|show;#ar2|show;#gk|show" data-say="Framework gom các cặp key-value theo key."></span>
+  <span class="f ghost" data-act="#e1|show;#e2|show;#gk|show;#ar2|show;#ar3|show;#rs|show" data-say="<code class='i'>reduce(&quot;1995-12&quot;, [3, 4])</code> trả về <b>7</b>."></span>
+  <p class="say">Nhấn → để chạy từng bước.</p>
+  <div class="cols" style="margin-top:6px;gap:20px">
+    <div class="card f"><h3 style="font-size:19px">map &amp; reduce phải là <b>pure functions</b></h3><p class="ps">Chỉ dùng input được truyền vào, không chạy thêm database query, <b>không side effects</b> → DB chạy chúng ở đâu cũng được, thứ tự nào cũng được, <b>rerun khi failure</b>. Vẫn mạnh: parse string, gọi library, tính toán…</p></div>
+    <div class="card f"><h3 style="font-size:19px">MapReduce khá low-level</h3><p class="ps">SQL có thể implement thành pipeline các MapReduce operations, nhưng cũng có nhiều distributed SQL không dùng MapReduce. SQL không bị giới hạn ở một máy; MapReduce không độc quyền distributed query execution.</p></div>
+  </div>
+</section>
+
+<!-- ===================== AGGREGATION PIPELINE ===================== -->
+<section class="slide" id="agg">
+  <div class="hdr in"><span class="qn">20</span><h2>Aggregation pipeline: <span class="grad">“reinventing SQL”</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:22px">
+    <div>
+      <div class="card bad"><span class="lbl bad">Usability problem của MapReduce</span><p class="ps">Phải viết <b>hai JavaScript functions</b> phối hợp cẩn thận — thường khó hơn viết một query. Declarative language cũng cho optimizer nhiều cơ hội hơn.</p></div>
+      <p class="ps" style="margin-top:12px">→ <b>MongoDB 2.2</b> thêm declarative query language: <b>aggregation pipeline</b>.</p>
+      <div class="code-title" style="margin-top:10px">MongoDB aggregation pipeline</div>
+<script type="text/x-code" data-lang="js" class="sm" id="aggjs" data-mark="2:a;3-8:b;9:c">
+db.observations.aggregate([
+  { $match: { family: "Sharks" } },
+  { $group: {
+      _id: {
+        year:  { $year:  "$observationTimestamp" },
+        month: { $month: "$observationTimestamp" }
+      },
+      totalAnimals: { $sum: "$numAnimals" }
+  } }
+]);
+</script>
+    </div>
+    <div>
+      <div class="code-title">SQL tương đương</div>
+<script type="text/x-code" data-lang="sql" class="xs" id="aggsql" data-mark="5:a;1-2:b;6:b;3:c">
+SELECT date_trunc('month', observation_timestamp)
+         AS observation_month,
+       sum(num_animals) AS total_animals
+FROM observations
+WHERE family = 'Sharks'
+GROUP BY observation_month;
+</script>
+      <div class="chips" style="margin-top:12px">
+        <span class="pill f" data-act="#aggjs|show-a;#aggsql|show-a">$match ↔ WHERE</span>
+        <span class="pill f" data-act="#aggjs|show-b;#aggsql|show-b">$group ↔ GROUP BY</span>
+        <span class="pill f" data-act="#aggjs|show-c;#aggsql|show-c">$sum ↔ sum()</span>
+      </div>
+      <div class="quote f" style="margin-top:16px;font-size:19px">Biểu đạt tương đương một subset của SQL, chỉ khác syntax JSON thay vì câu tiếng Anh. Bài học: một NoSQL system có thể <b>vô tình reinvent SQL</b>, dù trong lớp ngụy trang.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== GRAPH INTRO ===================== -->
+<section class="slide" id="graph">
+  <div class="hdr in"><span class="qn">21</span><h2>Graph-Like Data Models</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.25fr;gap:24px">
+    <div>
+      <p style="font-size:18px">Nếu <b>many-to-many</b> relationships rất phổ biến trong data, khi các kết nối ngày càng phức tạp, model data thành <b>graph</b> sẽ tự nhiên hơn.</p>
+      <div style="display:flex;gap:12px;margin-top:14px">
+        <div class="card" style="flex:1"><h3>⬤ vertices</h3><p class="ps">aka <b>nodes</b>, <b>entities</b></p></div>
+        <div class="card" style="flex:1"><h3>➝ edges</h3><p class="ps">aka <b>relationships</b>, <b>arcs</b></p></div>
+      </div>
+      <div class="card f" data-o="4" style="margin-top:12px"><h3>Không chỉ homogeneous data</h3><p class="ps"><b>Facebook</b> giữ một graph duy nhất với nhiều loại vertex (people, locations, events, checkins, comments) và edge (friends, checkin ở đâu, ai comment post nào, ai dự event nào…).</p></div>
+    </div>
+    <div>
+      <div class="cols3" style="gap:12px">
+        <div class="card f"><div class="icon">👥</div><h3>Social graphs</h3><p class="ps">Vertex: người. Edge: ai quen ai.</p></div>
+        <div class="card f"><div class="icon">🌐</div><h3>Web graph</h3><p class="ps">Vertex: web pages. Edge: HTML links.</p></div>
+        <div class="card f"><div class="icon">🛣️</div><h3>Road / rail networks</h3><p class="ps">Vertex: junctions. Edge: đường bộ / đường ray.</p></div>
+      </div>
+      <div class="cols f" data-o="3" style="margin-top:12px;gap:12px">
+        <div class="card"><h3 style="font-size:19px">🧭 Shortest path</h3><p class="ps">Hệ thống dẫn đường tìm đường ngắn nhất giữa hai điểm trong road network.</p></div>
+        <div class="card"><h3 style="font-size:19px">📊 PageRank</h3><p class="ps">Đo độ phổ biến của web page trên web graph → ranking trong search results.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FIGURE 2-5 ===================== -->
+<section class="slide" id="fig">
+  <div class="hdr in"><span class="qn">22</span><h2>Ví dụ: <span class="grad">Lucy &amp; Alain</span> <span class="muted" style="font-size:22px">(Figure 2-5)</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.75fr 1fr;gap:18px">
+    <div><svg class="sv" id="gfig" viewBox="45 12 770 400" style="">
+<defs>
+<marker id="gfig-w" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#a78bfa"/></marker>
+<marker id="gfig-bi" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#ec4899"/></marker>
+<marker id="gfig-li" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#0891b2"/></marker>
+<marker id="gfig-mr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#f59e0b"/></marker>
+</defs>
+<line class="e   g g1" x1="130" y1="100" x2="130" y2="65" marker-end="url(#gfig-w)"/>
+<text class="el   g g1" x="130" y="86" text-anchor="middle">within</text>
+<line class="e  p1 g g1" x1="130" y1="185" x2="130" y2="150" marker-end="url(#gfig-w)"/>
+<text class="el  p1 g g1" x="130" y="172" text-anchor="middle">within</text>
+<line class="e  p2 g g2" x1="461" y1="100" x2="519" y2="65" marker-end="url(#gfig-w)"/>
+<text class="el  p2 g g2" x="490" y="86" text-anchor="middle">within</text>
+<line class="e  p2 g g2" x1="420" y1="185" x2="420" y2="150" marker-end="url(#gfig-w)"/>
+<text class="el  p2 g g2" x="420" y="172" text-anchor="middle">within</text>
+<line class="e  p2 g g2" x1="420" y1="270" x2="420" y2="235" marker-end="url(#gfig-w)"/>
+<text class="el  p2 g g2" x="420" y="256" text-anchor="middle">within</text>
+<line class="e   g g2" x1="659" y1="100" x2="601" y2="65" marker-end="url(#gfig-w)"/>
+<text class="el   g g2" x="630" y="86" text-anchor="middle">within</text>
+<line class="e   g g2" x1="700" y1="185" x2="700" y2="150" marker-end="url(#gfig-w)"/>
+<text class="el   g g2" x="700" y="172" text-anchor="middle">within</text>
+<line class="e   g g2" x1="700" y1="270" x2="700" y2="235" marker-end="url(#gfig-w)"/>
+<text class="el   g g2" x="700" y="256" text-anchor="middle">within</text>
+<line class="e   g g2" x1="700" y1="360" x2="700" y2="320" marker-end="url(#gfig-w)"/>
+<text class="el   g g2" x="700" y="344" text-anchor="middle">within</text>
+<line class="e bi p1 g g3" x1="207" y1="360" x2="143" y2="235" marker-end="url(#gfig-bi)"/>
+<text class="el bi p1 g g3" x="175" y="302" text-anchor="middle">born_in</text>
+<line class="e li p2 g g3" x1="276" y1="360" x2="364" y2="320" marker-end="url(#gfig-li)"/>
+<text class="el li p2 g g3" x="320" y="344" text-anchor="middle">lives_in</text>
+<line class="e li  g g3" x1="478" y1="360" x2="442" y2="320" marker-end="url(#gfig-li)"/>
+<text class="el li  g g3" x="460" y="344" text-anchor="middle">lives_in</text>
+<line class="e bi  g g3" x1="568" y1="385" x2="632" y2="385" marker-end="url(#gfig-bi)"/>
+<text class="el bi  g g3" x="600" y="389" text-anchor="middle">born_in</text>
+<line class="e mr  g g3" x1="288" y1="385" x2="432" y2="385" marker-end="url(#gfig-mr)" marker-start="url(#gfig-mr)"/>
+<text class="el mr  g g3" x="360" y="389" text-anchor="middle">married</text>
+<rect class="nd   g g1" x="65.0" y="18.0" width="130" height="44" rx="10"/>
+<text class=" g g1" x="130" y="38" text-anchor="middle">North America</text>
+<text class="ty  g g1" x="130" y="54" text-anchor="middle">Location · continent</text>
+<rect class="nd  p2 g g2" x="495.0" y="18.0" width="130" height="44" rx="10"/>
+<text class="p2 g g2" x="560" y="38" text-anchor="middle">Europe</text>
+<text class="ty p2 g g2" x="560" y="54" text-anchor="middle">Location · continent</text>
+<rect class="nd  p1 g g1" x="65.0" y="103.0" width="130" height="44" rx="10"/>
+<text class="p1 g g1" x="130" y="123" text-anchor="middle">United States</text>
+<text class="ty p1 g g1" x="130" y="139" text-anchor="middle">Location · country</text>
+<rect class="nd  p2 g g2" x="355.0" y="103.0" width="130" height="44" rx="10"/>
+<text class="p2 g g2" x="420" y="123" text-anchor="middle">United Kingdom</text>
+<text class="ty p2 g g2" x="420" y="139" text-anchor="middle">Location · country</text>
+<rect class="nd   g g2" x="635.0" y="103.0" width="130" height="44" rx="10"/>
+<text class=" g g2" x="700" y="123" text-anchor="middle">France</text>
+<text class="ty  g g2" x="700" y="139" text-anchor="middle">Location · country</text>
+<rect class="nd  p1 g g1" x="65.0" y="188.0" width="130" height="44" rx="10"/>
+<text class="p1 g g1" x="130" y="208" text-anchor="middle">Idaho</text>
+<text class="ty p1 g g1" x="130" y="224" text-anchor="middle">Location · state</text>
+<rect class="nd  p2 g g2" x="355.0" y="188.0" width="130" height="44" rx="10"/>
+<text class="p2 g g2" x="420" y="208" text-anchor="middle">England</text>
+<text class="ty p2 g g2" x="420" y="224" text-anchor="middle">Location · country</text>
+<rect class="nd   g g2" x="635.0" y="188.0" width="130" height="44" rx="10"/>
+<text class=" g g2" x="700" y="208" text-anchor="middle">Bourgogne</text>
+<text class="ty  g g2" x="700" y="224" text-anchor="middle">Location · région</text>
+<rect class="nd  p2 g g2" x="355.0" y="273.0" width="130" height="44" rx="10"/>
+<text class="p2 g g2" x="420" y="293" text-anchor="middle">London</text>
+<text class="ty p2 g g2" x="420" y="309" text-anchor="middle">Location · city</text>
+<rect class="nd   g g2" x="635.0" y="273.0" width="130" height="44" rx="10"/>
+<text class=" g g2" x="700" y="293" text-anchor="middle">Côte-d'Or</text>
+<text class="ty  g g2" x="700" y="309" text-anchor="middle">Location · département</text>
+<rect class="nd per p1 p2 g g3" x="155.0" y="363.0" width="130" height="44" rx="10"/>
+<text class="p1 p2 g g3" x="220" y="383" text-anchor="middle">Lucy</text>
+<text class="ty p1 p2 g g3" x="220" y="399" text-anchor="middle">Person</text>
+<rect class="nd per  g g3" x="435.0" y="363.0" width="130" height="44" rx="10"/>
+<text class=" g g3" x="500" y="383" text-anchor="middle">Alain</text>
+<text class="ty  g g3" x="500" y="399" text-anchor="middle">Person</text>
+<rect class="nd   g g2" x="635.0" y="363.0" width="130" height="44" rx="10"/>
+<text class=" g g2" x="700" y="383" text-anchor="middle">Beaune</text>
+<text class="ty  g g2" x="700" y="399" text-anchor="middle">Location · city</text>
+</svg></div>
+    <div>
+      <p style="font-size:17px">Lucy (Idaho) và Alain (Beaune, Pháp) đã kết hôn và sống ở London. Boxes = vertices, arrows = edges.</p>
+      <h3 class="f" data-o="4" style="margin-top:10px;font-size:19px">Khó biểu diễn trong relational schema truyền thống</h3>
+      <ul class="mini f" data-o="4">
+        <li>Cấu trúc vùng khác nhau mỗi nước: Pháp có <b>départements</b> &amp; <b>régions</b>, Mỹ có <b>counties</b> &amp; <b>states</b></li>
+        <li>Quirks of history: <b>country within a country</b> (England ⊂ United Kingdom)</li>
+        <li><b>Granularity</b> khác nhau: Lucy sống ở cấp city, nơi sinh chỉ ở cấp state</li>
+      </ul>
+      <div class="card f" data-o="5" style="margin-top:10px;padding:10px 14px"><p class="ps"><b>Property graph</b> (Neo4j, Titan, InfiniteGraph) · <b>Triple-store</b> (Datomic, AllegroGraph). Declarative: <b>Cypher</b>, <b>SPARQL</b>, <b>Datalog</b>. Imperative: <b>Gremlin</b>; processing framework: <b>Pregel</b>.</p></div>
+      <span class="f ghost" data-o="1" data-act="#gfig|s1" data-say="Phía Mỹ: Idaho → United States → North America."></span>
+      <span class="f ghost" data-o="2" data-act="#gfig|s1;#gfig|s2" data-say="Phía châu Âu: chuỗi <code class='i'>within</code> của London và Beaune."></span>
+      <span class="f ghost" data-o="3" data-act="#gfig|s1;#gfig|s2;#gfig|s3" data-say="Hai người: <code class='i'>born_in</code>, <code class='i'>lives_in</code>, <code class='i'>married</code>."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PROPERTY GRAPHS ===================== -->
+<section class="slide" id="pg">
+  <div class="hdr in"><span class="qn">23</span><h2>Property Graphs</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr;gap:22px">
+    <div>
+      <div class="cols" style="gap:10px">
+        <div class="card"><h3 style="font-size:19px">Vertex</h3><ul class="mini"><li>unique identifier</li><li>set of <b>outgoing</b> edges</li><li>set of <b>incoming</b> edges</li><li><b>properties</b> (key-value)</li></ul></div>
+        <div class="card"><h3 style="font-size:19px">Edge</h3><ul class="mini"><li>unique identifier</li><li><b>tail vertex</b> (bắt đầu)</li><li><b>head vertex</b> (kết thúc)</li><li><b>label</b> mô tả relationship</li><li><b>properties</b> (key-value)</li></ul></div>
+      </div>
+      <h3 style="margin-top:12px;font-size:19px">Đặc điểm quan trọng</h3>
+      <div class="stack" style="gap:6px">
+        <div class="leg a f" style="padding:6px 12px" data-act="#pgsql|show-a"><p>① Vertex bất kỳ có thể nối với vertex bất kỳ — <b>không có schema</b> giới hạn loại liên kết.</p></div>
+        <div class="leg b f" style="padding:6px 12px" data-act="#pgsql|show-b"><p>② Từ một vertex, tìm nhanh cả incoming &amp; outgoing edges → <b>traverse</b> cả xuôi lẫn ngược (vì thế có index trên cả hai cột).</p></div>
+        <div class="leg c f" style="padding:6px 12px" data-act="#pgsql|show-c"><p>③ Dùng <b>labels</b> khác nhau → nhiều loại thông tin trong một graph mà data model vẫn sạch.</p></div>
+      </div>
+    </div>
+    <div>
+      <div class="code-title">Example 2-2 · property graph bằng relational schema (PostgreSQL json)</div>
+<script type="text/x-code" data-lang="sql" class="sm" id="pgsql" data-mark="1-4:a;6-12:a;8-9:b;13-14:b;10:c">
+CREATE TABLE vertices (
+  vertex_id   integer PRIMARY KEY,
+  properties  json
+);
+
+CREATE TABLE edges (
+  edge_id     integer PRIMARY KEY,
+  tail_vertex integer REFERENCES vertices (vertex_id),
+  head_vertex integer REFERENCES vertices (vertex_id),
+  label       text,
+  properties  json
+);
+
+CREATE INDEX edges_tails ON edges (tail_vertex);
+CREATE INDEX edges_heads ON edges (head_vertex);
+</script>
+      <div class="note f" style="font-size:16px">Graphs tốt cho <b>evolvability</b>: muốn thêm food allergies? Thêm vertex cho mỗi allergen, edge person → allergen, rồi nối allergen với foods chứa nó → query xem mỗi người ăn được gì an toàn.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CYPHER ===================== -->
+<section class="slide" id="cy">
+  <div class="hdr in"><span class="qn">24</span><h2>The <span class="grad">Cypher</span> Query Language</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:18px">
+    <div>
+      <p class="ps">Declarative query language cho property graphs, tạo ra cho <b>Neo4j</b>. (Tên lấy từ một nhân vật trong <i>The Matrix</i>, không liên quan tới cipher trong cryptography.)</p>
+      <div class="code-title" style="margin-top:6px">Example 2-3 · insert phần bên trái của Figure 2-5</div>
+<script type="text/x-code" data-lang="cypher" class="xxs" id="cyc" data-mark="5:a;6:b">
+CREATE
+  (NAmerica:Location {name:'North America', type:'continent'}),
+  (USA:Location      {name:'United States', type:'country'  }),
+  (Idaho:Location    {name:'Idaho',         type:'state'    }),
+  (Lucy:Person       {name:'Lucy' }),
+  (Idaho) -[:WITHIN]-> (USA)  -[:WITHIN]-> (NAmerica),
+  (Lucy)  -[:BORN_IN]-> (Idaho)
+</script>
+      <div class="code-title" style="margin-top:8px">Example 2-4 · ai đã emigrate từ US sang Europe?</div>
+<script type="text/x-code" data-lang="cypher" class="xxs" id="cym" data-mark="2-3:a;4-5:b;6:c">
+MATCH
+  (person) -[:BORN_IN]->  () -[:WITHIN*0..]->
+        (us:Location {name:'United States'}),
+  (person) -[:LIVES_IN]-> () -[:WITHIN*0..]->
+        (eu:Location {name:'Europe'})
+RETURN person.name
+</script>
+      <p class="ps muted" style="margin-top:6px;font-size:15px"><code class="i">(Idaho) -[:WITHIN]-&gt; (USA)</code>: edge label WITHIN, tail = Idaho, head = USA. <code class="i">:WITHIN*0..</code> = “follow WITHIN edge, zero or more times” — như <code class="i">*</code> trong regex.</p>
+    </div>
+    <div>
+      <svg class="sv" id="gcy" viewBox="45 12 770 400" style="">
+<defs>
+<marker id="gcy-w" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#a78bfa"/></marker>
+<marker id="gcy-bi" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#ec4899"/></marker>
+<marker id="gcy-li" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#0891b2"/></marker>
+<marker id="gcy-mr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#f59e0b"/></marker>
+</defs>
+<line class="e  " x1="130" y1="100" x2="130" y2="65" marker-end="url(#gcy-w)"/>
+<text class="el  " x="130" y="86" text-anchor="middle">within</text>
+<line class="e  p1" x1="130" y1="185" x2="130" y2="150" marker-end="url(#gcy-w)"/>
+<text class="el  p1" x="130" y="172" text-anchor="middle">within</text>
+<line class="e  p2" x1="461" y1="100" x2="519" y2="65" marker-end="url(#gcy-w)"/>
+<text class="el  p2" x="490" y="86" text-anchor="middle">within</text>
+<line class="e  p2" x1="420" y1="185" x2="420" y2="150" marker-end="url(#gcy-w)"/>
+<text class="el  p2" x="420" y="172" text-anchor="middle">within</text>
+<line class="e  p2" x1="420" y1="270" x2="420" y2="235" marker-end="url(#gcy-w)"/>
+<text class="el  p2" x="420" y="256" text-anchor="middle">within</text>
+<line class="e  " x1="659" y1="100" x2="601" y2="65" marker-end="url(#gcy-w)"/>
+<text class="el  " x="630" y="86" text-anchor="middle">within</text>
+<line class="e  " x1="700" y1="185" x2="700" y2="150" marker-end="url(#gcy-w)"/>
+<text class="el  " x="700" y="172" text-anchor="middle">within</text>
+<line class="e  " x1="700" y1="270" x2="700" y2="235" marker-end="url(#gcy-w)"/>
+<text class="el  " x="700" y="256" text-anchor="middle">within</text>
+<line class="e  " x1="700" y1="360" x2="700" y2="320" marker-end="url(#gcy-w)"/>
+<text class="el  " x="700" y="344" text-anchor="middle">within</text>
+<line class="e bi p1" x1="207" y1="360" x2="143" y2="235" marker-end="url(#gcy-bi)"/>
+<text class="el bi p1" x="175" y="302" text-anchor="middle">born_in</text>
+<line class="e li p2" x1="276" y1="360" x2="364" y2="320" marker-end="url(#gcy-li)"/>
+<text class="el li p2" x="320" y="344" text-anchor="middle">lives_in</text>
+<line class="e li " x1="478" y1="360" x2="442" y2="320" marker-end="url(#gcy-li)"/>
+<text class="el li " x="460" y="344" text-anchor="middle">lives_in</text>
+<line class="e bi " x1="568" y1="385" x2="632" y2="385" marker-end="url(#gcy-bi)"/>
+<text class="el bi " x="600" y="389" text-anchor="middle">born_in</text>
+<line class="e mr " x1="288" y1="385" x2="432" y2="385" marker-end="url(#gcy-mr)" marker-start="url(#gcy-mr)"/>
+<text class="el mr " x="360" y="389" text-anchor="middle">married</text>
+<rect class="nd  " x="65.0" y="18.0" width="130" height="44" rx="10"/>
+<text class="" x="130" y="38" text-anchor="middle">North America</text>
+<text class="ty " x="130" y="54" text-anchor="middle">Location · continent</text>
+<rect class="nd  p2" x="495.0" y="18.0" width="130" height="44" rx="10"/>
+<text class="p2" x="560" y="38" text-anchor="middle">Europe</text>
+<text class="ty p2" x="560" y="54" text-anchor="middle">Location · continent</text>
+<rect class="nd  p1" x="65.0" y="103.0" width="130" height="44" rx="10"/>
+<text class="p1" x="130" y="123" text-anchor="middle">United States</text>
+<text class="ty p1" x="130" y="139" text-anchor="middle">Location · country</text>
+<rect class="nd  p2" x="355.0" y="103.0" width="130" height="44" rx="10"/>
+<text class="p2" x="420" y="123" text-anchor="middle">United Kingdom</text>
+<text class="ty p2" x="420" y="139" text-anchor="middle">Location · country</text>
+<rect class="nd  " x="635.0" y="103.0" width="130" height="44" rx="10"/>
+<text class="" x="700" y="123" text-anchor="middle">France</text>
+<text class="ty " x="700" y="139" text-anchor="middle">Location · country</text>
+<rect class="nd  p1" x="65.0" y="188.0" width="130" height="44" rx="10"/>
+<text class="p1" x="130" y="208" text-anchor="middle">Idaho</text>
+<text class="ty p1" x="130" y="224" text-anchor="middle">Location · state</text>
+<rect class="nd  p2" x="355.0" y="188.0" width="130" height="44" rx="10"/>
+<text class="p2" x="420" y="208" text-anchor="middle">England</text>
+<text class="ty p2" x="420" y="224" text-anchor="middle">Location · country</text>
+<rect class="nd  " x="635.0" y="188.0" width="130" height="44" rx="10"/>
+<text class="" x="700" y="208" text-anchor="middle">Bourgogne</text>
+<text class="ty " x="700" y="224" text-anchor="middle">Location · région</text>
+<rect class="nd  p2" x="355.0" y="273.0" width="130" height="44" rx="10"/>
+<text class="p2" x="420" y="293" text-anchor="middle">London</text>
+<text class="ty p2" x="420" y="309" text-anchor="middle">Location · city</text>
+<rect class="nd  " x="635.0" y="273.0" width="130" height="44" rx="10"/>
+<text class="" x="700" y="293" text-anchor="middle">Côte-d'Or</text>
+<text class="ty " x="700" y="309" text-anchor="middle">Location · département</text>
+<rect class="nd per p1 p2" x="155.0" y="363.0" width="130" height="44" rx="10"/>
+<text class="p1 p2" x="220" y="383" text-anchor="middle">Lucy</text>
+<text class="ty p1 p2" x="220" y="399" text-anchor="middle">Person</text>
+<rect class="nd per " x="435.0" y="363.0" width="130" height="44" rx="10"/>
+<text class="" x="500" y="383" text-anchor="middle">Alain</text>
+<text class="ty " x="500" y="399" text-anchor="middle">Person</text>
+<rect class="nd  " x="635.0" y="363.0" width="130" height="44" rx="10"/>
+<text class="" x="700" y="383" text-anchor="middle">Beaune</text>
+<text class="ty " x="700" y="399" text-anchor="middle">Location · city</text>
+</svg>
+      <span class="f ghost" data-act="#gcy|dimall;#gcy|hp1;#cym|show-a" data-say="① <code class='i'>person</code> có BORN_IN tới một vertex; từ đó đi chuỗi WITHIN tới Location tên “United States”."></span>
+      <span class="f ghost" data-act="#gcy|dimall;#gcy|hp1;#gcy|hp2;#cym|show-b" data-say="② Cùng <code class='i'>person</code> đó có LIVES_IN, đi chuỗi WITHIN tới “Europe”."></span>
+      <span class="f ghost" data-act="#gcy|dimall;#gcy|hp1;#gcy|hp2;#cym|show-c" data-say="RETURN <code class='i'>person.name</code> → <b>Lucy</b>."></span>
+      <span class="f ghost" data-act="#cym|show-c" data-say="Cách thực thi? Quét mọi người rồi kiểm tra… <b>hoặc</b> bắt đầu từ 2 Location (dùng index trên <code class='i'>name</code>), đi ngược incoming WITHIN, rồi tìm người qua BORN_IN/LIVES_IN. Declarative → <b>query optimizer</b> tự chọn."></span>
+      <p class="say" style="margin-top:4px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== GRAPH QUERIES IN SQL ===================== -->
+<section class="slide" id="sqlg">
+  <div class="hdr in"><span class="qn">25</span><h2>Graph Queries in SQL: <span class="grad">WITH RECURSIVE</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr;gap:20px">
+    <div>
+<script type="text/x-code" data-lang="sql" class="xxs" id="rsql" data-style="font-size:11.6px;line-height:1.3;padding:6px 0" data-mark="2-9:a;10-17:b;18-23:c;24-29:c;30-34:d">
+WITH RECURSIVE
+  -- in_usa is the set of vertex IDs of all locations within the United States
+  in_usa(vertex_id) AS (
+      SELECT vertex_id FROM vertices WHERE properties->>'name' = 'United States'
+    UNION
+      SELECT edges.tail_vertex FROM edges
+        JOIN in_usa ON edges.head_vertex = in_usa.vertex_id
+        WHERE edges.label = 'within'
+  ),
+  -- in_europe is the set of vertex IDs of all locations within Europe
+  in_europe(vertex_id) AS (
+      SELECT vertex_id FROM vertices WHERE properties->>'name' = 'Europe'
+    UNION
+      SELECT edges.tail_vertex FROM edges
+        JOIN in_europe ON edges.head_vertex = in_europe.vertex_id
+        WHERE edges.label = 'within'
+  ),
+  -- born_in_usa is the set of vertex IDs of all people born in the US
+  born_in_usa(vertex_id) AS (
+    SELECT edges.tail_vertex FROM edges
+      JOIN in_usa ON edges.head_vertex = in_usa.vertex_id
+      WHERE edges.label = 'born_in'
+  ),
+  -- lives_in_europe is the set of vertex IDs of all people living in Europe
+  lives_in_europe(vertex_id) AS (
+    SELECT edges.tail_vertex FROM edges
+      JOIN in_europe ON edges.head_vertex = in_europe.vertex_id
+      WHERE edges.label = 'lives_in'
+  )
+SELECT vertices.properties->>'name'
+FROM vertices
+-- join to find those people who were both born in the US *and* live in Europe
+JOIN born_in_usa     ON vertices.vertex_id = born_in_usa.vertex_id
+JOIN lives_in_europe ON vertices.vertex_id = lives_in_europe.vertex_id;
+</script>
+    </div>
+    <div>
+      <p class="ps">Relational: thường biết trước cần bao nhiêu join. Graph query: phải traverse <b>số edge thay đổi</b> — LIVES_IN có thể trỏ tới street, city, region, state… Từ <b>SQL:1999</b> dùng <b>recursive common table expressions</b> (PostgreSQL, DB2, Oracle, SQL Server).</p>
+      <p class="rowlbl">in_usa</p><div class="setbox" id="su"><span class="tw b" id="su1">United States</span><span class="tw b" id="su2">Idaho</span></div>
+      <p class="rowlbl">in_europe</p><div class="setbox" id="se"><span class="tw y" id="se1">Europe</span><span class="tw y" id="se2">United Kingdom</span><span class="tw y" id="se3">France</span><span class="tw y" id="se4">England</span><span class="tw y" id="se5">Bourgogne</span><span class="tw y" id="se6">London</span><span class="tw y" id="se7">Côte-d'Or</span><span class="tw y" id="se8">Beaune</span></div>
+      <div class="vs2"><div><p class="rowlbl">born_in_usa</p><div class="setbox"><span class="tw" id="sb1">Lucy</span></div></div><div><p class="rowlbl">lives_in_europe</p><div class="setbox"><span class="tw" id="sl1">Lucy</span><span class="tw" id="sl2">Alain</span></div></div></div>
+      <div class="formula" style="margin-top:8px;font-size:18px" id="sres">∩ → <span id="sresv">?</span></div>
+      <span class="f ghost" data-act="#rsql|show-a;#su1|show" data-say="Bắt đầu từ vertex “United States”…"></span>
+      <span class="f ghost" data-act="#rsql|show-a;#su1|show;#su2|show" data-say="…follow mọi incoming <code class='i'>within</code> edge, thêm vào set cho tới khi hết."></span>
+      <span class="f ghost" data-act="#rsql|show-b;#su1|show;#su2|show;#se1|show;#se2|show;#se3|show;#se4|show;#se5|show;#se6|show;#se7|show;#se8|show" data-say="Tương tự với “Europe” → <code class='i'>in_europe</code>."></span>
+      <span class="f ghost" data-act="#rsql|show-c;#su1|show;#su2|show;#se1|show;#se2|show;#se3|show;#se4|show;#se5|show;#se6|show;#se7|show;#se8|show;#sb1|show;#sl1|show;#sl2|show" data-say="Follow incoming <code class='i'>born_in</code> / <code class='i'>lives_in</code> để tìm người."></span>
+      <span class="f ghost" data-act="#rsql|show-d;#su1|show;#su2|show;#se1|show;#se2|show;#se3|show;#se4|show;#se5|show;#se6|show;#se7|show;#se8|show;#sb1|show;#sl1|show;#sl2|show" data-set="#sresv::<b style='color:#db2777'>Lucy</b> ✓" data-say="Intersect hai set bằng JOIN. <b>4 dòng</b> Cypher vs <b>29 dòng</b> SQL → mỗi data model phục vụ use case khác nhau; hãy chọn model phù hợp."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TRIPLE STORES ===================== -->
+<section class="slide" id="triple">
+  <div class="hdr in"><span class="qn">26</span><h2>Triple-Stores: <span class="grad">(subject, predicate, object)</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr;gap:22px">
+    <div>
+      <p style="font-size:17px">Gần như tương đương property graph, chỉ dùng từ khác cho cùng ý tưởng. Mọi thông tin là các statement 3 phần:</p>
+      <div style="display:flex;justify-content:center;margin:12px 0"><div><div class="tri"><span class="s1">Jim</span><span class="p1">likes</span><span class="o1">bananas</span></div><div class="tri" style="justify-content:space-around;gap:40px"><span class="tri-l" style="border:none;padding:0">subject</span><span class="tri-l" style="border:none;padding:0">predicate</span><span class="tri-l" style="border:none;padding:0">object</span></div></div></div>
+      <p class="ps"><b>Subject</b> ≈ một vertex. <b>Object</b> là một trong hai:</p>
+      <div class="card f" data-act="#ttl|show-a" style="margin-top:8px;padding:10px 14px"><div class="tri"><span class="s1">lucy</span><span class="p1">age</span><span class="o2">33</span></div><p class="ps" style="margin-top:6px">① <b>Primitive value</b> → predicate &amp; object = key &amp; value của property: vertex <code class="i">lucy</code> với <code class="i">{"age":33}</code>.</p></div>
+      <div class="card f" data-act="#ttl|show-b" style="margin-top:8px;padding:10px 14px"><div class="tri"><span class="s1">lucy</span><span class="p1">marriedTo</span><span class="o1">alain</span></div><p class="ps" style="margin-top:6px">② <b>Vertex khác</b> → predicate là <b>edge</b>; subject = tail vertex, object = head vertex.</p></div>
+    </div>
+    <div>
+      <div class="code-title">Example 2-6 · Turtle triples (subset của Notation3)</div>
+<script type="text/x-code" data-lang="turtle" class="xxs" id="ttl" data-mark="3:a;6-7:a;10-11:a;4:b;8:b;12:b">
+@prefix : <urn:example:>.
+_:lucy     a       :Person.
+_:lucy     :name   "Lucy".
+_:lucy     :bornIn _:idaho.
+_:idaho    a       :Location.
+_:idaho    :name   "Idaho".
+_:idaho    :type   "state".
+_:idaho    :within _:usa.
+_:usa      a       :Location.
+_:usa      :name   "United States".
+_:usa      :type   "country".
+_:usa      :within _:namerica.
+</script>
+      <div class="code-title" style="margin-top:8px">Example 2-7 · gọn hơn với dấu chấm phẩy</div>
+<script type="text/x-code" data-lang="turtle" class="xxs f" data-nonum>
+@prefix : <urn:example:>.
+_:lucy a :Person; :name "Lucy"; :bornIn _:idaho.
+_:idaho a :Location; :name "Idaho"; :type "state"; :within _:usa.
+_:usa a :Location; :name "United States"; :type "country";
+      :within _:namerica.
+_:namerica a :Location; :name "North America"; :type "continent".
+</script>
+      <p class="ps muted" style="margin-top:6px;font-size:15px"><code class="i">_:someName</code> là vertex, tên chỉ có nghĩa trong file. Predicate là edge → object là vertex (<code class="i">_:idaho :within _:usa</code>); predicate là property → object là literal (<code class="i">_:usa :name "United States"</code>).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== RDF ===================== -->
+<section class="slide" id="rdf">
+  <div class="hdr in"><span class="qn">27</span><h2>The Semantic Web &amp; <span class="grad">RDF</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:22px">
+    <div>
+      <div class="card"><h3>Semantic web: ý tưởng đơn giản, hợp lý</h3><p class="ps">Website đã publish text/ảnh cho người đọc — sao không publish thêm <b>machine-readable data</b> cho máy đọc? <b>Resource Description Framework (RDF)</b> giúp các site publish data theo format thống nhất → kết hợp thành một <b>web of data</b>, kiểu “database of everything” cỡ internet.</p></div>
+      <div class="card bad f" style="margin-top:10px"><span class="lbl bad">Thực tế</span><p class="ps">Overhyped đầu 2000s, chưa thành hiện thực; quá nhiều acronyms, standards phức tạp, và hubris. Nhưng <b>triples</b> vẫn là internal data model tốt cho app. Triple-store độc lập với semantic web — vd. <b>Datomic</b> (thực ra dùng 5-tuples, thêm metadata cho versioning).</p></div>
+      <div class="card f" style="margin-top:10px"><h3 style="font-size:19px">URIs làm namespace</h3><p class="ps">Predicate có thể là <code class="i">&lt;http://my-company.com/namespace#within&gt;</code> thay vì <code class="i">WITHIN</code> → ghép data với người khác không conflict. URL không cần resolve; sách dùng <code class="i">urn:example:within</code>, khai báo prefix một lần ở đầu file.</p></div>
+    </div>
+    <div>
+      <div class="code-title">Example 2-8 · RDF/XML (verbose) — Turtle/N3 dễ nhìn hơn nhiều; Apache Jena chuyển đổi tự động</div>
+<script type="text/x-code" data-lang="xml" class="xxs" data-style="font-size:12.4px">
+<rdf:RDF xmlns="urn:example:"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <Location rdf:nodeID="idaho">
+    <name>Idaho</name>
+    <type>state</type>
+    <within>
+      <Location rdf:nodeID="usa">
+        <name>United States</name>
+        <type>country</type>
+        <within>
+          <Location rdf:nodeID="namerica">
+            <name>North America</name>
+            <type>continent</type>
+          </Location>
+        </within>
+      </Location>
+    </within>
+  </Location>
+  <Person rdf:nodeID="lucy">
+    <name>Lucy</name>
+    <bornIn rdf:nodeID="idaho"/>
+  </Person>
+</rdf:RDF>
+</script>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SPARQL ===================== -->
+<section class="slide" id="sparql">
+  <div class="hdr in"><span class="qn">28</span><h2>The <span class="grad">SPARQL</span> Query Language</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:22px">
+    <div>
+      <p style="font-size:17px">Query language cho triple-stores dùng RDF data model. Viết tắt của <b>SPARQL Protocol and RDF Query Language</b>, đọc là “sparkle”. Ra đời <b>trước Cypher</b> — Cypher mượn pattern matching từ SPARQL.</p>
+      <div class="code-title" style="margin-top:10px">Example 2-9 · cùng query: ai chuyển từ US sang Europe</div>
+<script type="text/x-code" data-lang="sparql" class="sm" id="spq" data-mark="3:a;4:b;5:c">
+PREFIX : <urn:example:>
+
+SELECT ?personName WHERE {
+  ?person :name ?personName.
+  ?person :bornIn  / :within* / :name "United States".
+  ?person :livesIn / :within* / :name "Europe".
+}
+</script>
+      <p class="ps muted" style="margin-top:8px">Còn ngắn gọn hơn Cypher. Biến bắt đầu bằng <code class="i">?</code>.</p>
+    </div>
+    <div>
+      <h3>Cypher ↔ SPARQL</h3>
+      <div class="f" data-act="#spq|show-b"><div class="code-title" style="margin-top:8px">Traversal</div>
+      <div class="code xs"><div class="ln"><span class="no">C</span><span>(person) -[<span class="p">:BORN_IN</span>]-&gt; () -[<span class="p">:WITHIN*0..</span>]-&gt; (location)</span></div><div class="ln"><span class="no">S</span><span><span class="t">?person</span> <span class="t">:bornIn</span> / <span class="t">:within*</span> <span class="t">?location</span>.</span></div></div></div>
+      <div class="f" data-act="#spq|show-a"><div class="code-title" style="margin-top:14px">Property match</div>
+      <div class="code xs"><div class="ln"><span class="no">C</span><span>(usa {name:<span class="s">'United States'</span>})</span></div><div class="ln"><span class="no">S</span><span><span class="t">?usa</span> <span class="t">:name</span> <span class="s">"United States"</span>.</span></div></div></div>
+      <div class="note blue f" style="font-size:16px">RDF <b>không phân biệt</b> properties và edges — chỉ dùng predicates cho cả hai → cùng một syntax để match. SPARQL là công cụ mạnh cho app dùng nội bộ, dù semantic web có thành hay không.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== GRAPH vs NETWORK ===================== -->
+<section class="slide" id="gvn">
+  <div class="hdr in"><span class="qn">29</span><h2>Graph DB có phải <span class="grad">CODASYL tái sinh?</span> Không.</h2></div>
+  <table class="diff" style="margin-top:6px">
+    <tr><th style="width:150px"></th><th>CODASYL (network model)</th><th>Graph database</th></tr>
+    <tr class="f"><td>Schema</td><td>Schema quy định record type nào được nest trong record type nào</td><td>Không giới hạn: vertex nào cũng có edge tới vertex nào → linh hoạt khi requirements đổi</td></tr>
+    <tr class="f"><td>Truy cập</td><td>Cách duy nhất: traverse một <b>access path</b></td><td>Refer trực tiếp vertex bằng <b>unique ID</b>, hoặc dùng <b>index</b> tìm theo giá trị</td></tr>
+    <tr class="f"><td>Thứ tự</td><td>Children là <b>ordered set</b> → DB phải duy trì thứ tự (ảnh hưởng storage layout), app lo vị trí record mới</td><td>Vertices &amp; edges <b>không có thứ tự</b> (chỉ sort kết quả lúc query)</td></tr>
+    <tr class="f"><td>Query</td><td>Toàn bộ <b>imperative</b>, khó viết, dễ vỡ khi schema đổi</td><td>Có thể viết traversal imperative, nhưng đa số hỗ trợ <b>declarative</b>: Cypher, SPARQL</td></tr>
+  </table>
+</section>
+
+<!-- ===================== DATALOG ===================== -->
+<section class="slide" id="dl">
+  <div class="hdr in"><span class="qn">30</span><h2>The Foundation: <span class="grad">Datalog</span></h2></div>
+  <div class="cols" style="grid-template-columns:.8fr 1.2fr;gap:20px">
+    <div>
+      <p class="ps">Cũ hơn SPARQL/Cypher nhiều, được giới học thuật nghiên cứu kỹ thập niên 1980 — <b>nền tảng</b> cho các query language sau này. Dùng trong <b>Datomic</b>, <b>Cascalog</b> (Hadoop). Datalog là subset của <b>Prolog</b>.</p>
+      <p class="ps" style="margin-top:6px">Triple viết thành <code class="i">predicate(subject, object)</code>:</p>
+      <p class="rowlbl">Facts · Example 2-10</p>
+      <div class="fact" id="f1">name(namerica, 'North America').</div>
+      <div class="fact" id="f2">within(usa, namerica).</div>
+      <div class="fact" id="f3">within(idaho, usa).</div>
+      <div class="fact">name(lucy, 'Lucy').</div>
+      <div class="fact">born_in(lucy, idaho).</div>
+      <p class="rowlbl">Derived (Figure 2-6)</p>
+      <div class="fact der" id="r1">within_recursive(namerica, 'North America').</div>
+      <div class="fact der" id="r2">within_recursive(usa, 'North America').</div>
+      <div class="fact der" id="r3">within_recursive(idaho, 'North America').</div>
+    </div>
+    <div>
+      <p class="rowlbl" style="margin-top:0">Rules · Example 2-11</p>
+      <div class="stack" style="gap:6px">
+        <div class="rule" id="ru1">within_recursive(Location, Name) :- name(Location, Name).          /* Rule 1 */</div>
+        <div class="rule" id="ru2">within_recursive(Location, Name) :- within(Location, Via),        /* Rule 2 */
+                                   within_recursive(Via, Name).</div>
+        <div class="rule" id="ru3">migrated(Name, BornIn, LivingIn) :- name(Person, Name),           /* Rule 3 */
+                                   born_in(Person, BornLoc),
+                                   within_recursive(BornLoc, BornIn),
+                                   lives_in(Person, LivingLoc),
+                                   within_recursive(LivingLoc, LivingIn).</div>
+        <div class="fact" id="qq" style="font-weight:700">?- migrated(Who, 'United States', 'Europe').   <span id="qqa" style="color:#be185d">/* Who = ? */</span></div>
+      </div>
+      <span class="f ghost" data-now="#ru1|hot;#f1|use;#r1|hot" data-act="#r1|show" data-say="① <code class='i'>name(namerica, 'North America')</code> tồn tại → Rule 1 áp dụng, sinh ra <code class='i'>within_recursive(namerica, 'North America')</code>."></span>
+      <span class="f ghost" data-now="#ru2|hot;#f2|use;#r1|use;#r2|hot" data-act="#r2|show" data-say="② <code class='i'>within(usa, namerica)</code> + kết quả bước trước → Rule 2 sinh <code class='i'>within_recursive(usa, 'North America')</code>."></span>
+      <span class="f ghost" data-now="#ru2|hot;#f3|use;#r2|use;#r3|hot" data-act="#r3|show" data-say="③ <code class='i'>within(idaho, usa)</code> → <code class='i'>within_recursive(idaho, 'North America')</code>. Lặp Rule 1 &amp; 2 → biết mọi location trong North America."></span>
+      <span class="f ghost" data-now="#ru3|hot" data-act="#qq|ans" data-set="#qqa::/* Who = 'Lucy'. */" data-say="Rule 3 tìm người sinh ở <code class='i'>BornIn</code> và sống ở <code class='i'>LivingIn</code>. Query với Who là biến → cùng đáp án: <b>Lucy</b>."></span>
+      <p class="say" style="font-size:17px;min-height:48px">Nhấn → để chạy từng bước.</p>
+      <div class="cols f" style="margin-top:10px;gap:10px">
+        <div class="card" style="padding:10px 12px"><p class="ps">Rule định nghĩa <b>predicate mới</b>, derive từ data hoặc rule khác — như function gọi function, kể cả <b>đệ quy</b>. Biến viết <b>hoa chữ đầu</b>.</p></div>
+        <div class="card" style="padding:10px 12px"><p class="ps">Cách nghĩ khác, nhưng mạnh: rules <b>kết hợp &amp; tái sử dụng</b> giữa các query. Kém tiện cho query one-off, nhưng xử lý tốt data phức tạp.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="slide" id="end">
+  <div class="title-wrap" style="align-items:center;text-align:center">
+    <div class="orb" style="width:360px;height:360px;background:#f9a8d4;left:10%;top:10%"></div>
+    <h1 class="in" style="font-size:56px">Tóm tắt <span class="grad">Chapter 2</span></h1>
+    <p class="in muted" style="font-size:18px;margin-top:8px;max-width:1080px">Lịch sử: data ban đầu là một cây lớn (<b>hierarchical model</b>) — không hợp many-to-many → <b>relational model</b> ra đời. Gần đây một số app không hợp relational → <b>NoSQL</b> rẽ hai hướng:</p>
+    <div class="cols3 in" style="margin-top:16px;text-align:left;max-width:1180px">
+      <div class="card"><h3>📄 Document</h3><p class="ps">Data là các <b>self-contained documents</b>, quan hệ giữa document hiếm khi có.</p></div>
+      <div class="card"><h3>🗃️ Relational</h3><p class="ps">Joins, many-to-one &amp; many-to-many tốt. Vẫn dùng rộng rãi, đang hội tụ với document (JSON/XML).</p></div>
+      <div class="card"><h3>🕸️ Graph</h3><p class="ps">Hướng ngược lại: <b>anything is potentially related to everything</b>.</p></div>
+    </div>
+    <div class="cols in" style="margin-top:14px;text-align:left;max-width:1180px;gap:16px">
+      <div class="card"><p class="ps">Một model emulate được model khác nhưng thường <b>awkward</b> → mỗi mục đích một hệ thống, không có one-size-fits-all. Document &amp; graph thường không enforce schema — câu hỏi là schema <b>explicit (on write)</b> hay <b>implicit (on read)</b>.</p></div>
+      <div class="card"><p class="ps">Query languages: <b>SQL, MapReduce, aggregation pipeline, Cypher, SPARQL, Datalog</b> (+ CSS, XSL/XPath). Còn nhiều model khác: genome (<b>GenBank</b>), LHC hàng trăm petabytes, <b>full-text search</b>.</p></div>
+    </div>
+    <p class="in muted" style="font-size:18px;margin-top:16px">Chapter 3 → <b>Storage and Retrieval</b>: các trade-off khi implement những data model này.</p>
+  </div>
+</section>
+
+</div></div>
+<div id="bar"></div>
+<div id="hint">← → / Space: từng bước · Shift+→: qua slide · A: hiện hết · Home: đầu · F: toàn màn hình</div>
+<div id="nav"><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+<script>(function(){
+  // ---------- generic multi-language highlighter for <script type="text/x-code" data-lang=…> ----------
+  const W=s=>new Set(s.split(" "));
+  const LANG={
+    sql:{kw:W("SELECT FROM WHERE JOIN ON AS GROUP BY ORDER UNION WITH RECURSIVE CREATE TABLE INDEX PRIMARY KEY REFERENCES ALTER ADD COLUMN UPDATE SET AND OR NOT NULL INSERT INTO VALUES"),ty:W("integer text json"),fn:W("date_trunc sum split_part substring_index"),com:/--.*$/},
+    js:{kw:W("function var let const for if return new this true false null && === document"),ty:W("Node Array Date"),fn:W("emit push split getFullYear getMonth parse sum mapReduce aggregate getElementsByTagName setAttribute"),com:/\/\/.*$/},
+    cypher:{kw:W("CREATE MATCH RETURN WHERE"),ty:W("Location Person"),fn:W(""),com:/\/\/.*$/},
+    sparql:{kw:W("PREFIX SELECT WHERE"),ty:W(""),fn:W(""),com:/#.*$/},
+    turtle:{kw:W("a @prefix"),ty:W(""),fn:W(""),com:/#\s.*$/},
+    datalog:{kw:W(""),ty:W(""),fn:W("within_recursive migrated name born_in lives_in within type"),com:/\/\*.*?\*\/|%.*$/},
+    css:{kw:W("li p"),ty:W(""),fn:W(""),com:/\/\*.*\*\//},
+    xml:{xml:true},
+    algebra:{kw:W(""),ty:W(""),fn:W(""),com:/$^/}
+  };
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hl(line,L){
+    if(L.xml){
+      return esc(line).replace(/(&lt;\/?)([\w:-]+)|([\w:-]+)(=)("[^"]*")/g,(m,a,b,c,d,e)=>a?a+'<span class="k">'+b+'</span>':'<span class="t">'+c+'</span>'+d+'<span class="s">'+e+'</span>');
+    }
+    let tail="",cm=line.match(L.com);
+    if(cm&&cm.index!==undefined&&L.com.source!=="$^"){
+      // ignore comment markers that live inside strings (rough check: count quotes before)
+      const pre=line.slice(0,cm.index);
+      if(((pre.match(/'/g)||[]).length%2===0)&&((pre.match(/"/g)||[]).length%2===0)){tail='<span class="c">'+esc(line.slice(cm.index,cm.index+cm[0].length))+'</span>'+(cm.index+cm[0].length<line.length?hl(line.slice(cm.index+cm[0].length),L):"");line=pre}
+    }
+    const re=/("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(\$[A-Za-z_]+|\?[A-Za-z_]+|_:[A-Za-z_]+|:[A-Za-z_]+)|\b(\d+(?:\.\d+)?)\b|([A-Za-z_@][\w]*)(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="s">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="t">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="n">'+m[3]+'</span>';
+      else if(m[4]){
+        const w=m[4];
+        const cls=L.kw.has(w)||L.kw.has(w.toUpperCase())&&L===LANG.sql?"k":L.ty.has(w)?"t":(L.fn.has(w)||m[5])?"fn":(/^[A-Z][A-Z_]+$/.test(w)&&L!==LANG.sql?"p":"");
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[5]?esc(m[5]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last))+tail;
+  }
+  document.querySelectorAll('script[type="text/x-code"]').forEach(sc=>{
+    const L=LANG[sc.dataset.lang]||LANG.js;
+    const lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");const [a,b]=r.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    if(sc.dataset.style) div.setAttribute("style",sc.dataset.style);
+    const nonum=sc.hasAttribute("data-nonum");
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'">'+(nonum?'':'<span class="no">'+(i+1)+'</span>')+'<span>'+(hl(l,L)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+})();
+</script>
+<script>
+(function(){
+  // ---------- C++ highlighter (same as lec03) ----------
+  const KW=new Set("if else for while do return break continue switch case default struct class using namespace const static new delete true false sizeof public private include pragma auto".split(" "));
+  const TY=new Set("int double float char void bool long short unsigned string".split(" "));
+  const LIB=new Set("cout cin endl sqrt fabs std".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line){
+    if(/^\s*#/.test(line)) return '<span class="p">'+esc(line)+'</span>';
+    const re=/(\/\/.*$)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="n">'+m[3]+'</span>';
+      else if(m[4]){
+        const w=m[4];
+        let cls=KW.has(w)?"k":TY.has(w)?"t":LIB.has(w)?"fn":(m[5]?"fn":"");
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[5]?esc(m[5]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-cpp"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");const [a,b]=r.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+  // ---------- deck engine ----------
+  // .f fragments, shown one per step. Per fragment:
+  //   data-act  "sel|cls;…"   class kept while the fragment is shown
+  //   data-now  "sel|cls;…"   class only while it is the latest fragment
+  //   data-set  "sel::html;…" content set while shown (later fragments win)
+  //   data-say  narration for the .say line
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")].sort((x,y)=>(+x.dataset.o||0)-(+y.dataset.o||0)); // data-o: show later
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  const pairs=(v,sep)=>(v||"").split(";").filter(Boolean).map(p=>{const k=p.indexOf(sep);return [p.slice(0,k).trim(),p.slice(k+sep.length)]});
+  function tog(v,on){pairs(v,"|").forEach(([sel,cls])=>{document.querySelectorAll(sel).forEach(t=>t.classList.toggle(cls,on))})}
+  // remember original content of every data-set target
+  document.querySelectorAll("[data-set]").forEach(f=>pairs(f.dataset.set,"::").forEach(([sel])=>{document.querySelectorAll(sel).forEach(t=>{if(t.dataset.orig===undefined)t.dataset.orig=t.innerHTML})}));
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach(f=>{tog(f.dataset.now,false);tog(f.dataset.act,false)});
+      s.querySelectorAll("[data-orig]").forEach(t=>t.innerHTML=t.dataset.orig);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step);f.classList.toggle("on",on);if(on){tog(f.dataset.act,true);pairs(f.dataset.set,"::").forEach(([sel,val])=>document.querySelectorAll(sel).forEach(t=>t.innerHTML=val))}});
+      if(i===cur&&step>0)tog(fs[step-1].dataset.now,true);
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.innerHTML=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length;
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    try{history.replaceState(null,"","#"+slides[cur].id)}catch(e){}
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+  addEventListener("keydown",e=>{
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+
+</script>
+</body>
+</html>

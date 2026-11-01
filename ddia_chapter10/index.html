@@ -1,0 +1,1313 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DDIA Chapter 10 · Batch Processing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+h1{font-size:70px;line-height:1.1;font-weight:800}
+h2{font-size:38px;line-height:1.2;font-weight:800}
+h3{font-size:23px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:22px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:26px;margin:6px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.88em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 6px;border-radius:6px;color:#be185d}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.cols.c64{grid-template-columns:1.25fr 1fr}.cols.c46{grid-template-columns:1fr 1.2fr}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.card.bad{border-color:#fecdd3;background:linear-gradient(180deg,#fff1f3,#fff)}
+.card.good{border-color:#a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff)}
+.lbl{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
+.icon{font-size:34px;margin-bottom:4px}
+.note{margin-top:12px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:20px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.code{font-family:var(--mono);font-size:18px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
+.code.sm{font-size:16.5px}.code.xs{font-size:15px;line-height:1.45}.code.xxs{font-size:13.6px;line-height:1.38;padding:8px 0}
+.code .ln{padding:0 14px 0 8px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.11);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.13);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
+.code-title{font-family:var(--mono);font-size:15px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+.f.zoom{transform:scale(.85)}.f.zoom.on{transform:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:19px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.legend{display:flex;flex-direction:column;gap:10px}
+.leg{border-radius:12px;padding:10px 16px;background:#fff;border:1px solid var(--line)}
+.leg b{display:block;font-size:21px;margin-bottom:2px}
+.leg p{font-size:19px}
+.leg.a{border-left:6px solid #7c3aed}.leg.b{border-left:6px solid #06b6d4}.leg.c{border-left:6px solid #f59e0b}
+.console{font-family:var(--mono);font-size:17px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.mem{display:flex;align-items:center;gap:16px;min-height:130px}
+.frame{border:2px solid #e4dcfb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
+.frame .fname{font-family:var(--mono);font-size:16px;color:var(--muted);margin-bottom:6px}
+.var{display:flex;align-items:center;gap:10px}
+.vn{font-family:var(--mono);font-size:21px;color:var(--t);font-weight:600}
+.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #c4b5fd;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
+.vb .new{display:none}
+.callee,.arw{opacity:0;transform:translateX(-14px);transition:all .5s}
+.mem.s1 .callee,.mem.s1 .arw{opacity:1;transform:none}
+.mem.s2 .chg .old{display:none}.mem.s2 .chg .new{display:inline;animation:pop .5s}
+.mem.s2 .chg{border-color:#f59e0b;box-shadow:0 0 18px rgba(245,158,11,.5)}
+.mem.s3 .callee,.mem.s3 .arw{opacity:.15;transform:translateY(10px)}
+.mem.s3 .result{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.5)}
+.arw{font-family:var(--mono);font-size:16px;color:var(--gold);text-align:center;line-height:1.2;font-weight:600}
+.arw .bar{display:block;font-size:30px}
+.alias{font-size:18px;color:var(--accent2);font-weight:600}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.25)}100%{transform:none;opacity:1}}
+.flow{display:flex;align-items:center;gap:12px;justify-content:center}
+.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:18px;border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:14px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.h{border-color:var(--gold)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#c4b5fd}.box.exe{border-color:#ec4899;background:#fdf2f8}
+.ar{color:var(--muted);font-size:26px;text-align:center}
+.stack{display:flex;flex-direction:column;gap:8px}
+svg text{font-family:var(--mono);font-weight:600}
+.draw{stroke-dasharray:400;stroke-dashoffset:400;transition:stroke-dashoffset 1s ease}
+svg.d1 .dr1,svg.d2 .dr2,svg.d3 .dr3{stroke-dashoffset:0}
+.fadein{opacity:0;transition:opacity .6s}
+svg.d1 .fd1,svg.d2 .fd2,svg.d3 .fd3{opacity:1}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:19px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05)}
+.ag:hover{border-color:#ec4899;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
+.ag b{color:#db2777;margin-right:6px;font-family:var(--mono)}
+.formula{font-family:var(--mono);font-size:23px;text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:16px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+@media (max-width:700px){#hint{display:none}}
+@media print{#nav,#bar,#hint{display:none}}
+
+/* lec03 additions */
+.chain{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pv{display:inline-flex;align-items:center;font-family:var(--mono);font-size:18px;font-weight:700;padding:5px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;white-space:nowrap}
+.pv.yes{background:#d1fae5;border-color:#34d399;color:#047857}
+.pv.no{background:#ffe4e6;border-color:#fb7185;color:#be123c}
+.pv.skip{background:#f1f5f9;border-color:#cbd5e1;color:#94a3b8;text-decoration:line-through;border-style:dashed}
+.op{font-family:var(--mono);font-size:26px;font-weight:800;color:var(--sa1)}
+.tt th,.tt td{text-align:center}.tt td:first-child{color:var(--text);font-weight:400}
+.tt tr.hit td{background:#fdf2f8;color:#be185d}
+tr.f{transform:none}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.code.show-s .mark-s{opacity:.3;text-decoration:line-through}
+.arr{display:flex;gap:12px;justify-content:center;margin-top:6px}
+.cell{width:84px;height:84px;border-radius:16px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:800;transition:all .45s;box-shadow:0 6px 16px -10px rgba(124,58,237,.4)}
+.cell small{font-size:13px;color:var(--muted);font-weight:600}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857;transform:translateY(-6px)}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;transform:translateY(-10px) scale(1.06);box-shadow:0 10px 24px -8px rgba(225,29,72,.5)}
+.cell.skip{opacity:.3;transform:scale(.92)}
+.syn{display:flex;gap:12px;align-items:center;justify-content:center;font-family:var(--mono);font-size:24px;font-weight:700}
+.sy{padding:8px 16px;border-radius:12px;color:#fff}
+.sy.c1{background:linear-gradient(135deg,#7c3aed,#a855f7)}.sy.c2{background:linear-gradient(135deg,#059669,#10b981)}.sy.c3{background:linear-gradient(135deg,#e11d48,#f97316)}
+.spin{display:inline-block;animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* lec04 arrays additions */
+.cell .v{display:block;line-height:1}
+.cell.max{border-color:#db2777;background:#fdf2f8;color:#be185d}
+.cell.empty{border-style:dashed;background:#f8fafc;color:#cbd5e1;box-shadow:none}
+.cell.done{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cell.new{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.cell.out{opacity:.4;border-style:dashed}
+.cell.gone{border-color:#e11d48;background:#fff1f3;color:#be123c;text-decoration:line-through}
+.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(245,158,11,.55)}
+.cell.cmp{border-color:#0891b2;background:#ecfeff;color:#0e7490;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(8,145,178,.5)}
+.cell.dots{border:none;box-shadow:none;background:none;width:40px;color:var(--muted)}
+.arr.sm .cell{width:70px;height:74px;font-size:24px;border-radius:14px}
+.arr.xs .cell{width:56px;height:62px;font-size:19px;border-radius:12px}
+.arr.xs .cell small{font-size:11.5px}
+.arr.left{justify-content:flex-start}
+.addr{display:flex;gap:12px;justify-content:center;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.addr span{width:84px;text-align:center}
+.vars{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.vc{font-family:var(--mono);font-size:19px;font-weight:700;padding:5px 14px;border-radius:12px;background:#fff;border:2px solid #e4dcfb;transition:all .35s}
+.vc b{color:var(--t)}
+.vc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.45)}
+.vc.res{border-color:#10b981;background:#ecfdf5;color:#047857}
+.ci{opacity:0;transition:opacity .4s}.ci.show{opacity:1}
+.say{font-size:20px;margin-top:12px;min-height:56px;color:var(--muted)}
+.say b{color:var(--text)}
+.rowlbl{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted);margin:10px 0 4px}
+.zone{display:flex;gap:6px;justify-content:center;margin-top:8px;font-size:15px;font-weight:700}
+.zone span{padding:3px 10px;border-radius:999px}
+.z1{background:#d1fae5;color:#047857}.z2{background:#f1f5f9;color:#64748b}.z3{background:#ffe4e6;color:#be123c}
+.brace{display:flex;gap:12px;justify-content:center;margin-top:4px}
+.brace div{border-top:3px solid currentColor;padding-top:4px;text-align:center;font-family:var(--mono);font-size:15px;font-weight:700}
+.mx{display:grid;gap:6px;justify-content:center}
+.mc{width:62px;height:52px;border-radius:10px;border:2px solid #e4dcfb;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .4s}
+.mx.sm .mc{width:44px;height:36px;font-size:14px;border-radius:8px}
+.mc.ix{border:none;background:none;color:var(--muted);font-size:14px;font-weight:600;box-shadow:none}
+.mc.unused{border-style:dashed;background:#f8fafc;color:#cbd5e1}
+.mc.used{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.mc.hl{background:#fffbeb;border-color:#fcd34d}
+.mc.cur{border-color:#f59e0b;background:#fde68a;color:#92400e;transform:scale(1.12);box-shadow:0 8px 20px -6px rgba(245,158,11,.6)}
+.mc.bd{border-color:#ec4899;border-width:3px}
+.mc.inr{opacity:.3}
+.mc.pos{border-color:#10b981;background:#d1fae5;color:#047857}
+.mc.neg{background:#fff1f3;color:#be123c}
+.mc.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;border-style:dashed}
+.strip{display:flex;gap:3px;font-family:var(--mono);font-size:12px;flex-wrap:nowrap;overflow:hidden}
+.strip span{padding:6px 5px;border-radius:5px;background:#f3edff;color:#6d28d9;white-space:nowrap}
+.strip span.r1{background:#e0f2fe;color:#0369a1}
+.strip span.gap{background:none;color:var(--muted)}
+.trace td,.trace th{font-size:17px;padding:5px 10px}
+.trace td:first-child{color:var(--text)}
+.trace tr.now td{background:#fffbeb}
+.sig{font-family:var(--mono);font-size:17px;background:#fff;border:1px dashed #c4b5fd;border-radius:10px;padding:6px 12px;color:#6d28d9;display:inline-block}
+
+.cols>*{min-width:0}
+
+/* ===== DDIA ch1 additions ===== */
+.sv{width:100%;height:auto;overflow:visible}
+.sv text{font-family:"Be Vietnam Pro",system-ui,sans-serif;font-weight:700;font-size:15px;fill:#1e1b3a}
+.sv text.sm{font-size:12.5px;fill:#64607d;font-weight:500}
+.sv text.lb{font-size:12.5px;fill:#7c3aed;font-weight:700}
+.sv .nd{fill:#fff;stroke:#c4b5fd;stroke-width:2}
+.sv .nd.c2{stroke:#0891b2}.sv .nd.c3{stroke:#ec4899}.sv .nd.c4{stroke:#f59e0b}.sv .nd.c5{stroke:#10b981}
+.sv .ln{stroke:#a78bfa;stroke-width:2.2;fill:none}
+.sv .g{opacity:0;transition:opacity .55s}
+.sv .g.hot .ln{stroke:#ec4899;stroke-dasharray:7 6;animation:dash .7s linear infinite}
+.sv .g.hot .nd{filter:drop-shadow(0 6px 10px rgba(236,72,153,.35))}
+@keyframes dash{to{stroke-dashoffset:-13}}
+.sv .box6{fill:none;stroke:#ec4899;stroke-width:2.5;stroke-dasharray:9 7}
+.chip{display:inline-flex;align-items:center;gap:8px;font-size:18px;font-weight:600;padding:6px 14px;border-radius:999px;background:#fff;border:2px solid #e4dcfb;white-space:nowrap}
+.chip.p{border-color:#c4b5fd;background:#f5f0ff;color:#6d28d9}.chip.c{border-color:#a5f3fc;background:#ecfeff;color:#0e7490}.chip.k{border-color:#fbcfe8;background:#fdf2f8;color:#be185d}.chip.y{border-color:#fde68a;background:#fffbeb;color:#b45309}.chip.g{border-color:#a7f3d0;background:#ecfdf5;color:#047857}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.cell.t{font-size:15px;font-weight:700;text-align:center;line-height:1.15;padding:4px}
+.cell.t .v{font-size:15px}
+.cell.big{font-size:30px}
+.stat{font-family:var(--mono);font-size:44px;font-weight:800;line-height:1;background:linear-gradient(90deg,var(--sa1),var(--sa2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat small{font-size:18px}
+.sysbox{border-radius:14px;padding:12px 16px;text-align:center;font-weight:700;font-size:20px;border:2px solid #e4dcfb;background:#fff;transition:all .45s}
+.sysbox.fail{border-color:#e11d48;background:#fff1f3;color:#be123c;box-shadow:0 0 22px rgba(225,29,72,.35)}
+.sysbox.ok{border-color:#10b981;background:#ecfdf5;color:#047857;box-shadow:0 0 22px rgba(16,185,129,.3)}
+.shield{opacity:0;transform:scale(.7);transition:all .45s;font-size:15px;font-weight:700;color:#7c3aed;text-align:center;border:2px dashed #a78bfa;border-radius:12px;padding:6px 10px;background:#f5f0ff}
+.shield.on{opacity:1;transform:none}
+.dots{display:grid;grid-template-columns:repeat(25,1fr);gap:5px;padding:12px;background:#fff;border:1px solid var(--line);border-radius:14px}
+.dots i{display:block;aspect-ratio:1;border-radius:4px;background:#e9e3fb;transition:all .4s}
+.dots i.x{background:#e11d48;transform:scale(1.35);box-shadow:0 0 10px rgba(225,29,72,.6)}
+.dots i.r{background:#10b981}
+.node{width:110px;border-radius:14px;border:2.5px solid #c4b5fd;background:#fff;text-align:center;padding:8px 4px;font-weight:700;transition:all .45s}
+.node .ver{display:block;font-family:var(--mono);font-size:22px;color:#6d28d9}
+.node small{display:block;font-size:13px;color:var(--muted);font-weight:600}
+.node.down{border-color:#f59e0b;background:#fffbeb;opacity:.55;transform:translateY(8px)}
+.node.v2{border-color:#10b981;background:#ecfdf5}.node.v2 .ver{color:#047857}
+.node.bad{border-color:#e11d48;background:#fff1f3;color:#be123c}.node.bad .ver{color:#be123c}
+.nodes{display:flex;gap:14px;justify-content:center}
+.casc{display:flex;align-items:center;gap:6px;justify-content:center}
+.casc .ar{font-size:22px}
+.tw{display:inline-block;font-size:13px;font-weight:700;padding:2px 8px;border-radius:6px;background:#fdf2f8;color:#be185d;border:1px solid #fbcfe8;margin:2px;opacity:0;transform:translateY(-10px) scale(.6);transition:all .45s}
+.tw.show{opacity:1;transform:none}
+.tw.b{background:#ecfeff;color:#0e7490;border-color:#a5f3fc}
+.tw.y{background:#fffbeb;color:#b45309;border-color:#fde68a}
+.mbox{border:2px solid #e4dcfb;border-radius:12px;background:#fff;padding:6px 8px;min-height:84px;transition:all .4s}
+.mbox h4{font-size:14px;color:var(--muted);margin-bottom:4px}
+.mbox.hot{border-color:#0891b2;box-shadow:0 0 16px rgba(8,145,178,.35)}
+.mboxes{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.who{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:18px;padding:8px 14px;border-radius:12px;background:#fff;border:2px solid #fbcfe8}
+.big-ar{font-size:30px;color:var(--muted);text-align:center;line-height:1}
+.rt{display:flex;height:58px;border-radius:12px;overflow:hidden;border:2px solid #e4dcfb;background:#fff}
+.rt>div{display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;opacity:0;transition:opacity .45s;white-space:nowrap}
+.rt>div.show{opacity:1}
+.rt .n1,.rt .n2{background:#94a3b8}.rt .q{background:#f59e0b}.rt .sv2{background:#7c3aed}
+.brk{position:relative;height:44px;margin-top:6px}
+.brk>div{position:absolute;top:0;border-top:3px solid;text-align:center;font-size:15px;font-weight:700;padding-top:4px;opacity:0;transition:opacity .45s}
+.brk>div.show{opacity:1}
+.pc rect.b{fill:#c4b5fd;transform:translateX(var(--x0));transition:transform 1.3s cubic-bezier(.6,0,.2,1) calc(var(--d)*7ms),fill .4s}
+.pc.sorted rect.b{transform:translateX(var(--x1))}
+.pc.p95 rect.t95{fill:#f472b6}.pc.p99 rect.t99{fill:#e11d48}
+.pc .mk{opacity:0;transition:opacity .5s}
+.pc.mean .mkm,.pc.p50 .mk50,.pc.p95 .mk95,.pc.p99 .mk99{opacity:1}
+.pc text{font-family:var(--mono);font-size:12px;font-weight:700}
+.q-row{display:flex;gap:8px;align-items:center}
+.rq{height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;font-weight:700;color:#fff;transition:all .5s}
+.rq.slow{width:190px;background:linear-gradient(135deg,#e11d48,#f97316)}
+.rq.fast{width:54px;background:linear-gradient(135deg,#0891b2,#7c3aed)}
+.rq.wait{box-shadow:0 0 0 3px #fde68a;animation:shake .5s infinite}
+.rq.done{opacity:.25}
+@keyframes shake{50%{transform:translateY(-3px)}}
+.srv{border:2.5px solid #7c3aed;border-radius:14px;padding:10px 14px;text-align:center;font-weight:800;background:#f5f0ff;min-width:120px}
+.be{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;margin:6px 0}
+.be .nm{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted)}
+.be .trk{height:26px;border-radius:8px;background:#f5f3ff;position:relative;overflow:hidden}
+.be .bb{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:8px;background:linear-gradient(90deg,#0891b2,#7c3aed);transition:width 1s ease}
+.be .bb.slow{background:linear-gradient(90deg,#f97316,#e11d48)}
+.run .be .bb{width:var(--w)}
+.mach{border:3px solid #7c3aed;border-radius:14px;background:#f5f0ff;display:flex;align-items:center;justify-content:center;font-weight:800;color:#6d28d9;transition:all .7s cubic-bezier(.2,.8,.2,1);width:90px;height:70px;font-size:15px;text-align:center}
+.mach.big{width:220px;height:170px;font-size:22px;border-width:5px;box-shadow:0 14px 30px -12px rgba(124,58,237,.6)}
+.mach.sm2{width:70px;height:56px;font-size:13px;border-color:#0891b2;background:#ecfeff;color:#0e7490;opacity:0;transform:scale(.5)}
+.mach.sm2.show{opacity:1;transform:none}
+.farm{display:grid;grid-template-columns:repeat(4,70px);gap:10px;justify-content:center}
+.layer{border-radius:12px;padding:10px 14px;font-weight:700;font-size:17px;text-align:center;transition:all .6s}
+.layer.top{background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;font-size:20px}
+.layer.hid{background:#f8fafc;border:2px dashed #cbd5e1;color:#64748b;font-weight:600;font-size:16px}
+.abs.cover .layer.hid{opacity:.25;filter:blur(1.5px)}
+.toggle{display:flex;gap:10px;align-items:center;justify-content:center}
+.pill{padding:8px 16px;border-radius:999px;font-weight:800;font-size:17px;border:2px solid #e4dcfb;background:#fff;transition:all .4s;color:var(--muted)}
+.pill.on{background:linear-gradient(135deg,var(--sa1),var(--sa2));color:#fff;border-color:transparent;transform:scale(1.06)}
+.quote{font-size:21px;line-height:1.45;font-style:italic;color:#4c4672;border-left:5px solid #ec4899;padding:8px 18px;background:rgba(255,255,255,.7);border-radius:8px}
+.quote b{font-style:normal}
+.mini li{font-size:18px;margin:3px 0;line-height:1.35}
+.card p.ps,p.ps{font-size:17px;line-height:1.4}
+.vs{font-weight:800;font-size:22px;color:var(--muted);align-self:center;text-align:center}
+.here{display:inline-block;font-size:13px;font-weight:800;color:#fff;background:#e11d48;border-radius:6px;padding:2px 8px;margin-left:6px;opacity:0;transition:opacity .4s}
+.here.show{opacity:1}
+.cols4>.card.lit{box-shadow:0 0 0 3px #ec4899,0 12px 26px -10px rgba(236,72,153,.5);transform:translateY(-4px)}
+.card{transition:all .4s}
+
+.chip.c,.leg.c{font-style:normal}.leg.c{color:var(--text)}.leg.c b{color:var(--text)}
+.leg p b{display:inline;font-size:inherit;margin:0}
+.toggle .pill{font-size:15px;white-space:nowrap}
+.abs.cover .layer.hid{opacity:.4;filter:blur(1px)}
+.mach.big{width:260px;font-size:21px}
+.sv text.lb,.pc text{paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+.sv.s1 .g1{opacity:1}.sv.s2 .g2{opacity:1}.sv.s3 .g3{opacity:1}.sv.s4 .g4{opacity:1}.sv.s5 .g5{opacity:1}.sv.s6 .g6{opacity:1}.sv.s7 .g7{opacity:1}.sv.s8 .g8{opacity:1}.who.hot{border-color:#ec4899;box-shadow:0 0 18px rgba(236,72,153,.45)}.toggle.flip #ev1{background:#fff;color:var(--muted);border-color:#e4dcfb;transform:none}.toggle.flip #ev2{background:linear-gradient(135deg,var(--sa1),var(--sa2));color:#fff;border-color:transparent;transform:scale(1.06)}.dots{grid-template-columns:repeat(50,1fr);gap:3px}.dots i{border-radius:2px}
+/* ===== DDIA ch10 additions ===== */
+.code .ln.hl{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
+.code .ln.dim{opacity:.35}
+.console.data{font-size:15.5px;line-height:1.45;min-height:250px;transition:all .3s}
+.console .u{color:#7dd3fc}.console .cnt{color:#f472b6;font-weight:700}.console .dm{color:#8b85b0}
+.sv .nd.c6{stroke:#94a3b8}
+.sv .pp1{fill:#ede9fe;stroke:#7c3aed;stroke-width:1.6}.sv .pp2{fill:#cffafe;stroke:#0891b2;stroke-width:1.6}.sv .pp3{fill:#fce7f3;stroke:#ec4899;stroke-width:1.6}
+.sv .l1{stroke:#7c3aed}.sv .l2{stroke:#0891b2}.sv .l3{stroke:#ec4899}
+.sv .blk{fill:#fffbeb;stroke:#f59e0b;stroke-width:1.6}
+.sv .blk.b2{fill:#ecfeff;stroke:#0891b2}.sv .blk.b3{fill:#fdf2f8;stroke:#ec4899}
+.sv .dead .nd{stroke:#e11d48;fill:#fff1f3}.sv .dead{opacity:.45;transition:opacity .5s}
+.sv .xmark{opacity:0;transition:opacity .4s}.sv.s5 .xmark{opacity:1}
+.sv .hl2 .nd,.sv .hl2 .blk{filter:drop-shadow(0 0 8px rgba(16,185,129,.7))}
+.sv circle.vx{fill:#fff;stroke:#c4b5fd;stroke-width:3;transition:all .45s}
+.sv g.vh circle.vx{stroke:#ec4899;fill:#fdf2f8;filter:drop-shadow(0 0 8px rgba(236,72,153,.55))}
+.sv g.vd circle.vx{stroke:#10b981;fill:#ecfdf5}
+.sv text.big{font-size:22px;font-family:var(--mono);font-weight:800;fill:#6d28d9}
+.sv .edge{stroke:#cbd5e1;stroke-width:3}
+.sv .msg{opacity:0;transition:opacity .4s}.sv.m1 .msg1,.sv.m2 .msg2,.sv.m3 .msg3{opacity:1}
+.sv .msg path{stroke:#ec4899;stroke-width:2.5;fill:none;stroke-dasharray:6 5;animation:dash .7s linear infinite}
+.kv{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:14.5px;font-weight:700;padding:3px 9px;border-radius:8px;border:1.5px solid #e4dcfb;background:#fff;margin:2px;opacity:0;transform:translateY(-8px) scale(.7);transition:all .45s}
+.kv.show{opacity:1;transform:none}
+.kv .key{color:#be185d}.kv.ev{background:#ecfeff;border-color:#a5f3fc}.kv.us{background:#f5f0ff;border-color:#c4b5fd}.kv.out{background:#ecfdf5;border-color:#6ee7b7;color:#047857}
+.kv.first{box-shadow:0 0 0 3px #f59e0b}
+.grp{border:2px dashed #e4dcfb;border-radius:12px;padding:6px 8px;margin:6px 0;min-height:44px;transition:all .4s}
+.grp.hot{border-color:#ec4899;border-style:solid;background:#fff7fb}
+.grp h4{font-family:var(--mono);font-size:13px;color:var(--muted);margin-bottom:2px}
+.colh{font-size:15px;font-weight:800;letter-spacing:.04em;color:var(--sa1);margin-bottom:6px;text-transform:uppercase}
+.tbl{border:2px solid #e4dcfb;border-radius:12px;background:#fff;overflow:hidden;font-family:var(--mono);font-size:14px}
+.tbl div{padding:3px 10px;border-bottom:1px solid var(--line);transition:all .4s}
+.tbl div:last-child{border-bottom:none}
+.tbl .th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:800}
+.tbl .rw.hit{background:#fef3c7;color:#92400e;font-weight:700}
+.mapper{border:2.5px solid #0891b2;border-radius:14px;background:#fff;padding:8px 10px;transition:all .45s}
+.mapper h4{font-size:15px;color:#0e7490;margin-bottom:6px}
+.mapper.hot{box-shadow:0 0 18px rgba(8,145,178,.4)}
+.ht{opacity:0;transform:scale(.6);transition:all .5s;border:2px dashed #7c3aed;border-radius:10px;padding:4px 8px;background:#f5f0ff;font-family:var(--mono);font-size:13px;color:#6d28d9;font-weight:700;margin-bottom:6px}
+.ht.show{opacity:1;transform:none}
+.run.bal .be .bb{width:var(--w2)}
+.be .bb.hot{background:linear-gradient(90deg,#f97316,#e11d48)}
+.gantt{position:relative;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.gr{display:grid;grid-template-columns:96px 1fr;align-items:center;gap:8px;height:28px}
+.gr .nm{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--muted)}
+.gr .trk{position:relative;height:20px}
+.gr .bb{position:absolute;top:0;bottom:0;left:var(--l);width:0;border-radius:6px;background:linear-gradient(90deg,#0891b2,#7c3aed);transition:width .9s ease calc(var(--d,0)*1ms);font-size:11px;color:#fff;font-weight:700;display:flex;align-items:center;padding-left:6px;white-space:nowrap;overflow:hidden}
+.gr .bb.j2{background:linear-gradient(90deg,#ec4899,#f97316)}
+.gr .bb.st{background:linear-gradient(90deg,#f59e0b,#e11d48)}
+.gr .bb.io{background:repeating-linear-gradient(45deg,#94a3b8 0 6px,#cbd5e1 6px 12px);color:#334155}
+.gantt.run .bb{width:var(--w)}
+.vline{position:absolute;top:4px;bottom:4px;width:0;border-left:2px dashed #e11d48;opacity:0;transition:opacity .4s}
+.gantt.run .vline{opacity:1}
+.prob{font-family:var(--mono);font-size:22px;font-weight:700;text-align:center;padding:10px;border-radius:12px;background:#fff;border:1px solid var(--line)}
+.prob .r{color:#e11d48}
+.dots.d20{grid-template-columns:repeat(20,1fr);gap:6px}
+.jobchain{display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:nowrap}
+.job{border-radius:12px;padding:8px 12px;font-weight:800;font-size:16px;text-align:center;border:2.5px solid #7c3aed;background:#f5f0ff;color:#6d28d9;transition:all .45s;min-width:92px}
+.job small{display:block;font-size:12px;font-weight:600;color:var(--muted)}
+.job.dir{border-color:#f59e0b;background:#fffbeb;color:#b45309;font-family:var(--mono);font-size:13.5px;border-style:dashed}
+.job.done{border-color:#10b981;background:#ecfdf5;color:#047857}
+.job.wait{opacity:.35}
+.job.hot{box-shadow:0 0 18px rgba(236,72,153,.45);border-color:#ec4899}
+.jar{font-size:22px;color:var(--muted)}
+.ux{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.slot{border:2px solid #e4dcfb;border-radius:12px;padding:8px 12px;background:#fff;text-align:center;font-weight:700;transition:all .45s}
+.slot small{display:block;font-size:13px;font-weight:600;color:var(--muted)}
+.slot.ok{border-color:#10b981;background:#ecfdf5;color:#047857;box-shadow:0 0 14px rgba(16,185,129,.3)}
+.slot.old{opacity:.4;text-decoration:line-through}
+.slot.bad{border-color:#e11d48;background:#fff1f3;color:#be123c}
+.plug{display:flex;align-items:center;gap:10px;justify-content:center}
+.port{font-family:var(--mono);font-size:15px;font-weight:700;padding:6px 10px;border-radius:999px;border:2px dashed #94a3b8;color:#64748b;background:#f8fafc;transition:all .45s}
+.port.on{border-style:solid;border-color:#0891b2;color:#0e7490;background:#ecfeff}
+.prog{border:3px solid #7c3aed;border-radius:14px;padding:12px 16px;font-weight:800;background:#f5f0ff;color:#6d28d9;text-align:center}
+.cmp td:first-child{color:var(--text)}
+.cmp td,.cmp th{font-size:16.5px;padding:7px 10px}
+.cmp tr.f td{transition:all .4s}
+.tag{display:inline-block;font-family:var(--mono);font-size:12.5px;font-weight:700;padding:1px 8px;border-radius:6px;background:#f1f5f9;color:#475569;margin:1px}
+.tbl div.hit{background:#fef3c7;color:#92400e;font-weight:700}
+.tbl.hot{border-color:#ec4899;box-shadow:0 0 16px rgba(236,72,153,.4)}
+.slot.hot{border-color:#f59e0b;background:#fffbeb;color:#b45309;box-shadow:0 0 14px rgba(245,158,11,.4)}
+.job.wait.done,.job.wait.hot{opacity:1}
+.slot.ok.hot{border-color:#10b981;background:#ecfdf5;color:#047857;box-shadow:0 0 14px rgba(16,185,129,.3)}
+.jobchain.big{gap:12px}.jobchain.big .job{font-size:21px;padding:16px 20px;min-width:150px}.jobchain.big .job small{font-size:14px}.jobchain.big .job.dir{font-size:17px}.jobchain.big .jar{font-size:30px}
+#dataflow .chip{white-space:normal;font-size:16.5px}
+#hlapi .card p.ps{font-size:18px}
+#smj .kv{font-size:17px;padding:5px 11px}#smj .grp{min-height:56px;padding:8px 10px}#smj .mapper h4{font-size:16px}
+#joinex .tbl{font-size:16.5px}#joinex .tbl div{padding:5px 12px}
+#transp .card p.ps{font-size:19px}#transp .card{padding:18px 20px}
+#skew .be{margin:12px 0}#skew .be .trk{height:32px}
+#faults .prob{font-size:19px}
+#workflow .card p.ps{font-size:18px}
+.gr .bb{padding-left:0}.gantt.run .bb{padding-left:6px}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="deck">
+
+<!-- ===================== TITLE ===================== -->
+<section class="slide" id="title">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// DDIA · Part III · Chapter 10</div>
+    <h1 class="in" style="font-size:76px"><span class="grad">Batch Processing</span></h1>
+    <p class="in muted" style="font-size:24px;margin-top:18px;max-width:1000px"><i>Designing Data-Intensive Applications</i> — Martin Kleppmann. Từ <b>Unix tools</b> đến <b>MapReduce</b>, <b>join algorithms</b>, và các <b>dataflow engines</b> (Spark, Tez, Flink) — cách xử lý một lượng lớn data <b>bounded</b> để sinh ra <b>derived data</b>.</p>
+    <div class="quote in" style="margin-top:26px;max-width:1000px;font-size:19px">“A system cannot be successful if it is too strongly influenced by a single person. Once the initial design is complete and fairly robust, the real test begins as people with many different viewpoints undertake their own experiments.” <b>— Donald Knuth</b></div>
+    <p class="in" style="margin-top:26px;font-size:18px;color:#8a91b4">Phím ← → hoặc Space: chạy từng bước · Shift+→: qua slide · A: hiện hết · F: toàn màn hình</p>
+  </div>
+</section>
+
+<!-- ===================== AGENDA ===================== -->
+<section class="slide" id="agenda">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:18px">· bấm vào mục để đi tới</span></div>
+  <div class="agenda in" style="gap:10px">
+    <div class="ag" data-goto="part3"><b>01</b>Part III: Derived Data</div>
+    <div class="ag" data-goto="three"><b>02</b>Services · Batch · Stream</div>
+    <div class="ag" data-goto="unix"><b>03</b>Batch Processing with Unix Tools</div>
+    <div class="ag" data-goto="sortmem"><b>04</b>Sorting vs in-memory aggregation</div>
+    <div class="ag" data-goto="unixphil"><b>05</b>The Unix Philosophy</div>
+    <div class="ag" data-goto="hdfs"><b>06</b>HDFS · distributed filesystem</div>
+    <div class="ag" data-goto="mrsteps"><b>07</b>MapReduce Job Execution</div>
+    <div class="ag" data-goto="mrdist"><b>08</b>Distributed execution &amp; shuffle</div>
+    <div class="ag" data-goto="workflow"><b>09</b>MapReduce workflows</div>
+    <div class="ag" data-goto="joinex"><b>10</b>Reduce-side joins</div>
+    <div class="ag" data-goto="smj"><b>11</b>Sort-merge join</div>
+    <div class="ag" data-goto="skew"><b>12</b>GROUP BY &amp; handling skew</div>
+    <div class="ag" data-goto="bhj"><b>13</b>Map-side joins</div>
+    <div class="ag" data-goto="output"><b>14</b>Output of batch workflows</div>
+    <div class="ag" data-goto="mpp"><b>15</b>Hadoop vs MPP databases</div>
+    <div class="ag" data-goto="faults"><b>16</b>Designing for frequent faults</div>
+    <div class="ag" data-goto="mat"><b>17</b>Materialization of intermediate state</div>
+    <div class="ag" data-goto="dataflow"><b>18</b>Dataflow engines</div>
+    <div class="ag" data-goto="pregel"><b>19</b>Graphs &amp; the Pregel model</div>
+    <div class="ag" data-goto="hlapi"><b>20</b>High-level APIs · Summary</div>
+  </div>
+</section>
+
+<!-- ===================== PART III ===================== -->
+<section class="slide" id="part3">
+  <div class="hdr in"><span class="qn">PART III</span><h2>Derived Data</h2></div>
+  <p class="in muted" style="font-size:21px;max-width:1150px">Trong thực tế, một ứng dụng lớn thường phải <b>tích hợp nhiều data system</b> khác nhau (database, cache, search index, analytics…). Part III bàn về cách ghép chúng lại thành một kiến trúc coherent.</p>
+  <div class="cols" style="margin-top:18px;gap:20px">
+    <div class="card f"><span class="lbl info">SYSTEMS OF RECORD</span><h3>Source of truth</h3><p class="ps">Giữ phiên bản <b>authoritative</b> của data. Data mới được ghi vào đây <b>đầu tiên</b>; mỗi fact được biểu diễn đúng một lần (thường là <b>normalized</b>). Nếu có khác biệt giữa các hệ thống, system of record là đúng.</p></div>
+    <div class="card f"><span class="lbl good">DERIVED DATA SYSTEMS</span><h3>Kết quả của một transformation</h3><p class="ps">Lấy data có sẵn rồi <b>transform/process</b> theo cách nào đó. Mất thì <b>tạo lại được</b> từ source. Ví dụ: <b>cache</b>, <b>denormalized values</b>, <b>indexes</b>, <b>materialized views</b>, recommendation model.</p></div>
+  </div>
+  <div class="cols3" style="margin-top:16px">
+    <div class="card f zoom" id="p3c10"><div class="icon">📦</div><h3>Chapter 10</h3><p class="ps"><b>Batch Processing</b> — dataflow theo lô, như MapReduce. <span class="here" id="p3here">BẠN Ở ĐÂY</span></p></div>
+    <div class="card f zoom"><div class="icon">🌊</div><h3>Chapter 11</h3><p class="ps"><b>Stream Processing</b> — cùng ý tưởng nhưng với <b>độ trễ thấp hơn</b>.</p></div>
+    <div class="card f zoom"><div class="icon">🔭</div><h3>Chapter 12</h3><p class="ps"><b>The Future of Data Systems</b> — dùng các tool này để build hệ thống reliable, scalable, maintainable.</p></div>
+  </div>
+  <div class="note blue f" style="margin-top:14px;font-size:18px" data-act="#p3c10|lit;#p3here|show">Phân biệt rõ <b>data nào được derive từ data nào</b> giúp làm rõ <b>dataflow</b> của cả hệ thống. Database chỉ là tool — là “system of record” hay “derived” phụ thuộc vào <b>cách bạn dùng</b> nó.</div>
+</section>
+
+<!-- ===================== THREE TYPES ===================== -->
+<section class="slide" id="three">
+  <div class="hdr in"><span class="qn">01</span><h2>Ba kiểu hệ thống xử lý data</h2></div>
+  <p class="in muted" style="font-size:20px">Web và HTTP/REST API khiến kiểu <b>request/response</b> phổ biến đến mức ta coi là đương nhiên. Nhưng đó không phải cách duy nhất.</p>
+  <div class="cols3" style="margin-top:16px">
+    <div class="card f zoom"><div class="icon">🛎️</div><h3>Services <span class="muted" style="font-size:16px">(online)</span></h3><p class="ps">Chờ request từ client, xử lý <b>nhanh nhất có thể</b> rồi trả response. Thước đo chính: <b>response time</b>; <b>availability</b> rất quan trọng.</p>
+      <div class="rq fast" style="width:100%;margin-top:10px">request → response</div></div>
+    <div class="card f zoom"><div class="icon">📦</div><h3>Batch processing <span class="muted" style="font-size:16px">(offline)</span></h3><p class="ps">Nhận một lượng lớn <b>input data</b>, chạy <b>job</b> và sinh <b>output</b>. Job chạy vài phút → vài ngày, thường được <b>schedule</b> định kỳ. Thước đo chính: <b>throughput</b>.</p>
+      <div class="rq slow" style="width:100%;margin-top:10px">bounded input ▸ job ▸ output</div></div>
+    <div class="card f zoom"><div class="icon">🌊</div><h3>Stream processing <span class="muted" style="font-size:16px">(near-real-time)</span></h3><p class="ps">Nằm giữa online và batch: consume input, produce output, nhưng xử lý <b>event ngay sau khi xảy ra</b> → latency thấp hơn batch. (Chapter 11)</p>
+      <div class="rq" style="width:100%;margin-top:10px;background:linear-gradient(135deg,#059669,#0ea5e9)">event ▸ event ▸ event ▸ …</div></div>
+  </div>
+  <div class="cols" style="margin-top:16px;gap:16px">
+    <div class="note f" style="margin-top:0;font-size:18px"><b>MapReduce</b> (Google, 2004) từng được gọi là “the algorithm that makes Google so massively scalable”, sau đó có mặt trong <b>Hadoop</b>, <b>CouchDB</b>, <b>MongoDB</b>. Tầm quan trọng đang giảm, nhưng vẫn là mô hình rõ ràng để hiểu <b>vì sao và cách nào</b> batch processing hữu ích.</div>
+    <div class="note blue f" style="margin-top:0;font-size:18px">Batch processing rất cổ: máy tabulating <b>Hollerith</b> (US Census 1890), máy card-sorting của <b>IBM</b> những năm 1940–50 trông giống MapReduce đến kỳ lạ. <i>History has a tendency of repeating itself.</i></div>
+  </div>
+</section>
+
+<!-- ===================== UNIX LOG ANALYSIS ===================== -->
+<section class="slide" id="unix">
+  <div class="hdr in"><span class="qn">02</span><h2>Batch Processing with Unix Tools · <span class="grad">Simple Log Analysis</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:24px">
+    <div>
+      <p style="font-size:18px">Web server (nginx) append một dòng vào <b>access log</b> mỗi request. Mục tiêu: tìm <b>5 trang phổ biến nhất</b>.</p>
+      <div class="code-title" style="margin-top:8px">$remote_addr - $remote_user [$time_local] "$request" $status …</div>
+      <div class="code sm" id="upipe">
+        <div class="ln" id="up1"><span class="no">1</span><span><span class="fn">cat</span> /var/log/nginx/access.log <span class="p">|</span></span></div>
+        <div class="ln" id="up2"><span class="no">2</span><span>  <span class="fn">awk</span> <span class="s">'{print $7}'</span> <span class="p">|</span></span></div>
+        <div class="ln" id="up3"><span class="no">3</span><span>  <span class="fn">sort</span> <span class="p">|</span></span></div>
+        <div class="ln" id="up4"><span class="no">4</span><span>  <span class="fn">uniq</span> <span class="n">-c</span> <span class="p">|</span></span></div>
+        <div class="ln" id="up5"><span class="no">5</span><span>  <span class="fn">sort</span> <span class="n">-r -n</span> <span class="p">|</span></span></div>
+        <div class="ln" id="up6"><span class="no">6</span><span>  <span class="fn">head</span> <span class="n">-n 5</span></span></div>
+      </div>
+      <p class="say" style="font-size:18px">Nhấn → để chạy từng bước.</p>
+      <div class="note blue f" style="font-size:17px;margin-top:4px">Xử lý <b>hàng GB</b> log trong vài giây, dễ chỉnh: bỏ CSS bằng <code class="i">'$7 !~ /\.css$/ {print $7}'</code>, đếm top IP bằng <code class="i">'{print $1}'</code>. Kết hợp <b>awk, sed, grep, sort, uniq, xargs</b> giải được rất nhiều bài toán phân tích.</div>
+    </div>
+    <div>
+      <div class="code-title">stdout tại bước hiện tại</div>
+      <div class="console data" id="udata"><span class="dm">216.58.210.78 - - [27/Feb/2015:17:55:11 +0000]
+  "GET <span class="u">/css/typography.css</span> HTTP/1.1" 200 3377
+  "http://martin.kleppmann.com/" "Mozilla/5.0 …"
+… (mỗi request là một dòng)</span></div>
+      <span class="f ghost" data-now="#up1|hl" data-set="#udata::&lt;span class=&quot;dm&quot;&gt;… GET &lt;/span&gt;&lt;span class=&quot;u&quot;&gt;/css/typography.css&lt;/span&gt;&lt;span class=&quot;dm&quot;&gt; HTTP/1.1 200 …&lt;/span&gt;
+&lt;span class=&quot;dm&quot;&gt;… GET &lt;/span&gt;&lt;span class=&quot;u&quot;&gt;/favicon.ico&lt;/span&gt;&lt;span class=&quot;dm&quot;&gt; HTTP/1.1 200 …&lt;/span&gt;
+&lt;span class=&quot;dm&quot;&gt;… GET &lt;/span&gt;&lt;span class=&quot;u&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;dm&quot;&gt; HTTP/1.1 200 …&lt;/span&gt;
+&lt;span class=&quot;dm&quot;&gt;… GET &lt;/span&gt;&lt;span class=&quot;u&quot;&gt;/favicon.ico&lt;/span&gt;&lt;span class=&quot;dm&quot;&gt; HTTP/1.1 200 …&lt;/span&gt;
+&lt;span class=&quot;dm&quot;&gt;… GET &lt;/span&gt;&lt;span class=&quot;u&quot;&gt;/2013/05/24/improving-security…&lt;/span&gt;
+&lt;span class=&quot;dm&quot;&gt;… GET &lt;/span&gt;&lt;span class=&quot;u&quot;&gt;/favicon.ico&lt;/span&gt;&lt;span class=&quot;dm&quot;&gt; HTTP/1.1 200 …&lt;/span&gt;
+&lt;span class=&quot;dm&quot;&gt;… GET &lt;/span&gt;&lt;span class=&quot;u&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;dm&quot;&gt; HTTP/1.1 304 …&lt;/span&gt;" data-say="<b>cat</b>: đọc log file, mỗi dòng là một <b>record</b> (phân tách bởi <code class='i'>\n</code>)."></span>
+      <span class="f ghost" data-now="#up2|hl" data-set="#udata::&lt;span class=&quot;u&quot;&gt;/css/typography.css
+/favicon.ico
+/
+/favicon.ico
+/2013/05/24/improving-security…
+/favicon.ico
+/&lt;/span&gt;" data-say="<b>awk '{print $7}'</b>: tách dòng theo whitespace, chỉ lấy <b>field thứ 7</b> — chính là URL được request."></span>
+      <span class="f ghost" data-now="#up3|hl" data-set="#udata::&lt;span class=&quot;u&quot;&gt;/
+/
+/2013/05/24/improving-security…
+/css/typography.css
+/favicon.ico
+/favicon.ico
+/favicon.ico&lt;/span&gt;" data-say="<b>sort</b> theo alphabet: URL nào được request <b>n</b> lần sẽ xuất hiện <b>n lần liên tiếp</b>."></span>
+      <span class="f ghost" data-now="#up4|hl" data-set="#udata::&lt;span class=&quot;cnt&quot;&gt;   2&lt;/span&gt; &lt;span class=&quot;u&quot;&gt;/&lt;/span&gt;
+&lt;span class=&quot;cnt&quot;&gt;   1&lt;/span&gt; &lt;span class=&quot;u&quot;&gt;/2013/05/24/improving-security…&lt;/span&gt;
+&lt;span class=&quot;cnt&quot;&gt;   1&lt;/span&gt; &lt;span class=&quot;u&quot;&gt;/css/typography.css&lt;/span&gt;
+&lt;span class=&quot;cnt&quot;&gt;   3&lt;/span&gt; &lt;span class=&quot;u&quot;&gt;/favicon.ico&lt;/span&gt;" data-say="<b>uniq -c</b>: gộp các dòng <b>kề nhau</b> giống nhau, kèm <b>counter</b>. Chỉ hoạt động vì dữ liệu đã được sort!"></span>
+      <span class="f ghost" data-now="#up5|hl" data-set="#udata::&lt;span class=&quot;cnt&quot;&gt;   3&lt;/span&gt; &lt;span class=&quot;u&quot;&gt;/favicon.ico&lt;/span&gt;
+&lt;span class=&quot;cnt&quot;&gt;   2&lt;/span&gt; &lt;span class=&quot;u&quot;&gt;/&lt;/span&gt;
+&lt;span class=&quot;cnt&quot;&gt;   1&lt;/span&gt; &lt;span class=&quot;u&quot;&gt;/css/typography.css&lt;/span&gt;
+&lt;span class=&quot;cnt&quot;&gt;   1&lt;/span&gt; &lt;span class=&quot;u&quot;&gt;/2013/05/24/improving-security…&lt;/span&gt;" data-say="<b>sort -r -n</b>: sort lần hai theo <b>số</b> (-n) đầu dòng, thứ tự <b>giảm dần</b> (-r)."></span>
+      <span class="f ghost" data-now="#up6|hl" data-set="#udata::&lt;span class=&quot;cnt&quot;&gt;4189&lt;/span&gt; &lt;span class=&quot;u&quot;&gt;/favicon.ico&lt;/span&gt;
+&lt;span class=&quot;cnt&quot;&gt;3631&lt;/span&gt; &lt;span class=&quot;u&quot;&gt;/2013/05/24/improving-security-of-ssh-private-keys.html&lt;/span&gt;
+&lt;span class=&quot;cnt&quot;&gt;2124&lt;/span&gt; &lt;span class=&quot;u&quot;&gt;/2012/12/05/schema-evolution-in-avro-protocol-buffers…&lt;/span&gt;
+&lt;span class=&quot;cnt&quot;&gt;1369&lt;/span&gt; &lt;span class=&quot;u&quot;&gt;/&lt;/span&gt;
+&lt;span class=&quot;cnt&quot;&gt; 915&lt;/span&gt; &lt;span class=&quot;u&quot;&gt;/css/typography.css&lt;/span&gt;" data-say="<b>head -n 5</b>: giữ 5 dòng đầu. Đây là output thật trên log đầy đủ của blog tác giả."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SORT vs MEMORY ===================== -->
+<section class="slide" id="sortmem">
+  <div class="hdr in"><span class="qn">03</span><h2>Chain of commands vs custom program</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:24px">
+    <div>
+      <div class="code-title">Cùng bài toán, viết bằng Ruby</div>
+      <div class="code xs">
+        <div class="ln"><span class="no">1</span><span>counts = <span class="t">Hash</span>.<span class="fn">new</span>(<span class="n">0</span>)</span></div>
+        <div class="ln"><span class="no">2</span><span><span class="t">File</span>.<span class="fn">open</span>(<span class="s">'/var/log/nginx/access.log'</span>) <span class="k">do</span> |file|</span></div>
+        <div class="ln"><span class="no">3</span><span>  file.<span class="fn">each</span> <span class="k">do</span> |line|</span></div>
+        <div class="ln"><span class="no">4</span><span>    url = line.<span class="fn">split</span>[<span class="n">6</span>]</span></div>
+        <div class="ln"><span class="no">5</span><span>    counts[url] += <span class="n">1</span></span></div>
+        <div class="ln"><span class="no">6</span><span>  <span class="k">end</span></span></div>
+        <div class="ln"><span class="no">7</span><span><span class="k">end</span></span></div>
+        <div class="ln"><span class="no">8</span><span>top5 = counts.<span class="fn">map</span>{|url, count| [count, url] }</span></div>
+        <div class="ln"><span class="no">9</span><span>             .<span class="fn">sort</span>.<span class="fn">reverse</span>[<span class="n">0</span>...<span class="n">5</span>]</span></div>
+        <div class="ln"><span class="no">10</span><span>top5.<span class="fn">each</span>{|count, url| <span class="fn">puts</span> <span class="s">"#{count} #{url}"</span> }</span></div>
+      </div>
+      <p style="font-size:18px;margin-top:10px">Không gọn bằng Unix pipes nhưng dễ đọc. Khác biệt lớn không nằm ở syntax mà ở <b>execution flow</b> khi chạy trên file lớn.</p>
+      <div class="note f" style="font-size:17px">Nguyên lý giống <b>SSTables &amp; LSM-Trees</b> (Chapter 3): sort chunk trong memory → ghi <b>segment files</b> ra disk → merge thành file lớn. <b>Mergesort</b> có access pattern <b>sequential</b>, rất hợp với disk.</div>
+    </div>
+    <div>
+      <div class="card f"><span class="lbl info">IN-MEMORY AGGREGATION · Ruby</span><p class="ps">Giữ <b>hash table</b> URL → counter. <b>Working set</b> (lượng memory cần random access) chỉ phụ thuộc vào <b>số URL khác nhau</b>: 1 triệu dòng cùng một URL vẫn chỉ tốn 1 entry. Website nhỏ/vừa: vừa trong ~1 GB RAM → chạy tốt ngay trên laptop.</p></div>
+      <div class="card f" style="margin-top:12px"><span class="lbl good">SORTING · Unix pipeline</span><p class="ps">Không có hash table; dựa vào việc <b>sort</b> danh sách URL để các bản lặp đứng cạnh nhau. Khi working set <b>lớn hơn memory</b>, cách này tận dụng <b>disk</b> hiệu quả.</p></div>
+      <div class="card f" style="margin-top:12px"><h3>🐧 GNU Coreutils <code class="i">sort</code></h3><p class="ps">Tự động <b>spill to disk</b> khi dataset lớn hơn memory, và tự <b>parallelize</b> sort trên nhiều CPU cores → chuỗi lệnh Unix đơn giản vẫn scale tốt. Bottleneck thường là tốc độ <b>đọc file từ disk</b>.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== UNIX PHILOSOPHY ===================== -->
+<section class="slide" id="unixphil">
+  <div class="hdr in"><span class="qn">04</span><h2>The Unix Philosophy</h2></div>
+  <div class="quote in" style="font-size:19px">“We should have some ways of connecting programs like [a] <b>garden hose</b>—screw in another segment when it becomes necessary to massage data in another way. This is the way of I/O also.” <b>— Doug McIlroy, cha đẻ Unix pipes (1964)</b></div>
+  <div class="cols4" style="margin-top:18px">
+    <div class="card f zoom"><div class="icon">🎯</div><h3>Do one thing well</h3><p class="ps">Mỗi program làm tốt <b>một việc</b>. Việc mới → viết program mới, đừng nhồi thêm “features” vào program cũ.</p></div>
+    <div class="card f zoom"><div class="icon">🔗</div><h3>Output = input</h3><p class="ps">Output của mọi program sẽ thành input của một program khác <b>chưa biết trước</b>. Đừng xả thông tin thừa, tránh format cột cứng nhắc hay binary, đừng đòi interactive input.</p></div>
+    <div class="card f zoom"><div class="icon">⚡</div><h3>Try early</h3><p class="ps">Thiết kế và build để <b>dùng thử sớm</b>, lý tưởng trong vài tuần. Đừng ngại vứt bỏ phần vụng về và build lại.</p></div>
+    <div class="card f zoom"><div class="icon">🧰</div><h3>Build tools</h3><p class="ps">Dùng <b>tools</b> thay cho sức người để nhẹ việc lập trình, kể cả khi phải đi đường vòng để viết tool rồi bỏ đi sau đó.</p></div>
+  </div>
+  <div class="note blue f" style="font-size:18px">Automation, rapid prototyping, incremental iteration, thân thiện với experimentation, chia dự án lớn thành phần nhỏ — nghe rất giống <b>Agile</b> và <b>DevOps</b> ngày nay. Bốn thập kỷ, thay đổi ít đến bất ngờ. Ví dụ: <code class="i">sort</code> tốt hơn sort trong standard library của đa số ngôn ngữ, nhưng chỉ thật sự mạnh khi <b>kết hợp</b> với <code class="i">uniq</code>.</div>
+</section>
+
+<!-- ===================== UNIFORM INTERFACE / WIRING ===================== -->
+<section class="slide" id="uniform">
+  <div class="hdr in"><span class="qn">04b</span><h2>Uniform interface &amp; separation of logic and wiring</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:26px">
+    <div>
+      <h3>🔌 A uniform interface</h3>
+      <p style="font-size:18px">Muốn nối output của bất kỳ program nào vào input của program khác → tất cả phải dùng <b>cùng một I/O interface</b>. Trong Unix, đó là <b>file</b> (chính xác hơn: <b>file descriptor</b>) — một chuỗi bytes có thứ tự.</p>
+      <div class="chips" style="margin-top:10px">
+        <span class="chip p f">📄 file trên filesystem</span><span class="chip c f">🔁 pipe · stdin · stdout</span><span class="chip k f">🌐 TCP socket</span><span class="chip y f">🔊 /dev/audio · /dev/lp0</span>
+      </div>
+      <div class="sysbox f" style="margin-top:12px">↓ cùng một interface: <span style="font-family:var(--mono)">ordered sequence of bytes</span></div>
+      <p class="ps f" style="margin-top:10px">Quy ước: nhiều tool coi bytes là <b>ASCII text</b>, record phân tách bằng <code class="i">\n</code>. Không hoàn hảo (<code class="i">{print $7}</code> khó đọc), nhưng hiếm phần mềm nào <b>compose</b> tốt như Unix tools. Thiếu tích hợp giữa các hệ thống → <b>Balkanization of data</b>.</p>
+    </div>
+    <div>
+      <h3>🧵 Separation of logic and wiring</h3>
+      <p style="font-size:18px">Program chỉ đọc <b>stdin</b>, ghi <b>stdout</b>; không quan tâm data đến từ đâu, đi về đâu. Shell user tự “đi dây”.</p>
+      <div class="plug" style="margin-top:16px">
+        <span class="port" id="pin">stdin</span><span class="jar">→</span>
+        <div class="prog">program logic<br><small style="font-weight:600;font-size:13px;color:var(--muted)">không biết file path</small></div>
+        <span class="jar">→</span><span class="port" id="pout">stdout</span>
+      </div>
+      <div class="sysbox" style="margin-top:14px;font-size:17px" id="wire">wiring: chưa nối</div>
+      <span class="f ghost" data-act="#pin|on;#pout|on" data-set="#wire::⌨️ keyboard → program → 🖥️ screen  (mặc định)" data-say="Mặc định stdin là keyboard, stdout là màn hình."></span>
+      <span class="f ghost" data-act="#pin|on;#pout|on;#wire|ok" data-set="#wire::access.log → awk → sort → uniq → … (pipe, buffer nhỏ in-memory)" data-say="Pipe nối stdout của process này vào stdin của process khác, qua một <b>in-memory buffer nhỏ</b>, không ghi toàn bộ ra disk."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+      <div class="note f" style="font-size:17px">Đây là dạng <b>loose coupling</b>, <b>late binding</b>, <b>inversion of control</b>. Giới hạn: program cần <b>nhiều input/output</b> thì khó; không thể pipe output vào network connection; program tự mở file/network thì mất sự linh hoạt của việc đi dây trong shell.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TRANSPARENCY ===================== -->
+<section class="slide" id="transp">
+  <div class="hdr in"><span class="qn">04c</span><h2>Transparency &amp; experimentation</h2></div>
+  <p class="in muted" style="font-size:20px">Một phần lý do Unix tools thành công: rất dễ <b>nhìn thấy điều gì đang xảy ra</b>.</p>
+  <div class="cols3" style="margin-top:16px">
+    <div class="card f zoom"><div class="icon">🧊</div><h3>Immutable input</h3><p class="ps">Input file được coi là <b>immutable</b> → chạy lệnh bao nhiêu lần cũng được, thử đủ loại option mà <b>không làm hỏng</b> input.</p></div>
+    <div class="card f zoom"><div class="icon">🔍</div><h3>Inspect bất kỳ lúc nào</h3><p class="ps">Cắt pipeline ở bất kỳ điểm nào, pipe vào <code class="i">less</code> để xem output có đúng dạng không. Rất tốt cho <b>debugging</b>.</p></div>
+    <div class="card f zoom"><div class="icon">💾</div><h3>Ghi stage ra file</h3><p class="ps">Ghi output của một stage ra file và dùng làm input stage sau → <b>restart</b> stage sau mà không chạy lại toàn bộ pipeline.</p></div>
+  </div>
+  <div class="cols" style="margin-top:18px;gap:18px;grid-template-columns:1fr 1.1fr">
+    <div class="card bad f"><span class="lbl bad">GIỚI HẠN LỚN NHẤT</span><p style="font-size:20px">Unix tools chỉ chạy trên <b>một máy</b>.</p></div>
+    <div class="card good f"><span class="lbl good">→ HADOOP</span><p style="font-size:19px"><b>MapReduce</b> giống Unix tools nhưng <b>phân tán</b> trên hàng nghìn máy: blunt, brute-force, nhưng hiệu quả bất ngờ.</p></div>
+  </div>
+</section>
+
+<!-- ===================== HDFS ===================== -->
+<section class="slide" id="hdfs">
+  <div class="hdr in"><span class="qn">05</span><h2>MapReduce &amp; Distributed Filesystems · <span class="grad">HDFS</span></h2></div>
+  <div class="cols" style="grid-template-columns:.95fr 1.2fr;gap:22px">
+    <div>
+      <p style="font-size:18px">Một MapReduce job giống một Unix process: nhận một hoặc nhiều input, sinh một hoặc nhiều output, <b>không sửa input</b>, không có side effect nào ngoài output. Thay vì stdin/stdout, nó đọc/ghi file trên <b>distributed filesystem</b>.</p>
+      <ul class="mini" style="margin-top:8px">
+        <li><b>HDFS</b> (Hadoop Distributed File System) — bản open source của <b>Google File System (GFS)</b>.</li>
+        <li>Khác: GlusterFS, QFS; object storage như <b>Amazon S3</b>, Azure Blob Storage, OpenStack Swift.</li>
+        <li><b>Shared-nothing</b>, khác với <b>shared-disk</b> (NAS, SAN) cần hardware chuyên dụng, Fibre Channel.</li>
+      </ul>
+      <p class="say" style="font-size:18px">Nhấn → để chạy từng bước.</p>
+      <div class="note blue f" style="font-size:17px">Deployment HDFS lớn nhất: <b>hàng chục nghìn máy</b>, tổng dung lượng <b>hàng trăm petabytes</b> — rẻ hơn nhiều so với storage appliance chuyên dụng nhờ <b>commodity hardware</b> + open source.</div>
+    </div>
+    <div>
+      <svg class="sv" id="fhdfs" viewBox="0 0 640 400">
+        <defs><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#a78bfa"/></marker></defs>
+        <g class="g g1">
+          <g id="dn1"><rect class="nd c2" x="10" y="190" width="140" height="150" rx="14"/><text x="80" y="214" text-anchor="middle">DataNode 1</text><text x="80" y="232" text-anchor="middle" class="sm">daemon + local disks</text></g>
+          <g id="dn2"><rect class="nd c2" x="168" y="190" width="140" height="150" rx="14"/><text x="238" y="214" text-anchor="middle">DataNode 2</text><text x="238" y="232" text-anchor="middle" class="sm">daemon + local disks</text></g>
+          <g id="dn3"><rect class="nd c2" x="326" y="190" width="140" height="150" rx="14"/><text x="396" y="214" text-anchor="middle">DataNode 3</text><text x="396" y="232" text-anchor="middle" class="sm">daemon + local disks</text></g>
+          <g id="dn4"><rect class="nd c2" x="484" y="190" width="140" height="150" rx="14"/><text x="554" y="214" text-anchor="middle">DataNode 4</text><text x="554" y="232" text-anchor="middle" class="sm">daemon + local disks</text></g>
+          <text x="317" y="372" text-anchor="middle" class="lb">conventional datacenter network · không cần hardware đặc biệt</text>
+        </g>
+        <g class="g g2">
+          <rect class="nd c3" x="222" y="14" width="190" height="64" rx="14"/><text x="317" y="42" text-anchor="middle">NameNode</text><text x="317" y="62" text-anchor="middle" class="sm">block nào nằm ở máy nào</text>
+          <line class="ln" x1="260" y1="78" x2="80" y2="190" marker-end="url(#ah2)"/><line class="ln" x1="295" y1="78" x2="238" y2="190" marker-end="url(#ah2)"/>
+          <line class="ln" x1="340" y1="78" x2="396" y2="190" marker-end="url(#ah2)"/><line class="ln" x1="375" y1="78" x2="554" y2="190" marker-end="url(#ah2)"/>
+          <text x="20" y="120" class="lb">metadata only</text>
+        </g>
+        <g class="g g3">
+          <rect class="blk" x="28" y="250" width="48" height="30" rx="6"/><text x="52" y="270" text-anchor="middle">A</text>
+          <rect class="blk b2" x="86" y="250" width="48" height="30" rx="6"/><text x="110" y="270" text-anchor="middle">B</text>
+          <rect class="blk" x="186" y="250" width="48" height="30" rx="6"/><text x="210" y="270" text-anchor="middle">A</text>
+          <rect class="blk b3" x="244" y="250" width="48" height="30" rx="6"/><text x="268" y="270" text-anchor="middle">C</text>
+          <rect class="blk b2" x="344" y="250" width="48" height="30" rx="6"/><text x="368" y="270" text-anchor="middle">B</text>
+          <rect class="blk b3" x="402" y="250" width="48" height="30" rx="6"/><text x="426" y="270" text-anchor="middle">C</text>
+          <rect class="blk" x="502" y="250" width="48" height="30" rx="6"/><text x="526" y="270" text-anchor="middle">A</text>
+          <rect class="blk b2" x="560" y="250" width="48" height="30" rx="6"/><text x="584" y="270" text-anchor="middle">B</text>
+          <rect class="blk b3" x="28" y="292" width="48" height="30" rx="6"/><text x="52" y="312" text-anchor="middle">C</text>
+          <text x="317" y="100" text-anchor="middle" class="lb" style="fill:#d97706">file = blocks A · B · C, mỗi block có 3 replicas</text>
+        </g>
+        <g class="g g4"><text x="396" y="160" text-anchor="middle" class="lb" style="fill:#e11d48">✖ DataNode 3 chết</text></g>
+        <g class="g g5"><text x="317" y="132" text-anchor="middle" class="lb" style="fill:#059669">✔ A, B, C vẫn đọc được từ các replica còn lại</text></g>
+      </svg>
+      <span class="f ghost" data-act="#fhdfs|s1" data-say="Mỗi máy chạy một <b>daemon</b> expose network service để node khác truy cập file trên disk của máy đó."></span>
+      <span class="f ghost" data-act="#fhdfs|s2" data-say="Một server trung tâm — <b>NameNode</b> — theo dõi <b>file block</b> nào nằm trên máy nào. HDFS tạo ra <b>một filesystem lớn</b> dùng disk của tất cả các máy."></span>
+      <span class="f ghost" data-act="#fhdfs|s3" data-say="Để chịu được lỗi máy/disk, block được <b>replicate</b> lên nhiều máy — hoặc dùng <b>erasure coding</b> (Reed–Solomon) để tiết kiệm storage. Giống RAID nhưng qua network."></span>
+      <span class="f ghost" data-act="#fhdfs|s4;#dn3|dead" data-say="Một DataNode bị hỏng…"></span>
+      <span class="f ghost" data-act="#fhdfs|s5" data-say="…data vẫn an toàn nhờ replicas trên các máy khác."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MR STEPS ===================== -->
+<section class="slide" id="mrsteps">
+  <div class="hdr in"><span class="qn">06</span><h2>MapReduce Job Execution</h2></div>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr;gap:24px">
+    <div>
+      <p style="font-size:18px;margin-bottom:10px">Pattern xử lý của MapReduce gần như trùng khớp với ví dụ log analysis:</p>
+      <table class="cmp">
+        <tr><th>#</th><th>MapReduce</th><th>Unix pipeline</th></tr>
+        <tr class="f"><td>1</td><td>Đọc input files, tách thành <b>records</b> <span class="tag">input format parser</span></td><td><code class="i">\n</code> là record separator</td></tr>
+        <tr class="f"><td>2</td><td>Gọi <b>mapper</b> để extract <b>key</b> &amp; <b>value</b> <span class="tag">your code</span></td><td><code class="i">awk '{print $7}'</code> → key = URL</td></tr>
+        <tr class="f"><td>3</td><td><b>Sort</b> tất cả key-value pairs theo key <span class="tag">implicit</span></td><td><code class="i">sort</code> lần thứ nhất</td></tr>
+        <tr class="f"><td>4</td><td>Gọi <b>reducer</b> lặp qua các pairs đã sort <span class="tag">your code</span></td><td><code class="i">uniq -c</code></td></tr>
+      </table>
+      <div class="note f" style="font-size:17px">Cần sort lần hai (xếp hạng URL)? Viết <b>MapReduce job thứ hai</b> lấy output của job đầu làm input. Mapper <b>chuẩn bị data</b> cho việc sort; reducer <b>xử lý data</b> đã được sort.</div>
+    </div>
+    <div>
+      <div class="leg a f"><b>🗺️ Mapper</b><p>Gọi <b>một lần cho mỗi input record</b>, extract key-value (có thể 0, 1 hoặc nhiều pair). <b>Stateless</b>: không giữ state giữa các record → mỗi record xử lý độc lập.</p></div>
+      <div class="leg b f" style="margin-top:12px"><b>🧮 Reducer</b><p>Framework gom mọi value có <b>cùng key</b>, gọi reducer với <b>iterator</b> qua tập value đó. Reducer sinh output records (vd. số lần một URL xuất hiện).</p></div>
+      <div class="leg c f" style="margin-top:12px"><b>☕ Implementations</b><p>Hadoop: mapper/reducer là <b>Java class</b>. MongoDB, CouchDB: <b>JavaScript functions</b>. Có thể dùng cả Unix tools làm mapper/reducer.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MR DISTRIBUTED (Fig 10-1) ===================== -->
+<section class="slide" id="mrdist">
+  <div class="hdr in"><span class="qn">07</span><h2>Distributed execution · <span class="grad">the shuffle</span></h2></div>
+  <div class="cols" style="grid-template-columns:.82fr 1.3fr;gap:20px">
+    <div>
+      <p style="font-size:18px">Khác biệt chính so với Unix pipes: MapReduce <b>parallelize</b> trên nhiều máy mà bạn <b>không cần viết code</b> xử lý parallelism. Parallelization dựa trên <b>partitioning</b> (Chapter 6).</p>
+      <p class="say" style="font-size:18px;min-height:150px">Nhấn → để chạy từng bước.</p>
+      <div class="note blue f" style="font-size:16.5px"><b>Shuffle</b> = partition theo reducer + sort + copy partitions từ mapper sang reducer. Tên dễ gây nhầm: khác với xáo bài, <b>không có gì random</b> ở đây.</div>
+    </div>
+    <div>
+      <svg class="sv" id="fmr" viewBox="0 0 720 400">
+        <defs><marker id="ah3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#a78bfa"/></marker></defs>
+        <g class="g g1">
+          <text x="58" y="22" text-anchor="middle" class="lb">HDFS input dir</text>
+          <rect class="blk" x="8" y="40" width="100" height="60" rx="10"/><text x="58" y="68" text-anchor="middle">block 1</text><text x="58" y="86" text-anchor="middle" class="sm">~100s MB</text>
+          <rect class="blk" x="8" y="165" width="100" height="60" rx="10"/><text x="58" y="193" text-anchor="middle">block 2</text><text x="58" y="211" text-anchor="middle" class="sm">~100s MB</text>
+          <rect class="blk" x="8" y="290" width="100" height="60" rx="10"/><text x="58" y="318" text-anchor="middle">block 3</text><text x="58" y="336" text-anchor="middle" class="sm">~100s MB</text>
+        </g>
+        <g class="g g2" id="fmr2">
+          <rect class="nd c2" x="140" y="40" width="80" height="60" rx="12"/><text x="180" y="75" text-anchor="middle">m 1</text>
+          <rect class="nd c2" x="140" y="165" width="80" height="60" rx="12"/><text x="180" y="200" text-anchor="middle">m 2</text>
+          <rect class="nd c2" x="140" y="290" width="80" height="60" rx="12"/><text x="180" y="325" text-anchor="middle">m 3</text>
+          <line class="ln" x1="108" y1="70" x2="140" y2="70" marker-end="url(#ah3)"/><line class="ln" x1="108" y1="195" x2="140" y2="195" marker-end="url(#ah3)"/><line class="ln" x1="108" y1="320" x2="140" y2="320" marker-end="url(#ah3)"/>
+          <text x="180" y="125" text-anchor="middle" class="lb">computation near the data</text>
+        </g>
+        <g class="g g3">
+          <rect class="pp1" x="236" y="38" width="40" height="18" rx="4"/><rect class="pp2" x="236" y="61" width="40" height="18" rx="4"/><rect class="pp3" x="236" y="84" width="40" height="18" rx="4"/>
+          <rect class="pp1" x="236" y="163" width="40" height="18" rx="4"/><rect class="pp2" x="236" y="186" width="40" height="18" rx="4"/><rect class="pp3" x="236" y="209" width="40" height="18" rx="4"/>
+          <rect class="pp1" x="236" y="288" width="40" height="18" rx="4"/><rect class="pp2" x="236" y="311" width="40" height="18" rx="4"/><rect class="pp3" x="236" y="334" width="40" height="18" rx="4"/>
+          <text x="256" y="372" text-anchor="middle" class="lb">hash(key) → partition</text><text x="256" y="388" text-anchor="middle" class="lb">sorted, local disk</text>
+        </g>
+        <g class="g g4" id="fmr4">
+          <line class="ln l1" x1="276" y1="47" x2="470" y2="70"/><line class="ln l1" x1="276" y1="172" x2="470" y2="70"/><line class="ln l1" x1="276" y1="297" x2="470" y2="70"/>
+          <line class="ln l2" x1="276" y1="70" x2="470" y2="195"/><line class="ln l2" x1="276" y1="195" x2="470" y2="195"/><line class="ln l2" x1="276" y1="320" x2="470" y2="195"/>
+          <line class="ln l3" x1="276" y1="93" x2="470" y2="320"/><line class="ln l3" x1="276" y1="218" x2="470" y2="320"/><line class="ln l3" x1="276" y1="343" x2="470" y2="320"/>
+          <text x="372" y="22" text-anchor="middle" class="lb" style="fill:#db2777">shuffle</text>
+        </g>
+        <g class="g g5" id="fmr5">
+          <rect class="nd c3" x="470" y="40" width="90" height="60" rx="12"/><text x="515" y="68" text-anchor="middle">r 1</text><text x="515" y="86" text-anchor="middle" class="sm">merge</text>
+          <rect class="nd c3" x="470" y="165" width="90" height="60" rx="12"/><text x="515" y="193" text-anchor="middle">r 2</text><text x="515" y="211" text-anchor="middle" class="sm">merge</text>
+          <rect class="nd c3" x="470" y="290" width="90" height="60" rx="12"/><text x="515" y="318" text-anchor="middle">r 3</text><text x="515" y="336" text-anchor="middle" class="sm">merge</text>
+        </g>
+        <g class="g g6">
+          <line class="ln" x1="560" y1="70" x2="592" y2="70" marker-end="url(#ah3)"/><line class="ln" x1="560" y1="195" x2="592" y2="195" marker-end="url(#ah3)"/><line class="ln" x1="560" y1="320" x2="592" y2="320" marker-end="url(#ah3)"/>
+          <rect class="nd c5" x="592" y="45" width="120" height="50" rx="10"/><text x="652" y="75" text-anchor="middle" style="font-size:13px">part-r-00000</text>
+          <rect class="nd c5" x="592" y="170" width="120" height="50" rx="10"/><text x="652" y="200" text-anchor="middle" style="font-size:13px">part-r-00001</text>
+          <rect class="nd c5" x="592" y="295" width="120" height="50" rx="10"/><text x="652" y="325" text-anchor="middle" style="font-size:13px">part-r-00002</text>
+          <text x="652" y="22" text-anchor="middle" class="lb" style="fill:#059669">HDFS output</text>
+        </g>
+      </svg>
+      <span class="f ghost" data-act="#fmr|s1" data-say="Input của job thường là một <b>directory</b> trong HDFS; mỗi file/block là một <b>partition</b> riêng, được xử lý bởi một map task."></span>
+      <span class="f ghost" data-act="#fmr|s2" data-now="#fmr2|hot" data-say="Scheduler cố chạy mapper trên máy <b>đang giữ replica</b> của input block: <b>putting the computation near the data</b> → đỡ copy qua network. Framework copy code (vd. <b>JAR files</b>) tới máy đó rồi chạy."></span>
+      <span class="f ghost" data-act="#fmr|s3" data-say="Mỗi map task <b>partition output theo reducer</b> dựa trên <b>hash của key</b>; mỗi partition được ghi thành <b>sorted file</b> trên local disk của mapper (giống SSTables)."></span>
+      <span class="f ghost" data-act="#fmr|s4" data-now="#fmr4|hot" data-say="Mapper xong → scheduler báo reducer. Mỗi reducer kết nối tới <b>từng mapper</b>, tải về sorted file của partition mình. Đây là <b>shuffle</b>. Cùng key → luôn về cùng reducer."></span>
+      <span class="f ghost" data-act="#fmr|s5" data-now="#fmr5|hot" data-say="Reducer <b>merge</b> các file, giữ nguyên thứ tự sort → record cùng key nằm <b>kề nhau</b>. Reducer được gọi với key + <b>iterator</b> (có thể không vừa memory). Số reducer do <b>job author</b> cấu hình."></span>
+      <span class="f ghost" data-act="#fmr|s6" data-say="Output được ghi thành file trên distributed filesystem: một bản trên local disk của reducer, <b>replicas</b> ở các máy khác."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== WORKFLOWS ===================== -->
+<section class="slide" id="workflow">
+  <div class="hdr in"><span class="qn">08</span><h2>MapReduce workflows</h2></div>
+  <p class="in" style="font-size:19px">Một job đơn lẻ có giới hạn: đếm page views per URL được, nhưng tìm <b>URL phổ biến nhất</b> cần thêm một vòng sort nữa → <b>chain</b> nhiều job thành <b>workflow</b>.</p>
+  <div class="jobchain big in" style="margin-top:34px">
+    <div class="job" id="wj1">Job 1<small>count per URL</small></div><span class="jar">→</span>
+    <div class="job dir" id="wd1">/tmp/counts/</div><span class="jar">→</span>
+    <div class="job wait" id="wj2">Job 2<small>rank by count</small></div><span class="jar">→</span>
+    <div class="job dir wait" id="wd2">/out/top-urls/</div><span class="jar">→</span>
+    <div class="job wait" id="wj3">Job 3 …<small>team khác đọc tiếp</small></div>
+  </div>
+  <p class="say" style="text-align:center">Nhấn → để chạy từng bước.</p>
+  <span class="f ghost" data-act="#wj1|hot" data-say="Hadoop MapReduce <b>không hỗ trợ workflow</b> trực tiếp: chaining được làm ngầm qua <b>tên directory</b>."></span>
+  <span class="f ghost" data-act="#wj1|done;#wd1|hot" data-say="Job 1 ghi output vào một directory trong HDFS. Output chỉ <b>valid khi job thành công</b> — output dở dang của job lỗi bị bỏ."></span>
+  <span class="f ghost" data-act="#wj1|done;#wd1|done;#wj2|hot" data-set="#wj2::Job 2&lt;small&gt;rank by count&lt;/small&gt;" data-say="Job 2 được cấu hình đọc <b>đúng directory đó</b> làm input, và chỉ bắt đầu khi job 1 xong. Với framework, đây là <b>hai job độc lập</b>."></span>
+  <span class="f ghost" data-act="#wj1|done;#wd1|done;#wj2|done;#wd2|done;#wj3|hot" data-say="Giống chuỗi lệnh mà mỗi lệnh ghi ra <b>temporary file</b>, hơn là Unix pipe. Ưu/nhược điểm sẽ bàn ở phần <b>Materialization of Intermediate State</b>."></span>
+  <div class="cols" style="margin-top:6px;gap:18px">
+    <div class="card f"><h3>🗓️ Workflow schedulers</h3><p class="ps">Quản lý dependency giữa các job: <b>Oozie</b>, <b>Azkaban</b>, <b>Luigi</b>, <b>Airflow</b>, <b>Pinball</b>. Workflow <b>50–100 MapReduce jobs</b> là chuyện thường khi build recommendation systems.</p></div>
+    <div class="card f"><h3>🧱 Higher-level tools</h3><p class="ps"><b>Pig</b>, <b>Hive</b>, <b>Cascading</b>, <b>Crunch</b>, <b>FlumeJava</b> tự động dựng workflow nhiều stage MapReduce và nối dây giữa chúng.</p></div>
+  </div>
+</section>
+
+<!-- ===================== JOIN EXAMPLE ===================== -->
+<section class="slide" id="joinex">
+  <div class="hdr in"><span class="qn">09</span><h2>Reduce-Side Joins · <span class="grad">user activity events</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:24px">
+    <div>
+      <p style="font-size:18px">MapReduce <b>không có index</b> theo nghĩa thông thường: nó đọc <b>toàn bộ</b> input — database gọi là <b>full table scan</b>. Với analytic queries tính aggregate trên nhiều record, scan toàn bộ (song song) lại hợp lý.</p>
+      <div class="cols" style="margin-top:12px;gap:12px">
+        <div><div class="colh">Activity events · fact table</div>
+          <div class="tbl"><div class="th">user_id · url · ts</div><div>104 · /about · 1</div><div>173 · /home · 2</div><div>104 · /blog · 3</div><div>104 · /home · 4</div></div></div>
+        <div><div class="colh" style="color:#0891b2">User database · dimension</div>
+          <div class="tbl"><div class="th">user_id · date_of_birth</div><div>104 · 1990</div><div>173 · 1972</div><div>…</div></div></div>
+      </div>
+      <p class="ps" style="margin-top:10px">Mục tiêu ví dụ: trang nào phổ biến với <b>nhóm tuổi</b> nào? Event chỉ có <b>user ID</b>, nhúng cả profile vào mọi event thì quá lãng phí → cần <b>join</b>. (Một phần của <b>star schema</b>.)</p>
+    </div>
+    <div>
+      <div class="card bad f"><span class="lbl bad">CÁCH NGÂY THƠ</span><p class="ps">Duyệt từng event, <b>query database từ xa</b> cho mỗi user ID:</p>
+        <ul class="mini"><li>Throughput bị giới hạn bởi <b>round-trip time</b> tới DB server</li><li>Local cache hiệu quả hay không phụ thuộc phân bố data</li><li>Nhiều query song song dễ <b>overwhelm</b> database</li><li>Job trở nên <b>nondeterministic</b> vì data từ xa có thể thay đổi</li></ul></div>
+      <div class="card good f" style="margin-top:12px"><span class="lbl good">CÁCH TỐT HƠN</span><p class="ps">Lấy <b>bản copy</b> của user database (vd. từ backup qua <b>ETL</b>), đặt vào cùng HDFS với activity log. Rồi dùng MapReduce gom các record liên quan <b>về cùng một chỗ</b>. Computation càng <b>local</b> trên một máy càng tốt.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SORT-MERGE JOIN ===================== -->
+<section class="slide" id="smj">
+  <div class="hdr in"><span class="qn">10</span><h2>Sort-merge join <span class="muted" style="font-weight:600;font-size:26px">· join trên user ID</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr 1fr;gap:16px">
+    <div>
+      <div class="colh">① Mappers extract key</div>
+      <div class="mapper" id="smm1"><h4>mapper · activity events</h4>
+        <span class="kv ev" id="k1"><span class="key">104</span>→ /about</span><span class="kv ev" id="k2"><span class="key">173</span>→ /home</span><span class="kv ev" id="k3"><span class="key">104</span>→ /blog</span><span class="kv ev" id="k4"><span class="key">104</span>→ /home</span></div>
+      <div class="mapper" id="smm2" style="margin-top:10px;border-color:#7c3aed"><h4 style="color:#6d28d9">mapper · user database</h4>
+        <span class="kv us" id="k5"><span class="key">104</span>→ dob 1990</span><span class="kv us" id="k6"><span class="key">173</span>→ dob 1972</span></div>
+    </div>
+    <div>
+      <div class="colh">② Partition + sort → reducer input</div>
+      <div class="grp" id="g104"><h4>key = 104</h4><span class="kv us" id="r5">dob 1990</span><span class="kv ev" id="r1">/about</span><span class="kv ev" id="r3">/blog</span><span class="kv ev" id="r4">/home</span></div>
+      <div class="grp" id="g173"><h4>key = 173</h4><span class="kv us" id="r6">dob 1972</span><span class="kv ev" id="r2">/home</span></div>
+      <div class="colh" style="margin-top:12px">③ Reducer output</div>
+      <div><span class="kv out" id="o1">(/about, 36)</span><span class="kv out" id="o2">(/blog, 36)</span><span class="kv out" id="o3">(/home, 36)</span><span class="kv out" id="o4">(/home, 54)</span></div>
+    </div>
+    <div>
+      <p class="say" style="font-size:18px;margin-top:0;min-height:210px">Nhấn → để chạy từng bước.</p>
+      <div class="note blue f" style="font-size:16.5px">Reducer chỉ cần giữ <b>một user record</b> trong memory, và <b>không gửi request nào</b> qua network. Mapper output được sort theo key, reducer <b>merge</b> các sorted lists từ hai phía → <b>sort-merge join</b>.</div>
+    </div>
+  </div>
+  <span class="f ghost" data-act="#k1|show;#k2|show;#k3|show;#k4|show" data-now="#smm1|hot" data-say="Một nhóm mapper đọc <b>activity events</b>: key = <b>user ID</b>, value = event (ở đây là URL)."></span>
+  <span class="f ghost" data-act="#k5|show;#k6|show" data-now="#smm2|hot" data-say="Nhóm mapper khác đọc <b>user database</b>: key = user ID, value = <b>date of birth</b>. Input chia nhiều file thì chạy nhiều mapper song song."></span>
+  <span class="f ghost" data-act="#r1|show;#r2|show;#r3|show;#r4|show;#r5|show;#r6|show;#g104|hot;#g173|hot" data-say="Framework partition theo key rồi sort: mọi event và user record cùng user ID <b>nằm kề nhau</b> trong reducer input."></span>
+  <span class="f ghost" data-act="#r5|first;#r6|first" data-say="<b>Secondary sort</b>: sắp xếp để reducer luôn thấy record từ user database <b>trước tiên</b>, sau đó là các activity events theo timestamp."></span>
+  <span class="f ghost" data-act="#o1|show;#o2|show;#o3|show;#o4|show" data-say="Reducer được gọi <b>một lần mỗi user ID</b>: lưu date of birth vào biến local, lặp qua events, output <b>(viewed-url, viewer-age)</b>. Job tiếp theo có thể tính phân bố tuổi theo URL."></span>
+</section>
+
+<!-- ===================== BRINGING TOGETHER + GROUP BY ===================== -->
+<section class="slide" id="together">
+  <div class="hdr in"><span class="qn">11</span><h2>Bringing related data together · <span class="grad">GROUP BY</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:24px">
+    <div>
+      <h3>📮 Key như một địa chỉ</h3>
+      <p style="font-size:18px">Có thể xem mapper đang <b>“send messages”</b> tới reducer: key đóng vai <b>destination address</b>. Không phải IP/port, nhưng mọi pair cùng key được giao tới <b>cùng một đích</b> (một lần gọi reducer).</p>
+      <div class="card f" style="margin-top:12px"><h3>Tách network khỏi application logic</h3><p class="ps">MapReduce tách phần <b>đưa data tới đúng máy</b> khỏi phần <b>xử lý data</b>. Khác với cách dùng DB thông thường, nơi request fetch data nằm sâu trong application code. Framework còn che <b>partial failures</b>: tự <b>retry</b> task lỗi mà không ảnh hưởng logic.</p></div>
+    </div>
+    <div>
+      <h3>🧺 GROUP BY</h3>
+      <p style="font-size:18px">Cấu hình mapper sao cho key = <b>grouping key</b>; partition + sort sẽ gom cùng key về cùng reducer. Grouping và join trông <b>rất giống nhau</b> trên MapReduce.</p>
+      <div class="stack" style="margin-top:10px">
+        <div class="chip p f">COUNT(*) — đếm records mỗi group (như page views)</div>
+        <div class="chip c f">SUM(fieldname) — cộng giá trị một field</div>
+        <div class="chip k f">Top k records theo ranking function</div>
+      </div>
+      <div class="note f" style="font-size:17px"><b>Sessionization</b>: gom mọi activity event của một user session (session cookie / user ID làm grouping key) để xem chuỗi hành động — dùng cho <b>A/B testing</b> hay đánh giá marketing. Events vốn nằm rải rác trên log của nhiều web server.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SKEW ===================== -->
+<section class="slide" id="skew">
+  <div class="hdr in"><span class="qn">12</span><h2>Handling skew · <span class="grad">hot keys</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:24px">
+    <div>
+      <p style="font-size:18px">“Gom mọi record cùng key về một chỗ” <b>vỡ</b> khi một key có quá nhiều data. Mạng xã hội: đa số user có vài trăm kết nối, nhưng vài <b>celebrities</b> có hàng triệu followers → <b>linchpin objects</b> / <b>hot keys</b>.</p>
+      <div class="card" style="margin-top:12px;padding:12px 16px">
+        <div class="colh">Records mỗi reducer</div>
+        <div id="skb">
+          <div class="be"><span class="nm">reducer 1</span><div class="trk"><div class="bb" style="--w:14%;--w2:30%"></div></div></div>
+          <div class="be"><span class="nm">reducer 2 🌟</span><div class="trk"><div class="bb hot" id="hotbar" style="--w:96%;--w2:32%"></div></div></div>
+          <div class="be"><span class="nm">reducer 3</span><div class="trk"><div class="bb" style="--w:12%;--w2:29%"></div></div></div>
+          <div class="be"><span class="nm">reducer 4</span><div class="trk"><div class="bb" style="--w:16%;--w2:31%"></div></div></div>
+        </div>
+      </div>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+      <span class="f ghost" data-act="#skb|run" data-say="Gom mọi activity liên quan tới một celebrity vào <b>một reducer</b> → <b>skew</b> (hot spot). Job chỉ xong khi reducer <b>chậm nhất</b> xong; job sau phải chờ."></span>
+      <span class="f ghost" data-act="#skb|run;#skb|bal" data-say="Phân tán record của hot key ra <b>nhiều reducer</b> → parallelize tốt hơn, đổi lại phải <b>replicate</b> input bên kia của join."></span>
+    </div>
+    <div>
+      <div class="leg a f"><b>🐷 Pig · skewed join</b><p>Chạy <b>sampling job</b> trước để tìm hot keys. Khi join, mapper gửi record của hot key tới <b>một reducer ngẫu nhiên</b> trong vài reducer (thay vì chọn theo hash); input còn lại được <b>replicate</b> tới mọi reducer xử lý key đó.</p></div>
+      <div class="leg b f" style="margin-top:10px"><b>🥣 Crunch · sharded join</b><p>Tương tự, nhưng hot keys phải được <b>chỉ định tường minh</b> thay vì sampling.</p></div>
+      <div class="leg c f" style="margin-top:10px"><b>🐝 Hive · skewed join optimization</b><p>Hot keys khai báo trong <b>table metadata</b>, record của chúng lưu ở file riêng; khi join dùng <b>map-side join</b> cho hot keys.</p></div>
+      <div class="note blue f" style="font-size:16.5px">Khi <b>grouping/aggregate</b> theo hot key: làm <b>2 stage</b>. Stage 1 gửi record tới reducer ngẫu nhiên, mỗi reducer aggregate một phần; stage 2 gộp kết quả thành <b>một value mỗi key</b>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== BROADCAST HASH JOIN ===================== -->
+<section class="slide" id="bhj">
+  <div class="hdr in"><span class="qn">13</span><h2>Map-Side Joins · <span class="grad">broadcast hash join</span></h2></div>
+  <div class="cols" style="grid-template-columns:.95fr 1.25fr;gap:22px">
+    <div>
+      <div class="card bad"><span class="lbl bad">REDUCE-SIDE JOIN</span><p class="ps">Không cần giả định gì về input — nhưng sorting, copy sang reducer, merge rất <b>tốn kém</b>; data có thể bị ghi ra disk nhiều lần.</p></div>
+      <div class="card good" style="margin-top:10px"><span class="lbl good">MAP-SIDE JOIN</span><p class="ps">Nếu <b>biết trước tính chất</b> của input: job rút gọn, <b>không reducer, không sorting</b>. Mỗi mapper đọc một input block, ghi một output file.</p></div>
+      <p class="say" style="font-size:17px;min-height:96px">Nhấn → để chạy từng bước.</p>
+      <div class="note f" style="font-size:16px;margin-top:4px">Pig: <b>“replicated join”</b> · Hive: <b>“MapJoin”</b> · Cascading, Crunch, Impala. Biến thể: lưu input nhỏ trong <b>read-only index trên local disk</b>, phần hay dùng nằm trong <b>OS page cache</b>.</div>
+    </div>
+    <div>
+      <div style="display:flex;justify-content:center;margin-bottom:8px"><div class="tbl" id="bsmall" style="width:340px;transition:all .4s"><div class="th">small input · users (fits in memory)</div><div>104 → 1990</div><div>173 → 1972</div></div></div>
+      <div class="big-ar" style="font-size:16px;font-weight:700" id="bar1">↓ broadcast tới mọi mapper ↓</div>
+      <div class="cols3" style="gap:10px;margin-top:8px">
+        <div class="mapper" id="bm1"><h4>mapper 1 · block 1</h4><div class="ht" id="bh1">hash table {104,173}</div><div class="tbl"><div id="be1">104 · /about</div><div id="be2">173 · /home</div></div><div style="margin-top:6px"><span class="kv out" id="bo1">/about, 36</span><span class="kv out" id="bo2">/home, 54</span></div></div>
+        <div class="mapper" id="bm2"><h4>mapper 2 · block 2</h4><div class="ht" id="bh2">hash table {104,173}</div><div class="tbl"><div id="be3">104 · /blog</div><div>…</div></div><div style="margin-top:6px"><span class="kv out" id="bo3">/blog, 36</span></div></div>
+        <div class="mapper" id="bm3"><h4>mapper 3 · block 3</h4><div class="ht" id="bh3">hash table {104,173}</div><div class="tbl"><div id="be4">104 · /home</div><div>…</div></div><div style="margin-top:6px"><span class="kv out" id="bo4">/home, 36</span></div></div>
+      </div>
+      <p class="muted" style="font-size:15px;text-align:center;margin-top:6px">large input · activity events — một mapper cho mỗi file block</p>
+      <span class="f ghost" data-act="#bh1|show;#bh2|show;#bh3|show" data-now="#bsmall|hot" data-say="Khi start, mỗi mapper đọc <b>toàn bộ</b> user database vào một <b>in-memory hash table</b>. “<b>Broadcast</b>”: input nhỏ được phát tới mọi partition của input lớn."></span>
+      <span class="f ghost" data-act="#bh1|show;#bh2|show;#bh3|show;#be1|hit;#be3|hit;#be4|hit;#bo1|show;#bo3|show;#bo4|show" data-say="Mapper scan activity events, <b>lookup user ID</b> trong hash table cho từng event…"></span>
+      <span class="f ghost" data-act="#bh1|show;#bh2|show;#bh3|show;#be2|hit;#bo1|show;#bo2|show;#bo3|show;#bo4|show" data-say="…và output ngay record đã join. Không shuffle, không sort. “<b>Hash</b>” vì dùng hash table."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PARTITIONED / MERGE JOINS ===================== -->
+<section class="slide" id="phj">
+  <div class="hdr in"><span class="qn">13b</span><h2>Partitioned hash join · map-side merge join</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:24px">
+    <div>
+      <div class="card f"><h3>🪣 Partitioned hash join <span class="muted" style="font-size:15px">(Hive: bucketed map join)</span></h3><p class="ps">Nếu cả hai input được <b>partition giống nhau</b> — cùng key, cùng hash function, cùng số partition — áp dụng hash join cho <b>từng partition độc lập</b>. Ví dụ: chia theo <b>chữ số cuối</b> của user ID (10 partitions): mapper 3 chỉ load users có ID tận cùng là 3, rồi scan events của đúng những user đó.</p></div>
+      <div class="cols" style="gap:8px;margin-top:10px">
+        <div class="slot f">users_*3<small>partition 3</small></div><div class="slot f ok">events_*3<small>→ mapper 3</small></div>
+      </div>
+      <div class="card f" style="margin-top:10px"><h3>🔀 Map-side merge join</h3><p class="ps">Input không chỉ partition giống nhau mà còn được <b>sort theo cùng key</b> → không cần vừa memory: mapper đọc tuần tự cả hai file theo thứ tự key tăng dần và match — đúng việc reducer thường làm.</p></div>
+    </div>
+    <div>
+      <h3>MapReduce workflows with map-side joins</h3>
+      <table class="cmp" style="margin-top:6px">
+        <tr><th></th><th>Output được partition &amp; sort theo</th></tr>
+        <tr class="f"><td>Reduce-side join</td><td><b>join key</b></td></tr>
+        <tr class="f"><td>Map-side join</td><td>giống <b>input lớn</b> (một map task cho mỗi block)</td></tr>
+      </table>
+      <div class="note f" style="font-size:17px">Map-side joins đòi hỏi nhiều giả định về <b>size, sorting, partitioning</b>. Tối ưu join cần biết <b>physical layout</b>: không chỉ encoding format và tên directory, mà cả <b>số partition</b> và <b>key</b> dùng để partition/sort.</div>
+      <div class="note blue f" style="font-size:17px">Trong Hadoop ecosystem, metadata này thường nằm trong <b>HCatalog</b> và <b>Hive metastore</b>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== OUTPUT: SEARCH INDEXES ===================== -->
+<section class="slide" id="output">
+  <div class="hdr in"><span class="qn">14</span><h2>The Output of Batch Workflows</h2></div>
+  <div class="cols3" style="margin-top:4px">
+    <div class="card f zoom"><div class="icon">⚡</div><h3>OLTP</h3><p class="ps">Lookup <b>số ít record theo key</b> qua index, để hiển thị cho user.</p></div>
+    <div class="card f zoom"><div class="icon">📊</div><h3>Analytics</h3><p class="ps">Scan nhiều record, grouping &amp; aggregation; output thường là <b>report</b> cho analyst/manager.</p></div>
+    <div class="card f zoom"><div class="icon">📦</div><h3>Batch processing</h3><p class="ps">Gần analytics hơn (scan phần lớn input), nhưng output thường <b>không phải report</b> mà là <b>một loại cấu trúc khác</b>.</p></div>
+  </div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr;gap:22px;margin-top:16px">
+    <div>
+      <h3>🔎 Building search indexes</h3>
+      <p style="font-size:18px">Mục đích ban đầu của MapReduce ở Google: build index cho search engine — một workflow <b>5–10 MapReduce jobs</b>. (Hadoop MapReduce vẫn là cách tốt để build index cho <b>Lucene/Solr</b>.)</p>
+      <p class="ps f" style="margin-top:8px">Mapper partition tập documents, mỗi reducer build index cho partition của mình, index files được ghi lên distributed filesystem → <b>document-partitioned indexes</b> parallelize rất tốt. Index files là <b>immutable</b> sau khi tạo.</p>
+    </div>
+    <div>
+      <div class="tbl f" style="font-size:15px"><div class="th">term dictionary → postings list</div><div><b>kafka</b> → doc 3, doc 17, doc 42</div><div><b>mapreduce</b> → doc 3, doc 8</div><div><b>unix</b> → doc 8, doc 17</div></div>
+      <div class="cols" style="gap:10px;margin-top:10px">
+        <div class="card f" style="padding:10px 12px"><h3 style="font-size:17px">♻️ Rebuild toàn bộ</h3><p class="ps" style="font-size:15px">Định kỳ chạy lại cả workflow, thay index cũ wholesale. Tốn tính toán nhưng dễ reason: <b>documents in, indexes out</b>.</p></div>
+        <div class="card f" style="padding:10px 12px"><h3 style="font-size:17px">➕ Incremental</h3><p class="ps" style="font-size:15px">Lucene ghi <b>segment files</b> mới, merge &amp; compact ở background (xem Chapter 3, 11).</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== KEY-VALUE OUTPUT ===================== -->
+<section class="slide" id="kvout">
+  <div class="hdr in"><span class="qn">14b</span><h2>Key-value stores as batch process output</h2></div>
+  <p class="in" style="font-size:18px">Batch job build <b>ML systems</b> (spam filter, anomaly detection, image recognition) và <b>recommendation systems</b> (people you may know, related products…). Output là một <b>database</b> mà web app cần query. Đưa nó về đó thế nào?</p>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:22px;margin-top:12px">
+    <div class="card bad f"><span class="lbl bad">Ý TƯỞNG TỒI</span><p class="ps">Gọi DB client trong mapper/reducer, <b>ghi từng record</b> vào database production:</p>
+      <ul class="mini"><li>Network request mỗi record chậm hơn throughput batch <b>nhiều orders of magnitude</b></li><li>Nhiều task song song cùng ghi → <b>overwhelm</b> database, ảnh hưởng query của hệ thống khác</li><li>Mất đảm bảo <b>all-or-nothing</b>: side effect của job chạy dở bị lộ ra ngoài; phải lo task attempts &amp; <b>speculative execution</b></li></ul></div>
+    <div>
+      <div class="card good f"><span class="lbl good">GIẢI PHÁP TỐT</span><p class="ps">Build <b>database mới tinh</b> ngay trong batch job, ghi thành files trong output directory → immutable → <b>bulk load</b> vào server phục vụ read-only. Hỗ trợ: <b>Voldemort</b>, <b>Terrapin</b>, <b>ElephantDB</b>, <b>HBase bulk loading</b>. Read-only nên cấu trúc đơn giản, không cần <b>WAL</b>.</p></div>
+      <div class="ux" style="margin-top:12px">
+        <div class="slot ok" id="vold">📗 old files<small>đang phục vụ requests</small></div>
+        <div class="slot" id="vnew">📘 new files<small>chưa có</small></div>
+      </div>
+      <div class="sysbox" style="margin-top:8px;font-size:17px" id="vst">Voldemort server</div>
+      <span class="f ghost" data-act="#vnew|hot" data-set="#vnew::📘 new files&lt;small&gt;đang copy từ HDFS → local disk…&lt;/small&gt;" data-say="Voldemort: server <b>vẫn phục vụ</b> data cũ trong khi file mới được copy từ HDFS về local disk."></span>
+      <span class="f ghost" data-act="#vnew|ok;#vold|old;#vst|ok" data-set="#vnew::📘 new files&lt;small&gt;đang phục vụ requests&lt;/small&gt;;#vst::⚡ atomic switch sang files mới" data-say="Copy xong → <b>atomically switch</b> sang file mới. Có sự cố? Dễ dàng <b>switch back</b>, vì file cũ vẫn còn và immutable."></span>
+      <p class="say" style="font-size:17px;min-height:40px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PHILOSOPHY OF OUTPUTS ===================== -->
+<section class="slide" id="philo">
+  <div class="hdr in"><span class="qn">14c</span><h2>Philosophy of batch process outputs</h2></div>
+  <p class="in muted" style="font-size:19px">Giống Unix: input <b>không đổi</b>, output cũ được <b>thay hoàn toàn</b>, không có side effect nào khác. Inputs immutable + tránh side effects → vừa nhanh vừa <b>dễ maintain</b>:</p>
+  <div class="cols" style="margin-top:12px;gap:14px">
+    <div class="leg a f"><b>⏪ Human fault tolerance</b><p>Deploy code lỗi → output sai? <b>Roll back</b> code và chạy lại, hoặc chuyển về output cũ ở directory khác. Database read-write không làm được: rollback code không sửa được data đã ghi sai.</p></div>
+    <div class="leg b f"><b>🚀 Minimizing irreversibility</b><p>Rollback dễ → phát triển feature <b>nhanh hơn</b> so với môi trường mà lỗi có thể gây thiệt hại không thể đảo ngược. Có lợi cho <b>Agile</b>.</p></div>
+    <div class="leg c f"><b>🔁 Automatic retry an toàn</b><p>Task lỗi được re-schedule trên cùng input. Lỗi do bug → fail sau vài lần; lỗi <b>transient</b> → được tolerate. An toàn chỉ vì input immutable và output của task lỗi bị bỏ.</p></div>
+    <div class="leg a f" style="border-left-color:#ec4899"><b>🧪 Reuse cùng input</b><p>Cùng một tập file dùng cho nhiều job, kể cả <b>monitoring jobs</b> so sánh output với lần chạy trước.</p></div>
+  </div>
+  <div class="cols" style="margin-top:12px;gap:14px">
+    <div class="note blue f" style="margin-top:0;font-size:17px"><b>Separation of logic and wiring</b>: một team viết job “do one thing well”, team khác quyết định chạy ở đâu, khi nào (input/output directories).</div>
+    <div class="note f" style="margin-top:0;font-size:17px">Khác Unix: thay vì untyped text (phải parse <code class="i">{print $7}</code>), Hadoop dùng format có cấu trúc như <b>Avro</b>, <b>Parquet</b> — schema-based encoding, hỗ trợ <b>schema evolution</b>.</div>
+  </div>
+</section>
+
+<!-- ===================== HADOOP vs MPP ===================== -->
+<section class="slide" id="mpp">
+  <div class="hdr in"><span class="qn">15</span><h2>Comparing Hadoop to Distributed Databases</h2></div>
+  <p class="in" style="font-size:18px">Hadoop ≈ một <b>Unix phân tán</b>: HDFS là filesystem, MapReduce là một Unix process “kỳ quặc” (luôn chạy <code class="i">sort</code> giữa map và reduce). Các thuật toán join song song đã có trong <b>MPP databases</b> (Gamma, Teradata, Tandem NonStop SQL) từ hơn một thập kỷ trước. Khác biệt: MPP tập trung chạy <b>analytic SQL</b>; MapReduce + DFS giống một <b>general-purpose OS</b> chạy program tùy ý.</p>
+  <div class="cols" style="margin-top:14px;gap:22px">
+    <div>
+      <h3>🗃️ Diversity of storage</h3>
+      <div class="card f"><p class="ps">Database bắt data theo một model cụ thể; file trên DFS chỉ là <b>byte sequences</b>: record, text, ảnh, video, sensor readings, feature vectors, genome… Hadoop cho phép <b>dump data bừa bãi</b> vào HDFS rồi tính cách xử lý sau; MPP cần <b>modeling cẩn thận</b> trước khi import.</p></div>
+      <div class="chips f" style="margin-top:10px"><span class="chip y">🍣 sushi principle: “raw data is better”</span><span class="chip c">data lake · enterprise data hub</span><span class="chip k">schema-on-read</span></div>
+      <p class="ps f" style="margin-top:8px">Làm data available <b>nhanh</b> thường giá trị hơn chọn data model lý tưởng từ đầu. Diễn giải data trở thành việc của <b>consumer</b>. Hadoop thường dùng cho <b>ETL</b>: dump raw → MapReduce làm sạch → import vào MPP warehouse.</p>
+    </div>
+    <div>
+      <h3>⚙️ Diversity of processing models</h3>
+      <div class="card f"><p class="ps">MPP: <b>monolithic</b>, tích hợp chặt storage layout, query planning, scheduling, execution → performance rất tốt cho loại query được thiết kế; SQL dễ dùng cho tool như <b>Tableau</b>.</p></div>
+      <div class="card f" style="margin-top:10px"><p class="ps">Nhưng ML, recommendation, full-text index với ranking, image analysis… cần <b>viết code</b>, không chỉ query. MapReduce cho phép chạy code tùy ý trên dataset lớn; có thể build SQL engine bên trên (<b>Hive</b>) và nhiều model khác.</p></div>
+      <div class="note blue f" style="font-size:16.5px">Mọi processing model chạy trên <b>một shared cluster</b>, đọc cùng file trên DFS — không phải import data vào nhiều hệ thống chuyên biệt. <b>HBase</b> (OLTP) và <b>Impala</b> (MPP-style) đều dùng HDFS, không dùng MapReduce.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FREQUENT FAULTS ===================== -->
+<section class="slide" id="faults">
+  <div class="hdr in"><span class="qn">16</span><h2>Designing for frequent faults</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr;gap:24px">
+    <div>
+      <table class="cmp">
+        <tr><th></th><th>MPP database</th><th>MapReduce</th></tr>
+        <tr><td>Node crash</td><td>Abort <b>cả query</b>, chạy lại</td><td>Retry ở mức <b>từng task</b></td></tr>
+        <tr><td>Memory/disk</td><td>Giữ nhiều trong <b>memory</b> (hash joins)</td><td>Rất “hăng” <b>ghi ra disk</b></td></tr>
+        <tr><td>Hợp với</td><td>Query vài giây–vài phút</td><td>Job <b>lớn, chạy lâu</b></td></tr>
+      </table>
+      <p style="font-size:18px;margin-top:12px">Nhưng máy hỏng đâu có thường xuyên? Lý do thật nằm ở môi trường <b>Google</b>: datacenter <b>mixed-use</b>, online services và batch chạy chung máy. Task có <b>priority</b>; task priority cao cần tài nguyên → task thấp hơn bị <b>preempted</b>.</p>
+      <div class="note f" style="font-size:17px">Batch jobs “<b>pick up the scraps under the table</b>”. Overcommit tài nguyên low-priority → utilization tốt hơn. MapReduce chịu được việc task bị kill bất ngờ không phải vì hardware tệ, mà vì <b>tự do kill process</b> giúp tận dụng cluster tốt hơn.</div>
+    </div>
+    <div>
+      <div class="prob f">Một task chạy 1 giờ: <span class="r">~5%</span> khả năng bị preempt</div>
+      <p class="muted f" style="font-size:16px;text-align:center;margin:6px 0">cao hơn tỉ lệ lỗi hardware/reboot <b>hơn một order of magnitude</b></p>
+      <div class="dots d20 f" id="fdots" style="margin-top:6px"><i id="t0"></i><i id="t1"></i><i id="t2"></i><i id="t3"></i><i id="t4"></i><i id="t5"></i><i id="t6"></i><i id="t7"></i><i id="t8"></i><i id="t9"></i><i id="t10"></i><i id="t11"></i><i id="t12"></i><i id="t13"></i><i id="t14"></i><i id="t15"></i><i id="t16"></i><i id="t17"></i><i id="t18"></i><i id="t19"></i><i id="t20"></i><i id="t21"></i><i id="t22"></i><i id="t23"></i><i id="t24"></i><i id="t25"></i><i id="t26"></i><i id="t27"></i><i id="t28"></i><i id="t29"></i><i id="t30"></i><i id="t31"></i><i id="t32"></i><i id="t33"></i><i id="t34"></i><i id="t35"></i><i id="t36"></i><i id="t37"></i><i id="t38"></i><i id="t39"></i><i id="t40"></i><i id="t41"></i><i id="t42"></i><i id="t43"></i><i id="t44"></i><i id="t45"></i><i id="t46"></i><i id="t47"></i><i id="t48"></i><i id="t49"></i><i id="t50"></i><i id="t51"></i><i id="t52"></i><i id="t53"></i><i id="t54"></i><i id="t55"></i><i id="t56"></i><i id="t57"></i><i id="t58"></i><i id="t59"></i><i id="t60"></i><i id="t61"></i><i id="t62"></i><i id="t63"></i><i id="t64"></i><i id="t65"></i><i id="t66"></i><i id="t67"></i><i id="t68"></i><i id="t69"></i><i id="t70"></i><i id="t71"></i><i id="t72"></i><i id="t73"></i><i id="t74"></i><i id="t75"></i><i id="t76"></i><i id="t77"></i><i id="t78"></i><i id="t79"></i><i id="t80"></i><i id="t81"></i><i id="t82"></i><i id="t83"></i><i id="t84"></i><i id="t85"></i><i id="t86"></i><i id="t87"></i><i id="t88"></i><i id="t89"></i><i id="t90"></i><i id="t91"></i><i id="t92"></i><i id="t93"></i><i id="t94"></i><i id="t95"></i><i id="t96"></i><i id="t97"></i><i id="t98"></i><i id="t99"></i></div>
+      <p class="muted" style="font-size:15px;text-align:center;margin-top:4px">Job với <b>100 tasks</b>, mỗi task chạy <b>10 phút</b></p>
+      <div class="prob f" style="margin-top:8px" data-act="#t37|x;#t82|x">P(≥ 1 task bị kill) = 1 − (0.95<sup>1/6</sup>)<sup>100</sup> ≈ <span class="r">57% &gt; 50%</span></div>
+      <div class="note blue f" style="font-size:16.5px">Open source schedulers ít dùng preemption: <b>YARN CapacityScheduler</b> có cho cân bằng queues, nhưng general priority preemption không có trong YARN, <b>Mesos</b>, <b>Kubernetes</b> (lúc sách viết) → thiết kế của MapReduce <b>kém hợp lý hơn</b> ở đó.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== BEYOND / MATERIALIZATION ===================== -->
+<section class="slide" id="mat">
+  <div class="hdr in"><span class="qn">17</span><h2>Beyond MapReduce · <span class="grad">Materialization of Intermediate State</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr;gap:22px">
+    <div>
+      <p style="font-size:17.5px">MapReduce dễ <b>hiểu</b> nhưng không dễ <b>dùng</b>: viết job phức tạp bằng raw API rất cực (tự implement join). Pig, Hive, Cascading, Crunch giúp dễ viết hơn — nhưng vấn đề nằm ở <b>execution model</b>.</p>
+      <p style="font-size:17.5px;margin-top:8px">Output một job thường chỉ làm input cho <b>một job khác</b> cùng team → file trên DFS chỉ là <b>intermediate state</b>. Ghi nó ra file = <b>materialization</b>. Unix pipes thì <b>stream</b> qua buffer nhỏ.</p>
+      <div data-o="1" class="leg a f" style="margin-top:10px"><b>🐢 Stragglers</b><p>Job chỉ bắt đầu khi <b>mọi task</b> của job trước xong; skew khiến vài task rất chậm kéo cả workflow.</p></div>
+      <div data-o="1" class="leg b f" style="margin-top:8px"><b>♊ Mappers thừa</b><p>Mapper chỉ đọc lại file reducer vừa ghi để partition &amp; sort lại — lẽ ra có thể gộp vào reducer trước.</p></div>
+      <div data-o="1" class="leg c f" style="margin-top:8px"><b>📀 Replicate dữ liệu tạm</b><p>Intermediate state trên DFS bị <b>replicate</b> lên nhiều node — overkill cho data tạm.</p></div>
+    </div>
+    <div>
+      <div class="colh">MapReduce workflow · materialized</div>
+      <div class="gantt" id="gmr">
+        <div class="gr"><span class="nm">job1 · t1</span><div class="trk"><div class="bb" style="--l:0%;--w:30%">map+reduce</div></div></div>
+        <div class="gr"><span class="nm">job1 · t2</span><div class="trk"><div class="bb" style="--l:0%;--w:34%"></div></div></div>
+        <div class="gr"><span class="nm">job1 · t3</span><div class="trk"><div class="bb st" style="--l:0%;--w:55%">straggler 🐢</div></div></div>
+        <div class="gr"><span class="nm">HDFS write</span><div class="trk"><div class="bb io" style="--l:55%;--w:10%;--d:600">×3 replicas</div></div></div>
+        <div class="gr"><span class="nm">job2 · all</span><div class="trk"><div class="bb j2" style="--l:65%;--w:33%;--d:900">job 2 chờ…</div></div></div>
+      </div>
+      <div class="colh" style="margin-top:12px;color:#0891b2">Unix pipes / dataflow engine · pipelined</div>
+      <div class="gantt" id="gdf">
+        <div class="gr"><span class="nm">operator 1</span><div class="trk"><div class="bb" style="--l:0%;--w:40%">produce…</div></div></div>
+        <div class="gr"><span class="nm">operator 2</span><div class="trk"><div class="bb j2" style="--l:4%;--w:42%;--d:150">consume ngay khi có data</div></div></div>
+        <div class="gr"><span class="nm">operator 3</span><div class="trk"><div class="bb j2" style="--l:8%;--w:42%;--d:300">…</div></div></div>
+      </div>
+      <span class="f ghost" data-act="#gmr|run" data-say="MapReduce: job 2 phải chờ <b>straggler</b> của job 1 và chờ intermediate state được ghi + replicate lên HDFS."></span>
+      <span class="f ghost" data-act="#gmr|run;#gdf|run" data-say="Pipes: các process start <b>cùng lúc</b>, output được consume <b>ngay khi được produce</b>."></span>
+      <p class="say" style="font-size:17px;min-height:40px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DATAFLOW ENGINES ===================== -->
+<section class="slide" id="dataflow">
+  <div class="hdr in"><span class="qn">18</span><h2>Dataflow engines · <span class="grad">Spark · Tez · Flink</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:22px">
+    <div>
+      <p style="font-size:18px">Xử lý <b>cả workflow như một job</b>, thay vì nhiều subjob độc lập. Vẫn gọi user-defined function trên từng record, một thread, partition input, copy output qua network — nhưng các function (<b>operators</b>) không bị ép vào vai map/reduce xen kẽ.</p>
+      <div class="colh" style="margin-top:12px">Các cách nối operator → operator</div>
+      <div class="stack">
+        <div class="chip p f">🔀 Repartition + sort theo key (như shuffle) → sort-merge join, grouping</div>
+        <div class="chip c f">🪣 Partition giống nhau nhưng <b>bỏ sort</b> → partitioned hash join</div>
+        <div class="chip k f">📡 Gửi cùng output tới mọi partition → broadcast hash join</div>
+      </div>
+      <p class="ps f" style="margin-top:10px">Dựa trên research systems <b>Dryad</b>, <b>Nephele</b>. Workflow viết bằng Pig, Hive, Cascading có thể chuyển từ MapReduce sang <b>Tez</b>/<b>Spark</b> chỉ bằng <b>đổi config</b>. Tez là library mỏng dựa trên YARN shuffle service; Spark, Flink là framework lớn có network layer, scheduler, API riêng.</p>
+    </div>
+    <div>
+      <div class="card f" style="padding:12px 16px"><h3>✅ Ưu điểm so với MapReduce</h3>
+        <ul class="mini">
+          <li>Việc tốn kém như <b>sorting</b> chỉ làm ở chỗ thật sự cần</li>
+          <li><b>Không có map task thừa</b>: việc của mapper gộp vào reduce operator trước</li>
+          <li>Joins &amp; data dependencies khai báo tường minh → scheduler tối ưu <b>locality</b> (vd. trao đổi qua shared memory buffer)</li>
+          <li>Intermediate state giữ trong <b>memory</b> hoặc <b>local disk</b>, không ghi HDFS replicated</li>
+          <li>Operator chạy <b>ngay khi input sẵn sàng</b>, không chờ cả stage trước</li>
+          <li>Tái sử dụng <b>JVM process</b>, giảm startup overhead (MapReduce mở JVM mới mỗi task)</li>
+        </ul></div>
+      <div class="note blue f" style="font-size:16.5px">Spark/Flink/Tez sắp xếp operators thành một <b>DAG</b> (directed acyclic graph). Đừng nhầm với <b>graph processing</b>: ở đây flow giữa operator là graph, còn data là relational-style tuples.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DATAFLOW FAULT TOLERANCE ===================== -->
+<section class="slide" id="dffault">
+  <div class="hdr in"><span class="qn">18b</span><h2>Fault tolerance &amp; discussion of materialization</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:24px">
+    <div>
+      <div class="card bad f"><span class="lbl info">MAPREDUCE</span><p class="ps">Intermediate state materialized trên DFS là <b>durable</b> → task lỗi chỉ cần restart ở máy khác và đọc lại input.</p></div>
+      <div class="card good f" style="margin-top:10px"><span class="lbl good">SPARK · FLINK · TEZ</span><p class="ps">Không ghi intermediate state ra HDFS → máy hỏng thì <b>recompute</b> từ data còn lại (stage trước, hoặc input gốc trên HDFS). Framework phải nhớ data được tính <b>thế nào</b>:</p>
+        <div class="chips" style="margin-top:6px"><span class="chip p">Spark: <b>RDD</b> — track ancestry</span><span class="chip c">Flink: <b>checkpoint</b> operator state</span></div></div>
+      <div class="note f" style="font-size:16.5px">Recompute không phải lúc nào cũng đúng: nếu intermediate data <b>nhỏ hơn nhiều</b> so với source, hoặc tính toán <b>rất CPU-intensive</b>, materialize ra file có thể rẻ hơn.</div>
+    </div>
+    <div>
+      <h3>🎲 Determinism</h3>
+      <p class="ps">Nếu data lỗi đã được gửi xuống downstream và lần recompute cho kết quả <b>khác</b> → downstream khó giải quyết mâu thuẫn; thường phải kill và chạy lại cả downstream. Tránh <b>cascading faults</b>: làm operators <b>deterministic</b>.</p>
+      <div class="chips f" style="margin-top:8px"><span class="chip k">thứ tự iterate hash table</span><span class="chip k">random numbers</span><span class="chip k">system clock</span><span class="chip k">external data sources</span></div>
+      <p class="ps f" style="margin-top:6px">→ loại bỏ các nguồn nondeterminism, vd. dùng pseudorandom với <b>fixed seed</b>.</p>
+      <div class="card f" style="margin-top:12px"><h3>🚰 Pipelined execution</h3><p class="ps">MapReduce ≈ ghi output mỗi lệnh ra temp file; dataflow engines ≈ <b>Unix pipes</b> (đặc biệt <b>Flink</b>). Riêng <b>sorting</b> buộc phải đọc hết input (record cuối có thể có key nhỏ nhất). Input đầu &amp; output cuối vẫn thường nằm trên HDFS: input immutable, output thay hoàn toàn — chỉ bỏ được việc ghi <b>intermediate state</b>.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== GRAPHS ===================== -->
+<section class="slide" id="graph">
+  <div class="hdr in"><span class="qn">19</span><h2>Graphs and Iterative Processing</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:24px">
+    <div>
+      <p style="font-size:18px">Chapter 2 nhìn graph theo kiểu OLTP (query nhanh vài vertex). Batch context: xử lý/analyze <b>toàn bộ graph</b> — recommendation engines, ranking systems. Nổi tiếng nhất: <b>PageRank</b>, ước lượng độ phổ biến của web page dựa trên các trang link tới nó.</p>
+      <p style="font-size:18px;margin-top:10px">Nhiều graph algorithm duyệt <b>từng edge một</b>, join vertex với vertex kề để lan truyền thông tin, <b>lặp đến khi xong</b> (vd. <b>transitive closure</b>). Plain MapReduce chỉ chạy <b>một pass</b> → phải viết theo kiểu iterative:</p>
+    </div>
+    <div>
+      <div class="jobchain" style="flex-direction:column;gap:8px">
+        <div class="job f" style="width:100%">① External scheduler chạy batch process tính <b>một bước</b></div>
+        <div class="job dir f" style="width:100%;font-family:inherit;font-size:15px">② Kiểm tra điều kiện kết thúc: hết edge để đi? thay đổi &lt; threshold?</div>
+        <div class="job f" style="width:100%;border-color:#ec4899;background:#fdf2f8;color:#be185d">③ Chưa xong → quay lại ① ↺</div>
+      </div>
+      <div class="card bad f" style="margin-top:12px"><span class="lbl bad">KÉM HIỆU QUẢ</span><p class="ps">MapReduce không hiểu bản chất iterative: luôn đọc <b>toàn bộ input</b> và ghi ra <b>toàn bộ output mới</b>, kể cả khi chỉ một phần nhỏ graph thay đổi.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PREGEL ===================== -->
+<section class="slide" id="pregel">
+  <div class="hdr in"><span class="qn">19b</span><h2>The Pregel processing model · <span class="grad">BSP</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:22px">
+    <div>
+      <p style="font-size:17.5px"><b>Bulk synchronous parallel (BSP)</b> — Apache <b>Giraph</b>, Spark <b>GraphX</b>, Flink <b>Gelly</b>; còn gọi là <b>Pregel model</b> (Google). Giống mapper “gửi message” tới reducer: một <b>vertex gửi message</b> tới vertex khác dọc theo edges.</p>
+      <ul class="mini" style="margin-top:6px">
+        <li>Mỗi iteration, function được gọi cho từng vertex với các message gửi tới nó — như một lần gọi reducer.</li>
+        <li>Khác MapReduce: vertex <b>nhớ state trong memory</b> giữa các iteration → chỉ xử lý message mới. Không có message → <b>không tốn công</b>.</li>
+        <li>Giống <b>actor model</b>, nhưng state &amp; message <b>fault-tolerant, durable</b>, giao tiếp theo <b>round cố định</b>.</li>
+      </ul>
+      <p class="say" style="font-size:17px;min-height:78px">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <svg class="sv" id="fpg" viewBox="0 0 600 330">
+        <rect x="20" y="18" width="300" height="270" rx="18" fill="none" stroke="#c4b5fd" stroke-width="2" stroke-dasharray="8 6"/><text x="34" y="310" class="lb">machine 1</text>
+        <rect x="335" y="90" width="250" height="210" rx="18" fill="none" stroke="#a5f3fc" stroke-width="2" stroke-dasharray="8 6"/><text x="350" y="322" class="lb" style="fill:#0891b2">machine 2</text>
+        <line class="edge" x1="90" y1="90" x2="250" y2="70"/><line class="edge" x1="250" y1="70" x2="200" y2="220"/><line class="edge" x1="90" y1="90" x2="200" y2="220"/><line class="edge" x1="200" y1="220" x2="400" y2="240"/><line class="edge" x1="400" y1="240" x2="520" y2="150"/>
+        <g class="msg msg1"><path d="M90,90 L250,70"/><path d="M250,70 L200,220"/><path d="M90,90 L200,220"/><path d="M200,220 L400,240"/><path d="M400,240 L520,150"/></g>
+        <g class="msg msg2"><path d="M200,220 L400,240"/><path d="M400,240 L520,150"/><path d="M90,90 L250,70"/><path d="M200,220 L250,70"/></g>
+        <g class="msg msg3"><path d="M400,240 L520,150"/></g>
+        <g id="vA"><circle class="vx" cx="90" cy="90" r="30"/><text x="90" y="98" text-anchor="middle" class="big" id="pvA">3</text><text x="90" y="44" text-anchor="middle" class="lb">A</text></g>
+        <g id="vB"><circle class="vx" cx="250" cy="70" r="30"/><text x="250" y="78" text-anchor="middle" class="big" id="pvB">6</text><text x="290" y="44" text-anchor="middle" class="lb">B</text></g>
+        <g id="vC"><circle class="vx" cx="200" cy="220" r="30"/><text x="200" y="228" text-anchor="middle" class="big" id="pvC">2</text><text x="200" y="274" text-anchor="middle" class="lb">C</text></g>
+        <g id="vD"><circle class="vx" cx="400" cy="240" r="30"/><text x="400" y="248" text-anchor="middle" class="big" id="pvD">1</text><text x="400" y="290" text-anchor="middle" class="lb">D</text></g>
+        <g id="vE"><circle class="vx" cx="520" cy="150" r="30"/><text x="520" y="158" text-anchor="middle" class="big" id="pvE">5</text><text x="520" y="106" text-anchor="middle" class="lb">E</text></g>
+        <text x="460" y="40" text-anchor="middle" class="lb" style="fill:#db2777;font-size:15px" id="pstep">superstep 0</text>
+      </svg>
+      <span class="f ghost" data-now="#fpg|m1;#vA|vh;#vC|vh;#vD|vh" data-set="#pvA::6;#pvC::6;#pvD::5;#pstep::superstep 1" data-say="Ví dụ: lan truyền <b>giá trị lớn nhất</b>. Superstep 1: mọi vertex gửi value cho hàng xóm, rồi giữ max của các message nhận được. A, C, D thay đổi."></span>
+      <span class="f ghost" data-now="#fpg|m2;#vD|vh" data-set="#pvA::6;#pvC::6;#pvD::6;#pstep::superstep 2" data-say="Chỉ vertex <b>vừa thay đổi</b> mới gửi message. Message qua <b>machine boundary</b> phải đi qua network. Framework đảm bảo message xử lý <b>exactly once</b> ở iteration sau."></span>
+      <span class="f ghost" data-now="#fpg|m3;#vE|vh" data-set="#pvA::6;#pvC::6;#pvD::6;#pvE::6;#pstep::superstep 3" data-say="D gửi tới E → E = 6. Giữa các iteration là điểm chờ duy nhất: iteration trước phải xong và mọi message đã được copy qua network."></span>
+      <span class="f ghost" data-act="#vA|vd;#vB|vd;#vC|vd;#vD|vd;#vE|vd" data-set="#pvA::6;#pvC::6;#pvD::6;#pvE::6;#pstep::no messages → halt ✔" data-say="Không còn message nào → thuật toán kết thúc."></span>
+      <div class="cols" style="gap:10px;margin-top:4px">
+        <div class="card f" style="padding:10px 12px"><h3 style="font-size:17px">🛟 Fault tolerance</h3><p class="ps" style="font-size:15px"><b>Checkpoint</b> state của mọi vertex cuối iteration. Node hỏng → roll back cả graph về checkpoint, hoặc (deterministic + logged messages) chỉ recover partition bị mất.</p></div>
+        <div class="card f" style="padding:10px 12px"><h3 style="font-size:17px">🧩 Parallel execution</h3><p class="ps" style="font-size:15px">“<b>Thinking like a vertex</b>”: graph thường partition theo vertex ID tùy ý → nhiều cross-machine traffic. Graph vừa một máy? <b>Single-machine</b> (kể cả <b>GraphChi</b>) thường thắng.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== HIGH-LEVEL APIs ===================== -->
+<section class="slide" id="hlapi">
+  <div class="hdr in"><span class="qn">20</span><h2>High-Level APIs and Languages</h2></div>
+  <p class="in" style="font-size:18px">Infrastructure đã đủ robust để xử lý <b>nhiều petabytes</b> trên cluster <b>&gt;10,000 máy</b>. Trọng tâm chuyển sang: programming model, hiệu năng xử lý, mở rộng loại bài toán giải được. Hive, Pig, Cascading, Crunch, và API riêng của Spark/Flink (lấy cảm hứng từ <b>FlumeJava</b>) dùng các building block <b>relational-style</b>: join, group by, filter, aggregate. Còn cho phép dùng <b>interactive</b> trong shell — rất “Unix philosophy”.</p>
+  <div class="cols3" style="margin-top:14px">
+    <div class="card f zoom"><div class="icon">🧠</div><h3>Declarative query languages</h3><p class="ps">Khai báo join như relational operator → <b>cost-based query optimizer</b> (Hive, Spark, Flink) tự chọn join algorithm phù hợp và đổi thứ tự join để giảm intermediate state. Không cần nhớ hết các thuật toán join!</p></div>
+    <div class="card f zoom"><div class="icon">🏎️</div><h3>Hiệu năng như MPP</h3><p class="ps">Filter/map đơn giản viết declarative → đọc chỉ cột cần (<b>column-oriented storage</b>), <b>vectorized execution</b> (Hive, Spark DataFrames, Impala); Spark sinh <b>JVM bytecode</b>, Impala dùng <b>LLVM</b>. Vẫn giữ quyền chạy <b>arbitrary code</b> (libraries qua Maven, npm, Rubygems).</p></div>
+    <div class="card f zoom"><div class="icon">🎓</div><h3>Specialization for domains</h3><p class="ps">Reusable building blocks: ML (<b>Mahout</b> trên MapReduce/Spark/Flink, <b>MADlib</b> trong Apache HAWQ), spatial <b>k-nearest neighbors</b>, approximate search cho genome analysis.</p></div>
+  </div>
+  <div class="note blue f" style="font-size:18px">Batch frameworks có thêm declarative operators, MPP databases ngày càng programmable — hai bên bắt đầu <b>giống nhau</b>: suy cho cùng, đều chỉ là <b>systems for storing and processing data</b>.</div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="slide" id="end">
+  <div class="title-wrap" style="align-items:center;text-align:center">
+    <div class="orb" style="width:360px;height:360px;background:#f9a8d4;left:10%;top:10%"></div>
+    <h1 class="in" style="font-size:56px">Tóm tắt <span class="grad">Chapter 10</span></h1>
+    <p class="in muted" style="font-size:18px;margin-top:8px;max-width:1100px">Triết lý Unix sống tiếp trong MapReduce và dataflow engines: <b>inputs immutable</b>, output thành input của program khác, giải bài toán lớn bằng cách <b>compose</b> các tool nhỏ “do one thing well”. Unix: <b>files &amp; pipes</b>; MapReduce: <b>distributed filesystem</b>.</p>
+    <div class="cols3 in" style="margin-top:16px;text-align:left;max-width:1200px">
+      <div class="card"><h3>🧩 Partitioning</h3><p class="ps">Mapper partition theo input block; output được repartition, sort, merge về các reducer partition để <b>đưa data liên quan về cùng chỗ</b>. Dataflow engines tránh sort khi không cần.</p></div>
+      <div class="card"><h3>🛟 Fault tolerance</h3><p class="ps">MapReduce ghi disk thường xuyên → recover task dễ nhưng chậm khi không lỗi. Dataflow engines giữ nhiều trong memory → recompute nhiều hơn; <b>deterministic operators</b> giảm phần phải tính lại.</p></div>
+      <div class="card"><h3>🔗 Join algorithms</h3><p class="ps"><b>Sort-merge join</b> (partition + sort + merge về một reducer call) · <b>Broadcast hash join</b> (input nhỏ load vào hash table ở mọi mapper) · <b>Partitioned hash join</b> (hai input partition giống nhau).</p></div>
+    </div>
+    <p class="in" style="font-size:17.5px;margin-top:16px;max-width:1120px">Programming model hạn chế có chủ đích (callbacks <b>stateless</b>, không side effect) cho phép framework retry an toàn và đảm bảo output <b>như thể không có fault</b>. Input của batch job là <b>bounded</b> → job biết khi nào xong. <b>Chapter 11</b>: input <b>unbounded</b> — stream processing.</p>
+  </div>
+</section>
+
+</div></div>
+<div id="bar"></div>
+<div id="hint">← → / Space: từng bước · Shift+→: qua slide · A: hiện hết · Home: đầu · F: toàn màn hình</div>
+<div id="nav"><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+<script>
+(function(){
+  // ---------- C++ highlighter (same as lec03) ----------
+  const KW=new Set("if else for while do return break continue switch case default struct class using namespace const static new delete true false sizeof public private include pragma auto".split(" "));
+  const TY=new Set("int double float char void bool long short unsigned string".split(" "));
+  const LIB=new Set("cout cin endl sqrt fabs std".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line){
+    if(/^\s*#/.test(line)) return '<span class="p">'+esc(line)+'</span>';
+    const re=/(\/\/.*$)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="n">'+m[3]+'</span>';
+      else if(m[4]){
+        const w=m[4];
+        let cls=KW.has(w)?"k":TY.has(w)?"t":LIB.has(w)?"fn":(m[5]?"fn":"");
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[5]?esc(m[5]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-cpp"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");const [a,b]=r.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+  // ---------- deck engine ----------
+  // .f fragments, shown one per step. Per fragment:
+  //   data-act  "sel|cls;…"   class kept while the fragment is shown
+  //   data-now  "sel|cls;…"   class only while it is the latest fragment
+  //   data-set  "sel::html;…" content set while shown (later fragments win)
+  //   data-say  narration for the .say line
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")].sort((x,y)=>(+x.dataset.o||0)-(+y.dataset.o||0)); // data-o: show later
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  const pairs=(v,sep)=>(v||"").split(";").filter(Boolean).map(p=>{const k=p.indexOf(sep);return [p.slice(0,k).trim(),p.slice(k+sep.length)]});
+  function tog(v,on){pairs(v,"|").forEach(([sel,cls])=>{document.querySelectorAll(sel).forEach(t=>t.classList.toggle(cls,on))})}
+  // remember original content of every data-set target
+  document.querySelectorAll("[data-set]").forEach(f=>pairs(f.dataset.set,"::").forEach(([sel])=>{document.querySelectorAll(sel).forEach(t=>{if(t.dataset.orig===undefined)t.dataset.orig=t.innerHTML})}));
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach(f=>{tog(f.dataset.now,false);tog(f.dataset.act,false)});
+      s.querySelectorAll("[data-orig]").forEach(t=>t.innerHTML=t.dataset.orig);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step);f.classList.toggle("on",on);if(on){tog(f.dataset.act,true);pairs(f.dataset.set,"::").forEach(([sel,val])=>document.querySelectorAll(sel).forEach(t=>t.innerHTML=val))}});
+      if(i===cur&&step>0)tog(fs[step-1].dataset.now,true);
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.innerHTML=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length;
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    try{history.replaceState(null,"","#"+slides[cur].id)}catch(e){}
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+  addEventListener("keydown",e=>{
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+
+</script>
+</body>
+</html>
