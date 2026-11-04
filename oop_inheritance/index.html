@@ -1,0 +1,998 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kế thừa (Inheritance)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:16px;padding-right:150px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+.lvl{font-size:14px;font-weight:700;color:var(--muted);white-space:nowrap;margin-left:auto}
+.lvl b{color:#f59e0b;letter-spacing:2px}.lvl s{color:#d9d6e8;text-decoration:none;letter-spacing:2px}
+h1{font-size:66px;line-height:1.1;font-weight:800}
+h2{font-size:30px;line-height:1.2;font-weight:800}
+h3{font-size:21px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:20px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:24px;margin:5px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:9px;height:9px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.86em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 5px;border-radius:6px;color:#be185d;white-space:nowrap}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+.cols>*{min-width:0}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.card p,.card li{font-size:17px}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.note{margin-top:10px;padding:8px 14px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:17px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.note.red{border-color:#e11d48;background:linear-gradient(90deg,#fff1f3,#fffafa)}
+.code{font-family:var(--mono);font-size:15px;line-height:1.45;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:8px 0;overflow:hidden;position:relative}
+.code.sm{font-size:14px;line-height:1.42}.code.xs{font-size:13px;line-height:1.4}.code.xxs{font-size:12px;line-height:1.36;padding:6px 0}
+.code.x4{font-size:11.4px;line-height:1.33;padding:6px 0}
+.code .ln{padding:0 12px 0 6px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:22px;flex:none;text-align:right;margin-right:10px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.13);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.15);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.18);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.14);box-shadow:inset 5px 0 #ec4899}
+.code.show-e .mark-e{background:rgba(16,185,129,.15);box-shadow:inset 5px 0 #10b981}
+.code.show-f .mark-f{background:rgba(124,58,237,.13);box-shadow:inset 5px 0 #7c3aed}
+.code.show-g .mark-g{background:rgba(6,182,212,.15);box-shadow:inset 5px 0 #06b6d4}
+.code.show-h .mark-h{background:rgba(245,158,11,.18);box-shadow:inset 5px 0 #f59e0b}
+.code.show-i .mark-i{background:rgba(236,72,153,.14);box-shadow:inset 5px 0 #ec4899}
+.code.show-j .mark-j{background:rgba(16,185,129,.15);box-shadow:inset 5px 0 #10b981}
+.hide0{opacity:0;transform:translateY(8px) scale(.96);transition:all .45s}
+.hide0.sh{opacity:1;transform:none}
+.win.pre.sh:not(.vis){opacity:.35;filter:grayscale(1)}
+.gone.sh{display:none}
+.stage{position:relative;display:flex;align-items:center;justify-content:center}
+.chip{display:inline-block;font-family:var(--mono);font-size:12.5px;font-weight:700;padding:2px 9px;border-radius:999px;background:#fef3c7;color:#b45309;border:1px solid #fcd34d}
+.chip.v{background:#ede9fe;color:#6d28d9;border-color:#c4b5fd}.chip.g{background:#d1fae5;color:#047857;border-color:#6ee7b7}.chip.r{background:#ffe4e6;color:#be123c;border-color:#fda4af}
+.hlo{outline:3px solid #f59e0b;outline-offset:3px;border-radius:6px}
+.jb.dis.en{color:#111;border-color:#9aa1b3;background:linear-gradient(180deg,#fff,#e6e8ee)}.jb.dis.en .ico{filter:none;opacity:1}
+.jb.dis.en.dis2{color:#a0a4ad;border-color:#ccd0d8;background:#f1f2f5}
+.rad.on.off::before,.chk.on.off::before{background:#fff;content:""}
+.code-title{font-family:var(--mono);font-size:13px;color:var(--muted);margin:0 0 4px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:16px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:6px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.3}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+table.t1 td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.console{font-family:var(--mono);font-size:13.5px;line-height:1.45;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:8px 14px;color:#e6f0ff;white-space:pre;min-height:40px;overflow:hidden}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:10px;letter-spacing:3px;margin-bottom:3px}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.flow{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap}
+.box{border-radius:12px;padding:8px 12px;text-align:center;font-family:var(--mono);font-size:15px;border:2px solid var(--line);background:#fff;min-width:110px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:12.5px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.a{border-color:#7c3aed}.box.b{border-color:#0891b2}.box.c{border-color:#ec4899;background:#fdf2f8}.box.d{border-color:#f59e0b;background:#fffbeb}.box.e{border-color:#10b981;background:#ecfdf5}
+.ar{color:var(--muted);font-size:22px;text-align:center}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.say{font-size:17px;margin-top:10px;min-height:50px;color:var(--muted);line-height:1.42}
+.say b{color:var(--text)}
+.vars{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.vc{font-family:var(--mono);font-size:15px;font-weight:700;padding:4px 12px;border-radius:10px;background:#fff;border:2px solid #e4dcfb;transition:all .35s}
+.vc b{color:var(--t)}
+.vc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.45)}
+.vc.res{border-color:#10b981;background:#ecfdf5;color:#047857}
+.arr{display:flex;gap:8px;justify-content:center}
+.cell{width:52px;height:56px;border-radius:12px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .45s}
+.cell small{font-size:11px;color:var(--muted);font-weight:600}
+.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-6px)}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c}
+.cell.dim{opacity:.35}
+.cell.wide{width:auto;padding:0 10px;font-size:14px}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.15)}100%{transform:none;opacity:1}}
+.pop{animation:pop .45s}
+
+/* ===== agenda ===== */
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 10px}
+.sec{grid-column:1/-1;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.08em;margin-top:4px;text-transform:uppercase}
+.ag{background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 10px;cursor:pointer;transition:all .2s;font-size:15.5px;line-height:1.25;box-shadow:0 2px 6px rgba(40,50,110,.05);font-family:var(--mono);font-weight:600}
+.ag:hover{border-color:#ec4899;transform:translateY(-2px);box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag b{color:#db2777;margin-right:6px}
+.ag.g1{border-left:5px solid #7c3aed}.ag.g2{border-left:5px solid #0891b2}.ag.g3{border-left:5px solid #ec4899}.ag.g4{border-left:5px solid #f59e0b}
+.ag.g5{border-left:5px solid #10b981}.ag.g6{border-left:5px solid #6366f1}.ag.g7{border-left:5px solid #f97316}.ag.g8{border-left:5px solid #0ea5e9}
+
+/* ===== mock Swing windows ===== */
+.win{border:1px solid #cfc8e6;border-radius:10px;background:#eef0f4;box-shadow:0 18px 40px -18px rgba(30,27,58,.45);font-family:"Segoe UI",system-ui,sans-serif;font-size:14px;color:#222;transition:all .5s;overflow:hidden;position:relative}
+.wt{height:28px;background:linear-gradient(180deg,#f7f7fa,#e2e4ea);border-bottom:1px solid #cfd2da;display:flex;align-items:center;gap:6px;padding:0 10px;font-weight:600;font-size:13px;color:#333}
+.wt i{width:11px;height:11px;border-radius:50%;background:#ff5f57;display:inline-block}.wt i:nth-child(2){background:#febc2e}.wt i:nth-child(3){background:#28c840}
+.wt span{margin-left:8px}
+.wb{padding:12px;position:relative}
+.win.ghost{opacity:.25;filter:grayscale(1)}
+.win.undec .wt{display:none}
+.jb{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid #9aa1b3;border-radius:5px;background:linear-gradient(180deg,#fff,#e6e8ee);font-size:13.5px;color:#111;transition:all .3s;white-space:nowrap;cursor:default}
+.jb.dis{color:#a0a4ad;border-color:#ccd0d8;background:#f1f2f5}
+.jb.dis .ico{filter:grayscale(1);opacity:.5}
+.jb.press{background:linear-gradient(180deg,#cfd8ea,#b9c6e2);border-color:#5b74b5;transform:scale(.96)}
+.jb.def{box-shadow:0 0 0 2px #7aa2f7}
+.jb.vert{flex-direction:column}
+.jb u{text-decoration:underline}
+.ico{display:inline-block;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#a7f3d0,#059669);flex:none}
+.ico.l{border-radius:4px;background:linear-gradient(135deg,#60a5fa,#2563eb);clip-path:polygon(100% 0,0 50%,100% 100%)}
+.ico.r{border-radius:4px;background:linear-gradient(135deg,#f472b6,#db2777);clip-path:polygon(0 0,100% 50%,0 100%)}
+.splat{display:inline-block;width:34px;height:30px;background:radial-gradient(circle at 50% 50%,#f59e0b 0 30%,transparent 31%),radial-gradient(circle at 25% 30%,#ec4899 0 18%,transparent 19%),radial-gradient(circle at 75% 35%,#7c3aed 0 18%,transparent 19%),radial-gradient(circle at 40% 78%,#0891b2 0 17%,transparent 18%),radial-gradient(circle at 78% 75%,#10b981 0 15%,transparent 16%)}
+.chk,.rad{display:block;padding:3px 0;font-size:14px;transition:all .3s;white-space:nowrap}
+.chk::before,.rad::before{display:inline-block;vertical-align:-2px;margin-right:7px}
+.chk::before{content:"";width:14px;height:14px;border:1px solid #7b8394;border-radius:3px;background:#fff;flex:none;font-size:12px;line-height:14px;text-align:center;font-weight:900;color:#1d4ed8}
+.chk.on::before{content:"✓";background:#dbe7ff}
+.rad::before{content:"";width:14px;height:14px;border:1px solid #7b8394;border-radius:50%;background:#fff;flex:none;box-sizing:border-box}
+.rad.on::before{background:radial-gradient(circle,#1d4ed8 0 35%,#fff 40%)}
+.chk.hl,.rad.hl{background:#fff3c4;border-radius:4px}
+.tf{display:inline-block;min-width:120px;min-height:26px;border:1px solid #8c93a3;background:#fff;padding:3px 7px;font-family:var(--mono);font-size:13.5px;border-radius:3px;transition:all .3s;white-space:pre;vertical-align:middle}
+.tf.err{background:#ffd1dc}
+.tf.ro{background:#f3f4f6}
+.tf .cur{display:inline-block;width:1px;height:15px;background:#111;vertical-align:middle;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.ta{border:1px solid #8c93a3;background:#fff;padding:6px 8px;font-family:var(--mono);font-size:12.5px;line-height:1.5;border-radius:3px;white-space:pre-wrap;overflow:hidden}
+/* text area that stays scrolled to bottom */
+.ta.bottom{display:flex;flex-direction:column;justify-content:flex-end}
+mark{background:#d1d5db;color:inherit;border-radius:2px;padding:0 1px}
+mark.sel{background:#bfdbfe}
+.combo{display:inline-flex;align-items:center;justify-content:space-between;min-width:170px;border:1px solid #8c93a3;border-radius:4px;background:linear-gradient(180deg,#fff,#eceef3);padding:4px 8px;font-size:14px;gap:10px;position:relative}
+.combo::after{content:"▾";color:#555}
+.combo.ed{background:#fff}
+.dd{position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid #8c93a3;box-shadow:0 8px 18px -8px rgba(0,0,0,.35);z-index:3;display:none;text-align:left}
+.dd div{padding:3px 8px;font-size:13.5px}
+.dd div.s{background:#3b6fd8;color:#fff}
+.open .dd{display:block}
+.lst{border:1px solid #8c93a3;background:#fff;font-size:14px;min-height:90px}
+.lst div{padding:3px 8px;transition:all .3s}
+.lst div.s{background:#3b6fd8;color:#fff}
+.lst div.nw{animation:pop .5s}
+.jt{border-collapse:collapse;width:100%;font-size:13px;border:1px solid #9aa1b3;border-radius:0;background:#fff;font-family:"Segoe UI",system-ui,sans-serif}
+.jt th{background:linear-gradient(180deg,#fafafa,#e3e5ea);border:1px solid #b9bec9;padding:3px 6px;font-weight:600;font-size:12.5px;white-space:nowrap;text-align:left}
+.jt td{border:1px solid #e1e3e8;padding:3px 6px;color:#111;font-weight:400;white-space:nowrap;vertical-align:middle}
+.jt td.num{text-align:right}
+.jt td.ck{text-align:center}
+.jt tr.s td{background:#3b6fd8;color:#fff}
+.jt td.s{background:#3b6fd8;color:#fff}
+.jt td.edit{outline:2px solid #f59e0b;background:#fffbeb}
+.jt th.sorted::after{content:" ▲";color:#3b6fd8}
+.jt th.sorted.desc::after{content:" ▼"}
+.jt tr.hide{display:none}
+.jt .cb{display:inline-block;width:13px;height:13px;border:1px solid #7b8394;border-radius:2px;background:#fff;vertical-align:middle;font-size:11px;line-height:12px;text-align:center;font-weight:900;color:#1d4ed8}
+.jt .cb.on::before{content:"✓"}
+.pb{height:20px;border:1px solid #8c93a3;border-radius:4px;background:#e5e7eb;position:relative;overflow:hidden;min-width:180px}
+.pb .fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(180deg,#7aa2f7,#3b6fd8);transition:width .6s}
+.pb .txt{position:absolute;inset:0;text-align:center;font-size:12px;line-height:18px;font-weight:600;color:#111}
+.pb.ind .fill{width:30%!important;animation:ind 1.2s linear infinite alternate}
+.pb.ind .txt{opacity:0}
+@keyframes ind{from{left:0}to{left:70%}}
+.mbar{display:flex;gap:2px;background:linear-gradient(180deg,#fbfbfc,#e9ebf0);border-bottom:1px solid #cfd2da;padding:2px 6px;font-size:13.5px;position:relative}
+.mbar>span{padding:2px 8px;border-radius:3px}
+.mbar>span.s{background:#3b6fd8;color:#fff}
+.menu{position:absolute;top:26px;left:6px;background:#fff;border:1px solid #9aa1b3;box-shadow:0 10px 24px -8px rgba(0,0,0,.4);min-width:250px;z-index:4;display:none;font-size:13px}
+.menu.open{display:block;animation:pop .3s}
+.mi{display:flex;align-items:center;gap:6px;padding:3px 10px;white-space:nowrap}
+.mi .acc{margin-left:auto;color:#666;font-size:12px;padding-left:16px}
+.mi.s{background:#3b6fd8;color:#fff}.mi.s .acc{color:#e0e7ff}
+.msep{height:1px;background:#d9dce3;margin:3px 0}
+.mi .mk{width:14px;text-align:center;font-weight:900;flex:none}
+.dlgwrap{position:absolute;inset:0;background:rgba(30,27,58,.18);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;z-index:6}
+.dlgwrap.on{opacity:1}
+.dlgwrap.on .win{animation:pop .4s}
+.dlgwrap.nomodal{background:none}
+.dlgico{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:20px;flex:none;background:#3b82f6}
+.dlgico.q{background:#10b981}.dlgico.e{background:#e11d48}.dlgico.w{background:#f59e0b;border-radius:6px}
+.tabs{display:flex;gap:2px;border-bottom:1px solid #9aa1b3;margin-bottom:8px}
+.tabs span{padding:3px 10px;border:1px solid #b9bec9;border-bottom:none;border-radius:5px 5px 0 0;background:#e6e8ee;font-size:12.5px}
+.tabs span.s{background:#fff;font-weight:600}
+.tip{position:absolute;background:#ffffe1;border:1px solid #777;font-size:12px;padding:2px 6px;box-shadow:2px 2px 4px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;white-space:nowrap;z-index:5}
+.tip.on{opacity:1}
+.pic{display:flex;align-items:center;justify-content:center;font-size:64px;min-height:110px;transition:all .4s}
+.thumb{width:34px;height:34px;border-radius:5px;border:1px solid #888;display:inline-block;transition:all .4s}
+.lane{display:grid;grid-template-columns:110px 1fr;gap:6px;align-items:center;font-size:13px}
+.lane .ln2{height:30px;border-radius:8px;background:#f8fafc;border:1px dashed #cbd5e1;display:flex;align-items:center;gap:6px;padding:0 8px;overflow:hidden}
+.ev{font-family:var(--mono);font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:6px;background:#ede9fe;color:#6d28d9;white-space:nowrap}
+.ev.b{background:#cffafe;color:#0e7490}.ev.c{background:#fce7f3;color:#be185d}.ev.d{background:#fef3c7;color:#b45309}
+.kv{font-family:var(--mono);font-size:13px}
+.swatch{display:inline-block;width:100%;height:100%;border-radius:4px}
+
+/* ===== nav / jump ===== */
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;min-width:36px;height:32px;cursor:pointer;font-size:16px;padding:0 8px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+.jumpbtn{position:absolute;top:26px;right:30px;z-index:7;font-family:"Be Vietnam Pro",sans-serif;font-size:14px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));border:none;border-radius:999px;padding:7px 14px;cursor:pointer;box-shadow:0 6px 16px -6px var(--sa1);transition:transform .2s}
+.jumpbtn:hover{transform:translateY(-2px) scale(1.04)}
+#jump{position:fixed;inset:0;z-index:20;background:rgba(30,27,58,.45);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
+#jump.on{display:flex}
+#jbox{width:min(1100px,94vw);max-height:88vh;overflow:auto;background:#fff;border-radius:18px;padding:20px 24px;box-shadow:0 30px 70px -20px rgba(30,27,58,.6);animation:pop .3s}
+#jbox .jh{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+#jbox .jh h3{font-size:22px;color:#7c3aed;margin:0}
+#jbox .jh input{margin-left:auto;font-family:var(--mono);font-size:15px;padding:6px 10px;border:2px solid var(--line);border-radius:10px;width:260px;outline:none}
+#jbox .jh input:focus{border-color:#a78bfa}
+#jbox .jh button{border:none;background:#f1eaff;color:#6d28d9;font-weight:800;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:18px}
+#jlist{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+#jlist .ji{display:flex;gap:8px;align-items:center;padding:7px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:14.5px;transition:all .15s;background:#fff}
+#jlist .ji:hover,#jlist .ji.k{border-color:#ec4899;background:#fdf2f8}
+#jlist .ji.cur{background:#f3edff;border-color:#a78bfa}
+#jlist .ji b{font-family:var(--mono);color:#db2777;min-width:26px}
+#jlist .ji span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:700px){#hint{display:none}#jlist{grid-template-columns:1fr}}
+@media print{#nav,#bar,#hint,.jumpbtn{display:none}}
+
+/* ===== OOP deck extras ===== */
+.code.nonum .no{display:none}
+.code .mark-z{display:none}
+.code.alt .mark-z{display:flex}
+.code.alt .mark-y{display:none}
+.code.show-z .mark-z{background:rgba(250,204,21,.32);box-shadow:inset 5px 0 #eab308}
+.code.show-y .mark-y{background:rgba(225,29,72,.12);box-shadow:inset 5px 0 #e11d48}
+.code .ln.ok-l::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px}
+.code .ln.bad-l::after{content:"✗ lỗi";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}
+.code.done .ok-x::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px}
+.code.done .bad-x::after{content:"✗ lỗi";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro";font-size:.92em}
+.obj{border:2.5px solid #ec4899;border-radius:14px;padding:8px 12px 10px;background:#fff;position:relative;transition:all .45s}
+.obj>.lab,.part>.lab{font-family:var(--mono);font-size:12.5px;font-weight:800;color:#be185d;margin-bottom:5px;display:flex;justify-content:space-between;gap:10px}
+.part{border:2px dashed #7c3aed;border-radius:10px;padding:6px 10px;background:#f7f3ff;margin-bottom:6px;transition:all .45s}
+.part>.lab{color:#6d28d9}
+.part.b{border-color:#0891b2;background:#ecfeff}.part.b>.lab{color:#0e7490}
+.fld{font-family:var(--mono);font-size:14px;display:flex;gap:8px;padding:2px 0;align-items:center}
+.fld>span:first-child{color:var(--muted);min-width:110px}
+.fld b{font-weight:700;color:#111;transition:all .3s;padding:0 4px;border-radius:5px}
+.fld b.new{background:#fef3c7;color:#b45309}
+.fld b.def{background:#ffe4e6;color:#be123c}
+.fld b.okv{background:#d1fae5;color:#047857}
+.glow{box-shadow:0 0 0 4px rgba(245,158,11,.35),0 0 22px rgba(245,158,11,.45)}
+.dimx{opacity:.3;filter:grayscale(.8)}
+.stack{display:flex;flex-direction:column-reverse;gap:6px;min-height:40px}
+.fr{font-family:var(--mono);font-size:14px;font-weight:700;padding:6px 12px;border-radius:10px;border:2px solid #c4b5fd;background:#f5f3ff;color:#5b21b6}
+.fr.b{border-color:#67e8f9;background:#ecfeff;color:#0e7490}
+.fr.d{border-color:#fcd34d;background:#fffbeb;color:#b45309}
+.fr small{display:block;font-family:"Be Vietnam Pro";font-weight:500;font-size:12px;color:var(--muted)}
+.hide0.sh.rm{opacity:.1;transform:translateY(-10px) scale(.94)}
+.big-ok{color:#059669;font-weight:800}.big-bad{color:#e11d48;font-weight:800}
+.mem{display:flex;gap:16px;align-items:flex-end;justify-content:center;flex-wrap:wrap}
+.mc{display:flex;flex-direction:column;align-items:center;gap:4px}
+.mc .addr{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.mc .nm{font-family:var(--mono);font-size:14px;font-weight:800;color:#6d28d9}
+.mc .val{min-width:96px;height:52px;border-radius:12px;border:3px solid #e4dcfb;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:18px;font-weight:800;transition:all .45s;padding:0 8px}
+.mc.hot .val{border-color:#f59e0b;background:#fffbeb;color:#b45309}
+.mc.orph .val{border-color:#e11d48;background:#fff1f3;color:#be123c;border-style:dashed}
+.mc.ptr .val{border-color:#0891b2;background:#ecfeff;color:#0e7490}
+/* UML */
+.uml{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;align-items:flex-start}
+.umlc{display:flex;flex-direction:column;align-items:center}
+.ucls{min-width:120px;border:2px solid #1e1b3a;background:#fffbe6;border-radius:4px;font-family:var(--mono);font-size:14px;font-weight:700;text-align:center;box-shadow:4px 4px 0 #e6e2f3}
+.ucls div{padding:4px 10px}.ucls i{display:block;height:9px;border-top:1.5px solid #1e1b3a}
+.conn{position:relative;width:2px;height:64px;background:#1e1b3a;margin:0 auto}
+.conn.isa::before{content:"";position:absolute;top:-1px;left:50%;transform:translateX(-50%);border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:16px solid #1e1b3a}
+.conn.isa::after{content:"";position:absolute;top:3px;left:50%;transform:translateX(-50%);border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:10px solid #fff}
+.conn.hasa::before{content:"";position:absolute;top:0;left:50%;width:13px;height:13px;background:#fff;border:2px solid #1e1b3a;transform:translate(-50%,-3px) rotate(45deg)}
+.conn .mul{position:absolute;bottom:2px;right:8px;font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.house{display:flex;flex-direction:column;align-items:center;gap:3px}
+.house .roof{width:0;height:0;border-left:130px solid transparent;border-right:130px solid transparent;border-bottom:80px solid #ec4899}
+.house .wall{width:220px;height:90px;background:linear-gradient(180deg,#a78bfa,#7c3aed);border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+.house .base{width:280px;height:34px;background:linear-gradient(180deg,#94a3b8,#475569);border-radius:4px;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px}
+.house .roof-l{position:relative;top:-46px;color:#fff;font-weight:700;font-size:14px;height:0}
+.onion{position:relative;width:300px;height:300px;margin:0 auto}
+.onion>div{position:absolute;border-radius:50%;display:flex;align-items:flex-start;justify-content:center;font-family:var(--mono);font-weight:800;font-size:14px;padding-top:14px}
+.tick{display:inline-flex;width:26px;height:26px;border-radius:50%;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:15px}
+.tick.y{background:#10b981}.tick.n{background:#e11d48}
+table.acc td,table.acc th{text-align:center;font-size:17px;padding:8px 10px}
+table.acc td:first-child,table.acc th:first-child{text-align:left}
+table.acc td.hl{background:#fffbeb;box-shadow:inset 0 0 0 2px #f59e0b}
+.pill{display:inline-block;font-family:var(--mono);font-weight:700;font-size:14px;padding:3px 10px;border-radius:999px;border:2px solid #c4b5fd;background:#f5f3ff;color:#5b21b6;transition:all .35s}
+.pill.b{border-color:#67e8f9;background:#ecfeff;color:#0e7490}.pill.c{border-color:#f9a8d4;background:#fdf2f8;color:#be185d}.pill.d{border-color:#fcd34d;background:#fffbeb;color:#b45309}.pill.x{border-color:#e5e7eb;background:#f3f4f6;color:#9ca3af;text-decoration:line-through}
+.vt{font-family:var(--mono);font-size:13.5px;border:2px solid #0891b2;border-radius:10px;background:#ecfeff;padding:6px 10px}
+.vt div{padding:2px 0}
+.strike{position:relative}
+.strike.on::after{content:"";position:absolute;left:-4px;right:-4px;top:50%;height:3px;background:#e11d48;transform:rotate(-4deg)}
+.code.r1 .mark-o1::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r1 .mark-x1::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r2 .mark-o2::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r2 .mark-x2::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r3 .mark-o3::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r3 .mark-x3::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r4 .mark-o4::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r4 .mark-x4::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r5 .mark-o5::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r5 .mark-x5::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r6 .mark-o6::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r6 .mark-x6::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r7 .mark-o7::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r7 .mark-x7::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r8 .mark-o8::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r8 .mark-x8::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r9 .mark-o9::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r9 .mark-x9::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r10 .mark-o10::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r10 .mark-x10::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r11 .mark-o11::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r11 .mark-x11::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r12 .mark-o12::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r12 .mark-x12::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r13 .mark-o13::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r13 .mark-x13::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r14 .mark-o14::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r14 .mark-x14::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r15 .mark-o15::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r15 .mark-x15::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r16 .mark-o16::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r16 .mark-x16::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r17 .mark-o17::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r17 .mark-x17::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r18 .mark-o18::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r18 .mark-x18::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r19 .mark-o19::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r19 .mark-x19::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r20 .mark-o20::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r20 .mark-x20::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r21 .mark-o21::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r21 .mark-x21::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r22 .mark-o22::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r22 .mark-x22::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r23 .mark-o23::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r23 .mark-x23::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r24 .mark-o24::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r24 .mark-x24::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}
+/* larger sizing for lecture decks */
+.slide.z1>*:not(.hdr):not(.jumpbtn):not(.orb){zoom:1.15}.slide.z2>*:not(.hdr):not(.jumpbtn):not(.orb){zoom:1.3}.slide.z3>*:not(.hdr):not(.jumpbtn):not(.orb){zoom:1.42}
+p,li{font-size:21px}.card p,.card li{font-size:18.5px}
+.code{font-size:17px;line-height:1.5}.code.sm{font-size:15.5px}.code.xs{font-size:14.5px;line-height:1.45}
+.code-title{font-size:14px}
+.fld{font-size:16px}.pill{font-size:16px;padding:3px 12px}
+.ucls{font-size:16px;min-width:130px}.ucls div{padding:6px 12px}.conn{height:96px}
+.box{font-size:17px;padding:12px 16px}.box small{font-size:14px}
+table{font-size:18px}th,td{padding:9px 12px}
+.say{font-size:19px}.console{font-size:15.5px;line-height:1.55}
+.chip{font-size:15px;padding:3px 12px}.vc{font-size:17px}
+.note{font-size:18.5px}.fr{font-size:16px}.obj>.lab,.part>.lab{font-size:14px}
+</style>
+</head>
+<body>
+
+<div id="viewport"><div id="deck">
+<!-- ===================== TITLE ===================== -->
+<section class="slide" id="title" data-title="Trang bìa">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// Lập trình hướng đối tượng · C++</div>
+    <h1 class="in">Kế thừa<br><span class="grad">Inheritance</span></h1>
+    <p class="in muted" style="font-size:24px;margin-top:20px;max-width:980px">Vì sao cần kế thừa → khai báo trong C++ → tầm vực <code class="i">public / protected / private</code> → định nghĩa lại hàm → phân biệt quan hệ <b>IS-A</b> và <b>HAS-A</b>.</p>
+    <p class="in" style="margin-top:34px;font-size:18px;color:#8a91b4">← → hoặc Space: chạy từng bước · Shift+→: qua slide · <b>G</b> hoặc nút <b>☰ Đi tới slide</b>: nhảy tới slide bất kỳ · A: hiện hết · F: toàn màn hình</p>
+  </div>
+</section>
+
+<!-- ===================== AGENDA ===================== -->
+<section class="slide z1" id="agenda" data-title="Nội dung">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:17px">· bấm vào mục để đi tới</span></div>
+  <div class="agenda in" style="grid-template-columns:repeat(3,1fr);gap:10px 14px">
+    <div class="sec">1 · Khái niệm kế thừa</div>
+    <div class="ag g1" data-goto="tinhchat"><b>01</b>Ba tính chất của OOP</div>
+    <div class="ag g1" data-goto="trunglap"><b>02</b>Vấn đề trùng lắp thông tin</div>
+    <div class="ag g1" data-goto="khainiem"><b>03</b>Khái niệm kế thừa</div>
+    <div class="ag g1" data-goto="khaibao"><b>04</b>Khai báo trong C++</div>
+    <div class="ag g1" data-goto="vidu-gv"><b>05</b>Ví dụ GiaoVien &amp; GVCN</div>
+    <div class="ag g1" data-goto="vidu-main"><b>06</b>Hàm main</div>
+    <div class="sec">2 · Tầm vực trong kế thừa</div>
+    <div class="ag g2" data-goto="tamvuc3"><b>07</b>3 loại tầm vực</div>
+    <div class="ag g2" data-goto="tamvuc-vande"><b>08</b>Tầm vực ở lớp con?</div>
+    <div class="ag g2" data-goto="tamvuc-bang"><b>09</b>Bảng tầm vực</div>
+    <div class="ag g2" data-goto="baitap"><b>10</b>Bài tập: dòng nào lỗi?</div>
+    <div class="sec">3 · Định nghĩa lại hàm &nbsp;·&nbsp; 4 · IS-A vs HAS-A</div>
+    <div class="ag g3" data-goto="override"><b>11</b>Định nghĩa lại hàm</div>
+    <div class="ag g3" data-goto="override-vd"><b>12</b>Ví dụ tinhLuong()</div>
+    <div class="ag g3" data-goto="override-luuy"><b>13</b>Lưu ý khi override</div>
+    <div class="ag g4" data-goto="isa"><b>14</b>Quan hệ IS-A</div>
+    <div class="ag g4" data-goto="hasa"><b>15</b>Quan hệ HAS-A</div>
+    <div class="ag g4" data-goto="quiz"><b>16</b>Thử phân loại</div>
+    <div class="ag g5" data-goto="summary"><b>✓</b>Tổng kết</div>
+  </div>
+</section>
+
+<!-- ===================== 3 TÍNH CHẤT ===================== -->
+<section class="slide z2" id="tinhchat" data-title="01 · Ba tính chất của OOP">
+  <div class="hdr in"><span class="qn">01</span><h2>Ba tính chất của lập trình hướng đối tượng</h2></div>
+  <div class="cols3" style="margin-top:20px">
+    <div class="card f" id="tc1"><h3>🔒 Đóng gói</h3><p>Gói dữ liệu và hàm xử lý vào trong lớp; che giấu chi tiết bên trong (<code class="i">private</code>).</p></div>
+    <div class="card f" id="tc2"><h3>🧬 Kế thừa</h3><p>Xây dựng lớp mới <b>dựa trên</b> một lớp đã có, giữ lại phần cài đặt tương tự, chỉ bổ sung phần khác biệt.</p></div>
+    <div class="card f" id="tc3"><h3>🎭 Đa hình</h3><p>Cùng một lời gọi hàm, mỗi loại đối tượng xử lý theo cách riêng của nó (bài sau).</p></div>
+  </div>
+  <span class="f ghost" data-act="#tc1|dimx;#tc3|dimx;#tc2|glow" data-say="Bài này tập trung vào <b>tính kế thừa</b>: định nghĩa một lớp dựa trên một lớp khác, thừa hưởng lại những gì lớp đó đã có."></span>
+  <div class="note blue f" style="margin-top:26px">Theo định nghĩa phổ biến (Wikipedia): kế thừa là cơ chế xây dựng một đối tượng hoặc một lớp <b>dựa trên</b> một đối tượng/lớp khác, <b>giữ lại phần cài đặt tương tự</b>. C++ dùng kiểu kế thừa <b>dựa trên lớp</b> (class-based).</div>
+  <p class="say">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== TRÙNG LẮP ===================== -->
+<section class="slide z1" id="trunglap" data-title="02 · Vấn đề trùng lắp thông tin">
+  <div class="hdr in"><span class="qn">02</span><h2>Vấn đề: nhiều lớp có thông tin giống nhau</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr">
+    <div>
+      <div class="card in" style="margin-bottom:12px">
+        <h3>Dạng chia sẻ: A ∩ B ≠ Ø</h3>
+        <div style="display:flex;gap:30px;justify-content:center;margin-top:6px">
+          <div class="obj" style="min-width:200px"><div class="lab">class A</div>
+            <span class="pill" id="s1x">x</span> <span class="pill" id="s1y">y</span> <span class="pill" id="s1z">z</span><br><span class="pill b" style="margin-top:6px">a</span> <span class="pill b">b</span> <span class="pill b">c</span></div>
+          <div class="obj" style="min-width:200px"><div class="lab">class B</div>
+            <span class="pill" id="s2x">x</span> <span class="pill" id="s2y">y</span> <span class="pill" id="s2z">z</span><br><span class="pill c" style="margin-top:6px">u</span> <span class="pill c">v</span> <span class="pill c">w</span></div>
+        </div>
+      </div>
+      <div class="card f" id="tlB" data-o="1" data-act="#e1x|d;#e1y|d;#e1z|d;#e2x|d;#e2y|d;#e2z|d" data-say="Dạng mở rộng: B có <b>tất cả</b> những gì A có, cộng thêm một phần ε (a, b, c). Ta lại viết lại x, y, z trong B.">
+        <h3>Dạng mở rộng: B = A + ε</h3>
+        <div style="display:flex;gap:30px;justify-content:center;margin-top:6px">
+          <div class="obj" style="min-width:200px"><div class="lab">class A</div>
+            <span class="pill" id="e1x">x</span> <span class="pill" id="e1y">y</span> <span class="pill" id="e1z">z</span></div>
+          <div class="obj" style="min-width:200px"><div class="lab">class B</div>
+            <span class="pill" id="e2x">x</span> <span class="pill" id="e2y">y</span> <span class="pill" id="e2z">z</span><br><span class="pill b" style="margin-top:6px">a</span> <span class="pill b">b</span> <span class="pill b">c</span></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <span class="f ghost" data-act="#s1x|d;#s1y|d;#s1z|d;#s2x|d;#s2y|d;#s2z|d" data-say="Lớp A và B có <b>chung</b> x, y, z, ngoài ra mỗi lớp có phần riêng. Phần chung bị khai báo và cài đặt <b>hai lần</b>."></span>
+      <span class="f ghost" data-o="1" data-act="#e1x|d;#e1y|d;#e1z|d;#e2x|d;#e2y|d;#e2z|d" data-say="Dạng mở rộng: B có <b>tất cả</b> những gì A có, cộng thêm một phần ε (a, b, c). Ta lại viết lại x, y, z trong B."></span>
+      <div class="card f" data-o="2"><h3 style="color:#e11d48">Nhược điểm</h3>
+        <ul><li>Xây dựng <b>tốn kém</b>: viết lại cùng một đoạn code nhiều lần</li>
+        <li>Dung lượng lưu trữ mã nguồn <b>lớn</b></li>
+        <li><b>Thay đổi phần chung khó khăn</b>: sửa x ở A thì phải nhớ sửa x ở B, C, D…</li></ul></div>
+      <div class="note f" data-o="3" style="font-size:20px">💡 Giải quyết: <b>TÁI SỬ DỤNG</b> phần chung → <b>kế thừa</b>.</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== KHÁI NIỆM ===================== -->
+<section class="slide z1" id="khainiem" data-title="03 · Khái niệm kế thừa">
+  <div class="hdr in"><span class="qn">03</span><h2>Khái niệm kế thừa: tách phần chung ra lớp mới</h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+    <div style="position:relative;height:430px">
+      <div class="obj hide0" id="kO" style="position:absolute;left:120px;top:0;width:320px;border-color:#7c3aed"><div class="lab" style="color:#6d28d9">class O <span>lớp cơ sở / lớp cha</span></div>
+        <span class="pill d">x</span> <span class="pill d">y</span> <span class="pill d">z</span></div>
+      <svg class="hide0" id="kTree" style="position:absolute;left:0;top:78px" width="560" height="110" viewBox="0 0 560 110">
+        <polygon points="280,2 268,24 292,24" fill="#fff" stroke="#1e1b3a" stroke-width="2"/>
+        <path d="M280 24 V60 M120 60 H440 M120 60 V108 M440 60 V108" fill="none" stroke="#1e1b3a" stroke-width="2"/>
+      </svg>
+      <div class="obj" id="kA" style="position:absolute;left:10px;top:190px;width:220px"><div class="lab">class A <span class="hide0" id="kAl">lớp con</span></div>
+        <span class="pill" id="kAx">x</span> <span class="pill" id="kAy">y</span> <span class="pill" id="kAz">z</span><br><span class="pill b" style="margin-top:6px">a</span> <span class="pill b">b</span> <span class="pill b">c</span></div>
+      <div class="obj" id="kB" style="position:absolute;left:330px;top:190px;width:220px"><div class="lab">class B <span class="hide0" id="kBl">lớp con</span></div>
+        <span class="pill" id="kBx">x</span> <span class="pill" id="kBy">y</span> <span class="pill" id="kBz">z</span><br><span class="pill c" style="margin-top:6px">u</span> <span class="pill c">v</span> <span class="pill c">w</span></div>
+      <div class="note blue hide0" id="kEff" style="position:absolute;left:10px;top:330px;width:540px">Nhìn từ bên ngoài, A <b>vẫn có</b> x, y, z, a, b, c: nó thừa hưởng x, y, z từ O. Tương tự B có x, y, z, u, v, w.</div>
+    </div>
+    <div>
+      <span class="f ghost" data-now="#kAx|d;#kAy|d;#kAz|d;#kBx|d;#kBy|d;#kBz|d" data-say="Bắt đầu từ hai lớp hiện tại A và B có chung x, y, z."></span>
+      <span class="f ghost" data-act="#kO|sh" data-say="<b>Bước 1</b>: định nghĩa lớp mới <b>O</b> chứa các thuộc tính chung x, y, z."></span>
+      <span class="f ghost" data-act="#kTree|sh;#kAl|sh;#kBl|sh;#kAx|x;#kAy|x;#kAz|x;#kBx|x;#kBy|x;#kBz|x" data-say="<b>Bước 2</b>: cho A và B <b>kế thừa</b> O (mũi tên đầu tam giác chỉ vào lớp cha). x, y, z không cần khai báo lại trong A, B nữa."></span>
+      <span class="f ghost" data-act="#kEff|sh" data-say="<b>Bước 3</b>: A, B chỉ khai báo phần <b>riêng</b>. Nguyên tắc: <b>lớp kế thừa thừa hưởng TẤT CẢ từ lớp cơ sở</b>."></span>
+      <div class="card f" style="margin-top:4px"><h3>Thuật ngữ</h3>
+        <table class="t1"><tr><td>O</td><td>lớp <b>cơ sở</b>, lớp <b>cha</b> (base class)</td></tr>
+        <tr><td>A, B</td><td>lớp <b>kế thừa</b>, lớp <b>dẫn xuất</b>, lớp <b>con</b> (derived class)</td></tr></table></div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== KHAI BÁO ===================== -->
+<section class="slide z2" id="khaibao" data-title="04 · Khai báo kế thừa trong C++">
+  <div class="hdr in"><span class="qn">04</span><h2>Khai báo kế thừa trong C++</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr">
+    <div>
+      <div class="card in" style="margin-bottom:14px;font-family:var(--mono);font-size:20px;text-align:center;padding:16px">
+        <span class="k">class</span> <span class="pill c" id="sy1">&lt;Lớp kế thừa&gt;</span> : <span class="pill d" id="sy2">&lt;Loại kế thừa&gt;</span> <span class="pill" id="sy3">&lt;Lớp cơ sở&gt;</span>
+      </div>
+<script type="text/x-cpp" id="kKb" data-title="Ví dụ: A kế thừa O" data-mark="1:a;3-4:b;5-6:c">
+class A : public O
+{
+private:
+    // Khai báo những thuộc tính mà chỉ A có
+public:
+    // Khai báo những hàm mà chỉ A có
+};
+</script>
+    </div>
+    <div>
+      <span class="f ghost" data-now="#kKb|show-a;#sy1|glow" data-say="Sau từ khóa <b>class</b> là tên lớp mới (lớp con): <b>A</b>."></span>
+      <span class="f ghost" data-now="#kKb|show-a;#sy2|glow" data-act="#lk1|glow" data-say="Dấu <b>:</b> rồi tới <b>loại kế thừa</b>: public, protected hoặc private. Đại đa số trường hợp dùng <b>public</b>."></span>
+      <span class="f ghost" data-now="#kKb|show-a;#sy3|glow" data-say="Cuối cùng là tên <b>lớp cơ sở</b> (lớp cha): <b>O</b>."></span>
+      <span class="f ghost" data-now="#kKb|show-b;#kKb|show-c" data-say="Trong thân lớp A <b>chỉ</b> khai báo phần riêng của A. Những gì O đã có (x, y, z…) A tự động có, không khai báo lại."></span>
+      <div class="card in"><h3>Loại kế thừa</h3>
+        <p style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px"><span class="pill d" id="lk1" style="font-size:17px">public</span><span class="pill b" style="font-size:17px">protected</span><span class="pill c" style="font-size:17px">private</span></p>
+        <p class="muted" style="font-size:16px;margin-top:8px">Loại kế thừa quyết định tầm vực của các thành phần lớp cha khi sang lớp con (phần 2).</p></div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== VÍ DỤ GV ===================== -->
+<section class="slide" id="vidu-gv" data-title="05 · Ví dụ: GiaoVien & GVCN">
+  <div class="hdr in"><span class="qn">05</span><h2>Ví dụ: Giáo viên &amp; Giáo viên chủ nhiệm</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr 1fr;gap:16px">
+    <div class="card in" style="padding:10px 14px">
+      <table style="font-size:15px">
+        <tr><th>GiaoVien</th><th>GVCN</th></tr>
+        <tr id="r1"><td>Họ tên</td><td>Họ tên</td></tr>
+        <tr id="r2"><td>Mức lương</td><td>Mức lương</td></tr>
+        <tr id="r3"><td>Số ngày nghỉ</td><td>Số ngày nghỉ</td></tr>
+        <tr id="r4"><td class="muted">—</td><td><b>Lớp chủ nhiệm</b></td></tr>
+        <tr><th colspan="2" style="font-size:13px">Công việc</th></tr>
+        <tr id="r5"><td>Giảng dạy</td><td>Giảng dạy</td></tr>
+        <tr id="r6"><td>Tính lương</td><td>Tính lương</td></tr>
+        <tr id="r7"><td class="muted">—</td><td><b>Sinh hoạt chủ nhiệm</b></td></tr>
+      </table>
+      <p class="say" style="font-size:15.5px">Nhấn → để chạy từng bước.</p>
+    </div>
+<div>
+<script type="text/x-cpp" class="sm" id="kGv" data-title="GiaoVien" data-mark="3-6:a;7-12:b">
+class GiaoVien
+{
+private:
+    string hoTen;
+    float mucLuong;
+    int soNgayNghi;
+public:
+    GiaoVien(string ht,
+             float ml,
+             int snn);
+    void giangDay();
+    float tinhLuong();
+};
+</script>
+</div>
+<div>
+<script type="text/x-cpp" class="sm" id="kCn" data-title="GVCN" data-mark="1:c;3-4:d;5-10:e">
+class GVCN : public GiaoVien
+{
+private:
+    string lopCN;
+public:
+    GVCN(string ht,
+         float ml,
+         int snn,
+         string lcn);
+    void sinhHoatCN();
+};
+</script>
+</div>
+  </div>
+  <span class="f ghost" data-now="#r1|hlo;#r2|hlo;#r3|hlo;#r5|hlo;#r6|hlo" data-say="GVCN có <b>tất cả</b> thông tin và công việc của GiaoVien → dạng <b>mở rộng</b>: GVCN = GiaoVien + ε."></span>
+  <span class="f ghost" data-now="#kGv|show-a" data-say="Lớp cha <b>GiaoVien</b> chứa các <b>thuộc tính chung</b>: hoTen, mucLuong, soNgayNghi."></span>
+  <span class="f ghost" data-now="#kGv|show-b" data-say="…và các <b>hàm chung</b>: constructor, giangDay(), tinhLuong()."></span>
+  <span class="f ghost" data-now="#kCn|show-c" data-say="<b>class GVCN : public GiaoVien</b> — GVCN kế thừa public từ GiaoVien."></span>
+  <span class="f ghost" data-now="#kCn|show-d;#r4|hlo" data-say="GVCN chỉ khai báo <b>thuộc tính riêng</b>: lopCN."></span>
+  <span class="f ghost" data-now="#kCn|show-e;#r7|hlo" data-say="…và <b>hàm riêng</b>: constructor 4 tham số, sinhHoatCN(). giangDay() và tinhLuong() không cần khai báo lại."></span>
+</section>
+
+<!-- ===================== MAIN ===================== -->
+<section class="slide" id="vidu-main" data-title="06 · Hàm main: dùng lớp con">
+  <div class="hdr in"><span class="qn">06</span><h2>Hàm main: đối tượng lớp con dùng được hàm của lớp cha</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr">
+    <div>
+<script type="text/x-cpp" id="kMn" data-title="main.cpp" data-mark="3:a;4:b;5:c;7:d;8:e;9:f;10:g">
+void main()
+{
+    GiaoVien gv1("Nguyen Van A", 2000000, 2);
+    gv1.giangDay();
+    cout << gv1.tinhLuong();
+
+    GVCN gv2("Tran Thi B", 3000000, 3, "LOP-A1");
+    gv2.giangDay();
+    gv2.sinhHoatCN();
+    cout << gv2.tinhLuong();
+}
+</script>
+      <div class="console" style="margin-top:12px;min-height:118px"><span class="cl" id="mc1"><span class="in">→</span> GiaoVien::giangDay()   [gv1]</span><span class="cl" id="mc2">1980000</span><span class="cl" id="mc3"><span class="in">→</span> GiaoVien::giangDay()   [gv2]  (thừa hưởng)</span><span class="cl" id="mc4"><span class="in">→</span> GVCN::sinhHoatCN()     [gv2]</span><span class="cl" id="mc5">2970000</span></div>
+    </div>
+    <div>
+      <div style="display:flex;gap:14px;align-items:flex-start">
+        <div class="obj hide0" id="o1" style="border-color:#7c3aed;flex:1"><div class="lab" style="color:#6d28d9">gv1 : GiaoVien</div>
+          <div class="fld"><span>hoTen</span><b>"Nguyen Van A"</b></div><div class="fld"><span>mucLuong</span><b>2000000</b></div><div class="fld"><span>soNgayNghi</span><b>2</b></div></div>
+        <div class="obj hide0" id="o2" style="flex:1.15"><div class="lab">gv2 : GVCN</div>
+          <div class="part"><div class="lab">phần GiaoVien</div>
+            <div class="fld"><span>hoTen</span><b>"Tran Thi B"</b></div><div class="fld"><span>mucLuong</span><b>3000000</b></div><div class="fld"><span>soNgayNghi</span><b>3</b></div></div>
+          <div class="fld"><span>lopCN</span><b class="new">"LOP-A1"</b></div></div>
+      </div>
+      <div class="vars hide0" id="calc1" style="margin-top:12px"><span class="vc">2000000 − 2 × 10000</span><span class="vc res">= 1980000</span></div>
+      <div class="vars hide0" id="calc2"><span class="vc">3000000 − 3 × 10000</span><span class="vc res">= 2970000</span></div>
+      <span class="f ghost" data-now="#kMn|show-a" data-act="#o1|sh" data-say="Tạo <b>gv1</b> thuộc lớp GiaoVien với 3 tham số: họ tên, mức lương, số ngày nghỉ."></span>
+      <span class="f ghost" data-now="#kMn|show-b" data-act="#mc1|show" data-say="<b>gv1.giangDay()</b>: gọi hàm của chính lớp GiaoVien."></span>
+      <span class="f ghost" data-now="#kMn|show-c" data-act="#mc2|show;#calc1|sh" data-say="<b>tinhLuong()</b> = mức lương − số ngày nghỉ × 10000."></span>
+      <span class="f ghost" data-now="#kMn|show-d" data-act="#o2|sh" data-say="Tạo <b>gv2</b> thuộc lớp GVCN với 4 tham số. Bên trong gv2 có <b>phần GiaoVien</b> (thừa hưởng) và phần riêng <b>lopCN</b>."></span>
+      <span class="f ghost" data-now="#kMn|show-e" data-act="#mc3|show" data-say="GVCN <b>không khai báo</b> giangDay(), nhưng gv2 vẫn gọi được: hàm này thừa hưởng từ GiaoVien."></span>
+      <span class="f ghost" data-now="#kMn|show-f" data-act="#mc4|show" data-say="<b>sinhHoatCN()</b> là hàm riêng của GVCN. Đối tượng gv1 (GiaoVien) thì <b>không</b> gọi được hàm này."></span>
+      <span class="f ghost" data-now="#kMn|show-g" data-act="#mc5|show;#calc2|sh" data-say="gv2.tinhLuong() đang dùng cách tính của GiaoVien. Muốn GVCN tính lương khác (có phụ cấp) → <b>định nghĩa lại hàm</b> (phần 3)."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 3 TẦM VỰC ===================== -->
+<section class="slide z2" id="tamvuc3" data-title="07 · Ba loại tầm vực">
+  <div class="hdr in"><span class="qn">07</span><h2>Ba loại tầm vực của thuộc tính / hàm</h2></div>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr">
+    <div>
+      <table class="acc in">
+        <tr><th>Tầm vực</th><th>Trong lớp</th><th>Lớp con</th><th>Ngoài lớp</th></tr>
+        <tr id="ta1"><td><code class="i">public</code></td><td><span class="tick y hide0" id="t11">✓</span></td><td><span class="tick y hide0" id="t12">✓</span></td><td><span class="tick y hide0" id="t13">✓</span></td></tr>
+        <tr id="ta2"><td><code class="i">protected</code></td><td><span class="tick y hide0" id="t21">✓</span></td><td><span class="tick y hide0" id="t22">✓</span></td><td><span class="tick n hide0" id="t23">✗</span></td></tr>
+        <tr id="ta3"><td><code class="i">private</code></td><td><span class="tick y hide0" id="t31">✓</span></td><td><span class="tick n hide0" id="t32">✗</span></td><td><span class="tick n hide0" id="t33">✗</span></td></tr>
+      </table>
+      <div class="note blue f" data-o="4" style="margin-top:16px"><b>protected</b> là tầm vực "nửa kín": người ngoài không thấy, nhưng <b>con cháu</b> thì thấy. Rất hay dùng cho thuộc tính lớp cha khi muốn lớp con truy xuất trực tiếp.</div>
+    </div>
+    <div>
+      <div class="card in"><h3>Cũng có 3 loại kế thừa</h3><p><code class="i">public</code>, <code class="i">protected</code>, <code class="i">private</code> — đại đa số trường hợp dùng <b>public</b>.</p></div>
+      <span class="f ghost" data-o="1" data-act="#t11|sh;#t12|sh;#t13|sh" data-now="#ta1|hlo" data-say="<b>public</b>: ai cũng truy xuất được — trong lớp, lớp con và cả bên ngoài (ví dụ trong main)."></span>
+      <span class="f ghost" data-o="2" data-act="#t21|sh;#t22|sh;#t23|sh" data-now="#ta2|hlo" data-say="<b>protected</b>: trong lớp và lớp con truy xuất được; <b>ngoài lớp không</b>."></span>
+      <span class="f ghost" data-o="3" data-act="#t31|sh;#t32|sh;#t33|sh" data-now="#ta3|hlo" data-say="<b>private</b>: <b>chỉ</b> trong lớp. Kể cả lớp con cũng không truy xuất trực tiếp được (dù vẫn thừa hưởng phần dữ liệu đó)."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== VẤN ĐỀ TẦM VỰC ===================== -->
+<section class="slide z2" id="tamvuc-vande" data-title="08 · Tầm vực ở lớp con là gì?">
+  <div class="hdr in"><span class="qn">08</span><h2>Ở lớp con, tầm vực của x, y, z là gì?</h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr">
+    <div>
+      <div style="display:flex;align-items:center;gap:18px;justify-content:center">
+        <div class="obj" style="border-color:#7c3aed;min-width:210px"><div class="lab" style="color:#6d28d9">Lớp cơ sở</div>
+          <div class="fld"><span style="min-width:96px">private:</span><b>x</b></div>
+          <div class="fld"><span style="min-width:96px">protected:</span><b>y</b></div>
+          <div class="fld"><span style="min-width:96px">public:</span><b>z</b></div></div>
+        <div style="text-align:center"><div class="pill d" id="vk" style="font-size:15px">kế thừa ???</div><div class="ar" style="font-size:34px">⟹</div></div>
+        <div class="obj" style="min-width:260px"><div class="lab">Lớp kế thừa</div>
+          <div class="fld"><span style="min-width:30px">x:</span><b id="vx">???</b></div>
+          <div class="fld"><span style="min-width:30px">y:</span><b id="vy">???</b></div>
+          <div class="fld"><span style="min-width:30px">z:</span><b id="vz">???</b></div></div>
+      </div>
+      <div class="note f" data-o="4" style="margin-top:22px;font-size:19px">Trả lời: do <b>loại kế thừa</b> quyết định. Quy tắc nhớ: tầm vực mới = <b>"chặt hơn"</b> giữa tầm vực cũ và loại kế thừa; riêng <b>private</b> của cha thì lớp con <b>không bao giờ</b> truy xuất được.</div>
+    </div>
+    <div>
+      <span class="f ghost" data-o="1" data-set="#vk::kế thừa public;#vx::<span class='big-bad'>không truy xuất được</span>;#vy::protected;#vz::public" data-say="<b>Kế thừa public</b>: giữ nguyên — protected vẫn protected, public vẫn public. Đây là loại dùng nhiều nhất."></span>
+      <span class="f ghost" data-o="2" data-set="#vk::kế thừa protected;#vx::<span class='big-bad'>không truy xuất được</span>;#vy::protected;#vz::<span class='big-ok'>protected</span>" data-say="<b>Kế thừa protected</b>: phần public của cha bị <b>hạ xuống</b> protected ở lớp con."></span>
+      <span class="f ghost" data-o="3" data-set="#vk::kế thừa private;#vx::<span class='big-bad'>không truy xuất được</span>;#vy::<span class='big-ok'>private</span>;#vz::<span class='big-ok'>private</span>" data-say="<b>Kế thừa private</b>: mọi thứ truy xuất được từ cha đều thành <b>private</b> ở lớp con → cháu (lớp con của lớp con) sẽ không truy xuất được nữa."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== BẢNG TẦM VỰC ===================== -->
+<section class="slide z2" id="tamvuc-bang" data-title="09 · Bảng tầm vực trong kế thừa">
+  <div class="hdr in"><span class="qn">09</span><h2>Bảng tầm vực trong kế thừa</h2></div>
+  <table class="acc in" style="max-width:1000px;margin:10px auto 0">
+    <tr><th>Tầm vực ở lớp cha ↓ &nbsp;/&nbsp; Loại kế thừa →</th><th id="h1">Kế thừa public</th><th id="h2">Kế thừa protected</th><th id="h3">Kế thừa private</th></tr>
+    <tr><td><code class="i">public</code></td><td><span class="hide0" id="c11">public</span></td><td><span class="hide0" id="c12"><b>protected</b></span></td><td><span class="hide0" id="c13"><b>private</b></span></td></tr>
+    <tr><td><code class="i">protected</code></td><td><span class="hide0" id="c21">protected</span></td><td><span class="hide0" id="c22">protected</span></td><td><span class="hide0" id="c23"><b>private</b></span></td></tr>
+    <tr id="rp"><td><code class="i">private</code></td><td><span class="hide0 big-bad" id="c31">Không truy xuất được</span></td><td><span class="hide0 big-bad" id="c32">Không truy xuất được</span></td><td><span class="hide0 big-bad" id="c33">Không truy xuất được</span></td></tr>
+  </table>
+  <span class="f ghost" data-act="#c11|sh;#c21|sh;#c31|sh" data-now="#h1|hlo" data-say="Cột <b>public</b>: giữ nguyên tầm vực (trừ private)."></span>
+  <span class="f ghost" data-act="#c12|sh;#c22|sh;#c32|sh" data-now="#h2|hlo" data-say="Cột <b>protected</b>: public bị hạ thành protected."></span>
+  <span class="f ghost" data-act="#c13|sh;#c23|sh;#c33|sh" data-now="#h3|hlo" data-say="Cột <b>private</b>: tất cả hạ thành private."></span>
+  <span class="f ghost" data-now="#rp|hlo" data-say="Hàng cuối: thành phần <b>private</b> của lớp cha luôn <b>không truy xuất được</b> ở lớp con, bất kể loại kế thừa. Lớp con chỉ truy xuất gián tiếp qua các hàm public/protected của cha."></span>
+  <p class="say" style="max-width:1000px;margin:14px auto 0">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== BÀI TẬP ===================== -->
+<section class="slide z1" id="baitap" data-title="10 · Bài tập: dòng nào lỗi?">
+  <div class="hdr in"><span class="qn">10</span><h2>Bài tập: dòng nào biên dịch lỗi?</h2></div>
+  <div class="cols" style="grid-template-columns:.8fr .95fr 1.15fr;gap:14px">
+    <div>
+<script type="text/x-cpp" class="xs" id="bA" data-title="class A" data-mark="10:o1">
+class A
+{
+private:
+    int xA;
+protected:
+    int yA;
+public:
+    int zA;
+    void fA() {
+        cout << xA << yA << zA;
+    }
+};
+</script>
+    </div>
+    <div>
+<script type="text/x-cpp" class="xs" id="bB" data-title="class B : public A" data-mark="10:x2;11:o3">
+class B : public A
+{
+private:
+    int xB;
+protected:
+    int yB;
+public:
+    int zB;
+    void fB() {
+        cout << xA << yA << zA;
+        cout << xB << yB << zB;
+    }
+};
+</script>
+    </div>
+    <div>
+<script type="text/x-cpp" class="xs" id="bM" data-title="main()" data-mark="5:a;6:b;7:c;8:d">
+void main()
+{
+    A a;
+    B b;
+    cout << a.xA << a.yA << a.zA;
+    cout << a.xB << a.yB << a.zB;
+    cout << b.xA << b.yA << b.zA;
+    cout << b.xB << b.yB << b.zB;
+}
+</script>
+      <table class="acc" style="margin-top:8px;font-size:14px">
+        <tr><th style="font-size:14px">Dòng</th><th style="font-size:14px">x</th><th style="font-size:14px">y</th><th style="font-size:14px">z</th></tr>
+        <tr><td style="font-size:14px">5 · a.?A</td><td><span class="tick n hide0" id="m51">✗</span></td><td><span class="tick n hide0" id="m52">✗</span></td><td><span class="tick y hide0" id="m53">✓</span></td></tr>
+        <tr><td style="font-size:14px">6 · a.?B</td><td><span class="tick n hide0" id="m61">✗</span></td><td><span class="tick n hide0" id="m62">✗</span></td><td><span class="tick n hide0" id="m63">✗</span></td></tr>
+        <tr><td style="font-size:14px">7 · b.?A</td><td><span class="tick n hide0" id="m71">✗</span></td><td><span class="tick n hide0" id="m72">✗</span></td><td><span class="tick y hide0" id="m73">✓</span></td></tr>
+        <tr><td style="font-size:14px">8 · b.?B</td><td><span class="tick n hide0" id="m81">✗</span></td><td><span class="tick n hide0" id="m82">✗</span></td><td><span class="tick y hide0" id="m83">✓</span></td></tr>
+      </table>
+    </div>
+  </div>
+  <span class="f ghost" data-act="#bA|r1" data-say="<b>fA()</b> nằm <b>trong</b> lớp A → truy xuất được cả xA (private), yA, zA. ✓"></span>
+  <span class="f ghost" data-act="#bB|r2" data-say="<b>fB()</b> dòng 10: <b>xA</b> là private của A → lớp con B <b>không</b> truy xuất được → lỗi. yA (protected), zA (public) thì được."></span>
+  <span class="f ghost" data-act="#bB|r3" data-say="fB() dòng 11: xB, yB, zB là của chính B → được. ✓"></span>
+  <span class="f ghost" data-now="#bM|show-a" data-act="#m51|sh;#m52|sh;#m53|sh" data-say="main dòng 5: ở <b>ngoài lớp</b> chỉ thấy public → a.xA ✗ (private), a.yA ✗ (protected), a.zA ✓."></span>
+  <span class="f ghost" data-now="#bM|show-b" data-act="#m61|sh;#m62|sh;#m63|sh" data-say="Dòng 6: đối tượng <b>a</b> thuộc lớp cha A, mà A <b>không có</b> xB, yB, zB → lỗi cả 3. Lớp cha không biết gì về lớp con."></span>
+  <span class="f ghost" data-now="#bM|show-c" data-act="#m71|sh;#m72|sh;#m73|sh" data-say="Dòng 7: b thừa hưởng xA, yA, zA. Kế thừa public → ở B: xA không truy xuất được, yA vẫn protected, zA vẫn public → chỉ b.zA ✓."></span>
+  <span class="f ghost" data-now="#bM|show-d" data-act="#m81|sh;#m82|sh;#m83|sh" data-say="Dòng 8: b.xB ✗ (private), b.yB ✗ (protected), b.zB ✓. <b>Kết luận</b>: từ main chỉ dùng được zA, zB."></span>
+</section>
+
+<!-- ===================== OVERRIDE ===================== -->
+<section class="slide z2" id="override" data-title="11 · Định nghĩa lại hàm (override)">
+  <div class="hdr in"><span class="qn">11</span><h2>Định nghĩa lại hàm</h2></div>
+  <div class="flow" style="margin-top:30px;gap:14px">
+    <div class="box a f">Lớp cha có hàm <b>f</b><small>cách xử lý của cha</small></div><div class="ar f">→</div>
+    <div class="box b f">⟹ Lớp con có hàm <b>f</b><small>thừa hưởng TẤT CẢ</small></div><div class="ar f">→</div>
+    <div class="box d f">Nhưng con muốn<br><b>f xử lý khác</b><small>yêu cầu riêng của lớp con</small></div><div class="ar f">→</div>
+    <div class="box e f">Con <b>định nghĩa lại</b> f<small>override</small></div>
+  </div>
+  <div class="cols f" style="margin-top:34px">
+    <div class="card"><h3>Vd: Animal → Cat</h3><p>Animal có <code class="i">talk()</code>; Cat thừa hưởng, nhưng mèo kêu "meo meo" nên Cat định nghĩa lại <code class="i">talk()</code>.</p></div>
+    <div class="card"><h3>Vd: GiaoVien → GVCN</h3><p>GVCN thừa hưởng <code class="i">tinhLuong()</code>, nhưng lương GVCN có thêm phụ cấp → GVCN định nghĩa lại <code class="i">tinhLuong()</code>.</p></div>
+  </div>
+  <p class="say" style="margin-top:20px">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== OVERRIDE VD ===================== -->
+<section class="slide z1" id="override-vd" data-title="12 · Ví dụ: GVCN định nghĩa lại tinhLuong()">
+  <div class="hdr in"><span class="qn">12</span><h2>Ví dụ: GVCN tính lương khác GiaoVien</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr">
+    <div>
+      <div class="card in" style="margin-bottom:12px"><p style="font-size:18px">Lương GV = Mức lương − Số ngày nghỉ × 10000<br>Lương GVCN = <b>Lương GV</b> + Phụ cấp 50000</p></div>
+<script type="text/x-cpp" id="kOv" data-title="GiaoVien.cpp / GVCN.cpp" data-mark="1-4:a;6:b;8:c;3:d">
+float GiaoVien::tinhLuong()
+{
+    return mucLuong - soNgayNghi * 10000;
+}
+
+float GVCN::tinhLuong()
+{
+    return GiaoVien::tinhLuong() + 50000;
+}
+</script>
+      <p class="muted" style="font-size:14.5px;margin-top:6px">Đừng quên khai báo <code class="i">float tinhLuong();</code> trong <code class="i">class GVCN</code>.</p>
+    </div>
+    <div>
+      <div class="code-title">gv2 : GVCN ("Tran Thi B", 3000000, 3, "LOP-A1")</div>
+      <div class="stack" style="margin:6px 0 10px">
+        <div class="fr hide0" id="sf1">GVCN::tinhLuong()<small>main gọi gv2.tinhLuong() → bản của GVCN</small></div>
+        <div class="fr b hide0" id="sf2">GiaoVien::tinhLuong()<small>gọi lại bản của lớp cha</small></div>
+      </div>
+      <div class="vars hide0" id="oc1"><span class="vc">3000000 − 3 × 10000</span><span class="vc res">= 2970000</span></div>
+      <div class="vars hide0" id="oc2"><span class="vc">2970000 + 50000</span><span class="vc res">= 3020000</span></div>
+      <span class="f ghost" data-now="#kOv|show-a" data-say="Cách tính của lớp cha GiaoVien giữ nguyên."></span>
+      <span class="f ghost" data-now="#kOv|show-b" data-act="#sf1|sh" data-say="GVCN viết lại hàm có <b>cùng tên, cùng tham số, cùng kiểu trả về</b>: float tinhLuong(). Gọi gv2.tinhLuong() giờ chạy bản của GVCN."></span>
+      <span class="f ghost" data-now="#kOv|show-c" data-act="#sf2|sh" data-say="Không viết lại công thức: gọi lại hàm của cha bằng cú pháp <b>GiaoVien::tinhLuong()</b>. Nếu thiếu <b>GiaoVien::</b>, hàm sẽ tự gọi chính nó → đệ quy vô hạn!"></span>
+      <span class="f ghost" data-now="#kOv|show-d" data-act="#oc1|sh" data-say="Hàm của cha tính phần lương cơ bản: 2970000."></span>
+      <span class="f ghost" data-now="#kOv|show-c" data-act="#oc2|sh;#sf2|rm" data-say="Quay về GVCN::tinhLuong(), cộng thêm phụ cấp → <b>3020000</b> (trước đây là 2970000)."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== OVERRIDE LƯU Ý ===================== -->
+<section class="slide z2" id="override-luuy" data-title="13 · Lưu ý khi định nghĩa lại hàm">
+  <div class="hdr in"><span class="qn">13</span><h2>Lưu ý khi định nghĩa lại hàm</h2></div>
+  <div class="cols3" style="margin-top:14px">
+    <div class="card f"><h3>① Khai báo lại ở lớp con</h3><p>Muốn định nghĩa lại hàm nào thì phải <b>khai báo</b> hàm đó trong <code class="i">class</code> của lớp con.</p></div>
+    <div class="card f"><h3>② Giống y hệt</h3><p>Khai báo ở lớp con <b>PHẢI GIỐNG Y HỆT</b> lớp cha: tên hàm, danh sách tham số, kiểu trả về.</p></div>
+    <div class="card f"><h3>③ Gọi lại hàm cha</h3><p>Khi cần: <code class="i">TenLopCha::TenHam(ds tham số)</code></p></div>
+  </div>
+<div class="f" style="margin-top:18px"><script type="text/x-cpp" class="sm" id="kLu" data-title="class GVCN : public GiaoVien" data-mark="5:a;6:y">
+class GVCN : public GiaoVien
+{
+    // ...
+public:
+    float tinhLuong();          // ✓ đúng: giống y hệt lớp cha
+    float tinhLuong(int phuCap); // ✗ khác tham số: KHÔNG phải định nghĩa lại
+};
+</script></div>
+  <span class="f ghost" data-now="#kLu|show-a" data-say="Dòng 5: cùng chữ ký với GiaoVien::tinhLuong() → định nghĩa lại đúng."></span>
+  <span class="f ghost" data-now="#kLu|show-y" data-say="Dòng 6: khác tham số → đây là một hàm <b>mới</b> cùng tên, và nó còn <b>che</b> mất tinhLuong() của cha trong GVCN. Tránh viết như vậy."></span>
+  <p class="say">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== IS-A ===================== -->
+<section class="slide z1" id="isa" data-title="14 · Quan hệ IS-A (là một)">
+  <div class="hdr in"><span class="qn">14</span><h2>Quan hệ IS-A: "A <i>là một loại</i> B"</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.5fr">
+    <div>
+      <ul class="in"><li>A là một trường hợp đặc biệt của B</li><li>A cùng loại với B</li><li>→ <b>A kế thừa B</b></li></ul>
+      <div class="note f" data-o="0">Trước khi cho A kế thừa B, tự hỏi: <b>"A có phải là một loại của B không?"</b></div>
+      <div class="note blue f" data-o="6">Ký hiệu UML: mũi tên <b>đầu tam giác rỗng</b> chỉ vào lớp cha.</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div class="uml" style="margin-top:10px">
+      <div class="umlc f" data-o="1" data-say="Ký hiệu tổng quát: A kế thừa B."><div class="ucls"><div>B</div><i></i><i></i></div><div class="conn isa"></div><div class="ucls"><div>A</div><i></i><i></i></div></div>
+      <div class="umlc f" data-o="2" data-say="Con mèo <b>là một loại</b> con vật."><div class="ucls"><div>ConVat</div><i></i><i></i></div><div class="conn isa"></div><div class="ucls"><div>ConMeo</div><i></i><i></i></div></div>
+      <div class="umlc f" data-o="3" data-say="Trái chuối <b>là một loại</b> trái cây."><div class="ucls"><div>TraiCay</div><i></i><i></i></div><div class="conn isa"></div><div class="ucls"><div>TraiChuoi</div><i></i><i></i></div></div>
+      <div class="umlc f" data-o="4" data-say="GVCN <b>là một loại</b> giáo viên."><div class="ucls"><div>GiaoVien</div><i></i><i></i></div><div class="conn isa"></div><div class="ucls"><div>GVCN</div><i></i><i></i></div></div>
+      <div class="umlc f" data-o="5" data-say="Hình vuông <b>là một loại</b> hình chữ nhật (đặc biệt: hai cạnh bằng nhau)."><div class="ucls"><div>HinhChuNhat</div><i></i><i></i></div><div class="conn isa"></div><div class="ucls"><div>HinhVuong</div><i></i><i></i></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== HAS-A ===================== -->
+<section class="slide z1" id="hasa" data-title="15 · Quan hệ HAS-A (có một)">
+  <div class="hdr in"><span class="qn">15</span><h2>Quan hệ HAS-A: "A <i>chứa</i> B"</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.5fr">
+    <div>
+      <ul class="in"><li>A bao hàm / chứa B</li><li>B là một bộ phận của A</li><li>→ Trong lớp A có <b>thuộc tính kiểu B</b></li></ul>
+<div class="f" data-o="0"><script type="text/x-cpp" class="sm" data-title="HAS-A trong code">
+class TamGiac
+{
+private:
+    Diem A, B, C;   // TamGiac HAS-A Diem
+};
+</script></div>
+      <div class="note blue f" data-o="6">Ký hiệu UML: đường nối <b>đầu hình thoi</b> ở phía lớp chứa.</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div class="uml" style="margin-top:10px">
+      <div class="umlc f" data-o="1" data-say="Ký hiệu tổng quát: A chứa B."><div class="ucls"><div>A</div><i></i><i></i></div><div class="conn hasa"></div><div class="ucls"><div>B</div><i></i><i></i></div></div>
+      <div class="umlc f" data-o="2" data-say="Chiếc xe <b>có</b> nhiều bánh xe — bánh xe không phải là một loại xe."><div class="ucls"><div>ChiecXe</div><i></i><i></i></div><div class="conn hasa"><span class="mul">nhiều</span></div><div class="ucls"><div>BanhXe</div><i></i><i></i></div></div>
+      <div class="umlc f" data-o="3" data-say="Quyển sách <b>có</b> nhiều trang sách."><div class="ucls"><div>QuyenSach</div><i></i><i></i></div><div class="conn hasa"><span class="mul">1..*</span></div><div class="ucls"><div>TrangSach</div><i></i><i></i></div></div>
+      <div class="umlc f" data-o="4" data-say="Lớp học <b>có</b> nhiều sinh viên."><div class="ucls"><div>LopHoc</div><i></i><i></i></div><div class="conn hasa"><span class="mul">1..*</span></div><div class="ucls"><div>SinhVien</div><i></i><i></i></div></div>
+      <div class="umlc f" data-o="5" data-say="Tam giác <b>có</b> 3 điểm."><div class="ucls"><div>TamGiac</div><i></i><i></i></div><div class="conn hasa"><span class="mul">3</span></div><div class="ucls"><div>Diem</div><i></i><i></i></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== QUIZ ===================== -->
+<section class="slide z2" id="quiz" data-title="16 · Thử phân loại IS-A / HAS-A">
+  <div class="hdr in"><span class="qn">16</span><h2>Thử phân loại: IS-A hay HAS-A?</h2></div>
+  <table class="in" style="max-width:1000px;margin:14px auto 0;font-size:19px">
+    <tr><th>Cặp lớp</th><th>Câu hỏi kiểm tra</th><th style="width:220px">Quan hệ</th></tr>
+    <tr><td><b>SinhVien</b> – Nguoi</td><td>Sinh viên có phải là một loại người?</td><td><span class="chip v hide0" id="q1">IS-A → kế thừa</span></td></tr>
+    <tr><td><b>MayTinh</b> – BanPhim</td><td>Máy tính là một loại bàn phím? Không — máy tính <i>có</i> bàn phím</td><td><span class="chip g hide0" id="q2">HAS-A → thuộc tính</span></td></tr>
+    <tr><td><b>PhanSo</b> – SoNguyen</td><td>Phân số có tử số, mẫu số là số nguyên</td><td><span class="chip g hide0" id="q3">HAS-A → thuộc tính</span></td></tr>
+    <tr><td><b>XeTai</b> – XeHoi</td><td>Xe tải là một loại xe hơi (ô tô)?</td><td><span class="chip v hide0" id="q4">IS-A → kế thừa</span></td></tr>
+    <tr><td><b>HinhTron</b> – Diem</td><td>Hình tròn có tâm là một điểm</td><td><span class="chip g hide0" id="q5">HAS-A → thuộc tính</span></td></tr>
+  </table>
+  <span class="f ghost" data-act="#q1|sh" data-say="Câu hỏi IS-A trả lời <b>có</b> → dùng kế thừa: class SinhVien : public Nguoi."></span>
+  <span class="f ghost" data-act="#q2|sh" data-say="Trả lời <b>không</b>, mà là "có" → HAS-A: MayTinh có thuộc tính kiểu BanPhim."></span>
+  <span class="f ghost" data-act="#q3|sh" data-say="Lỗi hay gặp: cho PhanSo kế thừa SoNguyen. Thật ra phân số <b>chứa</b> hai số nguyên."></span>
+  <span class="f ghost" data-act="#q4|sh" data-say="Xe tải là một loại ô tô → IS-A."></span>
+  <span class="f ghost" data-act="#q5|sh" data-say="Hình tròn <b>có</b> tâm (Diem) và bán kính → HAS-A. Không nên viết class HinhTron : public Diem."></span>
+  <p class="say" style="max-width:1000px;margin:14px auto 0">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="slide z2" id="summary" data-title="Tổng kết">
+  <div class="hdr in"><span class="qn">✓</span><h2>Tổng kết</h2></div>
+  <div class="cols4" style="margin-top:10px">
+    <div class="card f"><h3>Kế thừa</h3><p>Tách phần chung ra lớp cha; lớp con thừa hưởng <b>tất cả</b> và chỉ khai báo phần riêng.</p><p style="margin-top:6px"><code class="i">class B : public A</code></p></div>
+    <div class="card f"><h3>Tầm vực</h3><p>private của cha: lớp con không truy xuất. protected: lớp con thấy, ngoài không thấy. Loại kế thừa chỉ có thể <b>hạ</b> tầm vực.</p></div>
+    <div class="card f"><h3>Định nghĩa lại</h3><p>Lớp con viết lại hàm <b>giống y hệt</b> chữ ký; gọi lại cha bằng <code class="i">Cha::Ham()</code>.</p></div>
+    <div class="card f"><h3>IS-A / HAS-A</h3><p>"là một loại" → kế thừa.<br>"có / chứa" → thuộc tính.</p></div>
+  </div>
+  <div class="note blue f" style="margin-top:20px">Bài tiếp theo: <b>hàm dựng, hàm hủy trong kế thừa</b> — đối tượng lớp con được tạo ra và hủy đi theo thứ tự nào?</div>
+</section>
+
+</div></div>
+
+<div id="bar"></div>
+<div id="hint">← → / Space: từng bước · Shift+→: qua slide · G: đi tới slide bất kỳ · A: hiện hết · F: toàn màn hình</div>
+<div id="nav"><button id="jumpNav" title="Đi tới slide (G)">☰</button><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+<div id="jump"><div id="jbox"><div class="jh"><h3>Đi tới slide</h3><span class="muted" style="font-size:14px">gõ số hoặc tên slide rồi Enter</span><input id="jq" placeholder="vd: 5 hoặc hàm ảo" autocomplete="off"><button id="jx" aria-label="Đóng">×</button></div><div id="jlist"></div></div></div>
+
+<script>
+(function(){
+  // ---------- C++ highlighter ----------
+  const KW=new Set("class struct public private protected virtual const this new delete return if else for while do switch case break continue default friend operator static using namespace include true false nullptr sizeof".split(" "));
+  const PRIM=new Set("bool char double float int long short void unsigned auto".split(" "));
+  const STD=new Set("cout cin endl".split(" "));const LIBT=new Set("string vector".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line){
+    const re=/(\/\/.*$|\/\*.*?\*\/)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(^\s*#\w+.*$)|\b(\d+(?:\.\d+)?[fFL]?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="p">'+m[3]+'</span>';
+      else if(m[4]) out+='<span class="n">'+m[4]+'</span>';
+      else if(m[5]){
+        const w=m[5];let cls="";
+        if(PRIM.has(w)||LIBT.has(w))cls="t";else if(KW.has(w))cls="k";else if(STD.has(w))cls="fn";
+        else if(m[6])cls="fn";
+        else if(/^[A-Z][A-Z0-9_]+$/.test(w))cls="n";
+        else if(/^[A-Z]/.test(w))cls="t";
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[6]?esc(m[6]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-cpp"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");r.split(",").forEach(rr=>{const [a,b]=rr.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);});
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    if(sc.dataset.title){const t=document.createElement("div");t.className="code-title";t.textContent=sc.dataset.title;sc.before(t)}
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+  // ---------- deck engine ----------
+  //   .f = fragment, one per step.  data-act "sel|cls;…" (kept while shown) · data-now "sel|cls;…" (only on latest step)
+  //   data-set "sel::html;…" (content while shown) · data-say narration · data-o order
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")].sort((x,y)=>(+x.dataset.o||0)-(+y.dataset.o||0));
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  const pairs=(v,sep)=>(v||"").split(/;(?=\s*#)/).filter(s=>s.trim()).map(p=>{const k=p.indexOf(sep);return [p.slice(0,k).trim(),p.slice(k+sep.length)]});
+  function tog(v,on){pairs(v,"|").forEach(([sel,cls])=>{document.querySelectorAll(sel).forEach(t=>cls.split(" ").forEach(c=>c&&t.classList.toggle(c,on)))})}
+  document.querySelectorAll("[data-set]").forEach(f=>pairs(f.dataset.set,"::").forEach(([sel])=>{document.querySelectorAll(sel).forEach(t=>{if(t.dataset.orig===undefined)t.dataset.orig=t.innerHTML})}));
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach(f=>{tog(f.dataset.now,false);tog(f.dataset.act,false)});
+      s.querySelectorAll("[data-orig]").forEach(t=>t.innerHTML=t.dataset.orig);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step);f.classList.toggle("on",on);if(on){tog(f.dataset.act,true);pairs(f.dataset.set,"::").forEach(([sel,val])=>document.querySelectorAll(sel).forEach(t=>t.innerHTML=val))}});
+      if(i===cur&&step>0)tog(fs[step-1].dataset.now,true);
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.innerHTML=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length+(fs.length?" · "+step+"/"+fs.length:"");
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    try{history.replaceState(null,"","#"+slides[cur].id)}catch(e){}
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+
+  // ---------- jump-to-slide panel ----------
+  const jump=document.getElementById("jump"),jlist=document.getElementById("jlist"),jq=document.getElementById("jq");
+  const titleOf=s=>s.dataset.title||(s.querySelector("h2,h1")||{}).textContent||s.id;
+  slides.forEach((s,i)=>{
+    const d=document.createElement("div");d.className="ji";d.dataset.i=i;
+    d.innerHTML="<b>"+String(i+1).padStart(2,"0")+"</b><span>"+esc(titleOf(s).replace(/\s+/g," ").trim())+"</span>";
+    d.onclick=()=>{closeJump();go(i)};jlist.appendChild(d);
+    const b=document.createElement("button");b.className="jumpbtn";b.type="button";b.innerHTML="☰ Đi tới slide";b.title="Mở danh sách slide (phím G)";
+    b.onclick=e=>{e.stopPropagation();openJump()};s.appendChild(b);
+  });
+  function filterJump(){
+    const q=jq.value.trim().toLowerCase();let first=null;
+    [...jlist.children].forEach(d=>{const i=+d.dataset.i;const ok=!q||String(i+1)===q||d.textContent.toLowerCase().includes(q);d.style.display=ok?"":"none";d.classList.remove("k");if(ok&&!first)first=d});
+    if(first&&q)first.classList.add("k");return first;
+  }
+  function openJump(){jump.classList.add("on");jq.value="";filterJump();[...jlist.children].forEach(d=>d.classList.toggle("cur",+d.dataset.i===cur));setTimeout(()=>jq.focus(),30)}
+  function closeJump(){jump.classList.remove("on");jq.blur()}
+  jq.addEventListener("input",filterJump);
+  jq.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Escape")closeJump();else if(e.key==="Enter"){const q=jq.value.trim();const n=parseInt(q,10);if(String(n)===q&&n>=1&&n<=slides.length){closeJump();go(n-1)}else{const f=filterJump();if(f){closeJump();go(+f.dataset.i)}}}});
+  jump.addEventListener("click",e=>{if(e.target===jump)closeJump()});
+  document.getElementById("jx").onclick=closeJump;
+  document.getElementById("jumpNav").onclick=openJump;
+
+  addEventListener("keydown",e=>{
+    if(jump.classList.contains("on")){if(e.key==="Escape")closeJump();return}
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="g"||e.key==="G"){e.preventDefault();openJump()}
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null||jump.classList.contains("on"))return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,900 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hàm dựng & hàm hủy trong kế thừa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:16px;padding-right:150px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+.lvl{font-size:14px;font-weight:700;color:var(--muted);white-space:nowrap;margin-left:auto}
+.lvl b{color:#f59e0b;letter-spacing:2px}.lvl s{color:#d9d6e8;text-decoration:none;letter-spacing:2px}
+h1{font-size:66px;line-height:1.1;font-weight:800}
+h2{font-size:30px;line-height:1.2;font-weight:800}
+h3{font-size:21px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:20px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:24px;margin:5px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:9px;height:9px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.86em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 5px;border-radius:6px;color:#be185d;white-space:nowrap}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+.cols>*{min-width:0}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.card p,.card li{font-size:17px}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.note{margin-top:10px;padding:8px 14px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:17px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.note.red{border-color:#e11d48;background:linear-gradient(90deg,#fff1f3,#fffafa)}
+.code{font-family:var(--mono);font-size:15px;line-height:1.45;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:8px 0;overflow:hidden;position:relative}
+.code.sm{font-size:14px;line-height:1.42}.code.xs{font-size:13px;line-height:1.4}.code.xxs{font-size:12px;line-height:1.36;padding:6px 0}
+.code.x4{font-size:11.4px;line-height:1.33;padding:6px 0}
+.code .ln{padding:0 12px 0 6px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:22px;flex:none;text-align:right;margin-right:10px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.13);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.15);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.18);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.14);box-shadow:inset 5px 0 #ec4899}
+.code.show-e .mark-e{background:rgba(16,185,129,.15);box-shadow:inset 5px 0 #10b981}
+.code.show-f .mark-f{background:rgba(124,58,237,.13);box-shadow:inset 5px 0 #7c3aed}
+.code.show-g .mark-g{background:rgba(6,182,212,.15);box-shadow:inset 5px 0 #06b6d4}
+.code.show-h .mark-h{background:rgba(245,158,11,.18);box-shadow:inset 5px 0 #f59e0b}
+.code.show-i .mark-i{background:rgba(236,72,153,.14);box-shadow:inset 5px 0 #ec4899}
+.code.show-j .mark-j{background:rgba(16,185,129,.15);box-shadow:inset 5px 0 #10b981}
+.hide0{opacity:0;transform:translateY(8px) scale(.96);transition:all .45s}
+.hide0.sh{opacity:1;transform:none}
+.win.pre.sh:not(.vis){opacity:.35;filter:grayscale(1)}
+.gone.sh{display:none}
+.stage{position:relative;display:flex;align-items:center;justify-content:center}
+.chip{display:inline-block;font-family:var(--mono);font-size:12.5px;font-weight:700;padding:2px 9px;border-radius:999px;background:#fef3c7;color:#b45309;border:1px solid #fcd34d}
+.chip.v{background:#ede9fe;color:#6d28d9;border-color:#c4b5fd}.chip.g{background:#d1fae5;color:#047857;border-color:#6ee7b7}.chip.r{background:#ffe4e6;color:#be123c;border-color:#fda4af}
+.hlo{outline:3px solid #f59e0b;outline-offset:3px;border-radius:6px}
+.jb.dis.en{color:#111;border-color:#9aa1b3;background:linear-gradient(180deg,#fff,#e6e8ee)}.jb.dis.en .ico{filter:none;opacity:1}
+.jb.dis.en.dis2{color:#a0a4ad;border-color:#ccd0d8;background:#f1f2f5}
+.rad.on.off::before,.chk.on.off::before{background:#fff;content:""}
+.code-title{font-family:var(--mono);font-size:13px;color:var(--muted);margin:0 0 4px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:16px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:6px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.3}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+table.t1 td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.console{font-family:var(--mono);font-size:13.5px;line-height:1.45;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:8px 14px;color:#e6f0ff;white-space:pre;min-height:40px;overflow:hidden}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:10px;letter-spacing:3px;margin-bottom:3px}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.flow{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap}
+.box{border-radius:12px;padding:8px 12px;text-align:center;font-family:var(--mono);font-size:15px;border:2px solid var(--line);background:#fff;min-width:110px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:12.5px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.a{border-color:#7c3aed}.box.b{border-color:#0891b2}.box.c{border-color:#ec4899;background:#fdf2f8}.box.d{border-color:#f59e0b;background:#fffbeb}.box.e{border-color:#10b981;background:#ecfdf5}
+.ar{color:var(--muted);font-size:22px;text-align:center}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.say{font-size:17px;margin-top:10px;min-height:50px;color:var(--muted);line-height:1.42}
+.say b{color:var(--text)}
+.vars{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.vc{font-family:var(--mono);font-size:15px;font-weight:700;padding:4px 12px;border-radius:10px;background:#fff;border:2px solid #e4dcfb;transition:all .35s}
+.vc b{color:var(--t)}
+.vc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.45)}
+.vc.res{border-color:#10b981;background:#ecfdf5;color:#047857}
+.arr{display:flex;gap:8px;justify-content:center}
+.cell{width:52px;height:56px;border-radius:12px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .45s}
+.cell small{font-size:11px;color:var(--muted);font-weight:600}
+.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-6px)}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c}
+.cell.dim{opacity:.35}
+.cell.wide{width:auto;padding:0 10px;font-size:14px}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.15)}100%{transform:none;opacity:1}}
+.pop{animation:pop .45s}
+
+/* ===== agenda ===== */
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 10px}
+.sec{grid-column:1/-1;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.08em;margin-top:4px;text-transform:uppercase}
+.ag{background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 10px;cursor:pointer;transition:all .2s;font-size:15.5px;line-height:1.25;box-shadow:0 2px 6px rgba(40,50,110,.05);font-family:var(--mono);font-weight:600}
+.ag:hover{border-color:#ec4899;transform:translateY(-2px);box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag b{color:#db2777;margin-right:6px}
+.ag.g1{border-left:5px solid #7c3aed}.ag.g2{border-left:5px solid #0891b2}.ag.g3{border-left:5px solid #ec4899}.ag.g4{border-left:5px solid #f59e0b}
+.ag.g5{border-left:5px solid #10b981}.ag.g6{border-left:5px solid #6366f1}.ag.g7{border-left:5px solid #f97316}.ag.g8{border-left:5px solid #0ea5e9}
+
+/* ===== mock Swing windows ===== */
+.win{border:1px solid #cfc8e6;border-radius:10px;background:#eef0f4;box-shadow:0 18px 40px -18px rgba(30,27,58,.45);font-family:"Segoe UI",system-ui,sans-serif;font-size:14px;color:#222;transition:all .5s;overflow:hidden;position:relative}
+.wt{height:28px;background:linear-gradient(180deg,#f7f7fa,#e2e4ea);border-bottom:1px solid #cfd2da;display:flex;align-items:center;gap:6px;padding:0 10px;font-weight:600;font-size:13px;color:#333}
+.wt i{width:11px;height:11px;border-radius:50%;background:#ff5f57;display:inline-block}.wt i:nth-child(2){background:#febc2e}.wt i:nth-child(3){background:#28c840}
+.wt span{margin-left:8px}
+.wb{padding:12px;position:relative}
+.win.ghost{opacity:.25;filter:grayscale(1)}
+.win.undec .wt{display:none}
+.jb{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid #9aa1b3;border-radius:5px;background:linear-gradient(180deg,#fff,#e6e8ee);font-size:13.5px;color:#111;transition:all .3s;white-space:nowrap;cursor:default}
+.jb.dis{color:#a0a4ad;border-color:#ccd0d8;background:#f1f2f5}
+.jb.dis .ico{filter:grayscale(1);opacity:.5}
+.jb.press{background:linear-gradient(180deg,#cfd8ea,#b9c6e2);border-color:#5b74b5;transform:scale(.96)}
+.jb.def{box-shadow:0 0 0 2px #7aa2f7}
+.jb.vert{flex-direction:column}
+.jb u{text-decoration:underline}
+.ico{display:inline-block;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#a7f3d0,#059669);flex:none}
+.ico.l{border-radius:4px;background:linear-gradient(135deg,#60a5fa,#2563eb);clip-path:polygon(100% 0,0 50%,100% 100%)}
+.ico.r{border-radius:4px;background:linear-gradient(135deg,#f472b6,#db2777);clip-path:polygon(0 0,100% 50%,0 100%)}
+.splat{display:inline-block;width:34px;height:30px;background:radial-gradient(circle at 50% 50%,#f59e0b 0 30%,transparent 31%),radial-gradient(circle at 25% 30%,#ec4899 0 18%,transparent 19%),radial-gradient(circle at 75% 35%,#7c3aed 0 18%,transparent 19%),radial-gradient(circle at 40% 78%,#0891b2 0 17%,transparent 18%),radial-gradient(circle at 78% 75%,#10b981 0 15%,transparent 16%)}
+.chk,.rad{display:block;padding:3px 0;font-size:14px;transition:all .3s;white-space:nowrap}
+.chk::before,.rad::before{display:inline-block;vertical-align:-2px;margin-right:7px}
+.chk::before{content:"";width:14px;height:14px;border:1px solid #7b8394;border-radius:3px;background:#fff;flex:none;font-size:12px;line-height:14px;text-align:center;font-weight:900;color:#1d4ed8}
+.chk.on::before{content:"✓";background:#dbe7ff}
+.rad::before{content:"";width:14px;height:14px;border:1px solid #7b8394;border-radius:50%;background:#fff;flex:none;box-sizing:border-box}
+.rad.on::before{background:radial-gradient(circle,#1d4ed8 0 35%,#fff 40%)}
+.chk.hl,.rad.hl{background:#fff3c4;border-radius:4px}
+.tf{display:inline-block;min-width:120px;min-height:26px;border:1px solid #8c93a3;background:#fff;padding:3px 7px;font-family:var(--mono);font-size:13.5px;border-radius:3px;transition:all .3s;white-space:pre;vertical-align:middle}
+.tf.err{background:#ffd1dc}
+.tf.ro{background:#f3f4f6}
+.tf .cur{display:inline-block;width:1px;height:15px;background:#111;vertical-align:middle;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.ta{border:1px solid #8c93a3;background:#fff;padding:6px 8px;font-family:var(--mono);font-size:12.5px;line-height:1.5;border-radius:3px;white-space:pre-wrap;overflow:hidden}
+/* text area that stays scrolled to bottom */
+.ta.bottom{display:flex;flex-direction:column;justify-content:flex-end}
+mark{background:#d1d5db;color:inherit;border-radius:2px;padding:0 1px}
+mark.sel{background:#bfdbfe}
+.combo{display:inline-flex;align-items:center;justify-content:space-between;min-width:170px;border:1px solid #8c93a3;border-radius:4px;background:linear-gradient(180deg,#fff,#eceef3);padding:4px 8px;font-size:14px;gap:10px;position:relative}
+.combo::after{content:"▾";color:#555}
+.combo.ed{background:#fff}
+.dd{position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid #8c93a3;box-shadow:0 8px 18px -8px rgba(0,0,0,.35);z-index:3;display:none;text-align:left}
+.dd div{padding:3px 8px;font-size:13.5px}
+.dd div.s{background:#3b6fd8;color:#fff}
+.open .dd{display:block}
+.lst{border:1px solid #8c93a3;background:#fff;font-size:14px;min-height:90px}
+.lst div{padding:3px 8px;transition:all .3s}
+.lst div.s{background:#3b6fd8;color:#fff}
+.lst div.nw{animation:pop .5s}
+.jt{border-collapse:collapse;width:100%;font-size:13px;border:1px solid #9aa1b3;border-radius:0;background:#fff;font-family:"Segoe UI",system-ui,sans-serif}
+.jt th{background:linear-gradient(180deg,#fafafa,#e3e5ea);border:1px solid #b9bec9;padding:3px 6px;font-weight:600;font-size:12.5px;white-space:nowrap;text-align:left}
+.jt td{border:1px solid #e1e3e8;padding:3px 6px;color:#111;font-weight:400;white-space:nowrap;vertical-align:middle}
+.jt td.num{text-align:right}
+.jt td.ck{text-align:center}
+.jt tr.s td{background:#3b6fd8;color:#fff}
+.jt td.s{background:#3b6fd8;color:#fff}
+.jt td.edit{outline:2px solid #f59e0b;background:#fffbeb}
+.jt th.sorted::after{content:" ▲";color:#3b6fd8}
+.jt th.sorted.desc::after{content:" ▼"}
+.jt tr.hide{display:none}
+.jt .cb{display:inline-block;width:13px;height:13px;border:1px solid #7b8394;border-radius:2px;background:#fff;vertical-align:middle;font-size:11px;line-height:12px;text-align:center;font-weight:900;color:#1d4ed8}
+.jt .cb.on::before{content:"✓"}
+.pb{height:20px;border:1px solid #8c93a3;border-radius:4px;background:#e5e7eb;position:relative;overflow:hidden;min-width:180px}
+.pb .fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(180deg,#7aa2f7,#3b6fd8);transition:width .6s}
+.pb .txt{position:absolute;inset:0;text-align:center;font-size:12px;line-height:18px;font-weight:600;color:#111}
+.pb.ind .fill{width:30%!important;animation:ind 1.2s linear infinite alternate}
+.pb.ind .txt{opacity:0}
+@keyframes ind{from{left:0}to{left:70%}}
+.mbar{display:flex;gap:2px;background:linear-gradient(180deg,#fbfbfc,#e9ebf0);border-bottom:1px solid #cfd2da;padding:2px 6px;font-size:13.5px;position:relative}
+.mbar>span{padding:2px 8px;border-radius:3px}
+.mbar>span.s{background:#3b6fd8;color:#fff}
+.menu{position:absolute;top:26px;left:6px;background:#fff;border:1px solid #9aa1b3;box-shadow:0 10px 24px -8px rgba(0,0,0,.4);min-width:250px;z-index:4;display:none;font-size:13px}
+.menu.open{display:block;animation:pop .3s}
+.mi{display:flex;align-items:center;gap:6px;padding:3px 10px;white-space:nowrap}
+.mi .acc{margin-left:auto;color:#666;font-size:12px;padding-left:16px}
+.mi.s{background:#3b6fd8;color:#fff}.mi.s .acc{color:#e0e7ff}
+.msep{height:1px;background:#d9dce3;margin:3px 0}
+.mi .mk{width:14px;text-align:center;font-weight:900;flex:none}
+.dlgwrap{position:absolute;inset:0;background:rgba(30,27,58,.18);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;z-index:6}
+.dlgwrap.on{opacity:1}
+.dlgwrap.on .win{animation:pop .4s}
+.dlgwrap.nomodal{background:none}
+.dlgico{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:20px;flex:none;background:#3b82f6}
+.dlgico.q{background:#10b981}.dlgico.e{background:#e11d48}.dlgico.w{background:#f59e0b;border-radius:6px}
+.tabs{display:flex;gap:2px;border-bottom:1px solid #9aa1b3;margin-bottom:8px}
+.tabs span{padding:3px 10px;border:1px solid #b9bec9;border-bottom:none;border-radius:5px 5px 0 0;background:#e6e8ee;font-size:12.5px}
+.tabs span.s{background:#fff;font-weight:600}
+.tip{position:absolute;background:#ffffe1;border:1px solid #777;font-size:12px;padding:2px 6px;box-shadow:2px 2px 4px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;white-space:nowrap;z-index:5}
+.tip.on{opacity:1}
+.pic{display:flex;align-items:center;justify-content:center;font-size:64px;min-height:110px;transition:all .4s}
+.thumb{width:34px;height:34px;border-radius:5px;border:1px solid #888;display:inline-block;transition:all .4s}
+.lane{display:grid;grid-template-columns:110px 1fr;gap:6px;align-items:center;font-size:13px}
+.lane .ln2{height:30px;border-radius:8px;background:#f8fafc;border:1px dashed #cbd5e1;display:flex;align-items:center;gap:6px;padding:0 8px;overflow:hidden}
+.ev{font-family:var(--mono);font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:6px;background:#ede9fe;color:#6d28d9;white-space:nowrap}
+.ev.b{background:#cffafe;color:#0e7490}.ev.c{background:#fce7f3;color:#be185d}.ev.d{background:#fef3c7;color:#b45309}
+.kv{font-family:var(--mono);font-size:13px}
+.swatch{display:inline-block;width:100%;height:100%;border-radius:4px}
+
+/* ===== nav / jump ===== */
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;min-width:36px;height:32px;cursor:pointer;font-size:16px;padding:0 8px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+.jumpbtn{position:absolute;top:26px;right:30px;z-index:7;font-family:"Be Vietnam Pro",sans-serif;font-size:14px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));border:none;border-radius:999px;padding:7px 14px;cursor:pointer;box-shadow:0 6px 16px -6px var(--sa1);transition:transform .2s}
+.jumpbtn:hover{transform:translateY(-2px) scale(1.04)}
+#jump{position:fixed;inset:0;z-index:20;background:rgba(30,27,58,.45);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
+#jump.on{display:flex}
+#jbox{width:min(1100px,94vw);max-height:88vh;overflow:auto;background:#fff;border-radius:18px;padding:20px 24px;box-shadow:0 30px 70px -20px rgba(30,27,58,.6);animation:pop .3s}
+#jbox .jh{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+#jbox .jh h3{font-size:22px;color:#7c3aed;margin:0}
+#jbox .jh input{margin-left:auto;font-family:var(--mono);font-size:15px;padding:6px 10px;border:2px solid var(--line);border-radius:10px;width:260px;outline:none}
+#jbox .jh input:focus{border-color:#a78bfa}
+#jbox .jh button{border:none;background:#f1eaff;color:#6d28d9;font-weight:800;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:18px}
+#jlist{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+#jlist .ji{display:flex;gap:8px;align-items:center;padding:7px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:14.5px;transition:all .15s;background:#fff}
+#jlist .ji:hover,#jlist .ji.k{border-color:#ec4899;background:#fdf2f8}
+#jlist .ji.cur{background:#f3edff;border-color:#a78bfa}
+#jlist .ji b{font-family:var(--mono);color:#db2777;min-width:26px}
+#jlist .ji span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:700px){#hint{display:none}#jlist{grid-template-columns:1fr}}
+@media print{#nav,#bar,#hint,.jumpbtn{display:none}}
+
+/* ===== OOP deck extras ===== */
+.code.nonum .no{display:none}
+.code .mark-z{display:none}
+.code.alt .mark-z{display:flex}
+.code.alt .mark-y{display:none}
+.code.show-z .mark-z{background:rgba(250,204,21,.32);box-shadow:inset 5px 0 #eab308}
+.code.show-y .mark-y{background:rgba(225,29,72,.12);box-shadow:inset 5px 0 #e11d48}
+.code .ln.ok-l::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px}
+.code .ln.bad-l::after{content:"✗ lỗi";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}
+.code.done .ok-x::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px}
+.code.done .bad-x::after{content:"✗ lỗi";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro";font-size:.92em}
+.obj{border:2.5px solid #ec4899;border-radius:14px;padding:8px 12px 10px;background:#fff;position:relative;transition:all .45s}
+.obj>.lab,.part>.lab{font-family:var(--mono);font-size:12.5px;font-weight:800;color:#be185d;margin-bottom:5px;display:flex;justify-content:space-between;gap:10px}
+.part{border:2px dashed #7c3aed;border-radius:10px;padding:6px 10px;background:#f7f3ff;margin-bottom:6px;transition:all .45s}
+.part>.lab{color:#6d28d9}
+.part.b{border-color:#0891b2;background:#ecfeff}.part.b>.lab{color:#0e7490}
+.fld{font-family:var(--mono);font-size:14px;display:flex;gap:8px;padding:2px 0;align-items:center}
+.fld>span:first-child{color:var(--muted);min-width:110px}
+.fld b{font-weight:700;color:#111;transition:all .3s;padding:0 4px;border-radius:5px}
+.fld b.new{background:#fef3c7;color:#b45309}
+.fld b.def{background:#ffe4e6;color:#be123c}
+.fld b.okv{background:#d1fae5;color:#047857}
+.glow{box-shadow:0 0 0 4px rgba(245,158,11,.35),0 0 22px rgba(245,158,11,.45)}
+.dimx{opacity:.3;filter:grayscale(.8)}
+.stack{display:flex;flex-direction:column-reverse;gap:6px;min-height:40px}
+.fr{font-family:var(--mono);font-size:14px;font-weight:700;padding:6px 12px;border-radius:10px;border:2px solid #c4b5fd;background:#f5f3ff;color:#5b21b6}
+.fr.b{border-color:#67e8f9;background:#ecfeff;color:#0e7490}
+.fr.d{border-color:#fcd34d;background:#fffbeb;color:#b45309}
+.fr small{display:block;font-family:"Be Vietnam Pro";font-weight:500;font-size:12px;color:var(--muted)}
+.hide0.sh.rm{opacity:.1;transform:translateY(-10px) scale(.94)}
+.big-ok{color:#059669;font-weight:800}.big-bad{color:#e11d48;font-weight:800}
+.mem{display:flex;gap:16px;align-items:flex-end;justify-content:center;flex-wrap:wrap}
+.mc{display:flex;flex-direction:column;align-items:center;gap:4px}
+.mc .addr{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.mc .nm{font-family:var(--mono);font-size:14px;font-weight:800;color:#6d28d9}
+.mc .val{min-width:96px;height:52px;border-radius:12px;border:3px solid #e4dcfb;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:18px;font-weight:800;transition:all .45s;padding:0 8px}
+.mc.hot .val{border-color:#f59e0b;background:#fffbeb;color:#b45309}
+.mc.orph .val{border-color:#e11d48;background:#fff1f3;color:#be123c;border-style:dashed}
+.mc.ptr .val{border-color:#0891b2;background:#ecfeff;color:#0e7490}
+/* UML */
+.uml{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;align-items:flex-start}
+.umlc{display:flex;flex-direction:column;align-items:center}
+.ucls{min-width:120px;border:2px solid #1e1b3a;background:#fffbe6;border-radius:4px;font-family:var(--mono);font-size:14px;font-weight:700;text-align:center;box-shadow:4px 4px 0 #e6e2f3}
+.ucls div{padding:4px 10px}.ucls i{display:block;height:9px;border-top:1.5px solid #1e1b3a}
+.conn{position:relative;width:2px;height:64px;background:#1e1b3a;margin:0 auto}
+.conn.isa::before{content:"";position:absolute;top:-1px;left:50%;transform:translateX(-50%);border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:16px solid #1e1b3a}
+.conn.isa::after{content:"";position:absolute;top:3px;left:50%;transform:translateX(-50%);border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:10px solid #fff}
+.conn.hasa::before{content:"";position:absolute;top:0;left:50%;width:13px;height:13px;background:#fff;border:2px solid #1e1b3a;transform:translate(-50%,-3px) rotate(45deg)}
+.conn .mul{position:absolute;bottom:2px;right:8px;font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.house{display:flex;flex-direction:column;align-items:center;gap:3px}
+.house .roof{width:0;height:0;border-left:130px solid transparent;border-right:130px solid transparent;border-bottom:80px solid #ec4899}
+.house .wall{width:220px;height:90px;background:linear-gradient(180deg,#a78bfa,#7c3aed);border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+.house .base{width:280px;height:34px;background:linear-gradient(180deg,#94a3b8,#475569);border-radius:4px;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px}
+.house .roof-l{position:relative;top:-46px;color:#fff;font-weight:700;font-size:14px;height:0}
+.onion{position:relative;width:300px;height:300px;margin:0 auto}
+.onion>div{position:absolute;border-radius:50%;display:flex;align-items:flex-start;justify-content:center;font-family:var(--mono);font-weight:800;font-size:14px;padding-top:14px}
+.tick{display:inline-flex;width:26px;height:26px;border-radius:50%;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:15px}
+.tick.y{background:#10b981}.tick.n{background:#e11d48}
+table.acc td,table.acc th{text-align:center;font-size:17px;padding:8px 10px}
+table.acc td:first-child,table.acc th:first-child{text-align:left}
+table.acc td.hl{background:#fffbeb;box-shadow:inset 0 0 0 2px #f59e0b}
+.pill{display:inline-block;font-family:var(--mono);font-weight:700;font-size:14px;padding:3px 10px;border-radius:999px;border:2px solid #c4b5fd;background:#f5f3ff;color:#5b21b6;transition:all .35s}
+.pill.b{border-color:#67e8f9;background:#ecfeff;color:#0e7490}.pill.c{border-color:#f9a8d4;background:#fdf2f8;color:#be185d}.pill.d{border-color:#fcd34d;background:#fffbeb;color:#b45309}.pill.x{border-color:#e5e7eb;background:#f3f4f6;color:#9ca3af;text-decoration:line-through}
+.vt{font-family:var(--mono);font-size:13.5px;border:2px solid #0891b2;border-radius:10px;background:#ecfeff;padding:6px 10px}
+.vt div{padding:2px 0}
+.strike{position:relative}
+.strike.on::after{content:"";position:absolute;left:-4px;right:-4px;top:50%;height:3px;background:#e11d48;transform:rotate(-4deg)}
+.code.r1 .mark-o1::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r1 .mark-x1::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r2 .mark-o2::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r2 .mark-x2::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r3 .mark-o3::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r3 .mark-x3::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r4 .mark-o4::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r4 .mark-x4::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r5 .mark-o5::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r5 .mark-x5::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r6 .mark-o6::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r6 .mark-x6::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r7 .mark-o7::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r7 .mark-x7::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r8 .mark-o8::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r8 .mark-x8::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r9 .mark-o9::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r9 .mark-x9::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r10 .mark-o10::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r10 .mark-x10::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r11 .mark-o11::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r11 .mark-x11::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r12 .mark-o12::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r12 .mark-x12::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r13 .mark-o13::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r13 .mark-x13::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r14 .mark-o14::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r14 .mark-x14::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r15 .mark-o15::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r15 .mark-x15::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r16 .mark-o16::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r16 .mark-x16::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r17 .mark-o17::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r17 .mark-x17::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r18 .mark-o18::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r18 .mark-x18::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r19 .mark-o19::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r19 .mark-x19::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r20 .mark-o20::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r20 .mark-x20::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r21 .mark-o21::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r21 .mark-x21::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r22 .mark-o22::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r22 .mark-x22::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r23 .mark-o23::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r23 .mark-x23::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r24 .mark-o24::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r24 .mark-x24::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}
+/* larger sizing for lecture decks */
+.slide.z1>*:not(.hdr):not(.jumpbtn):not(.orb){zoom:1.15}.slide.z2>*:not(.hdr):not(.jumpbtn):not(.orb){zoom:1.3}.slide.z3>*:not(.hdr):not(.jumpbtn):not(.orb){zoom:1.42}
+p,li{font-size:21px}.card p,.card li{font-size:18.5px}
+.code{font-size:17px;line-height:1.5}.code.sm{font-size:15.5px}.code.xs{font-size:14.5px;line-height:1.45}
+.code-title{font-size:14px}
+.fld{font-size:16px}.pill{font-size:16px;padding:3px 12px}
+.ucls{font-size:16px;min-width:130px}.ucls div{padding:6px 12px}.conn{height:96px}
+.box{font-size:17px;padding:12px 16px}.box small{font-size:14px}
+table{font-size:18px}th,td{padding:9px 12px}
+.say{font-size:19px}.console{font-size:15.5px;line-height:1.55}
+.chip{font-size:15px;padding:3px 12px}.vc{font-size:17px}
+.note{font-size:18.5px}.fr{font-size:16px}.obj>.lab,.part>.lab{font-size:14px}
+</style>
+</head>
+<body>
+
+<div id="viewport"><div id="deck">
+
+<section class="slide" id="title" data-title="Trang bìa">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// Lập trình hướng đối tượng · C++</div>
+    <h1 class="in">Kế thừa:<br><span class="grad">Hàm dựng &amp; Hàm hủy</span></h1>
+    <p class="in muted" style="font-size:24px;margin-top:20px;max-width:1000px">Đối tượng lớp con được <b>tạo lập từ lõi ra vỏ</b> và <b>hủy từ vỏ vào lõi</b>. Chạy từng bước để thấy hàm dựng nào của lớp cha thực sự được gọi — và cái bẫy khi quên chỉ định.</p>
+    <p class="in" style="margin-top:34px;font-size:18px;color:#8a91b4">← → hoặc Space: chạy từng bước · Shift+→: qua slide · <b>G</b> hoặc nút <b>☰ Đi tới slide</b>: nhảy tới slide bất kỳ · A: hiện hết · F: toàn màn hình</p>
+  </div>
+</section>
+
+<section class="slide z1" id="agenda" data-title="Nội dung">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:17px">· bấm vào mục để đi tới</span></div>
+  <div class="agenda in" style="grid-template-columns:repeat(3,1fr);gap:10px 14px">
+    <div class="sec">1 · Hàm dựng trong kế thừa</div>
+    <div class="ag g1" data-goto="trinhtu"><b>01</b>Trình tự tạo lập</div>
+    <div class="ag g1" data-goto="hamdung"><b>02</b>Hàm dựng cha chạy trước</div>
+    <div class="ag g1" data-goto="lop"><b>03</b>Các lớp ví dụ</div>
+    <div class="ag g2" data-goto="sc-cha"><b>04</b>Đối tượng lớp cha</div>
+    <div class="ag g2" data-goto="sc-macdinh"><b>05</b>GVCN mặc định</div>
+    <div class="ag g2" data-goto="sc-3ts"><b>06</b>GVCN 3 tham số</div>
+    <div class="ag g2" data-goto="sc-4ts"><b>07</b>GVCN 4 tham số</div>
+    <div class="ag g2" data-goto="sc-copy"><b>08</b>Hàm dựng sao chép</div>
+    <div class="ag g2" data-goto="sc-gan"><b>09</b>Toán tử gán =</div>
+    <div class="sec">2 · Hàm hủy trong kế thừa &nbsp;·&nbsp; 3 · Thuộc tính con trỏ</div>
+    <div class="ag g3" data-goto="huy-trinhtu"><b>10</b>Trình tự hủy</div>
+    <div class="ag g3" data-goto="huy-vd"><b>11</b>Ví dụ hàm hủy</div>
+    <div class="ag g3" data-goto="tonghop"><b>12</b>Dựng &amp; hủy: toàn cảnh</div>
+    <div class="ag g4" data-goto="contro"><b>13</b>Lớp có thuộc tính con trỏ</div>
+    <div class="ag g4" data-goto="contro-code"><b>14</b>Code mẫu GVCN</div>
+    <div class="ag g5" data-goto="summary"><b>✓</b>Tổng kết</div>
+  </div>
+</section>
+
+<section class="slide z1" id="trinhtu" data-title="01 · Trình tự tạo lập đối tượng">
+  <div class="hdr in"><span class="qn">01</span><h2>Trình tự tạo lập: từ lõi ra vỏ</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;align-items:center">
+    <div class="house" style="flex-direction:column-reverse;margin-top:10px">
+      <div class="base hide0" id="h1">① Nền móng</div>
+      <div class="wall hide0" id="h2">② Tường</div>
+      <div class="hide0" id="h3" style="display:flex;flex-direction:column;align-items:center"><div class="roof"></div><div class="roof-l">③ Mái</div></div>
+    </div>
+    <div>
+      <ul class="in"><li>Nhà được xây từ <b>nền móng lên mái</b></li><li>Khái niệm được xây dựng từ <b>thấp lên cao</b></li><li>Đối tượng được tạo lập từ <b>lõi ra vỏ</b></li></ul>
+      <div class="obj hide0" id="on" style="margin-top:16px"><div class="lab">đối tượng GVCN <span>vỏ — tạo sau</span></div>
+        <div class="part hide0" id="onc"><div class="lab">phần GiaoVien <span>lõi — tạo trước</span></div><div class="fld"><span>hoTen, mucLuong, soNgayNghi</span></div></div>
+        <div class="fld hide0" id="onl"><span>lopCN</span></div></div>
+      <div class="note f" data-o="6" style="margin-top:14px">⟹ Thành phần của <b>lớp cha</b> được tạo lập <b>trước</b> thành phần của <b>lớp con</b>.</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+<span class="f ghost" data-act="#h1|sh" data-o="1" data-say="Muốn có nhà, trước hết phải đổ &lt;b&gt;móng&lt;/b&gt;…"></span><span class="f ghost" data-act="#h2|sh" data-o="2" data-say="…rồi mới xây &lt;b&gt;tường&lt;/b&gt; trên móng…"></span><span class="f ghost" data-act="#h3|sh" data-o="3" data-say="…và cuối cùng là &lt;b&gt;mái&lt;/b&gt;. Không thể lợp mái trước khi có tường."></span><span class="f ghost" data-act="#on|sh;#onc|sh" data-o="4" data-say="Đối tượng lớp con cũng vậy: &lt;b&gt;phần lõi&lt;/b&gt; thừa hưởng từ lớp cha được tạo trước…"></span><span class="f ghost" data-act="#onl|sh;#onl|glow" data-o="5" data-say="…sau đó mới tới &lt;b&gt;phần vỏ&lt;/b&gt; riêng của lớp con (lopCN), vì phần riêng có thể dựa vào phần lõi."></span></section>
+
+<section class="slide z1" id="hamdung" data-title="02 · Hàm dựng trong kế thừa">
+  <div class="hdr in"><span class="qn">02</span><h2>Hàm dựng trong kế thừa</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+      <div class="card in"><h3>Khi khai báo một đối tượng lớp con</h3>
+        <ul><li>Gọi hàm dựng của <b>lớp con</b></li><li>→ hàm dựng lớp con (trước khi vào thân) gọi hàm dựng của <b>lớp cha</b></li></ul></div>
+      <div class="card f" data-o="5" style="margin-top:12px"><h3>Lớp cha có nhiều hàm dựng?</h3>
+        <ul><li>Trong hàm dựng lớp con, ta <b>có thể chỉ định</b> hàm dựng nào của lớp cha được gọi (danh sách khởi tạo <code class="i">: GiaoVien(...)</code>)</li>
+        <li>Nếu <b>không chỉ định</b> → hàm dựng <b>mặc định</b> của lớp cha được gọi</li></ul></div>
+    </div>
+    <div>
+      <div class="code-title">GVCN gv;</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div class="fr d hide0" id="hf1">① gọi GVCN::GVCN()<small>đối tượng lớp con được khai báo</small></div>
+        <div class="fr hide0" id="hf2" style="margin-left:30px">② gọi GiaoVien::GiaoVien()<small>trước khi vào thân hàm dựng GVCN</small></div>
+        <div class="fr hide0" id="hf3" style="margin-left:30px">③ thân hàm dựng GiaoVien chạy<small>phần lõi được tạo lập trước</small></div>
+        <div class="fr d hide0" id="hf4">④ thân hàm dựng GVCN chạy<small>phần vỏ được tạo lập sau</small></div>
+      </div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+<span class="f ghost" data-act="#hf1|sh" data-o="1" data-say="Khai báo đối tượng lớp con → hàm dựng &lt;b&gt;GVCN&lt;/b&gt; được gọi."></span><span class="f ghost" data-act="#hf2|sh" data-o="2" data-say="Nhưng nó &lt;b&gt;chưa&lt;/b&gt; chạy thân hàm ngay: việc đầu tiên là gọi hàm dựng của lớp cha &lt;b&gt;GiaoVien&lt;/b&gt;."></span><span class="f ghost" data-act="#hf3|sh;#hf3|glow" data-o="3" data-say="Hàm dựng lớp cha chạy &lt;b&gt;trước&lt;/b&gt; → khởi tạo phần lõi (hoTen, mucLuong, soNgayNghi)."></span><span class="f ghost" data-act="#hf4|sh;#hf4|glow" data-o="4" data-say="Xong rồi mới quay về chạy thân hàm dựng lớp con → khởi tạo phần vỏ (lopCN)."></span></section>
+
+<section class="slide" id="lop" data-title="03 · Các lớp dùng trong ví dụ">
+  <div class="hdr in"><span class="qn">03</span><h2>Các lớp dùng trong ví dụ: mỗi lớp nhiều hàm dựng</h2></div>
+  <div class="cols">
+    <div><script type="text/x-cpp" class="sm" id="kG" data-title="class GiaoVien" data-mark="8:a;12:b;13:c">
+class GiaoVien
+{
+private:
+    string hoTen;
+    float mucLuong;
+    int soNgayNghi;
+public:
+    GiaoVien();
+    GiaoVien(string ht);
+    GiaoVien(float ml);
+    GiaoVien(float ml, int snn);
+    GiaoVien(string ht, float ml, int snn);
+    GiaoVien(const GiaoVien& gv);
+};
+</script></div>
+    <div><script type="text/x-cpp" class="sm" id="kC" data-title="class GVCN : public GiaoVien" data-mark="6:a;11:b;12:d;13:c">
+class GVCN : public GiaoVien
+{
+private:
+    string lopCN;
+public:
+    GVCN();
+    GVCN(string ht);
+    GVCN(float ml);
+    GVCN(float ml, int snn);
+    GVCN(string ht, string lopCN);
+    GVCN(string ht, float ml, int snn);
+    GVCN(string ht, float ml, int snn, string lopCN);
+    GVCN(const GVCN& gv);
+};
+</script>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+<span class="f ghost" data-now="#kG|show-a;#kC|show-a" data-say="Cả hai lớp đều có &lt;b&gt;hàm dựng mặc định&lt;/b&gt; (không tham số)."></span><span class="f ghost" data-now="#kG|show-b;#kC|show-b" data-say="Hàm dựng &lt;b&gt;3 tham số&lt;/b&gt;: họ tên, mức lương, số ngày nghỉ. GVCN cũng có bản 3 tham số (không có lopCN)."></span><span class="f ghost" data-now="#kC|show-d" data-say="GVCN có thêm bản &lt;b&gt;4 tham số&lt;/b&gt; để khởi tạo luôn lopCN."></span><span class="f ghost" data-now="#kG|show-c;#kC|show-c" data-say="Và &lt;b&gt;hàm dựng sao chép&lt;/b&gt;. Các slide sau lần lượt chạy từng hàm dựng để xem hàm nào của lớp cha được gọi."></span></section>
+
+<section class="slide" id="sc-cha" data-title="04 · Đối tượng lớp cha">
+  <div class="hdr in"><span class="qn">04</span><h2>Khởi động: tạo đối tượng lớp cha GiaoVien</h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+    <div><script type="text/x-cpp" class="sm" id="a0" data-title="main()" data-mark="3:a;4:b">
+void main()
+{
+    GiaoVien gv1;
+    GiaoVien gv2("Tran Thi B", 4000000, 2);
+}
+</script><div style="margin-top:10px"></div><script type="text/x-cpp" class="sm" id="a1" data-title="Hàm dựng mặc định" data-mark="1:a;3-5:c">
+GiaoVien::GiaoVien()
+{
+    hoTen = "Nguyen Van A";
+    mucLuong = 3000000;
+    soNgayNghi = 1;
+}
+</script><div style="margin-top:10px"></div><script type="text/x-cpp" class="sm" id="a2" data-title="Hàm dựng 3 tham số" data-mark="1:b;3-5:c">
+GiaoVien::GiaoVien(string ht, float ml, int snn)
+{
+    hoTen = ht;
+    mucLuong = ml;
+    soNgayNghi = snn;
+}
+</script></div>
+    <div>
+      <div style="display:flex;flex-direction:column;gap:12px"><div class="obj hide0" id="p1o" style="border-color:#7c3aed"><div class="lab" style="color:#6d28d9">gv1 : GiaoVien</div><div class="fld"><span>hoTen</span><b id="p1h">?</b></div><div class="fld"><span>mucLuong</span><b id="p1m">?</b></div><div class="fld"><span>soNgayNghi</span><b id="p1s">?</b></div></div><div class="obj hide0" id="p2o" style="border-color:#7c3aed"><div class="lab" style="color:#6d28d9">gv2 : GiaoVien</div><div class="fld"><span>hoTen</span><b id="p2h">?</b></div><div class="fld"><span>mucLuong</span><b id="p2m">?</b></div><div class="fld"><span>soNgayNghi</span><b id="p2s">?</b></div></div></div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+<span class="f ghost" data-now="#a0|show-a;#a1|show-a" data-act="#p1o|sh" data-say="&lt;b&gt;GiaoVien gv1;&lt;/b&gt; không có tham số → gọi &lt;b&gt;hàm dựng mặc định&lt;/b&gt;."></span><span class="f ghost" data-now="#a1|show-c" data-act="#p1o|sh" data-set="#p1h::&quot;Nguyen Van A&quot;;#p1m::3000000;#p1s::1" data-say="Thân hàm dựng mặc định gán các giá trị mặc định."></span><span class="f ghost" data-now="#a0|show-b;#a2|show-b" data-act="#p2o|sh" data-say="&lt;b&gt;gv2&lt;/b&gt; có 3 tham số → C++ chọn hàm dựng &lt;b&gt;3 tham số&lt;/b&gt; (nạp chồng hàm dựng)."></span><span class="f ghost" data-now="#a2|show-c" data-act="#p2o|sh" data-set="#p2h::&quot;Tran Thi B&quot;;#p2m::4000000;#p2s::2" data-say="Các thuộc tính nhận đúng giá trị truyền vào. Chưa có gì bất ngờ — giờ chuyển sang lớp con."></span></section>
+
+<section class="slide" id="sc-macdinh" data-title="05 · GVCN gv3; → hàm dựng mặc định">
+  <div class="hdr in"><span class="qn">05</span><h2>GVCN gv3; → hàm dựng mặc định</h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr">
+    <div><script type="text/x-cpp" class="sm" id="gv3M" data-title="main()" data-mark="3:a">
+void main()
+{
+    GVCN gv3;
+}
+</script><div style="margin-top:8px"></div><script type="text/x-cpp" class="sm nonum" id="qC" data-title="GVCN::GVCN()" data-mark="1:a;3:c">
+GVCN::GVCN()
+{
+    lopCN = "LOP-A1";
+}
+</script><div style="margin-top:8px"></div><script type="text/x-cpp" class="sm nonum" id="qG" data-title="GiaoVien::GiaoVien()" data-mark="1:b;3-5:c">
+GiaoVien::GiaoVien()
+{
+    hoTen = "Nguyen Van A";
+    mucLuong = 3000000;
+    soNgayNghi = 1;
+}
+</script></div>
+    <div>
+      <div class="obj hide0" id="gv3o"><div class="lab">gv3 : GVCN <span>vỏ</span></div><div class="part hide0" id="gv3p"><div class="lab">phần GiaoVien <span>lõi</span></div><div class="fld"><span>hoTen</span><b id="gv3h">?</b></div><div class="fld"><span>mucLuong</span><b id="gv3m">?</b></div><div class="fld"><span>soNgayNghi</span><b id="gv3s">?</b></div></div><div class="fld"><span>lopCN</span><b id="gv3l">?</b></div></div>
+      
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+<span class="f ghost" data-now="#gv3M|show-a;#qC|show-a" data-act="#gv3o|sh" data-say="Khai báo &lt;b&gt;gv3&lt;/b&gt; thuộc GVCN, không tham số → gọi &lt;b&gt;GVCN()&lt;/b&gt;."></span><span class="f ghost" data-now="#qG|show-b" data-act="#gv3p|sh" data-say="Trước khi vào thân, GVCN() gọi hàm dựng &lt;b&gt;mặc định&lt;/b&gt; của lớp cha GiaoVien (vì không chỉ định gì)."></span><span class="f ghost" data-now="#qG|show-c" data-act="#gv3p|sh" data-set="#gv3h::&quot;Nguyen Van A&quot;;#gv3m::3000000;#gv3s::1" data-say="Thân GiaoVien() chạy → phần &lt;b&gt;lõi&lt;/b&gt; được khởi tạo."></span><span class="f ghost" data-now="#qC|show-c" data-set="#gv3h::&quot;Nguyen Van A&quot;;#gv3m::3000000;#gv3s::1;#gv3l::&quot;LOP-A1&quot;" data-say="Quay về thân GVCN() → phần &lt;b&gt;vỏ&lt;/b&gt; lopCN được khởi tạo. Kết quả hợp lý."></span></section>
+
+<section class="slide" id="sc-3ts" data-title="06 · GVCN 3 tham số: cái bẫy “quên gọi cha”">
+  <div class="hdr in"><span class="qn">06</span><h2>GVCN 3 tham số: cái bẫy “quên gọi cha”</h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr">
+    <div><script type="text/x-cpp" class="sm" id="gv4M" data-title="main()" data-mark="3:a">
+void main()
+{
+    GVCN gv4("Tran Thi B", 4000000, 2);
+}
+</script><div style="margin-top:8px"></div><script type="text/x-cpp" class="sm nonum" id="rC" data-title="GVCN::GVCN(string, float, int)" data-mark="1:a;2:z">
+GVCN::GVCN(string ht, float ml, int snn)
+    : GiaoVien(ht, ml, snn)
+{
+    // không làm gì
+}
+</script><div style="margin-top:8px"></div><div id="rGd"><script type="text/x-cpp" class="xs nonum" id="rG1" data-title="GiaoVien::GiaoVien()" data-mark="1:b;3-5:c">
+GiaoVien::GiaoVien()
+{
+    hoTen = "Nguyen Van A";
+    mucLuong = 3000000;
+    soNgayNghi = 1;
+}
+</script></div></div>
+    <div>
+      <div class="obj hide0" id="gv4o"><div class="lab">gv4 : GVCN <span>vỏ</span></div><div class="part hide0" id="gv4p"><div class="lab">phần GiaoVien <span>lõi</span></div><div class="fld"><span>hoTen</span><b id="gv4h">?</b></div><div class="fld"><span>mucLuong</span><b id="gv4m">?</b></div><div class="fld"><span>soNgayNghi</span><b id="gv4s">?</b></div></div><div class="fld"><span>lopCN</span><b id="gv4l">?</b></div></div>
+      <div class="note blue f" data-o="9" style="margin-top:12px">Vì sao không viết <code class="i">GiaoVien(ht, ml, snn);</code> trong thân hàm? Vì lệnh đó chỉ tạo một đối tượng GiaoVien <b>tạm</b> rồi bỏ đi; phần lõi của gv4 lúc đó <b>đã được tạo xong</b> bằng hàm dựng mặc định.</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+<span class="f ghost" data-now="#gv4M|show-a;#rC|show-a" data-act="#gv4o|sh" data-say="Gọi hàm dựng 3 tham số của GVCN với &quot;Tran Thi B&quot;, 4000000, 2."></span><span class="f ghost" data-now="#rG1|show-b" data-act="#gv4p|sh" data-say="Thân hàm GVCN &lt;b&gt;không&lt;/b&gt; chỉ định hàm dựng nào của cha → C++ tự gọi hàm dựng &lt;b&gt;mặc định&lt;/b&gt; GiaoVien()!"></span><span class="f ghost" data-now="#rG1|show-c;#gv4o|glow" data-set="#gv4h::&lt;span class=&#x27;big-bad&#x27;&gt;&quot;Nguyen Van A&quot;&lt;/span&gt;;#gv4m::&lt;span class=&#x27;big-bad&#x27;&gt;3000000&lt;/span&gt;;#gv4s::&lt;span class=&#x27;big-bad&#x27;&gt;1&lt;/span&gt;;#gv4l::&quot;&quot;" data-say="Kết quả: phần lõi nhận giá trị &lt;b&gt;mặc định&lt;/b&gt;. Ba tham số truyền vào bị &lt;b&gt;bỏ qua&lt;/b&gt; hoàn toàn. ✗"></span><span class="f ghost" data-now="#rC|show-z" data-act="#rC|alt;#rG1|dimx" data-set="#gv4h::?;#gv4m::?;#gv4s::?;#gv4l::?" data-say="&lt;b&gt;Sửa&lt;/b&gt;: thêm danh sách khởi tạo &lt;b&gt;: GiaoVien(ht, ml, snn)&lt;/b&gt; ngay sau chữ ký hàm, trước dấu {."></span><span class="f ghost" data-now="#rC|show-z" data-act="#rC|alt;#rG1|dimx" data-set="#gv4h::&lt;span class=&#x27;big-ok&#x27;&gt;&quot;Tran Thi B&quot;&lt;/span&gt;;#gv4m::&lt;span class=&#x27;big-ok&#x27;&gt;4000000&lt;/span&gt;;#gv4s::&lt;span class=&#x27;big-ok&#x27;&gt;2&lt;/span&gt;;#gv4l::&quot;&quot;" data-say="Giờ hàm dựng &lt;b&gt;3 tham số&lt;/b&gt; của lớp cha được gọi với đúng các giá trị → phần lõi đúng. ✓"></span></section>
+
+<section class="slide" id="sc-4ts" data-title="07 · GVCN 4 tham số: lopCN đúng, nhưng còn phần lõi?">
+  <div class="hdr in"><span class="qn">07</span><h2>GVCN 4 tham số: lopCN đúng, nhưng còn phần lõi?</h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr">
+    <div><script type="text/x-cpp" class="sm" id="gv5M" data-title="main()" data-mark="3:a">
+void main()
+{
+    GVCN gv5("Le Van C", 5000000, 1, "LOP-B2");
+}
+</script><div style="margin-top:8px"></div><script type="text/x-cpp" class="sm nonum" id="sC" data-title="GVCN::GVCN(string, float, int, string)" data-mark="1:a;2:z;5:c">
+GVCN::GVCN(string ht, float ml, int snn, string lopCN)
+    : GiaoVien(ht, ml, snn)
+{
+    this->lopCN = lopCN;
+}
+</script><div style="margin-top:8px"></div><script type="text/x-cpp" class="xs nonum" id="sG" data-title="GiaoVien::GiaoVien()  /  GiaoVien(string, float, int)" data-mark="1:b;3-5:c">
+GiaoVien::GiaoVien()
+{
+    hoTen = "Nguyen Van A";
+    mucLuong = 3000000;
+    soNgayNghi = 1;
+}
+</script></div>
+    <div>
+      <div class="obj hide0" id="gv5o"><div class="lab">gv5 : GVCN <span>vỏ</span></div><div class="part hide0" id="gv5p"><div class="lab">phần GiaoVien <span>lõi</span></div><div class="fld"><span>hoTen</span><b id="gv5h">?</b></div><div class="fld"><span>mucLuong</span><b id="gv5m">?</b></div><div class="fld"><span>soNgayNghi</span><b id="gv5s">?</b></div></div><div class="fld"><span>lopCN</span><b id="gv5l">?</b></div></div>
+      
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+<span class="f ghost" data-now="#gv5M|show-a;#sC|show-a" data-act="#gv5o|sh" data-say="Gọi hàm dựng 4 tham số của GVCN."></span><span class="f ghost" data-now="#sG|show-b;#sG|show-c" data-act="#gv5p|sh" data-set="#gv5h::&lt;span class=&#x27;big-bad&#x27;&gt;&quot;Nguyen Van A&quot;&lt;/span&gt;;#gv5m::&lt;span class=&#x27;big-bad&#x27;&gt;3000000&lt;/span&gt;;#gv5s::&lt;span class=&#x27;big-bad&#x27;&gt;1&lt;/span&gt;" data-say="Không chỉ định → lại là hàm dựng &lt;b&gt;mặc định&lt;/b&gt; của cha chạy trước."></span><span class="f ghost" data-now="#sC|show-c;#gv5o|glow" data-set="#gv5h::&lt;span class=&#x27;big-bad&#x27;&gt;&quot;Nguyen Van A&quot;&lt;/span&gt;;#gv5m::&lt;span class=&#x27;big-bad&#x27;&gt;3000000&lt;/span&gt;;#gv5s::&lt;span class=&#x27;big-bad&#x27;&gt;1&lt;/span&gt;;#gv5l::&lt;span class=&#x27;big-ok&#x27;&gt;&quot;LOP-B2&quot;&lt;/span&gt;" data-say="Thân GVCN gán &lt;b&gt;this-&amp;gt;lopCN = lopCN&lt;/b&gt; (this-&amp;gt; để phân biệt thuộc tính với tham số cùng tên). Vỏ đúng, lõi sai. ✗"></span><span class="f ghost" data-now="#sC|show-z" data-act="#sC|alt;#sG|dimx" data-set="#gv5h::&lt;span class=&#x27;big-ok&#x27;&gt;&quot;Le Van C&quot;&lt;/span&gt;;#gv5m::&lt;span class=&#x27;big-ok&#x27;&gt;5000000&lt;/span&gt;;#gv5s::&lt;span class=&#x27;big-ok&#x27;&gt;1&lt;/span&gt;;#gv5l::&lt;span class=&#x27;big-ok&#x27;&gt;&quot;LOP-B2&quot;&lt;/span&gt;" data-say="&lt;b&gt;Sửa&lt;/b&gt;: thêm &lt;b&gt;: GiaoVien(ht, ml, snn)&lt;/b&gt; → gọi hàm dựng 3 tham số của cha. Lõi do cha lo, vỏ do con lo."></span></section>
+
+<section class="slide" id="sc-copy" data-title="08 · Hàm dựng sao chép: quên gọi cha thì chép thiếu">
+  <div class="hdr in"><span class="qn">08</span><h2>Hàm dựng sao chép: quên gọi cha thì chép thiếu</h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr">
+    <div><script type="text/x-cpp" class="sm" id="gv6M" data-title="main()" data-mark="4:a">
+void main()
+{
+    GVCN gv5("Le Van C", 5000000, 1, "LOP-B2");
+    GVCN gv6(gv5);
+}
+</script><div style="margin-top:8px"></div><script type="text/x-cpp" class="sm nonum" id="tC" data-title="GVCN::GVCN(const GVCN&amp;)" data-mark="1:a;2:z;5:c">
+GVCN::GVCN(const GVCN& gv)
+    : GiaoVien(gv)
+{
+    lopCN = gv.lopCN;
+}
+</script><div style="margin-top:8px"></div><script type="text/x-cpp" class="xs nonum" id="tG" data-title="GiaoVien::GiaoVien(const GiaoVien&amp; gv)" data-mark="1:b;3-5:c">
+GiaoVien::GiaoVien(const GiaoVien& gv)
+{
+    hoTen = gv.hoTen;
+    mucLuong = gv.mucLuong;
+    soNgayNghi = gv.soNgayNghi;
+}
+</script></div>
+    <div>
+      <div class="obj hide0" id="gv6o"><div class="lab">gv6 : GVCN <span>vỏ</span></div><div class="part hide0" id="gv6p"><div class="lab">phần GiaoVien <span>lõi</span></div><div class="fld"><span>hoTen</span><b id="gv6h">?</b></div><div class="fld"><span>mucLuong</span><b id="gv6m">?</b></div><div class="fld"><span>soNgayNghi</span><b id="gv6s">?</b></div></div><div class="fld"><span>lopCN</span><b id="gv6l">?</b></div></div>
+      
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+<span class="f ghost" data-now="#gv6M|show-a;#tC|show-a" data-act="#gv6o|sh" data-say="&lt;b&gt;gv6(gv5)&lt;/b&gt;: tạo gv6 là bản sao của gv5 → gọi hàm dựng &lt;b&gt;sao chép&lt;/b&gt; của GVCN."></span><span class="f ghost" data-now="#tC|show-c;#gv6o|glow" data-act="#gv6p|sh" data-set="#gv6h::&lt;span class=&#x27;big-bad&#x27;&gt;&quot;Nguyen Van A&quot;&lt;/span&gt;;#gv6m::&lt;span class=&#x27;big-bad&#x27;&gt;3000000&lt;/span&gt;;#gv6s::&lt;span class=&#x27;big-bad&#x27;&gt;1&lt;/span&gt;;#gv6l::&lt;span class=&#x27;big-ok&#x27;&gt;&quot;LOP-B2&quot;&lt;/span&gt;" data-say="Không chỉ định → hàm dựng &lt;b&gt;mặc định&lt;/b&gt; của cha chạy (không phải hàm sao chép!). Thân GVCN chỉ chép lopCN."></span><span class="f ghost" data-now="#gv6o|glow" data-say="gv6 chỉ giống gv5 ở phần vỏ → &lt;b&gt;sao chép thiếu&lt;/b&gt;. ✗"></span><span class="f ghost" data-now="#tC|show-z;#tG|show-b" data-act="#tC|alt" data-set="#gv6h::?;#gv6m::?;#gv6s::?;#gv6l::?" data-say="&lt;b&gt;Sửa&lt;/b&gt;: &lt;b&gt;: GiaoVien(gv)&lt;/b&gt;. gv là GVCN, nhưng tham số của cha là const GiaoVien&amp;amp; — đối tượng lớp con được truyền vào chỗ lớp cha."></span><span class="f ghost" data-now="#tG|show-c" data-act="#tC|alt" data-set="#gv6h::&lt;span class=&#x27;big-ok&#x27;&gt;&quot;Le Van C&quot;&lt;/span&gt;;#gv6m::&lt;span class=&#x27;big-ok&#x27;&gt;5000000&lt;/span&gt;;#gv6s::&lt;span class=&#x27;big-ok&#x27;&gt;1&lt;/span&gt;;#gv6l::&lt;span class=&#x27;big-ok&#x27;&gt;&quot;LOP-B2&quot;&lt;/span&gt;" data-say="Hàm sao chép của cha chép phần lõi, hàm của con chép phần vỏ → gv6 giống hệt gv5. ✓"></span></section>
+
+<section class="slide" id="sc-gan" data-title="09 · Toán tử gán = trong kế thừa">
+  <div class="hdr in"><span class="qn">09</span><h2>Toán tử gán: lớp con phải tự gọi <code class="i" style="font-size:.8em">GiaoVien::operator=</code></h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr">
+    <div><script type="text/x-cpp" class="sm" id="uM" data-title="main()" data-mark="4:a;5:b">
+void main()
+{
+    GVCN gv5("Le Van C", 5000000, 1, "LOP-B2");
+    GVCN gv6;
+    gv6 = gv5;
+}
+</script><div style="margin-top:8px"></div><script type="text/x-cpp" class="sm" id="uC" data-title="GVCN&amp; GVCN::operator=(const GVCN&amp; gv)" data-mark="3-4:a;5:h;6:c;7:d">
+GVCN& GVCN::operator=(const GVCN& gv)
+{
+    if (this == &gv)
+        return *this;
+    GiaoVien::operator=(gv);
+    lopCN = gv.lopCN;
+    return *this;
+}
+</script><div style="margin-top:8px"></div><script type="text/x-cpp" class="xs" id="uG" data-title="GiaoVien&amp; GiaoVien::operator=(const GiaoVien&amp; gv)" data-mark="4-5:c">
+GiaoVien& GiaoVien::operator=(const GiaoVien& gv)
+{
+    if (this == &gv) return *this;
+    hoTen = gv.hoTen;  mucLuong = gv.mucLuong;
+    soNgayNghi = gv.soNgayNghi;
+    return *this;
+}
+</script></div>
+    <div>
+      <div class="obj hide0" id="g9o"><div class="lab">gv6 : GVCN <span>vỏ</span></div><div class="part hide0" id="g9p"><div class="lab">phần GiaoVien <span>lõi</span></div><div class="fld"><span>hoTen</span><b id="g9h">?</b></div><div class="fld"><span>mucLuong</span><b id="g9m">?</b></div><div class="fld"><span>soNgayNghi</span><b id="g9s">?</b></div></div><div class="fld"><span>lopCN</span><b id="g9l">?</b></div></div>
+      <div class="note blue f" data-o="9" style="margin-top:12px">Toán tử gán <b>không</b> phải hàm dựng nên không có danh sách khởi tạo: gọi hàm của cha bằng cú pháp <code class="i">TenLopCha::operator=(gv)</code> như một hàm bình thường.</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+<span class="f ghost" data-now="#uM|show-a" data-act="#g9o|sh;#g9p|sh" data-set="#g9h::&quot;Nguyen Van A&quot;;#g9m::3000000;#g9s::1;#g9l::&quot;LOP-A1&quot;" data-say="gv6 tạo bằng hàm dựng mặc định: GiaoVien() rồi GVCN()."></span><span class="f ghost" data-now="#uM|show-b;#uC|show-a" data-set="#g9h::&quot;Nguyen Van A&quot;;#g9m::3000000;#g9s::1;#g9l::&quot;LOP-A1&quot;" data-say="&lt;b&gt;gv6 = gv5&lt;/b&gt; (cả hai đã tồn tại) → gọi &lt;b&gt;toán tử gán&lt;/b&gt; của GVCN, không phải hàm dựng sao chép."></span><span class="f ghost" data-now="#uC|show-a" data-set="#g9h::&quot;Nguyen Van A&quot;;#g9m::3000000;#g9s::1;#g9l::&quot;LOP-A1&quot;" data-say="Kiểm tra tự gán (gv6 = gv6) để tránh tự chép lên chính mình."></span><span class="f ghost" data-now="#uC|show-h;#uG|show-c" data-set="#g9h::&lt;span class=&#x27;big-ok&#x27;&gt;&quot;Le Van C&quot;&lt;/span&gt;;#g9m::&lt;span class=&#x27;big-ok&#x27;&gt;5000000&lt;/span&gt;;#g9s::&lt;span class=&#x27;big-ok&#x27;&gt;1&lt;/span&gt;;#g9l::&quot;LOP-A1&quot;" data-say="&lt;b&gt;GiaoVien::operator=(gv)&lt;/b&gt;: nhờ toán tử gán của cha chép phần lõi."></span><span class="f ghost" data-now="#uC|show-c;#uC|show-d" data-set="#g9h::&lt;span class=&#x27;big-ok&#x27;&gt;&quot;Le Van C&quot;&lt;/span&gt;;#g9m::&lt;span class=&#x27;big-ok&#x27;&gt;5000000&lt;/span&gt;;#g9s::&lt;span class=&#x27;big-ok&#x27;&gt;1&lt;/span&gt;;#g9l::&lt;span class=&#x27;big-ok&#x27;&gt;&quot;LOP-B2&quot;&lt;/span&gt;" data-say="Lớp con tự chép phần vỏ, rồi trả về *this để cho phép gán liên tiếp (a = b = c). Nếu quên dòng 5, phần lõi sẽ &lt;b&gt;giữ nguyên giá trị cũ&lt;/b&gt;."></span></section>
+
+<section class="slide z1" id="huy-trinhtu" data-title="10 · Trình tự hủy đối tượng">
+  <div class="hdr in"><span class="qn">10</span><h2>Trình tự hủy: từ vỏ vào lõi</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;align-items:center">
+    <div class="house" style="flex-direction:column-reverse;margin-top:10px">
+      <div class="base hide0 sh" id="d1">③ Nền móng</div>
+      <div class="wall hide0 sh" id="d2">② Tường</div>
+      <div class="hide0 sh" id="d3" style="display:flex;flex-direction:column;align-items:center"><div class="roof"></div><div class="roof-l">① Mái</div></div>
+    </div>
+    <div>
+      <ul class="in"><li>Nhà được dỡ từ <b>mái xuống móng</b></li><li>Đối tượng bị phá hủy từ <b>vỏ vào lõi</b></li></ul>
+      <div class="obj" id="dn" style="margin-top:16px"><div class="lab">đối tượng GVCN <span>vỏ — hủy trước</span></div>
+        <div class="part" id="dnc"><div class="lab">phần GiaoVien <span>lõi — hủy sau</span></div><div class="fld"><span>hoTen, mucLuong, soNgayNghi</span></div></div>
+        <div class="fld" id="dnl"><span>lopCN</span></div></div>
+      <div class="note f" data-o="6" style="margin-top:14px">⟹ Hàm hủy <b>lớp con</b> thực hiện <b>trước</b>, hàm hủy <b>lớp cha</b> thực hiện <b>sau</b> — ngược với hàm dựng.</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+<span class="f ghost" data-act="#d3|rm" data-o="1" data-say="Dỡ nhà: &lt;b&gt;mái&lt;/b&gt; đi trước…"></span><span class="f ghost" data-act="#d2|rm" data-o="2" data-say="…rồi tới &lt;b&gt;tường&lt;/b&gt;…"></span><span class="f ghost" data-act="#d1|rm" data-o="3" data-say="…cuối cùng là &lt;b&gt;móng&lt;/b&gt;. Dỡ móng trước thì cả nhà sập!"></span><span class="f ghost" data-act="#dnl|dimx" data-o="4" data-say="Đối tượng: phần &lt;b&gt;vỏ&lt;/b&gt; của lớp con hủy trước (vì nó có thể còn dùng phần lõi)…"></span><span class="f ghost" data-act="#dnl|dimx;#dnc|dimx;#dn|dimx" data-o="5" data-say="…rồi phần &lt;b&gt;lõi&lt;/b&gt; của lớp cha hủy sau cùng."></span></section>
+
+<section class="slide" id="huy-vd" data-title="11 · Ví dụ hàm hủy">
+  <div class="hdr in"><span class="qn">11</span><h2>Ví dụ: thứ tự gọi hàm hủy</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr">
+    <div><script type="text/x-cpp" class="sm" id="vM" data-title="main()" data-mark="4:a">
+void main()
+{
+    GVCN gv4("Tran Thi B", 4000000, 2);
+}   // gv4 hết phạm vi → bị hủy
+</script><div style="margin-top:10px"></div><script type="text/x-cpp" class="sm" id="vC" data-title="GVCN::~GVCN()" data-mark="1:a;3:b">
+GVCN::~GVCN()
+{
+    cout << "Ham huy lop GVCN\n";
+}
+</script><div style="margin-top:10px"></div><script type="text/x-cpp" class="sm" id="vG" data-title="GiaoVien::~GiaoVien()" data-mark="1:a;3:b">
+GiaoVien::~GiaoVien()
+{
+    cout << "Ham huy lop GiaoVien\n";
+}
+</script></div>
+    <div>
+      <div class="code-title">Console</div>
+      <div class="console" style="min-height:90px"><span class="cl" id="vc1">Ham huy lop GVCN</span><span class="cl" id="vc2">Ham huy lop GiaoVien</span></div>
+      <div class="note blue f" data-o="9" style="margin-top:14px">Hàm hủy <b>không có tham số</b> và mỗi lớp chỉ có <b>một</b> hàm hủy, nên không cần (và không thể) chỉ định gọi hàm hủy nào của cha: C++ <b>tự động</b> gọi sau khi thân hàm hủy lớp con chạy xong.</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+<span class="f ghost" data-now="#vM|show-a;#vC|show-a" data-say="Tới dấu &lt;b&gt;}&lt;/b&gt; của main, gv4 hết phạm vi → C++ gọi hàm hủy của lớp &lt;b&gt;GVCN&lt;/b&gt; trước."></span><span class="f ghost" data-now="#vC|show-b" data-act="#vc1|show" data-say="Thân hàm hủy GVCN chạy → in dòng đầu tiên."></span><span class="f ghost" data-now="#vG|show-a" data-act="#vc1|show" data-say="Sau đó C++ &lt;b&gt;tự động&lt;/b&gt; gọi hàm hủy lớp cha &lt;b&gt;GiaoVien&lt;/b&gt;."></span><span class="f ghost" data-now="#vG|show-b" data-act="#vc1|show;#vc2|show" data-say="In dòng thứ hai. Thứ tự: &lt;b&gt;con trước, cha sau&lt;/b&gt;."></span></section>
+
+<section class="slide" id="tonghop" data-title="12 · Dựng & hủy: toàn cảnh">
+  <div class="hdr in"><span class="qn">12</span><h2>Toàn cảnh: dựng từ lõi ra vỏ, hủy từ vỏ vào lõi</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr">
+    <div><script type="text/x-cpp" class="sm" id="wK" data-title="demo.cpp" data-mark="13:a;3:b;8:c;14:d;15:e;9:f;4:g">
+class GiaoVien {
+public:
+    GiaoVien()  { cout << "+ GiaoVien\n"; }
+    ~GiaoVien() { cout << "- GiaoVien\n"; }
+};
+class GVCN : public GiaoVien {
+public:
+    GVCN()  { cout << "+ GVCN\n"; }
+    ~GVCN() { cout << "- GVCN\n"; }
+};
+void main()
+{
+    GVCN gv;
+    cout << "... dung gv ...\n";
+}
+</script></div>
+    <div>
+      <div class="console" style="min-height:150px"><span class="cl" id="wc1">+ GiaoVien</span><span class="cl" id="wc2">+ GVCN</span><span class="cl" id="wc3">... dung gv ...</span><span class="cl" id="wc4">- GVCN</span><span class="cl" id="wc5">- GiaoVien</span></div>
+      <div style="display:flex;gap:16px;justify-content:center;margin-top:14px;align-items:flex-end">
+        <div class="obj hide0" id="wo" style="width:250px"><div class="lab">gv : GVCN</div><div class="part hide0" id="wp"><div class="lab">phần GiaoVien</div></div><div class="fld hide0" id="wl"><span>lopCN</span></div></div>
+      </div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+<span class="f ghost" data-now="#wK|show-a" data-act="#wo|sh" data-say="Khai báo gv → hàm dựng GVCN được gọi, nhưng trước hết…"></span><span class="f ghost" data-now="#wK|show-b" data-act="#wo|sh;#wp|sh;#wc1|show" data-say="…hàm dựng GiaoVien chạy: &lt;b&gt;+ GiaoVien&lt;/b&gt;."></span><span class="f ghost" data-now="#wK|show-c" data-act="#wl|sh;#wc2|show" data-say="Rồi thân hàm dựng GVCN: &lt;b&gt;+ GVCN&lt;/b&gt;."></span><span class="f ghost" data-now="#wK|show-d" data-act="#wc3|show" data-say="Sử dụng đối tượng."></span><span class="f ghost" data-now="#wK|show-e;#wK|show-f" data-act="#wc4|show;#wl|dimx" data-say="Hết phạm vi → hàm hủy GVCN trước: &lt;b&gt;- GVCN&lt;/b&gt;."></span><span class="f ghost" data-now="#wK|show-g" data-act="#wc5|show;#wp|dimx;#wo|dimx" data-say="Rồi hàm hủy GiaoVien: &lt;b&gt;- GiaoVien&lt;/b&gt;. Thứ tự hủy là &lt;b&gt;ảnh gương&lt;/b&gt; của thứ tự dựng."></span></section>
+
+<section class="slide z1" id="contro" data-title="13 · Thuộc tính con trỏ trong kế thừa">
+  <div class="hdr in"><span class="qn">13</span><h2>Con trỏ – hàm dựng – hàm hủy – kế thừa</h2></div>
+  <div class="cols">
+    <div class="card f" style="border-top:5px solid #7c3aed"><h3>Lớp cha có thuộc tính con trỏ</h3><p>→ <b>Lớp cha</b> giải quyết:</p>
+      <ul><li>Hàm dựng mặc định</li><li>Hàm dựng sao chép</li><li>Toán tử gán bằng</li><li>Hàm hủy</li></ul></div>
+    <div class="card f" style="border-top:5px solid #ec4899"><h3 style="color:#db2777">Lớp con có thuộc tính con trỏ</h3><p>→ <b>Lớp con</b> giải quyết:</p>
+      <ul><li>Hàm dựng mặc định</li><li>Hàm dựng sao chép</li><li>Toán tử gán bằng</li><li>Hàm hủy</li></ul></div>
+  </div>
+  <div class="note f" style="margin-top:16px">Nguyên tắc: <b>ai cấp phát thì người đó thu hồi</b>. Lớp con chỉ quản lý con trỏ <b>của mình</b>, còn phần của cha thì <b>gọi lại</b> hàm của cha (<code class="i">: GiaoVien(gv)</code>, <code class="i">GiaoVien::operator=(gv)</code>; hàm hủy cha được gọi tự động).</div>
+  <p class="say">Nhấn → để chạy từng bước.</p>
+</section>
+
+<section class="slide" id="contro-code" data-title="14 · Code mẫu: GVCN có thuộc tính con trỏ">
+  <div class="hdr in"><span class="qn">14</span><h2>Code mẫu: GVCN có thuộc tính con trỏ <code class="i" style="font-size:.75em">char* lopCN</code></h2></div>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr">
+    <div><script type="text/x-cpp" class="sm" id="xK" data-title="GVCN.cpp" data-mark="1-3:a;4:b;5-6:c;10:d;11-13:e;16-18:f">
+GVCN::GVCN() {
+    lopCN = new char[1]; lopCN[0] = '\0';
+}
+GVCN::GVCN(const GVCN& gv) : GiaoVien(gv) {
+    lopCN = new char[strlen(gv.lopCN) + 1];
+    strcpy(lopCN, gv.lopCN);
+}
+GVCN& GVCN::operator=(const GVCN& gv) {
+    if (this == &gv) return *this;
+    GiaoVien::operator=(gv);
+    delete[] lopCN;
+    lopCN = new char[strlen(gv.lopCN) + 1];
+    strcpy(lopCN, gv.lopCN);
+    return *this;
+}
+GVCN::~GVCN() {
+    delete[] lopCN;
+}
+</script></div>
+    <div>
+      <div class="mem" style="margin-top:6px">
+        <div class="mc hide0" id="xm1"><span class="nm">gv5.lopCN</span><div class="val">0x2A0</div></div>
+        <div class="mc hot hide0" id="xm2"><span class="addr">0x2A0</span><div class="val">"LOP-B2"</div></div>
+      </div>
+      <div class="mem" style="margin-top:12px">
+        <div class="mc ptr hide0" id="xm3"><span class="nm">gv6.lopCN</span><div class="val" id="xv3">0x2A0</div></div>
+        <div class="mc hide0" id="xm4"><span class="addr">0x3B0</span><div class="val">"LOP-B2"</div></div>
+      </div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+<span class="f ghost" data-now="#xK|show-a" data-say="Hàm dựng mặc định: cấp phát chuỗi rỗng cho con trỏ của lớp con."></span><span class="f ghost" data-now="#xK|show-b" data-act="#xm1|sh;#xm2|sh" data-say="Hàm dựng sao chép: phần lõi giao cho cha qua &lt;b&gt;: GiaoVien(gv)&lt;/b&gt;."></span><span class="f ghost" data-now="#xK|show-b" data-act="#xm1|sh;#xm2|sh;#xm3|sh;#xm3|orph" data-say="Nếu chỉ chép địa chỉ (sao chép nông), hai đối tượng sẽ &lt;b&gt;dùng chung&lt;/b&gt; một vùng nhớ → khi một bên hủy, bên kia trỏ vào vùng nhớ đã giải phóng."></span><span class="f ghost" data-now="#xK|show-c" data-act="#xm1|sh;#xm2|sh;#xm3|sh;#xm4|sh" data-set="#xv3::0x3B0" data-say="Vì vậy cấp phát vùng nhớ &lt;b&gt;mới&lt;/b&gt; rồi chép nội dung (sao chép sâu)."></span><span class="f ghost" data-now="#xK|show-d" data-act="#xm1|sh;#xm2|sh;#xm3|sh;#xm4|sh" data-set="#xv3::0x3B0" data-say="Toán tử gán: gọi &lt;b&gt;GiaoVien::operator=&lt;/b&gt; cho phần lõi…"></span><span class="f ghost" data-now="#xK|show-e" data-act="#xm1|sh;#xm2|sh;#xm3|sh;#xm4|sh" data-set="#xv3::0x3B0" data-say="…giải phóng vùng nhớ cũ của mình, cấp phát mới và chép."></span><span class="f ghost" data-now="#xK|show-f" data-act="#xm1|sh;#xm2|sh;#xm3|sh;#xm4|sh;#xm4|dimx" data-set="#xv3::0x3B0" data-say="Hàm hủy lớp con &lt;b&gt;chỉ&lt;/b&gt; delete con trỏ của lớp con. Con trỏ của lớp cha (nếu có) do hàm hủy cha — được gọi tự động ngay sau — lo."></span></section>
+
+<section class="slide z2" id="summary" data-title="Tổng kết">
+  <div class="hdr in"><span class="qn">✓</span><h2>Tổng kết</h2></div>
+  <div class="cols3" style="margin-top:10px">
+    <div class="card f"><h3>Hàm dựng</h3><p>Cha chạy <b>trước</b>, con chạy <b>sau</b> (lõi → vỏ). Không chỉ định → hàm dựng <b>mặc định</b> của cha.</p><p style="margin-top:6px"><code class="i">GVCN(...) : GiaoVien(...) { }</code></p></div>
+    <div class="card f"><h3>Sao chép &amp; gán</h3><p>Hàm dựng sao chép: <code class="i">: GiaoVien(gv)</code>.<br>Toán tử gán: <code class="i">GiaoVien::operator=(gv);</code></p></div>
+    <div class="card f"><h3>Hàm hủy</h3><p>Con chạy <b>trước</b>, cha chạy <b>sau</b> (vỏ → lõi); cha được gọi <b>tự động</b>. Ai có con trỏ thì người đó tự lo 4 hàm.</p></div>
+  </div>
+  <div class="note blue f" style="margin-top:20px">Bài tiếp theo: <b>đa hình</b> — con trỏ lớp cha trỏ tới đối tượng lớp con, hàm ảo, hàm hủy ảo.</div>
+</section>
+</div></div>
+
+<div id="bar"></div>
+<div id="hint">← → / Space: từng bước · Shift+→: qua slide · G: đi tới slide bất kỳ · A: hiện hết · F: toàn màn hình</div>
+<div id="nav"><button id="jumpNav" title="Đi tới slide (G)">☰</button><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+<div id="jump"><div id="jbox"><div class="jh"><h3>Đi tới slide</h3><span class="muted" style="font-size:14px">gõ số hoặc tên slide rồi Enter</span><input id="jq" placeholder="vd: 5 hoặc hàm ảo" autocomplete="off"><button id="jx" aria-label="Đóng">×</button></div><div id="jlist"></div></div></div>
+
+<script>
+(function(){
+  // ---------- C++ highlighter ----------
+  const KW=new Set("class struct public private protected virtual const this new delete return if else for while do switch case break continue default friend operator static using namespace include true false nullptr sizeof".split(" "));
+  const PRIM=new Set("bool char double float int long short void unsigned auto".split(" "));
+  const STD=new Set("cout cin endl".split(" "));const LIBT=new Set("string vector".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line){
+    const re=/(\/\/.*$|\/\*.*?\*\/)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(^\s*#\w+.*$)|\b(\d+(?:\.\d+)?[fFL]?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="p">'+m[3]+'</span>';
+      else if(m[4]) out+='<span class="n">'+m[4]+'</span>';
+      else if(m[5]){
+        const w=m[5];let cls="";
+        if(PRIM.has(w)||LIBT.has(w))cls="t";else if(KW.has(w))cls="k";else if(STD.has(w))cls="fn";
+        else if(m[6])cls="fn";
+        else if(/^[A-Z][A-Z0-9_]+$/.test(w))cls="n";
+        else if(/^[A-Z]/.test(w))cls="t";
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[6]?esc(m[6]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-cpp"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");r.split(",").forEach(rr=>{const [a,b]=rr.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);});
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    if(sc.dataset.title){const t=document.createElement("div");t.className="code-title";t.textContent=sc.dataset.title;sc.before(t)}
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+  // ---------- deck engine ----------
+  //   .f = fragment, one per step.  data-act "sel|cls;…" (kept while shown) · data-now "sel|cls;…" (only on latest step)
+  //   data-set "sel::html;…" (content while shown) · data-say narration · data-o order
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")].sort((x,y)=>(+x.dataset.o||0)-(+y.dataset.o||0));
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  const pairs=(v,sep)=>(v||"").split(/;(?=\s*#)/).filter(s=>s.trim()).map(p=>{const k=p.indexOf(sep);return [p.slice(0,k).trim(),p.slice(k+sep.length)]});
+  function tog(v,on){pairs(v,"|").forEach(([sel,cls])=>{document.querySelectorAll(sel).forEach(t=>cls.split(" ").forEach(c=>c&&t.classList.toggle(c,on)))})}
+  document.querySelectorAll("[data-set]").forEach(f=>pairs(f.dataset.set,"::").forEach(([sel])=>{document.querySelectorAll(sel).forEach(t=>{if(t.dataset.orig===undefined)t.dataset.orig=t.innerHTML})}));
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach(f=>{tog(f.dataset.now,false);tog(f.dataset.act,false)});
+      s.querySelectorAll("[data-orig]").forEach(t=>t.innerHTML=t.dataset.orig);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step);f.classList.toggle("on",on);if(on){tog(f.dataset.act,true);pairs(f.dataset.set,"::").forEach(([sel,val])=>document.querySelectorAll(sel).forEach(t=>t.innerHTML=val))}});
+      if(i===cur&&step>0)tog(fs[step-1].dataset.now,true);
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.innerHTML=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length+(fs.length?" · "+step+"/"+fs.length:"");
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    try{history.replaceState(null,"","#"+slides[cur].id)}catch(e){}
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+
+  // ---------- jump-to-slide panel ----------
+  const jump=document.getElementById("jump"),jlist=document.getElementById("jlist"),jq=document.getElementById("jq");
+  const titleOf=s=>s.dataset.title||(s.querySelector("h2,h1")||{}).textContent||s.id;
+  slides.forEach((s,i)=>{
+    const d=document.createElement("div");d.className="ji";d.dataset.i=i;
+    d.innerHTML="<b>"+String(i+1).padStart(2,"0")+"</b><span>"+esc(titleOf(s).replace(/\s+/g," ").trim())+"</span>";
+    d.onclick=()=>{closeJump();go(i)};jlist.appendChild(d);
+    const b=document.createElement("button");b.className="jumpbtn";b.type="button";b.innerHTML="☰ Đi tới slide";b.title="Mở danh sách slide (phím G)";
+    b.onclick=e=>{e.stopPropagation();openJump()};s.appendChild(b);
+  });
+  function filterJump(){
+    const q=jq.value.trim().toLowerCase();let first=null;
+    [...jlist.children].forEach(d=>{const i=+d.dataset.i;const ok=!q||String(i+1)===q||d.textContent.toLowerCase().includes(q);d.style.display=ok?"":"none";d.classList.remove("k");if(ok&&!first)first=d});
+    if(first&&q)first.classList.add("k");return first;
+  }
+  function openJump(){jump.classList.add("on");jq.value="";filterJump();[...jlist.children].forEach(d=>d.classList.toggle("cur",+d.dataset.i===cur));setTimeout(()=>jq.focus(),30)}
+  function closeJump(){jump.classList.remove("on");jq.blur()}
+  jq.addEventListener("input",filterJump);
+  jq.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Escape")closeJump();else if(e.key==="Enter"){const q=jq.value.trim();const n=parseInt(q,10);if(String(n)===q&&n>=1&&n<=slides.length){closeJump();go(n-1)}else{const f=filterJump();if(f){closeJump();go(+f.dataset.i)}}}});
+  jump.addEventListener("click",e=>{if(e.target===jump)closeJump()});
+  document.getElementById("jx").onclick=closeJump;
+  document.getElementById("jumpNav").onclick=openJump;
+
+  addEventListener("keydown",e=>{
+    if(jump.classList.contains("on")){if(e.key==="Escape")closeJump();return}
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="g"||e.key==="G"){e.preventDefault();openJump()}
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null||jump.classList.contains("on"))return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,933 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Đa hình (Polymorphism)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:16px;padding-right:150px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+.lvl{font-size:14px;font-weight:700;color:var(--muted);white-space:nowrap;margin-left:auto}
+.lvl b{color:#f59e0b;letter-spacing:2px}.lvl s{color:#d9d6e8;text-decoration:none;letter-spacing:2px}
+h1{font-size:66px;line-height:1.1;font-weight:800}
+h2{font-size:30px;line-height:1.2;font-weight:800}
+h3{font-size:21px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:20px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:24px;margin:5px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:9px;height:9px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.86em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 5px;border-radius:6px;color:#be185d;white-space:nowrap}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+.cols>*{min-width:0}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.card p,.card li{font-size:17px}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.note{margin-top:10px;padding:8px 14px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:17px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.note.red{border-color:#e11d48;background:linear-gradient(90deg,#fff1f3,#fffafa)}
+.code{font-family:var(--mono);font-size:15px;line-height:1.45;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:8px 0;overflow:hidden;position:relative}
+.code.sm{font-size:14px;line-height:1.42}.code.xs{font-size:13px;line-height:1.4}.code.xxs{font-size:12px;line-height:1.36;padding:6px 0}
+.code.x4{font-size:11.4px;line-height:1.33;padding:6px 0}
+.code .ln{padding:0 12px 0 6px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:22px;flex:none;text-align:right;margin-right:10px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.13);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.15);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.18);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.14);box-shadow:inset 5px 0 #ec4899}
+.code.show-e .mark-e{background:rgba(16,185,129,.15);box-shadow:inset 5px 0 #10b981}
+.code.show-f .mark-f{background:rgba(124,58,237,.13);box-shadow:inset 5px 0 #7c3aed}
+.code.show-g .mark-g{background:rgba(6,182,212,.15);box-shadow:inset 5px 0 #06b6d4}
+.code.show-h .mark-h{background:rgba(245,158,11,.18);box-shadow:inset 5px 0 #f59e0b}
+.code.show-i .mark-i{background:rgba(236,72,153,.14);box-shadow:inset 5px 0 #ec4899}
+.code.show-j .mark-j{background:rgba(16,185,129,.15);box-shadow:inset 5px 0 #10b981}
+.hide0{opacity:0;transform:translateY(8px) scale(.96);transition:all .45s}
+.hide0.sh{opacity:1;transform:none}
+.win.pre.sh:not(.vis){opacity:.35;filter:grayscale(1)}
+.gone.sh{display:none}
+.stage{position:relative;display:flex;align-items:center;justify-content:center}
+.chip{display:inline-block;font-family:var(--mono);font-size:12.5px;font-weight:700;padding:2px 9px;border-radius:999px;background:#fef3c7;color:#b45309;border:1px solid #fcd34d}
+.chip.v{background:#ede9fe;color:#6d28d9;border-color:#c4b5fd}.chip.g{background:#d1fae5;color:#047857;border-color:#6ee7b7}.chip.r{background:#ffe4e6;color:#be123c;border-color:#fda4af}
+.hlo{outline:3px solid #f59e0b;outline-offset:3px;border-radius:6px}
+.jb.dis.en{color:#111;border-color:#9aa1b3;background:linear-gradient(180deg,#fff,#e6e8ee)}.jb.dis.en .ico{filter:none;opacity:1}
+.jb.dis.en.dis2{color:#a0a4ad;border-color:#ccd0d8;background:#f1f2f5}
+.rad.on.off::before,.chk.on.off::before{background:#fff;content:""}
+.code-title{font-family:var(--mono);font-size:13px;color:var(--muted);margin:0 0 4px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:16px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:6px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.3}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+table.t1 td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.console{font-family:var(--mono);font-size:13.5px;line-height:1.45;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:8px 14px;color:#e6f0ff;white-space:pre;min-height:40px;overflow:hidden}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:10px;letter-spacing:3px;margin-bottom:3px}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.flow{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap}
+.box{border-radius:12px;padding:8px 12px;text-align:center;font-family:var(--mono);font-size:15px;border:2px solid var(--line);background:#fff;min-width:110px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:12.5px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.a{border-color:#7c3aed}.box.b{border-color:#0891b2}.box.c{border-color:#ec4899;background:#fdf2f8}.box.d{border-color:#f59e0b;background:#fffbeb}.box.e{border-color:#10b981;background:#ecfdf5}
+.ar{color:var(--muted);font-size:22px;text-align:center}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.say{font-size:17px;margin-top:10px;min-height:50px;color:var(--muted);line-height:1.42}
+.say b{color:var(--text)}
+.vars{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.vc{font-family:var(--mono);font-size:15px;font-weight:700;padding:4px 12px;border-radius:10px;background:#fff;border:2px solid #e4dcfb;transition:all .35s}
+.vc b{color:var(--t)}
+.vc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.45)}
+.vc.res{border-color:#10b981;background:#ecfdf5;color:#047857}
+.arr{display:flex;gap:8px;justify-content:center}
+.cell{width:52px;height:56px;border-radius:12px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .45s}
+.cell small{font-size:11px;color:var(--muted);font-weight:600}
+.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-6px)}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c}
+.cell.dim{opacity:.35}
+.cell.wide{width:auto;padding:0 10px;font-size:14px}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.15)}100%{transform:none;opacity:1}}
+.pop{animation:pop .45s}
+
+/* ===== agenda ===== */
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 10px}
+.sec{grid-column:1/-1;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.08em;margin-top:4px;text-transform:uppercase}
+.ag{background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 10px;cursor:pointer;transition:all .2s;font-size:15.5px;line-height:1.25;box-shadow:0 2px 6px rgba(40,50,110,.05);font-family:var(--mono);font-weight:600}
+.ag:hover{border-color:#ec4899;transform:translateY(-2px);box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag b{color:#db2777;margin-right:6px}
+.ag.g1{border-left:5px solid #7c3aed}.ag.g2{border-left:5px solid #0891b2}.ag.g3{border-left:5px solid #ec4899}.ag.g4{border-left:5px solid #f59e0b}
+.ag.g5{border-left:5px solid #10b981}.ag.g6{border-left:5px solid #6366f1}.ag.g7{border-left:5px solid #f97316}.ag.g8{border-left:5px solid #0ea5e9}
+
+/* ===== mock Swing windows ===== */
+.win{border:1px solid #cfc8e6;border-radius:10px;background:#eef0f4;box-shadow:0 18px 40px -18px rgba(30,27,58,.45);font-family:"Segoe UI",system-ui,sans-serif;font-size:14px;color:#222;transition:all .5s;overflow:hidden;position:relative}
+.wt{height:28px;background:linear-gradient(180deg,#f7f7fa,#e2e4ea);border-bottom:1px solid #cfd2da;display:flex;align-items:center;gap:6px;padding:0 10px;font-weight:600;font-size:13px;color:#333}
+.wt i{width:11px;height:11px;border-radius:50%;background:#ff5f57;display:inline-block}.wt i:nth-child(2){background:#febc2e}.wt i:nth-child(3){background:#28c840}
+.wt span{margin-left:8px}
+.wb{padding:12px;position:relative}
+.win.ghost{opacity:.25;filter:grayscale(1)}
+.win.undec .wt{display:none}
+.jb{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid #9aa1b3;border-radius:5px;background:linear-gradient(180deg,#fff,#e6e8ee);font-size:13.5px;color:#111;transition:all .3s;white-space:nowrap;cursor:default}
+.jb.dis{color:#a0a4ad;border-color:#ccd0d8;background:#f1f2f5}
+.jb.dis .ico{filter:grayscale(1);opacity:.5}
+.jb.press{background:linear-gradient(180deg,#cfd8ea,#b9c6e2);border-color:#5b74b5;transform:scale(.96)}
+.jb.def{box-shadow:0 0 0 2px #7aa2f7}
+.jb.vert{flex-direction:column}
+.jb u{text-decoration:underline}
+.ico{display:inline-block;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#a7f3d0,#059669);flex:none}
+.ico.l{border-radius:4px;background:linear-gradient(135deg,#60a5fa,#2563eb);clip-path:polygon(100% 0,0 50%,100% 100%)}
+.ico.r{border-radius:4px;background:linear-gradient(135deg,#f472b6,#db2777);clip-path:polygon(0 0,100% 50%,0 100%)}
+.splat{display:inline-block;width:34px;height:30px;background:radial-gradient(circle at 50% 50%,#f59e0b 0 30%,transparent 31%),radial-gradient(circle at 25% 30%,#ec4899 0 18%,transparent 19%),radial-gradient(circle at 75% 35%,#7c3aed 0 18%,transparent 19%),radial-gradient(circle at 40% 78%,#0891b2 0 17%,transparent 18%),radial-gradient(circle at 78% 75%,#10b981 0 15%,transparent 16%)}
+.chk,.rad{display:block;padding:3px 0;font-size:14px;transition:all .3s;white-space:nowrap}
+.chk::before,.rad::before{display:inline-block;vertical-align:-2px;margin-right:7px}
+.chk::before{content:"";width:14px;height:14px;border:1px solid #7b8394;border-radius:3px;background:#fff;flex:none;font-size:12px;line-height:14px;text-align:center;font-weight:900;color:#1d4ed8}
+.chk.on::before{content:"✓";background:#dbe7ff}
+.rad::before{content:"";width:14px;height:14px;border:1px solid #7b8394;border-radius:50%;background:#fff;flex:none;box-sizing:border-box}
+.rad.on::before{background:radial-gradient(circle,#1d4ed8 0 35%,#fff 40%)}
+.chk.hl,.rad.hl{background:#fff3c4;border-radius:4px}
+.tf{display:inline-block;min-width:120px;min-height:26px;border:1px solid #8c93a3;background:#fff;padding:3px 7px;font-family:var(--mono);font-size:13.5px;border-radius:3px;transition:all .3s;white-space:pre;vertical-align:middle}
+.tf.err{background:#ffd1dc}
+.tf.ro{background:#f3f4f6}
+.tf .cur{display:inline-block;width:1px;height:15px;background:#111;vertical-align:middle;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.ta{border:1px solid #8c93a3;background:#fff;padding:6px 8px;font-family:var(--mono);font-size:12.5px;line-height:1.5;border-radius:3px;white-space:pre-wrap;overflow:hidden}
+/* text area that stays scrolled to bottom */
+.ta.bottom{display:flex;flex-direction:column;justify-content:flex-end}
+mark{background:#d1d5db;color:inherit;border-radius:2px;padding:0 1px}
+mark.sel{background:#bfdbfe}
+.combo{display:inline-flex;align-items:center;justify-content:space-between;min-width:170px;border:1px solid #8c93a3;border-radius:4px;background:linear-gradient(180deg,#fff,#eceef3);padding:4px 8px;font-size:14px;gap:10px;position:relative}
+.combo::after{content:"▾";color:#555}
+.combo.ed{background:#fff}
+.dd{position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid #8c93a3;box-shadow:0 8px 18px -8px rgba(0,0,0,.35);z-index:3;display:none;text-align:left}
+.dd div{padding:3px 8px;font-size:13.5px}
+.dd div.s{background:#3b6fd8;color:#fff}
+.open .dd{display:block}
+.lst{border:1px solid #8c93a3;background:#fff;font-size:14px;min-height:90px}
+.lst div{padding:3px 8px;transition:all .3s}
+.lst div.s{background:#3b6fd8;color:#fff}
+.lst div.nw{animation:pop .5s}
+.jt{border-collapse:collapse;width:100%;font-size:13px;border:1px solid #9aa1b3;border-radius:0;background:#fff;font-family:"Segoe UI",system-ui,sans-serif}
+.jt th{background:linear-gradient(180deg,#fafafa,#e3e5ea);border:1px solid #b9bec9;padding:3px 6px;font-weight:600;font-size:12.5px;white-space:nowrap;text-align:left}
+.jt td{border:1px solid #e1e3e8;padding:3px 6px;color:#111;font-weight:400;white-space:nowrap;vertical-align:middle}
+.jt td.num{text-align:right}
+.jt td.ck{text-align:center}
+.jt tr.s td{background:#3b6fd8;color:#fff}
+.jt td.s{background:#3b6fd8;color:#fff}
+.jt td.edit{outline:2px solid #f59e0b;background:#fffbeb}
+.jt th.sorted::after{content:" ▲";color:#3b6fd8}
+.jt th.sorted.desc::after{content:" ▼"}
+.jt tr.hide{display:none}
+.jt .cb{display:inline-block;width:13px;height:13px;border:1px solid #7b8394;border-radius:2px;background:#fff;vertical-align:middle;font-size:11px;line-height:12px;text-align:center;font-weight:900;color:#1d4ed8}
+.jt .cb.on::before{content:"✓"}
+.pb{height:20px;border:1px solid #8c93a3;border-radius:4px;background:#e5e7eb;position:relative;overflow:hidden;min-width:180px}
+.pb .fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(180deg,#7aa2f7,#3b6fd8);transition:width .6s}
+.pb .txt{position:absolute;inset:0;text-align:center;font-size:12px;line-height:18px;font-weight:600;color:#111}
+.pb.ind .fill{width:30%!important;animation:ind 1.2s linear infinite alternate}
+.pb.ind .txt{opacity:0}
+@keyframes ind{from{left:0}to{left:70%}}
+.mbar{display:flex;gap:2px;background:linear-gradient(180deg,#fbfbfc,#e9ebf0);border-bottom:1px solid #cfd2da;padding:2px 6px;font-size:13.5px;position:relative}
+.mbar>span{padding:2px 8px;border-radius:3px}
+.mbar>span.s{background:#3b6fd8;color:#fff}
+.menu{position:absolute;top:26px;left:6px;background:#fff;border:1px solid #9aa1b3;box-shadow:0 10px 24px -8px rgba(0,0,0,.4);min-width:250px;z-index:4;display:none;font-size:13px}
+.menu.open{display:block;animation:pop .3s}
+.mi{display:flex;align-items:center;gap:6px;padding:3px 10px;white-space:nowrap}
+.mi .acc{margin-left:auto;color:#666;font-size:12px;padding-left:16px}
+.mi.s{background:#3b6fd8;color:#fff}.mi.s .acc{color:#e0e7ff}
+.msep{height:1px;background:#d9dce3;margin:3px 0}
+.mi .mk{width:14px;text-align:center;font-weight:900;flex:none}
+.dlgwrap{position:absolute;inset:0;background:rgba(30,27,58,.18);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;z-index:6}
+.dlgwrap.on{opacity:1}
+.dlgwrap.on .win{animation:pop .4s}
+.dlgwrap.nomodal{background:none}
+.dlgico{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:20px;flex:none;background:#3b82f6}
+.dlgico.q{background:#10b981}.dlgico.e{background:#e11d48}.dlgico.w{background:#f59e0b;border-radius:6px}
+.tabs{display:flex;gap:2px;border-bottom:1px solid #9aa1b3;margin-bottom:8px}
+.tabs span{padding:3px 10px;border:1px solid #b9bec9;border-bottom:none;border-radius:5px 5px 0 0;background:#e6e8ee;font-size:12.5px}
+.tabs span.s{background:#fff;font-weight:600}
+.tip{position:absolute;background:#ffffe1;border:1px solid #777;font-size:12px;padding:2px 6px;box-shadow:2px 2px 4px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;white-space:nowrap;z-index:5}
+.tip.on{opacity:1}
+.pic{display:flex;align-items:center;justify-content:center;font-size:64px;min-height:110px;transition:all .4s}
+.thumb{width:34px;height:34px;border-radius:5px;border:1px solid #888;display:inline-block;transition:all .4s}
+.lane{display:grid;grid-template-columns:110px 1fr;gap:6px;align-items:center;font-size:13px}
+.lane .ln2{height:30px;border-radius:8px;background:#f8fafc;border:1px dashed #cbd5e1;display:flex;align-items:center;gap:6px;padding:0 8px;overflow:hidden}
+.ev{font-family:var(--mono);font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:6px;background:#ede9fe;color:#6d28d9;white-space:nowrap}
+.ev.b{background:#cffafe;color:#0e7490}.ev.c{background:#fce7f3;color:#be185d}.ev.d{background:#fef3c7;color:#b45309}
+.kv{font-family:var(--mono);font-size:13px}
+.swatch{display:inline-block;width:100%;height:100%;border-radius:4px}
+
+/* ===== nav / jump ===== */
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;min-width:36px;height:32px;cursor:pointer;font-size:16px;padding:0 8px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+.jumpbtn{position:absolute;top:26px;right:30px;z-index:7;font-family:"Be Vietnam Pro",sans-serif;font-size:14px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));border:none;border-radius:999px;padding:7px 14px;cursor:pointer;box-shadow:0 6px 16px -6px var(--sa1);transition:transform .2s}
+.jumpbtn:hover{transform:translateY(-2px) scale(1.04)}
+#jump{position:fixed;inset:0;z-index:20;background:rgba(30,27,58,.45);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
+#jump.on{display:flex}
+#jbox{width:min(1100px,94vw);max-height:88vh;overflow:auto;background:#fff;border-radius:18px;padding:20px 24px;box-shadow:0 30px 70px -20px rgba(30,27,58,.6);animation:pop .3s}
+#jbox .jh{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+#jbox .jh h3{font-size:22px;color:#7c3aed;margin:0}
+#jbox .jh input{margin-left:auto;font-family:var(--mono);font-size:15px;padding:6px 10px;border:2px solid var(--line);border-radius:10px;width:260px;outline:none}
+#jbox .jh input:focus{border-color:#a78bfa}
+#jbox .jh button{border:none;background:#f1eaff;color:#6d28d9;font-weight:800;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:18px}
+#jlist{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+#jlist .ji{display:flex;gap:8px;align-items:center;padding:7px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:14.5px;transition:all .15s;background:#fff}
+#jlist .ji:hover,#jlist .ji.k{border-color:#ec4899;background:#fdf2f8}
+#jlist .ji.cur{background:#f3edff;border-color:#a78bfa}
+#jlist .ji b{font-family:var(--mono);color:#db2777;min-width:26px}
+#jlist .ji span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:700px){#hint{display:none}#jlist{grid-template-columns:1fr}}
+@media print{#nav,#bar,#hint,.jumpbtn{display:none}}
+
+/* ===== OOP deck extras ===== */
+.code.nonum .no{display:none}
+.code.alt2 .mark-w{opacity:.3;text-decoration:line-through;text-decoration-color:#e11d48}
+.code .mark-z{display:none}
+.code.alt .mark-z{display:flex}
+.code.alt .mark-y{display:none}
+.code.show-z .mark-z{background:rgba(250,204,21,.32);box-shadow:inset 5px 0 #eab308}
+.code.show-y .mark-y{background:rgba(225,29,72,.12);box-shadow:inset 5px 0 #e11d48}
+.code .ln.ok-l::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px}
+.code .ln.bad-l::after{content:"✗ lỗi";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}
+.code.done .ok-x::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px}
+.code.done .bad-x::after{content:"✗ lỗi";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro";font-size:.92em}
+.obj{border:2.5px solid #ec4899;border-radius:14px;padding:8px 12px 10px;background:#fff;position:relative;transition:all .45s}
+.obj>.lab,.part>.lab{font-family:var(--mono);font-size:12.5px;font-weight:800;color:#be185d;margin-bottom:5px;display:flex;justify-content:space-between;gap:10px}
+.part{border:2px dashed #7c3aed;border-radius:10px;padding:6px 10px;background:#f7f3ff;margin-bottom:6px;transition:all .45s}
+.part>.lab{color:#6d28d9}
+.part.b{border-color:#0891b2;background:#ecfeff}.part.b>.lab{color:#0e7490}
+.fld{font-family:var(--mono);font-size:14px;display:flex;gap:8px;padding:2px 0;align-items:center}
+.fld>span:first-child{color:var(--muted);min-width:110px}
+.fld b{font-weight:700;color:#111;transition:all .3s;padding:0 4px;border-radius:5px}
+.fld b.new{background:#fef3c7;color:#b45309}
+.fld b.def{background:#ffe4e6;color:#be123c}
+.fld b.okv{background:#d1fae5;color:#047857}
+.glow{box-shadow:0 0 0 4px rgba(245,158,11,.35),0 0 22px rgba(245,158,11,.45)}
+.dimx{opacity:.3;filter:grayscale(.8)}
+.stack{display:flex;flex-direction:column-reverse;gap:6px;min-height:40px}
+.fr{font-family:var(--mono);font-size:14px;font-weight:700;padding:6px 12px;border-radius:10px;border:2px solid #c4b5fd;background:#f5f3ff;color:#5b21b6}
+.fr.b{border-color:#67e8f9;background:#ecfeff;color:#0e7490}
+.fr.d{border-color:#fcd34d;background:#fffbeb;color:#b45309}
+.fr small{display:block;font-family:"Be Vietnam Pro";font-weight:500;font-size:12px;color:var(--muted)}
+.hide0.sh.rm{opacity:.1;transform:translateY(-10px) scale(.94)}
+.big-ok{color:#059669;font-weight:800}.big-bad{color:#e11d48;font-weight:800}
+.mem{display:flex;gap:16px;align-items:flex-end;justify-content:center;flex-wrap:wrap}
+.mc{display:flex;flex-direction:column;align-items:center;gap:4px}
+.mc .addr{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.mc .nm{font-family:var(--mono);font-size:14px;font-weight:800;color:#6d28d9}
+.mc .val{min-width:96px;height:52px;border-radius:12px;border:3px solid #e4dcfb;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:18px;font-weight:800;transition:all .45s;padding:0 8px}
+.mc.hot .val{border-color:#f59e0b;background:#fffbeb;color:#b45309}
+.mc.orph .val{border-color:#e11d48;background:#fff1f3;color:#be123c;border-style:dashed}
+.mc.ptr .val{border-color:#0891b2;background:#ecfeff;color:#0e7490}
+/* UML */
+.uml{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;align-items:flex-start}
+.umlc{display:flex;flex-direction:column;align-items:center}
+.ucls{min-width:120px;border:2px solid #1e1b3a;background:#fffbe6;border-radius:4px;font-family:var(--mono);font-size:14px;font-weight:700;text-align:center;box-shadow:4px 4px 0 #e6e2f3}
+.ucls div{padding:4px 10px}.ucls i{display:block;height:9px;border-top:1.5px solid #1e1b3a}
+.conn{position:relative;width:2px;height:64px;background:#1e1b3a;margin:0 auto}
+.conn.isa::before{content:"";position:absolute;top:-1px;left:50%;transform:translateX(-50%);border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:16px solid #1e1b3a}
+.conn.isa::after{content:"";position:absolute;top:3px;left:50%;transform:translateX(-50%);border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:10px solid #fff}
+.conn.hasa::before{content:"";position:absolute;top:0;left:50%;width:13px;height:13px;background:#fff;border:2px solid #1e1b3a;transform:translate(-50%,-3px) rotate(45deg)}
+.conn .mul{position:absolute;bottom:2px;right:8px;font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.house{display:flex;flex-direction:column;align-items:center;gap:3px}
+.house .roof{width:0;height:0;border-left:130px solid transparent;border-right:130px solid transparent;border-bottom:80px solid #ec4899}
+.house .wall{width:220px;height:90px;background:linear-gradient(180deg,#a78bfa,#7c3aed);border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+.house .base{width:280px;height:34px;background:linear-gradient(180deg,#94a3b8,#475569);border-radius:4px;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px}
+.house .roof-l{position:relative;top:-46px;color:#fff;font-weight:700;font-size:14px;height:0}
+.onion{position:relative;width:300px;height:300px;margin:0 auto}
+.onion>div{position:absolute;border-radius:50%;display:flex;align-items:flex-start;justify-content:center;font-family:var(--mono);font-weight:800;font-size:14px;padding-top:14px}
+.tick{display:inline-flex;width:26px;height:26px;border-radius:50%;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:15px}
+.tick.y{background:#10b981}.tick.n{background:#e11d48}
+table.acc td,table.acc th{text-align:center;font-size:17px;padding:8px 10px}
+table.acc td:first-child,table.acc th:first-child{text-align:left}
+table.acc td.hl{background:#fffbeb;box-shadow:inset 0 0 0 2px #f59e0b}
+.pill{display:inline-block;font-family:var(--mono);font-weight:700;font-size:14px;padding:3px 10px;border-radius:999px;border:2px solid #c4b5fd;background:#f5f3ff;color:#5b21b6;transition:all .35s}
+.pill.b{border-color:#67e8f9;background:#ecfeff;color:#0e7490}.pill.c{border-color:#f9a8d4;background:#fdf2f8;color:#be185d}.pill.d{border-color:#fcd34d;background:#fffbeb;color:#b45309}.pill.x{border-color:#e5e7eb;background:#f3f4f6;color:#9ca3af;text-decoration:line-through}
+.vt{font-family:var(--mono);font-size:13.5px;border:2px solid #0891b2;border-radius:10px;background:#ecfeff;padding:6px 10px}
+.vt div{padding:2px 0}
+.strike{position:relative}
+.strike.on::after{content:"";position:absolute;left:-4px;right:-4px;top:50%;height:3px;background:#e11d48;transform:rotate(-4deg)}
+.code.r1 .mark-o1::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r1 .mark-x1::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r2 .mark-o2::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r2 .mark-x2::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r3 .mark-o3::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r3 .mark-x3::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r4 .mark-o4::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r4 .mark-x4::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r5 .mark-o5::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r5 .mark-x5::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r6 .mark-o6::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r6 .mark-x6::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r7 .mark-o7::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r7 .mark-x7::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r8 .mark-o8::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r8 .mark-x8::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r9 .mark-o9::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r9 .mark-x9::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r10 .mark-o10::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r10 .mark-x10::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r11 .mark-o11::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r11 .mark-x11::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r12 .mark-o12::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r12 .mark-x12::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r13 .mark-o13::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r13 .mark-x13::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r14 .mark-o14::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r14 .mark-x14::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r15 .mark-o15::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r15 .mark-x15::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r16 .mark-o16::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r16 .mark-x16::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r17 .mark-o17::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r17 .mark-x17::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r18 .mark-o18::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r18 .mark-x18::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r19 .mark-o19::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r19 .mark-x19::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r20 .mark-o20::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r20 .mark-x20::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r21 .mark-o21::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r21 .mark-x21::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r22 .mark-o22::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r22 .mark-x22::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r23 .mark-o23::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r23 .mark-x23::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r24 .mark-o24::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r24 .mark-x24::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}
+/* larger sizing for lecture decks */
+.slide.z1>*:not(.hdr):not(.jumpbtn):not(.orb){zoom:1.15}.slide.z2>*:not(.hdr):not(.jumpbtn):not(.orb){zoom:1.3}.slide.z3>*:not(.hdr):not(.jumpbtn):not(.orb){zoom:1.42}
+p,li{font-size:21px}.card p,.card li{font-size:18.5px}
+.code{font-size:17px;line-height:1.5}.code.sm{font-size:15.5px}.code.xs{font-size:14.5px;line-height:1.45}
+.code-title{font-size:14px}
+.fld{font-size:16px}.pill{font-size:16px;padding:3px 12px}
+.ucls{font-size:16px;min-width:130px}.ucls div{padding:6px 12px}.conn{height:96px}
+.box{font-size:17px;padding:12px 16px}.box small{font-size:14px}
+table{font-size:18px}th,td{padding:9px 12px}
+.say{font-size:19px}.console{font-size:15.5px;line-height:1.55}
+.chip{font-size:15px;padding:3px 12px}.vc{font-size:17px}
+.note{font-size:18.5px}.fr{font-size:16px}.obj>.lab,.part>.lab{font-size:14px}
+</style>
+</head>
+<body>
+
+<div id="viewport"><div id="deck">
+
+<section class="slide" id="title" data-title="Trang bìa">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// Lập trình hướng đối tượng · C++</div>
+    <h1 class="in">Đa hình<br><span class="grad">Polymorphism</span></h1>
+    <p class="in muted" style="font-size:24px;margin-top:20px;max-width:1000px">Con trỏ lớp cha trỏ tới đối tượng lớp con → hàm ảo &amp; liên kết động → tính đa hình → hàm thuần ảo, lớp trừu tượng → hàm hủy ảo → interface.</p>
+    <p class="in" style="margin-top:34px;font-size:18px;color:#8a91b4">← → hoặc Space: chạy từng bước · Shift+→: qua slide · <b>G</b> hoặc nút <b>☰ Đi tới slide</b>: nhảy tới slide bất kỳ · A: hiện hết · F: toàn màn hình</p>
+  </div>
+</section>
+
+<section class="slide z1" id="agenda" data-title="Nội dung">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:17px">· bấm vào mục để đi tới</span></div>
+  <div class="agenda in" style="grid-template-columns:repeat(3,1fr);gap:10px 14px">
+    <div class="sec">1 · Con trỏ &nbsp;·&nbsp; 2 · Hàm ảo</div>
+    <div class="ag g1" data-goto="thanchu"><b>01</b>Thần chú con trỏ</div>
+    <div class="ag g1" data-goto="newdelete"><b>02</b>new / delete / rò rỉ</div>
+    <div class="ag g1" data-goto="chacon"><b>03</b>Con trỏ lớp cha → lớp con</div>
+    <div class="ag g1" data-goto="lktinh"><b>04</b>Liên kết tĩnh</div>
+    <div class="ag g2" data-goto="hamao"><b>05</b>Khái niệm hàm ảo</div>
+    <div class="ag g2" data-goto="animal"><b>06</b>Animal: có / không virtual</div>
+    <div class="ag g2" data-goto="vtable"><b>07</b>Bên trong: vtable</div>
+    <div class="sec">3 · Đa hình &nbsp;·&nbsp; 4 · Hàm thuần ảo &nbsp;·&nbsp; 5 · Hàm hủy ảo</div>
+    <div class="ag g3" data-goto="dahinh"><b>08</b>Đa hình: là gì, làm sao</div>
+    <div class="ag g3" data-goto="loiich"><b>09</b>Ngắn hơn, dễ mở rộng</div>
+    <div class="ag g4" data-goto="thuanao"><b>10</b>Hàm thuần ảo</div>
+    <div class="ag g4" data-goto="truutuong"><b>11</b>Lớp trừu tượng</div>
+    <div class="ag g5" data-goto="huyao"><b>12</b>Hàm hủy ảo</div>
+    <div class="sec">6 · Interface</div>
+    <div class="ag g6" data-goto="if-khainiem"><b>13</b>Interface là gì</div>
+    <div class="ag g6" data-goto="if-hopdong"><b>14</b>Interface = hợp đồng</div>
+    <div class="ag g6" data-goto="if-vidu"><b>15</b>"Tôi cần một thứ có thể…"</div>
+    <div class="ag g6" data-goto="if-code"><b>16</b>Ví dụ C++: IIntArray</div>
+    <div class="ag g5" data-goto="summary"><b>✓</b>Tổng kết</div>
+  </div>
+</section>
+
+<section class="slide z1" id="thanchu" data-title="01 · Thần chú con trỏ">
+  <div class="hdr in"><span class="qn">01</span><h2>Thần chú: giá trị của biến con trỏ là <span class="grad">địa chỉ ô nhớ</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr">
+    <div><script type="text/x-cpp" class="sm" id="pK" data-title="pointer.cpp" data-mark="1:a;2:b;3:c;4:d;5:e;6:f">
+int x = 5;
+int* p;
+p = &x;      // & : lấy địa chỉ của x
+cout << p;   // 0x1000
+cout << *p;  // * : giá trị tại ô p trỏ đến → 5
+*p = 9;      // ghi vào ô nhớ của x
+</script>
+      <div class="cols" style="margin-top:12px;gap:10px"><div class="card"><h3>&amp;</h3><p>lấy <b>địa chỉ</b> của một biến</p></div><div class="card"><h3>*</h3><p>lấy <b>giá trị</b> tại ô nhớ con trỏ trỏ đến</p></div></div>
+    </div>
+    <div>
+      <div class="mem" style="margin-top:20px;gap:60px">
+        <div class="mc hide0" id="pm1"><span class="addr">địa chỉ 0x1000</span><div class="val" id="pv1">5</div><span class="nm">x</span></div>
+        <div class="mc ptr hide0" id="pm2"><span class="addr">địa chỉ 0x2000</span><div class="val" id="pv2">???</div><span class="nm">p</span></div>
+      </div>
+      <div class="ar hide0" id="parr" style="font-size:20px;margin-top:10px">p ──trỏ đến──▶ x</div>
+      <div class="console hide0" id="pcon" style="margin-top:14px"><span class="cl" id="pc1">0x1000</span><span class="cl" id="pc2">5</span></div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+<span class="f ghost" data-now="#pK|show-a;#pm1|hot" data-act="#pm1|sh" data-say="Biến &lt;b&gt;x&lt;/b&gt; nằm ở ô nhớ có địa chỉ 0x1000, chứa giá trị 5."></span><span class="f ghost" data-now="#pK|show-b;#pm2|hot" data-act="#pm2|sh" data-say="Biến con trỏ &lt;b&gt;p&lt;/b&gt; cũng là một ô nhớ (ở 0x2000). Chưa gán → chứa rác."></span><span class="f ghost" data-now="#pK|show-c;#pm2|hot" data-act="#parr|sh" data-set="#pv2::0x1000" data-say="&lt;b&gt;p = &amp;amp;x&lt;/b&gt;: giá trị của p là &lt;b&gt;địa chỉ&lt;/b&gt; của x. Ta nói &quot;p trỏ đến x&quot;."></span><span class="f ghost" data-now="#pK|show-d" data-act="#pcon|sh;#pc1|show" data-say="In &lt;b&gt;p&lt;/b&gt; → in ra một địa chỉ, không phải 5."></span><span class="f ghost" data-now="#pK|show-e;#pm1|hot" data-act="#pc2|show" data-say="In &lt;b&gt;*p&lt;/b&gt; → đi theo địa chỉ, lấy giá trị ở đó: 5."></span><span class="f ghost" data-now="#pK|show-f;#pm1|hot" data-set="#pv1::9" data-say="&lt;b&gt;*p = 9&lt;/b&gt; ghi vào ô nhớ 0x1000 → x đổi thành 9 dù không viết tên x."></span></section>
+
+<section class="slide z1" id="newdelete" data-title="02 · new, delete và rò rỉ bộ nhớ">
+  <div class="hdr in"><span class="qn">02</span><h2>new, delete và rò rỉ bộ nhớ</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr">
+    <div><script type="text/x-cpp" class="sm" id="nK" data-title="leak.cpp" data-mark="1:a;2:b;3:c;4:d">
+int* p = new int(5);  // cấp vùng nhớ mới
+p = new int(7);       // vùng cũ bị mồ côi!
+delete p;             // chỉ thu hồi vùng 7
+p = NULL;
+</script>
+      <ul style="margin-top:12px"><li><b>new</b>: cấp vùng nhớ mới cho con trỏ quản lý</li><li><b>delete</b>: thu hồi vùng nhớ đã cấp</li><li><b>Có new thì phải có delete</b></li></ul>
+    </div>
+    <div>
+      <div class="mem" style="margin-top:10px;gap:40px">
+        <div class="mc ptr hide0" id="nm0"><span class="nm">p</span><div class="val" id="nv0">0xA0</div></div>
+        <div class="mc hot hide0" id="nm1"><span class="addr">heap 0xA0</span><div class="val">5</div></div>
+        <div class="mc hot hide0" id="nm2"><span class="addr">heap 0xB0</span><div class="val">7</div></div>
+      </div>
+      <div class="note red hide0" id="nleak" style="margin-top:16px"><b>Vùng nhớ mồ côi</b>: không còn con trỏ nào tham chiếu → không bao giờ delete được nữa. <b>Rò rỉ bộ nhớ</b> (memory leak): new mà không delete sau khi dùng xong.</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+<span class="f ghost" data-now="#nK|show-a" data-act="#nm0|sh;#nm1|sh" data-say="&lt;b&gt;new int(5)&lt;/b&gt;: xin một ô nhớ trên heap, p giữ địa chỉ của nó."></span><span class="f ghost" data-now="#nK|show-b" data-act="#nm2|sh;#nm1|orph;#nleak|sh" data-set="#nv0::0xB0" data-say="Gán p cho vùng mới 0xB0 mà &lt;b&gt;chưa delete&lt;/b&gt; vùng 0xA0 → vùng 5 thành &lt;b&gt;mồ côi&lt;/b&gt;."></span><span class="f ghost" data-now="#nK|show-c" data-act="#nm2|dimx" data-set="#nv0::0xB0" data-say="&lt;b&gt;delete p&lt;/b&gt; chỉ thu hồi vùng 0xB0. Vùng 0xA0 bị rò rỉ cho tới khi chương trình kết thúc."></span><span class="f ghost" data-now="#nK|show-d" data-set="#nv0::NULL" data-say="Thói quen tốt: sau delete gán con trỏ về NULL (hoặc nullptr) để không dùng nhầm vùng đã thu hồi."></span></section>
+
+<section class="slide" id="chacon" data-title="03 · Con trỏ lớp cha trỏ tới lớp con">
+  <div class="hdr in"><span class="qn">03</span><h2>Con trỏ cha → đối tượng con: <span class="big-ok">được</span> · ngược lại: <span class="big-bad">không</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+    <div><script type="text/x-cpp" class="sm" id="cK" data-title="main()" data-mark="3:o1;6:o2;9:o3;10:x4">
+GiaoVien gv("Nguyen Van A", 2000000, 1);
+GiaoVien* p;
+p = &gv;      // p và gv cùng là GiaoVien
+
+GVCN gvcn("Le Van C", 3000000, 2, "LOP-A1");
+p = &gvcn;    // con trỏ lớp cha → đối tượng lớp con
+
+GVCN* p2;
+p2 = &gvcn;   // p2 và gvcn cùng là GVCN
+p2 = &gv;     // con trỏ lớp con → đối tượng lớp cha
+</script></div>
+    <div>
+      <div style="display:flex;gap:14px;align-items:flex-start">
+        <div class="obj" id="cgv" style="border-color:#7c3aed;flex:1"><div class="lab" style="color:#6d28d9">gv : GiaoVien</div><div class="fld"><span>hoTen…</span></div></div>
+        <div class="obj" id="ccn" style="flex:1.3"><div class="lab">gvcn : GVCN</div><div class="part" id="ccp"><div class="lab">phần GiaoVien</div><div class="fld"><span>hoTen…</span></div></div><div class="fld"><span>lopCN</span></div></div>
+      </div>
+      <div class="vars" style="margin-top:12px"><span class="vc" id="cp1">GiaoVien* p → <b id="cpv">?</b></span><span class="vc" id="cp2">GVCN* p2 → <b id="cp2v">?</b></span></div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+<span class="f ghost" data-now="#cgv|glow;#cp1|hot" data-act="#cK|r1" data-set="#cpv::gv" data-say="Cùng kiểu: GiaoVien* trỏ tới GiaoVien. ✓"></span><span class="f ghost" data-now="#ccp|glow;#cp1|hot" data-act="#cK|r2" data-set="#cpv::gvcn (chỉ &quot;nhìn thấy&quot; phần GiaoVien)" data-say="&lt;b&gt;Lớp con là một loại lớp cha&lt;/b&gt; (IS-A): gvcn có đầy đủ phần GiaoVien, nên con trỏ GiaoVien* trỏ vào được. ✓"></span><span class="f ghost" data-now="#ccn|glow;#cp2|hot" data-act="#cK|r3" data-set="#cp2v::gvcn" data-say="Cùng kiểu GVCN. ✓"></span><span class="f ghost" data-now="#cgv|glow;#cp2|hot" data-act="#cK|r4" data-set="#cp2v::&lt;span class=&quot;big-bad&quot;&gt;gv ✗&lt;/span&gt;" data-say="&lt;b&gt;Sai&lt;/b&gt;: GVCN* kỳ vọng có lopCN, nhưng gv chỉ có phần GiaoVien → biên dịch báo lỗi. ✗"></span><span class="f ghost" data-say="Tương tự, hàm có tham số kiểu GiaoVien hoặc GiaoVien* đều nhận được đối tượng lớp con (slide sau)."></span></section>
+
+<section class="slide" id="lktinh" data-title="04 · Liên kết tĩnh: vẫn gọi hàm của lớp cha">
+  <div class="hdr in"><span class="qn">04</span><h2>Vấn đề: p trỏ tới GVCN nhưng vẫn gọi <code class="i" style="font-size:.8em">GiaoVien::Xuat()</code></h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+    <div><script type="text/x-cpp" class="xs" id="sK" data-title="static_binding.cpp" data-mark="12:a;5:b;13:c;6:d;14:e;1:f">
+class GiaoVien { public: void Xuat() { cout << "Xuat GiaoVien\n"; } };
+class GVCN : public GiaoVien {
+public: void Xuat() { cout << "Xuat GVCN\n"; } };
+
+void f1(GiaoVien gv)  { gv.Xuat(); }
+void f2(GiaoVien* p)  { p->Xuat(); }
+
+void main()
+{
+    GVCN gvcn("Le Van C", 3000000, 2, "LOP-A1");
+    GiaoVien* p = &gvcn;
+    p->Xuat();
+    f1(gvcn);
+    f2(&gvcn);
+}
+</script></div>
+    <div>
+      <div class="console" style="min-height:96px"><span class="cl" id="sc1">Xuat GiaoVien</span><span class="cl" id="sc2">Xuat GiaoVien</span><span class="cl" id="sc3">Xuat GiaoVien</span></div>
+      <div class="card f" data-o="9" style="margin-top:12px"><h3>Liên kết tĩnh (static binding)</h3><p>Trình biên dịch chọn hàm theo <b>kiểu khai báo</b> của con trỏ/biến (GiaoVien), không theo đối tượng <b>thật</b> mà nó trỏ tới. ⟹ Làm sao gọi được Xuat của GVCN? → <b>hàm ảo</b>.</p></div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+<span class="f ghost" data-now="#sK|show-a" data-say="p là &lt;b&gt;GiaoVien*&lt;/b&gt;, trỏ tới đối tượng GVCN. Lưu ý: con trỏ thì dùng dấu &lt;b&gt;-&amp;gt;&lt;/b&gt;, không dùng dấu chấm."></span><span class="f ghost" data-now="#sK|show-a;#sK|show-f" data-act="#sc1|show" data-say="Kết quả: &lt;b&gt;Xuat GiaoVien&lt;/b&gt;! Vì p được khai báo kiểu GiaoVien*, trình biên dịch gắn chết lời gọi với GiaoVien::Xuat."></span><span class="f ghost" data-now="#sK|show-c;#sK|show-b" data-act="#sc2|show" data-say="&lt;b&gt;f1(gvcn)&lt;/b&gt;: truyền &lt;b&gt;giá trị&lt;/b&gt; → gvcn bị chép vào tham số gv kiểu GiaoVien, phần GVCN bị &quot;cắt&quot; mất (object slicing)."></span><span class="f ghost" data-now="#sK|show-e;#sK|show-d" data-act="#sc3|show" data-say="&lt;b&gt;f2(&amp;amp;gvcn)&lt;/b&gt;: truyền con trỏ, đối tượng còn nguyên — nhưng vẫn là liên kết tĩnh → Xuat GiaoVien."></span></section>
+
+<section class="slide z1" id="hamao" data-title="05 · Khái niệm hàm ảo">
+  <div class="hdr in"><span class="qn">05</span><h2>Hàm ảo (virtual function)</h2></div>
+  <div class="cols3" style="margin-top:12px">
+    <div class="card f"><h3>Là một hàm trong lớp</h3><p>Hàm thành viên của lớp. Hàm <code class="i">friend</code> không thể là hàm ảo.</p></div>
+    <div class="card f"><h3>Mang tính chất ảo</h3><p>Gọi <b>đúng</b> hàm của đối tượng mà con trỏ <b>đang trỏ đến</b> → <b>liên kết động</b> (dynamic binding).</p></div>
+    <div class="card f"><h3>Khai báo</h3><p>Thêm từ khóa <code class="i">virtual</code> trước khai báo hàm ở <b>lớp cha</b>.</p><p style="margin-top:6px"><code class="i">virtual void Xuat();</code></p></div>
+  </div>
+  <div class="cols f" style="margin-top:18px">
+    <div class="note blue">Liên kết động thường được cài đặt bằng <b>vtable</b> (virtual function table) — xem slide 07. <b>Bài tập</b>: tìm hiểu vtable, viết report 2 trang theo định dạng Markdown.</div>
+    <div class="note">Đây chính là nền tảng của <b>tính chất thứ 3 của OOP: tính đa hình</b>.</div>
+  </div>
+  <p class="say">Nhấn → để chạy từng bước.</p>
+</section>
+
+<section class="slide" id="animal" data-title="06 · Animal: không / có virtual">
+  <div class="hdr in"><span class="qn">06</span><h2>Ví dụ Animal: thêm một chữ <code class="i" style="font-size:.85em">virtual</code> thay đổi tất cả</h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr">
+    <div><script type="text/x-cpp" class="sm nonum" id="aK" data-title="animal.cpp" data-mark="3:y;4:z;8:b;12:c">
+class Animal {
+public:
+    void talk() { cout << "Biet keu gi day???\n"; }
+    virtual void talk() { cout << "Biet keu gi day???\n"; }
+};
+class Cat : public Animal {
+public:
+    void talk() { cout << "Meo meo!!!\n"; }
+};
+class Dog : public Animal {
+public:
+    void talk() { cout << "Gau gau!!!\n"; }
+};
+</script><div style="margin-top:8px"></div><script type="text/x-cpp" class="sm" id="aM" data-title="main()" data-mark="3:a;4:b;5:c">
+Animal a;  Cat c;  Dog d;
+Animal* p;
+p = &a;  p->talk();
+p = &c;  p->talk();
+p = &d;  p->talk();
+</script></div>
+    <div>
+      <div class="vars" style="justify-content:center;margin-bottom:10px"><span class="vc" id="ao1">a : Animal</span><span class="vc" id="ao2">c : Cat</span><span class="vc" id="ao3">d : Dog</span></div>
+      <div class="code-title" id="aTt">Console — KHÔNG có virtual</div>
+      <div class="console" style="min-height:96px"><span class="cl" id="ac1">Biet keu gi day???</span><span class="cl" id="ac2">Biet keu gi day???</span><span class="cl" id="ac3">Biet keu gi day???</span></div>
+      <div class="note blue f" data-o="9" style="margin-top:12px">Chỉ cần viết <b>virtual</b> ở <b>lớp cha</b>; ở lớp con không bắt buộc (hàm cùng chữ ký tự động là ảo). Từ C++11 nên ghi thêm <code class="i">override</code> ở lớp con để trình biên dịch kiểm tra giúp.</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+<span class="f ghost" data-now="#aM|show-a;#ao1|hot" data-act="#ac1|show" data-say="Chưa có virtual. p trỏ tới a → Animal::talk()."></span><span class="f ghost" data-now="#aM|show-b;#ao2|hot" data-act="#ac2|show" data-say="p trỏ tới c (Cat)… nhưng vẫn in &lt;b&gt;Biet keu gi day???&lt;/b&gt; — liên kết tĩnh theo kiểu Animal*."></span><span class="f ghost" data-now="#aM|show-c;#ao3|hot" data-act="#ac3|show" data-say="Dog cũng vậy. Con mèo, con chó đều &quot;không biết kêu&quot;!"></span><span class="f ghost" data-now="#aK|show-z" data-act="#aK|alt" data-set="#aTt::Console — CÓ virtual" data-say="Thêm &lt;b&gt;virtual&lt;/b&gt; trước talk() ở lớp Animal…"></span><span class="f ghost" data-now="#aM|show-a;#ao1|hot" data-act="#aK|alt;#ac1|show" data-set="#aTt::Console — CÓ virtual" data-say="p = &amp;amp;a → vẫn là Animal::talk()."></span><span class="f ghost" data-now="#aM|show-b;#ao2|hot;#aK|show-b" data-act="#aK|alt;#ac1|show;#ac2|show" data-set="#aTt::Console — CÓ virtual;#ac2::Meo meo!!!" data-say="p = &amp;amp;c → &lt;b&gt;Meo meo!!!&lt;/b&gt; — gọi đúng hàm của đối tượng thật (Cat)."></span><span class="f ghost" data-now="#aM|show-c;#ao3|hot;#aK|show-c" data-act="#aK|alt;#ac1|show;#ac2|show;#ac3|show" data-set="#aTt::Console — CÓ virtual;#ac2::Meo meo!!!;#ac3::Gau gau!!!" data-say="p = &amp;amp;d → &lt;b&gt;Gau gau!!!&lt;/b&gt;. Cùng một dòng p-&amp;gt;talk() nhưng hành vi khác nhau → &lt;b&gt;đa hình&lt;/b&gt;."></span></section>
+
+<section class="slide z1" id="vtable" data-title="07 · Bên trong liên kết động: vtable">
+  <div class="hdr in"><span class="qn">07</span><h2>Bên trong <code class="i" style="font-size:.8em">p-&gt;talk()</code>: vptr và vtable</h2></div>
+  <div style="display:grid;grid-template-columns:150px 30px 260px 30px 300px;gap:10px;align-items:center;justify-content:center;margin-top:16px">
+    <div class="mc ptr" id="vp"><span class="nm">Animal* p</span><div class="val" id="vpv">&amp;c</div></div>
+    <div class="ar">→</div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="obj" id="voc"><div class="lab">c : Cat</div><div class="fld"><span>vptr</span><b id="vvc">→ vtable Cat</b></div></div>
+      <div class="obj" id="vod"><div class="lab">d : Dog</div><div class="fld"><span>vptr</span><b>→ vtable Dog</b></div></div>
+    </div>
+    <div class="ar">→</div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="vt" id="vtc"><b>vtable Cat</b><div>talk → <span id="vtcf">Cat::talk</span></div></div>
+      <div class="vt" id="vtd"><b>vtable Dog</b><div>talk → Dog::talk</div></div>
+      <div class="vt" style="border-color:#7c3aed;background:#f5f3ff"><b>vtable Animal</b><div>talk → Animal::talk</div></div>
+    </div>
+  </div>
+  <div class="console hide0" id="vcon" style="max-width:520px;margin:16px auto 0"><span class="cl" id="vc1">Meo meo!!!</span></div>
+  <p class="say" style="max-width:1000px;margin:12px auto 0">Nhấn → để chạy từng bước.</p>
+<span class="f ghost" data-now="#vtc|glow;#vtd|glow" data-say="Mỗi lớp có hàm ảo được trình biên dịch tạo một &lt;b&gt;bảng hàm ảo&lt;/b&gt; (vtable) chứa địa chỉ các hàm ảo của lớp đó."></span><span class="f ghost" data-now="#voc|glow;#vod|glow" data-say="Mỗi đối tượng có thêm một con trỏ ẩn &lt;b&gt;vptr&lt;/b&gt; trỏ tới vtable của lớp &lt;b&gt;thật&lt;/b&gt; của nó — gắn lúc hàm dựng chạy."></span><span class="f ghost" data-now="#vp|hot;#voc|glow" data-say="&lt;b&gt;p-&amp;gt;talk()&lt;/b&gt; ①: đi theo p tới đối tượng c."></span><span class="f ghost" data-now="#voc|glow;#vtc|glow" data-say="②: đọc vptr của c → vtable Cat."></span><span class="f ghost" data-now="#vtc|glow" data-act="#vcon|sh;#vc1|show" data-say="③: tra ô talk trong vtable → Cat::talk, rồi gọi. Quyết định xảy ra lúc &lt;b&gt;chạy&lt;/b&gt; (runtime), không phải lúc biên dịch."></span><span class="f ghost" data-now="#vod|glow;#vtd|glow" data-act="#vcon|sh;#vc1|show" data-set="#vpv::&amp;amp;d;#vc1::Gau gau!!!" data-say="Đổi p = &amp;amp;d thì cùng đoạn máy đó sẽ dẫn tới Dog::talk. Cái giá: mỗi đối tượng tốn thêm 1 con trỏ, mỗi lời gọi tốn thêm 1 lần tra bảng."></span></section>
+
+<section class="slide z1" id="dahinh" data-title="08 · Tính đa hình">
+  <div class="hdr in"><span class="qn">08</span><h2>Tính đa hình: là gì, làm sao, để làm gì?</h2></div>
+  <div class="cols3" style="margin-top:12px">
+    <div class="card f" data-o="-2"><h3>Là gì?</h3><p>Trong sinh học: một loài có thể có <b>nhiều hình thái</b>. Trong OOP: dùng <b>tham chiếu/con trỏ lớp cha</b> trỏ tới đối tượng lớp con; lời gọi hàm sẽ chạy hàm <b>khác nhau</b> tùy loại đối tượng thật.</p></div>
+    <div class="card f" data-o="-1"><h3>Làm sao?</h3><ul><li><span class="tick y hide0" id="dh1">1</span> Khai báo <b>kế thừa</b></li><li><span class="tick y hide0" id="dh2">2</span> Khai báo <b>hàm ảo</b> ở lớp cha</li><li><span class="tick y hide0" id="dh3">3</span> Sử dụng <b>con trỏ</b> (hoặc tham chiếu)</li></ul></div>
+    <div class="card f" data-o="1"><h3>Để làm gì?</h3><p>Chương trình <b>viết ngắn hơn</b> và <b>dễ mở rộng hơn</b> (slide sau).</p></div>
+  </div>
+  <div class="note f" data-o="2" style="margin-top:16px">Thiếu một trong ba điều kiện là mất đa hình: không virtual → liên kết tĩnh; truyền <b>giá trị</b> thay vì con trỏ → bị cắt mất phần lớp con.</div>
+<span class="f ghost" data-act="#dh1|sh" data-o="0" data-say="Điều kiện 1: Cat, Dog kế thừa Animal."></span><span class="f ghost" data-act="#dh2|sh" data-o="0" data-say="Điều kiện 2: virtual void talk() ở Animal."></span><span class="f ghost" data-act="#dh3|sh" data-o="0" data-say="Điều kiện 3: gọi qua Animal* p."></span><p class="say">Nhấn → để chạy từng bước.</p></section>
+
+<section class="slide" id="loiich" data-title="09 · Lợi ích: ngắn hơn, dễ mở rộng">
+  <div class="hdr in"><span class="qn">09</span><h2>Lợi ích: viết ngắn hơn &amp; dễ mở rộng hơn</h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+    <div><script type="text/x-cpp" class="sm nonum" id="bL" data-title="KHÔNG dùng đa hình" data-mark="3-10:a;11-14:z">
+void giveATalk(Animal* obj, int type)
+{
+    if (type == 1) {
+        Cat* c = (Cat*)obj;
+        c->talk();
+    }
+    else if (type == 2) {
+        Dog* d = (Dog*)obj;
+        d->talk();
+    }
+    else if (type == 3) {
+        Mouse* m = (Mouse*)obj;
+        m->talk();
+    }
+}
+</script></div>
+    <div><script type="text/x-cpp" class="sm nonum" id="bR" data-title="CÓ dùng đa hình" data-mark="3:b">
+void giveATalk(Animal* p)
+{
+    p->talk();
+}
+</script>
+      <div class="card hide0" id="bMo" style="margin-top:12px"><h3>Thêm loài mới: Mouse</h3><p><code class="i">class Mouse : public Animal</code> định nghĩa lại talk() → bên phải <b>không sửa một dòng nào</b>.</p></div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+<span class="f ghost" data-now="#bL|show-a" data-say="Không đa hình: phải truyền thêm &quot;type&quot;, rồi &lt;b&gt;if/else&lt;/b&gt; từng loại, ép kiểu đúng lớp con mới gọi được hàm riêng."></span><span class="f ghost" data-now="#bR|show-b" data-say="Có đa hình: &lt;b&gt;một dòng&lt;/b&gt; p-&amp;gt;talk(). Mỗi đối tượng tự biết mình kêu thế nào. → &lt;b&gt;Lợi ích 1: viết ngắn hơn&lt;/b&gt;."></span><span class="f ghost" data-now="#bL|show-z" data-act="#bL|alt;#bMo|sh" data-say="Thêm Mouse: bên trái phải &lt;b&gt;mở hàm ra sửa&lt;/b&gt;, thêm một nhánh — và sửa ở mọi nơi có if/else kiểu này."></span><span class="f ghost" data-now="#bR|show-b" data-act="#bL|alt;#bMo|sh;#bMo|glow" data-say="Bên phải giữ nguyên, chỉ cần viết thêm lớp Mouse. → &lt;b&gt;Lợi ích 2: dễ mở rộng&lt;/b&gt; (mở để mở rộng, đóng để sửa đổi)."></span></section>
+
+<section class="slide z1" id="thuanao" data-title="10 · Hàm thuần ảo (pure virtual)">
+  <div class="hdr in"><span class="qn">10</span><h2>Hàm thuần ảo (pure virtual)</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr">
+    <div>
+      <ul class="in"><li>Có những hàm ảo <b>không biết cài đặt thế nào</b> ở lớp cha: "con vật" chung chung thì kêu ra sao?</li><li>⟹ Biến chúng thành <b>hàm thuần ảo</b></li></ul>
+      <div class="card in" style="margin-top:10px;font-family:var(--mono);font-size:19px;text-align:center"><span class="k">virtual</span> &lt;Chữ ký hàm&gt; <b class="p">= 0</b>;</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div><script type="text/x-cpp" class="nonum" id="tK" data-title="Animal" data-mark="4:y;5:z;8-11:w">
+class Animal
+{
+public:
+    virtual void talk();
+    virtual void talk() = 0;
+};
+
+void Animal::talk()
+{
+    cout << "Biet keu gi day???";
+}
+</script></div>
+  </div>
+<span class="f ghost" data-now="#tK|show-y" data-say="Trước đây: talk() là hàm ảo bình thường, phải viết thân hàm với một câu kêu &quot;chung chung&quot; vô nghĩa."></span><span class="f ghost" data-now="#tK|show-z" data-act="#tK|alt" data-say="Dùng hàm thuần ảo: thêm &lt;b&gt;= 0&lt;/b&gt;, nghĩa là &quot;lớp này &lt;b&gt;không&lt;/b&gt; cài đặt talk(), lớp con phải tự cài&quot;."></span><span class="f ghost" data-now="#tK|show-z" data-act="#tK|alt;#tK|alt2" data-say="Không cần (và thường không viết) thân hàm Animal::talk() nữa."></span></section>
+
+<section class="slide" id="truutuong" data-title="11 · Lớp trừu tượng (abstract class)">
+  <div class="hdr in"><span class="qn">11</span><h2>Lớp trừu tượng (abstract class)</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr">
+    <div>
+      <ul class="in"><li>Là lớp chứa <b>ít nhất MỘT</b> hàm thuần ảo</li><li><b>Không thể</b> tạo đối tượng từ lớp trừu tượng</li><li>Chỉ dùng để <b>kế thừa</b></li><li>Lớp con phải cài đặt <b>TẤT CẢ</b> hàm thuần ảo, nếu không lớp con cũng thành lớp trừu tượng</li></ul>
+      <div style="margin-top:8px"></div><script type="text/x-cpp" class="sm" id="uA" data-title="Animal &amp; Duck" data-mark="5-7:d">
+class Animal {
+public:
+    virtual void talk() = 0;
+};
+class Duck : public Animal {
+    // quên cài đặt talk()
+};
+</script></div>
+    <div><script type="text/x-cpp" class="sm" id="uM" data-title="main()" data-mark="1:x1;2:o2;3:o3;4:o4;5:x5;6:o6;7:x7;1:a;2:b;3:c;4:d;5:e;6:f;7:g">
+Animal a;        // tạo đối tượng lớp trừu tượng
+Animal* p;       // con trỏ thì được
+Cat c;           // Cat đã cài đặt talk()
+p = &c;
+p = new Animal;  // tạo đối tượng lớp trừu tượng
+p = new Cat;
+Duck d;          // Duck chưa cài đặt talk()
+</script>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+<span class="f ghost" data-now="#uM|show-a" data-act="#uM|r1" data-say="&lt;b&gt;Animal a;&lt;/b&gt; → lỗi: không tạo được đối tượng của lớp trừu tượng."></span><span class="f ghost" data-now="#uM|show-b" data-act="#uM|r2" data-say="&lt;b&gt;Animal* p;&lt;/b&gt; → được: con trỏ lớp trừu tượng là cách dùng đa hình."></span><span class="f ghost" data-now="#uM|show-c" data-act="#uM|r3" data-say="Cat cài đặt đủ hàm thuần ảo → lớp cụ thể, tạo được."></span><span class="f ghost" data-now="#uM|show-d" data-act="#uM|r4" data-say="Con trỏ lớp cha trỏ tới lớp con → được."></span><span class="f ghost" data-now="#uM|show-e" data-act="#uM|r5" data-say="&lt;b&gt;new Animal&lt;/b&gt; cũng là tạo đối tượng lớp trừu tượng → lỗi."></span><span class="f ghost" data-now="#uM|show-f" data-act="#uM|r6" data-say="&lt;b&gt;new Cat&lt;/b&gt; → được."></span><span class="f ghost" data-now="#uM|show-g;#uA|show-d" data-act="#uM|r7" data-say="Duck không cài đặt talk() → Duck &lt;b&gt;cũng là lớp trừu tượng&lt;/b&gt; → không tạo được d."></span></section>
+
+<section class="slide" id="huyao" data-title="12 · Hàm hủy ảo">
+  <div class="hdr in"><span class="qn">12</span><h2>Hàm hủy ảo: <code class="i" style="font-size:.8em">delete</code> qua con trỏ lớp cha</h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+    <div><script type="text/x-cpp" class="sm nonum" id="hK" data-title="destructor.cpp" data-mark="3:y;4:z;10-13:c;18:a;19:b">
+class Base {
+public:
+    ~Base() { cout << "Base destructor\n"; }
+    virtual ~Base() { cout << "Base destructor\n"; }
+};
+class DerivedB : public Base {
+    int* data;
+public:
+    DerivedB(int a, int b) { data = new int[2]{a, b}; }
+    ~DerivedB() {
+        delete[] data;
+        cout << "DerivedB destructor\n";
+    }
+};
+void main()
+{
+    Base* pb;
+    pb = new DerivedB(4, 5);
+    delete pb;
+}
+</script></div>
+    <div>
+      <div class="code-title" id="hTt">Console — ~Base() KHÔNG virtual</div>
+      <div class="console" style="min-height:70px"><span class="cl" id="hc1">Base destructor</span><span class="cl" id="hc2"></span></div>
+      <div class="mem" style="margin-top:14px"><div class="mc hot hide0" id="hm"><span class="addr">heap: data của DerivedB</span><div class="val">{4, 5}</div></div></div>
+      <div class="note red hide0" id="hleak" style="margin-top:10px">Hàm hủy DerivedB <b>không được gọi</b> → mảng data <b>không bao giờ được delete</b> → rò rỉ bộ nhớ.</div>
+      <div class="note f" data-o="9" style="margin-top:10px">Quy tắc: lớp được dùng làm lớp cha (có hàm ảo) thì <b>hàm hủy phải luôn là hàm ảo</b> → lời gọi được chuyển tới hàm hủy của lớp kế thừa.</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+<span class="f ghost" data-now="#hK|show-a" data-act="#hm|sh" data-say="Tạo DerivedB qua con trỏ Base*; DerivedB cấp phát mảng data."></span><span class="f ghost" data-now="#hK|show-b;#hK|show-y" data-act="#hm|sh;#hm|orph;#hc1|show;#hleak|sh" data-say="&lt;b&gt;delete pb&lt;/b&gt;: hàm hủy không ảo → liên kết tĩnh theo Base* → &lt;b&gt;chỉ hủy lớp Base&lt;/b&gt;."></span><span class="f ghost" data-now="#hK|show-z" data-act="#hK|alt;#hm|sh" data-set="#hTt::Console — virtual ~Base()" data-say="Sửa: thêm &lt;b&gt;virtual&lt;/b&gt; trước ~Base()."></span><span class="f ghost" data-now="#hK|show-b;#hK|show-c" data-act="#hK|alt;#hm|sh;#hm|dimx;#hc1|show" data-set="#hTt::Console — virtual ~Base();#hc1::DerivedB destructor" data-say="Giờ delete pb gọi &lt;b&gt;~DerivedB()&lt;/b&gt; trước (giải phóng data)…"></span><span class="f ghost" data-now="#hK|show-z" data-act="#hK|alt;#hm|sh;#hm|dimx;#hc1|show;#hc2|show" data-set="#hTt::Console — virtual ~Base();#hc1::DerivedB destructor;#hc2::Base destructor" data-say="…rồi tự động gọi &lt;b&gt;~Base()&lt;/b&gt;: đúng thứ tự vỏ → lõi, không rò rỉ."></span></section>
+
+<section class="slide" id="if-khainiem" data-title="13 · Interface là gì?">
+  <div class="hdr in"><span class="qn">13</span><h2>Interface: "Tôi cần một thứ có thể…"</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.15fr">
+    <div>
+      <div class="card in"><h3>Định nghĩa</h3><p>Đối tượng giao tiếp với bên ngoài qua các <b>hàm</b> nó công bố → các hàm đó là <b>interface</b> của nó. Trong OOP, interface thường là một <b>kiểu trừu tượng</b> không chứa dữ liệu hay code, chỉ mô tả <b>hành vi</b> bằng chữ ký hàm. Lớp có đủ code cho các hàm đó được gọi là <b>cài đặt</b> (implement) interface.</p></div>
+      <div class="card f" data-o="7" style="margin-top:12px"><h3>Trong C++</h3><ul><li>Là một class <b>KHÔNG</b> chứa thuộc tính</li><li><b>CHỈ</b> chứa các hàm thuần ảo</li><li>C++ không có từ khóa interface; C#, Java thì có</li></ul></div>
+    </div>
+    <div>
+      <div class="card in" style="background:linear-gradient(135deg,#fff,#f5f3ff)"><h3>🧟 Tình huống</h3><p style="font-size:17.5px">Bạn đứng giữa một căn phòng trống, tay không, thì bị zombie tấn công. Một người đứng ở cửa. Bạn hét: <b>"Ném cho tôi cái gì để đập nó!"</b> Bạn không quan tâm đó là gì, miễn là nó…</p></div>
+      <div class="vars" style="margin-top:12px;justify-content:center"><span class="pill d hide0" id="z1">① ném được</span><span class="pill d hide0" id="z2">② cầm nắm được</span><span class="pill d hide0" id="z3">③ đập được</span></div>
+      <table style="margin-top:12px;font-size:16px">
+        <tr><th>Đồ vật</th><th>①</th><th>②</th><th>③</th><th>Dùng được?</th></tr>
+        <tr><td>🏏 Gậy bóng chày</td><td>✓</td><td>✓</td><td>✓</td><td><span class="chip g hide0" id="zr1">OK</span></td></tr>
+        <tr><td>🔨 Búa</td><td>✓</td><td>✓</td><td>✓</td><td><span class="chip g hide0" id="zr2">OK</span></td></tr>
+        <tr><td>🛋️ Ghế sofa</td><td class="big-bad">✗</td><td>—</td><td>—</td><td><span class="chip r hide0" id="zr3">không</span></td></tr>
+        <tr><td>⭐ Phi tiêu ninja</td><td>✓</td><td class="big-bad">✗</td><td>—</td><td><span class="chip r hide0" id="zr4">không</span></td></tr>
+        <tr><td>🛏️ Gối</td><td>✓</td><td>✓</td><td class="big-bad">✗</td><td><span class="chip r hide0" id="zr5">không</span></td></tr>
+      </table>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+<span class="f ghost" data-act="#z1|sh;#z2|sh;#z3|sh" data-o="1" data-say="Ba điều kiện — đó chính là &lt;b&gt;interface&lt;/b&gt; bạn yêu cầu."></span><span class="f ghost" data-act="#zr1|sh" data-o="2" data-say="Gậy bóng chày thỏa cả ba → dùng được."></span><span class="f ghost" data-act="#zr2|sh" data-o="3" data-say="Búa cũng thỏa → dùng được. Gậy hay búa đều &lt;b&gt;như nhau&lt;/b&gt; với bạn."></span><span class="f ghost" data-act="#zr3|sh" data-o="4" data-say="Sofa không ném được."></span><span class="f ghost" data-act="#zr4|sh" data-o="5" data-say="Phi tiêu: cầm vào thì đứt tay."></span><span class="f ghost" data-act="#zr5|sh" data-o="6" data-say="Gối thì đập chẳng ăn thua. Tóm lại: viết interface là nói &lt;b&gt;&quot;Tôi cần một thứ có thể…&quot;&lt;/b&gt;."></span></section>
+
+<section class="slide" id="if-hopdong" data-title="14 · Interface = bản hợp đồng">
+  <div class="hdr in"><span class="qn">14</span><h2>Interface giống một bản hợp đồng (contract)</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr">
+    <div>
+      <ul class="in"><li>Bảng mô tả <b>tất cả hành động</b> đối tượng có thể làm — không quan tâm làm <b>thế nào</b></li><li>Bảng các hàm đối tượng <b>phải có</b> để được công nhận là X</li></ul>
+      <div class="card f" style="margin-top:10px"><h3>💡 Ví dụ: cái đèn</h3><p>Mọi thứ "ACT LIKE" một cái đèn đều phải có <code class="i">turnOn()</code> và <code class="i">turnOff()</code>: đèn bàn, đèn LED, đèn pin…</p></div>
+      <div class="f" style="margin-top:10px"><script type="text/x-cpp" class="sm" id="lK" data-title="ILamp">
+class ILamp {
+public:
+    virtual void turnOn() = 0;
+    virtual void turnOff() = 0;
+};
+</script></div>
+    </div>
+    <div>
+      <div class="card f"><h3>File header .h chính là "hình ảnh" của interface</h3><p>Chỉ chứa khai báo hàm. Ta quan tâm hàm dùng để làm gì, cần đầu vào gì, trả ra gì — <b>không</b> quan tâm bên trong xử lý thế nào.</p></div>
+      <div class="f" style="margin-top:10px"><script type="text/x-cpp" class="xs" id="hH" data-title="mylib.h">
+int TimLonNhat(int a, int b);
+int TimNhoNhat(int a, int b);
+bool KiemTraNguyenTo(int k);
+bool KiemTraChinhPhuong(int k);
+int UCLN(int a, int b);
+int BCNN(int a, int b);
+int GiaiPTBacHai(float a, float b, float c, float& x1, float& x2);
+void Nhap(PhanSo& p);
+PhanSo Cong(PhanSo p, PhanSo q);
+</script></div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide z1" id="if-vidu" data-title="15 · Mọi bài tập đều là một interface">
+  <div class="hdr in"><span class="qn">15</span><h2>Mọi bài tập đều có dạng: "Tôi cần một thứ có thể…"</h2></div>
+  <div class="cols3" style="gap:12px">
+    <div class="card f"><h3>IPhanSo</h3><p>nhập, xuất, cộng, trừ, so sánh phân số</p><p class="muted" style="font-size:15px;margin-top:4px">class PhanSo cài đặt IPhanSo</p></div>
+    <div class="card f"><h3>IDiem</h3><p>nhập, xuất, khoảng cách 2 điểm, thuộc góc phần tư nào</p></div>
+    <div class="card f"><h3>INgay</h3><p>nhập, xuất, ngày mai, so sánh trước/sau</p><p style="font-size:15px;margin-top:4px">3 số int hay 1 số int (số ngày từ 1/1/1)? <span class="chip r">MẶC KỆ</span></p></div>
+    <div class="card f"><h3>IMangSinhVien</h3><p>nhập, xuất, SV có ĐTB cao nhất, SV có ĐTB dưới 5</p><p style="font-size:15px;margin-top:4px">mảng tĩnh, mảng động hay vector? <span class="chip r">MẶC KỆ</span></p></div>
+    <div class="card f"><h3>IStack</h3><p>push, pop, peek, empty</p><p style="font-size:15px;margin-top:4px">mảng tĩnh hay danh sách liên kết? <span class="chip r">MẶC KỆ</span></p></div>
+    <div class="card f" style="background:linear-gradient(135deg,#fffbeb,#fff)"><h3>Ý nghĩa</h3><p>Người <b>dùng</b> chỉ cần biết interface. Người <b>cài đặt</b> được tự do đổi cách lưu trữ mà không làm hỏng code của người dùng.</p></div>
+  </div>
+  <p class="say">Nhấn → để chạy từng bước.</p>
+</section>
+
+<section class="slide" id="if-code" data-title="16 · Ví dụ C++: IIntArray">
+  <div class="hdr in"><span class="qn">16</span><h2>Ví dụ C++: interface IIntArray, hai cách cài đặt</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr 1fr;gap:14px">
+    <div><script type="text/x-cpp" class="xs" id="iI" data-title="IIntArray (interface)" data-mark="4-6:a;7:c">
+class IIntArray
+{
+public:
+    virtual void Input() = 0;
+    virtual void Output() = 0;
+    virtual int FindMax() = 0;
+    virtual ~IIntArray() {}
+};
+</script>
+      <div class="uml hide0" id="iU" style="margin-top:12px;gap:10px"><div class="umlc"><div class="ucls" style="min-width:110px;font-size:13px"><div>IIntArray</div><i></i></div><div class="conn isa" style="height:40px"></div><div style="display:flex;gap:6px"><div class="ucls" style="min-width:0;font-size:12px" id="iu1"><div>StaticIntArray</div></div><div class="ucls" style="min-width:0;font-size:12px" id="iu2"><div>VectorIntArray</div></div></div></div></div>
+    </div>
+    <div><script type="text/x-cpp" class="xs" id="iS" data-title="StaticIntArray" data-mark="1:a;4-5:b">
+class StaticIntArray : public IIntArray
+{
+private:
+    int a[100];
+    int n;
+public:
+    void Input();
+    void Output();
+    int FindMax();
+};
+</script><div style="margin-top:8px"></div><script type="text/x-cpp" class="xs" id="iV" data-title="VectorIntArray" data-mark="1:a;4:b">
+class VectorIntArray : public IIntArray
+{
+private:
+    vector<int> a;
+public:
+    void Input();
+    void Output();
+    int FindMax();
+};
+</script></div>
+    <div><script type="text/x-cpp" class="xs nonum" id="iM" data-title="main()" data-mark="4:y;5:z;3:a;6-8:b;9:c">
+void main()
+{
+    IIntArray* arr;
+    arr = new StaticIntArray;
+    arr = new VectorIntArray;
+    arr->Input();
+    arr->Output();
+    cout << arr->FindMax();
+    delete arr;
+}
+</script>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+<span class="f ghost" data-now="#iI|show-a" data-say="Interface IIntArray: chỉ có các hàm thuần ảo, không có thuộc tính. (Thêm hàm hủy ảo để delete qua con trỏ interface cho an toàn.)"></span><span class="f ghost" data-now="#iS|show-a;#iS|show-b" data-act="#iU|sh;#iu1|glow" data-say="Cách 1: lưu bằng &lt;b&gt;mảng tĩnh&lt;/b&gt; int a[100] và số phần tử n."></span><span class="f ghost" data-now="#iM|show-a;#iM|show-y;#iM|show-b" data-act="#iU|sh;#iu1|glow" data-say="Người dùng chỉ khai báo con trỏ &lt;b&gt;IIntArray*&lt;/b&gt; và gọi các hàm của interface."></span><span class="f ghost" data-now="#iV|show-a;#iV|show-b" data-act="#iU|sh;#iu2|glow" data-say="Cách 2: lưu bằng &lt;b&gt;vector&amp;lt;int&amp;gt;&lt;/b&gt;."></span><span class="f ghost" data-now="#iM|show-z;#iM|show-b" data-act="#iU|sh;#iu2|glow;#iM|alt" data-say="Muốn đổi cách cài đặt: chỉ sửa &lt;b&gt;đúng một dòng&lt;/b&gt; new … — các dòng dùng arr giữ nguyên."></span><span class="f ghost" data-now="#iM|show-c;#iI|show-c" data-act="#iU|sh;#iu2|glow;#iM|alt" data-say="Hàm hủy ảo trong interface giúp delete arr gọi đúng hàm hủy của VectorIntArray."></span></section>
+
+<section class="slide z1" id="summary" data-title="Tổng kết">
+  <div class="hdr in"><span class="qn">✓</span><h2>Tổng kết</h2></div>
+  <div class="cols3" style="margin-top:10px;gap:12px">
+    <div class="card f"><h3>Con trỏ</h3><p>Giá trị là địa chỉ. Con trỏ lớp cha trỏ được tới lớp con (không ngược lại). new thì phải delete.</p></div>
+    <div class="card f"><h3>Hàm ảo</h3><p><code class="i">virtual</code> ở lớp cha → liên kết động qua vtable: gọi đúng hàm của đối tượng thật.</p></div>
+    <div class="card f"><h3>Đa hình</h3><p>Kế thừa + hàm ảo + con trỏ → code ngắn hơn, dễ mở rộng.</p></div>
+    <div class="card f"><h3>Thuần ảo &amp; trừu tượng</h3><p><code class="i">virtual f() = 0;</code> Lớp có hàm thuần ảo không tạo được đối tượng; lớp con phải cài đặt hết.</p></div>
+    <div class="card f"><h3>Hàm hủy ảo</h3><p>Lớp cha có hàm ảo → hàm hủy cũng phải ảo, nếu không delete qua con trỏ cha sẽ rò rỉ.</p></div>
+    <div class="card f"><h3>Interface</h3><p>Lớp chỉ gồm hàm thuần ảo: bản hợp đồng "tôi cần một thứ có thể…".</p></div>
+  </div>
+</section>
+</div></div>
+
+<div id="bar"></div>
+<div id="hint">← → / Space: từng bước · Shift+→: qua slide · G: đi tới slide bất kỳ · A: hiện hết · F: toàn màn hình</div>
+<div id="nav"><button id="jumpNav" title="Đi tới slide (G)">☰</button><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+<div id="jump"><div id="jbox"><div class="jh"><h3>Đi tới slide</h3><span class="muted" style="font-size:14px">gõ số hoặc tên slide rồi Enter</span><input id="jq" placeholder="vd: 5 hoặc hàm ảo" autocomplete="off"><button id="jx" aria-label="Đóng">×</button></div><div id="jlist"></div></div></div>
+
+<script>
+(function(){
+  // ---------- C++ highlighter ----------
+  const KW=new Set("class struct public private protected virtual const this new delete return if else for while do switch case break continue default friend operator static using namespace include true false nullptr sizeof".split(" "));
+  const PRIM=new Set("bool char double float int long short void unsigned auto".split(" "));
+  const STD=new Set("cout cin endl".split(" "));const LIBT=new Set("string vector".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line){
+    const re=/(\/\/.*$|\/\*.*?\*\/)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(^\s*#\w+.*$)|\b(\d+(?:\.\d+)?[fFL]?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="p">'+m[3]+'</span>';
+      else if(m[4]) out+='<span class="n">'+m[4]+'</span>';
+      else if(m[5]){
+        const w=m[5];let cls="";
+        if(PRIM.has(w)||LIBT.has(w))cls="t";else if(KW.has(w))cls="k";else if(STD.has(w))cls="fn";
+        else if(m[6])cls="fn";
+        else if(/^[A-Z][A-Z0-9_]+$/.test(w))cls="n";
+        else if(/^[A-Z]/.test(w))cls="t";
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[6]?esc(m[6]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-cpp"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");r.split(",").forEach(rr=>{const [a,b]=rr.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);});
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    if(sc.dataset.title){const t=document.createElement("div");t.className="code-title";t.textContent=sc.dataset.title;sc.before(t)}
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+  // ---------- deck engine ----------
+  //   .f = fragment, one per step.  data-act "sel|cls;…" (kept while shown) · data-now "sel|cls;…" (only on latest step)
+  //   data-set "sel::html;…" (content while shown) · data-say narration · data-o order
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")].sort((x,y)=>(+x.dataset.o||0)-(+y.dataset.o||0));
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  const pairs=(v,sep)=>(v||"").split(/;(?=\s*#)/).filter(s=>s.trim()).map(p=>{const k=p.indexOf(sep);return [p.slice(0,k).trim(),p.slice(k+sep.length)]});
+  function tog(v,on){pairs(v,"|").forEach(([sel,cls])=>{document.querySelectorAll(sel).forEach(t=>cls.split(" ").forEach(c=>c&&t.classList.toggle(c,on)))})}
+  document.querySelectorAll("[data-set]").forEach(f=>pairs(f.dataset.set,"::").forEach(([sel])=>{document.querySelectorAll(sel).forEach(t=>{if(t.dataset.orig===undefined)t.dataset.orig=t.innerHTML})}));
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach(f=>{tog(f.dataset.now,false);tog(f.dataset.act,false)});
+      s.querySelectorAll("[data-orig]").forEach(t=>t.innerHTML=t.dataset.orig);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step);f.classList.toggle("on",on);if(on){tog(f.dataset.act,true);pairs(f.dataset.set,"::").forEach(([sel,val])=>document.querySelectorAll(sel).forEach(t=>t.innerHTML=val))}});
+      if(i===cur&&step>0)tog(fs[step-1].dataset.now,true);
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.innerHTML=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length+(fs.length?" · "+step+"/"+fs.length:"");
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    try{history.replaceState(null,"","#"+slides[cur].id)}catch(e){}
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+
+  // ---------- jump-to-slide panel ----------
+  const jump=document.getElementById("jump"),jlist=document.getElementById("jlist"),jq=document.getElementById("jq");
+  const titleOf=s=>s.dataset.title||(s.querySelector("h2,h1")||{}).textContent||s.id;
+  slides.forEach((s,i)=>{
+    const d=document.createElement("div");d.className="ji";d.dataset.i=i;
+    d.innerHTML="<b>"+String(i+1).padStart(2,"0")+"</b><span>"+esc(titleOf(s).replace(/\s+/g," ").trim())+"</span>";
+    d.onclick=()=>{closeJump();go(i)};jlist.appendChild(d);
+    const b=document.createElement("button");b.className="jumpbtn";b.type="button";b.innerHTML="☰ Đi tới slide";b.title="Mở danh sách slide (phím G)";
+    b.onclick=e=>{e.stopPropagation();openJump()};s.appendChild(b);
+  });
+  function filterJump(){
+    const q=jq.value.trim().toLowerCase();let first=null;
+    [...jlist.children].forEach(d=>{const i=+d.dataset.i;const ok=!q||String(i+1)===q||d.textContent.toLowerCase().includes(q);d.style.display=ok?"":"none";d.classList.remove("k");if(ok&&!first)first=d});
+    if(first&&q)first.classList.add("k");return first;
+  }
+  function openJump(){jump.classList.add("on");jq.value="";filterJump();[...jlist.children].forEach(d=>d.classList.toggle("cur",+d.dataset.i===cur));setTimeout(()=>jq.focus(),30)}
+  function closeJump(){jump.classList.remove("on");jq.blur()}
+  jq.addEventListener("input",filterJump);
+  jq.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Escape")closeJump();else if(e.key==="Enter"){const q=jq.value.trim();const n=parseInt(q,10);if(String(n)===q&&n>=1&&n<=slides.length){closeJump();go(n-1)}else{const f=filterJump();if(f){closeJump();go(+f.dataset.i)}}}});
+  jump.addEventListener("click",e=>{if(e.target===jump)closeJump()});
+  document.getElementById("jx").onclick=closeJump;
+  document.getElementById("jumpNav").onclick=openJump;
+
+  addEventListener("keydown",e=>{
+    if(jump.classList.contains("on")){if(e.key==="Escape")closeJump();return}
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="g"||e.key==="G"){e.preventDefault();openJump()}
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null||jump.classList.contains("on"))return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+</script>
+</body>
+</html>
