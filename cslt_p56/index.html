@@ -1,0 +1,1065 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ma trận: phần tử bằng tổng hàng cột</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:16px;padding-right:150px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+.lvl{font-size:14px;font-weight:700;color:var(--muted);white-space:nowrap;margin-left:auto}
+.lvl b{color:#f59e0b;letter-spacing:2px}.lvl s{color:#d9d6e8;text-decoration:none;letter-spacing:2px}
+h1{font-size:66px;line-height:1.1;font-weight:800}
+h2{font-size:30px;line-height:1.2;font-weight:800}
+h3{font-size:21px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:20px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:24px;margin:5px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:9px;height:9px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.86em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 5px;border-radius:6px;color:#be185d;white-space:nowrap}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+.cols>*{min-width:0}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.card p,.card li{font-size:17px}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.note{margin-top:10px;padding:8px 14px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:17px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.note.red{border-color:#e11d48;background:linear-gradient(90deg,#fff1f3,#fffafa)}
+.code{font-family:var(--mono);font-size:15px;line-height:1.45;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:8px 0;overflow:hidden;position:relative}
+.code.sm{font-size:14px;line-height:1.42}.code.xs{font-size:13px;line-height:1.4}.code.xxs{font-size:12px;line-height:1.36;padding:6px 0}
+.code.x4{font-size:11.4px;line-height:1.33;padding:6px 0}
+.code .ln{padding:0 12px 0 6px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:22px;flex:none;text-align:right;margin-right:10px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.13);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.15);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.18);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.14);box-shadow:inset 5px 0 #ec4899}
+.code.show-e .mark-e{background:rgba(16,185,129,.15);box-shadow:inset 5px 0 #10b981}
+.code.show-f .mark-f{background:rgba(124,58,237,.13);box-shadow:inset 5px 0 #7c3aed}
+.code.show-g .mark-g{background:rgba(6,182,212,.15);box-shadow:inset 5px 0 #06b6d4}
+.code.show-h .mark-h{background:rgba(245,158,11,.18);box-shadow:inset 5px 0 #f59e0b}
+.code.show-i .mark-i{background:rgba(236,72,153,.14);box-shadow:inset 5px 0 #ec4899}
+.code.show-j .mark-j{background:rgba(16,185,129,.15);box-shadow:inset 5px 0 #10b981}
+.hide0{opacity:0;transform:translateY(8px) scale(.96);transition:all .45s}
+.hide0.sh{opacity:1;transform:none}
+.win.pre.sh:not(.vis){opacity:.35;filter:grayscale(1)}
+.gone.sh{display:none}
+.stage{position:relative;display:flex;align-items:center;justify-content:center}
+.chip{display:inline-block;font-family:var(--mono);font-size:12.5px;font-weight:700;padding:2px 9px;border-radius:999px;background:#fef3c7;color:#b45309;border:1px solid #fcd34d}
+.chip.v{background:#ede9fe;color:#6d28d9;border-color:#c4b5fd}.chip.g{background:#d1fae5;color:#047857;border-color:#6ee7b7}.chip.r{background:#ffe4e6;color:#be123c;border-color:#fda4af}
+.hlo{outline:3px solid #f59e0b;outline-offset:3px;border-radius:6px}
+.jb.dis.en{color:#111;border-color:#9aa1b3;background:linear-gradient(180deg,#fff,#e6e8ee)}.jb.dis.en .ico{filter:none;opacity:1}
+.jb.dis.en.dis2{color:#a0a4ad;border-color:#ccd0d8;background:#f1f2f5}
+.rad.on.off::before,.chk.on.off::before{background:#fff;content:""}
+.code-title{font-family:var(--mono);font-size:13px;color:var(--muted);margin:0 0 4px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:16px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:6px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.3}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+table.t1 td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.console{font-family:var(--mono);font-size:13.5px;line-height:1.45;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:8px 14px;color:#e6f0ff;white-space:pre;min-height:40px;overflow:hidden}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:10px;letter-spacing:3px;margin-bottom:3px}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.flow{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap}
+.box{border-radius:12px;padding:8px 12px;text-align:center;font-family:var(--mono);font-size:15px;border:2px solid var(--line);background:#fff;min-width:110px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:12.5px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.a{border-color:#7c3aed}.box.b{border-color:#0891b2}.box.c{border-color:#ec4899;background:#fdf2f8}.box.d{border-color:#f59e0b;background:#fffbeb}.box.e{border-color:#10b981;background:#ecfdf5}
+.ar{color:var(--muted);font-size:22px;text-align:center}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.say{font-size:17px;margin-top:10px;min-height:50px;color:var(--muted);line-height:1.42}
+.say b{color:var(--text)}
+.vars{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.vc{font-family:var(--mono);font-size:15px;font-weight:700;padding:4px 12px;border-radius:10px;background:#fff;border:2px solid #e4dcfb;transition:all .35s}
+.vc b{color:var(--t)}
+.vc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.45)}
+.vc.res{border-color:#10b981;background:#ecfdf5;color:#047857}
+.arr{display:flex;gap:8px;justify-content:center}
+.cell{width:52px;height:56px;border-radius:12px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .45s}
+.cell small{font-size:11px;color:var(--muted);font-weight:600}
+.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-6px)}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c}
+.cell.dim{opacity:.35}
+.cell.wide{width:auto;padding:0 10px;font-size:14px}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.15)}100%{transform:none;opacity:1}}
+.pop{animation:pop .45s}
+
+/* ===== agenda ===== */
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 10px}
+.sec{grid-column:1/-1;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.08em;margin-top:4px;text-transform:uppercase}
+.ag{background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 10px;cursor:pointer;transition:all .2s;font-size:15.5px;line-height:1.25;box-shadow:0 2px 6px rgba(40,50,110,.05);font-family:var(--mono);font-weight:600}
+.ag:hover{border-color:#ec4899;transform:translateY(-2px);box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag b{color:#db2777;margin-right:6px}
+.ag.g1{border-left:5px solid #7c3aed}.ag.g2{border-left:5px solid #0891b2}.ag.g3{border-left:5px solid #ec4899}.ag.g4{border-left:5px solid #f59e0b}
+.ag.g5{border-left:5px solid #10b981}.ag.g6{border-left:5px solid #6366f1}.ag.g7{border-left:5px solid #f97316}.ag.g8{border-left:5px solid #0ea5e9}
+
+/* ===== mock Swing windows ===== */
+.win{border:1px solid #cfc8e6;border-radius:10px;background:#eef0f4;box-shadow:0 18px 40px -18px rgba(30,27,58,.45);font-family:"Segoe UI",system-ui,sans-serif;font-size:14px;color:#222;transition:all .5s;overflow:hidden;position:relative}
+.wt{height:28px;background:linear-gradient(180deg,#f7f7fa,#e2e4ea);border-bottom:1px solid #cfd2da;display:flex;align-items:center;gap:6px;padding:0 10px;font-weight:600;font-size:13px;color:#333}
+.wt i{width:11px;height:11px;border-radius:50%;background:#ff5f57;display:inline-block}.wt i:nth-child(2){background:#febc2e}.wt i:nth-child(3){background:#28c840}
+.wt span{margin-left:8px}
+.wb{padding:12px;position:relative}
+.win.ghost{opacity:.25;filter:grayscale(1)}
+.win.undec .wt{display:none}
+.jb{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid #9aa1b3;border-radius:5px;background:linear-gradient(180deg,#fff,#e6e8ee);font-size:13.5px;color:#111;transition:all .3s;white-space:nowrap;cursor:default}
+.jb.dis{color:#a0a4ad;border-color:#ccd0d8;background:#f1f2f5}
+.jb.dis .ico{filter:grayscale(1);opacity:.5}
+.jb.press{background:linear-gradient(180deg,#cfd8ea,#b9c6e2);border-color:#5b74b5;transform:scale(.96)}
+.jb.def{box-shadow:0 0 0 2px #7aa2f7}
+.jb.vert{flex-direction:column}
+.jb u{text-decoration:underline}
+.ico{display:inline-block;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#a7f3d0,#059669);flex:none}
+.ico.l{border-radius:4px;background:linear-gradient(135deg,#60a5fa,#2563eb);clip-path:polygon(100% 0,0 50%,100% 100%)}
+.ico.r{border-radius:4px;background:linear-gradient(135deg,#f472b6,#db2777);clip-path:polygon(0 0,100% 50%,0 100%)}
+.splat{display:inline-block;width:34px;height:30px;background:radial-gradient(circle at 50% 50%,#f59e0b 0 30%,transparent 31%),radial-gradient(circle at 25% 30%,#ec4899 0 18%,transparent 19%),radial-gradient(circle at 75% 35%,#7c3aed 0 18%,transparent 19%),radial-gradient(circle at 40% 78%,#0891b2 0 17%,transparent 18%),radial-gradient(circle at 78% 75%,#10b981 0 15%,transparent 16%)}
+.chk,.rad{display:block;padding:3px 0;font-size:14px;transition:all .3s;white-space:nowrap}
+.chk::before,.rad::before{display:inline-block;vertical-align:-2px;margin-right:7px}
+.chk::before{content:"";width:14px;height:14px;border:1px solid #7b8394;border-radius:3px;background:#fff;flex:none;font-size:12px;line-height:14px;text-align:center;font-weight:900;color:#1d4ed8}
+.chk.on::before{content:"✓";background:#dbe7ff}
+.rad::before{content:"";width:14px;height:14px;border:1px solid #7b8394;border-radius:50%;background:#fff;flex:none;box-sizing:border-box}
+.rad.on::before{background:radial-gradient(circle,#1d4ed8 0 35%,#fff 40%)}
+.chk.hl,.rad.hl{background:#fff3c4;border-radius:4px}
+.tf{display:inline-block;min-width:120px;min-height:26px;border:1px solid #8c93a3;background:#fff;padding:3px 7px;font-family:var(--mono);font-size:13.5px;border-radius:3px;transition:all .3s;white-space:pre;vertical-align:middle}
+.tf.err{background:#ffd1dc}
+.tf.ro{background:#f3f4f6}
+.tf .cur{display:inline-block;width:1px;height:15px;background:#111;vertical-align:middle;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.ta{border:1px solid #8c93a3;background:#fff;padding:6px 8px;font-family:var(--mono);font-size:12.5px;line-height:1.5;border-radius:3px;white-space:pre-wrap;overflow:hidden}
+/* text area that stays scrolled to bottom */
+.ta.bottom{display:flex;flex-direction:column;justify-content:flex-end}
+mark{background:#d1d5db;color:inherit;border-radius:2px;padding:0 1px}
+mark.sel{background:#bfdbfe}
+.combo{display:inline-flex;align-items:center;justify-content:space-between;min-width:170px;border:1px solid #8c93a3;border-radius:4px;background:linear-gradient(180deg,#fff,#eceef3);padding:4px 8px;font-size:14px;gap:10px;position:relative}
+.combo::after{content:"▾";color:#555}
+.combo.ed{background:#fff}
+.dd{position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid #8c93a3;box-shadow:0 8px 18px -8px rgba(0,0,0,.35);z-index:3;display:none;text-align:left}
+.dd div{padding:3px 8px;font-size:13.5px}
+.dd div.s{background:#3b6fd8;color:#fff}
+.open .dd{display:block}
+.lst{border:1px solid #8c93a3;background:#fff;font-size:14px;min-height:90px}
+.lst div{padding:3px 8px;transition:all .3s}
+.lst div.s{background:#3b6fd8;color:#fff}
+.lst div.nw{animation:pop .5s}
+.jt{border-collapse:collapse;width:100%;font-size:13px;border:1px solid #9aa1b3;border-radius:0;background:#fff;font-family:"Segoe UI",system-ui,sans-serif}
+.jt th{background:linear-gradient(180deg,#fafafa,#e3e5ea);border:1px solid #b9bec9;padding:3px 6px;font-weight:600;font-size:12.5px;white-space:nowrap;text-align:left}
+.jt td{border:1px solid #e1e3e8;padding:3px 6px;color:#111;font-weight:400;white-space:nowrap;vertical-align:middle}
+.jt td.num{text-align:right}
+.jt td.ck{text-align:center}
+.jt tr.s td{background:#3b6fd8;color:#fff}
+.jt td.s{background:#3b6fd8;color:#fff}
+.jt td.edit{outline:2px solid #f59e0b;background:#fffbeb}
+.jt th.sorted::after{content:" ▲";color:#3b6fd8}
+.jt th.sorted.desc::after{content:" ▼"}
+.jt tr.hide{display:none}
+.jt .cb{display:inline-block;width:13px;height:13px;border:1px solid #7b8394;border-radius:2px;background:#fff;vertical-align:middle;font-size:11px;line-height:12px;text-align:center;font-weight:900;color:#1d4ed8}
+.jt .cb.on::before{content:"✓"}
+.pb{height:20px;border:1px solid #8c93a3;border-radius:4px;background:#e5e7eb;position:relative;overflow:hidden;min-width:180px}
+.pb .fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(180deg,#7aa2f7,#3b6fd8);transition:width .6s}
+.pb .txt{position:absolute;inset:0;text-align:center;font-size:12px;line-height:18px;font-weight:600;color:#111}
+.pb.ind .fill{width:30%!important;animation:ind 1.2s linear infinite alternate}
+.pb.ind .txt{opacity:0}
+@keyframes ind{from{left:0}to{left:70%}}
+.mbar{display:flex;gap:2px;background:linear-gradient(180deg,#fbfbfc,#e9ebf0);border-bottom:1px solid #cfd2da;padding:2px 6px;font-size:13.5px;position:relative}
+.mbar>span{padding:2px 8px;border-radius:3px}
+.mbar>span.s{background:#3b6fd8;color:#fff}
+.menu{position:absolute;top:26px;left:6px;background:#fff;border:1px solid #9aa1b3;box-shadow:0 10px 24px -8px rgba(0,0,0,.4);min-width:250px;z-index:4;display:none;font-size:13px}
+.menu.open{display:block;animation:pop .3s}
+.mi{display:flex;align-items:center;gap:6px;padding:3px 10px;white-space:nowrap}
+.mi .acc{margin-left:auto;color:#666;font-size:12px;padding-left:16px}
+.mi.s{background:#3b6fd8;color:#fff}.mi.s .acc{color:#e0e7ff}
+.msep{height:1px;background:#d9dce3;margin:3px 0}
+.mi .mk{width:14px;text-align:center;font-weight:900;flex:none}
+.dlgwrap{position:absolute;inset:0;background:rgba(30,27,58,.18);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;z-index:6}
+.dlgwrap.on{opacity:1}
+.dlgwrap.on .win{animation:pop .4s}
+.dlgwrap.nomodal{background:none}
+.dlgico{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:20px;flex:none;background:#3b82f6}
+.dlgico.q{background:#10b981}.dlgico.e{background:#e11d48}.dlgico.w{background:#f59e0b;border-radius:6px}
+.tabs{display:flex;gap:2px;border-bottom:1px solid #9aa1b3;margin-bottom:8px}
+.tabs span{padding:3px 10px;border:1px solid #b9bec9;border-bottom:none;border-radius:5px 5px 0 0;background:#e6e8ee;font-size:12.5px}
+.tabs span.s{background:#fff;font-weight:600}
+.tip{position:absolute;background:#ffffe1;border:1px solid #777;font-size:12px;padding:2px 6px;box-shadow:2px 2px 4px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;white-space:nowrap;z-index:5}
+.tip.on{opacity:1}
+.pic{display:flex;align-items:center;justify-content:center;font-size:64px;min-height:110px;transition:all .4s}
+.thumb{width:34px;height:34px;border-radius:5px;border:1px solid #888;display:inline-block;transition:all .4s}
+.lane{display:grid;grid-template-columns:110px 1fr;gap:6px;align-items:center;font-size:13px}
+.lane .ln2{height:30px;border-radius:8px;background:#f8fafc;border:1px dashed #cbd5e1;display:flex;align-items:center;gap:6px;padding:0 8px;overflow:hidden}
+.ev{font-family:var(--mono);font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:6px;background:#ede9fe;color:#6d28d9;white-space:nowrap}
+.ev.b{background:#cffafe;color:#0e7490}.ev.c{background:#fce7f3;color:#be185d}.ev.d{background:#fef3c7;color:#b45309}
+.kv{font-family:var(--mono);font-size:13px}
+.swatch{display:inline-block;width:100%;height:100%;border-radius:4px}
+
+/* ===== nav / jump ===== */
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;min-width:36px;height:32px;cursor:pointer;font-size:16px;padding:0 8px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+.jumpbtn{position:absolute;top:26px;right:30px;z-index:7;font-family:"Be Vietnam Pro",sans-serif;font-size:14px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));border:none;border-radius:999px;padding:7px 14px;cursor:pointer;box-shadow:0 6px 16px -6px var(--sa1);transition:transform .2s}
+.jumpbtn:hover{transform:translateY(-2px) scale(1.04)}
+#jump{position:fixed;inset:0;z-index:20;background:rgba(30,27,58,.45);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
+#jump.on{display:flex}
+#jbox{width:min(1100px,94vw);max-height:88vh;overflow:auto;background:#fff;border-radius:18px;padding:20px 24px;box-shadow:0 30px 70px -20px rgba(30,27,58,.6);animation:pop .3s}
+#jbox .jh{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+#jbox .jh h3{font-size:22px;color:#7c3aed;margin:0}
+#jbox .jh input{margin-left:auto;font-family:var(--mono);font-size:15px;padding:6px 10px;border:2px solid var(--line);border-radius:10px;width:260px;outline:none}
+#jbox .jh input:focus{border-color:#a78bfa}
+#jbox .jh button{border:none;background:#f1eaff;color:#6d28d9;font-weight:800;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:18px}
+#jlist{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+#jlist .ji{display:flex;gap:8px;align-items:center;padding:7px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:14.5px;transition:all .15s;background:#fff}
+#jlist .ji:hover,#jlist .ji.k{border-color:#ec4899;background:#fdf2f8}
+#jlist .ji.cur{background:#f3edff;border-color:#a78bfa}
+#jlist .ji b{font-family:var(--mono);color:#db2777;min-width:26px}
+#jlist .ji span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:700px){#hint{display:none}#jlist{grid-template-columns:1fr}}
+@media print{#nav,#bar,#hint,.jumpbtn{display:none}}
+
+/* ===== matrix visuals (C++ deck) ===== */
+.mx{display:inline-grid;gap:6px;align-items:center;justify-items:center}
+.mx .cell{width:64px;height:56px;font-size:24px;border-radius:12px}
+.mx .hd{font-family:var(--mono);font-size:13px;color:var(--muted);font-weight:700;white-space:nowrap}
+.mx.sm .cell{width:46px;height:42px;font-size:18px;border-width:2px;border-radius:9px}
+.mx.sm{gap:4px}
+.cell.sum{border-style:dashed;background:#faf7ff;color:#6d28d9;font-size:18px}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cell.no:not(.rw):not(.cw):not(.foc){opacity:.42}
+.cell.emp{background:#fafafa;border-color:#eee;color:#bbb}
+.cell.used{background:#f3edff;border-color:#c4b5fd;color:#6d28d9}
+.cell.rw{background:#ede9fe;border-color:#8b5cf6;color:#5b21b6}
+.cell.cw{background:#cffafe;border-color:#06b6d4;color:#0e7490}
+.cell.foc{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-5px) scale(1.07);box-shadow:0 8px 18px -6px rgba(245,158,11,.65)}
+.cell.ok.foc{border-color:#10b981;background:#d1fae5;color:#047857;box-shadow:0 8px 18px -6px rgba(16,185,129,.65)}
+.calc{font-family:var(--mono);font-size:18px;background:#fff;border:2px solid var(--line);border-radius:12px;padding:9px 14px;min-height:50px;line-height:1.55}
+.calc .y{color:#047857;font-weight:800}.calc .x{color:#be123c;font-weight:800}
+.calc .r{color:#6d28d9;font-weight:700}.calc .c2{color:#0e7490;font-weight:700}
+.fx{font-family:var(--mono);font-size:22px;font-weight:700;background:#fff;border:2px solid var(--line);border-radius:12px;padding:8px 16px;margin:7px 0}
+.fx .r{color:#6d28d9}.fx .c2{color:#0891b2}.fx .a{color:#d97706}
+.snip{font-family:var(--mono);font-size:13px;line-height:1.4;white-space:pre;border-radius:8px;padding:5px 8px;margin-top:6px;overflow:hidden}
+.snip.bad{background:#fff1f3;border:1px solid #fda4af;color:#9f1239}
+.snip.good{background:#ecfdf5;border:1px solid #6ee7b7;color:#065f46}
+.snip::before{display:block;font-family:"Be Vietnam Pro";font-size:11px;font-weight:800;letter-spacing:.05em;margin-bottom:1px}
+.snip.bad::before{content:"✗ SAI"}.snip.good::before{content:"✓ ĐÚNG"}
+.barw{display:grid;grid-template-columns:120px 1fr 120px;gap:8px;align-items:center;font-size:15px;margin:6px 0}
+.barw .bt{height:26px;border-radius:8px;background:#f1f0f7;overflow:hidden}
+.barw .bf{height:100%;width:0;border-radius:8px;transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+.barw .bf.on1{width:100%}.barw .bf.on2{width:1.5%}
+.barw b{font-family:var(--mono)}
+.file{border-radius:12px;padding:8px 12px;border:2px solid var(--line);background:#fff;font-size:15px;line-height:1.35}
+.file .fn2{font-family:var(--mono);font-weight:800;font-size:17px}
+.strip{display:flex;gap:2px;flex-wrap:nowrap}
+.strip span{width:30px;height:30px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;border:2px solid transparent;transition:all .35s}
+.strip .r0{background:#ede9fe}.strip .r1{background:#cffafe}.strip .r2{background:#fce7f3}
+.strip span.foc{border-color:#f59e0b;background:#fffbeb;transform:translateY(-4px)}
+.code.f16{font-size:16px;line-height:1.5}.code.f15{font-size:15px;line-height:1.48}.code.f145{font-size:14.5px;line-height:1.45}.code.f14{font-size:14px;line-height:1.45}.code.f13{font-size:13px;line-height:1.4}
+.ag{font-size:17px!important;padding:8px 12px!important}
+.vrow{display:flex;align-items:center;gap:6px;margin:4px 0}
+.vrow .lab{font-family:var(--mono);font-size:13px;color:var(--muted);width:64px;text-align:right}
+.vrow .cell{width:42px;height:36px;font-size:16px}
+
+</style>
+</head>
+<body>
+
+<div id="viewport"><div id="deck">
+
+<!-- ===== title ===== -->
+<section class="slide" id="title" data-title="Trang bìa">
+
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// C++ · Mảng 2 chiều · Practice 5.6</div>
+    <h1 class="in" style="font-size:58px">Ma trận M × N: tìm phần tử bằng<br><span class="grad">tổng các phần tử còn lại trên hàng &amp; cột</span></h1>
+    <p class="in muted" style="font-size:24px;margin-top:20px;max-width:1000px">Hướng dẫn từng bước cho sinh viên năm 1: phân tích đề → ý tưởng → giải thuật → chạy tay → code C++ với <code class="i">int a[100][100]</code>, chia hàm và <b>nhiều file</b> → lỗi hay gặp → làm lại bằng <code class="i">vector</code>.</p>
+    <p class="in" style="margin-top:34px;font-size:18px;color:#8a91b4">← → hoặc Space: chạy từng bước · Shift+→: qua slide · <b>G</b> hoặc nút <b>☰ Đi tới slide</b>: nhảy tới slide bất kỳ · A: hiện hết · F: toàn màn hình</p>
+  </div>
+</section>
+
+<!-- ===== agenda ===== -->
+<section class="slide" id="agenda" data-title="Nội dung">
+<div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:17px">· bấm vào mục để đi tới</span></div><div class="agenda in"><div class="sec">1 · Hiểu bài toán</div><div class="ag g1" data-goto="debai"><b>01</b>Đề bài &amp; phân tích</div><div class="ag g1" data-goto="hieude"><b>02</b>Hiểu đề qua hình</div><div class="ag g1" data-goto="vidu"><b>03</b>Ví dụ Input/Output</div><div class="ag g1" data-goto="mang"><b>04</b>Mảng 2 chiều cơ bản</div><div class="sec">2 · Ý tưởng, giải thuật &amp; chạy tay</div><div class="ag g2" data-goto="ytuong"><b>05</b>Hai ý tưởng</div><div class="ag g2" data-goto="congthuc"><b>06</b>Biến đổi công thức</div><div class="ag g2" data-goto="giaithuat"><b>07</b>Giải thuật</div><div class="ag g2" data-goto="chaytong"><b>08</b>Chạy tay: R[], C[]</div><div class="ag g2" data-goto="chaykt"><b>09</b>Chạy tay: kiểm tra</div><div class="ag g2" data-goto="casekhac"><b>10</b>Các case đặc biệt</div><div></div><div></div><div class="sec">3 · Code C++ nhiều file</div><div class="ag g3" data-goto="project"><b>11</b>Tổ chức project</div><div class="ag g3" data-goto="fileh"><b>12</b>matrix.h</div><div class="ag g3" data-goto="cpp1"><b>13</b>Nhập &amp; in</div><div class="ag g3" data-goto="cpp2"><b>14</b>Tính tổng &amp; kiểm tra</div><div class="ag g3" data-goto="cpp3"><b>15</b>printSpecial</div><div class="ag g3" data-goto="mainf"><b>16</b>main.cpp &amp; chạy thử</div><div></div><div></div><div class="sec">4 · Lỗi hay gặp &nbsp;·&nbsp; 5 · Dùng vector</div><div class="ag g4" data-goto="loi1"><b>17</b>Lỗi logic</div><div class="ag g4" data-goto="loi2"><b>18</b>Lỗi C++ / project</div><div class="ag g4" data-goto="vec"><b>19</b>Giải bằng vector</div><div class="ag g4" data-goto="sosanh"><b>20</b>Mảng tĩnh vs vector</div><div class="ag g5" data-goto="summary"><b>✓</b>Tổng kết</div></div>
+</section>
+
+<!-- ===== debai ===== -->
+<section class="slide" id="debai" data-title="01 · Đề bài &amp; phân tích">
+<div class="hdr in"><span class="qn">01</span><h2>Đề bài &amp; phân tích đề</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr">
+    <div>
+      <div class="card in" style="border-top:5px solid #7c3aed">
+        <h3>Practice 5.6 (nguyên văn)</h3>
+        <p style="font-family:var(--mono);font-size:15.5px;line-height:1.5">Write C/C++ program to manipulate matrix<br>(organize in functions and multiple-file project):<br>- Enter a matrix M x N of integers.<br>- Print to screen all elements satisfying its value equals to sum of the remaining elements on its row and column.</p>
+      </div>
+      <div class="card in" style="margin-top:12px;border-top:5px solid #0891b2">
+        <h3 style="color:#0891b2">Dịch sang tiếng Việt</h3>
+        <p style="font-size:16.5px">Viết chương trình xử lý ma trận (chia thành <b>các hàm</b> và <b>project nhiều file</b>):<br>• Nhập ma trận số nguyên M dòng × N cột.<br>• In ra mọi phần tử có giá trị <b>bằng tổng các phần tử còn lại</b> trên <b>dòng</b> và <b>cột</b> chứa nó.</p>
+      </div>
+    </div>
+    <div>
+      <table class="t1" style="font-size:17px">
+        <tr><th style="width:120px">Mục</th><th>Phân tích</th></tr>
+        <tr class="f"><td>Input</td><td>2 số nguyên <b>M</b> (số dòng), <b>N</b> (số cột); sau đó M×N số nguyên.</td></tr>
+        <tr class="f"><td>Output</td><td>Các phần tử thỏa điều kiện (kèm vị trí dòng, cột). Nếu không có: in thông báo.</td></tr>
+        <tr class="f"><td>Ràng buộc</td><td>Dùng <code class="i">int a[100][100]</code> ⇒ 1 ≤ M, N ≤ 100. Phần tử có thể âm, bằng 0.</td></tr>
+        <tr class="f"><td>Từ khóa</td><td><b>"remaining"</b> = <i>còn lại</i> ⇒ <b>không tính chính nó</b>. Phần tử a[i][j] nằm ở cả dòng i và cột j ⇒ bỏ nó ra ở <b>cả hai</b>.</td></tr>
+        <tr class="f"><td>Tổ chức</td><td>Chia hàm: nhập, in, tính tổng, kiểm tra, in kết quả. Nhiều file: <code class="i">matrix.h</code>, <code class="i">matrix.cpp</code>, <code class="i">main.cpp</code>.</td></tr>
+      </table>
+      <div class="note blue f">Câu hỏi cần tự trả lời trước khi code: <b>“tổng các phần tử còn lại”</b> của ô a[i][j] được tính như thế nào? → slide sau.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== hieude ===== -->
+<section class="slide" id="hieude" data-title="02 · Hiểu đề qua hình">
+<div class="hdr in"><span class="qn">02</span><h2>Hiểu đề: “tổng các phần tử còn lại” là gì?</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;align-items:center">
+    <div class="stage" style="flex-direction:column;gap:14px">
+      <div class="mx " id="g0" style="grid-template-columns:auto repeat(4,auto)"><span class="hd"></span><span class="hd">j=0</span><span class="hd">j=1</span><span class="hd">j=2</span><span class="hd">j=3</span><span class="hd">i=0</span><div class="cell" id="g0_0_0">1</div><div class="cell" id="g0_0_1">2</div><div class="cell" id="g0_0_2">4</div><div class="cell" id="g0_0_3">9</div><span class="hd">i=1</span><div class="cell" id="g0_1_0">8</div><div class="cell" id="g0_1_1">1</div><div class="cell" id="g0_1_2">1</div><div class="cell" id="g0_1_3">1</div><span class="hd">i=2</span><div class="cell" id="g0_2_0">4</div><div class="cell" id="g0_2_1">5</div><div class="cell" id="g0_2_2">5</div><div class="cell" id="g0_2_3">1</div></div>
+      <div style="display:flex;gap:10px;font-size:15px"><span class="chip v">tím = còn lại trên dòng</span><span class="chip" style="background:#cffafe;color:#0e7490;border-color:#67e8f9">xanh = còn lại trên cột</span><span class="chip g">xanh lá = thỏa</span></div>
+    </div>
+    <div>
+      <div class="calc" id="hcalc">Ma trận ví dụ 3 × 4 (M = 3, N = 4)</div>
+      <span class="f ghost" data-now="#g0_0_3|foc" data-set="#hcalc::Xét ô &lt;b&gt;a[0][3] = 9&lt;/b&gt; (dòng 0, cột 3)" data-say="Chọn một ô để thử: &lt;b&gt;a[0][3] = 9&lt;/b&gt;. Ta cần tìm “các phần tử còn lại” trên dòng và cột của nó."></span><span class="f ghost" data-now="#g0_0_3|foc;#g0_0_0|rw;#g0_0_1|rw;#g0_0_2|rw" data-set="#hcalc::Còn lại trên &lt;span class=&#x27;r&#x27;&gt;dòng 0&lt;/span&gt;: &lt;span class=&#x27;r&#x27;&gt;1 + 2 + 4 = 7&lt;/span&gt;" data-say="Trên &lt;b&gt;dòng 0&lt;/b&gt;, bỏ chính nó ra, còn lại 3 ô: 1, 2, 4. Tổng = &lt;b&gt;7&lt;/b&gt;."></span><span class="f ghost" data-now="#g0_0_3|foc;#g0_0_0|rw;#g0_0_1|rw;#g0_0_2|rw;#g0_1_3|cw;#g0_2_3|cw" data-set="#hcalc::Còn lại trên &lt;span class=&#x27;r&#x27;&gt;dòng 0&lt;/span&gt;: &lt;span class=&#x27;r&#x27;&gt;7&lt;/span&gt;&lt;br&gt;Còn lại trên &lt;span class=&#x27;c2&#x27;&gt;cột 3&lt;/span&gt;: &lt;span class=&#x27;c2&#x27;&gt;1 + 1 = 2&lt;/span&gt;" data-say="Trên &lt;b&gt;cột 3&lt;/b&gt;, bỏ chính nó ra, còn lại 2 ô: 1, 1. Tổng = &lt;b&gt;2&lt;/b&gt;."></span><span class="f ghost" data-now="#g0_0_3|foc;#g0_0_0|rw;#g0_0_1|rw;#g0_0_2|rw;#g0_1_3|cw;#g0_2_3|cw" data-act="#g0_0_3|ok" data-set="#hcalc::Tổng còn lại = &lt;span class=&#x27;r&#x27;&gt;7&lt;/span&gt; + &lt;span class=&#x27;c2&#x27;&gt;2&lt;/span&gt; = 9&lt;br&gt;a[0][3] = 9 &lt;span class=&#x27;y&#x27;&gt;= 9 ✓ THỎA&lt;/span&gt;" data-say="Tổng các phần tử còn lại = 7 + 2 = &lt;b&gt;9&lt;/b&gt;, đúng bằng a[0][3]. Vậy &lt;b&gt;9&lt;/b&gt; là một phần tử cần in."></span><span class="f ghost" data-now="#g0_1_1|foc;#g0_1_0|rw;#g0_1_2|rw;#g0_1_3|rw;#g0_0_1|cw;#g0_2_1|cw" data-set="#hcalc::a[1][1] = 1 · &lt;span class=&#x27;r&#x27;&gt;8+1+1 = 10&lt;/span&gt; + &lt;span class=&#x27;c2&#x27;&gt;2+5 = 7&lt;/span&gt; = 17&lt;br&gt;1 &lt;span class=&#x27;x&#x27;&gt;≠ 17 ✗ KHÔNG THỎA&lt;/span&gt;" data-say="Thử ô khác: &lt;b&gt;a[1][1] = 1&lt;/b&gt;. Còn lại trên dòng 1: 8+1+1 = 10; trên cột 1: 2+5 = 7. Tổng 17 ≠ 1 ⇒ không in."></span><span class="f ghost" data-now="#g0_1_0|foc;#g0_1_1|rw;#g0_1_2|rw;#g0_1_3|rw;#g0_0_0|cw;#g0_2_0|cw" data-act="#g0_1_0|ok" data-set="#hcalc::a[1][0] = 8 · &lt;span class=&#x27;r&#x27;&gt;1+1+1 = 3&lt;/span&gt; + &lt;span class=&#x27;c2&#x27;&gt;1+4 = 5&lt;/span&gt; = 8&lt;br&gt;8 &lt;span class=&#x27;y&#x27;&gt;= 8 ✓ THỎA&lt;/span&gt;" data-say="Ô &lt;b&gt;a[1][0] = 8&lt;/b&gt;: dòng còn 1+1+1 = 3, cột còn 1+4 = 5, tổng = 8 ⇒ &lt;b&gt;thỏa&lt;/b&gt;. Ma trận này có đúng 2 phần tử thỏa: 9 và 8."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+      <div class="note f">Hình “chữ thập”: dòng i và cột j giao nhau tại chính ô a[i][j]. Ô giữa <b>không</b> được cộng vào, ở cả dòng lẫn cột.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== vidu ===== -->
+<section class="slide" id="vidu" data-title="03 · Ví dụ Input / Output">
+<div class="hdr in"><span class="qn">03</span><h2>Ví dụ Input / Output</h2></div>
+  <table style="font-size:17px">
+    <tr><th style="width:44px">#</th><th style="width:220px">Input</th><th style="width:200px">Output</th><th>Giải thích</th></tr>
+    <tr class="f"><td>1</td><td><pre style="font-family:var(--mono);font-size:16px">3 4
+1 2 4 9
+8 1 1 1
+4 5 5 1</pre></td><td><pre style="font-family:var(--mono);font-size:16px">a[0][3] = 9
+a[1][0] = 8</pre></td><td>9 = (1+2+4) + (1+1) = 7 + 2.<br>8 = (1+1+1) + (1+4) = 3 + 5. Các ô khác đều không thỏa.</td></tr>
+    <tr class="f"><td>2</td><td><pre style="font-family:var(--mono);font-size:16px">2 2
+2 1
+1 0</pre></td><td><pre style="font-family:var(--mono);font-size:16px">a[0][0] = 2</pre></td><td>2 = 1 (dòng) + 1 (cột). Ô 0 ở góc dưới: còn lại 1 + 1 = 2 ≠ 0.</td></tr>
+    <tr class="f"><td>3</td><td><pre style="font-family:var(--mono);font-size:16px">3 3
+1 2 3
+4 5 6
+7 8 9</pre></td><td><pre style="font-family:var(--mono);font-size:16px">Khong co phan tu
+nao thoa man.</pre></td><td>Ví dụ ô 5: (4+6) + (2+8) = 20 ≠ 5. Phải in thông báo, <b>không</b> được im lặng.</td></tr>
+    <tr class="f"><td>4</td><td><pre style="font-family:var(--mono);font-size:16px">2 3
+0 0 0
+0 0 0</pre></td><td><pre style="font-family:var(--mono);font-size:16px">(in cả 6 ô)</pre></td><td>Mọi ô: 0 = 0 + 0 ⇒ tất cả đều thỏa. Chương trình phải in được <b>nhiều</b> kết quả.</td></tr>
+    <tr class="f"><td>5</td><td><pre style="font-family:var(--mono);font-size:16px">1 1
+5</pre></td><td><pre style="font-family:var(--mono);font-size:16px">Khong co phan tu
+nao thoa man.</pre></td><td>Ma trận 1×1: không có “phần tử còn lại” ⇒ tổng = 0. Chỉ thỏa khi phần tử = 0.</td></tr>
+  </table>
+</section>
+
+<!-- ===== mang ===== -->
+<section class="slide" id="mang" data-title="04 · Mảng 2 chiều cơ bản">
+<div class="hdr in"><span class="qn">04</span><h2>Kiến thức nền: mảng 2 chiều <code class='i' style='font-size:.8em'>int a[100][100]</code></h2></div>
+  <div class="cols" style="grid-template-columns:1.05fr 1fr">
+    <div>
+<script type="text/x-cpp" class="f14" id="kMg" data-title="co_ban.cpp" data-mark="1:a;2-3:b;4:c;5-9:d">
+int a[100][100];   // 100 dòng × 100 cột
+int m, n;          // số dòng, số cột THẬT SỰ dùng
+m = 3; n = 4;
+a[1][2] = 7;       // dòng 1, cột 2 (đếm từ 0)
+for (int i = 0; i < m; i++) {        // từng dòng
+    for (int j = 0; j < n; j++)      // từng cột của dòng i
+        cout << a[i][j] << " ";
+    cout << endl;                    // hết dòng thì xuống dòng
+}
+</script>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div class="stage" style="flex-direction:column;gap:12px">
+      <div class="mx sm" style="grid-template-columns:auto repeat(7,auto)"><span class="hd"></span><span class="hd">j=0</span><span class="hd">j=1</span><span class="hd">j=2</span><span class="hd">j=3</span><span class="hd">j=4</span><span class="hd">…</span><span class="hd">99</span><span class="hd">i=0</span><div class="cell emp" id="m_0_0"></div><div class="cell emp" id="m_0_1"></div><div class="cell emp" id="m_0_2"></div><div class="cell emp" id="m_0_3"></div><div class="cell emp" id="m_0_4"></div><span class="hd">·</span><div class="cell emp"></div><span class="hd">i=1</span><div class="cell emp" id="m_1_0"></div><div class="cell emp" id="m_1_1"></div><div class="cell emp" id="m_1_2"></div><div class="cell emp" id="m_1_3"></div><div class="cell emp" id="m_1_4"></div><span class="hd">·</span><div class="cell emp"></div><span class="hd">i=2</span><div class="cell emp" id="m_2_0"></div><div class="cell emp" id="m_2_1"></div><div class="cell emp" id="m_2_2"></div><div class="cell emp" id="m_2_3"></div><div class="cell emp" id="m_2_4"></div><span class="hd">·</span><div class="cell emp"></div><span class="hd">i=3</span><div class="cell emp" id="m_3_0"></div><div class="cell emp" id="m_3_1"></div><div class="cell emp" id="m_3_2"></div><div class="cell emp" id="m_3_3"></div><div class="cell emp" id="m_3_4"></div><span class="hd">·</span><div class="cell emp"></div><span class="hd">⋮</span><span class="hd">·</span><span class="hd">·</span><span class="hd">·</span><span class="hd">·</span><span class="hd">·</span><span class="hd">·</span><span class="hd">·</span><span class="hd">99</span><div class="cell emp"></div><div class="cell emp"></div><div class="cell emp"></div><div class="cell emp"></div><div class="cell emp"></div><span class="hd">·</span><div class="cell emp"></div></div>
+      <div class="calc" id="mvar" style="width:100%">Bảng a[100][100]</div>
+      <span class="f ghost" data-now="#kMg|show-a" data-act="#m_0_0|x;#m_0_1|x;#m_0_2|x;#m_0_3|x;#m_0_4|x;#m_1_0|x;#m_1_1|x;#m_1_2|x;#m_1_3|x;#m_1_4|x;#m_2_0|x;#m_2_1|x;#m_2_2|x;#m_2_3|x;#m_2_4|x;#m_3_0|x;#m_3_1|x;#m_3_2|x;#m_3_3|x;#m_3_4|x" data-set="#mvar::a: 100 × 100 = &lt;b&gt;10.000&lt;/b&gt; ô int (≈ 40 KB)" data-say="&lt;b&gt;int a[100][100]&lt;/b&gt;: xin sẵn một bảng 100 dòng × 100 cột. Chỉ số chạy từ &lt;b&gt;0 đến 99&lt;/b&gt;. Ta chưa biết người dùng nhập bao nhiêu nên xin &lt;b&gt;dư&lt;/b&gt;."></span><span class="f ghost" data-now="#kMg|show-b" data-act="#m_0_0|used;#m_0_1|used;#m_0_2|used;#m_0_3|used;#m_1_0|used;#m_1_1|used;#m_1_2|used;#m_1_3|used;#m_2_0|used;#m_2_1|used;#m_2_2|used;#m_2_3|used" data-set="#mvar::m = &lt;b&gt;3&lt;/b&gt; · n = &lt;b&gt;4&lt;/b&gt; → chỉ dùng góc trên-trái 3 × 4" data-say="&lt;b&gt;m, n&lt;/b&gt; là kích thước &lt;b&gt;thật&lt;/b&gt;. Ta chỉ dùng góc trên-trái m × n, phần còn lại bỏ trống. Mọi vòng lặp phải chạy tới &lt;b&gt;m, n&lt;/b&gt;, không phải 100."></span><span class="f ghost" data-now="#kMg|show-c;#m_1_2|foc" data-set="#m_1_2::7;#mvar::a[&lt;b&gt;1&lt;/b&gt;][&lt;b&gt;2&lt;/b&gt;] = 7 → dòng 1, cột 2" data-say="&lt;b&gt;a[i][j]&lt;/b&gt;: chỉ số đầu là &lt;b&gt;dòng&lt;/b&gt;, chỉ số sau là &lt;b&gt;cột&lt;/b&gt;. a[1][2] là dòng thứ 2, cột thứ 3 (vì đếm từ 0)."></span><span class="f ghost" data-now="#kMg|show-d;#m_0_0|rw;#m_0_1|rw;#m_0_2|rw;#m_0_3|rw" data-set="#m_1_2::7;#mvar::i = &lt;b&gt;0&lt;/b&gt; · j chạy 0 → 3 · in a[0][0..3]" data-say="Vòng ngoài cố định &lt;b&gt;i = 0&lt;/b&gt;, vòng trong cho j chạy 0, 1, 2, 3 ⇒ đi hết dòng 0 từ trái sang phải, rồi xuống dòng."></span><span class="f ghost" data-now="#kMg|show-d;#m_1_0|rw;#m_1_1|rw;#m_1_2|rw;#m_1_3|rw" data-set="#m_1_2::7;#mvar::i = &lt;b&gt;1&lt;/b&gt; · j chạy 0 → 3 · in a[1][0..3]" data-say="Vòng ngoài cố định &lt;b&gt;i = 1&lt;/b&gt;, vòng trong cho j chạy 0, 1, 2, 3 ⇒ đi hết dòng 1 từ trái sang phải, rồi xuống dòng."></span><span class="f ghost" data-now="#kMg|show-d;#m_2_0|rw;#m_2_1|rw;#m_2_2|rw;#m_2_3|rw" data-set="#m_1_2::7;#mvar::i = &lt;b&gt;2&lt;/b&gt; · j chạy 0 → 3 · in a[2][0..3]" data-say="Vòng &lt;b&gt;for lồng nhau&lt;/b&gt;: ngoài theo dòng, trong theo cột. Đây là khuôn mẫu duyệt ma trận dùng trong &lt;b&gt;mọi&lt;/b&gt; hàm của bài này."></span>
+      <div class="note blue f" style="width:100%">Ghi nhớ: <b>dòng trước, cột sau</b>; chỉ số từ <b>0</b> đến <b>kích thước − 1</b>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ytuong ===== -->
+<section class="slide" id="ytuong" data-title="05 · Hai ý tưởng giải">
+<div class="hdr in"><span class="qn">05</span><h2>Ý tưởng: làm “trâu” hay tính trước?</h2></div>
+  <div class="cols">
+    <div class="card f" style="border-top:5px solid #e11d48">
+      <h3 style="color:#be123c">Cách 1 · Với mỗi ô, cộng lại từ đầu</h3>
+      <p style="font-size:16px">Đứng ở từng ô a[i][j], chạy dọc dòng i và cột j để cộng các ô khác.</p>
+<script type="text/x-cpp" class="f14" id="kY1" data-title="" data-mark="">
+for (i...) for (j...) {
+    int s = 0;
+    for (int k = 0; k < n; k++) if (k != j) s += a[i][k];
+    for (int k = 0; k < m; k++) if (k != i) s += a[k][j];
+    if (a[i][j] == s) // in a[i][j]
+}
+</script>
+      <p style="font-size:16px;margin-top:6px">Dễ nghĩ, nhưng tổng của dòng i bị <b>tính lại N lần</b> (mỗi ô trên dòng tính 1 lần).</p>
+    </div>
+    <div class="card f" style="border-top:5px solid #10b981">
+      <h3 style="color:#047857">Cách 2 · Tính trước tổng mỗi dòng, mỗi cột</h3>
+      <p style="font-size:16px">Tính 1 lần: <b>R[i]</b> = tổng dòng i, <b>C[j]</b> = tổng cột j. Sau đó mỗi ô chỉ cần 1 phép so sánh.</p>
+<script type="text/x-cpp" class="f14" id="kY2" data-title="" data-mark="">
+// tính R[0..m-1], C[0..n-1]  (chỉ 1 lần)
+for (i...) for (j...) {
+    int conLai = (R[i] - a[i][j]) + (C[j] - a[i][j]);
+    if (a[i][j] == conLai) // in a[i][j]
+}
+</script>
+      <p style="font-size:16px;margin-top:6px">Giống tính <b>tổng điểm mỗi lớp</b> 1 lần rồi dùng lại, thay vì cộng lại mỗi khi có người hỏi.</p>
+    </div>
+  </div>
+  <div class="card f" style="margin-top:12px">
+    <h3>Số phép cộng với ma trận 100 × 100</h3>
+    <div class="barw"><span>Cách 1</span><div class="bt"><div class="bf" id="bar1" style="background:linear-gradient(90deg,#fb7185,#e11d48)"></div></div><b>≈ 1.980.000</b></div>
+    <div class="barw"><span>Cách 2</span><div class="bt"><div class="bf" id="bar2" style="background:linear-gradient(90deg,#34d399,#059669)"></div></div><b>≈ 30.000</b></div>
+  </div>
+  <span class="f ghost" data-act="#bar1|on1;#bar2|on2"></span>
+  <div class="note f">Cả 2 cách đều <b>đúng</b>. Ta chọn <b>Cách 2</b> vì nhanh hơn ~66 lần và chia hàm rất tự nhiên: <code class="i">computeRowSums</code>, <code class="i">computeColSums</code>, <code class="i">isSpecial</code>.</div>
+</section>
+
+<!-- ===== congthuc ===== -->
+<section class="slide" id="congthuc" data-title="06 · Biến đổi công thức">
+<div class="hdr in"><span class="qn">06</span><h2>Biến đổi công thức điều kiện</h2></div>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr;align-items:center">
+    <div>
+      <div class="fx f">conLai = (<span class="r">R[i]</span> − <span class="a">a[i][j]</span>) + (<span class="c2">C[j]</span> − <span class="a">a[i][j]</span>)</div>
+      <div class="fx f">conLai = <span class="r">R[i]</span> + <span class="c2">C[j]</span> − 2·<span class="a">a[i][j]</span></div>
+      <div class="fx f">Điều kiện: <span class="a">a[i][j]</span> == <span class="r">R[i]</span> + <span class="c2">C[j]</span> − 2·<span class="a">a[i][j]</span></div>
+      <div class="fx f" style="border-color:#10b981;background:#ecfdf5">⇔ 3·<span class="a">a[i][j]</span> == <span class="r">R[i]</span> + <span class="c2">C[j]</span></div>
+      <div class="fx f" style="font-size:17px">Kiểm chứng a[0][3] = 9: 3·9 = <b>27</b> và R[0] + C[3] = 16 + 11 = <b>27</b> ✓</div>
+      <span class="f ghost" data-say="R[i] = tổng &lt;b&gt;cả&lt;/b&gt; dòng i (có cả a[i][j]). Muốn “phần còn lại” thì phải trừ a[i][j] ra. Tương tự với cột j."></span>
+      <span class="f ghost" data-now="#gc_0_3|foc;#gc_0_0|rw;#gc_0_1|rw;#gc_0_2|rw;#gc_1_3|cw;#gc_2_3|cw" data-say="Gộp lại: a[i][j] bị trừ &lt;b&gt;2 lần&lt;/b&gt; vì nó nằm ở &lt;b&gt;cả&lt;/b&gt; dòng i &lt;b&gt;và&lt;/b&gt; cột j (ô giao của chữ thập)."></span>
+      <span class="f ghost" data-say="Đây là điều kiện đề bài yêu cầu: giá trị ô = tổng phần còn lại."></span>
+      <span class="f ghost" data-say="Chuyển vế: cộng 2·a[i][j] vào hai vế ⇒ &lt;b&gt;3·a[i][j] == R[i] + C[j]&lt;/b&gt;. Gọn hơn nhưng khó hiểu hơn khi đọc code."></span>
+      <span class="f ghost" data-now="#gc_0_3|foc;#gc_0_0|rw;#gc_0_1|rw;#gc_0_2|rw;#gc_1_3|cw;#gc_2_3|cw;#gc_r0|foc;#gc_c3|foc" data-say="Thử lại với số thật để chắc chắn công thức không sai."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div class="stage" style="flex-direction:column;gap:10px">
+      <div class="mx sm" id="gc" style="grid-template-columns:auto repeat(4,auto) auto"><span class="hd"></span><span class="hd">j=0</span><span class="hd">j=1</span><span class="hd">j=2</span><span class="hd">j=3</span><span class="hd">R[i]</span><span class="hd">i=0</span><div class="cell" id="gc_0_0">1</div><div class="cell" id="gc_0_1">2</div><div class="cell" id="gc_0_2">4</div><div class="cell" id="gc_0_3">9</div><div class="cell sum" id="gc_r0">16</div><span class="hd">i=1</span><div class="cell" id="gc_1_0">8</div><div class="cell" id="gc_1_1">1</div><div class="cell" id="gc_1_2">1</div><div class="cell" id="gc_1_3">1</div><div class="cell sum" id="gc_r1">11</div><span class="hd">i=2</span><div class="cell" id="gc_2_0">4</div><div class="cell" id="gc_2_1">5</div><div class="cell" id="gc_2_2">5</div><div class="cell" id="gc_2_3">1</div><div class="cell sum" id="gc_r2">15</div><span class="hd">C[j]</span><div class="cell sum" id="gc_c0">13</div><div class="cell sum" id="gc_c1">8</div><div class="cell sum" id="gc_c2">10</div><div class="cell sum" id="gc_c3">11</div><span></span></div>
+      <div class="note blue f" style="font-size:15px">Trong code ta viết dạng <b>(R[i] − a) + (C[j] − a)</b> cho dễ đọc, đúng nghĩa đề bài. Dạng 3·a == R + C cũng đúng.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== giaithuat ===== -->
+<section class="slide" id="giaithuat" data-title="07 · Giải thuật">
+<div class="hdr in"><span class="qn">07</span><h2>Giải thuật (mã giả)</h2></div>
+  <div class="cols" style="grid-template-columns:1.6fr 1fr">
+    <div>
+<script type="text/x-pseudo" class="f16" id="kGt" data-title="giai_thuat.txt" data-mark="1:a;2-3:b;4-5:c;6-11:d;12:e">
+Bước 1: Nhập m, n (1 ≤ m, n ≤ 100) và ma trận a[m][n]
+Bước 2: for i = 0 to m-1
+            R[i] = a[i][0] + a[i][1] + ... + a[i][n-1]
+Bước 3: for j = 0 to n-1
+            C[j] = a[0][j] + a[1][j] + ... + a[m-1][j]
+Bước 4: dem = 0
+        for i = 0 to m-1
+            for j = 0 to n-1
+                conLai = (R[i] - a[i][j]) + (C[j] - a[i][j])
+                if a[i][j] == conLai then
+                    in a[i][j] và vị trí (i, j);  dem = dem + 1
+Bước 5: if dem == 0 then in "Khong co phan tu nao thoa man."
+</script>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+      <span class="f ghost" data-now="#kGt|show-a;#gtB0|hlo" data-act="#gtB0|sh" data-say="Bước 1 – &lt;b&gt;nhập dữ liệu&lt;/b&gt;. Kiểm tra m, n trong [1, 100] để không vượt mảng a[100][100]."></span><span class="f ghost" data-now="#kGt|show-b;#gtB1|hlo" data-act="#gtB1|sh;#gtA1|sh" data-say="Bước 2 – mỗi dòng i cộng hết n phần tử, lưu vào &lt;b&gt;R[i]&lt;/b&gt;. Cần mảng R có m phần tử."></span><span class="f ghost" data-now="#kGt|show-c;#gtB2|hlo" data-act="#gtB2|sh;#gtA2|sh" data-say="Bước 3 – mỗi cột j cộng hết m phần tử, lưu vào &lt;b&gt;C[j]&lt;/b&gt;. Cần mảng C có n phần tử."></span><span class="f ghost" data-now="#kGt|show-d;#gtB3|hlo" data-act="#gtB3|sh;#gtA3|sh" data-say="Bước 4 – duyệt &lt;b&gt;mọi&lt;/b&gt; ô. Mỗi ô tính conLai bằng R, C đã có và so sánh. Thỏa thì in và tăng biến đếm &lt;b&gt;dem&lt;/b&gt;."></span><span class="f ghost" data-now="#kGt|show-e;#gtB4|hlo" data-act="#gtB4|sh;#gtA4|sh" data-say="Bước 5 – sau khi duyệt xong mới biết “không có ô nào”. Biến &lt;b&gt;dem&lt;/b&gt; giúp ta quyết định có in thông báo hay không."></span>
+    </div>
+    <div class="stage" style="flex-direction:column;gap:4px"><div class="box a hide0" id="gtB0" style="min-width:300px">Nhập m, n, a<small>hàm inputMatrix()</small></div><div class="ar hide0" id="gtA1">↓</div><div class="box b hide0" id="gtB1" style="min-width:300px">Tính R[i]<small>hàm computeRowSums()</small></div><div class="ar hide0" id="gtA2">↓</div><div class="box b hide0" id="gtB2" style="min-width:300px">Tính C[j]<small>hàm computeColSums()</small></div><div class="ar hide0" id="gtA3">↓</div><div class="box d hide0" id="gtB3" style="min-width:300px">Duyệt từng ô, so sánh<small>hàm isSpecial()</small></div><div class="ar hide0" id="gtA4">↓</div><div class="box e hide0" id="gtB4" style="min-width:300px">dem == 0 ? thông báo<small>hàm printSpecial()</small></div>
+      <div class="note f" style="font-size:15px">Mỗi bước ≈ <b>một hàm</b>. Viết giải thuật trước giúp chia hàm dễ dàng.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== chaytong ===== -->
+<section class="slide" id="chaytong" data-title="08 · Chạy tay: tính R[] và C[]">
+<div class="hdr in"><span class="qn">08</span><h2>Chạy tay (1): tính tổng mỗi dòng R[] và mỗi cột C[]</h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+    <div>
+<script type="text/x-cpp" class="f15" id="kSum" data-title="matrix.cpp (trích)" data-mark="3:a;4-5:b;10:c;11-12:d">
+void computeRowSums(int a[][MAX], int m, int n, int rowSum[]) {
+    for (int i = 0; i < m; i++) {
+        rowSum[i] = 0;
+        for (int j = 0; j < n; j++)
+            rowSum[i] += a[i][j];
+    }
+}
+void computeColSums(int a[][MAX], int m, int n, int colSum[]) {
+    for (int j = 0; j < n; j++) {
+        colSum[j] = 0;
+        for (int i = 0; i < m; i++)
+            colSum[j] += a[i][j];
+    }
+}
+</script>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div class="stage" style="flex-direction:column;gap:10px">
+      <div class="mx " id="gs" style="grid-template-columns:auto repeat(4,auto) auto"><span class="hd"></span><span class="hd">j=0</span><span class="hd">j=1</span><span class="hd">j=2</span><span class="hd">j=3</span><span class="hd">rowSum</span><span class="hd">i=0</span><div class="cell" id="gs_0_0">1</div><div class="cell" id="gs_0_1">2</div><div class="cell" id="gs_0_2">4</div><div class="cell" id="gs_0_3">9</div><div class="cell sum" id="gs_r0">?</div><span class="hd">i=1</span><div class="cell" id="gs_1_0">8</div><div class="cell" id="gs_1_1">1</div><div class="cell" id="gs_1_2">1</div><div class="cell" id="gs_1_3">1</div><div class="cell sum" id="gs_r1">?</div><span class="hd">i=2</span><div class="cell" id="gs_2_0">4</div><div class="cell" id="gs_2_1">5</div><div class="cell" id="gs_2_2">5</div><div class="cell" id="gs_2_3">1</div><div class="cell sum" id="gs_r2">?</div><span class="hd">colSum</span><div class="cell sum" id="gs_c0">?</div><div class="cell sum" id="gs_c1">?</div><div class="cell sum" id="gs_c2">?</div><div class="cell sum" id="gs_c3">?</div><span></span></div>
+      <span class="f ghost" data-now="#kSum|show-a;#kSum|show-b;#gs_r0|foc;#gs_0_0|rw;#gs_0_1|rw;#gs_0_2|rw;#gs_0_3|rw" data-set="#gs_r0::16" data-say="&lt;b&gt;i = 0&lt;/b&gt;: rowSum[0] = 0, rồi j chạy 0 → 3 cộng dồn: rowSum[0] = 1 + 2 + 4 + 9 = &lt;b&gt;16&lt;/b&gt;."></span><span class="f ghost" data-now="#kSum|show-a;#kSum|show-b;#gs_r1|foc;#gs_1_0|rw;#gs_1_1|rw;#gs_1_2|rw;#gs_1_3|rw" data-set="#gs_r0::16;#gs_r1::11" data-say="&lt;b&gt;i = 1&lt;/b&gt;: rowSum[1] = 0, rồi j chạy 0 → 3 cộng dồn: rowSum[1] = 8 + 1 + 1 + 1 = &lt;b&gt;11&lt;/b&gt;."></span><span class="f ghost" data-now="#kSum|show-a;#kSum|show-b;#gs_r2|foc;#gs_2_0|rw;#gs_2_1|rw;#gs_2_2|rw;#gs_2_3|rw" data-set="#gs_r0::16;#gs_r1::11;#gs_r2::15" data-say="&lt;b&gt;i = 2&lt;/b&gt;: rowSum[2] = 0, rồi j chạy 0 → 3 cộng dồn: rowSum[2] = 4 + 5 + 5 + 1 = &lt;b&gt;15&lt;/b&gt;."></span><span class="f ghost" data-now="#kSum|show-c;#kSum|show-d;#gs_c0|foc;#gs_0_0|cw;#gs_1_0|cw;#gs_2_0|cw" data-set="#gs_r0::16;#gs_r1::11;#gs_r2::15;#gs_c0::13" data-say="&lt;b&gt;j = 0&lt;/b&gt;: colSum[0] = 0, rồi i chạy 0 → 2: colSum[0] = 1 + 8 + 4 = &lt;b&gt;13&lt;/b&gt;. Lưu ý: vòng &lt;b&gt;ngoài là j&lt;/b&gt;, vòng trong là i."></span><span class="f ghost" data-now="#kSum|show-c;#kSum|show-d;#gs_c1|foc;#gs_0_1|cw;#gs_1_1|cw;#gs_2_1|cw" data-set="#gs_r0::16;#gs_r1::11;#gs_r2::15;#gs_c0::13;#gs_c1::8" data-say="&lt;b&gt;j = 1&lt;/b&gt;: colSum[1] = 0, rồi i chạy 0 → 2: colSum[1] = 2 + 1 + 5 = &lt;b&gt;8&lt;/b&gt;."></span><span class="f ghost" data-now="#kSum|show-c;#kSum|show-d;#gs_c2|foc;#gs_0_2|cw;#gs_1_2|cw;#gs_2_2|cw" data-set="#gs_r0::16;#gs_r1::11;#gs_r2::15;#gs_c0::13;#gs_c1::8;#gs_c2::10" data-say="&lt;b&gt;j = 2&lt;/b&gt;: colSum[2] = 0, rồi i chạy 0 → 2: colSum[2] = 4 + 1 + 5 = &lt;b&gt;10&lt;/b&gt;."></span><span class="f ghost" data-now="#kSum|show-c;#kSum|show-d;#gs_c3|foc;#gs_0_3|cw;#gs_1_3|cw;#gs_2_3|cw" data-set="#gs_r0::16;#gs_r1::11;#gs_r2::15;#gs_c0::13;#gs_c1::8;#gs_c2::10;#gs_c3::11" data-say="&lt;b&gt;j = 3&lt;/b&gt;: colSum[3] = 0, rồi i chạy 0 → 2: colSum[3] = 9 + 1 + 1 = &lt;b&gt;11&lt;/b&gt;."></span><span class="f ghost" data-set="#gs_r0::16;#gs_r1::11;#gs_r2::15;#gs_c0::13;#gs_c1::8;#gs_c2::10;#gs_c3::11" data-say="Xong! Chỉ mất 3×4 + 3×4 = &lt;b&gt;24&lt;/b&gt; phép cộng để có đủ R[] và C[]. Kiểm tra nhanh: tổng R = 16+11+15 = &lt;b&gt;42&lt;/b&gt; = tổng C = 13+8+10+11 = &lt;b&gt;42&lt;/b&gt; (đều là tổng cả ma trận)."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== chaykt ===== -->
+<section class="slide" id="chaykt" data-title="09 · Chạy tay: kiểm tra từng ô">
+<div class="hdr in"><span class="qn">09</span><h2>Chạy tay (2): kiểm tra từng ô với R[], C[] đã có</h2></div>
+  <div class="cols" style="grid-template-columns:.92fr 1.08fr">
+    <div class="stage" style="flex-direction:column;gap:10px;align-items:stretch">
+      <div style="display:flex;justify-content:center"><div class="mx " id="gk" style="grid-template-columns:auto repeat(4,auto) auto"><span class="hd"></span><span class="hd">j=0</span><span class="hd">j=1</span><span class="hd">j=2</span><span class="hd">j=3</span><span class="hd">R[i]</span><span class="hd">i=0</span><div class="cell" id="gk_0_0">1</div><div class="cell" id="gk_0_1">2</div><div class="cell" id="gk_0_2">4</div><div class="cell" id="gk_0_3">9</div><div class="cell sum" id="gk_r0">16</div><span class="hd">i=1</span><div class="cell" id="gk_1_0">8</div><div class="cell" id="gk_1_1">1</div><div class="cell" id="gk_1_2">1</div><div class="cell" id="gk_1_3">1</div><div class="cell sum" id="gk_r1">11</div><span class="hd">i=2</span><div class="cell" id="gk_2_0">4</div><div class="cell" id="gk_2_1">5</div><div class="cell" id="gk_2_2">5</div><div class="cell" id="gk_2_3">1</div><div class="cell sum" id="gk_r2">15</div><span class="hd">C[j]</span><div class="cell sum" id="gk_c0">13</div><div class="cell sum" id="gk_c1">8</div><div class="cell sum" id="gk_c2">10</div><div class="cell sum" id="gk_c3">11</div><span></span></div></div>
+      <div class="calc" id="kcalc" style="min-height:112px">Bắt đầu với count = 0.</div>
+    </div>
+    <div>
+<script type="text/x-cpp" class="xs" id="kChk" data-title="printSpecial (trích)" data-mark="3:a;4-5:b;8-9:c">
+for (int i = 0; i < m; i++)
+    for (int j = 0; j < n; j++) {
+        if (isSpecial(a, i, j, rowSum, colSum)) {
+            cout << "a[" << i << "][" << j << "] = " << a[i][j] << endl;
+            count++;
+        }
+    }
+if (count == 0)
+    cout << "Khong co phan tu nao thoa man." << endl;
+</script>
+      <div class="vars"><span class="vc" id="kcnt">count = 0</span></div>
+      <div style="margin-top:8px"><div class="console" id="kout"><span class="cl show" id="kout0"><span class='in'>Cac phan tu thoa man:</span></span><span class="cl" id="kout1">a[0][3] = 9</span><span class="cl" id="kout2">a[1][0] = 8</span></div></div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+      <span class="f ghost" data-now="#kChk|show-a;#gk_0_0|foc;#gk_r0|foc;#gk_c0|foc;#gk_0_1|rw;#gk_0_2|rw;#gk_0_3|rw;#gk_1_0|cw;#gk_2_0|cw" data-act="#gk_0_0|no" data-set="#kcalc::i=0, j=0: a = &lt;b&gt;1&lt;/b&gt;&lt;br&gt;&lt;span class=&#x27;r&#x27;&gt;R[0] − a = 16 − 1 = 15&lt;/span&gt;&lt;br&gt;&lt;span class=&#x27;c2&#x27;&gt;C[0] − a = 13 − 1 = 12&lt;/span&gt;&lt;br&gt;conLai = 15 + 12 = 27 → &lt;span class=&#x27;x&#x27;&gt;1 ≠ 27 ✗&lt;/span&gt;;#kcnt::count = 0" data-say="Ô (0,0) = 1: còn lại = 15 + 12 = 27. Khác nhau ⇒ bỏ qua."></span><span class="f ghost" data-now="#kChk|show-a;#gk_0_1|foc;#gk_r0|foc;#gk_c1|foc;#gk_0_0|rw;#gk_0_2|rw;#gk_0_3|rw;#gk_1_1|cw;#gk_2_1|cw" data-act="#gk_0_1|no" data-set="#kcalc::i=0, j=1: a = &lt;b&gt;2&lt;/b&gt;&lt;br&gt;&lt;span class=&#x27;r&#x27;&gt;R[0] − a = 16 − 2 = 14&lt;/span&gt;&lt;br&gt;&lt;span class=&#x27;c2&#x27;&gt;C[1] − a = 8 − 2 = 6&lt;/span&gt;&lt;br&gt;conLai = 14 + 6 = 20 → &lt;span class=&#x27;x&#x27;&gt;2 ≠ 20 ✗&lt;/span&gt;;#kcnt::count = 0" data-say="Ô (0,1) = 2: còn lại = 14 + 6 = 20. Khác nhau ⇒ bỏ qua."></span><span class="f ghost" data-now="#kChk|show-a;#gk_0_2|foc;#gk_r0|foc;#gk_c2|foc;#gk_0_0|rw;#gk_0_1|rw;#gk_0_3|rw;#gk_1_2|cw;#gk_2_2|cw" data-act="#gk_0_2|no" data-set="#kcalc::i=0, j=2: a = &lt;b&gt;4&lt;/b&gt;&lt;br&gt;&lt;span class=&#x27;r&#x27;&gt;R[0] − a = 16 − 4 = 12&lt;/span&gt;&lt;br&gt;&lt;span class=&#x27;c2&#x27;&gt;C[2] − a = 10 − 4 = 6&lt;/span&gt;&lt;br&gt;conLai = 12 + 6 = 18 → &lt;span class=&#x27;x&#x27;&gt;4 ≠ 18 ✗&lt;/span&gt;;#kcnt::count = 0" data-say="Ô (0,2) = 4: còn lại = 12 + 6 = 18. Khác nhau ⇒ bỏ qua."></span><span class="f ghost" data-now="#kChk|show-b;#gk_0_3|foc;#gk_r0|foc;#gk_c3|foc;#gk_0_0|rw;#gk_0_1|rw;#gk_0_2|rw;#gk_1_3|cw;#gk_2_3|cw" data-act="#gk_0_3|ok;#kout1|show" data-set="#kcalc::i=0, j=3: a = &lt;b&gt;9&lt;/b&gt;&lt;br&gt;&lt;span class=&#x27;r&#x27;&gt;R[0] − a = 16 − 9 = 7&lt;/span&gt;&lt;br&gt;&lt;span class=&#x27;c2&#x27;&gt;C[3] − a = 11 − 9 = 2&lt;/span&gt;&lt;br&gt;conLai = 7 + 2 = 9 → &lt;span class=&#x27;y&#x27;&gt;9 == 9 ✓ in ra&lt;/span&gt;;#kcnt::count = 1" data-say="Ô (0,3) = 9: còn lại = 7 + 2 = 9. &lt;b&gt;Bằng nhau ⇒ in ra&lt;/b&gt;, count = 1."></span><span class="f ghost" data-now="#kChk|show-b;#gk_1_0|foc;#gk_r1|foc;#gk_c0|foc;#gk_1_1|rw;#gk_1_2|rw;#gk_1_3|rw;#gk_0_0|cw;#gk_2_0|cw" data-act="#gk_1_0|ok;#kout1|show;#kout2|show" data-set="#kcalc::i=1, j=0: a = &lt;b&gt;8&lt;/b&gt;&lt;br&gt;&lt;span class=&#x27;r&#x27;&gt;R[1] − a = 11 − 8 = 3&lt;/span&gt;&lt;br&gt;&lt;span class=&#x27;c2&#x27;&gt;C[0] − a = 13 − 8 = 5&lt;/span&gt;&lt;br&gt;conLai = 3 + 5 = 8 → &lt;span class=&#x27;y&#x27;&gt;8 == 8 ✓ in ra&lt;/span&gt;;#kcnt::count = 2" data-say="Ô (1,0) = 8: còn lại = 3 + 5 = 8. &lt;b&gt;Bằng nhau ⇒ in ra&lt;/b&gt;, count = 2."></span><span class="f ghost" data-now="#kChk|show-a;#gk_1_1|foc;#gk_r1|foc;#gk_c1|foc;#gk_1_0|rw;#gk_1_2|rw;#gk_1_3|rw;#gk_0_1|cw;#gk_2_1|cw" data-act="#gk_1_1|no" data-set="#kcalc::i=1, j=1: a = &lt;b&gt;1&lt;/b&gt;&lt;br&gt;&lt;span class=&#x27;r&#x27;&gt;R[1] − a = 11 − 1 = 10&lt;/span&gt;&lt;br&gt;&lt;span class=&#x27;c2&#x27;&gt;C[1] − a = 8 − 1 = 7&lt;/span&gt;&lt;br&gt;conLai = 10 + 7 = 17 → &lt;span class=&#x27;x&#x27;&gt;1 ≠ 17 ✗&lt;/span&gt;;#kcnt::count = 2" data-say="Ô (1,1) = 1: còn lại = 10 + 7 = 17. Khác nhau ⇒ bỏ qua."></span><span class="f ghost" data-now="#kChk|show-a;#gk_1_2|foc;#gk_r1|foc;#gk_c2|foc;#gk_1_0|rw;#gk_1_1|rw;#gk_1_3|rw;#gk_0_2|cw;#gk_2_2|cw" data-act="#gk_1_2|no" data-set="#kcalc::i=1, j=2: a = &lt;b&gt;1&lt;/b&gt;&lt;br&gt;&lt;span class=&#x27;r&#x27;&gt;R[1] − a = 11 − 1 = 10&lt;/span&gt;&lt;br&gt;&lt;span class=&#x27;c2&#x27;&gt;C[2] − a = 10 − 1 = 9&lt;/span&gt;&lt;br&gt;conLai = 10 + 9 = 19 → &lt;span class=&#x27;x&#x27;&gt;1 ≠ 19 ✗&lt;/span&gt;;#kcnt::count = 2" data-say="Ô (1,2) = 1: còn lại = 10 + 9 = 19. Khác nhau ⇒ bỏ qua."></span><span class="f ghost" data-now="#kChk|show-a;#gk_1_3|foc;#gk_r1|foc;#gk_c3|foc;#gk_1_0|rw;#gk_1_1|rw;#gk_1_2|rw;#gk_0_3|cw;#gk_2_3|cw" data-act="#gk_1_3|no" data-set="#kcalc::i=1, j=3: a = &lt;b&gt;1&lt;/b&gt;&lt;br&gt;&lt;span class=&#x27;r&#x27;&gt;R[1] − a = 11 − 1 = 10&lt;/span&gt;&lt;br&gt;&lt;span class=&#x27;c2&#x27;&gt;C[3] − a = 11 − 1 = 10&lt;/span&gt;&lt;br&gt;conLai = 10 + 10 = 20 → &lt;span class=&#x27;x&#x27;&gt;1 ≠ 20 ✗&lt;/span&gt;;#kcnt::count = 2" data-say="Ô (1,3) = 1: còn lại = 10 + 10 = 20. Khác nhau ⇒ bỏ qua."></span><span class="f ghost" data-now="#kChk|show-a;#gk_2_0|foc;#gk_r2|foc;#gk_c0|foc;#gk_2_1|rw;#gk_2_2|rw;#gk_2_3|rw;#gk_0_0|cw;#gk_1_0|cw" data-act="#gk_2_0|no" data-set="#kcalc::i=2, j=0: a = &lt;b&gt;4&lt;/b&gt;&lt;br&gt;&lt;span class=&#x27;r&#x27;&gt;R[2] − a = 15 − 4 = 11&lt;/span&gt;&lt;br&gt;&lt;span class=&#x27;c2&#x27;&gt;C[0] − a = 13 − 4 = 9&lt;/span&gt;&lt;br&gt;conLai = 11 + 9 = 20 → &lt;span class=&#x27;x&#x27;&gt;4 ≠ 20 ✗&lt;/span&gt;;#kcnt::count = 2" data-say="Ô (2,0) = 4: còn lại = 11 + 9 = 20. Khác nhau ⇒ bỏ qua."></span><span class="f ghost" data-now="#kChk|show-a;#gk_2_1|foc;#gk_r2|foc;#gk_c1|foc;#gk_2_0|rw;#gk_2_2|rw;#gk_2_3|rw;#gk_0_1|cw;#gk_1_1|cw" data-act="#gk_2_1|no" data-set="#kcalc::i=2, j=1: a = &lt;b&gt;5&lt;/b&gt;&lt;br&gt;&lt;span class=&#x27;r&#x27;&gt;R[2] − a = 15 − 5 = 10&lt;/span&gt;&lt;br&gt;&lt;span class=&#x27;c2&#x27;&gt;C[1] − a = 8 − 5 = 3&lt;/span&gt;&lt;br&gt;conLai = 10 + 3 = 13 → &lt;span class=&#x27;x&#x27;&gt;5 ≠ 13 ✗&lt;/span&gt;;#kcnt::count = 2" data-say="Ô (2,1) = 5: còn lại = 10 + 3 = 13. Khác nhau ⇒ bỏ qua."></span><span class="f ghost" data-now="#kChk|show-a;#gk_2_2|foc;#gk_r2|foc;#gk_c2|foc;#gk_2_0|rw;#gk_2_1|rw;#gk_2_3|rw;#gk_0_2|cw;#gk_1_2|cw" data-act="#gk_2_2|no" data-set="#kcalc::i=2, j=2: a = &lt;b&gt;5&lt;/b&gt;&lt;br&gt;&lt;span class=&#x27;r&#x27;&gt;R[2] − a = 15 − 5 = 10&lt;/span&gt;&lt;br&gt;&lt;span class=&#x27;c2&#x27;&gt;C[2] − a = 10 − 5 = 5&lt;/span&gt;&lt;br&gt;conLai = 10 + 5 = 15 → &lt;span class=&#x27;x&#x27;&gt;5 ≠ 15 ✗&lt;/span&gt;;#kcnt::count = 2" data-say="Ô (2,2) = 5: còn lại = 10 + 5 = 15. Khác nhau ⇒ bỏ qua."></span><span class="f ghost" data-now="#kChk|show-a;#gk_2_3|foc;#gk_r2|foc;#gk_c3|foc;#gk_2_0|rw;#gk_2_1|rw;#gk_2_2|rw;#gk_0_3|cw;#gk_1_3|cw" data-act="#gk_2_3|no" data-set="#kcalc::i=2, j=3: a = &lt;b&gt;1&lt;/b&gt;&lt;br&gt;&lt;span class=&#x27;r&#x27;&gt;R[2] − a = 15 − 1 = 14&lt;/span&gt;&lt;br&gt;&lt;span class=&#x27;c2&#x27;&gt;C[3] − a = 11 − 1 = 10&lt;/span&gt;&lt;br&gt;conLai = 14 + 10 = 24 → &lt;span class=&#x27;x&#x27;&gt;1 ≠ 24 ✗&lt;/span&gt;;#kcnt::count = 2" data-say="Ô (2,3) = 1: còn lại = 14 + 10 = 24. Khác nhau ⇒ bỏ qua."></span><span class="f ghost" data-now="#kChk|show-c" data-act="#kout1|show;#kout2|show" data-set="#kcalc::Duyệt xong 12 ô.&lt;br&gt;count = 2 &amp;gt; 0 ⇒ &lt;b&gt;không&lt;/b&gt; in thông báo “Khong co…”.;#kcnt::count = 2" data-say="Duyệt hết ma trận: có &lt;b&gt;2&lt;/b&gt; phần tử thỏa. Vì count ≠ 0 nên không in dòng thông báo."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== casekhac ===== -->
+<section class="slide" id="casekhac" data-title="10 · Chạy thêm các case đặc biệt">
+<div class="hdr in"><span class="qn">10</span><h2>Chạy thêm các case đặc biệt</h2></div>
+  <div class="cols4"><div class="card f"><span class="f ghost" data-act="#cA_0_0|ok;#cA_0_1|no;#cA_1_0|no;#cA_1_1|no" data-say="Ma trận 2×2 (ví dụ 2). R = [3, 1], C = [3, 1]. Chỉ &lt;b&gt;a[0][0] = 2&lt;/b&gt; thỏa."></span><h3>2 × 2: một ô thỏa</h3><div style="display:flex;justify-content:center"><div class="mx sm" id="cA" style="grid-template-columns:auto repeat(2,auto) auto"><span class="hd"></span><span class="hd">j=0</span><span class="hd">j=1</span><span class="hd">R</span><span class="hd">i=0</span><div class="cell" id="cA_0_0">2</div><div class="cell" id="cA_0_1">1</div><div class="cell sum" id="cA_r0">3</div><span class="hd">i=1</span><div class="cell" id="cA_1_0">1</div><div class="cell" id="cA_1_1">0</div><div class="cell sum" id="cA_r1">1</div><span class="hd">C</span><div class="cell sum" id="cA_c0">3</div><div class="cell sum" id="cA_c1">1</div><span></span></div></div><p class="calc" style="font-size:14.5px;margin-top:8px;line-height:1.45;min-height:0;padding:6px 10px">a[0][0]=2: (3−2)+(3−2) = 2 ✓<br>a[0][1]=1: (3−1)+(1−1) = 2 ✗<br>a[1][0]=1: (1−1)+(3−1) = 2 ✗<br>a[1][1]=0: (1−0)+(1−0) = 2 ✗</p></div><div class="card f"><span class="f ghost" data-act="#cB_0_0|ok;#cB_0_1|no;#cB_1_0|no;#cB_1_1|no" data-say="Đổi dấu toàn bộ ma trận trên: R = [−3, −1], C = [−3, −1]. Công thức vẫn đúng với &lt;b&gt;số âm&lt;/b&gt;: a[0][0] = −2 thỏa."></span><h3>Số âm</h3><div style="display:flex;justify-content:center"><div class="mx sm" id="cB" style="grid-template-columns:auto repeat(2,auto) auto"><span class="hd"></span><span class="hd">j=0</span><span class="hd">j=1</span><span class="hd">R</span><span class="hd">i=0</span><div class="cell" id="cB_0_0">-2</div><div class="cell" id="cB_0_1">-1</div><div class="cell sum" id="cB_r0">-3</div><span class="hd">i=1</span><div class="cell" id="cB_1_0">-1</div><div class="cell" id="cB_1_1">0</div><div class="cell sum" id="cB_r1">-1</div><span class="hd">C</span><div class="cell sum" id="cB_c0">-3</div><div class="cell sum" id="cB_c1">-1</div><span></span></div></div><p class="calc" style="font-size:14.5px;margin-top:8px;line-height:1.45;min-height:0;padding:6px 10px">a[0][0]=−2: (−3+2)+(−3+2) = −2 ✓<br>a[1][1]=0: (−1−0)+(−1−0) = −2 ✗<br>Số âm vẫn đúng, không cần xử lý riêng.</p></div><div class="card f"><span class="f ghost" data-act="#cC_0_0|ok;#cC_0_1|ok;#cC_0_2|ok;#cC_1_0|ok;#cC_1_1|ok;#cC_1_2|ok" data-say="Ma trận toàn 0: &lt;b&gt;mọi&lt;/b&gt; ô đều thỏa ⇒ phải dùng vòng lặp in &lt;b&gt;tất cả&lt;/b&gt;, không return sớm."></span><h3>Toàn số 0</h3><div style="display:flex;justify-content:center"><div class="mx sm" id="cC" style="grid-template-columns:auto repeat(3,auto) auto"><span class="hd"></span><span class="hd">j=0</span><span class="hd">j=1</span><span class="hd">j=2</span><span class="hd">R</span><span class="hd">i=0</span><div class="cell" id="cC_0_0">0</div><div class="cell" id="cC_0_1">0</div><div class="cell" id="cC_0_2">0</div><div class="cell sum" id="cC_r0">0</div><span class="hd">i=1</span><div class="cell" id="cC_1_0">0</div><div class="cell" id="cC_1_1">0</div><div class="cell" id="cC_1_2">0</div><div class="cell sum" id="cC_r1">0</div><span class="hd">C</span><div class="cell sum" id="cC_c0">0</div><div class="cell sum" id="cC_c1">0</div><div class="cell sum" id="cC_c2">0</div><span></span></div></div><p class="calc" style="font-size:14.5px;margin-top:8px;line-height:1.45;min-height:0;padding:6px 10px">Mọi ô: 0 = (0−0)+(0−0) ✓<br>⇒ in cả <b>6</b> ô.<br>Đừng dừng lại sau ô đầu tiên!</p></div><div class="card f"><span class="f ghost" data-act=";#cD_0_0|no" data-say="Trường hợp biên 1×1: R[0] = C[0] = 5. conLai = 0 ⇒ chỉ thỏa nếu phần tử bằng 0. In thông báo “Khong co…”."></span><h3>1 × 1</h3><div style="display:flex;justify-content:center"><div class="mx sm" id="cD" style="grid-template-columns:auto repeat(1,auto) auto"><span class="hd"></span><span class="hd">j=0</span><span class="hd">R</span><span class="hd">i=0</span><div class="cell" id="cD_0_0">5</div><div class="cell sum" id="cD_r0">5</div><span class="hd">C</span><div class="cell sum" id="cD_c0">5</div><span></span></div></div><p class="calc" style="font-size:14.5px;margin-top:8px;line-height:1.45;min-height:0;padding:6px 10px">Không có ô “còn lại” ⇒ tổng = 0.<br>(5−5)+(5−5) = 0 ≠ 5 ✗<br>Nếu nhập 0 thì 0 == 0 ✓</p></div></div>
+  
+  <p class="say">Nhấn → để chạy từng bước.</p>
+  <div class="note f">Luôn tự thử: <b>ma trận nhỏ nhất</b> (1×1), <b>số âm</b>, <b>số 0</b>, <b>không có kết quả</b>, <b>nhiều kết quả</b>. Đó là nơi lỗi hay trốn.</div>
+</section>
+
+<!-- ===== project ===== -->
+<section class="slide" id="project" data-title="11 · Tổ chức project nhiều file">
+<div class="hdr in"><span class="qn">11</span><h2>Tổ chức project nhiều file</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.15fr">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="file f" style="border-color:#7c3aed"><span class="fn2" style="color:#7c3aed">matrix.h</span> · <b>file tiêu đề</b> (header)<br>Chỉ chứa <b>khai báo</b>: hằng MAX và <b>nguyên mẫu hàm</b> (prototype). Giống “mục lục” của một cuốn sách.</div>
+      <div class="file f" style="border-color:#0891b2"><span class="fn2" style="color:#0891b2">matrix.cpp</span> · <b>cài đặt</b><br><code class="i">#include "matrix.h"</code> rồi viết <b>thân</b> từng hàm: nhập, in, tính tổng, kiểm tra.</div>
+      <div class="file f" style="border-color:#ec4899"><span class="fn2" style="color:#db2777">main.cpp</span> · <b>chương trình chính</b><br><code class="i">#include "matrix.h"</code> rồi chỉ <b>gọi</b> hàm. main ngắn, dễ đọc như kịch bản.</div>
+      <div class="note blue f" style="font-size:15.5px;margin-top:0">Lợi ích: mỗi file một việc · dễ tìm lỗi · tái sử dụng <code class="i">matrix.cpp</code> cho bài khác · nhiều người cùng làm.</div>
+    </div>
+    <div>
+      <div class="flow" style="flex-direction:column;gap:6px">
+        <div class="flow" style="flex-wrap:nowrap">
+          <div class="box c hide0" id="pjB1">main.cpp<small>+ matrix.h</small></div><div class="ar hide0" id="pjA1">→ biên dịch →</div><div class="box hide0" id="pjB2">main.o</div>
+        </div>
+        <div class="flow" style="flex-wrap:nowrap">
+          <div class="box b hide0" id="pjB3">matrix.cpp<small>+ matrix.h</small></div><div class="ar hide0" id="pjA2">→ biên dịch →</div><div class="box hide0" id="pjB4">matrix.o</div>
+        </div>
+        <div class="ar hide0" id="pjA3">↘ ↙ &nbsp; linker (nối) </div>
+        <div class="box e hide0" id="pjB5" style="min-width:240px">matrix.exe<small>chương trình chạy được</small></div>
+      </div>
+      <div class="console" style="margin-top:12px" id="pjc"><span class="cl" id="pjc0"><span class="in">$ g++ main.cpp matrix.cpp -o matrix</span></span><span class="cl" id="pjc1"><span class="in">$ ./matrix</span>          (Windows: matrix.exe)</span></div>
+      <span class="f ghost" data-act="#pjB1|sh;#pjA1|sh;#pjB2|sh;#pjB3|sh;#pjA2|sh;#pjB4|sh" data-say="Mỗi file <b>.cpp</b> được biên dịch <b>riêng</b> thành file đối tượng <b>.o</b>. Nhờ <b>matrix.h</b>, main.cpp biết tên và kiểu tham số của hàm dù chưa thấy thân hàm."></span>
+      <span class="f ghost" data-act="#pjA3|sh;#pjB5|sh" data-say="<b>Linker</b> nối các file .o lại: lời gọi inputMatrix trong main.o được nối tới thân hàm nằm trong matrix.o."></span>
+      <span class="f ghost" data-act="#pjc0|show;#pjc1|show" data-say="Với g++: liệt kê <b>tất cả</b> file .cpp (không liệt kê .h). Trong Dev-C++/Code::Blocks: tạo <b>Project</b> → Console Application → <b>Add files</b> cả 3 file, rồi Build."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== fileh ===== -->
+<section class="slide" id="fileh" data-title="12 · matrix.h">
+<div class="hdr in"><span class="qn">12</span><h2>matrix.h: khai báo hằng và nguyên mẫu hàm</h2></div>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr">
+    <div>
+<script type="text/x-cpp" class="f14" id="kH" data-title="matrix.h" data-mark="1-2,18:a;4:b;7:c;9:d;11-12:e;14:f;16:g">
+#ifndef MATRIX_H
+#define MATRIX_H
+
+const int MAX = 100;    // kích thước tối đa: int a[100][100]
+
+// Nhập kích thước m, n và các phần tử của ma trận
+void inputMatrix(int a[][MAX], int &m, int &n);
+// In ma trận ra màn hình
+void printMatrix(int a[][MAX], int m, int n);
+// rowSum[i] = tổng dòng i ; colSum[j] = tổng cột j
+void computeRowSums(int a[][MAX], int m, int n, int rowSum[]);
+void computeColSums(int a[][MAX], int m, int n, int colSum[]);
+// a[i][j] có bằng tổng các phần tử còn lại trên dòng i và cột j?
+bool isSpecial(int a[][MAX], int i, int j, int rowSum[], int colSum[]);
+// In tất cả phần tử thỏa điều kiện
+void printSpecial(int a[][MAX], int m, int n);
+
+#endif
+</script>
+    </div>
+    <div>
+      <div class="card f" style="padding:10px 14px"><h3>Vì sao phải ghi <code class="i">a[][MAX]</code>?</h3>
+        <p style="font-size:15px">Trong bộ nhớ, mảng 2 chiều được xếp <b>thành một hàng dài</b>, hết dòng 0 tới dòng 1… (ví dụ thu nhỏ với MAX = 4):</p>
+        <div style="margin:8px 0"><div class="strip"><span class="r0" id="st00">0,0</span><span class="r0" id="st01">0,1</span><span class="r0" id="st02">0,2</span><span class="r0" id="st03">0,3</span><span class="r1" id="st10">1,0</span><span class="r1" id="st11">1,1</span><span class="r1" id="st12">1,2</span><span class="r1" id="st13">1,3</span><span class="r2" id="st20">2,0</span><span class="r2" id="st21">2,1</span><span class="r2" id="st22">2,2</span><span class="r2" id="st23">2,3</span></div></div>
+        <div class="calc" id="hpos" style="font-size:15px;min-height:0">a[i][j] nằm ở vị trí <b>i × MAX + j</b></div>
+      </div>
+      <span class="f ghost" data-now="#kH|show-a" data-say="&lt;b&gt;Include guard&lt;/b&gt;: lần đầu MATRIX_H chưa được định nghĩa ⇒ lấy nội dung và định nghĩa nó. Nếu file bị include lần 2, toàn bộ bị bỏ qua ⇒ không bị khai báo trùng."></span>
+      <span class="f ghost" data-now="#kH|show-b" data-say="&lt;b&gt;const int MAX = 100&lt;/b&gt;: hằng dùng chung. Đổi kích thước tối đa chỉ cần sửa 1 chỗ. Trong main sẽ khai báo &lt;b&gt;int a[MAX][MAX]&lt;/b&gt; = int a[100][100]."></span>
+      <span class="f ghost" data-now="#kH|show-c" data-say="&lt;b&gt;inputMatrix(int a[][MAX], int &amp;m, int &amp;n)&lt;/b&gt;: mảng truyền vào hàm thực chất là truyền &lt;b&gt;địa chỉ&lt;/b&gt; ⇒ hàm ghi vào a thì main thấy luôn. &lt;b&gt;&amp;m, &amp;n&lt;/b&gt; (tham chiếu) để hàm gửi kích thước vừa nhập về main."></span>
+      <span class="f ghost" data-now="#kH|show-c;#st12|foc" data-set="#hpos::a[1][2] → 1 × MAX + 2 = 1 × 4 + 2 = &lt;b&gt;6&lt;/b&gt;" data-say="Muốn tìm a[1][2], máy tính phải biết &lt;b&gt;mỗi dòng dài bao nhiêu&lt;/b&gt; (MAX). Vì vậy số cột &lt;b&gt;bắt buộc&lt;/b&gt; phải ghi: a[][MAX]. Số dòng thì được bỏ trống."></span>
+      <span class="f ghost" data-now="#kH|show-d" data-say="&lt;b&gt;printMatrix(int a[][MAX], int m, int n)&lt;/b&gt;: chỉ đọc m, n nên truyền &lt;b&gt;giá trị&lt;/b&gt; (không có &amp;)."></span>
+      <span class="f ghost" data-now="#kH|show-e" data-say="&lt;b&gt;rowSum[]&lt;/b&gt;, &lt;b&gt;colSum[]&lt;/b&gt;: mảng 1 chiều “kết quả”. Hàm điền giá trị vào, người gọi dùng lại."></span>
+      <span class="f ghost" data-now="#kH|show-f" data-say="&lt;b&gt;isSpecial&lt;/b&gt; trả về &lt;b&gt;bool&lt;/b&gt; (true/false): tách riêng điều kiện để dễ kiểm tra, dễ sửa nếu đề thay đổi."></span>
+      <span class="f ghost" data-now="#kH|show-g" data-say="&lt;b&gt;printSpecial&lt;/b&gt;: hàm “tổng hợp” gọi các hàm trên và in kết quả. Mọi dòng trong .h đều kết thúc bằng &lt;b&gt;;&lt;/b&gt; và &lt;b&gt;không có thân hàm&lt;/b&gt;."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== cpp1 ===== -->
+<section class="slide" id="cpp1" data-title="13 · matrix.cpp: nhập &amp; in">
+<div class="hdr in"><span class="qn">13</span><h2>matrix.cpp (1): hàm nhập và in ma trận</h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr">
+    <div>
+<script type="text/x-cpp" class="f14" id="kC1" data-title="matrix.cpp" data-mark="1-4:a;7-10:b;11-14:c;15-18:d;21-27:e">
+#include <iostream>
+#include <iomanip>
+#include "matrix.h"
+using namespace std;
+
+void inputMatrix(int a[][MAX], int &m, int &n) {
+    do {
+        cout << "Nhap so dong M (1..100): ";
+        cin >> m;
+    } while (m < 1 || m > MAX);
+    do {
+        cout << "Nhap so cot N (1..100): ";
+        cin >> n;
+    } while (n < 1 || n > MAX);
+    cout << "Nhap " << m << " dong, moi dong " << n << " so:" << endl;
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++)
+            cin >> a[i][j];
+}
+
+void printMatrix(int a[][MAX], int m, int n) {
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++)
+            cout << setw(5) << a[i][j];
+        cout << endl;
+    }
+}
+</script>
+    </div>
+    <div>
+      <div class="console" id="c1o"><span class="cl" id="c1o0">Nhap so dong M (1..100): <span class='in'>0</span></span><span class="cl" id="c1o1">Nhap so dong M (1..100): <span class='in'>3</span></span><span class="cl" id="c1o2">Nhap so cot N (1..100): <span class='in'>4</span></span><span class="cl" id="c1o3">Nhap 3 dong, moi dong 4 so:</span><span class="cl" id="c1o4"><span class='in'>1 2 4 9</span></span><span class="cl" id="c1o5"><span class='in'>8 1 1 1</span></span><span class="cl" id="c1o6"><span class='in'>4 5 5 1</span></span><span class="cl" id="c1o7">    1    2    4    9</span><span class="cl" id="c1o8">    8    1    1    1</span><span class="cl" id="c1o9">    4    5    5    1</span></div>
+      <span class="f ghost" data-now="#kC1|show-a" data-say="&lt;b&gt;&amp;lt;iostream&amp;gt;&lt;/b&gt; cho cin/cout, &lt;b&gt;&amp;lt;iomanip&amp;gt;&lt;/b&gt; cho setw. &lt;b&gt;&quot;matrix.h&quot;&lt;/b&gt; dùng dấu nháy kép vì là file &lt;b&gt;của mình&lt;/b&gt;, nằm cùng thư mục."></span>
+      <span class="f ghost" data-now="#kC1|show-b" data-act="#c1o0|show" data-say="&lt;b&gt;do … while&lt;/b&gt;: hỏi trước, kiểm tra sau. Người dùng nhập &lt;b&gt;0&lt;/b&gt; ⇒ điều kiện m &amp;lt; 1 đúng ⇒ hỏi lại."></span>
+      <span class="f ghost" data-now="#kC1|show-b" data-act="#c1o1|show" data-say="Nhập &lt;b&gt;3&lt;/b&gt; ⇒ hợp lệ ⇒ thoát vòng. Nhờ vậy m luôn nằm trong [1, 100], không bao giờ vượt mảng."></span>
+      <span class="f ghost" data-now="#kC1|show-c" data-act="#c1o2|show" data-say="Tương tự cho số cột &lt;b&gt;n&lt;/b&gt;."></span>
+      <span class="f ghost" data-now="#kC1|show-d" data-act="#c1o3|show;#c1o4|show;#c1o5|show;#c1o6|show" data-say="Hai vòng for lồng nhau đọc lần lượt a[0][0], a[0][1], … a[2][3]. cin bỏ qua khoảng trắng và xuống dòng, nên gõ mỗi dòng một hàng số là được."></span>
+      <span class="f ghost" data-now="#kC1|show-e" data-act="#c1o7|show;#c1o8|show;#c1o9|show" data-say="&lt;b&gt;setw(5)&lt;/b&gt;: mỗi số chiếm đúng 5 ký tự, canh phải ⇒ các cột thẳng hàng. Hết một dòng i thì &lt;b&gt;endl&lt;/b&gt; xuống dòng."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== cpp2 ===== -->
+<section class="slide" id="cpp2" data-title="14 · matrix.cpp: tính tổng &amp; kiểm tra">
+<div class="hdr in"><span class="qn">14</span><h2>matrix.cpp (2): tính tổng dòng, tổng cột, kiểm tra 1 ô</h2></div>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr">
+    <div>
+<script type="text/x-cpp" class="f14" id="kC2" data-title="matrix.cpp (tiếp)" data-mark="1:a;3:b;4-5:c;9-13:d;18:e;19:f;20:g">
+void computeRowSums(int a[][MAX], int m, int n, int rowSum[]) {
+    for (int i = 0; i < m; i++) {
+        rowSum[i] = 0;
+        for (int j = 0; j < n; j++)
+            rowSum[i] += a[i][j];
+    }
+}
+
+void computeColSums(int a[][MAX], int m, int n, int colSum[]) {
+    for (int j = 0; j < n; j++) {
+        colSum[j] = 0;
+        for (int i = 0; i < m; i++)
+            colSum[j] += a[i][j];
+    }
+}
+
+bool isSpecial(int a[][MAX], int i, int j, int rowSum[], int colSum[]) {
+    int restRow = rowSum[i] - a[i][j];   // phần còn lại trên dòng i
+    int restCol = colSum[j] - a[i][j];   // phần còn lại trên cột j
+    return a[i][j] == restRow + restCol;
+}
+</script>
+    </div>
+    <div>
+      <div class="vrow"><span class="lab">rowSum</span><div class="cell sum" id="v2r0">?</div><div class="cell sum" id="v2r1">?</div><div class="cell sum" id="v2r2">?</div></div><div class="vrow"><span class="lab">colSum</span><div class="cell sum" id="v2c0">?</div><div class="cell sum" id="v2c1">?</div><div class="cell sum" id="v2c2">?</div><div class="cell sum" id="v2c3">?</div></div>
+      <div class="calc" id="v2calc" style="margin-top:10px;min-height:96px">Ví dụ ma trận 3 × 4 ở trên.</div>
+      <span class="f ghost" data-now="#kC2|show-a" data-say="Tham số &lt;b&gt;int rowSum[]&lt;/b&gt;: mảng 1 chiều không cần ghi kích thước. Hàm sẽ &lt;b&gt;ghi&lt;/b&gt; kết quả vào mảng của người gọi."></span>
+      <span class="f ghost" data-now="#kC2|show-b" data-say="&lt;b&gt;rowSum[i] = 0&lt;/b&gt; trước khi cộng. Biến/mảng cục bộ trong C++ &lt;b&gt;không tự bằng 0&lt;/b&gt;; quên dòng này sẽ cộng vào giá trị rác."></span>
+      <span class="f ghost" data-now="#kC2|show-c" data-set="#v2r0::16;#v2r1::11;#v2r2::15" data-say="Cộng dồn từng phần tử của dòng i: rowSum = [16, 11, 15]."></span>
+      <span class="f ghost" data-now="#kC2|show-d" data-set="#v2r0::16;#v2r1::11;#v2r2::15;#v2c0::13;#v2c1::8;#v2c2::10;#v2c3::11" data-say="Tổng cột: vòng &lt;b&gt;ngoài là j&lt;/b&gt; (cột), vòng trong i chạy theo dòng, cộng &lt;b&gt;a[i][j]&lt;/b&gt; (không phải a[j][i]!). colSum = [13, 8, 10, 11]."></span>
+      <span class="f ghost" data-now="#kC2|show-e;#v2r1|foc" data-set="#v2r0::16;#v2r1::11;#v2r2::15;#v2c0::13;#v2c1::8;#v2c2::10;#v2c3::11;#v2calc::isSpecial(a, 1, 0, …): a[1][0] = 8&lt;br&gt;&lt;span class=&#x27;r&#x27;&gt;restRow = rowSum[1] − 8 = 11 − 8 = 3&lt;/span&gt;" data-say="&lt;b&gt;restRow&lt;/b&gt;: tổng dòng i trừ chính ô đó."></span>
+      <span class="f ghost" data-now="#kC2|show-f;#v2c0|foc" data-set="#v2r0::16;#v2r1::11;#v2r2::15;#v2c0::13;#v2c1::8;#v2c2::10;#v2c3::11;#v2calc::isSpecial(a, 1, 0, …): a[1][0] = 8&lt;br&gt;&lt;span class=&#x27;r&#x27;&gt;restRow = 11 − 8 = 3&lt;/span&gt;&lt;br&gt;&lt;span class=&#x27;c2&#x27;&gt;restCol = colSum[0] − 8 = 13 − 8 = 5&lt;/span&gt;" data-say="&lt;b&gt;restCol&lt;/b&gt;: tổng cột j trừ chính ô đó. Đặt tên biến rõ nghĩa giúp người đọc hiểu ngay."></span>
+      <span class="f ghost" data-now="#kC2|show-g" data-set="#v2r0::16;#v2r1::11;#v2r2::15;#v2c0::13;#v2c1::8;#v2c2::10;#v2c3::11;#v2calc::isSpecial(a, 1, 0, …): a[1][0] = 8&lt;br&gt;&lt;span class=&#x27;r&#x27;&gt;restRow = 3&lt;/span&gt; · &lt;span class=&#x27;c2&#x27;&gt;restCol = 5&lt;/span&gt;&lt;br&gt;return 8 == 3 + 5 → &lt;span class=&#x27;y&#x27;&gt;true&lt;/span&gt;" data-say="&lt;b&gt;return a[i][j] == restRow + restCol;&lt;/b&gt; biểu thức so sánh đã là bool, không cần viết if (…) return true; else return false;"></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== cpp3 ===== -->
+<section class="slide" id="cpp3" data-title="15 · matrix.cpp: printSpecial">
+<div class="hdr in"><span class="qn">15</span><h2>matrix.cpp (3): printSpecial ghép mọi thứ lại</h2></div>
+  <div class="cols" style="grid-template-columns:1.5fr 1fr">
+    <div>
+<script type="text/x-cpp" class="f14" id="kC3" data-title="matrix.cpp (tiếp)" data-mark="2:a;3-4:b;5:c;6-8:d;9-10:e;12-13:f">
+void printSpecial(int a[][MAX], int m, int n) {
+    int rowSum[MAX], colSum[MAX];
+    computeRowSums(a, m, n, rowSum);
+    computeColSums(a, m, n, colSum);
+    int count = 0;
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++)
+            if (isSpecial(a, i, j, rowSum, colSum)) {
+                cout << "a[" << i << "][" << j << "] = " << a[i][j] << endl;
+                count++;
+            }
+    if (count == 0)
+        cout << "Khong co phan tu nao thoa man." << endl;
+}
+</script>
+    </div>
+    <div>
+      <div class="vars"><span class="vc" id="c3v1">rowSum = ?</span><span class="vc" id="c3v2">colSum = ?</span><span class="vc" id="c3v3">count = ?</span></div>
+      <div style="margin-top:10px"><div class="console" id="c3o"><span class="cl" id="c3o0">a[0][3] = 9</span><span class="cl" id="c3o1">a[1][0] = 8</span></div></div>
+      <span class="f ghost" data-now="#kC3|show-a" data-say="Hai mảng &lt;b&gt;cục bộ&lt;/b&gt; rowSum[MAX], colSum[MAX]: kích thước mảng tĩnh phải là &lt;b&gt;hằng số&lt;/b&gt;, nên khai báo MAX (100) rồi chỉ dùng m hoặc n phần tử đầu."></span>
+      <span class="f ghost" data-now="#kC3|show-b;#c3v1|hot;#c3v2|hot" data-set="#c3v1::rowSum = [16, 11, 15];#c3v2::colSum = [13, 8, 10, 11]" data-say="Gọi 2 hàm tính tổng — &lt;b&gt;chỉ 1 lần&lt;/b&gt; trước khi duyệt (ý tưởng cách 2). Truyền tên mảng &lt;b&gt;a&lt;/b&gt;, &lt;b&gt;rowSum&lt;/b&gt;, không kèm []."></span>
+      <span class="f ghost" data-now="#kC3|show-c;#c3v3|hot" data-set="#c3v1::rowSum = [16, 11, 15];#c3v2::colSum = [13, 8, 10, 11];#c3v3::count = 0" data-say="&lt;b&gt;count&lt;/b&gt; đếm số phần tử thỏa. Phải gán 0 ban đầu."></span>
+      <span class="f ghost" data-now="#kC3|show-d;#kC3|show-e;#c3v3|hot" data-act="#c3o0|show;#c3o1|show" data-set="#c3v1::rowSum = [16, 11, 15];#c3v2::colSum = [13, 8, 10, 11];#c3v3::count = 2" data-say="Duyệt mọi ô, hỏi &lt;b&gt;isSpecial&lt;/b&gt;. Thỏa thì in vị trí + giá trị và tăng count. Kết quả: 2 dòng."></span>
+      <span class="f ghost" data-now="#kC3|show-f;#c3v3|res" data-set="#c3v1::rowSum = [16, 11, 15];#c3v2::colSum = [13, 8, 10, 11];#c3v3::count = 2" data-say="Kiểm tra count &lt;b&gt;sau&lt;/b&gt; vòng lặp: count = 2 ≠ 0 nên không in “Khong co…”. Với ma trận 1..9 thì count = 0 ⇒ in thông báo."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== mainf ===== -->
+<section class="slide" id="mainf" data-title="16 · main.cpp &amp; chạy thử">
+<div class="hdr in"><span class="qn">16</span><h2>main.cpp và chạy thử chương trình</h2></div>
+  <div class="cols" style="grid-template-columns:1.12fr 1fr">
+    <div>
+<script type="text/x-cpp" class="f16" id="kM" data-title="main.cpp" data-mark="1-3:a;6-7:b;9:c;11-12:d;14-15:e;16:f">
+#include <iostream>
+#include "matrix.h"
+using namespace std;
+
+int main() {
+    int a[MAX][MAX];          // chính là int a[100][100]
+    int m, n;
+
+    inputMatrix(a, m, n);
+
+    cout << "Ma tran vua nhap:" << endl;
+    printMatrix(a, m, n);
+
+    cout << "Cac phan tu thoa man:" << endl;
+    printSpecial(a, m, n);
+    return 0;
+}
+</script>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <div class="console" id="mo"><span class="cl" id="mo0">Nhap so dong M (1..100): <span class='in'>3</span></span><span class="cl" id="mo1">Nhap so cot N (1..100): <span class='in'>4</span></span><span class="cl" id="mo2">Nhap 3 dong, moi dong 4 so:</span><span class="cl" id="mo3"><span class='in'>1 2 4 9</span></span><span class="cl" id="mo4"><span class='in'>8 1 1 1</span></span><span class="cl" id="mo5"><span class='in'>4 5 5 1</span></span><span class="cl" id="mo6">Ma tran vua nhap:</span><span class="cl" id="mo7">    1    2    4    9</span><span class="cl" id="mo8">    8    1    1    1</span><span class="cl" id="mo9">    4    5    5    1</span><span class="cl" id="mo10">Cac phan tu thoa man:</span><span class="cl" id="mo11">a[0][3] = 9</span><span class="cl" id="mo12">a[1][0] = 8</span></div>
+      <span class="f ghost" data-now="#kM|show-a" data-say="main.cpp chỉ cần &lt;b&gt;#include &quot;matrix.h&quot;&lt;/b&gt; là gọi được mọi hàm, &lt;b&gt;không&lt;/b&gt; include matrix.cpp."></span>
+      <span class="f ghost" data-now="#kM|show-b" data-say="&lt;b&gt;int a[MAX][MAX]&lt;/b&gt; chính là &lt;b&gt;int a[100][100]&lt;/b&gt; (≈ 40 KB). m, n chưa có giá trị, sẽ do inputMatrix điền."></span>
+      <span class="f ghost" data-now="#kM|show-c" data-act="#mo0|show;#mo1|show;#mo2|show;#mo3|show;#mo4|show;#mo5|show" data-say="Gọi &lt;b&gt;inputMatrix(a, m, n)&lt;/b&gt;: truyền tên mảng (không có []). Sau lời gọi, m = 3, n = 4 nhờ tham chiếu &amp;."></span>
+      <span class="f ghost" data-now="#kM|show-d" data-act="#mo0|show;#mo1|show;#mo2|show;#mo3|show;#mo4|show;#mo5|show;#mo6|show;#mo7|show;#mo8|show;#mo9|show" data-say="In lại ma trận để người dùng kiểm tra đã nhập đúng chưa."></span>
+      <span class="f ghost" data-now="#kM|show-e" data-act="#mo0|show;#mo1|show;#mo2|show;#mo3|show;#mo4|show;#mo5|show;#mo6|show;#mo7|show;#mo8|show;#mo9|show;#mo10|show;#mo11|show;#mo12|show" data-say="&lt;b&gt;printSpecial&lt;/b&gt; làm phần chính: tính tổng, kiểm tra, in kết quả."></span>
+      <span class="f ghost" data-now="#kM|show-f" data-act="#mo0|show;#mo1|show;#mo2|show;#mo3|show;#mo4|show;#mo5|show;#mo6|show;#mo7|show;#mo8|show;#mo9|show;#mo10|show;#mo11|show;#mo12|show" data-say="&lt;b&gt;return 0&lt;/b&gt;: báo hệ điều hành chương trình kết thúc bình thường. Toàn bộ main chỉ ~10 dòng, đọc như một kịch bản."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== loi1 ===== -->
+<section class="slide" id="loi1" data-title="17 · Lỗi sai hay gặp: logic">
+<div class="hdr in"><span class="qn">17</span><h2>Những lỗi sai hay gặp (1): lỗi logic</h2></div><div class="cols4"><div class="card f"><h3>① Không trừ chính nó</h3><p style="font-size:15.5px;line-height:1.38">“Còn lại” = bỏ chính nó. Ô nằm ở cả dòng và cột ⇒ trừ <b>2 lần</b>. Trừ 1 lần: ví dụ 2×2 sẽ không ra a[0][0] = 2.</p><div class="snip bad">a[i][j] == R[i] + C[j]
+a[i][j] == R[i] + C[j] - a[i][j]</div><div class="snip good">a[i][j] == (R[i]-a[i][j])
+         + (C[j]-a[i][j])</div></div><div class="card f"><h3>② Quên gán tổng = 0</h3><p style="font-size:15.5px;line-height:1.38">Mảng cục bộ chứa <b>giá trị rác</b>. Kết quả sai ngẫu nhiên, mỗi lần chạy một khác.</p><div class="snip bad">int rowSum[MAX];
+for (i...) for (j...)
+  rowSum[i] += a[i][j];</div><div class="snip good">for (i...) {
+  rowSum[i] = 0;
+  for (j...) rowSum[i] += a[i][j];
+}</div></div><div class="card f"><h3>③ Nhầm chỉ số khi tính cột</h3><p style="font-size:15.5px;line-height:1.38">Luôn là <b>a[dòng][cột]</b>. Dòng chạy tới <b>m</b>, cột chạy tới <b>n</b>. Sai chỗ này chỉ lộ khi m ≠ n!</p><div class="snip bad">for (j=0; j&lt;n; j++)
+  for (i=0; i&lt;n; i++)
+    colSum[j] += a[j][i];</div><div class="snip good">for (j=0; j&lt;n; j++)
+  for (i=0; i&lt;m; i++)
+    colSum[j] += a[i][j];</div></div><div class="card f"><h3>④ In “không có” sai chỗ</h3><p style="font-size:15.5px;line-height:1.38">Chỉ biết “không có ô nào” <b>sau khi</b> duyệt hết. Dùng biến đếm <b>count</b>.</p><div class="snip bad">for (...) for (...)
+  if (thoa) cout &lt;&lt; ...;
+  else cout &lt;&lt; &quot;Khong co&quot;;</div><div class="snip good">if (thoa) { cout...; count++; }
+...
+if (count == 0)
+  cout &lt;&lt; &quot;Khong co&quot;;</div></div></div><div class="note f" style="font-size:15.5px">Thêm: dùng <code class="i">for (i = 1; i &lt;= m; i++)</code> (đếm từ 1) ⇒ bỏ sót dòng 0 và đọc a[m] ngoài vùng dữ liệu · chỉ test ma trận <b>vuông</b> nên không thấy lỗi ③ · <code class="i">return</code> ngay khi gặp ô đầu tiên ⇒ thiếu kết quả (case toàn 0).</div>
+</section>
+
+<!-- ===== loi2 ===== -->
+<section class="slide" id="loi2" data-title="18 · Lỗi sai hay gặp: C++ &amp; project">
+<div class="hdr in"><span class="qn">18</span><h2>Những lỗi sai hay gặp (2): cú pháp C++ &amp; project</h2></div><div class="cols4"><div class="card f"><h3>⑤ Tham số thiếu số cột</h3><p style="font-size:15.5px;line-height:1.38">Lỗi biên dịch: <i>declaration of 'a' as multidimensional array must have bounds for all dimensions except the first</i>.</p><div class="snip bad">void printMatrix(int a[][],
+                 int m, int n);</div><div class="snip good">void printMatrix(int a[][MAX],
+                 int m, int n);</div></div><div class="card f"><h3>⑥ Không kiểm tra M, N</h3><p style="font-size:15.5px;line-height:1.38">Vượt 100 ⇒ ghi đè bộ nhớ khác, chương trình chạy sai hoặc crash mà <b>không báo lỗi</b>.</p><div class="snip bad">cin &gt;&gt; m &gt;&gt; n;   // m = 150 ?
+// ghi a[149][..] → tràn mảng</div><div class="snip good">do { cin &gt;&gt; m; }
+while (m &lt; 1 || m &gt; MAX);</div></div><div class="card f"><h3>⑦ Chỉ biên dịch main.cpp</h3><p style="font-size:15.5px;line-height:1.38">Lỗi link: <i>undefined reference to `inputMatrix(int (*) [100], int&amp;, int&amp;)'</i> — có khai báo nhưng không tìm thấy thân hàm.</p><div class="snip bad">g++ main.cpp -o matrix</div><div class="snip good">g++ main.cpp matrix.cpp -o matrix</div></div><div class="card f"><h3>⑧ #include file .cpp</h3><p style="font-size:15.5px;line-height:1.38">Thân hàm bị chép vào 2 nơi ⇒ <i>multiple definition of `inputMatrix…'</i>. Tương tự nếu viết thân hàm trong .h.</p><div class="snip bad">// main.cpp
+#include &quot;matrix.cpp&quot;</div><div class="snip good">// main.cpp
+#include &quot;matrix.h&quot;</div></div></div><div class="note f" style="font-size:15.5px">Thêm: quên <b>include guard</b> ⇒ khai báo trùng khi .h bị include nhiều lần · viết <code class="i">a[i, j]</code> thay vì <code class="i">a[i][j]</code> · gọi <code class="i">printMatrix(a[][], m, n)</code> (đúng: <code class="i">printMatrix(a, m, n)</code>) · phần tử rất lớn (~10<sup>9</sup>) ⇒ tổng <b>tràn int</b>, nên dùng <code class="i">long long</code> cho rowSum/colSum.</div>
+</section>
+
+<!-- ===== vec ===== -->
+<section class="slide" id="vec" data-title="19 · Giải bằng vector">
+<div class="hdr in"><span class="qn">19</span><h2>Lưu ý thêm: giải bằng <code class='i' style='font-size:.8em'>vector&lt;vector&lt;int&gt;&gt;</code></h2></div>
+  <div class="cols" style="grid-template-columns:1.55fr 1fr">
+    <div>
+<script type="text/x-cpp" class="f13" id="kV" data-title="matrix_vec.cpp (trích)" data-mark="1:a;6:b;13:c;14:d;15:e;16-20:f;24:g">
+typedef vector<vector<int>> Matrix;
+
+Matrix inputMatrix() {
+    int m, n;
+    cin >> m >> n;
+    Matrix a(m, vector<int>(n));      // m dòng, mỗi dòng n số
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++)
+            cin >> a[i][j];
+    return a;
+}
+
+void printSpecial(const Matrix &a) {
+    int m = a.size(), n = a[0].size();
+    vector<int> rowSum(m, 0), colSum(n, 0);
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            rowSum[i] += a[i][j];
+            colSum[j] += a[i][j];
+        }
+    int count = 0;
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++)
+            if (a[i][j] == (rowSum[i] - a[i][j]) + (colSum[j] - a[i][j])) {
+                cout << "a[" << i << "][" << j << "] = " << a[i][j] << endl;
+                count++;
+            }
+    if (count == 0) cout << "Khong co phan tu nao thoa man." << endl;
+}
+</script>
+    </div>
+    <div>
+      <div id="vvis" style="display:flex;flex-direction:column;gap:5px;margin:8px 0"><div class="vrow hide0" id="vv0"><span class="lab">a[0] →</span><div class="cell">1</div><div class="cell">2</div><div class="cell">4</div><div class="cell">9</div></div><div class="vrow hide0" id="vv1"><span class="lab">a[1] →</span><div class="cell">8</div><div class="cell">1</div><div class="cell">1</div><div class="cell">1</div></div><div class="vrow hide0" id="vv2"><span class="lab">a[2] →</span><div class="cell">4</div><div class="cell">5</div><div class="cell">5</div><div class="cell">1</div></div></div>
+      <div class="calc" id="vcalc" style="font-size:15px">#include &lt;vector&gt;</div>
+      <span class="f ghost" data-now="#kV|show-a" data-set="#vcalc::Matrix = vector&amp;lt;vector&amp;lt;int&amp;gt;&amp;gt;" data-say="&lt;b&gt;vector&amp;lt;vector&amp;lt;int&amp;gt;&amp;gt;&lt;/b&gt; = “vector của các dòng”, mỗi dòng là một vector&amp;lt;int&amp;gt;. Đặt tên ngắn &lt;b&gt;Matrix&lt;/b&gt; bằng typedef cho dễ viết."></span>
+      <span class="f ghost" data-now="#kV|show-b" data-act="#vv0|sh;#vv1|sh;#vv2|sh" data-set="#vcalc::Matrix a(3, vector&amp;lt;int&amp;gt;(4));" data-say="Biết m, n rồi mới tạo: &lt;b&gt;a(m, vector&amp;lt;int&amp;gt;(n))&lt;/b&gt; = m dòng, mỗi dòng n số (tự bằng 0). Đúng kích thước, &lt;b&gt;không&lt;/b&gt; cần MAX, không giới hạn 100."></span>
+      <span class="f ghost" data-now="#kV|show-c" data-set="#vcalc::void printSpecial(&lt;b&gt;const Matrix &amp;amp;a&lt;/b&gt;)" data-say="Truyền vào hàm bằng &lt;b&gt;const &amp;amp;&lt;/b&gt;: không sao chép cả ma trận (nhanh), và const đảm bảo hàm không sửa a. Không cần truyền m, n."></span>
+      <span class="f ghost" data-now="#kV|show-d" data-set="#vcalc::m = a.size() = 3 · n = a[0].size() = 4" data-say="Vector &lt;b&gt;tự biết kích thước&lt;/b&gt;: a.size() = số dòng, a[0].size() = số cột."></span>
+      <span class="f ghost" data-now="#kV|show-e" data-set="#vcalc::rowSum = [0, 0, 0] · colSum = [0, 0, 0, 0]" data-say="&lt;b&gt;vector&amp;lt;int&amp;gt; rowSum(m, 0)&lt;/b&gt;: tạo m phần tử, tất cả bằng 0 ⇒ không còn lỗi “quên gán 0”."></span>
+      <span class="f ghost" data-now="#kV|show-f" data-set="#vcalc::rowSum = [16, 11, 15] · colSum = [13, 8, 10, 11]" data-say="Mẹo: tính &lt;b&gt;cả&lt;/b&gt; rowSum và colSum trong &lt;b&gt;một&lt;/b&gt; lần duyệt: ô a[i][j] được cộng vào dòng i và cột j cùng lúc."></span>
+      <span class="f ghost" data-now="#kV|show-g" data-set="#vcalc::→ a[0][3] = 9 · a[1][0] = 8 (giống hệt bản mảng tĩnh)" data-say="Phần kiểm tra và in &lt;b&gt;giữ nguyên&lt;/b&gt;: cú pháp a[i][j] của vector giống mảng thường."></span>
+      <div class="note blue f" style="font-size:14.5px">Chia nhiều file với vector: trong <b>matrix.h</b> thêm <code class="i">#include &lt;vector&gt;</code> và viết <code class="i">std::vector</code> (không đặt <code class="i">using namespace std;</code> trong file .h).</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== sosanh ===== -->
+<section class="slide" id="sosanh" data-title="20 · Mảng tĩnh vs vector">
+<div class="hdr in"><span class="qn">20</span><h2>So sánh: <code class='i' style='font-size:.8em'>int a[100][100]</code> và <code class='i' style='font-size:.8em'>vector&lt;vector&lt;int&gt;&gt;</code></h2></div>
+  <table class="t1" style="font-size:17.5px">
+    <tr><th style="width:190px">Tiêu chí</th><th>Mảng tĩnh int a[100][100]</th><th>vector&lt;vector&lt;int&gt;&gt;</th></tr>
+    <tr class="f"><td>Khai báo</td><td><code class="i">int a[MAX][MAX];</code> + biến m, n</td><td><code class="i">Matrix a(m, vector&lt;int&gt;(n));</code></td></tr>
+    <tr class="f"><td>Kích thước</td><td>Cố định, xin dư 100×100; phải kiểm tra m, n ≤ 100</td><td>Đúng m × n, tạo lúc chạy, không giới hạn 100</td></tr>
+    <tr class="f"><td>Truyền vào hàm</td><td><code class="i">int a[][MAX], int m, int n</code> (phải ghi số cột)</td><td><code class="i">const Matrix &amp;a</code> (tự mang kích thước)</td></tr>
+    <tr class="f"><td>Lấy kích thước</td><td>Phải tự giữ m, n</td><td><code class="i">a.size()</code>, <code class="i">a[0].size()</code></td></tr>
+    <tr class="f"><td>Khởi tạo 0</td><td>Phải tự gán (mảng cục bộ chứa rác)</td><td>Tự bằng 0 hoặc giá trị cho trước</td></tr>
+    <tr class="f"><td>Trả về từ hàm</td><td>Không trả về mảng được, phải truyền vào để hàm điền</td><td><code class="i">return a;</code> bình thường</td></tr>
+    <tr class="f"><td>Khi nào dùng</td><td>Bài tập yêu cầu mảng; học cách bộ nhớ hoạt động</td><td>Code thực tế, kích thước thay đổi, an toàn hơn</td></tr>
+  </table>
+  <div class="note blue f">Giải thuật <b>không đổi</b>: tính R[], C[] rồi so sánh từng ô. Chỉ thay đổi <b>cách lưu trữ</b> và <b>cách truyền tham số</b>.</div>
+</section>
+
+<!-- ===== summary ===== -->
+<section class="slide" id="summary" data-title="Tổng kết">
+<div class="hdr in"><span class="qn">TỔNG KẾT</span><h2>Những điều cần nhớ</h2></div>
+  <div class="cols3">
+    <div class="card in"><h3>Hiểu đề</h3><ul><li style="font-size:18px">“Còn lại” = bỏ chính nó ở <b>cả</b> dòng và cột</li><li style="font-size:18px">conLai = (R[i] − a) + (C[j] − a)</li><li style="font-size:18px">⇔ 3·a == R[i] + C[j]</li></ul></div>
+    <div class="card in"><h3>Giải thuật</h3><ul><li style="font-size:18px">Tính trước R[], C[] một lần</li><li style="font-size:18px">Duyệt mọi ô, so sánh O(1)</li><li style="font-size:18px">Biến đếm để in “không có”</li></ul></div>
+    <div class="card in"><h3>Code</h3><ul><li style="font-size:18px"><code class="i">a[][MAX]</code> khi truyền mảng 2 chiều</li><li style="font-size:18px">.h khai báo · .cpp cài đặt · main gọi</li><li style="font-size:18px">g++ main.cpp matrix.cpp</li></ul></div>
+  </div>
+  <div class="cols" style="margin-top:14px">
+    <div class="card in" style="border-top:5px solid #f59e0b"><h3 style="color:#d97706">Bộ test tự kiểm tra</h3><p style="font-size:17px;font-family:var(--mono);line-height:1.6">3×4 ví dụ → 9, 8 · 2×2 [2 1;1 0] → 2<br>1..9 → không có · toàn 0 → in hết<br>1×1 [5] → không có · số âm [−2 −1;−1 0] → −2</p></div>
+    <div class="card in" style="border-top:5px solid #10b981"><h3 style="color:#047857">Bài tập mở rộng</h3><p style="font-size:15.5px">In phần tử bằng tổng còn lại <b>chỉ trên dòng</b> · bằng <b>tích</b> các phần tử còn lại · lớn nhất trên dòng và nhỏ nhất trên cột (điểm yên ngựa).</p></div>
+  </div>
+</section>
+</div></div>
+
+<div id="bar"></div>
+<div id="hint">← → / Space: từng bước · Shift+→: qua slide · G: đi tới slide bất kỳ · A: hiện hết · F: toàn màn hình</div>
+<div id="nav"><button id="jumpNav" title="Đi tới slide (G)">☰</button><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+<div id="jump"><div id="jbox"><div class="jh"><h3>Đi tới slide</h3><span class="muted" style="font-size:14px">gõ số hoặc tên slide rồi Enter</span><input id="jq" placeholder="vd: 12 hoặc vector" autocomplete="off"><button id="jx" aria-label="Đóng">×</button></div><div id="jlist"></div></div></div>
+<script>
+(function(){
+  // ---------- C++ highlighter ----------
+  const KW=new Set("auto bool break case char class const continue default define delete do double else endif enum false float for if ifndef include inline int long namespace new nullptr return short signed sizeof static struct switch true typedef unsigned using void while".split(" "));const STD=new Set("cin cout endl setw vector std size push_back".split(" "));const PK=new Set("for to if then else end and or in nhập in_ra".split(" "));
+  const PRIM=new Set("bool char double float int long short void".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlP(line){
+    const re=/(\/\/.*$)|("(?:[^"])*")|\b(Bước \d)|\b(\d+)\b|([A-Za-zÀ-ỹ_]+)/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="fn" style="font-weight:700">'+m[3]+'</span>';
+      else if(m[4]) out+='<span class="n">'+m[4]+'</span>';
+      else if(m[5]) out+=(PK.has(m[5].toLowerCase())?'<span class="k">'+m[5]+'</span>':m[5]);
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  function hlLine(line){
+    const re=/(\/\/.*$|\/\*.*?\*\/)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(#\w+)|\b(\d+(?:\.\d+)?[fFL]?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="p">'+m[3]+'</span>';
+      else if(m[4]) out+='<span class="n">'+m[4]+'</span>';
+      else if(m[5]){
+        const w=m[5];let cls="";
+        if(PRIM.has(w))cls="t";else if(KW.has(w))cls="k";
+        else if(STD.has(w))cls="fn";else if(m[6])cls="fn";
+        else if(/^[A-Z][A-Z0-9_]+$/.test(w))cls="n";
+        else if(/^[A-Z]/.test(w))cls="t";
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[6]?esc(m[6]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-cpp"],script[type="text/x-pseudo"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");r.split(",").forEach(rr=>{const [a,b]=rr.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);});
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    if(sc.dataset.title){const t=document.createElement("div");t.className="code-title";t.textContent=sc.dataset.title;sc.before(t)}
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+((sc.type==="text/x-pseudo"?hlP(l):hlLine(l))||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+  // ---------- deck engine ----------
+  //   .f = fragment, one per step.  data-act "sel|cls;…" (kept while shown) · data-now "sel|cls;…" (only on latest step)
+  //   data-set "sel::html;…" (content while shown) · data-say narration · data-o order
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")].sort((x,y)=>(+x.dataset.o||0)-(+y.dataset.o||0));
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  const pairs=(v,sep)=>(v||"").split(/;(?=\s*#)/).filter(s=>s.trim()).map(p=>{const k=p.indexOf(sep);return [p.slice(0,k).trim(),p.slice(k+sep.length)]});
+  function tog(v,on){pairs(v,"|").forEach(([sel,cls])=>{document.querySelectorAll(sel).forEach(t=>cls.split(" ").forEach(c=>c&&t.classList.toggle(c,on)))})}
+  document.querySelectorAll("[data-set]").forEach(f=>pairs(f.dataset.set,"::").forEach(([sel])=>{document.querySelectorAll(sel).forEach(t=>{if(t.dataset.orig===undefined)t.dataset.orig=t.innerHTML})}));
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach(f=>{tog(f.dataset.now,false);tog(f.dataset.act,false)});
+      s.querySelectorAll("[data-orig]").forEach(t=>t.innerHTML=t.dataset.orig);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step);f.classList.toggle("on",on);if(on){tog(f.dataset.act,true);pairs(f.dataset.set,"::").forEach(([sel,val])=>document.querySelectorAll(sel).forEach(t=>t.innerHTML=val))}});
+      if(i===cur&&step>0)tog(fs[step-1].dataset.now,true);
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.innerHTML=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length+(fs.length?" · "+step+"/"+fs.length:"");
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    try{history.replaceState(null,"","#"+slides[cur].id)}catch(e){}
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+
+  // ---------- jump-to-slide panel ----------
+  const jump=document.getElementById("jump"),jlist=document.getElementById("jlist"),jq=document.getElementById("jq");
+  const titleOf=s=>s.dataset.title||(s.querySelector("h2,h1")||{}).textContent||s.id;
+  slides.forEach((s,i)=>{
+    const d=document.createElement("div");d.className="ji";d.dataset.i=i;
+    d.innerHTML="<b>"+String(i+1).padStart(2,"0")+"</b><span>"+esc(titleOf(s).replace(/\s+/g," ").trim())+"</span>";
+    d.onclick=()=>{closeJump();go(i)};jlist.appendChild(d);
+    const b=document.createElement("button");b.className="jumpbtn";b.type="button";b.innerHTML="☰ Đi tới slide";b.title="Mở danh sách slide (phím G)";
+    b.onclick=e=>{e.stopPropagation();openJump()};s.appendChild(b);
+  });
+  function filterJump(){
+    const q=jq.value.trim().toLowerCase();let first=null;
+    [...jlist.children].forEach(d=>{const i=+d.dataset.i;const ok=!q||String(i+1)===q||d.textContent.toLowerCase().includes(q);d.style.display=ok?"":"none";d.classList.remove("k");if(ok&&!first)first=d});
+    if(first&&q)first.classList.add("k");return first;
+  }
+  function openJump(){jump.classList.add("on");jq.value="";filterJump();[...jlist.children].forEach(d=>d.classList.toggle("cur",+d.dataset.i===cur));setTimeout(()=>jq.focus(),30)}
+  function closeJump(){jump.classList.remove("on");jq.blur()}
+  jq.addEventListener("input",filterJump);
+  jq.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Escape")closeJump();else if(e.key==="Enter"){const q=jq.value.trim();const n=parseInt(q,10);if(String(n)===q&&n>=1&&n<=slides.length){closeJump();go(n-1)}else{const f=filterJump();if(f){closeJump();go(+f.dataset.i)}}}});
+  jump.addEventListener("click",e=>{if(e.target===jump)closeJump()});
+  document.getElementById("jx").onclick=closeJump;
+  document.getElementById("jumpNav").onclick=openJump;
+
+  addEventListener("keydown",e=>{
+    if(jump.classList.contains("on")){if(e.key==="Escape")closeJump();return}
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="g"||e.key==="G"){e.preventDefault();openJump()}
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null||jump.classList.contains("on"))return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+</script>
+</body>
+</html>

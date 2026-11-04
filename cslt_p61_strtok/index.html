@@ -1,0 +1,930 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trim Spaces C++</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:16px;padding-right:150px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+.lvl{font-size:14px;font-weight:700;color:var(--muted);white-space:nowrap;margin-left:auto}
+.lvl b{color:#f59e0b;letter-spacing:2px}.lvl s{color:#d9d6e8;text-decoration:none;letter-spacing:2px}
+h1{font-size:66px;line-height:1.1;font-weight:800}
+h2{font-size:30px;line-height:1.2;font-weight:800}
+h3{font-size:21px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:20px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:24px;margin:5px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:9px;height:9px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.86em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 5px;border-radius:6px;color:#be185d;white-space:nowrap}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+.cols>*{min-width:0}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.card p,.card li{font-size:17px}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.note{margin-top:10px;padding:8px 14px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:17px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.note.red{border-color:#e11d48;background:linear-gradient(90deg,#fff1f3,#fffafa)}
+.code{font-family:var(--mono);font-size:15px;line-height:1.45;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:8px 0;overflow:hidden;position:relative}
+.code.sm{font-size:14px;line-height:1.42}.code.xs{font-size:13px;line-height:1.4}.code.xxs{font-size:12px;line-height:1.36;padding:6px 0}
+.code.x4{font-size:11.4px;line-height:1.33;padding:6px 0}
+.code .ln{padding:0 12px 0 6px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:22px;flex:none;text-align:right;margin-right:10px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.13);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.15);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.18);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.14);box-shadow:inset 5px 0 #ec4899}
+.code.show-e .mark-e{background:rgba(16,185,129,.15);box-shadow:inset 5px 0 #10b981}
+.code.show-f .mark-f{background:rgba(124,58,237,.13);box-shadow:inset 5px 0 #7c3aed}
+.code.show-g .mark-g{background:rgba(6,182,212,.15);box-shadow:inset 5px 0 #06b6d4}
+.code.show-h .mark-h{background:rgba(245,158,11,.18);box-shadow:inset 5px 0 #f59e0b}
+.code.show-i .mark-i{background:rgba(236,72,153,.14);box-shadow:inset 5px 0 #ec4899}
+.code.show-j .mark-j{background:rgba(16,185,129,.15);box-shadow:inset 5px 0 #10b981}
+.hide0{opacity:0;transform:translateY(8px) scale(.96);transition:all .45s}
+.hide0.sh{opacity:1;transform:none}
+.win.pre.sh:not(.vis){opacity:.35;filter:grayscale(1)}
+.gone.sh{display:none}
+.stage{position:relative;display:flex;align-items:center;justify-content:center}
+.chip{display:inline-block;font-family:var(--mono);font-size:12.5px;font-weight:700;padding:2px 9px;border-radius:999px;background:#fef3c7;color:#b45309;border:1px solid #fcd34d}
+.chip.v{background:#ede9fe;color:#6d28d9;border-color:#c4b5fd}.chip.g{background:#d1fae5;color:#047857;border-color:#6ee7b7}.chip.r{background:#ffe4e6;color:#be123c;border-color:#fda4af}
+.hlo{outline:3px solid #f59e0b;outline-offset:3px;border-radius:6px}
+.jb.dis.en{color:#111;border-color:#9aa1b3;background:linear-gradient(180deg,#fff,#e6e8ee)}.jb.dis.en .ico{filter:none;opacity:1}
+.jb.dis.en.dis2{color:#a0a4ad;border-color:#ccd0d8;background:#f1f2f5}
+.rad.on.off::before,.chk.on.off::before{background:#fff;content:""}
+.code-title{font-family:var(--mono);font-size:13px;color:var(--muted);margin:0 0 4px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:16px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:6px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.3}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+table.t1 td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.console{font-family:var(--mono);font-size:13.5px;line-height:1.45;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:8px 14px;color:#e6f0ff;white-space:pre;min-height:40px;overflow:hidden}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:10px;letter-spacing:3px;margin-bottom:3px}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.flow{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap}
+.box{border-radius:12px;padding:8px 12px;text-align:center;font-family:var(--mono);font-size:15px;border:2px solid var(--line);background:#fff;min-width:110px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:12.5px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.a{border-color:#7c3aed}.box.b{border-color:#0891b2}.box.c{border-color:#ec4899;background:#fdf2f8}.box.d{border-color:#f59e0b;background:#fffbeb}.box.e{border-color:#10b981;background:#ecfdf5}
+.ar{color:var(--muted);font-size:22px;text-align:center}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.say{font-size:17px;margin-top:10px;min-height:50px;color:var(--muted);line-height:1.42}
+.say b{color:var(--text)}
+.vars{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.vc{font-family:var(--mono);font-size:15px;font-weight:700;padding:4px 12px;border-radius:10px;background:#fff;border:2px solid #e4dcfb;transition:all .35s}
+.vc b{color:var(--t)}
+.vc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.45)}
+.vc.res{border-color:#10b981;background:#ecfdf5;color:#047857}
+.arr{display:flex;gap:8px;justify-content:center}
+.cell{width:52px;height:56px;border-radius:12px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .45s}
+.cell small{font-size:11px;color:var(--muted);font-weight:600}
+.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-6px)}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c}
+.cell.dim{opacity:.35}
+.cell.wide{width:auto;padding:0 10px;font-size:14px}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.15)}100%{transform:none;opacity:1}}
+.pop{animation:pop .45s}
+
+/* ===== agenda ===== */
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 10px}
+.sec{grid-column:1/-1;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.08em;margin-top:4px;text-transform:uppercase}
+.ag{background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 10px;cursor:pointer;transition:all .2s;font-size:15.5px;line-height:1.25;box-shadow:0 2px 6px rgba(40,50,110,.05);font-family:var(--mono);font-weight:600}
+.ag:hover{border-color:#ec4899;transform:translateY(-2px);box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag b{color:#db2777;margin-right:6px}
+.ag.g1{border-left:5px solid #7c3aed}.ag.g2{border-left:5px solid #0891b2}.ag.g3{border-left:5px solid #ec4899}.ag.g4{border-left:5px solid #f59e0b}
+.ag.g5{border-left:5px solid #10b981}.ag.g6{border-left:5px solid #6366f1}.ag.g7{border-left:5px solid #f97316}.ag.g8{border-left:5px solid #0ea5e9}
+
+/* ===== nav / jump ===== */
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;min-width:36px;height:32px;cursor:pointer;font-size:16px;padding:0 8px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+.jumpbtn{position:absolute;top:26px;right:30px;z-index:7;font-family:"Be Vietnam Pro",sans-serif;font-size:14px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));border:none;border-radius:999px;padding:7px 14px;cursor:pointer;box-shadow:0 6px 16px -6px var(--sa1);transition:transform .2s}
+.jumpbtn:hover{transform:translateY(-2px) scale(1.04)}
+#jump{position:fixed;inset:0;z-index:20;background:rgba(30,27,58,.45);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
+#jump.on{display:flex}
+#jbox{width:min(1100px,94vw);max-height:88vh;overflow:auto;background:#fff;border-radius:18px;padding:20px 24px;box-shadow:0 30px 70px -20px rgba(30,27,58,.6);animation:pop .3s}
+#jbox .jh{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+#jbox .jh h3{font-size:22px;color:#7c3aed;margin:0}
+#jbox .jh input{margin-left:auto;font-family:var(--mono);font-size:15px;padding:6px 10px;border:2px solid var(--line);border-radius:10px;width:260px;outline:none}
+#jbox .jh input:focus{border-color:#a78bfa}
+#jbox .jh button{border:none;background:#f1eaff;color:#6d28d9;font-weight:800;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:18px}
+#jlist{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+#jlist .ji{display:flex;gap:8px;align-items:center;padding:7px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:14.5px;transition:all .15s;background:#fff}
+#jlist .ji:hover,#jlist .ji.k{border-color:#ec4899;background:#fdf2f8}
+#jlist .ji.cur{background:#f3edff;border-color:#a78bfa}
+#jlist .ji b{font-family:var(--mono);color:#db2777;min-width:26px}
+#jlist .ji span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:700px){#hint{display:none}#jlist{grid-template-columns:1fr}}
+@media print{#nav,#bar,#hint,.jumpbtn{display:none}}
+
+/* ===== additions for C-string deck ===== */
+.arr.sm{gap:4px;justify-content:flex-start;flex-wrap:nowrap}
+.cell.sm{width:32px;height:46px;font-size:17px;border-width:2px;border-radius:8px;position:relative}
+.cell.sm small{font-size:10px}
+.cell .sp{color:#c4b5fd}
+.cell.nul{background:#f1f5f9;color:#94a3b8;font-size:13px}
+.cell.bad .sp{color:#fda4af}
+.cell.z{border-color:#e11d48;background:#e11d48;color:#fff;font-size:13px}
+.cell.z small{color:#ffe4e6}
+.cell.tok{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.cell .tg{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-style:normal;font-family:var(--mono);font-size:12px;font-weight:800;color:#fff;background:#7c3aed;border-radius:6px;padding:0 5px;white-space:nowrap}
+.cell .tg.b{background:#0891b2}.cell .tg.c{background:#f59e0b}.cell .tg.d{background:#db2777}
+.cell .tg.lo{top:auto;bottom:-22px}
+.rowlab{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--muted);width:30px;flex:none;align-self:center}
+.mem{padding-top:24px}
+.vc small{font-weight:500;color:var(--muted);font-size:12px;margin-right:4px}
+.big{font-family:var(--mono);font-size:22px;font-weight:700;padding:6px 14px;border-radius:12px;background:#fff;border:2px dashed #c4b5fd;display:inline-block;white-space:pre}
+.big .sp{color:#e11d48;background:#fff1f3;border-radius:3px}
+.bad-t{color:#be123c;font-weight:800}.ok-t{color:#047857;font-weight:800}
+.card .code{margin:4px 0}
+.card h3 small{font-weight:600;color:var(--muted);font-size:14px}
+.lbl{font-family:var(--mono);font-size:12.5px;font-weight:800;margin-top:4px}
+.lbl.x{color:#be123c}.lbl.v{color:#047857}
+#tryIn{width:100%;font-family:var(--mono);font-size:20px;padding:10px 14px;border:2px solid #c4b5fd;border-radius:12px;outline:none;white-space:pre}
+#tryIn:focus{border-color:#7c3aed;box-shadow:0 0 0 4px rgba(124,58,237,.12)}
+.btn{white-space:nowrap;font-family:"Be Vietnam Pro";font-weight:800;font-size:16px;color:#fff;border:none;border-radius:999px;padding:9px 18px;cursor:pointer;background:linear-gradient(135deg,#7c3aed,#ec4899)}
+.btn.ghost2{background:#fff;color:#6d28d9;border:2px solid #c4b5fd}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips .chip{font-size:15px}
+.flow .box{font-size:15px}
+td code.i{white-space:nowrap}
+</style>
+</head>
+<body>
+
+<div id="viewport"><div id="deck">
+
+<section class="slide" id="title" data-title="Trang bìa">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// C++ · Practice 6.1 · Chuỗi ký tự (mảng char)</div>
+    <h1 class="in">Trim spaces<br><span class="grad">Xoá khoảng trắng thừa trong câu</span></h1>
+    <p class="in muted" style="font-size:24px;margin-top:20px;max-width:1000px">Dành cho sinh viên năm 1 chưa biết lập trình. Dùng <code class="i">char s[101]</code> (không dùng <code class="i">string</code>), dùng hàm <code class="i">strtok</code>. Đi từ phân tích đề → ý tưởng → giải thuật → chạy tay → code → lỗi hay gặp → phiên bản dùng <code class="i">vector</code>.</p>
+    <p class="in" style="margin-top:34px;font-size:18px;color:#8a91b4">← → hoặc Space: chạy từng bước · Shift+→: qua slide · <b>G</b> hoặc nút <b>☰ Đi tới slide</b>: nhảy tới slide bất kỳ · A: hiện hết · F: toàn màn hình</p>
+  </div>
+</section>
+<section class="slide" id="agenda" data-title="Nội dung">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:17px">· bấm vào mục để đi tới</span></div>
+  <div class="agenda in" style="grid-template-columns:repeat(3,1fr);gap:10px 12px">
+    <div class="sec">1 · Hiểu đề</div>
+    <div class="ag g1" data-goto="debai"><b>01</b>Đề bài &amp; phân tích</div>
+    <div class="ag g1" data-goto="nentang"><b>02</b>Kiến thức nền: mảng char</div>
+    <div class="ag g1" data-goto="ytuong"><b>03</b>Ý tưởng &amp; chia nhỏ bài toán</div>
+    <div class="sec">2 · Cách 1: dùng strtok (cách chính)</div>
+    <div class="ag g2" data-goto="strtok"><b>04</b>strtok hoạt động thế nào?</div>
+    <div class="ag g2" data-goto="giaithuat"><b>05</b>Giải thuật</div>
+    <div class="ag g2" data-goto="trace1"><b>06</b>Chạy tay từng bước</div>
+    <div class="ag g2" data-goto="tests"><b>07</b>Các case đặc biệt</div>
+    <div class="ag g2" data-goto="code1"><b>08</b>Code C++ &amp; giải thích</div><div></div>
+    <div class="sec">3 · Cách 2: duyệt từng ký tự (không dùng strtok)</div>
+    <div class="ag g3" data-goto="cach2"><b>09</b>Ý tưởng &amp; chạy tay</div>
+    <div class="ag g3" data-goto="code2"><b>10</b>Code C++ &amp; giải thích</div><div></div>
+    <div class="sec">4 · Lỗi sai hay gặp · 5 · Dùng vector · 6 · Tổng kết</div>
+    <div class="ag g4" data-goto="loi1"><b>11</b>Lỗi khi nhập / bộ nhớ</div>
+    <div class="ag g4" data-goto="loi2"><b>12</b>Lỗi logic khi ghép từ</div>
+    <div class="ag g4" data-goto="loi3"><b>13</b>Lỗi khác</div>
+    <div class="ag g5" data-goto="vector1"><b>14</b>vector&lt;char*&gt; + strtok</div>
+    <div class="ag g5" data-goto="vector2"><b>15</b>vector&lt;string&gt; &amp; so sánh</div>
+    <div class="ag g6" data-goto="thu"><b>16</b>Thử ngay</div>
+    <div class="ag g1" data-goto="summary"><b>✓</b>Tổng kết</div>
+  </div>
+</section>
+<section class="slide" id="debai" data-title="01 · Đề bài &amp; phân tích">
+  <div class="hdr in"><span class="qn">01 · ĐỀ BÀI</span><h2>Practice 6.1: Trim spaces</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:18px">
+    <div class="card in"><h3>Đề bài (dịch)</h3>
+      <ul><li>Nhập một câu gồm nhiều từ.</li>
+      <li>Xoá các dấu cách ở <b>đầu</b> câu <span class="muted">(trim left)</span>.</li>
+      <li>Xoá các dấu cách ở <b>cuối</b> câu <span class="muted">(trim right)</span>.</li>
+      <li>Giữa 2 từ có nhiều dấu cách thì chỉ <b>giữ lại 1</b>.</li></ul></div>
+    <div class="card in"><h3>Phân tích Input / Output</h3>
+      <table class="t1" style="font-size:15px"><tr><th></th><th>Nội dung</th></tr>
+      <tr><td>Input</td><td>1 dòng chữ, <b>có dấu cách</b>, dài ≤ 100 ký tự → <code class="i">char s[101]</code></td></tr>
+      <tr><td>Output</td><td>câu đã chuẩn hoá, in trong cặp dấu <code class="i">"</code></td></tr>
+      <tr><td>Từ</td><td>dãy ký tự liên tiếp <b>không chứa dấu cách</b></td></tr>
+      <tr><td>Lưu ý</td><td>dấu <code class="i">“ ”</code> trong đề chỉ để thấy rõ khoảng trắng, người dùng <b>không gõ</b> dấu nháy</td></tr></table></div>
+  </div>
+  <div class="mem" style="margin-top:12px"><div class="arr sm" id="dbA"><span class="rowlab">s</span><div class="cell sm "><span class="sp">␣</span><small>0</small></div><div class="cell sm "><span class="sp">␣</span><small>1</small></div><div class="cell sm ">t<small>2</small></div><div class="cell sm ">o<small>3</small></div><div class="cell sm ">d<small>4</small></div><div class="cell sm ">a<small>5</small></div><div class="cell sm ">y<small>6</small></div><div class="cell sm "><span class="sp">␣</span><small>7</small></div><div class="cell sm "><span class="sp">␣</span><small>8</small></div><div class="cell sm "><span class="sp">␣</span><small>9</small></div><div class="cell sm ">i<small>10</small></div><div class="cell sm ">s<small>11</small></div><div class="cell sm "><span class="sp">␣</span><small>12</small></div><div class="cell sm ">a<small>13</small></div><div class="cell sm "><span class="sp">␣</span><small>14</small></div><div class="cell sm "><span class="sp">␣</span><small>15</small></div><div class="cell sm ">b<small>16</small></div><div class="cell sm ">e<small>17</small></div><div class="cell sm ">a<small>18</small></div><div class="cell sm ">u<small>19</small></div><div class="cell sm ">t<small>20</small></div><div class="cell sm ">i<small>21</small></div><div class="cell sm ">f<small>22</small></div><div class="cell sm ">u<small>23</small></div><div class="cell sm ">l<small>24</small></div><div class="cell sm "><span class="sp">␣</span><small>25</small></div><div class="cell sm ">d<small>26</small></div><div class="cell sm ">a<small>27</small></div><div class="cell sm ">y<small>28</small></div><div class="cell sm "><span class="sp">␣</span><small>29</small></div><div class="cell sm "><span class="sp">␣</span><small>30</small></div></div></div>
+  <div class="arr sm hide0" id="dbB" style="margin-top:10px"><span class="rowlab">kq</span><div class="cell sm ok">t<small>0</small></div><div class="cell sm ok">o<small>1</small></div><div class="cell sm ok">d<small>2</small></div><div class="cell sm ok">a<small>3</small></div><div class="cell sm ok">y<small>4</small></div><div class="cell sm ok"><span class="sp">␣</span><small>5</small></div><div class="cell sm ok">i<small>6</small></div><div class="cell sm ok">s<small>7</small></div><div class="cell sm ok"><span class="sp">␣</span><small>8</small></div><div class="cell sm ok">a<small>9</small></div><div class="cell sm ok"><span class="sp">␣</span><small>10</small></div><div class="cell sm ok">b<small>11</small></div><div class="cell sm ok">e<small>12</small></div><div class="cell sm ok">a<small>13</small></div><div class="cell sm ok">u<small>14</small></div><div class="cell sm ok">t<small>15</small></div><div class="cell sm ok">i<small>16</small></div><div class="cell sm ok">f<small>17</small></div><div class="cell sm ok">u<small>18</small></div><div class="cell sm ok">l<small>19</small></div><div class="cell sm ok"><span class="sp">␣</span><small>20</small></div><div class="cell sm ok">d<small>21</small></div><div class="cell sm ok">a<small>22</small></div><div class="cell sm ok">y<small>23</small></div></div>
+  <span class="f ghost" data-now="#dbA|" data-say="Đây là input ví dụ (␣ = dấu cách). Câu dài 31 ký tự, các ô được đánh số từ &lt;b&gt;0&lt;/b&gt;."></span>
+  <span class="f ghost" data-set="#dbA::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm bad&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm bad&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;t&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;o&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;d&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;i&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;s&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;13&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;14&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;15&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;b&lt;small&gt;16&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;e&lt;small&gt;17&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;18&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;19&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;t&lt;small&gt;20&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;i&lt;small&gt;21&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;f&lt;small&gt;22&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;23&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;l&lt;small&gt;24&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;25&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;d&lt;small&gt;26&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;27&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;28&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;29&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;30&lt;/small&gt;&lt;/div&gt;" data-say="Yêu cầu 1 · &lt;b&gt;trim left&lt;/b&gt;: 2 dấu cách ở đầu (ô 0, 1) phải bỏ."></span>
+  <span class="f ghost" data-set="#dbA::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm bad&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm bad&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;t&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;o&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;d&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;i&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;s&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;13&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;14&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;15&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;b&lt;small&gt;16&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;e&lt;small&gt;17&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;18&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;19&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;t&lt;small&gt;20&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;i&lt;small&gt;21&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;f&lt;small&gt;22&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;23&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;l&lt;small&gt;24&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;25&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;d&lt;small&gt;26&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;27&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;28&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm bad&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;29&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm bad&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;30&lt;/small&gt;&lt;/div&gt;" data-say="Yêu cầu 2 · &lt;b&gt;trim right&lt;/b&gt;: 2 dấu cách ở cuối (ô 29, 30) phải bỏ."></span>
+  <span class="f ghost" data-set="#dbA::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm bad&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm bad&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;t&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;o&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;d&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm bad&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm bad&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;i&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;s&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;13&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;14&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm bad&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;15&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;b&lt;small&gt;16&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;e&lt;small&gt;17&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;18&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;19&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;t&lt;small&gt;20&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;i&lt;small&gt;21&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;f&lt;small&gt;22&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;23&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;l&lt;small&gt;24&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;25&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;d&lt;small&gt;26&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;27&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;28&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm bad&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;29&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm bad&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;30&lt;/small&gt;&lt;/div&gt;" data-say="Yêu cầu 3 · giữa 2 từ chỉ giữ &lt;b&gt;1&lt;/b&gt; dấu cách (xanh), các dấu cách thừa (đỏ) phải bỏ."></span>
+  <span class="f ghost" data-act="#dbB|sh" data-say="Bỏ hết ô đỏ → kết quả &lt;b&gt;&amp;quot;today is a beautiful day&amp;quot;&lt;/b&gt; (24 ký tự). Nhận xét: kết quả = &lt;b&gt;các từ&lt;/b&gt; của câu, nối với nhau bằng &lt;b&gt;đúng 1 dấu cách&lt;/b&gt;."></span>
+  <p class="say" style="margin-top:6px">Nhấn → để chạy từng bước.</p>
+</section>
+<section class="slide" id="nentang" data-title="02 · Kiến thức nền: chuỗi = mảng char">
+  <div class="hdr in"><span class="qn">02 · NỀN TẢNG</span><h2>Chuỗi trong C/C++ = mảng <code class="i" style="font-size:.8em">char</code> kết thúc bằng <code class="i" style="font-size:.8em">'\0'</code></h2></div>
+  <div class="cols" style="grid-template-columns:1.05fr 1fr">
+    <div>
+      <p style="font-size:18px"><code class="i">char s[101];</code> → 101 ô, mỗi ô chứa 1 ký tự. Sau khi nhập <b>Hi you</b>:</p>
+      <div class="mem"><div class="arr sm" id="ntA"><div class="cell sm ">H<small>0</small></div><div class="cell sm ">i<small>1</small></div><div class="cell sm "><span class="sp">␣</span><small>2</small></div><div class="cell sm ">y<small>3</small></div><div class="cell sm ">o<small>4</small></div><div class="cell sm ">u<small>5</small></div><div class="cell sm nul">\0<small>6</small></div><div class="cell sm dim">?<small>7</small></div><div class="cell sm dim">?<small>8</small></div><div class="cell sm dim">?<small>9</small></div><div class="cell sm dim">…</div><div class="cell sm dim">?<small>100</small></div></div></div>
+      <ul style="margin-top:8px">
+        <li class="f" data-now="#ntA .cell:nth-child(7)|cur">Ký tự <code class="i">'\0'</code> (mã 0) đánh dấu <b>hết chuỗi</b>. Mọi hàm <code class="i">cout</code>, <code class="i">strlen</code>, <code class="i">strcat</code>… đọc tới <code class="i">'\0'</code> thì dừng.</li>
+        <li class="f">Các ô sau <code class="i">'\0'</code> là rác, không ai quan tâm. <code class="i">strlen(s)</code> = <b>6</b>.</li>
+        <li class="f">Tối đa 100 ký tự + 1 ô cho <code class="i">'\0'</code> = <b>101</b> ô.</li>
+        <li class="f">Ký tự viết trong nháy đơn: <code class="i">' '</code>. Chuỗi viết trong nháy kép: <code class="i">" "</code>. Hai thứ khác nhau!</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Đọc cả dòng: <code class="i">cin &gt;&gt;</code> hay <code class="i">cin.getline</code>?</h3>
+      <div class="console" id="ntC1"><span class="cl show">cin &gt;&gt; s;   // gõ:  <span class="in">today is a day</span></span><span class="cl" id="ntC1b">s = "today"   ← dừng ở dấu cách đầu tiên ✗</span></div>
+      <div class="console" style="margin-top:8px" id="ntC2"><span class="cl show">cin.getline(s, 101);   // gõ:  <span class="in">  today is a day</span></span><span class="cl" id="ntC2b">s = "  today is a day"   ← cả dòng ✓</span></div>
+
+      <span class="f ghost" data-act="#ntC1b|show"></span>
+      <span class="f ghost" data-act="#ntC2b|show"></span>
+      <table class="t1 f" style="margin-top:10px;font-size:14.5px">
+        <tr><th>Hàm (thư viện &lt;cstring&gt;)</th><th>Ý nghĩa</th></tr>
+        <tr><td>strlen(s)</td><td>độ dài (không tính '\0')</td></tr>
+        <tr><td>strcpy(a, b)</td><td>chép b vào a</td></tr>
+        <tr><td>strcat(a, b)</td><td>nối b vào <b>cuối</b> a</td></tr>
+        <tr><td>strtok(s, " ")</td><td>tách s thành từng từ (slide 04)</td></tr></table>
+    </div>
+  </div>
+</section>
+<section class="slide" id="ytuong" data-title="03 · Ý tưởng &amp; chia nhỏ bài toán">
+  <div class="hdr in"><span class="qn">03 · Ý TƯỞNG</span><h2>3 yêu cầu → thực chất là 1 việc: <span class="grad">lấy các từ rồi nối lại</span></h2></div>
+  <div class="note blue in" style="font-size:18px;margin-top:0">Nếu lấy ra được danh sách từ <b>today · is · a · beautiful · day</b> rồi nối chúng bằng <b>1</b> dấu cách thì: không còn dấu cách đầu, không còn dấu cách cuối, giữa các từ đúng 1 dấu cách. Cả 3 yêu cầu được giải <b>cùng lúc</b>.</div>
+  <h3 style="margin-top:14px">Chia nhỏ (decompose) thành 4 bài toán con đơn giản</h3>
+  <div class="flow" style="flex-wrap:nowrap;margin-top:6px">
+    <div class="box a f">① Đọc cả dòng<small>cin.getline(s, 101)</small></div><div class="ar f">→</div>
+    <div class="box b f">② Tách từng từ<small>strtok(s, " ")</small></div><div class="ar f">→</div>
+    <div class="box c f">③ Nối từ vào kết quả<small>strcat(t, " ") · strcat(t, p)</small></div><div class="ar f">→</div>
+    <div class="box e f">④ In kết quả<small>cout &lt;&lt; "\"" &lt;&lt; t &lt;&lt; "\""</small></div>
+  </div>
+  <div class="cols" style="margin-top:16px">
+    <div class="card f"><h3>Cách 1 · Dùng strtok <small>(cách chính của bài)</small></h3>
+      <ul><li><code class="i">strtok</code> tự bỏ qua mọi dấu cách và trả về từng từ.</li>
+      <li>Mình chỉ lo phần ③: thêm <b>1</b> dấu cách <b>trước</b> mỗi từ, trừ từ đầu tiên.</li>
+      <li>Ngắn, dễ đọc, ít lỗi.</li></ul></div>
+    <div class="card f"><h3>Cách 2 · Duyệt từng ký tự <small>(hiểu sâu hơn)</small></h3>
+      <ul><li>Đi qua s từ trái sang phải, chép ký tự sang t.</li>
+      <li>Gặp dấu cách: chỉ chép nếu ký tự vừa chép <b>không phải</b> dấu cách.</li>
+      <li>Cuối cùng xoá dấu cách cuối (nếu có) và đặt <code class="i">'\0'</code>.</li></ul></div>
+  </div>
+</section>
+<section class="slide" id="strtok" data-title="04 · strtok hoạt động thế nào?">
+  <div class="hdr in"><span class="qn">04 · strtok</span><h2>strtok(s, " "): cắt chuỗi thành từng từ (token)</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.25fr">
+    <div>
+<script type="text/x-cpp" class="sm" id="kSt" data-title="Cách dùng chuẩn (thuộc lòng!)" data-mark="1:a;2:b;3:c;4:d">
+char *p = strtok(s, " ");   // lần đầu: truyền s
+while (p != NULL) {         // NULL = hết từ
+    cout << p << endl;       // dùng từ p
+    p = strtok(NULL, " ");   // các lần sau: NULL
+}
+</script>
+      <ul style="margin-top:8px">
+        <li style="font-size:17px">Tham số 2 là <b>tập ký tự phân cách</b> (delimiter), ở đây chỉ có dấu cách.</li>
+        <li style="font-size:17px">Mỗi lần gọi trả về <b>con trỏ</b> tới đầu một từ, hoặc <code class="i">NULL</code> nếu hết.</li>
+        <li style="font-size:17px">strtok <b>tự nhớ</b> chỗ đang dừng, nên lần sau truyền <code class="i">NULL</code> để “đi tiếp”.</li>
+      </ul>
+      <div class="note red f" style="font-size:16px">⚠ strtok <b>sửa chuỗi gốc</b>: thay dấu cách sau mỗi từ bằng <code class="i">'\0'</code>. Sau khi tách, <code class="i">cout &lt;&lt; s</code> chỉ còn in <b>"␣␣hi"</b>.</div>
+    </div>
+    <div>
+      <div class="mem" style="padding-top:28px"><div class="arr sm" id="stA"><span class="rowlab">s</span><div class="cell sm "><span class="sp">␣</span><small>0</small></div><div class="cell sm "><span class="sp">␣</span><small>1</small></div><div class="cell sm ">h<small>2</small></div><div class="cell sm ">i<small>3</small></div><div class="cell sm "><span class="sp">␣</span><small>4</small></div><div class="cell sm "><span class="sp">␣</span><small>5</small></div><div class="cell sm "><span class="sp">␣</span><small>6</small></div><div class="cell sm ">y<small>7</small></div><div class="cell sm ">o<small>8</small></div><div class="cell sm ">u<small>9</small></div><div class="cell sm "><span class="sp">␣</span><small>10</small></div><div class="cell sm "><span class="sp">␣</span><small>11</small></div><div class="cell sm nul">\0<small>12</small></div></div></div>
+      <div class="vars" style="margin-top:28px"><span class="vc" id="stP"><small>p =</small>?</span><span class="vc" id="stO"><small>in ra:</small></span></div>
+      <span class="f ghost" data-now="#kSt|show-a;#stP|hot" data-set="#stA::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;&lt;em class=&quot;tg &quot;&gt;p&lt;/em&gt;h&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;i&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;em class=&quot;tg c lo&quot;&gt;nhớ&lt;/em&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;o&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;;#stP::&lt;small&gt;p →&lt;/small&gt;ô 2 = &amp;quot;hi&amp;quot;" data-say="&lt;b&gt;Lần 1: strtok(s, &amp;quot; &amp;quot;)&lt;/b&gt;. Bỏ qua dấu cách ở ô 0, 1 (mờ). Gặp &lt;b&gt;h&lt;/b&gt; ở ô 2 → đầu từ. Đi tiếp tới ô 4 là dấu cách → &lt;b&gt;ghi đè ô 4 bằng &#x27;\0&#x27;&lt;/b&gt; (đỏ). Trả về p → ô 2, tự &lt;b&gt;nhớ&lt;/b&gt; vị trí ô 5."></span>
+      <span class="f ghost" data-now="#kSt|show-b show-c;#stO|hot" data-set="#stA::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;&lt;em class=&quot;tg &quot;&gt;p&lt;/em&gt;h&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;i&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;em class=&quot;tg c lo&quot;&gt;nhớ&lt;/em&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;o&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;;#stP::&lt;small&gt;p →&lt;/small&gt;ô 2 = &amp;quot;hi&amp;quot;;#stO::&lt;small&gt;in ra:&lt;/small&gt;hi" data-say="Vì có &#x27;\0&#x27; ở ô 4 nên &lt;b&gt;cout &amp;lt;&amp;lt; p&lt;/b&gt; in ra &lt;b&gt;hi&lt;/b&gt; rồi dừng. p ≠ NULL nên vòng lặp chạy."></span>
+      <span class="f ghost" data-now="#kSt|show-d;#stP|hot" data-set="#stA::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;h&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;&lt;em class=&quot;tg &quot;&gt;p&lt;/em&gt;y&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;o&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;u&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;em class=&quot;tg c lo&quot;&gt;nhớ&lt;/em&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;;#stP::&lt;small&gt;p →&lt;/small&gt;ô 7 = &amp;quot;you&amp;quot;;#stO::&lt;small&gt;in ra:&lt;/small&gt;hi" data-say="&lt;b&gt;Lần 2: strtok(NULL, &amp;quot; &amp;quot;)&lt;/b&gt;. Đi tiếp từ chỗ đã nhớ (ô 5): bỏ qua ô 5, 6. Từ &lt;b&gt;you&lt;/b&gt; bắt đầu ô 7. Ô 10 là dấu cách → thành &#x27;\0&#x27;. Trả về p → ô 7, nhớ ô 11."></span>
+      <span class="f ghost" data-now="#kSt|show-c;#stO|hot" data-set="#stA::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;h&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;&lt;em class=&quot;tg &quot;&gt;p&lt;/em&gt;y&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;o&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;u&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;em class=&quot;tg c lo&quot;&gt;nhớ&lt;/em&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;;#stP::&lt;small&gt;p →&lt;/small&gt;ô 7 = &amp;quot;you&amp;quot;;#stO::&lt;small&gt;in ra:&lt;/small&gt;hi · you" data-say="In &lt;b&gt;you&lt;/b&gt;. Lưu ý: dù có 3 dấu cách giữa hi và you, strtok coi &lt;b&gt;nhiều dấu cách liền nhau như 1&lt;/b&gt;."></span>
+      <span class="f ghost" data-now="#kSt|show-b;#stP|res" data-set="#stA::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;h&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;y&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;o&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;u&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;&lt;em class=&quot;tg c lo&quot;&gt;nhớ&lt;/em&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;;#stP::&lt;small&gt;p =&lt;/small&gt;NULL;#stO::&lt;small&gt;in ra:&lt;/small&gt;hi · you" data-say="&lt;b&gt;Lần 3: strtok(NULL, &amp;quot; &amp;quot;)&lt;/b&gt;. Từ ô 11: bỏ qua dấu cách, gặp &#x27;\0&#x27; ở ô 12 (hết chuỗi) mà không thấy từ nào → trả về &lt;b&gt;NULL&lt;/b&gt;. Vòng while dừng. Dấu cách cuối câu tự nhiên bị bỏ!"></span>
+      <span class="f ghost" data-set="#stA::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;em class=&quot;tg b&quot;&gt;s&lt;/em&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;h&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;y&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;o&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;u&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim nul&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;;#stP::&lt;small&gt;p =&lt;/small&gt;NULL;#stO::&lt;small&gt;cout &amp;lt;&amp;lt; s:&lt;/small&gt;&amp;quot;␣␣hi&amp;quot;" data-say="Nhìn lại mảng s: ô 4 và ô 10 đã thành &#x27;\0&#x27;. Bây giờ &lt;b&gt;cout &amp;lt;&amp;lt; s&lt;/b&gt; chỉ in &lt;b&gt;&amp;quot;␣␣hi&amp;quot;&lt;/b&gt; (dừng ở &#x27;\0&#x27; đầu tiên). Muốn giữ câu gốc thì &lt;b&gt;strcpy&lt;/b&gt; ra bản sao trước khi gọi strtok."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+<section class="slide" id="giaithuat" data-title="05 · Giải thuật (cách 1)">
+  <div class="hdr in"><span class="qn">05 · GIẢI THUẬT</span><h2>Giải thuật cách 1: strtok + nối từ</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr">
+    <div>
+<span class="f ghost" data-now="#kGt|show-a show-b"></span>
+<script type="text/x-cpp" data-plain id="kGt" data-title="Mã giả (pseudo-code)" data-mark="1:a;2:b;3:c;4:d;5:e;6:f;7:g;8:h">
+B1. Đọc cả dòng vào s
+B2. t = ""                       // kết quả, rỗng
+B3. p = strtok(s, " ")           // từ đầu tiên
+B4. Trong khi p khác NULL:
+B5.     Nếu t không rỗng: nối " " vào t
+B6.     Nối từ p vào cuối t
+B7.     p = strtok(NULL, " ")    // từ kế tiếp
+B8. In ra  "t" (có dấu nháy kép)
+</script>
+      <div class="note f" data-now="#kGt|show-e" style="font-size:16px">Vì sao thêm dấu cách <b>trước</b> từ (B5) chứ không phải <b>sau</b> từ? Nếu thêm sau, từ cuối cùng cũng có dấu cách đi theo → kết quả bị thừa 1 dấu cách ở cuối.</div>
+    </div>
+    <div>
+      <h3>Mỗi yêu cầu được giải ở đâu?</h3>
+      <div class="card f" data-now="#kGt|show-c" style="margin-top:6px"><p><b>Trim left</b> · B3: lần gọi đầu, strtok tự bỏ qua các dấu cách đầu câu.</p></div>
+      <div class="card f" data-now="#kGt|show-g show-e" style="margin-top:8px"><p><b>Trim right</b> · B7: sau từ cuối, strtok trả <code class="i">NULL</code>; và vì B5 chỉ thêm dấu cách <b>trước</b> một từ có thật, cuối câu không bao giờ có dấu cách.</p></div>
+      <div class="card f" data-now="#kGt|show-e show-f" style="margin-top:8px"><p><b>Gộp dấu cách</b> · strtok coi nhiều dấu cách liên tiếp là 1 chỗ cắt; B5 thêm đúng <b>1</b> dấu cách giữa 2 từ.</p></div>
+      <div class="card f" data-now="#kGt|show-c show-d" style="margin-top:8px"><p><b>Câu toàn dấu cách / rỗng</b> · B3 trả <code class="i">NULL</code> ngay, vòng lặp không chạy, in ra <code class="i">""</code>.</p></div>
+      
+    </div>
+  </div>
+</section>
+<section class="slide" id="trace1" data-title="06 · Chạy tay từng bước (cách 1)">
+  <div class="hdr in"><span class="qn">06 · CHẠY TAY</span><h2>Chạy tay giải thuật với input ví dụ</h2></div>
+  <div class="mem" style="padding-top:22px"><div class="arr sm" id="trA"><span class="rowlab">s</span><div class="cell sm "><span class="sp">␣</span><small>0</small></div><div class="cell sm "><span class="sp">␣</span><small>1</small></div><div class="cell sm ">t<small>2</small></div><div class="cell sm ">o<small>3</small></div><div class="cell sm ">d<small>4</small></div><div class="cell sm ">a<small>5</small></div><div class="cell sm ">y<small>6</small></div><div class="cell sm "><span class="sp">␣</span><small>7</small></div><div class="cell sm "><span class="sp">␣</span><small>8</small></div><div class="cell sm "><span class="sp">␣</span><small>9</small></div><div class="cell sm ">i<small>10</small></div><div class="cell sm ">s<small>11</small></div><div class="cell sm "><span class="sp">␣</span><small>12</small></div><div class="cell sm ">a<small>13</small></div><div class="cell sm "><span class="sp">␣</span><small>14</small></div><div class="cell sm "><span class="sp">␣</span><small>15</small></div><div class="cell sm ">b<small>16</small></div><div class="cell sm ">e<small>17</small></div><div class="cell sm ">a<small>18</small></div><div class="cell sm ">u<small>19</small></div><div class="cell sm ">t<small>20</small></div><div class="cell sm ">i<small>21</small></div><div class="cell sm ">f<small>22</small></div><div class="cell sm ">u<small>23</small></div><div class="cell sm ">l<small>24</small></div><div class="cell sm "><span class="sp">␣</span><small>25</small></div><div class="cell sm ">d<small>26</small></div><div class="cell sm ">a<small>27</small></div><div class="cell sm ">y<small>28</small></div><div class="cell sm "><span class="sp">␣</span><small>29</small></div><div class="cell sm "><span class="sp">␣</span><small>30</small></div><div class="cell sm nul">\0<small>31</small></div></div></div>
+  <div class="cols" style="grid-template-columns:1fr 1.15fr;margin-top:18px">
+    <div>
+<script type="text/x-cpp" data-plain class="sm" id="kTr" data-mark="1-2:a;3:c;4:d;5:e;6:f;7:g;8:h">
+B1. Đọc cả dòng vào s
+B2. t = ""                       // kết quả, rỗng
+B3. p = strtok(s, " ")           // từ đầu tiên
+B4. Trong khi p khác NULL:
+B5.     Nếu t không rỗng: nối " " vào t
+B6.     Nối từ p vào cuối t
+B7.     p = strtok(NULL, " ")    // từ kế tiếp
+B8. In ra  "t" (có dấu nháy kép)
+</script>
+    </div>
+    <div>
+      <div class="vars" style="margin-top:0"><span class="vc" id="trN"><small>số từ:</small>0</span><span class="vc" id="trP"><small>p =</small>?</span></div>
+      <div class="vars"><span class="vc" id="trT" style="font-size:17px"><small>t =</small>&quot;&quot;</span></div>
+      <div class="console hide0" id="trCon" style="margin-top:10px">Enter a sentence = <span class="in">  today   is a  beautiful day  </span>
+"today is a beautiful day"</div>
+      <span class="f ghost" data-now="#kTr|show-a" data-set="#trA::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;t&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;o&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;d&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;i&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;s&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;13&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;14&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;15&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;b&lt;small&gt;16&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;e&lt;small&gt;17&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;18&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;19&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;t&lt;small&gt;20&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;i&lt;small&gt;21&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;f&lt;small&gt;22&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;23&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;l&lt;small&gt;24&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;25&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;d&lt;small&gt;26&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;27&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;28&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;29&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;30&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;31&lt;/small&gt;&lt;/div&gt;;#trP::&lt;small&gt;p =&lt;/small&gt;?;#trT::&lt;small&gt;t =&lt;/small&gt;&amp;quot;&amp;quot;;#trN::&lt;small&gt;số từ:&lt;/small&gt;0" data-say="&lt;b&gt;B1–B2&lt;/b&gt;: đọc cả dòng vào s (31 ký tự, ô 31 là &#x27;\0&#x27;); t là chuỗi rỗng."></span>
+<span class="f ghost" data-now="#kTr|show-c;#trP|hot" data-set="#trA::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;&lt;em class=&quot;tg &quot;&gt;p&lt;/em&gt;t&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;o&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;d&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;a&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;y&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;i&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;s&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;13&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;14&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;15&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;b&lt;small&gt;16&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;e&lt;small&gt;17&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;18&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;19&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;t&lt;small&gt;20&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;i&lt;small&gt;21&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;f&lt;small&gt;22&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;23&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;l&lt;small&gt;24&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;25&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;d&lt;small&gt;26&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;27&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;28&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;29&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;30&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;31&lt;/small&gt;&lt;/div&gt;;#trP::&lt;small&gt;p →&lt;/small&gt;&amp;quot;today&amp;quot;;#trT::&lt;small&gt;t =&lt;/small&gt;&amp;quot;&amp;quot;;#trN::&lt;small&gt;số từ:&lt;/small&gt;1" data-say="&lt;b&gt;B3&lt;/b&gt;: strtok(s, &amp;quot; &amp;quot;) → bỏ qua 2 dấu cách (ô 0, 1), tìm được từ &lt;b&gt;today&lt;/b&gt; (ô 2–6), ô 7 thành &#x27;\0&#x27;."></span>
+<span class="f ghost" data-now="#kTr|show-d show-f;#trT|hot" data-set="#trA::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;&lt;em class=&quot;tg &quot;&gt;p&lt;/em&gt;t&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;o&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;d&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;a&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;y&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;i&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;s&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;13&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;14&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;15&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;b&lt;small&gt;16&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;e&lt;small&gt;17&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;18&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;19&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;t&lt;small&gt;20&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;i&lt;small&gt;21&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;f&lt;small&gt;22&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;23&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;l&lt;small&gt;24&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;25&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;d&lt;small&gt;26&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;27&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;28&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;29&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;30&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;31&lt;/small&gt;&lt;/div&gt;;#trP::&lt;small&gt;p →&lt;/small&gt;&amp;quot;today&amp;quot;;#trT::&lt;small&gt;t =&lt;/small&gt;&amp;quot;today&amp;quot;;#trN::&lt;small&gt;số từ:&lt;/small&gt;1" data-say="&lt;b&gt;B4&lt;/b&gt;: p ≠ NULL → vào vòng lặp. &lt;b&gt;B5&lt;/b&gt;: t đang &lt;b&gt;rỗng&lt;/b&gt; → &lt;b&gt;không&lt;/b&gt; thêm dấu cách. &lt;b&gt;B6&lt;/b&gt;: nối &amp;quot;today&amp;quot; → t = &amp;quot;today&amp;quot;."></span>
+<span class="f ghost" data-now="#kTr|show-g;#trP|hot" data-set="#trA::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;t&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;o&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;d&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;a&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;y&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;&lt;em class=&quot;tg &quot;&gt;p&lt;/em&gt;i&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;s&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;13&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;14&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;15&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;b&lt;small&gt;16&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;e&lt;small&gt;17&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;18&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;19&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;t&lt;small&gt;20&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;i&lt;small&gt;21&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;f&lt;small&gt;22&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;23&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;l&lt;small&gt;24&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;25&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;d&lt;small&gt;26&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;27&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;28&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;29&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;30&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;31&lt;/small&gt;&lt;/div&gt;;#trP::&lt;small&gt;p →&lt;/small&gt;&amp;quot;is&amp;quot;;#trT::&lt;small&gt;t =&lt;/small&gt;&amp;quot;today&amp;quot;;#trN::&lt;small&gt;số từ:&lt;/small&gt;2" data-say="&lt;b&gt;B7&lt;/b&gt;: strtok(NULL, &amp;quot; &amp;quot;) → bỏ qua 2 dấu cách (ô 8, 9), tìm được từ &lt;b&gt;is&lt;/b&gt; (ô 10–11), ô 12 thành &#x27;\0&#x27;."></span>
+<span class="f ghost" data-now="#kTr|show-e show-f;#trT|hot" data-set="#trA::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;t&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;o&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;d&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;a&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;y&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;&lt;em class=&quot;tg &quot;&gt;p&lt;/em&gt;i&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;s&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;13&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;14&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;15&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;b&lt;small&gt;16&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;e&lt;small&gt;17&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;18&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;19&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;t&lt;small&gt;20&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;i&lt;small&gt;21&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;f&lt;small&gt;22&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;23&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;l&lt;small&gt;24&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;25&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;d&lt;small&gt;26&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;27&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;28&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;29&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;30&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;31&lt;/small&gt;&lt;/div&gt;;#trP::&lt;small&gt;p →&lt;/small&gt;&amp;quot;is&amp;quot;;#trT::&lt;small&gt;t =&lt;/small&gt;&amp;quot;today&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;is&amp;quot;;#trN::&lt;small&gt;số từ:&lt;/small&gt;2" data-say="&lt;b&gt;B5&lt;/b&gt;: t không rỗng → nối &amp;quot;␣&amp;quot;. &lt;b&gt;B6&lt;/b&gt;: nối &amp;quot;is&amp;quot; → t = &amp;quot;today&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;is&amp;quot;."></span>
+<span class="f ghost" data-now="#kTr|show-g;#trP|hot" data-set="#trA::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;t&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;o&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;d&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;a&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;y&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;s&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;&lt;em class=&quot;tg &quot;&gt;p&lt;/em&gt;a&lt;small&gt;13&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;14&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;15&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;b&lt;small&gt;16&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;e&lt;small&gt;17&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;18&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;19&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;t&lt;small&gt;20&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;i&lt;small&gt;21&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;f&lt;small&gt;22&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;23&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;l&lt;small&gt;24&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;25&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;d&lt;small&gt;26&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;27&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;28&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;29&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;30&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;31&lt;/small&gt;&lt;/div&gt;;#trP::&lt;small&gt;p →&lt;/small&gt;&amp;quot;a&amp;quot;;#trT::&lt;small&gt;t =&lt;/small&gt;&amp;quot;today&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;is&amp;quot;;#trN::&lt;small&gt;số từ:&lt;/small&gt;3" data-say="&lt;b&gt;B7&lt;/b&gt;: strtok(NULL, &amp;quot; &amp;quot;) → tìm được từ &lt;b&gt;a&lt;/b&gt; (ô 13–13), ô 14 thành &#x27;\0&#x27;."></span>
+<span class="f ghost" data-now="#kTr|show-e show-f;#trT|hot" data-set="#trA::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;t&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;o&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;d&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;a&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;y&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;s&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;&lt;em class=&quot;tg &quot;&gt;p&lt;/em&gt;a&lt;small&gt;13&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;14&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;15&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;b&lt;small&gt;16&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;e&lt;small&gt;17&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;18&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;19&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;t&lt;small&gt;20&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;i&lt;small&gt;21&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;f&lt;small&gt;22&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;23&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;l&lt;small&gt;24&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;25&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;d&lt;small&gt;26&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;27&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;28&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;29&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;30&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;31&lt;/small&gt;&lt;/div&gt;;#trP::&lt;small&gt;p →&lt;/small&gt;&amp;quot;a&amp;quot;;#trT::&lt;small&gt;t =&lt;/small&gt;&amp;quot;today&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;is&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;a&amp;quot;;#trN::&lt;small&gt;số từ:&lt;/small&gt;3" data-say="&lt;b&gt;B5&lt;/b&gt;: t không rỗng → nối &amp;quot;␣&amp;quot;. &lt;b&gt;B6&lt;/b&gt;: nối &amp;quot;a&amp;quot; → t = &amp;quot;today&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;is&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;a&amp;quot;."></span>
+<span class="f ghost" data-now="#kTr|show-g;#trP|hot" data-set="#trA::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;t&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;o&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;d&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;a&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;y&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;s&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;a&lt;small&gt;13&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;14&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;15&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;&lt;em class=&quot;tg &quot;&gt;p&lt;/em&gt;b&lt;small&gt;16&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;e&lt;small&gt;17&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;a&lt;small&gt;18&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;u&lt;small&gt;19&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;t&lt;small&gt;20&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;i&lt;small&gt;21&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;f&lt;small&gt;22&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;u&lt;small&gt;23&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;l&lt;small&gt;24&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;25&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;d&lt;small&gt;26&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;27&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;28&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;29&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;30&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;31&lt;/small&gt;&lt;/div&gt;;#trP::&lt;small&gt;p →&lt;/small&gt;&amp;quot;beautiful&amp;quot;;#trT::&lt;small&gt;t =&lt;/small&gt;&amp;quot;today&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;is&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;a&amp;quot;;#trN::&lt;small&gt;số từ:&lt;/small&gt;4" data-say="&lt;b&gt;B7&lt;/b&gt;: strtok(NULL, &amp;quot; &amp;quot;) → bỏ qua 1 dấu cách (ô 15), tìm được từ &lt;b&gt;beautiful&lt;/b&gt; (ô 16–24), ô 25 thành &#x27;\0&#x27;."></span>
+<span class="f ghost" data-now="#kTr|show-e show-f;#trT|hot" data-set="#trA::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;t&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;o&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;d&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;a&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;y&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;s&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;a&lt;small&gt;13&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;14&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;15&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;&lt;em class=&quot;tg &quot;&gt;p&lt;/em&gt;b&lt;small&gt;16&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;e&lt;small&gt;17&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;a&lt;small&gt;18&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;u&lt;small&gt;19&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;t&lt;small&gt;20&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;i&lt;small&gt;21&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;f&lt;small&gt;22&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;u&lt;small&gt;23&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;l&lt;small&gt;24&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;25&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;d&lt;small&gt;26&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;a&lt;small&gt;27&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;28&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;29&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;30&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;31&lt;/small&gt;&lt;/div&gt;;#trP::&lt;small&gt;p →&lt;/small&gt;&amp;quot;beautiful&amp;quot;;#trT::&lt;small&gt;t =&lt;/small&gt;&amp;quot;today&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;is&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;a&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;beautiful&amp;quot;;#trN::&lt;small&gt;số từ:&lt;/small&gt;4" data-say="&lt;b&gt;B5&lt;/b&gt;: t không rỗng → nối &amp;quot;␣&amp;quot;. &lt;b&gt;B6&lt;/b&gt;: nối &amp;quot;beautiful&amp;quot; → t = &amp;quot;today&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;is&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;a&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;beautiful&amp;quot;."></span>
+<span class="f ghost" data-now="#kTr|show-g;#trP|hot" data-set="#trA::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;t&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;o&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;d&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;a&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;y&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;s&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;a&lt;small&gt;13&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;14&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;15&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;b&lt;small&gt;16&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;e&lt;small&gt;17&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;a&lt;small&gt;18&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;u&lt;small&gt;19&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;t&lt;small&gt;20&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;21&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;f&lt;small&gt;22&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;u&lt;small&gt;23&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;l&lt;small&gt;24&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;25&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;&lt;em class=&quot;tg &quot;&gt;p&lt;/em&gt;d&lt;small&gt;26&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;a&lt;small&gt;27&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;y&lt;small&gt;28&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;29&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;30&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;31&lt;/small&gt;&lt;/div&gt;;#trP::&lt;small&gt;p →&lt;/small&gt;&amp;quot;day&amp;quot;;#trT::&lt;small&gt;t =&lt;/small&gt;&amp;quot;today&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;is&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;a&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;beautiful&amp;quot;;#trN::&lt;small&gt;số từ:&lt;/small&gt;5" data-say="&lt;b&gt;B7&lt;/b&gt;: strtok(NULL, &amp;quot; &amp;quot;) → tìm được từ &lt;b&gt;day&lt;/b&gt; (ô 26–28), ô 29 thành &#x27;\0&#x27;."></span>
+<span class="f ghost" data-now="#kTr|show-e show-f;#trT|hot" data-set="#trA::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;t&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;o&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;d&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;a&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;y&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;s&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;a&lt;small&gt;13&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;14&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;15&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;b&lt;small&gt;16&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;e&lt;small&gt;17&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;a&lt;small&gt;18&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;u&lt;small&gt;19&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;t&lt;small&gt;20&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;21&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;f&lt;small&gt;22&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;u&lt;small&gt;23&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;l&lt;small&gt;24&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;25&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;&lt;em class=&quot;tg &quot;&gt;p&lt;/em&gt;d&lt;small&gt;26&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;a&lt;small&gt;27&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm tok&quot;&gt;y&lt;small&gt;28&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;29&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;30&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;31&lt;/small&gt;&lt;/div&gt;;#trP::&lt;small&gt;p →&lt;/small&gt;&amp;quot;day&amp;quot;;#trT::&lt;small&gt;t =&lt;/small&gt;&amp;quot;today&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;is&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;a&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;beautiful&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;day&amp;quot;;#trN::&lt;small&gt;số từ:&lt;/small&gt;5" data-say="&lt;b&gt;B5&lt;/b&gt;: t không rỗng → nối &amp;quot;␣&amp;quot;. &lt;b&gt;B6&lt;/b&gt;: nối &amp;quot;day&amp;quot; → t = &amp;quot;today&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;is&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;a&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;beautiful&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;day&amp;quot;."></span>
+<span class="f ghost" data-now="#kTr|show-g show-d;#trP|res" data-set="#trA::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;t&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;o&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;d&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;a&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;y&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;s&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;a&lt;small&gt;13&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;14&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;15&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;b&lt;small&gt;16&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;e&lt;small&gt;17&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;a&lt;small&gt;18&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;u&lt;small&gt;19&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;t&lt;small&gt;20&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;21&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;f&lt;small&gt;22&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;u&lt;small&gt;23&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;l&lt;small&gt;24&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;25&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;d&lt;small&gt;26&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;a&lt;small&gt;27&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;y&lt;small&gt;28&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;29&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;30&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;31&lt;/small&gt;&lt;/div&gt;;#trP::&lt;small&gt;p =&lt;/small&gt;NULL;#trT::&lt;small&gt;t =&lt;/small&gt;&amp;quot;today&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;is&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;a&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;beautiful&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;day&amp;quot;;#trN::&lt;small&gt;số từ:&lt;/small&gt;5" data-say="&lt;b&gt;B7&lt;/b&gt;: strtok(NULL, &amp;quot; &amp;quot;) → từ ô 30 bỏ qua dấu cách, gặp &#x27;\0&#x27; ở ô 31 → trả về &lt;b&gt;NULL&lt;/b&gt;. &lt;b&gt;B4&lt;/b&gt;: p = NULL → thoát vòng lặp."></span>
+<span class="f ghost" data-now="#kTr|show-h;#trT|res;#trCon|sh" data-set="#trA::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;t&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;o&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;d&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;a&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;y&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;s&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;a&lt;small&gt;13&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;14&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;15&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;b&lt;small&gt;16&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;e&lt;small&gt;17&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;a&lt;small&gt;18&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;u&lt;small&gt;19&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;t&lt;small&gt;20&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;21&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;f&lt;small&gt;22&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;u&lt;small&gt;23&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;l&lt;small&gt;24&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;25&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;d&lt;small&gt;26&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;a&lt;small&gt;27&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;y&lt;small&gt;28&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;\0&lt;small&gt;29&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;30&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;31&lt;/small&gt;&lt;/div&gt;;#trP::&lt;small&gt;p =&lt;/small&gt;NULL;#trT::&lt;small&gt;t =&lt;/small&gt;&amp;quot;today&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;is&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;a&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;beautiful&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;day&amp;quot;;#trN::&lt;small&gt;số từ:&lt;/small&gt;5" data-say="&lt;b&gt;B8&lt;/b&gt;: in &lt;b&gt;&amp;quot;today is a beautiful day&amp;quot;&lt;/b&gt;. Không dấu cách đầu, không dấu cách cuối, giữa các từ đúng 1 dấu cách ✓"></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+<section class="slide" id="tests" data-title="07 · Các case đặc biệt">
+  <div class="hdr in"><span class="qn">07 · KIỂM THỬ</span><h2>Thử giải thuật với các case đặc biệt</h2></div>
+  <table class="t1 in" style="font-size:16px"><tr><th>Case</th><th>Input (␣ = dấu cách)</th><th>Output mong đợi</th><th>Giải thuật xử lý thế nào</th></tr><tr class="f"><td>1. Bình thường</td><td style="font-family:var(--mono)">&quot;<span class="sp">␣</span><span class="sp">␣</span>today<span class="sp">␣</span><span class="sp">␣</span><span class="sp">␣</span>is<span class="sp">␣</span>a<span class="sp">␣</span><span class="sp">␣</span>beautiful<span class="sp">␣</span>day<span class="sp">␣</span><span class="sp">␣</span>&quot;</td><td style="font-family:var(--mono)">&quot;today<span class="sp">␣</span>is<span class="sp">␣</span>a<span class="sp">␣</span>beautiful<span class="sp">␣</span>day&quot;</td><td>Ví dụ của đề.</td></tr><tr class="f"><td>2. Đã chuẩn sẵn</td><td style="font-family:var(--mono)">&quot;today<span class="sp">␣</span>is<span class="sp">␣</span>a<span class="sp">␣</span>beautiful<span class="sp">␣</span>day&quot;</td><td style="font-family:var(--mono)">&quot;today<span class="sp">␣</span>is<span class="sp">␣</span>a<span class="sp">␣</span>beautiful<span class="sp">␣</span>day&quot;</td><td>Không có gì để xoá, kết quả giữ nguyên.</td></tr><tr class="f"><td>3. 1 từ, có dấu cách 2 đầu</td><td style="font-family:var(--mono)">&quot;<span class="sp">␣</span><span class="sp">␣</span><span class="sp">␣</span>hello<span class="sp">␣</span><span class="sp">␣</span><span class="sp">␣</span>&quot;</td><td style="font-family:var(--mono)">&quot;hello&quot;</td><td>Chỉ 1 lần lặp; B5 không chạy vì t rỗng.</td></tr><tr class="f"><td>4. Toàn dấu cách</td><td style="font-family:var(--mono)">&quot;<span class="sp">␣</span><span class="sp">␣</span><span class="sp">␣</span><span class="sp">␣</span><span class="sp">␣</span><span class="sp">␣</span>&quot;</td><td style="font-family:var(--mono)">&quot;&quot;</td><td>strtok trả NULL ngay lần đầu → vòng lặp chạy 0 lần → in &quot;&quot;.</td></tr><tr class="f"><td>5. Dòng rỗng (Enter luôn)</td><td style="font-family:var(--mono)">&quot;&quot;</td><td style="font-family:var(--mono)">&quot;&quot;</td><td>Giống trên. Chương trình không được treo/lỗi.</td></tr><tr class="f"><td>6. Câu dài đúng 100 ký tự</td><td style="font-family:var(--mono)">&quot;a␣a␣…␣a (100 ký tự)&quot;</td><td style="font-family:var(--mono)">giữ nguyên</td><td>Cần đủ 101 ô: s[101], getline(s, 101).</td></tr></table>
+  <div class="note blue f" style="font-size:17px">Thói quen tốt: trước khi nộp bài, luôn tự thử <b>case thường</b>, <b>case biên</b> (rỗng, 1 phần tử, toàn dấu cách) và <b>case lớn nhất</b> (100 ký tự). Phần lớn lỗi nằm ở case biên.</div>
+</section>
+<section class="slide" id="code1" data-title="08 · Code C++ cách 1 &amp; giải thích">
+  <div class="hdr in"><span class="qn">08 · CODE</span><h2>Code C++ cách 1 (strtok)</h2></div>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr">
+    <div>
+<script type="text/x-cpp" id="kC1" data-title="trim_strtok.cpp" data-mark="1-3:a;6:b;7:c;9-10:d;12:e;13:f;14-15:g;16:h;17:i;20:j">
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+int main() {
+    char s[101];          // câu nhập vào: tối đa 100 ký tự + '\0'
+    char t[101] = "";     // kết quả, ban đầu là chuỗi rỗng
+
+    cout << "Enter a sentence = ";
+    cin.getline(s, 101);  // đọc CẢ DÒNG, kể cả dấu cách
+
+    char *p = strtok(s, " ");     // lấy từ đầu tiên
+    while (p != NULL) {           // còn từ thì còn làm
+        if (strlen(t) > 0)        // t đã có từ trước đó
+            strcat(t, " ");       // => thêm ĐÚNG 1 dấu cách
+        strcat(t, p);             // nối từ vào cuối t
+        p = strtok(NULL, " ");    // lấy từ tiếp theo
+    }
+
+    cout << "\"" << t << "\"" << endl;
+    return 0;
+}
+
+</script>
+    </div>
+    <div>
+      <div class="console hide0" id="c1Con">Enter a sentence = <span class="in">  today   is a  beautiful day  </span>
+"today is a beautiful day"</div>
+      <span class="f ghost" data-now="#kC1|show-a" data-say="&lt;b&gt;#include &amp;lt;cstring&amp;gt;&lt;/b&gt; để dùng strlen, strcat, strtok. &lt;b&gt;&amp;lt;iostream&amp;gt;&lt;/b&gt; cho cin/cout."></span>
+      <span class="f ghost" data-now="#kC1|show-b" data-say="&lt;b&gt;char s[101]&lt;/b&gt;: chứa tối đa 100 ký tự + &#x27;\0&#x27;."></span>
+      <span class="f ghost" data-now="#kC1|show-c" data-say="&lt;b&gt;char t[101] = &amp;quot;&amp;quot;&lt;/b&gt;: khởi tạo t là chuỗi rỗng (t[0] = &#x27;\0&#x27;). &lt;b&gt;Bắt buộc&lt;/b&gt;, vì strcat sẽ tìm &#x27;\0&#x27; trong t để nối vào sau. Kết quả không dài hơn s nên 101 ô là đủ."></span>
+      <span class="f ghost" data-now="#kC1|show-d" data-say="In lời nhắc rồi &lt;b&gt;cin.getline(s, 101)&lt;/b&gt;: đọc cả dòng (kể cả dấu cách), tối đa 100 ký tự, tự thêm &#x27;\0&#x27;."></span>
+      <span class="f ghost" data-now="#kC1|show-e" data-say="&lt;b&gt;strtok(s, &amp;quot; &amp;quot;)&lt;/b&gt; lần đầu truyền s. p là &lt;b&gt;char*&lt;/b&gt; (con trỏ) trỏ tới đầu từ đầu tiên, hoặc NULL nếu câu không có từ nào."></span>
+      <span class="f ghost" data-now="#kC1|show-f" data-say="&lt;b&gt;while (p != NULL)&lt;/b&gt;: mỗi vòng xử lý 1 từ."></span>
+      <span class="f ghost" data-now="#kC1|show-g" data-say="Nếu t đã có chữ (&lt;b&gt;strlen(t) &amp;gt; 0&lt;/b&gt;) thì thêm 1 dấu cách để ngăn cách với từ mới. Từ đầu tiên không được thêm → không có dấu cách đầu câu."></span>
+      <span class="f ghost" data-now="#kC1|show-h" data-say="&lt;b&gt;strcat(t, p)&lt;/b&gt;: nối từ p vào cuối t."></span>
+      <span class="f ghost" data-now="#kC1|show-i" data-say="&lt;b&gt;strtok(NULL, &amp;quot; &amp;quot;)&lt;/b&gt;: lấy từ kế tiếp (truyền NULL để strtok đi tiếp từ chỗ đã nhớ)."></span>
+      <span class="f ghost" data-now="#kC1|show-j" data-act="#c1Con|sh" data-say="In t kẹp giữa 2 dấu nháy kép. Trong chuỗi C++, dấu nháy kép viết là &lt;b&gt;\&amp;quot;&lt;/b&gt;."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+      <div class="note f" style="font-size:15.5px">Độ phức tạp: mỗi ký tự của s được strtok xem 1 lần; strcat/strlen phải đi lại từ đầu t nên tổng cộng cỡ <b>(số từ × độ dài)</b>, với 100 ký tự thì rất nhanh.</div>
+    </div>
+  </div>
+</section>
+<section class="slide" id="cach2" data-title="09 · Cách 2: duyệt từng ký tự">
+  <div class="hdr in"><span class="qn">09 · CÁCH 2</span><h2>Cách 2: duyệt từng ký tự, chép có chọn lọc (không strtok)</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+<script type="text/x-cpp" data-plain class="sm" id="kC2" data-nonum data-title="Mã giả · i chạy trên s, j là vị trí ghi trên t" data-mark="3:a;4-5:b;6:c;7:d;8:e">
+j = 0
+Với i = 0 .. n-1:
+    Nếu s[i] khác ' ':  t[j] = s[i]; j++          // chép chữ
+    Ngược lại, nếu j > 0 và t[j-1] khác ' ':
+                        t[j] = ' '; j++           // 1 dấu cách
+    Ngược lại:          bỏ qua                    // dấu cách thừa
+Nếu j > 0 và t[j-1] == ' ':  j--                  // trim right
+t[j] = '\0'
+</script>
+      <div class="note blue f" data-o="100" style="font-size:15.5px;margin-top:8px">Ý chính: <b>chỉ chép dấu cách khi ký tự vừa chép là chữ</b>. Như vậy: đầu câu (j = 0) không chép → trim left; nhiều dấu cách liền nhau chỉ chép cái đầu → gộp; dấu cách cuối (nếu có) xoá ở bước cuối → trim right.</div>
+    </div>
+    <div>
+      <div class="mem" style="padding-top:26px"><div class="arr sm" id="c2S"><span class="rowlab">s</span><div class="cell sm "><span class="sp">␣</span><small>0</small></div><div class="cell sm "><span class="sp">␣</span><small>1</small></div><div class="cell sm ">h<small>2</small></div><div class="cell sm ">i<small>3</small></div><div class="cell sm "><span class="sp">␣</span><small>4</small></div><div class="cell sm "><span class="sp">␣</span><small>5</small></div><div class="cell sm "><span class="sp">␣</span><small>6</small></div><div class="cell sm ">y<small>7</small></div><div class="cell sm ">o<small>8</small></div><div class="cell sm ">u<small>9</small></div><div class="cell sm "><span class="sp">␣</span><small>10</small></div><div class="cell sm "><span class="sp">␣</span><small>11</small></div><div class="cell sm nul">\0<small>12</small></div></div></div>
+      <div class="arr sm" id="c2T" style="margin-top:14px;margin-bottom:22px"><span class="rowlab">t</span><div class="cell sm dim"><em class="tg b lo">j</em>?<small>0</small></div></div>
+      <span class="f ghost" data-now="#kC2|show-c" data-set="#c2S::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm bad&quot;&gt;&lt;em class=&quot;tg &quot;&gt;i&lt;/em&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;h&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;i&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;o&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;;#c2T::&lt;span class=&quot;rowlab&quot;&gt;t&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;em class=&quot;tg b lo&quot;&gt;j&lt;/em&gt;?&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;" data-say="i = 0: dấu cách, nhưng t còn rỗng (j = 0) → đang ở đầu câu → &lt;b&gt;bỏ qua&lt;/b&gt; (ô đỏ)."></span><span class="f ghost" data-now="#kC2|show-c" data-set="#c2S::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm bad&quot;&gt;&lt;em class=&quot;tg &quot;&gt;i&lt;/em&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;h&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;i&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;o&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;;#c2T::&lt;span class=&quot;rowlab&quot;&gt;t&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;em class=&quot;tg b lo&quot;&gt;j&lt;/em&gt;?&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;" data-say="i = 1: dấu cách, nhưng t còn rỗng (j = 0) → đang ở đầu câu → &lt;b&gt;bỏ qua&lt;/b&gt; (ô đỏ)."></span><span class="f ghost" data-now="#kC2|show-a" data-set="#c2S::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm cur&quot;&gt;&lt;em class=&quot;tg &quot;&gt;i&lt;/em&gt;h&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;i&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;o&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;;#c2T::&lt;span class=&quot;rowlab&quot;&gt;t&lt;/span&gt;&lt;div class=&quot;cell sm cur&quot;&gt;h&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;em class=&quot;tg b lo&quot;&gt;j&lt;/em&gt;?&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;" data-say="i = 2: s[2] = &#x27;h&#x27; không phải dấu cách → &lt;b&gt;chép&lt;/b&gt; sang t[0], j tăng lên 1."></span><span class="f ghost" data-now="#kC2|show-a" data-set="#c2S::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;h&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm cur&quot;&gt;&lt;em class=&quot;tg &quot;&gt;i&lt;/em&gt;i&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;o&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;;#c2T::&lt;span class=&quot;rowlab&quot;&gt;t&lt;/span&gt;&lt;div class=&quot;cell sm ok&quot;&gt;h&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm cur&quot;&gt;i&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;em class=&quot;tg b lo&quot;&gt;j&lt;/em&gt;?&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;" data-say="i = 3: s[3] = &#x27;i&#x27; không phải dấu cách → &lt;b&gt;chép&lt;/b&gt; sang t[1], j tăng lên 2."></span><span class="f ghost" data-now="#kC2|show-b" data-set="#c2S::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;h&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;i&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm cur&quot;&gt;&lt;em class=&quot;tg &quot;&gt;i&lt;/em&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;o&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;;#c2T::&lt;span class=&quot;rowlab&quot;&gt;t&lt;/span&gt;&lt;div class=&quot;cell sm ok&quot;&gt;h&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm cur&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;em class=&quot;tg b lo&quot;&gt;j&lt;/em&gt;?&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;" data-say="i = 4: dấu cách, và ký tự vừa chép t[1] = &#x27;i&#x27; là chữ → đây là dấu cách &lt;b&gt;đầu tiên&lt;/b&gt; sau từ → &lt;b&gt;chép 1 dấu cách&lt;/b&gt;, j = 3."></span><span class="f ghost" data-now="#kC2|show-c" data-set="#c2S::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;h&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;i&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm bad&quot;&gt;&lt;em class=&quot;tg &quot;&gt;i&lt;/em&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;o&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;;#c2T::&lt;span class=&quot;rowlab&quot;&gt;t&lt;/span&gt;&lt;div class=&quot;cell sm ok&quot;&gt;h&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;em class=&quot;tg b lo&quot;&gt;j&lt;/em&gt;?&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;" data-say="i = 5: dấu cách, nhưng ký tự vừa chép đã là dấu cách → &lt;b&gt;bỏ qua&lt;/b&gt; (ô đỏ)."></span><span class="f ghost" data-now="#kC2|show-c" data-set="#c2S::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;h&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;i&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm bad&quot;&gt;&lt;em class=&quot;tg &quot;&gt;i&lt;/em&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;y&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;o&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;;#c2T::&lt;span class=&quot;rowlab&quot;&gt;t&lt;/span&gt;&lt;div class=&quot;cell sm ok&quot;&gt;h&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;em class=&quot;tg b lo&quot;&gt;j&lt;/em&gt;?&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;" data-say="i = 6: dấu cách, nhưng ký tự vừa chép đã là dấu cách → &lt;b&gt;bỏ qua&lt;/b&gt; (ô đỏ)."></span><span class="f ghost" data-now="#kC2|show-a" data-set="#c2S::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;h&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;i&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm cur&quot;&gt;&lt;em class=&quot;tg &quot;&gt;i&lt;/em&gt;y&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;o&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;;#c2T::&lt;span class=&quot;rowlab&quot;&gt;t&lt;/span&gt;&lt;div class=&quot;cell sm ok&quot;&gt;h&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm cur&quot;&gt;y&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;em class=&quot;tg b lo&quot;&gt;j&lt;/em&gt;?&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;" data-say="i = 7: s[7] = &#x27;y&#x27; không phải dấu cách → &lt;b&gt;chép&lt;/b&gt; sang t[3], j tăng lên 4."></span><span class="f ghost" data-now="#kC2|show-a" data-set="#c2S::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;h&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;i&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;y&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm cur&quot;&gt;&lt;em class=&quot;tg &quot;&gt;i&lt;/em&gt;o&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;u&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;;#c2T::&lt;span class=&quot;rowlab&quot;&gt;t&lt;/span&gt;&lt;div class=&quot;cell sm ok&quot;&gt;h&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;y&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm cur&quot;&gt;o&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;em class=&quot;tg b lo&quot;&gt;j&lt;/em&gt;?&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;" data-say="i = 8: s[8] = &#x27;o&#x27; không phải dấu cách → &lt;b&gt;chép&lt;/b&gt; sang t[4], j tăng lên 5."></span><span class="f ghost" data-now="#kC2|show-a" data-set="#c2S::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;h&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;i&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;y&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;o&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm cur&quot;&gt;&lt;em class=&quot;tg &quot;&gt;i&lt;/em&gt;u&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;;#c2T::&lt;span class=&quot;rowlab&quot;&gt;t&lt;/span&gt;&lt;div class=&quot;cell sm ok&quot;&gt;h&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;y&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;o&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm cur&quot;&gt;u&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;em class=&quot;tg b lo&quot;&gt;j&lt;/em&gt;?&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;" data-say="i = 9: s[9] = &#x27;u&#x27; không phải dấu cách → &lt;b&gt;chép&lt;/b&gt; sang t[5], j tăng lên 6."></span><span class="f ghost" data-now="#kC2|show-b" data-set="#c2S::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;h&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;i&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;y&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;o&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;u&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm cur&quot;&gt;&lt;em class=&quot;tg &quot;&gt;i&lt;/em&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm &quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;;#c2T::&lt;span class=&quot;rowlab&quot;&gt;t&lt;/span&gt;&lt;div class=&quot;cell sm ok&quot;&gt;h&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;y&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;o&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;u&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm cur&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;em class=&quot;tg b lo&quot;&gt;j&lt;/em&gt;?&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;" data-say="i = 10: dấu cách, và ký tự vừa chép t[5] = &#x27;u&#x27; là chữ → đây là dấu cách &lt;b&gt;đầu tiên&lt;/b&gt; sau từ → &lt;b&gt;chép 1 dấu cách&lt;/b&gt;, j = 7."></span><span class="f ghost" data-now="#kC2|show-c" data-set="#c2S::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;h&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;i&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;y&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;o&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;u&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm bad&quot;&gt;&lt;em class=&quot;tg &quot;&gt;i&lt;/em&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;;#c2T::&lt;span class=&quot;rowlab&quot;&gt;t&lt;/span&gt;&lt;div class=&quot;cell sm ok&quot;&gt;h&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;y&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;o&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;u&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;em class=&quot;tg b lo&quot;&gt;j&lt;/em&gt;?&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;" data-say="i = 11: dấu cách, nhưng ký tự vừa chép đã là dấu cách → &lt;b&gt;bỏ qua&lt;/b&gt; (ô đỏ)."></span><span class="f ghost" data-now="#kC2|show-d" data-set="#c2S::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;h&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;i&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;y&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;o&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;u&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;;#c2T::&lt;span class=&quot;rowlab&quot;&gt;t&lt;/span&gt;&lt;div class=&quot;cell sm ok&quot;&gt;h&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;y&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;o&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;u&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm bad&quot;&gt;&lt;em class=&quot;tg b lo&quot;&gt;j-1&lt;/em&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;" data-say="Hết vòng lặp: t = &amp;quot;hi&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;you&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&amp;quot;, còn &lt;b&gt;1 dấu cách ở cuối&lt;/b&gt; (vì sau &#x27;you&#x27; có dấu cách). Kiểm tra t[j-1] == &#x27; &#x27; → &lt;b&gt;j--&lt;/b&gt; (trim right)."></span><span class="f ghost" data-now="#kC2|show-e" data-set="#c2S::&lt;span class=&quot;rowlab&quot;&gt;s&lt;/span&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;h&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;i&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;y&lt;small&gt;7&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;o&lt;small&gt;8&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;u&lt;small&gt;9&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;10&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm dim&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;11&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm nul&quot;&gt;\0&lt;small&gt;12&lt;/small&gt;&lt;/div&gt;;#c2T::&lt;span class=&quot;rowlab&quot;&gt;t&lt;/span&gt;&lt;div class=&quot;cell sm ok&quot;&gt;h&lt;small&gt;0&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;i&lt;small&gt;1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;&lt;span class=&quot;sp&quot;&gt;␣&lt;/span&gt;&lt;small&gt;2&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;y&lt;small&gt;3&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;o&lt;small&gt;4&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm ok&quot;&gt;u&lt;small&gt;5&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;cell sm z&quot;&gt;&lt;em class=&quot;tg b lo&quot;&gt;j&lt;/em&gt;\0&lt;small&gt;6&lt;/small&gt;&lt;/div&gt;" data-say="Đặt &lt;b&gt;t[j] = &#x27;\0&#x27;&lt;/b&gt; để đóng chuỗi (j = 6). Kết quả: &lt;b&gt;&amp;quot;hi you&amp;quot;&lt;/b&gt; ✓"></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+<section class="slide" id="code2" data-title="10 · Code C++ cách 2 &amp; giải thích">
+  <div class="hdr in"><span class="qn">10 · CODE</span><h2>Code C++ cách 2 (duyệt ký tự)</h2></div>
+  <div class="cols" style="grid-template-columns:1.3fr 1fr">
+    <div>
+<script type="text/x-cpp" class="sm" id="kD2" data-title="trim_loop.cpp" data-mark="6:a;10:b;11:c;12:d;13-15:e;16-18:f;21-22:g;23:h;25:i">
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+int main() {
+    char s[101], t[101];
+    cout << "Enter a sentence = ";
+    cin.getline(s, 101);
+
+    int n = strlen(s);
+    int j = 0;                        // vị trí sẽ ghi tiếp trong t
+    for (int i = 0; i < n; i++) {
+        if (s[i] != ' ') {            // ký tự thường: chép sang t
+            t[j] = s[i];
+            j++;
+        } else if (j > 0 && t[j-1] != ' ') {
+            t[j] = ' ';               // dấu cách ĐẦU TIÊN sau một từ
+            j++;
+        }                             // các trường hợp còn lại: bỏ qua
+    }
+    if (j > 0 && t[j-1] == ' ')       // còn 1 dấu cách ở cuối?
+        j--;                          // => xoá đi (trim right)
+    t[j] = '\0';                      // đóng chuỗi
+
+    cout << "\"" << t << "\"" << endl;
+    return 0;
+}
+
+</script>
+    </div>
+    <div>
+      <span class="f ghost" data-now="#kD2|show-a" data-say="Hai mảng: &lt;b&gt;s&lt;/b&gt; (câu gốc) và &lt;b&gt;t&lt;/b&gt; (kết quả). Lần này t &lt;b&gt;không cần&lt;/b&gt; khởi tạo vì ta tự đặt &#x27;\0&#x27; ở cuối."></span>
+      <span class="f ghost" data-now="#kD2|show-b" data-say="&lt;b&gt;n = strlen(s)&lt;/b&gt; tính 1 lần trước vòng lặp (không viết &lt;b&gt;i &amp;lt; strlen(s)&lt;/b&gt; trong for: mỗi vòng lại đếm lại từ đầu, chậm)."></span>
+      <span class="f ghost" data-now="#kD2|show-c" data-say="&lt;b&gt;j&lt;/b&gt;: số ký tự đã ghi vào t, cũng là ô sẽ ghi tiếp theo."></span>
+      <span class="f ghost" data-now="#kD2|show-d" data-say="Duyệt i từ 0 tới n-1."></span>
+      <span class="f ghost" data-now="#kD2|show-e" data-say="Ký tự không phải dấu cách → chép vào t[j] rồi tăng j."></span>
+      <span class="f ghost" data-now="#kD2|show-f" data-say="Là dấu cách: chỉ chép khi &lt;b&gt;j &amp;gt; 0&lt;/b&gt; (không ở đầu câu) và &lt;b&gt;t[j-1] != &#x27; &#x27;&lt;/b&gt; (ký tự trước không phải dấu cách). Chú ý thứ tự: kiểm tra j &amp;gt; 0 &lt;b&gt;trước&lt;/b&gt;, để không đọc t[-1]."></span>
+      <span class="f ghost" data-now="#kD2|show-g" data-say="Sau vòng lặp có thể còn 1 dấu cách ở cuối → lùi j lại 1."></span>
+      <span class="f ghost" data-now="#kD2|show-h" data-say="&lt;b&gt;t[j] = &#x27;\0&#x27;&lt;/b&gt;: quên dòng này thì cout in ra cả rác phía sau!"></span>
+      <span class="f ghost" data-now="#kD2|show-i" data-say="In kết quả trong dấu nháy kép. Kết quả giống hệt cách 1."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+      <div class="note f" style="font-size:15px">Mở rộng: có thể ghi <b>đè ngay trên s</b> (dùng s thay cho t) vì j luôn ≤ i, không cần mảng thứ 2. Độ phức tạp O(n).</div>
+    </div>
+  </div>
+</section>
+<section class="slide" id="loi1" data-title="11 · Lỗi hay gặp: nhập & bộ nhớ">
+  <div class="hdr in"><span class="qn">11 · LỖI HAY GẶP</span><h2>Lỗi khi nhập dữ liệu &amp; khai báo mảng</h2></div>
+  <div class="cols3">
+  <div class="card f"><h3>① Dùng cin &gt;&gt; s</h3>
+<div class="lbl x">✗ SAI</div>
+<script type="text/x-cpp" class="sm" data-nonum>
+cin >> s;   // gõ "  today is"
+</script>
+<p style="font-size:17px;margin:4px 0"><code class='i'>&gt;&gt;</code> bỏ dấu cách đầu và <b>dừng ở dấu cách</b> → s = "today". Mất hết các từ sau.</p>
+<div class="lbl v">✓ ĐÚNG</div>
+<script type="text/x-cpp" class="sm" data-nonum>
+cin.getline(s, 101);
+</script><div class="lbl x" style="margin-top:8px">KẾT QUẢ CỦA CODE SAI</div><div class="console" style="font-size:13px;min-height:0">Enter a sentence = today   is a  day
+&quot;today&quot;</div></div>
+  <div class="card f"><h3>② getline sau cin &gt;&gt; n</h3>
+<div class="lbl x">✗ SAI</div>
+<script type="text/x-cpp" class="sm" data-nonum>
+cin >> n;
+cin.getline(s, 101); // s = ""
+</script>
+<p style="font-size:17px;margin:4px 0">Sau <code class='i'>cin &gt;&gt; n</code>, ký tự Enter <b>còn nằm lại</b> trong bộ đệm; getline đọc ngay dòng rỗng đó.</p>
+<div class="lbl v">✓ ĐÚNG</div>
+<script type="text/x-cpp" class="sm" data-nonum>
+cin >> n;
+cin.ignore();  // bỏ ký tự Enter
+cin.getline(s, 101);
+</script><div class="lbl x" style="margin-top:8px">KẾT QUẢ CỦA CODE SAI</div><div class="console" style="font-size:13px;min-height:0">3
+Enter a sentence =
+&quot;&quot;      ← chưa kịp gõ gì</div></div>
+  <div class="card f"><h3>③ Mảng thiếu chỗ cho '\0'</h3>
+<div class="lbl x">✗ SAI</div>
+<script type="text/x-cpp" class="sm" data-nonum>
+char s[100];
+cin.getline(s, 100);  // chỉ đọc 99
+</script>
+<p style="font-size:17px;margin:4px 0">Câu dài 100 ký tự cần <b>101</b> ô. getline(s, N) đọc tối đa N-1 ký tự; nhập dài hơn sẽ làm cin bị lỗi (fail).</p>
+<div class="lbl v">✓ ĐÚNG</div>
+<script type="text/x-cpp" class="sm" data-nonum>
+char s[101];
+cin.getline(s, 101);
+</script><div class="lbl x" style="margin-top:8px">KẾT QUẢ CỦA CODE SAI</div><div class="console" style="font-size:13px;min-height:0">(gõ câu dài 100 ký tự)
+→ chỉ lấy 99 ký tự, cin bị fail</div></div>
+  </div>
+</section>
+<section class="slide" id="loi2" data-title="12 · Lỗi hay gặp: logic ghép từ">
+  <div class="hdr in"><span class="qn">12 · LỖI HAY GẶP</span><h2>Lỗi logic khi dùng strtok / strcat</h2></div>
+  <div class="cols3">
+  <div class="card f"><h3>④ Không khởi tạo t</h3>
+<div class="lbl x">✗ SAI</div>
+<script type="text/x-cpp" class="sm" data-nonum>
+char t[101];
+strcat(t, p);   // t chứa rác!
+</script>
+<p style="font-size:17px;margin:4px 0">strcat tìm '\0' trong t để nối vào sau. t chưa khởi tạo thì chứa rác → kết quả có ký tự lạ, có thể tràn mảng.</p>
+<div class="lbl v">✓ ĐÚNG</div>
+<script type="text/x-cpp" class="sm" data-nonum>
+char t[101] = "";   // hoặc t[0] = '\0';
+</script><div class="lbl x" style="margin-top:8px">KẾT QUẢ CỦA CODE SAI</div><div class="console" style="font-size:13px;min-height:0">&quot;╠╠╠╠╠today is a beautiful day&quot;</div></div>
+  <div class="card f"><h3>⑤ Thêm dấu cách SAU mỗi từ</h3>
+<div class="lbl x">✗ SAI</div>
+<script type="text/x-cpp" class="sm" data-nonum>
+strcat(t, p);
+strcat(t, " ");
+// "today is a beautiful day␣"
+</script>
+<p style="font-size:17px;margin:4px 0">Từ cuối cũng bị thêm dấu cách → <b>thừa 1 dấu cách ở cuối</b>, sai yêu cầu trim right. Rất khó thấy khi nhìn màn hình!</p>
+<div class="lbl v">✓ ĐÚNG</div>
+<script type="text/x-cpp" class="sm" data-nonum>
+if (strlen(t) > 0) strcat(t, " ");
+strcat(t, p);
+</script><div class="lbl x" style="margin-top:8px">KẾT QUẢ CỦA CODE SAI</div><div class="console" style="font-size:13px;min-height:0">&quot;today is a beautiful day &quot;
+                         ↑ thừa</div></div>
+  <div class="card f"><h3>⑥ Gọi lại strtok(s, …) trong vòng lặp</h3>
+<div class="lbl x">✗ SAI</div>
+<script type="text/x-cpp" class="sm" data-nonum>
+while (p != NULL) {
+    ...
+    p = strtok(s, " ");
+}
+</script>
+<p style="font-size:17px;margin:4px 0">Truyền s là <b>bắt đầu lại từ đầu</b> → luôn trả về "today" → <b>lặp vô hạn</b>.</p>
+<div class="lbl v">✓ ĐÚNG</div>
+<script type="text/x-cpp" class="sm" data-nonum>
+p = strtok(NULL, " ");
+</script><div class="lbl x" style="margin-top:8px">KẾT QUẢ CỦA CODE SAI</div><div class="console" style="font-size:13px;min-height:0">&quot;today today today today today ...
+(chạy mãi không dừng)</div></div>
+  </div>
+</section>
+<section class="slide" id="loi3" data-title="13 · Lỗi hay gặp: các lỗi khác">
+  <div class="hdr in"><span class="qn">13 · LỖI HAY GẶP</span><h2>Các lỗi khác</h2></div>
+  <div class="cols3">
+  <div class="card f"><h3>⑦ Nhầm ' ' và " "</h3>
+<div class="lbl x">✗ SAI</div>
+<script type="text/x-cpp" class="sm" data-nonum>
+if (s[i] == " ")   // lỗi biên dịch
+</script>
+<p style="font-size:17px;margin:4px 0">s[i] là <b>1 ký tự</b> (char), còn " " là <b>chuỗi</b> (char*). So sánh ký tự phải dùng nháy đơn.</p>
+<div class="lbl v">✓ ĐÚNG</div>
+<script type="text/x-cpp" class="sm" data-nonum>
+if (s[i] == ' ')
+</script><div class="lbl x" style="margin-top:8px">KẾT QUẢ CỦA CODE SAI</div><div class="console" style="font-size:13px;min-height:0">error: ISO C++ forbids comparison
+between pointer and integer</div></div>
+  <div class="card f"><h3>⑧ Dùng s sau khi strtok</h3>
+<div class="lbl x">✗ SAI</div>
+<script type="text/x-cpp" class="sm" data-nonum>
+// ... tách xong ...
+cout << s;   // chỉ in "  today"
+</script>
+<p style="font-size:17px;margin:4px 0">strtok đã thay dấu cách bằng '\0' trong s. Cần câu gốc thì sao chép trước khi tách.</p>
+<div class="lbl v">✓ ĐÚNG</div>
+<script type="text/x-cpp" class="sm" data-nonum>
+char bak[101];
+strcpy(bak, s);  // giữ bản gốc
+p = strtok(s, " ");
+</script><div class="lbl x" style="margin-top:8px">KẾT QUẢ CỦA CODE SAI</div><div class="console" style="font-size:13px;min-height:0">cout &lt;&lt; s;   →   &quot;  today&quot;</div></div>
+  <div class="card f"><h3>⑨ Quên '\0' (cách 2)</h3>
+<div class="lbl x">✗ SAI</div>
+<script type="text/x-cpp" class="sm" data-nonum>
+for (...) { t[j] = ...; j++; }
+cout << t;   // in kèm rác
+</script>
+<p style="font-size:17px;margin:4px 0">Mảng t không tự có '\0'. Phải tự đặt sau khi chép xong.</p>
+<div class="lbl v">✓ ĐÚNG</div>
+<script type="text/x-cpp" class="sm" data-nonum>
+t[j] = '\0';
+cout << t;
+</script><div class="lbl x" style="margin-top:8px">KẾT QUẢ CỦA CODE SAI</div><div class="console" style="font-size:13px;min-height:0">&quot;hi you╠╠╠▒▓@...&quot;  ← rác sau chữ</div></div>
+  </div>
+  <div class="note blue f" style="font-size:16px">Thêm: nếu input có thể chứa phím <b>Tab</b>, dùng delimiter <code class="i">" \t"</code> cho strtok. Không viết <code class="i">i &lt; strlen(s)</code> trong điều kiện for (đếm lại mỗi vòng); tính <code class="i">n = strlen(s)</code> một lần.</div>
+</section>
+<section class="slide" id="vector1" data-title="14 · Giải bằng vector&lt;char*&gt;">
+  <div class="hdr in"><span class="qn">14 · VECTOR</span><h2>Giải bằng vector: tách từ vào <code class="i" style="font-size:.8em">vector&lt;char*&gt;</code></h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+    <div>
+<script type="text/x-cpp" class="sm" id="kV1" data-title="trim_vector.cpp (vẫn dùng char s[101] + strtok)" data-mark="3:a;11:b;12-16:c;14:d;19-22:e;20:f">
+#include <iostream>
+#include <cstring>
+#include <vector>
+using namespace std;
+
+int main() {
+    char s[101];
+    cout << "Enter a sentence = ";
+    cin.getline(s, 101);
+
+    vector<char*> words;             // danh sách các từ
+    char *p = strtok(s, " ");
+    while (p != NULL) {
+        words.push_back(p);          // cất con trỏ tới từ
+        p = strtok(NULL, " ");
+    }
+
+    cout << "\"";
+    for (int i = 0; i < (int)words.size(); i++) {
+        if (i > 0) cout << " ";      // dấu cách chỉ đặt GIỮA 2 từ
+        cout << words[i];
+    }
+    cout << "\"" << endl;
+    return 0;
+}
+
+</script>
+    </div>
+    <div>
+      <div class="vars" style="margin-top:0"><span class="vc" id="v1N"><small>size =</small>0</span></div>
+      <div class="flow" id="v1B" style="justify-content:flex-start;margin-top:10px;min-height:56px;gap:6px"><span class="muted" style="font-size:15px">(rỗng)</span></div>
+      <div class="console hide0" id="v1Con" style="margin-top:10px">Enter a sentence = <span class="in">  today   is a  beautiful day  </span>
+"today is a beautiful day"</div>
+      <span class="f ghost" data-now="#kV1|show-a" data-say="&lt;b&gt;#include &amp;lt;vector&amp;gt;&lt;/b&gt;. vector giống mảng nhưng &lt;b&gt;tự dài ra&lt;/b&gt; khi thêm phần tử."></span><span class="f ghost" data-now="#kV1|show-b" data-say="&lt;b&gt;vector&amp;lt;char*&amp;gt; words&lt;/b&gt;: danh sách các con trỏ, mỗi con trỏ trỏ tới 1 từ &lt;b&gt;nằm ngay trong s&lt;/b&gt; (không chép chữ ra chỗ khác)."></span><span class="f ghost" data-now="#kV1|show-c show-d" data-set="#v1B::&lt;div class=&quot;box d&quot; style=&quot;min-width:0;padding:6px 10px&quot;&gt;&amp;quot;today&amp;quot;&lt;small&gt;words[0]&lt;/small&gt;&lt;/div&gt;;#v1N::&lt;small&gt;size =&lt;/small&gt;1" data-say="strtok trả về từ &lt;b&gt;today&lt;/b&gt; → &lt;b&gt;words.push_back(p)&lt;/b&gt;. words.size() = 1."></span><span class="f ghost" data-now="#kV1|show-c show-d" data-set="#v1B::&lt;div class=&quot;box b&quot; style=&quot;min-width:0;padding:6px 10px&quot;&gt;&amp;quot;today&amp;quot;&lt;small&gt;words[0]&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;box d&quot; style=&quot;min-width:0;padding:6px 10px&quot;&gt;&amp;quot;is&amp;quot;&lt;small&gt;words[1]&lt;/small&gt;&lt;/div&gt;;#v1N::&lt;small&gt;size =&lt;/small&gt;2" data-say="strtok trả về từ &lt;b&gt;is&lt;/b&gt; → &lt;b&gt;words.push_back(p)&lt;/b&gt;. words.size() = 2."></span><span class="f ghost" data-now="#kV1|show-c show-d" data-set="#v1B::&lt;div class=&quot;box b&quot; style=&quot;min-width:0;padding:6px 10px&quot;&gt;&amp;quot;today&amp;quot;&lt;small&gt;words[0]&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;box b&quot; style=&quot;min-width:0;padding:6px 10px&quot;&gt;&amp;quot;is&amp;quot;&lt;small&gt;words[1]&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;box d&quot; style=&quot;min-width:0;padding:6px 10px&quot;&gt;&amp;quot;a&amp;quot;&lt;small&gt;words[2]&lt;/small&gt;&lt;/div&gt;;#v1N::&lt;small&gt;size =&lt;/small&gt;3" data-say="strtok trả về từ &lt;b&gt;a&lt;/b&gt; → &lt;b&gt;words.push_back(p)&lt;/b&gt;. words.size() = 3."></span><span class="f ghost" data-now="#kV1|show-c show-d" data-set="#v1B::&lt;div class=&quot;box b&quot; style=&quot;min-width:0;padding:6px 10px&quot;&gt;&amp;quot;today&amp;quot;&lt;small&gt;words[0]&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;box b&quot; style=&quot;min-width:0;padding:6px 10px&quot;&gt;&amp;quot;is&amp;quot;&lt;small&gt;words[1]&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;box b&quot; style=&quot;min-width:0;padding:6px 10px&quot;&gt;&amp;quot;a&amp;quot;&lt;small&gt;words[2]&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;box d&quot; style=&quot;min-width:0;padding:6px 10px&quot;&gt;&amp;quot;beautiful&amp;quot;&lt;small&gt;words[3]&lt;/small&gt;&lt;/div&gt;;#v1N::&lt;small&gt;size =&lt;/small&gt;4" data-say="strtok trả về từ &lt;b&gt;beautiful&lt;/b&gt; → &lt;b&gt;words.push_back(p)&lt;/b&gt;. words.size() = 4."></span><span class="f ghost" data-now="#kV1|show-c show-d" data-set="#v1B::&lt;div class=&quot;box b&quot; style=&quot;min-width:0;padding:6px 10px&quot;&gt;&amp;quot;today&amp;quot;&lt;small&gt;words[0]&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;box b&quot; style=&quot;min-width:0;padding:6px 10px&quot;&gt;&amp;quot;is&amp;quot;&lt;small&gt;words[1]&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;box b&quot; style=&quot;min-width:0;padding:6px 10px&quot;&gt;&amp;quot;a&amp;quot;&lt;small&gt;words[2]&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;box b&quot; style=&quot;min-width:0;padding:6px 10px&quot;&gt;&amp;quot;beautiful&amp;quot;&lt;small&gt;words[3]&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;box d&quot; style=&quot;min-width:0;padding:6px 10px&quot;&gt;&amp;quot;day&amp;quot;&lt;small&gt;words[4]&lt;/small&gt;&lt;/div&gt;;#v1N::&lt;small&gt;size =&lt;/small&gt;5" data-say="strtok trả về từ &lt;b&gt;day&lt;/b&gt; → &lt;b&gt;words.push_back(p)&lt;/b&gt;. words.size() = 5."></span><span class="f ghost" data-now="#kV1|show-e show-f" data-act="#v1Con|sh" data-set="#v1B::&lt;div class=&quot;box b&quot; style=&quot;min-width:0;padding:6px 10px&quot;&gt;&amp;quot;today&amp;quot;&lt;small&gt;words[0]&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;box b&quot; style=&quot;min-width:0;padding:6px 10px&quot;&gt;&amp;quot;is&amp;quot;&lt;small&gt;words[1]&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;box b&quot; style=&quot;min-width:0;padding:6px 10px&quot;&gt;&amp;quot;a&amp;quot;&lt;small&gt;words[2]&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;box b&quot; style=&quot;min-width:0;padding:6px 10px&quot;&gt;&amp;quot;beautiful&amp;quot;&lt;small&gt;words[3]&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;box b&quot; style=&quot;min-width:0;padding:6px 10px&quot;&gt;&amp;quot;day&amp;quot;&lt;small&gt;words[4]&lt;/small&gt;&lt;/div&gt;;#v1N::&lt;small&gt;size =&lt;/small&gt;5" data-say="Tách xong. Giờ in: &lt;b&gt;dấu cách chỉ đặt trước phần tử có i &amp;gt; 0&lt;/b&gt;, tức là chỉ nằm &lt;b&gt;giữa&lt;/b&gt; 2 từ."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+      <div class="note f" style="font-size:15px">Ưu điểm: tách <b>“lấy từ”</b> và <b>“in ra”</b> thành 2 phần riêng; biết ngay số từ (<code class="i">words.size()</code>); dễ làm thêm: đảo thứ tự từ, đếm từ, sắp xếp… Lưu ý: các con trỏ trỏ vào s, nên s phải còn tồn tại và không được sửa.</div>
+    </div>
+  </div>
+</section>
+<section class="slide" id="vector2" data-title="15 · vector&lt;string&gt; &amp; so sánh">
+  <div class="hdr in"><span class="qn">15 · VECTOR</span><h2>Tham khảo: <code class="i" style="font-size:.8em">vector&lt;string&gt;</code> + stringstream &amp; so sánh</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.15fr">
+    <div>
+<script type="text/x-cpp" class="sm" id="kV2" data-title="trim_string.cpp (ngoài phạm vi bài: dùng string)" data-mark="10:a;12:b;14-15:c;17-21:d">
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
+using namespace std;
+
+int main() {
+    string line, w;
+    cout << "Enter a sentence = ";
+    getline(cin, line);
+
+    stringstream ss(line);
+    vector<string> words;
+    while (ss >> w)                 // tự bỏ mọi khoảng trắng
+        words.push_back(w);
+
+    string t = "";
+    for (int i = 0; i < (int)words.size(); i++) {
+        if (i > 0) t += " ";
+        t += words[i];
+    }
+    cout << "\"" << t << "\"" << endl;
+    return 0;
+}
+
+</script>
+      <span class="f ghost" data-now="#kV2|show-a" data-say="<b>getline(cin, line)</b>: phiên bản đọc cả dòng cho string (không giới hạn 100 ký tự)."></span>
+      <span class="f ghost" data-now="#kV2|show-b show-c" data-say="<b>stringstream</b> biến chuỗi thành “luồng” giống cin; <b>ss &gt;&gt; w</b> đọc từng từ và tự bỏ mọi khoảng trắng (dấu cách, tab). Vai trò giống strtok nhưng <b>không phá</b> chuỗi gốc."></span>
+      <span class="f ghost" data-now="#kV2|show-d" data-say="Ghép lại bằng toán tử <b>+=</b>; quy tắc dấu cách giữa các từ giống hệt cách 1."></span>
+      <p class="say" style="min-height:44px;font-size:15.5px">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <table class="t1 f" style="font-size:14px"><tr><th></th><th>char[] + strtok</th><th>vector&lt;char*&gt;</th><th>vector&lt;string&gt;</th></tr>
+        <tr><td>Giới hạn độ dài</td><td>100 ký tự</td><td>100 ký tự</td><td>không giới hạn</td></tr>
+        <tr><td>Chuỗi gốc</td><td>bị sửa</td><td>bị sửa</td><td>giữ nguyên</td></tr>
+        <tr><td>Biết số từ</td><td>phải tự đếm</td><td>size()</td><td>size()</td></tr>
+        <tr><td>Đảo / sắp xếp từ</td><td>khó</td><td>dễ</td><td>dễ</td></tr>
+        <tr><td>Thư viện</td><td>&lt;cstring&gt;</td><td>+ &lt;vector&gt;</td><td>&lt;string&gt; &lt;sstream&gt; &lt;vector&gt;</td></tr>
+        <tr><td>Đúng yêu cầu bài?</td><td class="ok-t">✓</td><td class="ok-t">✓</td><td class="bad-t">✗ (dùng string)</td></tr></table>
+      <div class="note blue f" style="font-size:15.5px">Với bài này, <b>cách 1</b> là đủ và đúng yêu cầu. Dùng <b>vector</b> có lợi khi đề mở rộng: “in các từ theo thứ tự ngược”, “viết hoa chữ đầu mỗi từ”, “tìm từ dài nhất”… vì đã có sẵn danh sách từ trong tay.</div>
+    </div>
+  </div>
+</section>
+<section class="slide" id="thu" data-title="16 · Thử ngay">
+  <div class="hdr in"><span class="qn">16 · THỬ NGAY</span><h2>Tự gõ câu và xem giải thuật chạy</h2></div>
+  <div class="card in" style="padding:16px 20px">
+    <p style="font-size:16px;margin-bottom:6px" class="muted">Enter a sentence = (tối đa 100 ký tự)</p>
+    <div style="display:flex;gap:10px;align-items:center"><input id="tryIn" maxlength="100" value="  today   is a  beautiful day  " spellcheck="false"><button class="btn" id="tryGo">Chuẩn hoá</button><button class="btn ghost2" id="tryEx">Ví dụ khác</button></div>
+  </div>
+  <div class="cols" style="margin-top:14px;grid-template-columns:1fr 1fr">
+    <div class="card in"><h3>Input (␣ = dấu cách)</h3><div class="big" id="tryVis"></div><p class="muted" style="font-size:15px;margin-top:6px" id="tryLen"></p>
+      <h3 style="margin-top:10px">Các từ strtok lấy được</h3><div class="chips" id="tryTok"></div></div>
+    <div class="card in"><h3>Output</h3><div class="console" id="tryOut" style="font-size:17px;min-height:70px"></div><p class="muted" style="font-size:15px;margin-top:8px" id="tryInfo"></p></div>
+  </div>
+</section>
+<section class="slide" id="summary" data-title="Tổng kết">
+  <div class="hdr in"><span class="qn">TỔNG KẾT</span><h2>Những điều cần nhớ</h2></div>
+  <div class="cols3">
+    <div class="card in"><h3>Tư duy</h3><ul><li>Đọc kỹ đề, vẽ input ra từng ô.</li><li>Tìm điểm chung của các yêu cầu: 3 yêu cầu = “lấy từ rồi nối bằng 1 dấu cách”.</li><li>Chia nhỏ: đọc → tách → nối → in.</li></ul></div>
+    <div class="card in"><h3>Kỹ thuật</h3><ul><li><code class="i">cin.getline(s, 101)</code> để đọc cả dòng.</li><li><code class="i">strtok(s," ")</code> rồi <code class="i">strtok(NULL," ")</code>.</li><li>Khởi tạo <code class="i">t = ""</code>; thêm dấu cách <b>trước</b> từ, trừ từ đầu.</li><li>Tự duyệt thì nhớ đặt <code class="i">'\0'</code>.</li></ul></div>
+    <div class="card in"><h3>Kiểm tra trước khi nộp</h3><ul><li>Câu bình thường, câu đã chuẩn.</li><li>1 từ, toàn dấu cách, dòng rỗng.</li><li>Câu dài 100 ký tự.</li><li>Có dấu cách thừa ở cuối không? (in trong dấu nháy để thấy)</li></ul></div>
+  </div>
+  <div class="note in" style="font-size:17px;margin-top:14px">Bài tập mở rộng: (a) in số từ của câu · (b) in các từ theo thứ tự ngược “day beautiful a is today” · (c) viết hoa chữ cái đầu mỗi từ · (d) dùng cách 2 nhưng ghi đè trực tiếp lên s, không dùng mảng t.</div>
+</section>
+</div></div>
+
+<div id="bar"></div>
+<div id="hint">← → / Space: từng bước · Shift+→: qua slide · G: đi tới slide bất kỳ · A: hiện hết · F: toàn màn hình</div>
+<div id="nav"><button id="jumpNav" title="Đi tới slide (G)">☰</button><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+<div id="jump"><div id="jbox"><div class="jh"><h3>Đi tới slide</h3><span class="muted" style="font-size:14px">gõ số hoặc tên slide rồi Enter</span><input id="jq" placeholder="vd: 6 hoặc strtok" autocomplete="off"><button id="jx" aria-label="Đóng">×</button></div><div id="jlist"></div></div></div>
+
+
+<script>
+
+(function(){
+  const KW=new Set("if else for while do return break continue using namespace const NULL nullptr true false new delete sizeof struct".split(" "));
+  const PRIM=new Set("int char void bool long double float auto unsigned short size_t string vector stringstream".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  window.__esc=esc;
+  function hlLine(line){
+    const pm=line.match(/^(\s*)(#\w+)(\s*)(<[^>]+>)?(.*)$/);
+    if(pm) return pm[1]+'<span class="p">'+pm[2]+'</span>'+pm[3]+(pm[4]?'<span class="s">'+esc(pm[4])+'</span>':'')+hlCore(pm[5]);
+    return hlCore(line);
+  }
+  function hlCore(line){
+    const re=/(\/\/.*$)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|\b(\d+)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="n">'+m[3]+'</span>';
+      else if(m[4]){
+        const w=m[4];let cls="";
+        if(PRIM.has(w))cls="t";else if(KW.has(w))cls="k";
+        else if(m[5])cls="fn";
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[5]?esc(m[5]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-cpp"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const plain=sc.dataset.plain!==undefined;
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");r.split(",").forEach(rr=>{const [a,b]=rr.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);});
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    if(sc.dataset.title){const t=document.createElement("div");t.className="code-title";t.textContent=sc.dataset.title;sc.before(t)}
+    const nonum=sc.dataset.nonum!==undefined;
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'">'+(nonum?'':'<span class="no">'+(i+1)+'</span>')+'<span>'+((plain?hlPlain(l):hlLine(l))||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+  function hlPlain(l){
+    let e=esc(l);
+    e=e.replace(/("[^"]*"|'[^']*')/g,'\u0001$1\u0002');
+    e=e.replace(/(\/\/.*$)/,'\u0003$1\u0004');
+    e=e.replace(/^(B\d+\.)/,'<span class="k">$1</span>');
+    e=e.replace(/\b(strtok|strcat|strlen)\b/g,'<span class="fn">$1</span>');
+    e=e.replace(/\u0001/g,'<span class="s">').replace(/\u0003/g,'<span class="c">').replace(/[\u0002\u0004]/g,'</span>');
+    return e;
+  }
+  const esc2=esc;
+  // ---------- deck engine ----------
+  //   .f = fragment, one per step.  data-act "sel|cls;…" (kept while shown) · data-now "sel|cls;…" (only on latest step)
+  //   data-set "sel::html;…" (content while shown) · data-say narration · data-o order
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")].sort((x,y)=>(+x.dataset.o||0)-(+y.dataset.o||0));
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  const pairs=(v,sep)=>(v||"").split(/;(?=\s*#)/).filter(s=>s.trim()).map(p=>{const k=p.indexOf(sep);return [p.slice(0,k).trim(),p.slice(k+sep.length)]});
+  function tog(v,on){pairs(v,"|").forEach(([sel,cls])=>{document.querySelectorAll(sel).forEach(t=>cls.split(" ").forEach(c=>c&&t.classList.toggle(c,on)))})}
+  document.querySelectorAll("[data-set]").forEach(f=>pairs(f.dataset.set,"::").forEach(([sel])=>{document.querySelectorAll(sel).forEach(t=>{if(t.dataset.orig===undefined)t.dataset.orig=t.innerHTML})}));
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach(f=>{tog(f.dataset.now,false);tog(f.dataset.act,false)});
+      s.querySelectorAll("[data-orig]").forEach(t=>t.innerHTML=t.dataset.orig);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step);f.classList.toggle("on",on);if(on){tog(f.dataset.act,true);pairs(f.dataset.set,"::").forEach(([sel,val])=>document.querySelectorAll(sel).forEach(t=>t.innerHTML=val))}});
+      if(i===cur&&step>0)tog(fs[step-1].dataset.now,true);
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.innerHTML=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length+(fs.length?" · "+step+"/"+fs.length:"");
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    try{history.replaceState(null,"","#"+slides[cur].id)}catch(e){}
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+
+  // ---------- jump-to-slide panel ----------
+  const jump=document.getElementById("jump"),jlist=document.getElementById("jlist"),jq=document.getElementById("jq");
+  const titleOf=s=>s.dataset.title||(s.querySelector("h2,h1")||{}).textContent||s.id;
+  slides.forEach((s,i)=>{
+    const d=document.createElement("div");d.className="ji";d.dataset.i=i;
+    d.innerHTML="<b>"+String(i+1).padStart(2,"0")+"</b><span>"+esc(titleOf(s).replace(/\s+/g," ").trim())+"</span>";
+    d.onclick=()=>{closeJump();go(i)};jlist.appendChild(d);
+    const b=document.createElement("button");b.className="jumpbtn";b.type="button";b.innerHTML="☰ Đi tới slide";b.title="Mở danh sách slide (phím G)";
+    b.onclick=e=>{e.stopPropagation();openJump()};s.appendChild(b);
+  });
+  function filterJump(){
+    const q=jq.value.trim().toLowerCase();let first=null;
+    [...jlist.children].forEach(d=>{const i=+d.dataset.i;const ok=!q||String(i+1)===q||d.textContent.toLowerCase().includes(q);d.style.display=ok?"":"none";d.classList.remove("k");if(ok&&!first)first=d});
+    if(first&&q)first.classList.add("k");return first;
+  }
+  function openJump(){jump.classList.add("on");jq.value="";filterJump();[...jlist.children].forEach(d=>d.classList.toggle("cur",+d.dataset.i===cur));setTimeout(()=>jq.focus(),30)}
+  function closeJump(){jump.classList.remove("on");jq.blur()}
+  jq.addEventListener("input",filterJump);
+  jq.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Escape")closeJump();else if(e.key==="Enter"){const q=jq.value.trim();const n=parseInt(q,10);if(String(n)===q&&n>=1&&n<=slides.length){closeJump();go(n-1)}else{const f=filterJump();if(f){closeJump();go(+f.dataset.i)}}}});
+  jump.addEventListener("click",e=>{if(e.target===jump)closeJump()});
+  document.getElementById("jx").onclick=closeJump;
+  document.getElementById("jumpNav").onclick=openJump;
+
+  addEventListener("keydown",e=>{
+    if(jump.classList.contains("on")){if(e.key==="Escape")closeJump();return}
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="g"||e.key==="G"){e.preventDefault();openJump()}
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null||jump.classList.contains("on"))return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+</script>
+<script>
+(function(){
+  const inp=document.getElementById("tryIn");if(!inp)return;
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const vis=s=>esc(s).replace(/ /g,'<span class="sp">␣</span>');
+  const ex=["  today   is a  beautiful day  ","      ","hello","   C++    la    ngon   ngu   lap trinh   ","today is a beautiful day",""];let ei=0;
+  function run(){
+    const s=inp.value.slice(0,100);
+    const toks=s.split(" ").filter(w=>w.length);
+    const t=toks.join(" ");
+    document.getElementById("tryVis").innerHTML=s.length?vis(s):'<span class="muted">(dòng rỗng)</span>';
+    document.getElementById("tryLen").textContent="strlen(s) = "+s.length+" · số dấu cách = "+(s.split(" ").length-1);
+    document.getElementById("tryTok").innerHTML=toks.length?toks.map((w,i)=>'<span class="chip v">'+(i+1)+'. "'+esc(w)+'"</span>').join(""):'<span class="chip r">strtok trả NULL ngay lần đầu</span>';
+    document.getElementById("tryOut").innerHTML='Enter a sentence = <span class="in">'+esc(s)+'</span>\n"'+esc(t)+'"';
+    document.getElementById("tryInfo").innerHTML="strlen(t) = "+t.length+" · đã xoá "+(s.length-t.length)+" dấu cách thừa · vòng while chạy "+toks.length+" lần";
+  }
+  ["keydown","keyup","keypress"].forEach(e=>inp.addEventListener(e,ev=>ev.stopPropagation()));
+  inp.addEventListener("input",run);
+  document.getElementById("tryGo").onclick=run;
+  document.getElementById("tryEx").onclick=()=>{ei=(ei+1)%ex.length;inp.value=ex[ei];run()};
+  run();
+})();
+</script>
+</body>
+</html>

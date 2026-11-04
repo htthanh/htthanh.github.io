@@ -1,0 +1,1080 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trim Spaces C++</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:16px;padding-right:150px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+.lvl{font-size:14px;font-weight:700;color:var(--muted);white-space:nowrap;margin-left:auto}
+.lvl b{color:#f59e0b;letter-spacing:2px}.lvl s{color:#d9d6e8;text-decoration:none;letter-spacing:2px}
+h1{font-size:66px;line-height:1.1;font-weight:800}
+h2{font-size:30px;line-height:1.2;font-weight:800}
+h3{font-size:21px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:20px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:24px;margin:5px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:9px;height:9px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.86em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 5px;border-radius:6px;color:#be185d;white-space:nowrap}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+.cols>*{min-width:0}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.card p,.card li{font-size:17px}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.note{margin-top:10px;padding:8px 14px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:17px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.note.red{border-color:#e11d48;background:linear-gradient(90deg,#fff1f3,#fffafa)}
+.code{font-family:var(--mono);font-size:15px;line-height:1.45;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:8px 0;overflow:hidden;position:relative}
+.code.sm{font-size:14px;line-height:1.42}.code.xs{font-size:13px;line-height:1.4}.code.xxs{font-size:12px;line-height:1.36;padding:6px 0}
+.code.x4{font-size:11.4px;line-height:1.33;padding:6px 0}
+.code .ln{padding:0 12px 0 6px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:22px;flex:none;text-align:right;margin-right:10px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.13);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.15);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.18);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.14);box-shadow:inset 5px 0 #ec4899}
+.code.show-e .mark-e{background:rgba(16,185,129,.15);box-shadow:inset 5px 0 #10b981}
+.code.show-f .mark-f{background:rgba(124,58,237,.13);box-shadow:inset 5px 0 #7c3aed}
+.code.show-g .mark-g{background:rgba(6,182,212,.15);box-shadow:inset 5px 0 #06b6d4}
+.code.show-h .mark-h{background:rgba(245,158,11,.18);box-shadow:inset 5px 0 #f59e0b}
+.code.show-i .mark-i{background:rgba(236,72,153,.14);box-shadow:inset 5px 0 #ec4899}
+.code.show-j .mark-j{background:rgba(16,185,129,.15);box-shadow:inset 5px 0 #10b981}
+.hide0{opacity:0;transform:translateY(8px) scale(.96);transition:all .45s}
+.hide0.sh{opacity:1;transform:none}
+.win.pre.sh:not(.vis){opacity:.35;filter:grayscale(1)}
+.gone.sh{display:none}
+.stage{position:relative;display:flex;align-items:center;justify-content:center}
+.chip{display:inline-block;font-family:var(--mono);font-size:12.5px;font-weight:700;padding:2px 9px;border-radius:999px;background:#fef3c7;color:#b45309;border:1px solid #fcd34d}
+.chip.v{background:#ede9fe;color:#6d28d9;border-color:#c4b5fd}.chip.g{background:#d1fae5;color:#047857;border-color:#6ee7b7}.chip.r{background:#ffe4e6;color:#be123c;border-color:#fda4af}
+.hlo{outline:3px solid #f59e0b;outline-offset:3px;border-radius:6px}
+.jb.dis.en{color:#111;border-color:#9aa1b3;background:linear-gradient(180deg,#fff,#e6e8ee)}.jb.dis.en .ico{filter:none;opacity:1}
+.jb.dis.en.dis2{color:#a0a4ad;border-color:#ccd0d8;background:#f1f2f5}
+.rad.on.off::before,.chk.on.off::before{background:#fff;content:""}
+.code-title{font-family:var(--mono);font-size:13px;color:var(--muted);margin:0 0 4px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:16px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:6px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.3}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+table.t1 td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.console{font-family:var(--mono);font-size:13.5px;line-height:1.45;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:8px 14px;color:#e6f0ff;white-space:pre;min-height:40px;overflow:hidden}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:10px;letter-spacing:3px;margin-bottom:3px}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.flow{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap}
+.box{border-radius:12px;padding:8px 12px;text-align:center;font-family:var(--mono);font-size:15px;border:2px solid var(--line);background:#fff;min-width:110px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:12.5px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.a{border-color:#7c3aed}.box.b{border-color:#0891b2}.box.c{border-color:#ec4899;background:#fdf2f8}.box.d{border-color:#f59e0b;background:#fffbeb}.box.e{border-color:#10b981;background:#ecfdf5}
+.ar{color:var(--muted);font-size:22px;text-align:center}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.say{font-size:17px;margin-top:10px;min-height:50px;color:var(--muted);line-height:1.42}
+.say b{color:var(--text)}
+.vars{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.vc{font-family:var(--mono);font-size:15px;font-weight:700;padding:4px 12px;border-radius:10px;background:#fff;border:2px solid #e4dcfb;transition:all .35s}
+.vc b{color:var(--t)}
+.vc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.45)}
+.vc.res{border-color:#10b981;background:#ecfdf5;color:#047857}
+.arr{display:flex;gap:8px;justify-content:center}
+.cell{width:52px;height:56px;border-radius:12px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .45s}
+.cell small{font-size:11px;color:var(--muted);font-weight:600}
+.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-6px)}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c}
+.cell.dim{opacity:.35}
+.cell.wide{width:auto;padding:0 10px;font-size:14px}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.15)}100%{transform:none;opacity:1}}
+.pop{animation:pop .45s}
+/* ===== agenda ===== */
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 10px}
+.sec{grid-column:1/-1;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.08em;margin-top:4px;text-transform:uppercase}
+.ag{background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 10px;cursor:pointer;transition:all .2s;font-size:15.5px;line-height:1.25;box-shadow:0 2px 6px rgba(40,50,110,.05);font-family:var(--mono);font-weight:600}
+.ag:hover{border-color:#ec4899;transform:translateY(-2px);box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag b{color:#db2777;margin-right:6px}
+.ag.g1{border-left:5px solid #7c3aed}.ag.g2{border-left:5px solid #0891b2}.ag.g3{border-left:5px solid #ec4899}.ag.g4{border-left:5px solid #f59e0b}
+.ag.g5{border-left:5px solid #10b981}.ag.g6{border-left:5px solid #6366f1}.ag.g7{border-left:5px solid #f97316}.ag.g8{border-left:5px solid #0ea5e9}
+/* ===== nav / jump ===== */
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;min-width:36px;height:32px;cursor:pointer;font-size:16px;padding:0 8px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+.jumpbtn{position:absolute;top:26px;right:30px;z-index:7;font-family:"Be Vietnam Pro",sans-serif;font-size:14px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));border:none;border-radius:999px;padding:7px 14px;cursor:pointer;box-shadow:0 6px 16px -6px var(--sa1);transition:transform .2s}
+.jumpbtn:hover{transform:translateY(-2px) scale(1.04)}
+#jump{position:fixed;inset:0;z-index:20;background:rgba(30,27,58,.45);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
+#jump.on{display:flex}
+#jbox{width:min(1100px,94vw);max-height:88vh;overflow:auto;background:#fff;border-radius:18px;padding:20px 24px;box-shadow:0 30px 70px -20px rgba(30,27,58,.6);animation:pop .3s}
+#jbox .jh{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+#jbox .jh h3{font-size:22px;color:#7c3aed;margin:0}
+#jbox .jh input{margin-left:auto;font-family:var(--mono);font-size:15px;padding:6px 10px;border:2px solid var(--line);border-radius:10px;width:260px;outline:none}
+#jbox .jh input:focus{border-color:#a78bfa}
+#jbox .jh button{border:none;background:#f1eaff;color:#6d28d9;font-weight:800;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:18px}
+#jlist{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+#jlist .ji{display:flex;gap:8px;align-items:center;padding:7px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:14.5px;transition:all .15s;background:#fff}
+#jlist .ji:hover,#jlist .ji.k{border-color:#ec4899;background:#fdf2f8}
+#jlist .ji.cur{background:#f3edff;border-color:#a78bfa}
+#jlist .ji b{font-family:var(--mono);color:#db2777;min-width:26px}
+#jlist .ji span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:700px){#hint{display:none}#jlist{grid-template-columns:1fr}}
+@media print{#nav,#bar,#hint,.jumpbtn{display:none}}
+
+/* ===== C-string visualisation ===== */
+.arr2{display:flex;gap:5px;justify-content:center;align-items:flex-start;flex-wrap:nowrap}
+.col{display:flex;flex-direction:column;align-items:center;gap:1px}
+.ptr{height:19px;font-family:var(--mono);font-size:13px;font-weight:800;line-height:19px}
+.ptr.pi{color:#d97706}.ptr.pk{color:#059669}
+.c2{width:44px;height:50px;border-radius:10px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .35s;line-height:1.1}
+.c2 small{font-size:10.5px;color:var(--muted);font-weight:600}
+.c2.sp span{color:#a78bfa}
+.c2.nul{background:#f1f5f9}.c2.nul span{color:#64748b;font-size:15px}
+.c2.gar{border-style:dashed;opacity:.45}.c2.gar span{color:#94a3b8}
+.c2.ok{border-color:#10b981;background:#ecfdf5;color:#047857}.c2.ok.sp span{color:#059669}
+.c2.dim{opacity:.33}
+.c2.bad{border-color:#e11d48;background:#fff1f3;color:#be123c}.c2.bad.sp span{color:#e11d48}
+.c2.cur{border-color:#f59e0b;background:#fffbeb;transform:translateY(-5px);box-shadow:0 8px 16px -8px rgba(245,158,11,.7)}
+.c2.wr{box-shadow:0 0 0 4px rgba(16,185,129,.35)}
+.c2.mv{border-color:#0891b2;background:#ecfeff}
+.arr2.sm .c2{width:36px;height:44px;font-size:17px;border-width:2px;border-radius:8px}.arr2.sm{gap:4px}
+.lbl{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--muted);margin:4px 0 2px}
+.res{font-family:var(--mono);font-size:16px;font-weight:700;padding:4px 12px;border-radius:10px;background:#ecfdf5;border:2px solid #10b981;color:#047857;white-space:pre;display:inline-block}
+.inp{font-family:var(--mono);font-size:16px;font-weight:700;padding:4px 12px;border-radius:10px;background:#fff;border:2px solid #e4dcfb;white-space:pre;display:inline-block}
+.inp .sp,.res .sp{color:#a78bfa}
+
+/* ===== mini strip (phân tích đề) ===== */
+.strip{display:flex;gap:2px;justify-content:center;flex-wrap:nowrap}
+.mc{width:27px;height:36px;border-radius:7px;border:2px solid #e4dcfb;background:#fff;font-family:var(--mono);font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .5s;overflow:hidden;flex:none}
+.mc.sp{color:#c4b5fd}
+.strip.showL .mc.L{background:#ffe4e6;border-color:#e11d48;color:#be123c}
+.strip.showR .mc.R{background:#fce7f3;border-color:#db2777;color:#be185d}
+.strip.showD .mc.D{background:#fef3c7;border-color:#f59e0b;color:#b45309}
+.strip.showK .mc.K{background:#d1fae5;border-color:#10b981;color:#047857}
+.strip.cut .mc.L,.strip.cut .mc.R,.strip.cut .mc.D{width:0;border-width:0;margin:0 -1px;opacity:0}
+.leg{display:flex;gap:14px;justify-content:center;font-size:14px;margin-top:8px;flex-wrap:wrap}
+.leg span{display:inline-flex;align-items:center;gap:6px}
+.leg i{width:16px;height:16px;border-radius:4px;display:inline-block;border:2px solid}
+.steps{counter-reset:st}
+.steps li{padding-left:44px;margin:7px 0;font-size:17px;transition:all .35s;border-radius:8px}
+.steps li::before{counter-increment:st;content:counter(st);width:28px;height:28px;border-radius:50%;left:4px;top:1px;color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
+.steps li.hot{background:#fffbeb;box-shadow:inset 4px 0 #f59e0b}
+table.dec td,table.dec th{font-size:15px}
+table.dec tr{transition:background .35s}
+table.dec tr.hot td{background:#fffbeb}
+.big-arrow{font-size:28px;color:#a78bfa;text-align:center;line-height:1}
+.tree{display:flex;flex-direction:column;gap:10px;align-items:center}
+.err{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.err .card h3{font-size:18px}
+.err .card p{font-size:15.5px}
+.bad-t{color:#be123c;font-weight:700}.ok-t{color:#047857;font-weight:700}
+.steps li{position:relative}
+.steps li::before{position:absolute;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+tr.hot td{background:#fffbeb!important;transition:background .35s}
+.code.show-k .mark-k{background:rgba(245,158,11,.18);box-shadow:inset 5px 0 #f59e0b}
+.code.show-l .mark-l{background:rgba(236,72,153,.14);box-shadow:inset 5px 0 #ec4899}
+table.log{margin-top:6px;font-size:13.5px}
+table.log th{padding:3px 8px;font-size:13px}
+table.log td{padding:2px 8px;font-family:var(--mono);white-space:pre}
+tr.lgr{opacity:0;transition:opacity .3s}tr.lgr.sh{opacity:1}tr.lgr.cur td{background:#fffbeb}
+.steps li{font-size:19px}
+</style></head><body>
+<div id="viewport"><div id="deck">
+
+<!-- ===================== TITLE ===================== -->
+<section class="slide" id="title" data-title="Trang bìa">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// C++ · Practice 6.1 · Mảng ký tự char s[101]</div>
+    <h1 class="in">Trim Spaces<br><span class="grad">Chuẩn hóa khoảng trắng trong câu</span></h1>
+    <p class="in muted" style="font-size:24px;margin-top:20px;max-width:1000px">Xóa space ở đầu câu, cuối câu và các space trùng giữa các từ. Giải từng bước cho sinh viên năm 1: phân tích đề → ý tưởng → chia nhỏ bài toán → giải thuật &amp; chạy tay → code C++ → lỗi hay gặp → làm bằng <code class="i">vector</code>.</p>
+    <p class="in" style="margin-top:34px;font-size:18px;color:#8a91b4">← → hoặc Space: chạy từng bước · Shift+→: qua slide · <b>G</b> hoặc nút <b>☰ Đi tới slide</b>: nhảy tới slide bất kỳ · A: hiện hết · F: toàn màn hình</p>
+  </div>
+</section>
+
+<!-- ===================== AGENDA ===================== -->
+<section class="slide" id="agenda" data-title="Nội dung">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:17px">· bấm vào mục để đi tới</span></div>
+  <div class="agenda in" style="grid-template-columns:repeat(3,1fr);gap:12px 14px">
+    <div class="sec">1 · Hiểu bài toán</div>
+    <div class="ag g1" data-goto="analyze"><b>01</b>Phân tích đề bài</div>
+    <div class="ag g1" data-goto="basics"><b>02</b>Kiến thức nền: mảng char &amp; '\0'</div>
+    <div class="ag g1" data-goto="idea"><b>03</b>Ý tưởng giải</div>
+    <div class="sec">2 · Chia nhỏ &amp; giải thuật</div>
+    <div class="ag g2" data-goto="decompose"><b>04</b>Chia thành bài toán con</div>
+    <div class="ag g2" data-goto="delchar"><b>05</b>Bài toán con: xóa 1 ký tự</div>
+    <div class="ag g2" data-goto="way1"><b>06</b>Cách 1: xóa từng space</div>
+    <div class="ag g3" data-goto="algo2"><b>07</b>Cách 2: đọc / ghi (2 chỉ số)</div>
+    <div class="ag g3" data-goto="run1"><b>08</b>Chạy tay: "␣␣to␣␣be␣"</div>
+    <div class="ag g3" data-goto="run2"><b>09</b>Chạy tay: "␣a␣␣␣b"</div>
+    <div class="ag g3" data-goto="run3"><b>10</b>Chạy tay: "␣␣␣" (toàn space)</div>
+    <div class="sec">3 · Code &amp; kiểm thử</div>
+    <div class="ag g4" data-goto="code"><b>11</b>Code C++ hoàn chỉnh</div>
+    <div class="ag g4" data-goto="tests"><b>12</b>Bộ test</div>
+    <div class="ag g5" data-goto="bugs1"><b>13</b>Lỗi hay gặp (1)</div>
+    <div class="ag g5" data-goto="bugs2"><b>14</b>Lỗi hay gặp (2)</div>
+    <div class="ag g6" data-goto="vector"><b>15</b>Giải bằng vector</div>
+    <div class="ag g7" data-goto="summary"><b>✓</b>Tổng kết &amp; bài tập thêm</div>
+  </div>
+  <div class="note blue in" style="margin-top:18px">Ký hiệu <b style="color:#7c3aed">␣</b> trong các slide = <b>một dấu cách (space)</b>, để bạn đếm được bằng mắt. <code class="i">'\0'</code> = ký tự kết thúc chuỗi.</div>
+</section>
+
+<!-- ===================== 01 PHÂN TÍCH ===================== -->
+<section class="slide" id="analyze" data-title="01 · Phân tích đề bài">
+  <div class="hdr in"><span class="qn">BƯỚC 1</span><h2>Phân tích đề bài</h2></div>
+  <div class="lbl in" style="text-align:center">Ví dụ input (mỗi ô là 1 ký tự, ␣ là space)</div>
+  <div class="strip in" id="anStrip" data-strip="   today   is a  beautiful day   "></div>
+  <div class="leg in">
+    <span><i style="background:#ffe4e6;border-color:#e11d48"></i>space đầu câu → xóa</span>
+    <span><i style="background:#fce7f3;border-color:#db2777"></i>space cuối câu → xóa</span>
+    <span><i style="background:#fef3c7;border-color:#f59e0b"></i>space thừa giữa 2 từ → xóa</span>
+    <span><i style="background:#d1fae5;border-color:#10b981"></i>space giữ lại (1 cái giữa 2 từ)</span>
+  </div>
+  <p class="say" style="text-align:center">Nhấn → để chạy từng bước.</p>
+  <span class="f ghost" data-act="#anStrip|showL" data-say="<b>Trim left:</b> 3 space ở <b>đầu câu</b> (trước chữ t) không có ý nghĩa → xóa hết."></span>
+  <span class="f ghost" data-act="#anStrip|showR" data-say="<b>Trim right:</b> 3 space ở <b>cuối câu</b> (sau chữ y) → xóa hết."></span>
+  <span class="f ghost" data-act="#anStrip|showD;#anStrip|showK" data-say="<b>Space trùng:</b> giữa 2 từ có thể có 2, 3… space. Chỉ <b>giữ đúng 1</b> (ô xanh), xóa phần còn lại (ô vàng)."></span>
+  <span class="f ghost" data-act="#anStrip|cut" data-say="Bỏ hết các ô bị đánh dấu → còn lại <b>&quot;today is a beautiful day&quot;</b>: các từ giữ nguyên thứ tự, cách nhau đúng 1 space."></span>
+  <div class="cols" style="margin-top:4px;grid-template-columns:1fr 1.15fr">
+    <div class="card f">
+      <h3>Tóm tắt đề</h3>
+      <ul>
+        <li><b>Input:</b> 1 câu, có thể chứa nhiều space ở bất kỳ đâu. Giả sử ≤ 100 ký tự → <code class="i">char s[101]</code>.</li>
+        <li><b>Output:</b> câu đã chuẩn hóa, in trong dấu ngoặc kép.</li>
+        <li><b>Ràng buộc:</b> chỉ dùng mảng <code class="i">char</code>, <span class="bad-t">không</span> dùng <code class="i">string</code>, <span class="bad-t">không</span> dùng <code class="i">strtok</code>.</li>
+      </ul>
+    </div>
+    <div class="f">
+      <table class="t1" style="font-size:15px">
+        <tr><th>Trường hợp đặc biệt cần nghĩ tới</th><th>Input</th><th>Output</th></tr>
+        <tr><td>Không có space thừa</td><td><code class="i">"hello world"</code></td><td><code class="i">"hello world"</code></td></tr>
+        <tr><td>Chỉ có 1 từ</td><td><code class="i">"␣␣hi␣"</code></td><td><code class="i">"hi"</code></td></tr>
+        <tr><td>Toàn space</td><td><code class="i">"␣␣␣␣"</code></td><td><code class="i">""</code> (rỗng)</td></tr>
+        <tr><td>Chuỗi rỗng</td><td><code class="i">""</code></td><td><code class="i">""</code></td></tr>
+        <tr><td>Nhiều space liên tiếp</td><td><code class="i">"x␣␣␣␣y"</code></td><td><code class="i">"x␣y"</code></td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 02 KIẾN THỨC NỀN ===================== -->
+<section class="slide" id="basics" data-title="02 · Kiến thức nền: mảng char và '\0'">
+  <div class="hdr in"><span class="qn">KIẾN THỨC NỀN</span><h2>Chuỗi trong C = mảng <code class="i" style="font-size:26px">char</code> kết thúc bằng <code class="i" style="font-size:26px">'\0'</code></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr">
+    <div>
+<script type="text/x-cpp" id="kBa" data-title="Các lệnh cần biết" data-mark="1:a;2:b;3:c;4:d;5:e">
+char s[101];         // 100 ký tự + 1 ô cho '\0'
+cin.getline(s, 101); // đọc CẢ dòng, kể cả space
+int n = strlen(s);   // số ký tự trước '\0'
+if (s[i] == ' ')     // 1 ký tự: nháy đơn
+cout << s;           // in tới khi gặp '\0'
+</script>
+      <div class="note f" style="font-size:15.5px">Hàm <code class="i">strlen</code> thực chất chỉ là một vòng lặp đếm:<br><code class="i">int n = 0; while (s[n] != '\0') n++;</code></div>
+      <div class="note red f" style="font-size:15.5px"><code class="i">cin &gt;&gt; s</code> dừng đọc khi gặp space → chỉ lấy được <b>1 từ</b>. Bài này phải dùng <code class="i">cin.getline(s, 101)</code>.</div>
+    </div>
+    <div>
+      <div class="lbl">Bộ nhớ của mảng s (8 ô đầu)</div>
+      <div class="arr2" id="baA" data-cells="????????"></div>
+      <div class="vars" id="baV" style="justify-content:center;min-height:36px"></div>
+      <div class="console" id="baC" style="margin-top:8px;min-height:120px"><span class="cl" id="baC1"><span class="in">Hi you</span>          ← người dùng gõ</span><span class="cl" id="baC2">cin.getline → s = "Hi you"   (6 ký tự)</span><span class="cl" id="baC3">cin &gt;&gt; s    → s = "Hi"       (mất " you"!)</span></div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+      <span class="f ghost" data-now="#kBa|show-a" data-say="<b>char s[101]</b>: xin 101 ô nhớ, mỗi ô chứa 1 ký tự. Lúc mới khai báo, các ô chứa <b>giá trị rác</b> (?)."></span>
+      <span class="f ghost" data-now="#kBa|show-b" data-setcells="#baA|Hi you~?|0-5:ok wr;6:nul wr;7:gar" data-act="#baC1|show;#baC2|show" data-say="<b>cin.getline(s, 101)</b> đọc cả dòng &quot;Hi you&quot; (có space) vào s[0..5], rồi <b>tự đặt '\0'</b> vào s[6] để đánh dấu hết chuỗi. Ô sau '\0' vẫn là rác, không ai quan tâm."></span>
+      <span class="f ghost" data-now="#kBa|show-c" data-set="#baV::<span class='vc res'>n = strlen(s) = <b>6</b></span>" data-say="<b>strlen(s)</b> đếm từ s[0] tới trước '\0' → <b>6</b>. Chỉ số hợp lệ của ký tự là 0 … n-1, và s[n] luôn là '\0'."></span>
+      <span class="f ghost" data-now="#kBa|show-d" data-say="Kiểm tra space: <b>s[i] == ' '</b> (nháy đơn = 1 ký tự). Viết &quot; &quot; (nháy kép) là chuỗi, so sánh với char sẽ <b>báo lỗi</b>."></span>
+      <span class="f ghost" data-now="#kBa|show-e" data-act="#baC3|show" data-say="<b>cout &lt;&lt; s</b> in lần lượt từng ô cho đến khi gặp '\0'. ⇒ Muốn &quot;cắt ngắn&quot; chuỗi, chỉ cần <b>đặt '\0'</b> vào vị trí mới — mẹo quan trọng của bài này!"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 03 Ý TƯỞNG ===================== -->
+<section class="slide" id="idea" data-title="03 · Ý tưởng giải">
+  <div class="hdr in"><span class="qn">BƯỚC 2</span><h2>Ý tưởng: hai cách nghĩ</h2></div>
+  <div class="cols">
+    <div class="card in" style="border-top:5px solid #7c3aed">
+      <h3 style="color:#7c3aed">Cách 1 · Làm đúng như đề nói</h3>
+      <p>Làm 3 việc lần lượt, mỗi việc xóa một loại space:</p>
+      <ul>
+        <li><b>Trim left:</b> còn space ở s[0] thì xóa s[0].</li>
+        <li><b>Trim right:</b> còn space ở cuối thì thay nó bằng '\0'.</li>
+        <li><b>Xóa trùng:</b> thấy 2 space liền nhau thì xóa 1 cái.</li>
+      </ul>
+      <p style="margin-top:6px">Xóa 1 ký tự giữa mảng = <b>dời mọi ký tự phía sau sang trái 1 ô</b>.</p>
+      <p class="muted" style="font-size:15px;margin-top:6px">👍 Dễ nghĩ, bám sát đề. 👎 Mỗi lần xóa phải dời cả đoạn → chậm khi chuỗi dài, nhiều space.</p>
+    </div>
+    <div class="card in" style="border-top:5px solid #ec4899">
+      <h3 style="color:#db2777">Cách 2 · Chép lại câu cho sạch</h3>
+      <p>Giống chép bài sang vở mới: đọc từng ký tự từ trái sang phải, <b>chỉ chép những gì cần giữ</b>:</p>
+      <ul>
+        <li>Gặp <b>chữ</b> → chép.</li>
+        <li>Gặp <b>space</b> → chỉ chép nếu thứ <b>vừa chép</b> trước đó là chữ.</li>
+        <li>Chép xong, nếu cuối cùng là space → bỏ nó.</li>
+      </ul>
+      <p style="margin-top:6px">Mẹo: chép <b>ngay trên chính mảng s</b>, vì chỗ ghi không bao giờ vượt chỗ đọc.</p>
+      <p class="muted" style="font-size:15px;margin-top:6px">👍 Chỉ duyệt mảng 1 lần, code ngắn. 👎 Cần hiểu 2 chỉ số đọc/ghi.</p>
+    </div>
+  </div>
+  <div class="f" style="margin-top:14px">
+    <div class="flow" style="flex-wrap:nowrap">
+      <div><div class="lbl">Đọc (i)</div><div class="inp">"<span class="sp">␣␣</span>to<span class="sp">␣␣</span>be<span class="sp">␣</span>"</div></div>
+      <div class="big-arrow">⟹</div>
+      <div><div class="lbl">Ghi (k)</div><div class="res">"to<span class="sp">␣</span>be"</div></div>
+    </div>
+  </div>
+  <div class="note blue f">Cả 2 cách đều cho kết quả đúng. Ta sẽ học <b>Cách 1</b> để luyện kỹ năng thao tác mảng, rồi <b>Cách 2</b> là lời giải chính (gọn, nhanh).</div>
+</section>
+
+<!-- ===================== 04 DECOMPOSE ===================== -->
+<section class="slide" id="decompose" data-title="04 · Chia thành bài toán con">
+  <div class="hdr in"><span class="qn">BƯỚC 3</span><h2>Chia bài toán lớn thành các bài toán nhỏ</h2></div>
+  <div class="flow in" style="flex-wrap:nowrap">
+    <div class="box a">Nhập câu<small>cin.getline(s, 101)</small></div><div class="ar">→</div>
+    <div class="box" style="border-color:#ec4899;background:#fdf2f8;min-width:230px">Chuẩn hóa space<small>trimSpaces(s)</small></div><div class="ar">→</div>
+    <div class="box e">In kết quả<small>cout &lt;&lt; '"' &lt;&lt; s &lt;&lt; '"'</small></div>
+  </div>
+  <div class="cols" style="margin-top:16px">
+    <div class="card f" style="border-top:5px solid #7c3aed">
+      <h3 style="color:#7c3aed">Cách 1 tách thành</h3>
+      <div class="tree">
+        <div class="box b">xoaKyTu(s, p)<small>bài toán con dùng chung: xóa s[p], dời trái</small></div>
+        <div class="flow" style="flex-wrap:nowrap">
+          <div class="box a" style="min-width:0">trimLeft<small>xóa s[0] khi còn space</small></div>
+          <div class="box a" style="min-width:0">trimRight<small>đặt '\0' đè space cuối</small></div>
+          <div class="box a" style="min-width:0">xoaSpaceTrung<small>2 space liền → xóa 1</small></div>
+        </div>
+      </div>
+    </div>
+    <div class="card f" style="border-top:5px solid #ec4899">
+      <h3 style="color:#db2777">Cách 2 tách thành</h3>
+      <div class="tree">
+        <div class="box" style="border-color:#ec4899;background:#fdf2f8">Duyệt i = 0 … n-1<small>đọc s[i], quyết định chép hay bỏ</small></div>
+        <div class="flow" style="flex-wrap:nowrap">
+          <div class="box d" style="min-width:0">Chép ký tự<small>s[k] = s[i]; k++</small></div>
+          <div class="box d" style="min-width:0">Bỏ space cuối<small>k-- nếu cần</small></div>
+          <div class="box d" style="min-width:0">Đóng chuỗi<small>s[k] = '\0'</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cols" style="margin-top:12px;grid-template-columns:1fr 1fr">
+    <div class="note f" style="margin:0"><b>Kỹ năng nhỏ dùng chung:</b> lấy độ dài chuỗi, kiểm tra 1 ký tự có phải space, cắt chuỗi bằng '\0', dời mảng sang trái.</div>
+    <div class="note blue f" style="margin:0"><b>Vì sao phải chia nhỏ?</b> Mỗi hàm nhỏ dễ viết, dễ test riêng. Sai ở đâu sửa ở đó, không phải đọc lại cả chương trình.</div>
+  </div>
+  <div class="cols f" style="margin-top:12px;grid-template-columns:1fr 1fr;align-items:center">
+<div>
+<script type="text/x-cpp" class="sm" data-title="Bài toán con nhỏ nhất: tự đếm độ dài (thay cho strlen)">
+int doDai(char s[]) {
+    int n = 0;
+    while (s[n] != '\0') n++;   // đi tới khi gặp '\0'
+    return n;
+}
+</script>
+    </div>
+    <p style="font-size:17px">Mẹo khi tự chia nhỏ: hỏi <b>&quot;thao tác nhỏ nhất mình cần lặp đi lặp lại là gì?&quot;</b> → viết nó thành hàm riêng, chạy thử riêng, rồi mới ghép.</p>
+  </div>
+</section>
+
+<!-- ===================== 05 XÓA 1 KÝ TỰ ===================== -->
+<section class="slide" id="delchar" data-title="05 · Bài toán con: xóa 1 ký tự tại vị trí p">
+  <div class="hdr in"><span class="qn">BÀI TOÁN CON</span><h2>Xóa 1 ký tự tại vị trí p (dời trái)</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.15fr">
+    <div>
+<script type="text/x-cpp" id="kDel" data-title="xoaKyTu" data-mark="2:a;3-4:b;5:c">
+void xoaKyTu(char s[], int p) {
+    int n = strlen(s);
+    for (int j = p; j < n; j++)
+        s[j] = s[j+1];   // ô j nhận giá trị ô bên phải
+}
+</script>
+      <div class="card f" style="margin-top:12px">
+        <h3>Ý tưởng</h3>
+        <p>Mảng không có lệnh &quot;xóa ô&quot;. Muốn bỏ s[p], ta <b>chép đè</b>: s[p] ← s[p+1], s[p+1] ← s[p+2], … cho tới khi chép cả <code class="i">'\0'</code>.</p>
+        <p style="margin-top:6px">Vòng lặp chạy j = p … n-1, lần cuối chép s[n] = '\0' vào s[n-1] → chuỗi ngắn đi 1.</p>
+      </div>
+      <div class="note red f" style="font-size:15.5px">Nếu chạy <b>từ phải sang trái</b> (j = n-1 xuống p) thì ghi đè mất dữ liệu trước khi kịp chép. Dời <b>trái</b> thì phải duyệt từ <b>trái</b>.</div>
+    </div>
+    <div>
+      <div class="lbl" style="text-align:center">Ví dụ: s = "xy␣␣z", xóa p = 2</div>
+      <div class="arr2" id="dl_arr"></div>
+      <div class="vars" id="dl_vars" style="justify-content:center;min-height:38px"></div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+      <div id="dl_steps"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 06 CÁCH 1 ===================== -->
+<section class="slide" id="way1" data-title="06 · Cách 1: xóa từng space">
+  <div class="hdr in"><span class="qn">CÁCH 1</span><h2>Xóa từng space bằng xoaKyTu</h2><span class="lvl">Ví dụ: <code class="i">"␣␣a␣␣␣b␣␣"</code></span></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr">
+    <div>
+<script type="text/x-cpp" class="xs" id="kW1" data-title="Cách 1: ba hàm, mỗi hàm một việc" data-mark="1-5:a;7:b;10-12:c;17-19:d;20:e">
+void xoaKyTu(char s[], int p) {
+    int n = strlen(s);
+    for (int j = p; j < n; j++)
+        s[j] = s[j+1];          // dời trái, chép cả '\0'
+}
+void trimLeft(char s[]) {
+    while (s[0] == ' ') xoaKyTu(s, 0);
+}
+void trimRight(char s[]) {
+    int n = strlen(s);
+    while (n > 0 && s[n-1] == ' ') {
+        s[n-1] = '\0';  n--;    // cắt đuôi: không cần dời
+    }
+}
+void xoaSpaceTrung(char s[]) {
+    int i = 0;
+    while (s[i] != '\0') {
+        if (s[i] == ' ' && s[i+1] == ' ')
+            xoaKyTu(s, i+1);    // KHÔNG tăng i!
+        else i++;
+    }
+}
+</script>
+      <p class="muted" style="font-size:14px;margin-top:4px">Trong main: <code class="i">trimLeft(s); trimRight(s); xoaSpaceTrung(s);</code></p>
+    </div>
+    <div>
+      <div class="lbl" style="text-align:center">Câu gốc</div>
+      <div class="arr2 sm" data-cells="  a   b  ~"></div>
+      <div class="lbl" style="text-align:center;margin-top:8px">Mảng s đang thay đổi</div>
+      <div class="arr2" id="w1_arr"></div>
+      <div class="vars" id="w1_vars" style="justify-content:center;min-height:38px"></div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+      <div id="w1_steps"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 07 GIẢI THUẬT CÁCH 2 ===================== -->
+<section class="slide" id="algo2" data-title="07 · Cách 2: giải thuật đọc / ghi">
+  <div class="hdr in"><span class="qn">BƯỚC 4</span><h2>Giải thuật Cách 2: hai chỉ số đọc <span style="color:#d97706">i</span> và ghi <span style="color:#059669">k</span></h2></div>
+  <div class="cols" style="grid-template-columns:1.05fr 1fr">
+    <div>
+      <ol class="steps in" style="list-style:none">
+        <li id="al1"><b>Khởi tạo:</b> n = độ dài s; <b style="color:#059669">k = 0</b> (số ký tự đã ghi vào kết quả).</li>
+        <li id="al2"><b>Duyệt</b> <b style="color:#d97706">i</b> từ 0 đến n-1, xét ký tự s[i]:
+          <div style="font-size:15.5px;margin-top:4px;color:var(--muted)">• khác space → ghi: <code class="i">s[k] = s[i]; k++</code><br>• là space và ký tự ghi trước đó <code class="i">s[k-1]</code> là chữ → ghi 1 space<br>• là space còn lại (đầu câu, hoặc trùng) → bỏ qua</div></li>
+        <li id="al3"><b>Bỏ space cuối:</b> nếu k &gt; 0 và s[k-1] là space → k--.</li>
+        <li id="al4"><b>Đóng chuỗi:</b> s[k] = '\0'. Chuỗi mới là s[0 … k-1].</li>
+      </ol>
+      <div class="note blue f" style="font-size:15.5px"><b>Vì sao ghi đè lên chính s mà không hỏng?</b> Mỗi vòng i tăng 1, còn k tăng tối đa 1 ⇒ luôn có <b>k ≤ i</b>. Ô được ghi (k) luôn là ô <b>đã đọc xong</b>, không bao giờ đè lên ký tự chưa đọc.</div>
+    </div>
+    <div>
+      <table class="dec t1 in">
+        <tr><th>s[i] là…</th><th>Điều kiện thêm</th><th>Làm gì</th></tr>
+        <tr id="dr1"><td>chữ / dấu câu</td><td>—</td><td class="ok-t">chép, k++</td></tr>
+        <tr id="dr2"><td>space</td><td>k &gt; 0 và s[k-1] ≠ ' '</td><td class="ok-t">chép 1 space, k++</td></tr>
+        <tr id="dr3"><td>space</td><td>k == 0 <span class="muted">(đầu câu)</span></td><td class="bad-t">bỏ qua</td></tr>
+        <tr id="dr4"><td>space</td><td>s[k-1] == ' ' <span class="muted">(trùng)</span></td><td class="bad-t">bỏ qua</td></tr>
+      </table>
+      <div class="note f" style="font-size:15.5px"><b>Câu hỏi:</b> Tại sao cần kiểm tra <code class="i">k &gt; 0</code> trước khi đọc <code class="i">s[k-1]</code>?<br><span class="muted">→ Khi k = 0, s[k-1] = s[-1] nằm <b>ngoài mảng</b>. Điều kiện <code class="i">k &gt; 0 &amp;&amp; …</code> vừa chặn lỗi đó, vừa bỏ được space đầu câu.</span></div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+      <span class="f ghost" data-o="-5" data-now="#al1|hot" data-say="Bước 1: <b>k = 0</b>, chưa ghi gì. k vừa là <b>số ký tự đã ghi</b>, vừa là <b>vị trí sẽ ghi tiếp theo</b>."></span>
+      <span class="f ghost" data-o="-4" data-now="#al2|hot;#dr1|hot" data-say="Gặp chữ: luôn giữ, chép sang vị trí k rồi tăng k."></span>
+      <span class="f ghost" data-o="-3" data-now="#al2|hot;#dr2|hot" data-say="Gặp space ngay sau một chữ: đây là <b>space đầu tiên</b> giữa 2 từ → giữ 1 cái."></span>
+      <span class="f ghost" data-o="-2" data-now="#al2|hot;#dr3|hot;#dr4|hot" data-say="Gặp space mà chưa ghi gì (đầu câu) hoặc vừa ghi một space rồi (trùng) → <b>bỏ qua</b>, k đứng yên."></span>
+      <span class="f ghost" data-o="-1" data-now="#al3|hot;#al4|hot" data-say="Hết vòng lặp, kết quả có thể dư <b>1 space ở cuối</b> (vì câu gốc kết thúc bằng space). Lùi k rồi đặt '\0' tại s[k]."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 08-10 CHẠY TAY ===================== -->
+<section class="slide" id="run1" data-title="08 · Chạy tay: &quot;␣␣to␣␣be␣&quot;">
+  <div class="hdr in"><span class="qn">CHẠY TAY 1</span><h2>Chạy từng bước với s = <code class="i" style="font-size:24px">"␣␣to␣␣be␣"</code></h2></div>
+  <div class="cols" style="grid-template-columns:.95fr 1.2fr">
+    <div><div class="tcode"></div>
+    </div>
+    <div>
+      <div class="lbl" style="text-align:center">Câu gốc (để đối chiếu, vì s sẽ bị ghi đè)</div>
+      <div class="arr2 sm" data-cells="  to  be ~"></div>
+      <div class="arr2" id="r1_arr" style="margin-top:4px"></div>
+      <div class="leg" style="font-size:13px;margin-top:2px"><span><b style="color:#d97706">i</b> = đang đọc</span><span><b style="color:#059669">k</b> = sẽ ghi vào đây</span><span><i style="background:#ecfdf5;border-color:#10b981"></i>đã thuộc kết quả</span><span><i style="background:#fff;border-color:#e4dcfb;opacity:.4"></i>đã đọc, bỏ đi</span></div>
+      <div class="vars" id="r1_vars" style="justify-content:center;min-height:38px"></div>
+      <p class="say" style="min-height:52px">Nhấn → để chạy từng bước.</p>
+      <table class="log" id="r1_log"><tr><th>bước</th><th>i</th><th>s[i]</th><th>quyết định</th><th>k</th><th>kết quả tạm s[0..k-1]</th></tr></table>
+      <div id="r1_steps"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="run2" data-title="09 · Chạy tay: &quot;␣a␣␣␣b&quot;">
+  <div class="hdr in"><span class="qn">CHẠY TAY 2</span><h2>s = <code class="i" style="font-size:24px">"␣a␣␣␣b"</code>: 3 space giữa, không có space cuối</h2></div>
+  <div class="cols" style="grid-template-columns:.95fr 1.2fr">
+    <div><div class="tcode"></div></div>
+    <div>
+      <div class="lbl" style="text-align:center">Câu gốc (để đối chiếu, vì s sẽ bị ghi đè)</div>
+      <div class="arr2 sm" data-cells=" a   b~"></div>
+      <div class="arr2" id="r2_arr" style="margin-top:4px"></div>
+      <div class="vars" id="r2_vars" style="justify-content:center;min-height:38px"></div>
+      <p class="say" style="min-height:52px">Nhấn → để chạy từng bước.</p>
+      <table class="log" id="r2_log"><tr><th>bước</th><th>i</th><th>s[i]</th><th>quyết định</th><th>k</th><th>kết quả tạm s[0..k-1]</th></tr></table>
+      <div id="r2_steps"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="run3" data-title="10 · Chạy tay: &quot;␣␣␣&quot; (toàn space)">
+  <div class="hdr in"><span class="qn">CHẠY TAY 3</span><h2>Trường hợp biên: s = <code class="i" style="font-size:24px">"␣␣␣"</code> (toàn space)</h2></div>
+  <div class="cols" style="grid-template-columns:.95fr 1.2fr">
+    <div><div class="tcode"></div></div>
+    <div>
+      <div class="lbl" style="text-align:center">Câu gốc (để đối chiếu, vì s sẽ bị ghi đè)</div>
+      <div class="arr2 sm" data-cells="   ~"></div>
+      <div class="arr2" id="r3_arr" style="margin-top:4px"></div>
+      <div class="vars" id="r3_vars" style="justify-content:center;min-height:38px"></div>
+      <p class="say" style="min-height:52px">Nhấn → để chạy từng bước.</p>
+      <table class="log" id="r3_log"><tr><th>bước</th><th>i</th><th>s[i]</th><th>quyết định</th><th>k</th><th>kết quả tạm s[0..k-1]</th></tr></table>
+      <div id="r3_steps"></div>
+      <div class="note blue f" style="font-size:15.5px">Kết luận: điều kiện <code class="i">k &gt; 0</code> xuất hiện ở <b>2 chỗ</b>, giúp chương trình đúng cả khi chuỗi toàn space hoặc rỗng (n = 0 → không vào vòng lặp, s[0] = '\0').</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 11 CODE ===================== -->
+<section class="slide" id="code" data-title="11 · Code C++ hoàn chỉnh">
+  <div class="hdr in"><span class="qn">BƯỚC 5</span><h2>Code C++ hoàn chỉnh (Cách 2)</h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr">
+    <div>
+<script type="text/x-cpp" class="xs" id="kCode" data-title="trim_spaces.cpp" data-mark="1-3:a;5:b;6-7:c;8:d;9-10:e;11-12:f;14:g;16:h;17:i;20-23:j;24:k;25:l">
+#include <iostream>
+#include <cstring>      // strlen
+using namespace std;
+
+void trimSpaces(char s[]) {
+    int n = strlen(s);
+    int k = 0;                        // vị trí ghi tiếp theo
+    for (int i = 0; i < n; i++) {     // i: vị trí đọc
+        if (s[i] != ' ') {            // (1) chữ: luôn giữ
+            s[k] = s[i];  k++;
+        } else if (k > 0 && s[k-1] != ' ') {
+            s[k] = ' ';   k++;        // (2) space đầu tiên sau 1 từ
+        }
+        // (3) còn lại: space đầu câu / space trùng -> bỏ qua
+    }
+    if (k > 0 && s[k-1] == ' ') k--;  // bỏ space cuối (nếu có)
+    s[k] = '\0';                      // đóng chuỗi mới
+}
+
+int main() {
+    char s[101];
+    cout << "Enter a sentence = ";
+    cin.getline(s, 101);
+    trimSpaces(s);
+    cout << "\"" << s << "\"" << endl;
+    return 0;
+}
+</script>
+    </div>
+    <div>
+      <div class="console" id="cdC" style="min-height:76px"><span class="cl" id="cdC1">Enter a sentence = <span class="in">   today   is a  beautiful day   </span></span><span class="cl" id="cdC2">"today is a beautiful day"</span></div>
+      <p class="say" style="min-height:120px">Nhấn → để chạy từng bước.</p>
+      <span class="f ghost" data-now="#kCode|show-a" data-say="<b>#include &lt;iostream&gt;</b> cho cin/cout, <b>&lt;cstring&gt;</b> cho strlen. <b>using namespace std</b> để khỏi viết std::cout."></span>
+      <span class="f ghost" data-now="#kCode|show-b" data-say="<b>void trimSpaces(char s[])</b>: truyền mảng vào hàm thì hàm làm việc <b>trên chính mảng gốc</b> (không phải bản sao) ⇒ sửa s trong hàm thì main thấy ngay, không cần return."></span>
+      <span class="f ghost" data-now="#kCode|show-c" data-say="Tính <b>n</b> <b>một lần</b> trước vòng lặp (vì lát nữa ta ghi đè lên s, độ dài thật sẽ thay đổi). <b>k = 0</b>: chưa ghi ký tự nào."></span>
+      <span class="f ghost" data-now="#kCode|show-d" data-say="Vòng for: <b>i</b> đi qua từng ký tự của câu gốc, từ 0 tới n-1."></span>
+      <span class="f ghost" data-now="#kCode|show-e" data-say="Trường hợp (1): s[i] <b>không phải space</b> → chép sang vị trí k, rồi k tăng 1."></span>
+      <span class="f ghost" data-now="#kCode|show-f" data-say="Trường hợp (2): s[i] là space. Chỉ ghi nếu <b>k &gt; 0</b> (đã có chữ trước đó) <b>và</b> ký tự vừa ghi <b>s[k-1]</b> không phải space. Thứ tự trong &amp;&amp; quan trọng: k &gt; 0 sai thì C++ <b>không xét tiếp</b> s[k-1]."></span>
+      <span class="f ghost" data-now="#kCode|show-g" data-say="Trường hợp (3) không cần viết code: không làm gì = bỏ qua ký tự đó."></span>
+      <span class="f ghost" data-now="#kCode|show-h" data-say="Sau vòng lặp, nếu ký tự cuối đã ghi là space (câu gốc có space cuối) → <b>k--</b> để bỏ nó."></span>
+      <span class="f ghost" data-now="#kCode|show-i" data-say="<b>s[k] = '\0'</b>: cắt chuỗi tại k. Phần phía sau (rác của câu cũ) bị cout bỏ qua."></span>
+      <span class="f ghost" data-now="#kCode|show-j" data-act="#cdC1|show" data-say="Trong main: khai báo <b>char s[101]</b>, in lời nhắc, đọc cả dòng bằng <b>cin.getline</b>."></span>
+      <span class="f ghost" data-now="#kCode|show-k" data-say="Gọi <b>trimSpaces(s)</b>: chuẩn hóa ngay trên mảng s."></span>
+      <span class="f ghost" data-now="#kCode|show-l" data-act="#cdC1|show;#cdC2|show" data-say="In kết quả trong dấu ngoặc kép. Muốn in ký tự &quot; phải viết <b>\&quot;</b> (escape) bên trong chuỗi."></span>
+      <div class="note f" style="font-size:15px">Độ phức tạp: mỗi ký tự được đọc đúng 1 lần ⇒ <b>O(n)</b>. Cách 1 có thể phải dời mảng nhiều lần ⇒ <b>O(n²)</b> trong trường hợp xấu.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 12 TESTS ===================== -->
+<section class="slide" id="tests" data-title="12 · Bộ test">
+  <div class="hdr in"><span class="qn">KIỂM THỬ</span><h2>Chạy thử với nhiều bộ test</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr">
+    <table class="t1 in" style="font-size:15.5px">
+      <tr><th>#</th><th>Input</th><th>Output mong đợi</th><th>Kiểm tra điều gì</th></tr>
+      <tr><td>1</td><td><code class="i">"␣␣␣today␣␣␣is␣a␣␣beautiful␣day␣␣␣"</code></td><td><code class="i">"today is a beautiful day"</code></td><td>đề bài</td></tr>
+      <tr><td>2</td><td><code class="i">"hello"</code></td><td><code class="i">"hello"</code></td><td>không có space</td></tr>
+      <tr><td>3</td><td><code class="i">"␣a␣"</code></td><td><code class="i">"a"</code></td><td>1 ký tự</td></tr>
+      <tr><td>4</td><td><code class="i">"x␣␣␣␣y"</code></td><td><code class="i">"x y"</code></td><td>nhiều space giữa</td></tr>
+      <tr><td>5</td><td><code class="i">"␣␣␣␣␣"</code></td><td><code class="i">""</code></td><td>toàn space</td></tr>
+      <tr><td>6</td><td><code class="i">""</code> (Enter luôn)</td><td><code class="i">""</code></td><td>chuỗi rỗng</td></tr>
+      <tr><td>7</td><td><code class="i">"Hi,␣␣you␣!"</code></td><td><code class="i">"Hi, you !"</code></td><td>dấu câu = chữ</td></tr>
+    </table>
+    <div>
+      <div class="console" style="min-height:300px"><span class="cl" id="tc1">$ ./trim
+Enter a sentence = <span class="in">   today   is a  beautiful day   </span>
+"today is a beautiful day"</span><span class="cl" id="tc2">$ ./trim
+Enter a sentence = <span class="in">x    y</span>
+"x y"</span><span class="cl" id="tc3">$ ./trim
+Enter a sentence = <span class="in">     </span>
+""</span><span class="cl" id="tc4">$ ./trim
+Enter a sentence = <span class="in">Hi,  you !</span>
+"Hi, you !"</span></div>
+      <span class="f ghost" data-act="#tc1|show"></span>
+      <span class="f ghost" data-act="#tc2|show"></span>
+      <span class="f ghost" data-act="#tc3|show"></span>
+      <span class="f ghost" data-act="#tc4|show"></span>
+      <div class="note blue f" style="font-size:15px">Thói quen tốt: viết test <b>trước</b> khi code, và luôn có test <b>biên</b> (rỗng, toàn space, 1 ký tự). Đề không yêu cầu xử lý space trước dấu câu (test 7) — xem bài tập mở rộng.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 13 BUGS 1 ===================== -->
+<section class="slide" id="bugs1" data-title="13 · Lỗi hay gặp (1)">
+  <div class="hdr in"><span class="qn">LỖI HAY GẶP</span><h2>Những lỗi sai hay gặp (1)</h2></div>
+  <div class="err">
+    <div class="card in">
+      <h3>❶ Dùng <code class="i">cin &gt;&gt; s</code> để nhập</h3>
+      <p><code class="i">cin &gt;&gt;</code> bỏ qua space đầu và <b>dừng ở space đầu tiên</b>: nhập &quot;␣␣today␣is&quot; chỉ được &quot;today&quot;. Kết quả &quot;đúng&quot; một cách tình cờ nhưng mất hết các từ sau.</p>
+      <p class="ok-t" style="margin-top:4px">✔ Dùng <code class="i">cin.getline(s, 101)</code>.</p>
+    </div>
+    <div class="card in">
+      <h3>❷ Quên <code class="i">s[k] = '\0'</code></h3>
+      <p>Phần đuôi câu cũ vẫn còn trong mảng, cout in tiếp cho đến '\0' cũ:</p>
+      <div class="arr2 sm" style="margin:6px 0" data-cells="to be be ~" data-cls="0-4:ok;5-8:bad;9:nul"></div>
+      <p>&quot;␣␣to␣␣be␣&quot; → in ra <span class="bad-t">&quot;to be be &quot;</span> thay vì &quot;to be&quot;.</p>
+    </div>
+    <div class="card in">
+      <h3>❸ Đọc <code class="i">s[k-1]</code> khi k = 0</h3>
+      <p><code class="i">if (s[k-1] != ' ')</code> thiếu điều kiện <code class="i">k &gt; 0</code> → truy cập <b>s[-1]</b>, ngoài mảng: kết quả ngẫu nhiên, có thể giữ lại space đầu câu hoặc crash.</p>
+      <p class="ok-t" style="margin-top:4px">✔ Luôn viết <code class="i">k &gt; 0 &amp;&amp; s[k-1] …</code> (k &gt; 0 đứng trước).</p>
+    </div>
+    <div class="card in">
+      <h3>❹ So sánh với <code class="i">" "</code> thay vì <code class="i">' '</code></h3>
+      <p><code class="i">s[i] == " "</code> là so sánh 1 <b>ký tự</b> với 1 <b>chuỗi</b> → lỗi biên dịch. Tương tự <code class="i">"\0"</code> khác <code class="i">'\0'</code>.</p>
+      <p class="ok-t" style="margin-top:4px">✔ Ký tự đơn: nháy đơn <code class="i">' '</code>, <code class="i">'\0'</code>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 14 BUGS 2 ===================== -->
+<section class="slide" id="bugs2" data-title="14 · Lỗi hay gặp (2)">
+  <div class="hdr in"><span class="qn">LỖI HAY GẶP</span><h2>Những lỗi sai hay gặp (2): xóa rồi vẫn i++</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr">
+    <div>
+<script type="text/x-cpp" class="sm" id="kBug" data-title="SAI: dùng for, xóa xong vẫn tăng i" data-mark="1-3:a">
+for (int i = 0; s[i] != '\0'; i++)
+    if (s[i] == ' ' && s[i+1] == ' ')
+        xoaKyTu(s, i+1);   // xóa xong, for vẫn i++
+</script>
+      <div class="note red f" data-o="10" style="font-size:15.5px">Sau khi xóa s[i+1], ký tự mới dời vào ô i+1 <b>chưa được kiểm tra</b>. Nếu cứ i++ thì bỏ sót ⇒ 3 space chỉ còn 2.</div>
+      <div class="note f" data-o="11" style="font-size:15.5px">✔ Sửa: chỉ tăng i khi <b>không</b> xóa (dùng while như Cách 1), hoặc dùng <code class="i">while</code> lồng: còn trùng thì còn xóa.</div>
+      <div class="card f" data-o="12" style="margin-top:10px">
+        <h3>Thêm vài lỗi nữa</h3>
+        <ul>
+          <li style="font-size:15.5px"><code class="i">for (i = 0; i &lt; strlen(s); i++)</code> khi đang sửa s: độ dài thay đổi giữa chừng, lại gọi strlen mỗi vòng (chậm). Tính n trước.</li>
+          <li style="font-size:15.5px">Khai báo <code class="i">char s[100]</code> nhưng câu 100 ký tự: không còn chỗ cho '\0'.</li>
+          <li style="font-size:15.5px">trimRight đọc <code class="i">s[n-1]</code> khi n = 0 (chuỗi rỗng) → s[-1].</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="lbl" style="text-align:center">Chạy code SAI với s = "a␣␣␣b"</div>
+      <div class="arr2" id="bg_arr"></div>
+      <div class="vars" id="bg_vars" style="justify-content:center;min-height:38px"></div>
+      <p class="say" style="min-height:70px">Nhấn → để chạy từng bước.</p>
+      <div id="bg_steps"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 15 VECTOR ===================== -->
+<section class="slide" id="vector" data-title="15 · Giải bằng vector">
+  <div class="hdr in"><span class="qn">MỞ RỘNG</span><h2>Nếu giải bằng <code class="i" style="font-size:26px">vector&lt;char&gt;</code> thì sao?</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr">
+    <div>
+<script type="text/x-cpp" class="xs" id="kVec" data-title="trim_vector.cpp" data-mark="2:a;8:b;10-11:c;12-13:d;15-16:e;17-19:f">
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main() {
+    char s[101];
+    cin.getline(s, 101);
+    vector<char> kq;                   // mảng động, ban đầu rỗng
+    for (int i = 0; s[i] != '\0'; i++) {
+        if (s[i] != ' ')
+            kq.push_back(s[i]);        // thêm vào cuối
+        else if (!kq.empty() && kq.back() != ' ')
+            kq.push_back(' ');
+    }
+    if (!kq.empty() && kq.back() == ' ')
+        kq.pop_back();                 // bỏ phần tử cuối
+    cout << "\"";
+    for (int i = 0; i < (int)kq.size(); i++) cout << kq[i];
+    cout << "\"" << endl;
+    return 0;
+}
+</script>
+    </div>
+    <div>
+      <table class="t1 in" style="font-size:15px">
+        <tr><th>Mảng char + chỉ số k</th><th>vector&lt;char&gt; kq</th></tr>
+        <tr id="vr1"><td><code class="i">int k = 0;</code></td><td><code class="i">vector&lt;char&gt; kq;</code> (size = 0)</td></tr>
+        <tr id="vr2"><td><code class="i">s[k] = c; k++;</code></td><td><code class="i">kq.push_back(c);</code></td></tr>
+        <tr id="vr3"><td><code class="i">k &gt; 0</code> · <code class="i">s[k-1]</code></td><td><code class="i">!kq.empty()</code> · <code class="i">kq.back()</code></td></tr>
+        <tr id="vr4"><td><code class="i">k--;</code></td><td><code class="i">kq.pop_back();</code></td></tr>
+        <tr id="vr5"><td><code class="i">s[k] = '\0';</code> rồi <code class="i">cout &lt;&lt; s</code></td><td>không có '\0' → in bằng vòng lặp</td></tr>
+      </table>
+      <p class="say" style="min-height:66px">Nhấn → để chạy từng bước.</p>
+      <span class="f ghost" data-now="#kVec|show-a;#kVec|show-b;#vr1|hot" data-say="<b>#include &lt;vector&gt;</b>. Vector là mảng <b>tự co giãn</b>: không cần biết trước kích thước, tự nhớ số phần tử (size)."></span>
+      <span class="f ghost" data-now="#kVec|show-c;#kVec|show-d;#vr2|hot;#vr3|hot" data-say="Logic <b>y hệt Cách 2</b>, chỉ đổi cách viết: push_back thay cho &quot;ghi vào k rồi k++&quot;; back() là phần tử cuối (= s[k-1]); empty() thay cho k == 0."></span>
+      <span class="f ghost" data-now="#kVec|show-e;#vr4|hot" data-say="<b>pop_back()</b> xóa phần tử cuối — bỏ space thừa ở cuối câu."></span>
+      <span class="f ghost" data-now="#kVec|show-f;#vr5|hot" data-say="vector&lt;char&gt; <b>không có '\0'</b> nên không cout cả vector được; in từng phần tử bằng vòng for (ép (int) để tránh cảnh báo so sánh signed/unsigned)."></span>
+      <div class="cols" style="gap:10px">
+        <div class="card f" style="padding:8px 12px"><h3 style="font-size:17px">👍 Ưu điểm</h3><p style="font-size:14.5px">Không lo tràn mảng, không quên '\0', không đọc s[-1] (empty() chặn trước). Code dễ đọc.</p></div>
+        <div class="card f" style="padding:8px 12px"><h3 style="font-size:17px;color:#db2777">👎 Nhược điểm</h3><p style="font-size:14.5px">Tốn thêm bộ nhớ cho bản sao; s gốc không đổi. Muốn đưa lại vào s phải chép ngược + đặt '\0'.</p></div>
+      </div>
+      <div class="note blue f" style="font-size:14.5px"><b>Cách khác với vector:</b> lưu <code class="i">vector&lt;int&gt;</code> vị trí bắt đầu / kết thúc của từng từ, rồi in các từ cách nhau đúng 1 space (vẫn không cần strtok hay string).</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="slide" id="summary" data-title="Tổng kết &amp; bài tập thêm">
+  <div class="hdr in"><span class="qn">TỔNG KẾT</span><h2>Ghi nhớ &amp; luyện thêm</h2></div>
+  <div class="cols3">
+    <div class="card in"><h3>Chuỗi C</h3><ul><li style="font-size:16px">Mảng char, kết thúc bằng '\0'.</li><li style="font-size:16px">Nhập cả dòng: <code class="i">cin.getline</code>.</li><li style="font-size:16px">Cắt chuỗi: đặt '\0'.</li><li style="font-size:16px">Xóa 1 ô: dời trái từ trái qua phải.</li></ul></div>
+    <div class="card in"><h3>Kỹ thuật đọc / ghi</h3><ul><li style="font-size:16px">i đọc, k ghi, luôn k ≤ i.</li><li style="font-size:16px">Lọc / sửa mảng tại chỗ trong O(n).</li><li style="font-size:16px">Kiểm tra <code class="i">k &gt; 0</code> trước khi đọc s[k-1].</li><li style="font-size:16px">Cuối cùng: k-- (nếu cần) + s[k] = '\0'.</li></ul></div>
+    <div class="card in"><h3>Quy trình giải</h3><ul><li style="font-size:16px">Phân tích, liệt kê ca biên.</li><li style="font-size:16px">Chia bài toán con.</li><li style="font-size:16px">Chạy tay giải thuật trên giấy.</li><li style="font-size:16px">Code, rồi test lại các ca biên.</li></ul></div>
+  </div>
+  <div class="card f" style="margin-top:14px;border-top:5px solid #f59e0b">
+    <h3 style="color:#d97706">Bài tập mở rộng (dùng lại đúng kỹ thuật đọc / ghi)</h3>
+    <div class="cols" style="gap:10px 26px">
+      <ul>
+        <li style="font-size:16px">Coi cả tab <code class="i">'\t'</code> là khoảng trắng.</li>
+        <li style="font-size:16px">Bỏ space đứng <b>trước</b> dấu <code class="i">, . ! ?</code>: &quot;Hi␣,␣you&quot; → &quot;Hi, you&quot;.</li>
+      </ul>
+      <ul>
+        <li style="font-size:16px">Viết hoa chữ đầu mỗi từ: &quot;today is&quot; → &quot;Today Is&quot;.</li>
+        <li style="font-size:16px">Đếm số từ trong câu sau khi chuẩn hóa (= số space + 1, nếu câu không rỗng).</li>
+      </ul>
+    </div>
+  </div>
+</section>
+</div></div>
+
+<div id="bar"></div>
+<div id="hint">← → / Space: từng bước · Shift+→: qua slide · G: đi tới slide bất kỳ · A: hiện hết · F: toàn màn hình</div>
+<div id="nav"><button id="jumpNav" title="Đi tới slide (G)">☰</button><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+<div id="jump"><div id="jbox"><div class="jh"><h3>Đi tới slide</h3><span class="muted" style="font-size:14px">gõ số hoặc tên demo rồi Enter</span><input id="jq" placeholder="vd: 12 hoặc Table" autocomplete="off"><button id="jx" aria-label="Đóng">×</button></div><div id="jlist"></div></div></div>
+
+<script>
+/* ===== generator: builds array visuals + step fragments BEFORE the deck engine runs ===== */
+(function(){
+  const SP="␣";
+  const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const show=c=>c===" "?SP:c==="\0"?"\\0":c==="?"?"?":esc(c);
+  const qs=str=>'"'+str.replace(/ /g,SP)+'"';
+  const chs=c=>c===" "?"space":c==="\0"?"'\\0'":"'"+esc(c)+"'";
+  // arr: array of chars; o.cls {idx:"cls"}, o.top {idx:"label"}, o.bot {idx:"label"}
+  function arrHTML(arr,o={}){
+    const cls=o.cls||{},top=o.top||{},bot=o.bot||{};
+    return arr.map((c,j)=>{
+      let base=c===" "?" sp":c==="\0"?" nul":c==="?"?" gar":"";
+      return `<div class="col"><div class="ptr pi">${top[j]||"&nbsp;"}</div><div class="c2${base} ${cls[j]||""}"><span>${show(c)}</span><small>[${j}]</small></div><div class="ptr pk">${bot[j]||"&nbsp;"}</div></div>`;
+    }).join("");
+  }
+  function clsMap(spec){const m={};(spec||"").split(";").filter(Boolean).forEach(g=>{const k=g.indexOf(":");const r=g.slice(0,k),c=g.slice(k+1);const [a,b]=r.split("-").map(Number);for(let i=a;i<=(isNaN(b)?a:b);i++)m[i]=((m[i]||"")+" "+c).trim()});return m}
+  const parseCells=s=>[...s].map(c=>c==="~"?"\0":c);
+  function simpleCells(str,spec){ // no pointer rows
+    return parseCells(str).map((c,j)=>{let base=c===" "?" sp":c==="\0"?" nul":c==="?"?" gar":"";const m=clsMap(spec);return `<div class="c2${base} ${m[j]||""}"><span>${show(c)}</span><small>[${j}]</small></div>`}).join("");
+  }
+  document.querySelectorAll("[data-cells]").forEach(el=>el.innerHTML=simpleCells(el.dataset.cells,el.dataset.cls));
+  document.querySelectorAll("[data-setcells]").forEach(f=>{
+    const [sel,str,spec]=f.dataset.setcells.split("|");
+    f.dataset.set=(f.dataset.set?f.dataset.set+";":"")+sel+"::"+simpleCells(str,spec);
+  });
+  // mini strip for "phân tích đề"
+  document.querySelectorAll("[data-strip]").forEach(el=>{
+    const s=el.dataset.strip,n=s.length;let L=0;while(L<n&&s[L]===" ")L++;let R=n;while(R>L&&s[R-1]===" ")R--;
+    el.innerHTML=[...s].map((c,j)=>{let t="";if(c===" "){if(j<L)t="L";else if(j>=R)t="R";else t=(s[j-1]===" ")?"D":"K"}
+      return `<div class="mc ${c===" "?"sp":""} ${t}">${c===" "?SP:esc(c)}</div>`}).join("");
+  });
+  const vc=(k,v,c="")=>`<span class="vc ${c}">${k} = <b>${v}</b></span>`;
+  function emit(holder,steps,id,codeId){
+    const h=document.getElementById(holder);
+    document.getElementById(id+"_arr").innerHTML=steps.init;
+    steps.list.forEach(st=>{
+      const f=document.createElement("span");f.className="f ghost";
+      f.dataset.set=`#${id}_arr::${st.arr};#${id}_vars::${st.vars||""}`;
+      if(st.mark)f.dataset.now=st.mark.split(" ").map(m=>`#${codeId}|show-${m}`).join(";");
+      if(st.log){const tb=document.getElementById(id+"_log");const tr=document.createElement("tr");tr.className="lgr";tr.id=id+"_lg"+tb.rows.length;
+        tr.innerHTML=st.log.map(x=>"<td>"+x+"</td>").join("");tb.appendChild(tr);
+        f.dataset.act="#"+tr.id+"|sh";f.dataset.now=(f.dataset.now?f.dataset.now+";":"")+"#"+tr.id+"|cur";}
+      f.dataset.say=st.say;h.appendChild(f);
+    });
+  }
+
+  /* ---------- trace: delete one char ---------- */
+  (function(){
+    const a=[..."xy  z","\0"],p=2,n=5,list=[];
+    list.push({arr:arrHTML(a,{cls:{[p]:"bad"},top:{[p]:"p"}}),vars:vc("p",p)+vc("n",n),mark:"a",say:`Gọi xoaKyTu(s, 2): muốn xóa ô <b>s[2]</b> (space). <b>n = strlen(s) = 5</b>.`});
+    for(let j=p;j<n;j++){
+      a[j]=a[j+1];
+      const cls={};for(let t=p;t<j;t++)cls[t]="mv";cls[j]="mv cur";cls[j+1]="ok";
+      list.push({arr:arrHTML(a,{cls,top:{[j]:"j"}}),vars:vc("j",j,"hot")+vc("s[j]","s[j+1] = "+chs(a[j])),mark:"b",
+        say:`j = ${j}: <b>s[${j}] = s[${j+1}]</b> → ô ${j} nhận ${chs(a[j])}.`+(a[j]==="\0"?" Đã chép cả <b>'\\0'</b> → chuỗi kết thúc sớm hơn 1 ô.":"")});
+    }
+    const cls={};cls[n]="dim";
+    list.push({arr:arrHTML(a,{cls}),vars:`<span class="res">${qs("xy z")}</span>`,mark:"c",say:`j = 5 = n → dừng. Chuỗi còn <b>${qs("xy z")}</b> (4 ký tự). Ô [5] vẫn chứa '\\0' cũ nhưng nằm sau '\\0' mới nên không ảnh hưởng.`});
+    emit("dl_steps",{init:arrHTML(a.slice(0,0).concat([..."xy  z","\0"])),list},"dl","kDel");
+  })();
+
+  /* ---------- trace: cách 1 ---------- */
+  (function(){
+    const input="  a   b  ",a=[...input,"\0"],list=[];
+    const len=()=>a.indexOf("\0");
+    const tail=()=>{const c={};const L=len();for(let t=L+1;t<a.length;t++)c[t]="dim";return c};
+    const del=p=>{const n=len();for(let j=p;j<n;j++)a[j]=a[j+1]};
+    // trimLeft
+    while(a[0]===" "){
+      list.push({arr:arrHTML(a,{cls:Object.assign(tail(),{0:"bad"}),top:{0:"0"}}),vars:`<span class="ev">trimLeft</span>`,mark:"b",say:`<b>trimLeft:</b> s[0] là space → gọi <b>xoaKyTu(s, 0)</b>.`});
+      del(0);const c=tail();for(let t=0;t<len();t++)c[t]="mv";
+      list.push({arr:arrHTML(a,{cls:c}),vars:`<span class="ev">trimLeft</span>`+vc("độ dài",len()),mark:"b a",say:`Cả chuỗi dời sang trái 1 ô (ô xanh dương). Độ dài còn <b>${len()}</b>.`});
+    }
+    list.push({arr:arrHTML(a,{cls:Object.assign(tail(),{0:"ok cur"}),top:{0:"0"}}),vars:`<span class="ev">trimLeft</span>`,mark:"b",say:`s[0] = ${chs(a[0])} không phải space → <b>dừng trimLeft</b>. Đã xóa 2 space đầu nhưng phải dời mảng <b>2 lần</b>.`});
+    // trimRight
+    let n=len();
+    while(n>0&&a[n-1]===" "){
+      const k=n-1;a[k]="\0";n--;
+      list.push({arr:arrHTML(a,{cls:Object.assign(tail(),{[k]:"bad wr"}),top:{[k]:"n-1"}}),vars:`<span class="ev b">trimRight</span>`+vc("n",n),mark:"c",say:`<b>trimRight:</b> s[${k}] là space → ghi đè <b>'\\0'</b> vào đó, n giảm còn ${n}. Cắt đuôi <b>không cần dời</b> gì cả.`});
+    }
+    list.push({arr:arrHTML(a,{cls:Object.assign(tail(),{[n-1]:"ok cur"}),top:{[n-1]:"n-1"}}),vars:`<span class="ev b">trimRight</span>`+vc("n",n),mark:"c",say:`s[${n-1}] = ${chs(a[n-1])} → dừng trimRight. Giờ s = <b>${qs(a.slice(0,len()).join(""))}</b>.`});
+    // dup
+    let i=0;
+    while(a[i]!=="\0"){
+      if(a[i]===" "&&a[i+1]===" "){
+        list.push({arr:arrHTML(a,{cls:Object.assign(tail(),{[i]:"cur",[i+1]:"bad"}),top:{[i]:"i"}}),vars:`<span class="ev c">xoaSpaceTrung</span>`+vc("i",i,"hot"),mark:"d",say:`i = ${i}: s[${i}] và s[${i+1}] <b>đều là space</b> → xóa s[${i+1}] bằng xoaKyTu(s, ${i+1}).`});
+        del(i+1);const c=tail();for(let t=i+1;t<len();t++)c[t]="mv";c[i]="cur";
+        list.push({arr:arrHTML(a,{cls:c,top:{[i]:"i"}}),vars:`<span class="ev c">xoaSpaceTrung</span>`+vc("i",i,"hot"),mark:"d a",say:`Phần sau dời trái. <b>i giữ nguyên = ${i}</b> để kiểm tra lại cặp (s[${i}], s[${i+1}]) mới — có thể vẫn còn space trùng!`});
+      } else i++;
+    }
+    list.push({arr:arrHTML(a,{cls:Object.assign(tail(),(()=>{const c={};for(let t=0;t<len();t++)c[t]="ok";return c})())}),vars:`<span class="res">${qs(a.slice(0,len()).join(""))}</span>`,mark:"e",say:`i chạy tới '\\0' → xong. Kết quả <b>${qs(a.slice(0,len()).join(""))}</b>. Tổng cộng phải gọi xoaKyTu <b>4 lần</b>, mỗi lần dời cả đoạn phía sau.`});
+    emit("w1_steps",{init:arrHTML([...input,"\0"]),list},"w1","kW1");
+  })();
+
+  /* ---------- trace: cách 2 (đọc / ghi) ---------- */
+  const T2=`void trimSpaces(char s[]) {
+    int n = strlen(s);
+    int k = 0;
+    for (int i = 0; i < n; i++) {
+        if (s[i] != ' ') {
+            s[k] = s[i];  k++;
+        } else if (k > 0 && s[k-1] != ' ') {
+            s[k] = ' ';   k++;
+        }
+        // else: bỏ qua
+    }
+    if (k > 0 && s[k-1] == ' ') k--;
+    s[k] = '\\0';
+}`;
+  function trace2(id,input,codeId){
+    const a=[...input,"\0"],n=input.length,list=[];let k=0;
+    const st=(i,extra)=>{const c={};for(let j=0;j<a.length;j++){if(j<k)c[j]="ok";else if(i!=null&&j<i)c[j]="dim"} if(i!=null&&i<a.length)c[i]=((c[i]||"")+" cur").trim();Object.assign(c,extra||{});return c};
+    list.push({arr:arrHTML(a,{cls:st(null),bot:{0:"k"}}),vars:vc("n",n)+vc("k",0),log:["khởi tạo","","","n = "+n,0,'""'],mark:"a",say:`Khởi tạo: <b>n = strlen(s) = ${n}</b>, <b>k = 0</b>. k trỏ vào ô 0: ký tự giữ lại đầu tiên sẽ được ghi vào đây.`});
+    for(let i=0;i<n;i++){
+      const c=a[i];let say,mark,dec,extra={};
+      if(c!==" "){
+        const from=i,to=k;a[k]=c;k++;mark="b c";dec="chép";
+        extra[to]="ok wr";
+        say=`i = ${i}: s[${i}] = ${chs(c)} là chữ → <b>s[${to}] = s[${from}]</b>, k tăng lên ${k}.`+(to<from?` (ghi đè ô ${to} — ô này đã đọc rồi nên không sao.)`:"");
+      } else if(k>0&&a[k-1]!==" "){
+        const to=k;a[k]=" ";k++;mark="b d";dec="giữ 1 space";extra[to]="ok wr";
+        say=`i = ${i}: space, và ký tự vừa ghi s[${to-1}] = ${chs(a[to-1])} là chữ → đây là space <b>đầu tiên</b> sau từ → <b>ghi 1 space</b> vào s[${to}], k = ${k}.`;
+      } else {
+        mark="b e";dec="bỏ qua";
+        say=k===0?`i = ${i}: space nhưng <b>k = 0</b> (chưa ghi chữ nào) → space đầu câu → <b>bỏ qua</b>, k đứng yên.`:`i = ${i}: space nhưng s[k-1] = s[${k-1}] <b>đã là space</b> → space trùng → <b>bỏ qua</b>, k đứng yên.`;
+      }
+      list.push({arr:arrHTML(a,{cls:st(i,extra),top:{[i]:"i"},bot:{[k]:"k"}}),vars:vc("i",i,"hot")+vc("s[i]",chs(c))+vc("k",k)+`<span class="vc ${dec==="bỏ qua"?"":"res"}">${dec}</span>`,mark,say,log:["vòng lặp",i,show(c),dec==="bỏ qua"?'<span class="bad-t">bỏ qua</span>':'<span class="ok-t">'+dec+'</span>',k,qs(a.slice(0,k).join(""))]});
+    }
+    // trailing
+    const keep=()=>{const c={};for(let j=0;j<a.length;j++)c[j]=j<k?"ok":"dim";return c};
+    if(k>0&&a[k-1]===" "){
+      k--;const c=keep();c[k]="bad";
+      list.push({arr:arrHTML(a,{cls:c,bot:{[k]:"k"}}),vars:vc("k",k,"hot"),log:["sau vòng","","",'<span class="bad-t">k-- (space cuối)</span>',k,qs(a.slice(0,k).join(""))],mark:"f",say:`Hết vòng lặp (i = n). s[k-1] = s[${k}] là <b>space thừa ở cuối</b> → <b>k--</b>, k = ${k}.`});
+    } else {
+      list.push({arr:arrHTML(a,{cls:keep(),bot:{[k]:"k"}}),vars:vc("k",k),log:["sau vòng","","","không lùi k",k,qs(a.slice(0,k).join(""))],mark:"f",say:k===0?`Hết vòng lặp. <b>k = 0</b> → điều kiện k &gt; 0 sai, không lùi k (và không đọc s[-1]!).`:`Hết vòng lặp. s[k-1] = ${chs(a[k-1])} không phải space → không cần lùi k.`});
+    }
+    a[k]="\0";const c=keep();c[k]="ok wr";
+    const res=a.slice(0,k).join("");
+    list.push({arr:arrHTML(a,{cls:c,bot:{[k]:"k"}}),vars:`<span class="res">${qs(res)}</span>`+vc("độ dài",k),log:["kết thúc","","","s[k] = '\\0'",k,qs(res)],mark:"g",say:`<b>s[${k}] = '\\0'</b> → chuỗi mới là <b>${qs(res)}</b>. Các ô mờ phía sau là rác của câu cũ, cout sẽ không in tới.`});
+    emit(id+"_steps",{init:arrHTML([...input,"\0"]),list},id,codeId);
+  }
+  document.querySelectorAll(".tcode").forEach((d,ix)=>{
+    const sc=document.createElement("script");sc.type="text/x-cpp";sc.id="kT"+(ix+1);sc.className="sm";
+    sc.dataset.title="trimSpaces (Cách 2)";sc.dataset.mark="2-3:a;4:b;5-6:c;7-8:d;10:e;12:f;13:g";
+    sc.textContent="\n"+T2+"\n";d.appendChild(sc);
+  });
+  trace2("r1","  to  be ","kT1");
+  trace2("r2"," a   b","kT2");
+  trace2("r3","   ","kT3");
+
+  /* ---------- trace: buggy for-loop ---------- */
+  (function(){
+    const a=[..."a   b","\0"],list=[];
+    const len=()=>a.indexOf("\0");
+    const tail=()=>{const c={};for(let t=len()+1;t<a.length;t++)c[t]="dim";return c};
+    let i=0;
+    while(a[i]!=="\0"){
+      if(a[i]===" "&&a[i+1]===" "){
+        list.push({arr:arrHTML(a,{cls:Object.assign(tail(),{[i]:"cur",[i+1]:"bad"}),top:{[i]:"i"}}),vars:vc("i",i,"hot"),mark:"a",say:`i = ${i}: s[${i}], s[${i+1}] đều là space → xóa s[${i+1}].`});
+        const n=len();for(let j=i+1;j<n;j++)a[j]=a[j+1];
+        const c=tail();c[i]="cur";c[i+1]="mv";
+        list.push({arr:arrHTML(a,{cls:c,top:{[i]:"i"}}),vars:vc("i",i),mark:"a",say:`Sau khi xóa: ô ${i+1} nhận space mới dời tới — <b>chưa được kiểm tra</b> với ô ${i}…`});
+        i++;
+        list.push({arr:arrHTML(a,{cls:Object.assign(tail(),{[i]:"cur",[i-1]:"bad"}),top:{[i]:"i"}}),vars:vc("i",i,"hot"),mark:"a",say:`…nhưng vòng for vẫn <b>i++</b> → i = ${i}. Cặp (s[${i-1}], s[${i}]) = (space, space) bị <b>bỏ sót</b>!`});
+      } else i++;
+    }
+    list.push({arr:arrHTML(a,{cls:tail()}),vars:`<span class="vc" style="border-color:#e11d48;color:#be123c">kết quả SAI: ${qs(a.slice(0,len()).join(""))}</span>`,mark:"a",say:`Hết chuỗi. Còn lại <b class="bad-t">${qs(a.slice(0,len()).join(""))}</b> — vẫn 2 space giữa a và b.`});
+    emit("bg_steps",{init:arrHTML([..."a   b","\0"]),list},"bg","kBug");
+  })();
+})();
+</script>
+<script>
+(function(){
+  // ---------- C++ highlighter ----------
+  const KW=new Set("auto break case catch class const continue default delete do else enum false for if namespace new return sizeof static struct switch true try using while std".split(" "));
+  const PRIM=new Set("bool char double float int long short signed unsigned void".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line){
+    if(/^\s*#/.test(line)){const m=line.match(/^(\s*#\w+)(.*?)(\s*\/\/.*)?$/);return '<span class="p">'+esc(m[1])+'</span><span class="s">'+esc(m[2])+'</span>'+(m[3]?'<span class="c">'+esc(m[3])+'</span>':"")}
+    const re=/(\/\/.*$|\/\*.*?\*\/)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="n">'+m[3]+'</span>';
+      else if(m[4]){
+        const w=m[4];let cls="";
+        if(PRIM.has(w))cls="t";else if(KW.has(w))cls="k";
+        else if(m[5])cls="fn";
+        else if(w==="cin"||w==="cout"||w==="endl"||w==="vector")cls="t";
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[5]?esc(m[5]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-cpp"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");r.split(",").forEach(rr=>{const [a,b]=rr.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);});
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    if(sc.dataset.title){const t=document.createElement("div");t.className="code-title";t.textContent=sc.dataset.title;sc.before(t)}
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+  // ---------- deck engine ----------
+  //   .f = fragment, one per step.  data-act "sel|cls;…" (kept while shown) · data-now "sel|cls;…" (only on latest step)
+  //   data-set "sel::html;…" (content while shown) · data-say narration · data-o order
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")].sort((x,y)=>(+x.dataset.o||0)-(+y.dataset.o||0));
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  const pairs=(v,sep)=>(v||"").split(/;(?=\s*#)/).filter(s=>s.trim()).map(p=>{const k=p.indexOf(sep);return [p.slice(0,k).trim(),p.slice(k+sep.length)]});
+  function tog(v,on){pairs(v,"|").forEach(([sel,cls])=>{document.querySelectorAll(sel).forEach(t=>cls.split(" ").forEach(c=>c&&t.classList.toggle(c,on)))})}
+  document.querySelectorAll("[data-set]").forEach(f=>pairs(f.dataset.set,"::").forEach(([sel])=>{document.querySelectorAll(sel).forEach(t=>{if(t.dataset.orig===undefined)t.dataset.orig=t.innerHTML})}));
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach(f=>{tog(f.dataset.now,false);tog(f.dataset.act,false)});
+      s.querySelectorAll("[data-orig]").forEach(t=>t.innerHTML=t.dataset.orig);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step);f.classList.toggle("on",on);if(on){tog(f.dataset.act,true);pairs(f.dataset.set,"::").forEach(([sel,val])=>document.querySelectorAll(sel).forEach(t=>t.innerHTML=val))}});
+      if(i===cur&&step>0)tog(fs[step-1].dataset.now,true);
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.innerHTML=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length+(fs.length?" · "+step+"/"+fs.length:"");
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    try{history.replaceState(null,"","#"+slides[cur].id)}catch(e){}
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+
+  // ---------- jump-to-slide panel ----------
+  const jump=document.getElementById("jump"),jlist=document.getElementById("jlist"),jq=document.getElementById("jq");
+  const titleOf=s=>s.dataset.title||(s.querySelector("h2,h1")||{}).textContent||s.id;
+  slides.forEach((s,i)=>{
+    const d=document.createElement("div");d.className="ji";d.dataset.i=i;
+    d.innerHTML="<b>"+String(i+1).padStart(2,"0")+"</b><span>"+esc(titleOf(s).replace(/\s+/g," ").trim())+"</span>";
+    d.onclick=()=>{closeJump();go(i)};jlist.appendChild(d);
+    const b=document.createElement("button");b.className="jumpbtn";b.type="button";b.innerHTML="☰ Đi tới slide";b.title="Mở danh sách slide (phím G)";
+    b.onclick=e=>{e.stopPropagation();openJump()};s.appendChild(b);
+  });
+  function filterJump(){
+    const q=jq.value.trim().toLowerCase();let first=null;
+    [...jlist.children].forEach(d=>{const i=+d.dataset.i;const ok=!q||String(i+1)===q||d.textContent.toLowerCase().includes(q);d.style.display=ok?"":"none";d.classList.remove("k");if(ok&&!first)first=d});
+    if(first&&q)first.classList.add("k");return first;
+  }
+  function openJump(){jump.classList.add("on");jq.value="";filterJump();[...jlist.children].forEach(d=>d.classList.toggle("cur",+d.dataset.i===cur));setTimeout(()=>jq.focus(),30)}
+  function closeJump(){jump.classList.remove("on");jq.blur()}
+  jq.addEventListener("input",filterJump);
+  jq.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Escape")closeJump();else if(e.key==="Enter"){const q=jq.value.trim();const n=parseInt(q,10);if(String(n)===q&&n>=1&&n<=slides.length){closeJump();go(n-1)}else{const f=filterJump();if(f){closeJump();go(+f.dataset.i)}}}});
+  jump.addEventListener("click",e=>{if(e.target===jump)closeJump()});
+  document.getElementById("jx").onclick=closeJump;
+  document.getElementById("jumpNav").onclick=openJump;
+
+  addEventListener("keydown",e=>{
+    if(jump.classList.contains("on")){if(e.key==="Escape")closeJump();return}
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="g"||e.key==="G"){e.preventDefault();openJump()}
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null||jump.classList.contains("on"))return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+</script>
+</body>
+</html>

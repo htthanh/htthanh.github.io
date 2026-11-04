@@ -1,0 +1,2172 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nguyên tắc thiết kế giao diện</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+h1{font-size:70px;line-height:1.1;font-weight:800}
+h2{font-size:38px;line-height:1.2;font-weight:800}
+h3{font-size:23px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:22px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:26px;margin:6px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.88em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 6px;border-radius:6px;color:#be185d}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.cols.c64{grid-template-columns:1.25fr 1fr}.cols.c46{grid-template-columns:1fr 1.2fr}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.card.bad{border-color:#fecdd3;background:linear-gradient(180deg,#fff1f3,#fff)}
+.card.good{border-color:#a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff)}
+.lbl{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
+.icon{font-size:34px;margin-bottom:4px}
+.note{margin-top:12px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:20px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.code{font-family:var(--mono);font-size:18px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
+.code.sm{font-size:16.5px}.code.xs{font-size:15px;line-height:1.45}.code.xxs{font-size:13.6px;line-height:1.38;padding:8px 0}
+.code .ln{padding:0 14px 0 8px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.11);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.13);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
+.code-title{font-family:var(--mono);font-size:15px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+.f.zoom{transform:scale(.85)}.f.zoom.on{transform:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:19px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.legend{display:flex;flex-direction:column;gap:10px}
+.leg{border-radius:12px;padding:10px 16px;background:#fff;border:1px solid var(--line)}
+.leg b{display:block;font-size:21px;margin-bottom:2px}
+.leg p{font-size:19px}
+.leg.a{border-left:6px solid #7c3aed}.leg.b{border-left:6px solid #06b6d4}.leg.c{border-left:6px solid #f59e0b}
+.console{font-family:var(--mono);font-size:17px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.mem{display:flex;align-items:center;gap:16px;min-height:130px}
+.frame{border:2px solid #e4dcfb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
+.frame .fname{font-family:var(--mono);font-size:16px;color:var(--muted);margin-bottom:6px}
+.var{display:flex;align-items:center;gap:10px}
+.vn{font-family:var(--mono);font-size:21px;color:var(--t);font-weight:600}
+.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #c4b5fd;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
+.vb .new{display:none}
+.callee,.arw{opacity:0;transform:translateX(-14px);transition:all .5s}
+.mem.s1 .callee,.mem.s1 .arw{opacity:1;transform:none}
+.mem.s2 .chg .old{display:none}.mem.s2 .chg .new{display:inline;animation:pop .5s}
+.mem.s2 .chg{border-color:#f59e0b;box-shadow:0 0 18px rgba(245,158,11,.5)}
+.mem.s3 .callee,.mem.s3 .arw{opacity:.15;transform:translateY(10px)}
+.mem.s3 .result{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.5)}
+.arw{font-family:var(--mono);font-size:16px;color:var(--gold);text-align:center;line-height:1.2;font-weight:600}
+.arw .bar{display:block;font-size:30px}
+.alias{font-size:18px;color:var(--accent2);font-weight:600}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.25)}100%{transform:none;opacity:1}}
+.flow{display:flex;align-items:center;gap:12px;justify-content:center}
+.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:18px;border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:14px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.h{border-color:var(--gold)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#c4b5fd}.box.exe{border-color:#ec4899;background:#fdf2f8}
+.ar{color:var(--muted);font-size:26px;text-align:center}
+.stack{display:flex;flex-direction:column;gap:8px}
+svg text{font-family:var(--mono);font-weight:600}
+.draw{stroke-dasharray:400;stroke-dashoffset:400;transition:stroke-dashoffset 1s ease}
+svg.d1 .dr1,svg.d2 .dr2,svg.d3 .dr3{stroke-dashoffset:0}
+.fadein{opacity:0;transition:opacity .6s}
+svg.d1 .fd1,svg.d2 .fd2,svg.d3 .fd3{opacity:1}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:19px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05)}
+.ag:hover{border-color:#ec4899;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
+.ag b{color:#db2777;margin-right:6px;font-family:var(--mono)}
+.formula{font-family:var(--mono);font-size:23px;text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:16px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+@media (max-width:700px){#hint{display:none}}
+@media print{#nav,#bar,#hint{display:none}}
+
+/* lec03 additions */
+.chain{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pv{display:inline-flex;align-items:center;font-family:var(--mono);font-size:18px;font-weight:700;padding:5px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;white-space:nowrap}
+.pv.yes{background:#d1fae5;border-color:#34d399;color:#047857}
+.pv.no{background:#ffe4e6;border-color:#fb7185;color:#be123c}
+.pv.skip{background:#f1f5f9;border-color:#cbd5e1;color:#94a3b8;text-decoration:line-through;border-style:dashed}
+.op{font-family:var(--mono);font-size:26px;font-weight:800;color:var(--sa1)}
+.tt th,.tt td{text-align:center}.tt td:first-child{color:var(--text);font-weight:400}
+.tt tr.hit td{background:#fdf2f8;color:#be185d}
+tr.f{transform:none}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.code.show-s .mark-s{opacity:.3;text-decoration:line-through}
+.arr{display:flex;gap:12px;justify-content:center;margin-top:6px}
+.cell{width:84px;height:84px;border-radius:16px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:800;transition:all .45s;box-shadow:0 6px 16px -10px rgba(124,58,237,.4)}
+.cell small{font-size:13px;color:var(--muted);font-weight:600}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857;transform:translateY(-6px)}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;transform:translateY(-10px) scale(1.06);box-shadow:0 10px 24px -8px rgba(225,29,72,.5)}
+.cell.skip{opacity:.3;transform:scale(.92)}
+.syn{display:flex;gap:12px;align-items:center;justify-content:center;font-family:var(--mono);font-size:24px;font-weight:700}
+.sy{padding:8px 16px;border-radius:12px;color:#fff}
+.sy.c1{background:linear-gradient(135deg,#7c3aed,#a855f7)}.sy.c2{background:linear-gradient(135deg,#059669,#10b981)}.sy.c3{background:linear-gradient(135deg,#e11d48,#f97316)}
+.spin{display:inline-block;animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* lec04 arrays additions */
+.cell .v{display:block;line-height:1}
+.cell.max{border-color:#db2777;background:#fdf2f8;color:#be185d}
+.cell.empty{border-style:dashed;background:#f8fafc;color:#cbd5e1;box-shadow:none}
+.cell.done{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cell.new{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.cell.out{opacity:.4;border-style:dashed}
+.cell.gone{border-color:#e11d48;background:#fff1f3;color:#be123c;text-decoration:line-through}
+.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(245,158,11,.55)}
+.cell.cmp{border-color:#0891b2;background:#ecfeff;color:#0e7490;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(8,145,178,.5)}
+.cell.dots{border:none;box-shadow:none;background:none;width:40px;color:var(--muted)}
+.arr.sm .cell{width:70px;height:74px;font-size:24px;border-radius:14px}
+.arr.xs .cell{width:56px;height:62px;font-size:19px;border-radius:12px}
+.arr.xs .cell small{font-size:11.5px}
+.arr.left{justify-content:flex-start}
+.addr{display:flex;gap:12px;justify-content:center;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.addr span{width:84px;text-align:center}
+.vars{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.vc{font-family:var(--mono);font-size:19px;font-weight:700;padding:5px 14px;border-radius:12px;background:#fff;border:2px solid #e4dcfb;transition:all .35s}
+.vc b{color:var(--t)}
+.vc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.45)}
+.vc.res{border-color:#10b981;background:#ecfdf5;color:#047857}
+.ci{opacity:0;transition:opacity .4s}.ci.show{opacity:1}
+.say{font-size:20px;margin-top:12px;min-height:56px;color:var(--muted)}
+.say b{color:var(--text)}
+.rowlbl{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted);margin:10px 0 4px}
+.zone{display:flex;gap:6px;justify-content:center;margin-top:8px;font-size:15px;font-weight:700}
+.zone span{padding:3px 10px;border-radius:999px}
+.z1{background:#d1fae5;color:#047857}.z2{background:#f1f5f9;color:#64748b}.z3{background:#ffe4e6;color:#be123c}
+.brace{display:flex;gap:12px;justify-content:center;margin-top:4px}
+.brace div{border-top:3px solid currentColor;padding-top:4px;text-align:center;font-family:var(--mono);font-size:15px;font-weight:700}
+.mx{display:grid;gap:6px;justify-content:center}
+.mc{width:62px;height:52px;border-radius:10px;border:2px solid #e4dcfb;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .4s}
+.mx.sm .mc{width:44px;height:36px;font-size:14px;border-radius:8px}
+.mc.ix{border:none;background:none;color:var(--muted);font-size:14px;font-weight:600;box-shadow:none}
+.mc.unused{border-style:dashed;background:#f8fafc;color:#cbd5e1}
+.mc.used{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.mc.hl{background:#fffbeb;border-color:#fcd34d}
+.mc.cur{border-color:#f59e0b;background:#fde68a;color:#92400e;transform:scale(1.12);box-shadow:0 8px 20px -6px rgba(245,158,11,.6)}
+.mc.bd{border-color:#ec4899;border-width:3px}
+.mc.inr{opacity:.3}
+.mc.pos{border-color:#10b981;background:#d1fae5;color:#047857}
+.mc.neg{background:#fff1f3;color:#be123c}
+.mc.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;border-style:dashed}
+.strip{display:flex;gap:3px;font-family:var(--mono);font-size:12px;flex-wrap:nowrap;overflow:hidden}
+.strip span{padding:6px 5px;border-radius:5px;background:#f3edff;color:#6d28d9;white-space:nowrap}
+.strip span.r1{background:#e0f2fe;color:#0369a1}
+.strip span.gap{background:none;color:var(--muted)}
+.trace td,.trace th{font-size:17px;padding:5px 10px}
+.trace td:first-child{color:var(--text)}
+.trace tr.now td{background:#fffbeb}
+.sig{font-family:var(--mono);font-size:17px;background:#fff;border:1px dashed #c4b5fd;border-radius:10px;padding:6px 12px;color:#6d28d9;display:inline-block}
+
+.cols>*{min-width:0}
+
+/* ===== UI-principles deck additions ===== */
+.hdr h2{flex:1}
+.tm{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px;white-space:nowrap}
+.part-wrap{height:100%;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1}
+.pnum{font-family:var(--mono);font-size:150px;line-height:1;font-weight:800;background:linear-gradient(135deg,var(--sa1),var(--sa2));-webkit-background-clip:text;background-clip:text;color:transparent;opacity:.9}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.chip{font-size:18px;font-weight:600;padding:6px 14px;border-radius:999px;background:#fff;border:1px solid var(--line);box-shadow:0 2px 8px -4px rgba(124,58,237,.3)}
+.chip.on{background:#f3edff;border-color:#c4b5fd;color:#6d28d9}
+.cols5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.cols5>.card{border-top:5px solid var(--sa1)}
+.small,.small p,.small li{font-size:18px}
+.xs,.xs p,.xs li{font-size:16px}
+.card p{font-size:18px;line-height:1.4}
+.card li{font-size:18px;margin:3px 0}
+.big{font-size:28px;font-weight:800}
+.ctr{text-align:center}
+.mt{margin-top:14px}.mt2{margin-top:24px}
+.row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.tag{display:inline-block;font-size:14px;font-weight:700;padding:2px 9px;border-radius:6px;background:#f3edff;color:#6d28d9;margin-right:4px}
+.hl{background:linear-gradient(transparent 55%,#fde68a 55%);padding:0 2px}
+.q{font-size:20px;font-weight:700;color:#be185d}
+.ex{font-size:17px;color:var(--muted);margin-top:4px}
+.ex b{color:var(--text)}
+
+/* fake UI */
+.mock{background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 12px 30px -16px rgba(30,27,58,.35);overflow:hidden;font-family:"Be Vietnam Pro",sans-serif}
+.mock .wb{height:26px;background:#f4f4f8;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:6px;padding:0 10px;font-size:12px;color:#94a3b8}
+.mock .wb i{width:10px;height:10px;border-radius:50%;background:#fca5a5;display:inline-block}.mock .wb i+i{background:#fcd34d}.mock .wb i+i+i{background:#86efac;margin-right:8px}
+.mock .bd{padding:14px 16px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:600 16px/1 "Be Vietnam Pro",sans-serif;padding:11px 18px;border-radius:10px;border:2px solid transparent;cursor:pointer;transition:background .2s,transform .1s,box-shadow .2s,opacity .2s;white-space:nowrap}
+.btn.pri{background:#7c3aed;color:#fff;box-shadow:0 6px 14px -8px #7c3aed}.btn.pri:hover{background:#6d28d9}.btn:active{transform:translateY(1px) scale(.98)}
+.btn.sec{background:#fff;color:#6d28d9;border-color:#c4b5fd}.btn.sec:hover{background:#f5f3ff}
+.btn.ghost{background:transparent;color:#6d28d9}.btn.ghost:hover{background:#f5f3ff}
+.btn.dan{background:#e11d48;color:#fff}
+.btn.sm{font-size:14px;padding:7px 12px;border-radius:8px}
+.btn.lg{font-size:19px;padding:14px 24px}
+.btn:disabled,.btn.dis{opacity:.4;cursor:not-allowed;box-shadow:none}
+.btn:focus-visible{outline:3px solid #f59e0b;outline-offset:2px}
+.fld{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.fld label{font-size:14px;font-weight:600;color:#475569}
+.inp{font:15px "Be Vietnam Pro",sans-serif;padding:9px 12px;border:1.5px solid #cbd5e1;border-radius:8px;background:#fff;color:var(--text);width:100%;outline:none;transition:border .2s,box-shadow .2s}
+.inp:focus{border-color:#7c3aed;box-shadow:0 0 0 3px rgba(124,58,237,.18)}
+.inp.err{border-color:#e11d48}.errt{font-size:13px;color:#be123c;min-height:16px}
+.okt{font-size:13px;color:#047857}
+.spinr{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+
+/* visual helpers */
+.dots{display:grid;gap:14px;justify-content:center;transition:all .6s}
+.dot{width:26px;height:26px;border-radius:50%;background:#a78bfa;transition:all .6s}
+.lab{font-family:var(--mono);font-size:14px;color:var(--muted);text-align:center;margin-top:6px}
+.swatch{height:46px;border-radius:8px;display:flex;align-items:flex-end;padding:3px 6px;font-family:var(--mono);font-size:11px;font-weight:600}
+.sw-row{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:4px 0}
+.digits{display:flex;justify-content:center;gap:4px;font-family:var(--mono);font-size:46px;font-weight:800}
+.digits span{display:inline-block;width:40px;text-align:center;transition:margin .6s,color .6s}
+.digits.chunk span.g{margin-right:34px}
+.digits.chunk span.c1{color:#7c3aed}.digits.chunk span.c2{color:#0891b2}.digits.chunk span.c3{color:#db2777}
+.words{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;transition:filter .6s,opacity .6s}
+.words span{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 6px;text-align:center;font-size:19px;font-weight:600}
+.words.hide{filter:blur(14px);opacity:.25}
+.timerbar{height:10px;border-radius:99px;background:#f1f5f9;overflow:hidden;margin-top:10px}
+.timerbar div{height:100%;width:0;background:linear-gradient(90deg,#7c3aed,#ec4899)}
+.timerbar.go div{animation:tbar 15s linear forwards}
+@keyframes tbar{to{width:100%}}
+
+/* matrix 2x2 */
+.mtx{display:grid;grid-template-columns:150px 1fr 1fr;grid-template-rows:auto 1fr 1fr;gap:10px}
+.mtx .ax{font-weight:700;font-size:16px;color:var(--muted);display:flex;align-items:center;justify-content:center;text-align:center}
+.mtx .card{min-height:150px}
+
+/* redesign demo */
+.rd{width:430px;margin:0 auto;font-family:"Be Vietnam Pro",sans-serif;background:#fff;border:1px solid #e2e8f0;border-radius:12px;transition:all .6s;padding:10px 12px;box-shadow:0 12px 30px -16px rgba(30,27,58,.35)}
+.rd *{transition:all .6s}
+.rd .t{font-size:15px;font-weight:400;color:#888;text-align:center;margin:2px 0 4px}
+.rd .sub{font-size:12px;color:#aaa;text-align:right}
+.rd .r{display:flex;gap:4px;align-items:center;margin:3px 0}
+.rd .r:nth-of-type(2){margin-left:24px}.rd .r:nth-of-type(3){margin-left:6px}
+.rd .r label{font-size:13px;color:#999;width:auto}
+.rd .r input{font:13px "Be Vietnam Pro",sans-serif;border:1px solid #ddd;padding:3px 5px;width:150px;border-radius:0}
+.rd .acts{display:flex;gap:4px;justify-content:flex-end;margin-top:6px;flex-wrap:wrap}
+.rd .acts span{font-size:12px;padding:4px 8px;border:1px solid #ccc;background:#eee;color:#333;border-radius:0}
+.rd .acts span.go{background:#4ade80;color:#fef08a}
+.rd .msg{font-size:11px;color:#f472b6;margin-top:4px;font-family:var(--mono)}
+.rd.s1 .r{margin-left:0!important;flex-direction:column;align-items:stretch}
+.rd.s1 .r input{width:100%}
+.rd.s1 .t,.rd.s1 .sub{text-align:left}
+.rd.s2{padding:26px 28px}.rd.s2 .r{margin:0 0 14px}.rd.s2 .acts{margin-top:18px}
+.rd.s2 .r input{padding:10px 12px;border-radius:8px;font-size:15px}
+.rd.s3 .t{font-size:26px;font-weight:800;color:#1e1b3a;margin-bottom:2px}.rd.s3 .sub{font-size:14px;color:#64748b;margin-bottom:16px}
+.rd.s3 .r label{font-size:14px;font-weight:600;color:#475569}
+.rd .acts span.lnk{display:none}
+.rd.s4 .acts span{display:none}.rd.s4 .acts span.go{display:block;width:100%;text-align:center;background:#7c3aed;color:#fff;font-weight:700;font-size:16px;padding:12px;border-radius:10px;border:none}
+.rd.s4 .acts span.lnk{display:block;background:none;border:none;color:#6d28d9;font-size:14px;width:100%;text-align:center}
+.rd .msg .nw{display:none}
+.rd.s5 .msg .od{display:none}.rd.s5 .msg .nw{display:inline}.rd.s5 .msg{font-family:"Be Vietnam Pro",sans-serif;font-size:13px;color:#be123c;background:#fff1f3;border:1px solid #fecdd3;padding:6px 10px;border-radius:8px}
+.rd .eye{display:none}.rd.s6 .eye{display:inline;font-size:12px;color:#6d28d9;font-weight:600;margin-top:2px}
+.rd.s6 .r input:focus{outline:none}
+.rd.s6 .r input.bad{border-color:#e11d48}
+
+/* grid demo */
+.gd{position:relative;height:330px;border-radius:12px;background:#fff;border:1px solid #e2e8f0;overflow:hidden;padding:0 24px}
+.gd .cols12{position:absolute;inset:0 24px;display:grid;grid-template-columns:repeat(12,1fr);gap:16px;opacity:0;transition:opacity .5s}
+.gd .cols12 div{background:rgba(236,72,153,.12);border-left:1px dashed rgba(236,72,153,.5);border-right:1px dashed rgba(236,72,153,.5)}
+.gd.g1 .cols12{opacity:1}
+.gd .ct{position:relative;display:grid;grid-template-columns:repeat(12,1fr);gap:16px;padding-top:16px}
+.gd .ct>div{background:#f3edff;border-radius:8px;border:1.5px solid #c4b5fd;font-size:13px;color:#6d28d9;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .7s}
+.gd .h{grid-column:1/13;height:40px}
+.gd .a{grid-column:1/5;height:110px;transform:translate(14px,8px) rotate(-1.5deg)}
+.gd .b{grid-column:5/9;height:110px;transform:translate(-10px,22px)}
+.gd .c{grid-column:9/13;height:110px;transform:translate(6px,-6px) rotate(1deg)}
+.gd .w{grid-column:1/9;height:90px;transform:translateX(30px)}
+.gd .s{grid-column:9/13;height:90px;transform:translateX(-20px)}
+.gd.g2 .ct>div{transform:none}
+
+/* align demo */
+.al{position:relative;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px 22px;height:300px;font-family:"Be Vietnam Pro",sans-serif}
+.al .it{position:absolute;transition:all .8s cubic-bezier(.2,.8,.2,1);font-size:15px}
+.al .it .inp{width:220px;padding:6px 10px}
+.al .gl{position:absolute;top:10px;bottom:10px;width:0;border-left:2px dashed #ec4899;opacity:0;transition:opacity .5s}
+.al.on .gl{opacity:1}
+
+/* whitespace demo */
+.wsd{font-family:"Be Vietnam Pro",sans-serif;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:6px;transition:all .7s}
+.wsd *{transition:all .7s}
+.wsd h4{font-size:15px;margin:0}
+.wsd .r{display:flex;gap:2px;align-items:center;margin:1px 0}
+.wsd .r label{font-size:13px;width:90px}
+.wsd .r .inp{padding:2px 4px;font-size:13px;border-radius:2px;border-width:1px}
+.wsd .ft{display:flex;gap:2px;justify-content:flex-end;margin-top:2px}
+.wsd .ft .btn{padding:4px 8px;font-size:12px;border-radius:2px}
+.wsd .grp{border-top:0 solid #e2e8f0;padding-top:0;margin-top:0}
+.wsd.air{padding:22px 26px}
+.wsd.air h4{font-size:20px;margin-bottom:10px}
+.wsd.air .r{margin:0 0 10px;gap:14px}
+.wsd.air .r label{width:110px;color:#475569;font-weight:600;font-size:14px}
+.wsd.air .r .inp{padding:8px 10px;border-radius:8px;font-size:14px}
+.wsd.air .grp{border-top-width:1px;padding-top:14px;margin-top:14px}
+.wsd.air .ft{gap:10px;margin-top:16px}
+.wsd.air .ft .btn{padding:10px 16px;font-size:14px;border-radius:8px}
+
+/* hierarchy */
+.hc{font-family:"Be Vietnam Pro",sans-serif;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;transition:filter .6s}
+.hc *{transition:all .6s}
+.hc .ti,.hc .pr,.hc .ds,.hc .cta,.hc .meta{font-size:16px;font-weight:400;color:#334155}
+.hc .cta{display:inline-block;border:1px solid #cbd5e1;padding:6px 10px;border-radius:6px;margin-top:8px}
+.hc.h1 .ti{font-size:26px;font-weight:800;color:#1e1b3a}
+.hc.h1 .pr{font-size:24px;font-weight:800;color:#db2777}
+.hc.h1 .meta{font-size:13px;color:#94a3b8}
+.hc.h1 .ds{color:#64748b;font-size:15px}
+.hc.h1 .cta{background:#7c3aed;color:#fff;font-weight:700;border-color:#7c3aed;padding:10px 18px;border-radius:10px}
+.blur .hc{filter:blur(5px)}
+
+/* color wheel & palettes */
+.wheel .seg{transition:opacity .5s,transform .5s;transform-origin:150px 150px}
+.wheel.pm .seg:not(.s8){opacity:.12}
+.wheel.pa .seg:not(.s7):not(.s8):not(.s9){opacity:.12}
+.wheel.pc .seg:not(.s8):not(.s2){opacity:.12}
+.wheel.ps .seg:not(.s8):not(.s1):not(.s3){opacity:.12}
+.wheel.pt .seg:not(.s8):not(.s0):not(.s4){opacity:.12}
+.palrow{display:none;gap:8px}
+.palrow div{flex:1;height:60px;border-radius:10px;border:1px solid rgba(0,0,0,.06)}
+.palrow.show{display:flex}
+.c603010{display:flex;height:34px;border-radius:10px;overflow:hidden;font-size:14px;font-weight:700}
+.c603010 div{display:flex;align-items:center;justify-content:center;transition:flex .8s}
+/* colorblind */
+.cbd{transition:filter .6s}
+.cbd.gray{filter:grayscale(1)}
+.st{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;margin:6px 0;font-size:17px;font-weight:600;background:#fff;border:1px solid var(--line)}
+.st .d{width:16px;height:16px;border-radius:50%}
+.st .ic{display:none;font-weight:800}
+.cbd.fix .st .ic{display:inline}
+.cbd .tx{display:none}.cbd.fix .tx{display:inline}
+
+/* tokens/theme demo */
+.tdemo{--p:#7c3aed;--pt:#fff;--bg:#ffffff;--sf:#f5f3ff;--tx:#1e1b3a;--mu:#64748b;--r:14px;--sp:16px;--ff:"Be Vietnam Pro",sans-serif;background:var(--bg);color:var(--tx);border-radius:var(--r);padding:calc(var(--sp)*1.25);border:1px solid rgba(0,0,0,.08);font-family:var(--ff);transition:all .6s}
+.tdemo *{transition:all .6s}
+.tdemo .tt{font-size:22px;font-weight:800}
+.tdemo .mm{color:var(--mu);font-size:15px;margin:4px 0 var(--sp)}
+.tdemo .bx{background:var(--sf);border-radius:calc(var(--r) - 4px);padding:var(--sp);display:flex;gap:var(--sp);align-items:center;margin-bottom:var(--sp)}
+.tdemo .av{width:46px;height:46px;border-radius:50%;background:var(--p)}
+.tdemo .b1{background:var(--p);color:var(--pt);border:none;border-radius:calc(var(--r) - 4px);padding:10px 18px;font:700 15px var(--ff)}
+.tdemo .b2{background:transparent;color:var(--p);border:2px solid var(--p);border-radius:calc(var(--r) - 4px);padding:8px 16px;font:700 15px var(--ff)}
+.tdemo.thb{--p:#059669;--sf:#ecfdf5;--r:4px;--sp:12px}
+.tdemo.thc{--p:#f472b6;--pt:#1e1b3a;--bg:#18162b;--sf:#26223f;--tx:#f1f0ff;--mu:#a5a3c4;--r:22px}
+
+/* box model */
+.bm{font-family:var(--mono);font-size:14px;font-weight:700;text-align:center}
+.bm div{border-radius:8px;position:relative}.bm .m,.bm .b,.bm .p{padding:34px 22px 22px!important}
+.bm .lb{position:absolute;top:8px;left:12px}
+.bm .m{background:#fff7e0;border:2px dashed #f59e0b;color:#b45309}
+.bm .b{background:#fde2ef;border:3px solid #ec4899;color:#be185d;padding:22px}
+.bm .p{background:#dcfce7;color:#047857;padding:26px}
+.bm .cn{background:#e0e7ff;color:#3730a3;padding:18px;border-radius:6px}
+
+/* flex demo */
+.fx{display:block;background:#fff;border:1px dashed #c4b5fd;border-radius:12px;padding:12px;min-height:90px;transition:all .5s}
+.fx>div{display:inline-block;padding:12px 16px;margin:2px;border-radius:8px;background:#f3edff;color:#6d28d9;font-weight:700;font-size:15px;border:1.5px solid #c4b5fd;transition:all .5s}
+.fx>div:nth-child(2){padding:26px 16px}
+.fx.l1{display:flex}.fx.l1>div{margin:0}
+.fx.l2{gap:16px}.fx.l3{align-items:center}.fx.l4{justify-content:space-between}
+
+/* fitts game */
+.fitts{position:relative;height:250px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden}
+.fitts button{position:absolute;border:none;border-radius:10px;font:700 14px "Be Vietnam Pro",sans-serif;cursor:pointer;color:#fff}
+.fitts .st0{left:14px;top:105px;width:70px;height:40px;background:#64748b}
+.fitts .tA{left:150px;top:90px;width:120px;height:70px;background:#0891b2}
+.fitts .tB{right:16px;top:16px;width:26px;height:22px;background:#db2777;font-size:10px}
+.fitts .res{position:absolute;left:14px;bottom:10px;font-family:var(--mono);font-size:15px;color:var(--text)}
+
+/* break */
+.clockbig{font-family:var(--mono);font-size:120px;font-weight:800;text-align:center;letter-spacing:.04em}
+
+/* jump overlay & nav */
+#nav .wide{width:auto;padding:0 10px;font-family:"Be Vietnam Pro",sans-serif;font-size:14px;font-weight:600}
+#clock{cursor:pointer;padding:0 6px;border-radius:6px}
+#clock.run{color:#047857}
+#jump{position:fixed;inset:0;background:rgba(30,27,58,.45);backdrop-filter:blur(4px);display:none;z-index:30;align-items:center;justify-content:center;font-family:"Be Vietnam Pro",sans-serif}
+#jump.open{display:flex}
+.jbox{width:min(1180px,95vw);max-height:90vh;background:#fff;border-radius:18px;box-shadow:0 30px 80px -20px rgba(30,27,58,.5);display:flex;flex-direction:column;overflow:hidden}
+.jhead{display:flex;gap:10px;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,#f3eeff,#e8f8ff)}
+.jhead b{font-size:18px;margin-right:auto}
+.jhead input{font:15px "Be Vietnam Pro",sans-serif;padding:8px 12px;border:1.5px solid #c4b5fd;border-radius:10px;outline:none;background:#fff}
+.jhead input:focus{border-color:#7c3aed;box-shadow:0 0 0 3px rgba(124,58,237,.18)}
+#jnum{width:110px}#jq{width:240px}
+#jclose{border:none;background:#fff;border-radius:8px;width:34px;height:34px;font-size:18px;cursor:pointer;border:1px solid var(--line)}
+#jlist{overflow:auto;padding:10px 18px 18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:7px}
+.jpart{grid-column:1/-1;font-weight:800;color:#db2777;margin-top:10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;display:flex;justify-content:space-between}
+.jpart span{color:var(--muted);font-family:var(--mono);text-transform:none;letter-spacing:0}
+.jit{display:flex;gap:8px;align-items:baseline;padding:8px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:14px;line-height:1.3;background:#fff;text-align:left;font-family:inherit;color:var(--text)}
+.jit:hover{border-color:#ec4899;background:#fff7fb}
+.jit.cur{background:#f3edff;border-color:#7c3aed}
+.jit b{font-family:var(--mono);color:#7c3aed;min-width:24px}
+.jit small{margin-left:auto;color:var(--muted);font-family:var(--mono);white-space:nowrap}
+.jit.hidden{display:none}
+.code .tg{color:#d6336c;font-weight:600}.code .at{color:#7c3aed}.code .pr{color:#0284c7;font-weight:600}.code .vr{color:#db2777;font-weight:600}
+
+/* readability bumps */
+.small,.small p,.small li{font-size:20px}
+.xs,.xs p,.xs li{font-size:17.5px}
+.card p{font-size:19.5px}
+.card li{font-size:19px}
+.ex{font-size:17.5px}
+.box{font-size:19px}.box small{font-size:15.5px}
+.memflow .box{font-size:22px;padding:16px 18px}.memflow .box small{font-size:17px;line-height:1.4}
+.lab{font-size:16px}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="deck">
+
+<!-- ===================== TITLE ===================== -->
+<section class="slide" id="title" data-title="Trang bìa" data-min="1">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// UI Design · Nguyên tắc nền tảng</div>
+    <h1 class="in">Một số nguyên tắc<br><span class="grad">thiết kế giao diện</span></h1>
+    <p class="in muted" style="font-size:25px;margin-top:20px;max-width:980px">Bài giảng 180 phút cho người mới: tâm lý người dùng, nguyên tắc dễ học, nguyên tắc hiệu quả, bố cục, chữ, màu, icon, design system và cách giao diện được viết thành code.</p>
+    <p class="in" style="margin-top:34px;font-size:18px;color:#8a91b4">← → / Space: từng bước · Shift+→: qua slide · <b>☰ hoặc phím G: nhảy đến slide bất kỳ</b> · A: hiện hết · F: toàn màn hình · bấm ⏱ để bấm giờ</p>
+  </div>
+</section>
+
+<!-- ===================== ROADMAP ===================== -->
+<section class="slide" id="roadmap" data-title="Lộ trình 180 phút" data-min="2">
+  <div class="hdr in"><span class="qn">MỞ ĐẦU</span><h2>Lộ trình 180 phút &amp; bạn sẽ làm được gì</h2></div>
+  <div class="in" style="display:flex;height:64px;border-radius:14px;overflow:hidden;font-size:14px;font-weight:700;color:#fff;box-shadow:0 8px 20px -12px rgba(124,58,237,.5)">
+    <div style="flex:5;background:#94a3b8;display:flex;align-items:center;justify-content:center">5′</div>
+    <div style="flex:25;background:#7c3aed;display:flex;align-items:center;justify-content:center">1 · Nền tảng 25′</div>
+    <div style="flex:35;background:#0891b2;display:flex;align-items:center;justify-content:center">2 · Dễ học 35′</div>
+    <div style="flex:15;background:#db2777;display:flex;align-items:center;justify-content:center">3 · Hiệu quả</div>
+    <div style="flex:10;background:#fbbf24;color:#78350f;display:flex;align-items:center;justify-content:center">☕ 10′</div>
+    <div style="flex:28;background:#059669;display:flex;align-items:center;justify-content:center">4 · Bố cục 28′</div>
+    <div style="flex:27;background:#f97316;display:flex;align-items:center;justify-content:center">5 · Chữ·Màu·Icon</div>
+    <div style="flex:15;background:#6366f1;display:flex;align-items:center;justify-content:center">6 · DS</div>
+    <div style="flex:15;background:#0ea5e9;display:flex;align-items:center;justify-content:center">7 · Code</div>
+    <div style="flex:5;background:#64748b;display:flex;align-items:center;justify-content:center">✓</div>
+  </div>
+  <div class="cols mt2" style="grid-template-columns:1.1fr 1fr">
+    <div>
+      <h3>Sau buổi học, bạn có thể:</h3>
+      <ul>
+        <li class="f">Giải thích vì sao một giao diện <b>dễ dùng</b> hay <b>khó dùng</b> bằng từ ngữ chuyên môn</li>
+        <li class="f">Áp dụng ~20 nguyên tắc để <b>soi lỗi</b> và <b>sửa</b> một màn hình</li>
+        <li class="f">Chọn chữ, màu, icon, khoảng trắng có <b>lý do</b>, không theo cảm tính</li>
+        <li class="f">Hiểu <b>design system</b> là gì và đọc được một đoạn <b>HTML/CSS</b> đơn giản</li>
+      </ul>
+    </div>
+    <div class="card f">
+      <span class="lbl info">CÁCH HỌC HIỆU QUẢ</span>
+      <p>Mỗi nguyên tắc đi theo 3 bước: <b>Định nghĩa → Ví dụ đời thường → Ví dụ trên màn hình</b>.</p>
+      <p class="mt">Khi gặp ô <span class="lbl good" style="margin:0">THỬ NGAY</span>, hãy bấm/gõ trực tiếp trên slide.</p>
+      <p class="mt muted" style="font-size:16px">Không cần biết vẽ, không cần biết code. Chỉ cần quan sát kỹ và đặt câu hỏi “tại sao?”.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== AGENDA ===================== -->
+<section class="slide" id="agenda" data-title="Nội dung (mục lục)" data-min="2">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:18px">· bấm để đi tới · nút ⌂ ở góc dưới luôn quay về đây</span></div>
+  <div class="agenda in" style="gap:9px;grid-template-columns:repeat(4,1fr)">
+    <div class="ag" data-goto="p1"><b>1</b>Nền tảng: giao diện tốt là gì?</div>
+    <div class="ag" data-goto="usability"><b>1.2</b>5 chiều của Usability</div>
+    <div class="ag" data-goto="memory"><b>1.5</b>Trí nhớ &amp; chunking</div>
+    <div class="ag" data-goto="models"><b>1.8</b>3 mô hình tư duy</div>
+    <div class="ag" data-goto="p2"><b>2</b>Nguyên tắc giúp dễ học</div>
+    <div class="ag" data-goto="affordance"><b>2.1</b>Affordance &amp; Signifier</div>
+    <div class="ag" data-goto="feedback"><b>2.5</b>Feedback · Mapping</div>
+    <div class="ag" data-goto="consistency"><b>2.9</b>Nhất quán · Ngôn ngữ · Ẩn dụ</div>
+    <div class="ag" data-goto="p3"><b>3</b>Nguyên tắc hiệu quả</div>
+    <div class="ag" data-goto="fitts"><b>3.2</b>Định luật Fitts</div>
+    <div class="ag" data-goto="p4"><b>4</b>Bố cục &amp; đồ họa</div>
+    <div class="ag" data-goto="gestalt1"><b>4.4</b>Nguyên lý Gestalt</div>
+    <div class="ag" data-goto="grid"><b>4.7</b>Lưới · Phân cấp thị giác</div>
+    <div class="ag" data-goto="p5"><b>5</b>Chữ (Typography)</div>
+    <div class="ag" data-goto="color-mean"><b>5.5</b>Màu sắc &amp; tương phản</div>
+    <div class="ag" data-goto="icons"><b>5.10</b>Icon</div>
+    <div class="ag" data-goto="p6"><b>6</b>Design system</div>
+    <div class="ag" data-goto="tokens"><b>6.2</b>Design tokens</div>
+    <div class="ag" data-goto="p7"><b>7</b>Từ thiết kế đến code</div>
+    <div class="ag" data-goto="redesign"><b>✓</b>Tổng kết: sửa 1 màn hình</div>
+  </div>
+</section>
+
+<!-- ===================== PART 1 ===================== -->
+<section class="slide" id="p1" data-title="Phần 1 · Nền tảng" data-part="Phần 1 · Nền tảng" data-min="1">
+  <div class="orb" style="width:340px;height:340px;background:#c4b5fd;right:-40px;top:-60px"></div>
+  <div class="part-wrap">
+    <div class="pnum in">01</div>
+    <h1 class="in" style="font-size:60px">Nền tảng: <span class="grad">giao diện tốt là gì?</span></h1>
+    <div class="chips in"><span class="chip">UI vs UX</span><span class="chip">Usability</span><span class="chip">Đường cong học tập</span><span class="chip">Trí nhớ ngắn hạn</span><span class="chip">Chunking</span><span class="chip">Nhận ra vs Nhớ lại</span><span class="chip">Mô hình tư duy</span></div>
+    <p class="in muted mt2">Trước khi học “vẽ cho đẹp”, ta cần hiểu <b>người dùng nghĩ và nhớ như thế nào</b>.</p>
+  </div>
+</section>
+
+<section class="slide" id="ui-what" data-part="Phần 1 · Nền tảng" data-min="3">
+  <div class="hdr in"><span class="qn">1.1</span><h2>UI là gì? UX là gì? Thiết kế đồ họa nằm ở đâu?</h2></div>
+  <div class="cols c64">
+    <div>
+      <div class="card f"><h3>UI – User Interface (giao diện)</h3><p>Mọi thứ người dùng <b>nhìn thấy và chạm vào</b>: nút, ô nhập, chữ, màu, icon, bố cục, hiệu ứng.</p></div>
+      <div class="card f mt"><h3 style="color:#0891b2">UX – User Experience (trải nghiệm)</h3><p><b>Cảm nhận tổng thể</b> khi dùng sản phẩm: có đạt mục đích không, có nhanh, có bực mình, có muốn quay lại?</p></div>
+      <div class="note f"><b>Ví dụ đời thường:</b> chiếc ly. UI = hình dáng, màu, tay cầm. UX = cầm có chắc tay không, nước nóng có bỏng tay không, rửa có dễ không.</div>
+    </div>
+    <div>
+      <div class="card f" style="border-top:5px solid #ec4899">
+        <h3 style="color:#db2777">Graphic design trong UI = phần “look &amp; feel”</h3>
+        <ul class="small">
+          <li>Là thứ người dùng <b>gặp đầu tiên</b>, gây chú ý</li>
+          <li>Truyền tải <b>ấn tượng, cảm xúc</b>, vẻ đẹp</li>
+          <li>Giúp người dùng <b>hoàn thành công việc</b></li>
+          <li>Tạo ra <b>niềm tin</b> (app ngân hàng xấu → ngại nhập mật khẩu)</li>
+        </ul>
+      </div>
+      <div class="note blue f">Bài này tập trung vào <b>UI</b>, nhưng mọi nguyên tắc đều phục vụ <b>UX</b>: giao diện đẹp mà khó dùng vẫn là giao diện tồi.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="usability" data-part="Phần 1 · Nền tảng" data-min="3">
+  <div class="hdr in"><span class="qn">1.2</span><h2>Usability: “dễ dùng” gồm 5 chiều (Nielsen, 1994)</h2></div>
+  <p class="in muted small">Usability = mức độ người dùng <b>sử dụng được</b> các chức năng của hệ thống tốt đến đâu.</p>
+  <div class="cols5 mt">
+    <div class="card f"><div class="icon">🎓</div><h3>Dễ học</h3><p class="small"><i>Learnability</i></p><p class="q">Lần đầu dùng có tự làm được không?</p></div>
+    <div class="card f"><div class="icon">⚡</div><h3>Hiệu quả</h3><p class="small"><i>Efficiency</i></p><p class="q">Khi đã quen, làm nhanh tới mức nào?</p></div>
+    <div class="card f"><div class="icon">🧠</div><h3>Dễ nhớ</h3><p class="small"><i>Memorability</i></p><p class="q">Lâu không dùng, quay lại có nhớ cách dùng?</p></div>
+    <div class="card f"><div class="icon">🛟</div><h3>Ít lỗi</h3><p class="small"><i>Errors</i></p><p class="q">Có hay thao tác sai? Sai thì sửa được không?</p></div>
+    <div class="card f"><div class="icon">😊</div><h3>Hài lòng</h3><p class="small"><i>Satisfaction</i></p><p class="q">Dùng có thích không, có muốn dùng lại?</p></div>
+  </div>
+  <div class="note f"><b>Áp dụng thử:</b> app ngân hàng của bạn. Chuyển tiền lần đầu có cần hỏi ai không (dễ học)? Chuyển lần thứ 10 mất bao nhiêu giây (hiệu quả)? Nhập nhầm số tài khoản thì sao (ít lỗi)?</div>
+  <div class="note blue f">Usability chỉ là <b>một</b> thuộc tính để sản phẩm được chấp nhận, bên cạnh tính hữu ích, chi phí, độ tin cậy, khả năng tương thích…</div>
+</section>
+
+<section class="slide" id="learncurve" data-part="Phần 1 · Nền tảng" data-min="2">
+  <div class="hdr in"><span class="qn">1.3</span><h2>Đường cong học tập (learning curve)</h2></div>
+  <div class="cols c46">
+    <div class="in">
+      <svg id="lc" viewBox="0 0 520 360" width="520" height="360">
+        <line x1="50" y1="320" x2="500" y2="320" stroke="#64607d" stroke-width="2"/><line x1="50" y1="320" x2="50" y2="20" stroke="#64607d" stroke-width="2"/>
+        <text x="270" y="350" font-size="15" fill="#64607d" text-anchor="middle">Thời gian sử dụng →</text>
+        <text x="20" y="170" font-size="15" fill="#64607d" transform="rotate(-90 20 170)" text-anchor="middle">Mức thành thạo →</text>
+        <path class="draw dr1" d="M50 320 C 90 180, 140 170, 500 160" fill="none" stroke="#0891b2" stroke-width="5" style="stroke-dasharray:600;stroke-dashoffset:600"/>
+        <path class="draw dr2" d="M50 320 C 250 310, 300 120, 500 40" fill="none" stroke="#db2777" stroke-width="5" style="stroke-dasharray:600;stroke-dashoffset:600"/>
+        <text class="fadein fd1" x="330" y="195" font-size="16" fill="#0891b2">Thiết kế cho người mới</text>
+        <text class="fadein fd2" x="300" y="70" font-size="16" fill="#db2777">Thiết kế cho chuyên gia</text>
+      </svg>
+      <span class="f ghost" data-act="#lc|d1"></span><span class="f ghost" data-act="#lc|d2"></span>
+    </div>
+    <div>
+      <div class="card f" data-o="0" style="border-top:5px solid #0891b2"><h3 style="color:#0891b2">Dễ học nhưng “trần” thấp</h3><p>Học nhanh, nhưng sau đó khó nhanh hơn nữa. VD: Paint, Notepad.</p></div>
+      <div class="card f mt" style="border-top:5px solid #db2777"><h3 style="color:#db2777">Khó học nhưng mạnh</h3><p>Ban đầu rất chậm, thành thạo thì cực nhanh. VD: Photoshop, Excel, phím tắt.</p></div>
+      <div class="note f"><b>Mục tiêu tốt nhất:</b> có cả hai. Menu &amp; nút cho người mới, <b>phím tắt</b> cho người thạo. VD: Word có nút <b>B</b> và có <code class="i">Ctrl+B</code>.</div>
+    </div>
+  </div>
+  <style>svg.d1 .dr1,svg.d2 .dr2{stroke-dashoffset:0!important}</style>
+</section>
+
+<section class="slide" id="memexp" data-part="Phần 1 · Nền tảng" data-min="3">
+  <div class="hdr in"><span class="qn">1.4</span><h2>Thí nghiệm nhỏ: bạn nhớ được bao nhiêu từ?</h2></div>
+  <div class="words in" id="words">
+    <span>TKGD</span><span>Xe đạp</span><span>Nóng</span><span>Con người</span><span>Trịnh Công Sơn</span>
+    <span>CSC13112</span><span>Phần mềm</span><span>ebook</span><span>Google</span><span>Kỹ sư mù sử</span>
+    <span>Valentine</span><span>Báo chí</span><span>Nhà đất</span><span>Nhân văn</span><span>U23</span>
+  </div>
+  <div class="timerbar" id="tb"><div></div></div>
+  <span class="f ghost" data-act="#tb|go" data-say="<b>Bắt đầu!</b> Bạn có 15 giây để nhớ càng nhiều từ càng tốt. Không ghi chép."></span>
+  <span class="f ghost" data-act="#words|hide" data-say="<b>Hết giờ.</b> Hãy viết ra giấy tất cả những từ bạn còn nhớ (30 giây)."></span>
+  <div class="cols mt">
+    <div class="card f"><h3>Bạn nhớ được mấy từ?</h3><p>Đa số chỉ nhớ <b>5–9 từ</b>. Đó là giới hạn của <b>trí nhớ ngắn hạn</b>.</p></div>
+    <div class="card f"><h3>Vì sao nhớ được những từ đó?</h3><p class="small">Vì chúng <b>quen thuộc</b> (Google), <b>buồn cười/lạ</b> (Kỹ sư mù sử), <b>gây chú ý</b> (Trịnh Công Sơn), <b>liên quan nhau</b> (Báo chí – Nhà đất), hoặc bạn đã <b>lặp lại</b> trong đầu.</p></div>
+  </div>
+  <div class="say" data-def="Nhấn → để bắt đầu đếm ngược 15 giây."></div>
+</section>
+
+<section class="slide" id="memory" data-part="Phần 1 · Nền tảng" data-min="3">
+  <div class="hdr in"><span class="qn">1.5</span><h2>Trí nhớ ngắn hạn &amp; dài hạn</h2></div>
+  <div class="flow in memflow" style="gap:14px">
+    <div class="box" style="min-width:170px">👁 Giác quan<small>nhìn, nghe</small></div><div class="ar">→<br><small style="font-size:13px">chú ý</small></div>
+    <div class="box cpp f" style="min-width:300px;border-width:3px">Trí nhớ NGẮN hạn<small>~7 ± 2 “mẩu” (chunk) · mất sau ~10 giây<br>lặp lại thì giữ được, bị phân tâm thì mất</small></div>
+    <div class="ar f">⇄<br><small style="font-size:13px">ôn luyện có ý nghĩa</small></div>
+    <div class="box m f" style="min-width:270px;border-width:3px">Trí nhớ DÀI hạn<small>gần như vô hạn về dung lượng &amp; thời gian</small></div>
+  </div>
+  <div class="note blue f mt2"><b>Học</b> = quá trình chuyển thông tin từ trí nhớ ngắn hạn sang dài hạn.</div>
+  <h3 class="f mt">👉 Hệ quả cho thiết kế giao diện</h3>
+  <div class="cols">
+    <ul class="small f">
+      <li>Không bắt người dùng <b>nhớ thông tin từ màn hình này sang màn hình khác</b> (VD: mã đơn hàng ở bước 1 phải gõ lại ở bước 3)</li>
+      <li>Mỗi bước chỉ hỏi <b>ít thông tin</b>; chia form dài thành nhiều bước</li>
+    </ul>
+    <ul class="small f">
+      <li>Hạn chế yếu tố <b>gây phân tâm</b> (pop-up, quảng cáo nhấp nháy) khi người dùng đang làm việc</li>
+      <li>Tận dụng thứ người dùng <b>đã biết</b> (trí nhớ dài hạn): icon quen, vị trí quen</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide" id="chunking" data-part="Phần 1 · Nền tảng" data-min="2">
+  <div class="hdr in"><span class="qn">1.6</span><h2>Chunking: gom thành “mẩu” để dễ nhớ</h2></div>
+  <p class="in">Chunk = một đơn vị trí nhớ. Cùng một thông tin, cách <b>trình bày</b> và <b>kiến thức sẵn có</b> quyết định nó chiếm bao nhiêu chunk.</p>
+  <div class="digits mt2 in" id="dg"><span class="c1">0</span><span class="c1">8</span><span class="c1">8</span><span class="c1 g">8</span><span class="c2">2</span><span class="c2">4</span><span class="c2 g">7</span><span class="c3">2</span><span class="c3">4</span><span class="c3">7</span></div>
+  <p class="ctr muted mt" id="dgt">10 chữ số rời rạc = 10 chunk → vượt giới hạn 7 ± 2</p>
+  <span class="f ghost" data-act="#dg|chunk" data-set="#dgt::Gom thành <b>0888 · 247 · 247</b> = 3 chunk → nhớ dễ dàng"></span>
+  <div class="cols3 mt2">
+    <div class="card f"><h3>Số thẻ / tài khoản</h3><p class="ex" style="font-family:var(--mono);font-size:18px">9704 1234 5678 9012</p><p class="small">Ô nhập tự chèn khoảng trắng mỗi 4 số.</p></div>
+    <div class="card f"><h3>Menu &amp; danh sách</h3><p class="small">Gom các lệnh liên quan thành nhóm, có đường phân cách: <b>Mở · Lưu · Lưu thành</b> | <b>In · Xuất PDF</b>.</p></div>
+    <div class="card f"><h3>Trẻ em vs người lớn</h3><p class="small">Từ “GOOGLE” với người lớn là 1 chunk, với trẻ đang học chữ là 6 chunk. Chunk <b>phụ thuộc người dùng</b>!</p></div>
+  </div>
+</section>
+
+<section class="slide" id="recog" data-part="Phần 1 · Nền tảng" data-min="3">
+  <div class="hdr in"><span class="qn">1.7</span><h2>Nhận ra (Recognition) dễ hơn Nhớ lại (Recall)</h2></div>
+  <div class="cols">
+    <div class="card bad f">
+      <span class="lbl bad">NHỚ LẠI – không có gợi ý</span>
+      <p class="small">Yêu cầu: “Sao chép thư mục <b>src</b> sang <b>backup</b>”.</p>
+      <div class="console mt">$ <span class="in">_</span>
+<span style="color:#94a3b8">// phải tự nhớ: cp -r src/ backup/</span></div>
+      <p class="small mt">Giống phiếu bầu: “<i>Hãy viết tên ứng viên bạn chọn</i>”.</p>
+    </div>
+    <div class="card good f">
+      <span class="lbl good">NHẬN RA – có dấu hiệu nhìn thấy</span>
+      <div class="mock mt"><div class="wb"><i></i><i></i><i></i>Chuột phải vào “src”</div>
+        <div class="bd" style="padding:6px 0;font-size:16px">
+          <div style="padding:6px 16px">📂 Mở</div><div style="padding:6px 16px;background:#f3edff;color:#6d28d9;font-weight:700">📋 Sao chép</div><div style="padding:6px 16px">✏️ Đổi tên</div><div style="padding:6px 16px;border-top:1px solid #eee">🗑 Xóa</div></div></div>
+      <p class="small mt">Giống phiếu bầu có sẵn danh sách tên để <b>đánh dấu ✓</b>.</p>
+    </div>
+  </div>
+  <div class="note f"><b>Ví dụ:</b> bạn nhận ra mặt người bạn ngay, nhưng có thể không nhớ ra tên. Bạn không thuộc lòng menu File của Word, nhưng nhìn vào thì biết ngay mục nào làm gì.</div>
+  <div class="note blue f"><b>Hệ quả:</b> giao diện đồ họa (menu, nút) dễ học hơn dòng lệnh; <b>thao tác trực tiếp</b> (kéo–thả) dễ học hơn; dùng danh sách chọn, gợi ý, lịch sử thay vì bắt gõ.</div>
+</section>
+
+<section class="slide" id="models" data-part="Phần 1 · Nền tảng" data-min="3">
+  <div class="hdr in"><span class="qn">1.8</span><h2>Ba mô hình: hệ thống – giao diện – người dùng</h2></div>
+  <div class="cols3">
+    <div class="card f"><div class="icon">⚙️</div><h3>Mô hình hệ thống</h3><p class="small">Bên trong hệ thống <b>thực sự chạy thế nào</b>. Lập trình viên nắm rõ.</p><p class="ex"><b>Xóa file:</b> hệ điều hành chuyển file sang thư mục ẩn, đánh dấu “đã xóa”.</p></div>
+    <div class="card f"><div class="icon">🖥</div><h3>Mô hình giao diện</h3><p class="small">Hệ thống <b>trình bày</b> cách hoạt động qua giao diện. Designer quyết định.</p><p class="ex"><b>Xóa file:</b> kéo file vào biểu tượng <b>Thùng rác</b>.</p></div>
+    <div class="card f"><div class="icon">🧑</div><h3>Mô hình người dùng</h3><p class="small">Người dùng <b>tưởng</b> hệ thống chạy thế nào (mental model).</p><p class="ex"><b>Xóa file:</b> “vứt giấy vào thùng, lỡ tay thì lục lại được”.</p></div>
+  </div>
+  <div class="note blue f"><b>Nguyên tắc:</b> mô hình giao diện nên <b>che giấu</b> mô hình hệ thống, đơn giản, và <b>khớp với mô hình người dùng</b>.</div>
+  <div class="note f"><b>Khi mô hình người dùng sai → lỗi xảy ra.</b> VD: nhiều người chỉnh máy lạnh xuống 16°C vì nghĩ “sẽ lạnh nhanh hơn”, nhưng máy chạy cùng tốc độ, chỉ là dừng ở nhiệt độ thấp hơn. Giao diện tốt có thể sửa hiểu lầm đó (hiện “đang làm lạnh tối đa”).</div>
+</section>
+
+<section class="slide" id="ex1" data-part="Phần 1 · Nền tảng" data-min="2">
+  <div class="hdr in"><span class="qn">THỰC HÀNH</span><h2>2 phút: soi app bạn dùng hằng ngày</h2></div>
+  <div class="cols">
+    <div class="card in"><span class="lbl good">THỬ NGAY</span>
+      <p>Mở một app trên điện thoại (Zalo, app ngân hàng, Shopee, Grab…) và tìm:</p>
+      <ol style="margin:10px 0 0 26px;font-size:20px;line-height:1.6">
+        <li>1 chỗ bắt bạn phải <b>nhớ lại</b> (recall) → đề xuất đổi sang <b>nhận ra</b></li>
+        <li>1 chỗ hiển thị thông tin <b>quá dài</b> → có thể <b>chunk</b> được không?</li>
+        <li>1 chỗ mà bạn từng <b>hiểu sai</b> cách nó hoạt động (mô hình người dùng ≠ giao diện)</li>
+      </ol>
+    </div>
+    <div>
+      <div class="card f"><h3>Gợi ý câu trả lời</h3><ul class="small"><li>Nhập mã OTP: app tự đọc SMS và điền sẵn → không cần nhớ</li><li>Số tài khoản: hiện thành nhóm 4 số</li><li>Lịch sử chuyển tiền: chọn lại người nhận cũ thay vì gõ lại</li></ul></div>
+      <div class="note f">Ghi lại câu trả lời, cuối buổi ta sẽ dùng nó để “thiết kế lại”.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PART 2 ===================== -->
+<section class="slide" id="p2" data-title="Phần 2 · Nguyên tắc dễ học" data-part="Phần 2 · Dễ học" data-min="1">
+  <div class="orb" style="width:340px;height:340px;background:#7dd3fc;right:-40px;top:-60px"></div>
+  <div class="part-wrap">
+    <div class="pnum in">02</div>
+    <h1 class="in" style="font-size:60px">Nguyên tắc giúp giao diện <span class="grad">dễ học</span></h1>
+    <p class="in muted mt">Cách “truyền đạt” mô hình hệ thống tới người dùng mà không cần sách hướng dẫn.</p>
+    <div class="chips in"><span class="chip">Affordance</span><span class="chip">Signifier</span><span class="chip">Visibility</span><span class="chip">Feedback</span><span class="chip">Natural mapping</span><span class="chip">Constraints</span><span class="chip">Consistency</span><span class="chip">Ngôn ngữ người dùng</span><span class="chip">Metaphor</span><span class="chip">Platform standards</span></div>
+  </div>
+</section>
+
+<section class="slide" id="affordance" data-part="Phần 2 · Dễ học" data-min="3">
+  <div class="hdr in"><span class="qn">2.1</span><h2>Affordance: đồ vật “mời gọi” cách dùng</h2></div>
+  <div class="note blue in" style="font-size:22px">“Affordance là những thuộc tính <b>được cảm nhận</b> và <b>thực tế</b> của một vật, quyết định vật đó có thể được dùng như thế nào.” — <b>Don Norman</b></div>
+  <div class="cols mt">
+    <div>
+      <h3 class="f">Ngoài đời</h3>
+      <div class="cols3 f" style="gap:10px">
+        <div class="card ctr"><div class="icon">🪑</div><p class="small">Ghế → <b>ngồi</b></p></div>
+        <div class="card ctr"><div class="icon">🔘</div><p class="small">Nút lồi → <b>nhấn</b></p></div>
+        <div class="card ctr"><div class="icon">🎚</div><p class="small">Cần gạt → <b>gạt</b></p></div>
+      </div>
+      <div class="note f" style="font-size:18px">Trên màn hình, mọi thứ chỉ là <b>điểm ảnh</b>. Bạn không “cầm” được nút. Vì vậy với giao diện, ta chỉ thiết kế được <b>affordance cảm nhận</b> (perceived): <b>trông như</b> bấm được.</div>
+    </div>
+    <div>
+      <h3 class="f">Trên màn hình: cái nào trông bấm được?</h3>
+      <div class="card f" style="display:flex;flex-direction:column;gap:16px;align-items:flex-start">
+        <div class="row"><span style="font-size:17px">Gửi đơn</span><span class="lbl bad" style="margin:0">A · chữ trơn: không rõ</span></div>
+        <div class="row"><span style="font-size:17px;color:#2563eb;text-decoration:underline;cursor:pointer">Gửi đơn</span><span class="lbl info" style="margin:0">B · link: bấm để đi đâu đó</span></div>
+        <div class="row"><button class="btn pri">Gửi đơn</button><span class="lbl good" style="margin:0">C · nút: rõ ràng là bấm</span></div>
+      </div>
+      <p class="small muted f mt">Nền màu, bo góc, bóng đổ, đổi con trỏ thành bàn tay 👆 là các tín hiệu tạo affordance.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="aff-matrix" data-part="Phần 2 · Dễ học" data-min="3">
+  <div class="hdr in"><span class="qn">2.2</span><h2>Cảm nhận vs thực tế: 4 trường hợp</h2></div>
+  <div class="mtx in">
+    <div></div><div class="ax">TRÔNG NHƯ làm được</div><div class="ax">TRÔNG NHƯ KHÔNG làm được</div>
+    <div class="ax">THỰC SỰ<br>làm được</div>
+    <div class="card good f"><span class="lbl good">PERCEPTIBLE ✓</span><h3>Rõ ràng</h3><p>Nút trông như nút và bấm được thật. <b>Mục tiêu của ta.</b></p><button class="btn pri sm mt">Mua ngay</button></div>
+    <div class="card f" style="border-color:#fde68a;background:linear-gradient(180deg,#fffbeb,#fff)"><span class="lbl" style="background:#fef3c7;color:#b45309">HIDDEN – ẩn</span><h3>Có nhưng không thấy</h3><p>Vuốt sang trái để xóa tin nhắn, nhấn giữ, chuột phải, nhấp đúp tiêu đề cửa sổ.</p></div>
+    <div class="ax">THỰC SỰ<br>KHÔNG làm được</div>
+    <div class="card bad f"><span class="lbl bad">FALSE – đánh lừa</span><h3>Trông được mà không được</h3><p>Chữ xanh gạch chân nhưng không phải link; ảnh trông như nút. Ngoài đời: <b>ghế bằng giấy</b> → ngồi là sập!</p></div>
+    <div class="card f" style="background:#f8fafc"><span class="lbl info">CORRECT REJECTION</span><h3>Đúng là không</h3><p>Đoạn văn bản thường: không bấm được và cũng không trông như bấm được. Tốt.</p></div>
+  </div>
+  <div class="note f" style="font-size:18px">Vấn đề xảy ra khi <b>cảm nhận ≠ thực tế</b>, tức là người dùng không nghĩ giống nhà thiết kế mong đợi. Affordance còn phụ thuộc <b>kinh nghiệm, kiến thức, văn hóa</b> và <b>ngữ cảnh/vị trí</b>.</div>
+</section>
+
+<section class="slide" id="door" data-part="Phần 2 · Dễ học" data-min="2">
+  <div class="hdr in"><span class="qn">2.3</span><h2>Bài học kinh điển: tay nắm cửa</h2></div>
+  <div class="cols4 in" style="gap:18px">
+    <div class="card ctr f"><svg width="150" height="190" viewBox="0 0 150 190"><rect x="15" y="5" width="120" height="180" rx="6" fill="#f3edff" stroke="#7c3aed" stroke-width="3"/><rect x="100" y="55" width="12" height="80" rx="6" fill="#7c3aed"/></svg><h3>Thanh đứng</h3><p class="small">→ <b>KÉO</b></p></div>
+    <div class="card ctr f"><svg width="150" height="190" viewBox="0 0 150 190"><rect x="15" y="5" width="120" height="180" rx="6" fill="#ecfeff" stroke="#0891b2" stroke-width="3"/><rect x="90" y="80" width="34" height="44" rx="4" fill="#0891b2"/></svg><h3>Tấm phẳng</h3><p class="small">→ <b>ĐẨY</b></p></div>
+    <div class="card ctr f"><svg width="150" height="190" viewBox="0 0 150 190"><rect x="15" y="5" width="120" height="180" rx="6" fill="#fdf2f8" stroke="#db2777" stroke-width="3"/><circle cx="108" cy="100" r="12" fill="#db2777"/></svg><h3>Núm tròn</h3><p class="small">→ <b>NẮM &amp; XOAY</b></p></div>
+    <div class="card ctr bad f"><svg width="150" height="190" viewBox="0 0 150 190"><rect x="15" y="5" width="120" height="180" rx="6" fill="#fff1f3" stroke="#e11d48" stroke-width="3"/><rect x="100" y="55" width="12" height="80" rx="6" fill="#e11d48"/><rect x="40" y="18" width="70" height="26" rx="4" fill="#fff" stroke="#e11d48"/><text x="75" y="36" font-size="14" text-anchor="middle" fill="#e11d48">ĐẨY</text></svg><h3>“Norman door”</h3><p class="small">Tay kéo nhưng phải đẩy → phải dán chữ</p></div>
+  </div>
+  <div class="note f">Khi một thiết kế <b>phải dán hướng dẫn</b> mới dùng được, thường là thiết kế đã thất bại. Trên màn hình cũng vậy: “<i>Bấm vào hình để xem chi tiết</i>” là dấu hiệu affordance yếu. Vị trí tay nắm (trái/phải) còn cho biết cửa mở về phía nào.</div>
+</section>
+
+<section class="slide" id="signifier" data-part="Phần 2 · Dễ học" data-min="3">
+  <div class="hdr in"><span class="qn">2.4</span><h2>Signifier: dấu hiệu báo cho người dùng biết</h2></div>
+  <div class="cols">
+    <div class="card f"><h3>Affordance</h3><p>Là <b>khả năng hành động</b> mà một vật cho phép. (Cửa <i>có thể</i> đẩy.)</p></div>
+    <div class="card f"><h3>Signifier</h3><p>Là <b>dấu hiệu truyền đạt</b> khả năng đó: nhãn, hướng dẫn, hình dạng, màu, bố cục, âm thanh, hoạt ảnh, hình con trỏ… (Tấm “ĐẨY”.)</p></div>
+  </div>
+  <h3 class="f mt">Signifier trên giao diện <span class="lbl good">THỬ NGAY: rê chuột vào từng cái</span></h3>
+  <div class="cols4 f" style="gap:12px">
+    <div class="card"><p class="small"><a href="#" onclick="return false" style="color:#2563eb">Quên mật khẩu?</a></p><p class="ex">Chữ xanh + gạch chân = link</p></div>
+    <div class="card"><div class="inp" style="color:#94a3b8;cursor:text">ten@gmail.com</div><p class="ex">Viền ô + chữ mờ (placeholder) = chỗ để gõ</p></div>
+    <div class="card"><div class="inp" style="cursor:pointer;display:flex;justify-content:space-between">TP. Hồ Chí Minh <span>▾</span></div><p class="ex">Mũi tên ▾ = danh sách thả xuống</p></div>
+    <div class="card"><div style="display:flex;gap:8px;align-items:center;cursor:grab;font-size:17px"><span style="color:#94a3b8;letter-spacing:-3px">⋮⋮</span> Việc cần làm 1</div><p class="ex">Tay nắm ⋮⋮ = kéo được</p></div>
+    <div class="card"><div style="display:flex;gap:8px;overflow:hidden;width:100%"><div style="min-width:90px;height:50px;border-radius:8px;background:#ddd6fe"></div><div style="min-width:90px;height:50px;border-radius:8px;background:#fbcfe8"></div><div style="min-width:90px;height:50px;border-radius:8px;background:#a5f3fc"></div></div><p class="ex">Thẻ bị cắt ở mép = còn nữa, vuốt ngang</p></div>
+    <div class="card"><p class="small">Mật khẩu <span style="color:#e11d48">*</span></p><p class="ex">Dấu * đỏ = bắt buộc</p></div>
+    <div class="card"><p class="small" style="cursor:pointer">🔔<sup style="background:#e11d48;color:#fff;border-radius:99px;padding:0 6px;font-size:11px">3</sup></p><p class="ex">Chấm đỏ có số = có việc mới cần xem</p></div>
+    <div class="card"><button class="btn sec sm" style="cursor:pointer">Con trỏ 👆</button><p class="ex">Con trỏ đổi thành bàn tay khi rê vào</p></div>
+  </div>
+</section>
+
+<section class="slide" id="visibility" data-part="Phần 2 · Dễ học" data-min="3">
+  <div class="hdr in"><span class="qn">2.5</span><h2>Visibility: chức năng phải nhìn thấy được</h2></div>
+  <div class="cols c64">
+    <div>
+      <ul>
+        <li class="f">Lệnh Unix gần như <b>vô hình</b>; menu của Windows thì <b>nhìn thấy</b></li>
+        <li class="f">Menu chuột phải, kéo–thả, cử chỉ vuốt: <b>không dễ thấy</b> (lý do iOS ít dùng chuột phải)</li>
+        <li class="f">Kéo–thả dù khó thấy nhưng là thao tác <b>trực tiếp, giống đời thực</b> → vẫn đáng dùng, kèm gợi ý</li>
+      </ul>
+      <div class="note f"><b>Mâu thuẫn:</b> Visibility ↔ Simplicity. Hiện <b>mọi thứ</b> thì rối; giấu <b>quá nhiều</b> thì không ai tìm thấy.<br>👉 Giải pháp: <b>hé lộ dần</b> (progressive disclosure): hiện cái hay dùng, gom cái ít dùng vào “Thêm ▾” / “Nâng cao”.</div>
+    </div>
+    <div>
+      <div class="mock f"><div class="wb"><i></i><i></i><i></i>Soạn email</div>
+        <div class="bd">
+          <div class="row" style="gap:8px"><button class="btn pri sm">Gửi</button><button class="btn sec sm">📎 Đính kèm</button><button class="btn ghost sm" id="moreB">Thêm ▾</button></div>
+          <div id="moreP" style="max-height:0;overflow:hidden;transition:max-height .6s">
+            <div style="margin-top:10px;padding:10px;border:1px solid #e2e8f0;border-radius:10px;font-size:14px;line-height:1.9">⏰ Hẹn giờ gửi<br>🔒 Chế độ bảo mật<br>✍️ Chữ ký<br>🖨 In</div>
+          </div>
+          <div style="margin-top:10px;height:80px;border:1px dashed #cbd5e1;border-radius:8px;padding:8px;font-size:14px;color:#94a3b8">Nội dung…</div>
+        </div></div>
+      <span class="f ghost" data-act="#moreP|open" data-say="Bấm <b>Thêm ▾</b>: chức năng ít dùng hiện ra khi cần. Hai nút quan trọng nhất luôn hiển thị."></span>
+      <div class="say" data-def="Gmail chỉ hiện vài nút thường dùng."></div>
+    </div>
+  </div>
+  <style>#moreP.open{max-height:200px!important}</style>
+</section>
+
+<section class="slide" id="feedback" data-part="Phần 2 · Dễ học" data-min="4">
+  <div class="hdr in"><span class="qn">2.6</span><h2>Feedback: mọi hành động cần phản hồi ngay</h2></div>
+  <div class="cols">
+    <div>
+      <div class="card f"><span class="lbl good">THỬ NGAY</span>
+        <div class="cols" style="gap:14px">
+          <div><p class="small"><b>Không phản hồi</b></p><button class="btn sec" id="fbBtnNo" style="cursor:default">Thanh toán</button><p class="ex">Bấm… rồi sao? Bấm lại lần nữa? → <b>trừ tiền 2 lần</b>!</p></div>
+          <div><p class="small"><b>Có phản hồi</b></p><button class="btn pri" id="fbBtn">Thanh toán 250.000đ</button><p id="fbToast" class="okt" style="opacity:0;transition:opacity .4s;font-size:15px;margin-top:6px">✓ Mã giao dịch #A12345 · đã gửi biên nhận qua email</p></div>
+        </div>
+      </div>
+      <h3 class="f mt">Các trạng thái của một nút</h3>
+      <div class="row f" style="gap:8px">
+        <button class="btn pri sm">Mặc định</button><button class="btn pri sm" style="background:#6d28d9">Rê chuột</button><button class="btn pri sm" style="transform:scale(.96);background:#5b21b6">Đang nhấn</button><button class="btn pri sm" style="outline:3px solid #f59e0b;outline-offset:2px">Focus (bàn phím)</button><button class="btn pri sm" disabled>Vô hiệu</button><button class="btn pri sm"><span class="spinr"></span>Đang tải</button>
+      </div>
+    </div>
+    <div>
+      <table class="f">
+        <tr><th>Thời gian chờ</th><th>Cảm nhận &amp; cách phản hồi</th></tr>
+        <tr><td>≤ 0,1 giây</td><td>Thấy như <b>tức thì</b>. Chỉ cần đổi màu nút.</td></tr>
+        <tr><td>≤ 1 giây</td><td>Còn giữ mạch suy nghĩ. Hiện vòng xoay ⟳ nhỏ.</td></tr>
+        <tr><td>≤ 10 giây</td><td>Bắt đầu mất tập trung. Hiện <b>thanh tiến trình</b>.</td></tr>
+        <tr><td>&gt; 10 giây</td><td>Cho làm việc khác, <b>báo khi xong</b>.</td></tr>
+      </table>
+      <div class="cols3 mt f" style="gap:10px">
+        <div class="card ctr"><div class="icon">👀</div><p class="small"><b>Hình ảnh</b><br>màu, icon, thông báo</p></div>
+        <div class="card ctr"><div class="icon">🔊</div><p class="small"><b>Âm thanh</b><br>tiếng “ting” gửi tin</p></div>
+        <div class="card ctr"><div class="icon">📳</div><p class="small"><b>Xúc giác</b><br>rung (haptic)</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="mapping" data-part="Phần 2 · Dễ học" data-min="2">
+  <div class="hdr in"><span class="qn">2.7</span><h2>Natural mapping: bố trí điều khiển khớp với kết quả</h2></div>
+  <div class="cols">
+    <div class="card bad f ctr"><span class="lbl bad">NÚM NÀO CHO BẾP NÀO?</span>
+      <svg width="300" height="230" viewBox="0 0 300 230"><rect x="10" y="10" width="280" height="210" rx="14" fill="#fff" stroke="#e2e8f0" stroke-width="2"/>
+        <circle cx="90" cy="65" r="34" fill="none" stroke="#e11d48" stroke-width="4"/><circle cx="210" cy="65" r="34" fill="none" stroke="#e11d48" stroke-width="4"/><circle cx="90" cy="145" r="26" fill="none" stroke="#e11d48" stroke-width="4"/><circle cx="210" cy="145" r="26" fill="none" stroke="#e11d48" stroke-width="4"/>
+        <g fill="#334155"><circle cx="60" cy="198" r="10"/><circle cx="120" cy="198" r="10"/><circle cx="180" cy="198" r="10"/><circle cx="240" cy="198" r="10"/></g></svg>
+      <p class="small">4 núm xếp hàng ngang cho 4 bếp xếp 2×2 → phải đoán hoặc đọc nhãn.</p></div>
+    <div class="card good f ctr"><span class="lbl good">NHÌN LÀ BIẾT</span>
+      <svg width="300" height="230" viewBox="0 0 300 230"><rect x="10" y="10" width="280" height="210" rx="14" fill="#fff" stroke="#e2e8f0" stroke-width="2"/>
+        <circle cx="90" cy="65" r="34" fill="none" stroke="#059669" stroke-width="4"/><circle cx="210" cy="65" r="34" fill="none" stroke="#059669" stroke-width="4"/><circle cx="90" cy="145" r="26" fill="none" stroke="#059669" stroke-width="4"/><circle cx="210" cy="145" r="26" fill="none" stroke="#059669" stroke-width="4"/>
+        <g fill="#334155"><circle cx="135" cy="65" r="8"/><circle cx="165" cy="65" r="8"/><circle cx="135" cy="145" r="8"/><circle cx="165" cy="145" r="8"/></g></svg>
+      <p class="small">Núm đặt cạnh bếp tương ứng → <b>không cần nhãn</b>.</p></div>
+  </div>
+  <div class="note f"><b>Ví dụ khác:</b> cần xi-nhan ô tô gạt lên = rẽ phải (cùng chiều vô lăng); thanh âm lượng kéo sang phải = to hơn; công tắc đèn xếp theo đúng vị trí đèn trong phòng; nút “Tiếp” ở bên phải, “Quay lại” ở bên trái.</div>
+</section>
+
+<section class="slide" id="constraints" data-part="Phần 2 · Dễ học" data-min="3">
+  <div class="hdr in"><span class="qn">2.8</span><h2>Constraints: giới hạn hành động để tránh lỗi</h2></div>
+  <div class="cols c64">
+    <div>
+      <p class="f">Ràng buộc = những giới hạn về hành động mà người dùng <b>nhìn thấy được</b> từ hình thức của đối tượng.</p>
+      <ul class="small f">
+        <li>Chỉ cho phép hành động <b>hợp lệ</b> → ít cơ hội sai</li>
+        <li>Không cần người dùng <b>biết hết</b> (nhận ra thay vì nhớ lại)</li>
+        <li>VD: chọn ngày bằng <b>lịch</b> thay vì gõ “31/02”; ô SĐT chỉ nhận số; chọn tỉnh từ danh sách</li>
+      </ul>
+      <div class="note f" style="font-size:18px"><b>Nhưng ràng buộc quá nhiều → kém linh hoạt, chậm.</b> VD: ô nhập địa chỉ IP chia 4 ô, phải bấm vào từng ô. Người thạo thích gõ <code class="i">192.168.1.1</code> một lèo hơn.</div>
+    </div>
+    <div class="card f"><span class="lbl good">THỬ NGAY</span>
+      <div class="fld"><label>Email</label><input class="inp" id="cEmail" placeholder="ten@gmail.com"><div class="errt" id="cMsg"></div></div>
+      <label style="display:flex;gap:8px;align-items:center;font-size:15px;margin-bottom:14px"><input type="checkbox" id="cAgree" style="width:18px;height:18px"> Tôi đồng ý nhận bản tin</label>
+      <button class="btn pri" id="cBtn" style="width:100%">Đăng ký nhận tin</button>
+      <p class="ex mt">Nút chỉ bật khi email đúng dạng <b>và</b> đã tích đồng ý. Lỗi hiện ngay bên dưới ô, kèm ví dụ cách sửa.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="constraint-types" data-part="Phần 2 · Dễ học" data-min="1">
+  <div class="hdr in"><span class="qn">2.9</span><h2>3 loại ràng buộc (Norman, 1999)</h2></div>
+  <div class="cols3">
+    <div class="card f"><div class="icon">🧩</div><h3>Vật lý</h3><p>Hình dạng vật lý giới hạn chuyển động.</p><p class="ex">Thẻ SIM có góc cắt chỉ lắp 1 chiều. Đĩa CD có mấy cách đưa vào máy? Trên màn hình: thanh trượt chỉ kéo được trong khoảng 0–100.</p></div>
+    <div class="card f"><div class="icon">💡</div><h3>Logic</h3><p>Dựa vào suy luận thông thường.</p><p class="ex">Lắp xong mà còn dư 1 con ốc → có gì đó sai. Trang 3/3 thì nút “Trang sau” mờ đi.</p></div>
+    <div class="card f"><div class="icon">🌏</div><h3>Văn hóa</h3><p>Quy ước học được trong cộng đồng, <b>khác nhau theo nơi</b>.</p><p class="ex">Đỏ = nguy hiểm (nhưng ở VN/TQ còn là may mắn). Công tắc gạt xuống: Mỹ = tắt, Anh = bật. Vòi nước Mỹ: ngược chiều kim đồng hồ = mở.</p></div>
+  </div>
+</section>
+
+<section class="slide" id="consistency" data-part="Phần 2 · Dễ học" data-min="3">
+  <div class="hdr in"><span class="qn">2.10</span><h2>Consistency: nhất quán</h2></div>
+  <div class="note blue in" style="font-size:22px"><b>Giống nhau thì hoạt động giống nhau. Khác nhau thì phải trông khác nhau.</b> (font, màu, icon, bố cục, từ ngữ…)</div>
+  <div class="cols3 mt">
+    <div class="card f"><h3>Nội bộ</h3><p class="small">Trong cùng một hệ thống: mọi nút “Lưu” cùng màu, cùng vị trí, cùng tên.</p></div>
+    <div class="card f"><h3>Bên ngoài</h3><p class="small">Giữa các hệ thống: theo quy ước chung. <code class="i">Ctrl+C</code> = sao chép ở mọi nơi.</p></div>
+    <div class="card f"><h3>Ẩn dụ</h3><p class="small">Khớp với thế giới thật: icon máy in = In; icon thùng rác = Xóa.</p></div>
+  </div>
+  <div class="cols mt">
+    <div class="card bad f"><span class="lbl bad">TRÁI QUY ƯỚC</span><p class="small"><code class="i">Ctrl+F</code> ở hầu hết ứng dụng = <b>Tìm kiếm</b>. Nhưng trong <b>MS Outlook</b>, <code class="i">Ctrl+F</code> = <b>Chuyển tiếp email</b>!</p></div>
+    <div class="card f"><span class="lbl bad">KHÔNG NHẤT QUÁN NỘI BỘ</span>
+      <div class="row" id="incons" style="gap:8px"><button class="btn pri sm">Lưu</button><span class="btn sm" style="background:#16a34a;color:#fff;border-radius:2px">Save</span><span class="btn sm" style="background:#fff;border:1px solid #333;color:#333;border-radius:20px">Cập nhật</span></div>
+      <p class="ex" id="inconsT">3 nút cùng chức năng, 3 kiểu khác nhau → người dùng nghĩ chúng làm 3 việc khác nhau.</p></div>
+  </div>
+  <span class="f ghost" data-set="#incons::&lt;button class='btn pri sm'&gt;Lưu&lt;/button&gt;&lt;button class='btn pri sm'&gt;Lưu&lt;/button&gt;&lt;button class='btn pri sm'&gt;Lưu&lt;/button&gt;;#inconsT::✓ Sửa: cùng chức năng → cùng tên, cùng kiểu."></span>
+</section>
+
+<section class="slide" id="language" data-part="Phần 2 · Dễ học" data-min="3">
+  <div class="hdr in"><span class="qn">2.11</span><h2>Nói ngôn ngữ của người dùng</h2></div>
+  <p class="in">Dùng từ phổ thông, tránh tiếng lóng và <b>thuật ngữ nội bộ/kỹ thuật</b>; ngắn gọn nhưng không cộc lốc.</p>
+  <table class="mt in">
+    <tr><th style="width:45%">❌ Ngôn ngữ của máy / lập trình viên</th><th>✅ Ngôn ngữ của người dùng</th></tr>
+    <tr class="f"><td style="color:#be123c;font-weight:600">Error 0x80070057: Invalid parameter</td><td>Mật khẩu cần ít nhất 8 ký tự, gồm cả chữ và số.</td></tr>
+    <tr class="f"><td style="color:#be123c;font-weight:600">NullReferenceException at Order.load()</td><td>Không tìm thấy đơn hàng #DH123. Kiểm tra lại mã hoặc <u>liên hệ hỗ trợ</u>.</td></tr>
+    <tr class="f"><td style="color:#be123c;font-weight:600">Submit</td><td>Đặt hàng · Gửi hồ sơ · Thanh toán (nói rõ hành động)</td></tr>
+    <tr class="f"><td style="color:#be123c;font-weight:600">Bạn có chắc không? [OK] [Cancel]</td><td>Xóa 3 ảnh đã chọn? [Xóa 3 ảnh] [Giữ lại]</td></tr>
+  </table>
+  <div class="note f">Thông báo lỗi tốt = <b>Chuyện gì xảy ra</b> + <b>Tại sao</b> + <b>Làm gì để sửa</b>. Tốt hơn nữa: <b>ngăn lỗi từ đầu</b> (ràng buộc) và cho phép <b>Hoàn tác (Undo)</b>.</div>
+</section>
+
+<section class="slide" id="metaphor" data-part="Phần 2 · Dễ học" data-min="2">
+  <div class="hdr in"><span class="qn">2.12</span><h2>Metaphor: mượn hình ảnh đời thực</h2></div>
+  <div class="cols4 in">
+    <div class="card ctr"><div class="icon">🗂</div><h3>Thư mục</h3><p class="small">Chứa tài liệu</p></div>
+    <div class="card ctr"><div class="icon">🗑</div><h3>Thùng rác</h3><p class="small">Xóa, lục lại được</p></div>
+    <div class="card ctr"><div class="icon">🛒</div><h3>Giỏ hàng</h3><p class="small">Gom đồ trước khi trả tiền</p></div>
+    <div class="card ctr"><div class="icon">💾</div><h3>Đĩa mềm = Lưu</h3><p class="small">Gen Z chưa từng thấy đĩa mềm!</p></div>
+  </div>
+  <div class="cols mt">
+    <div class="card good f"><span class="lbl good">ƯU ĐIỂM</span><ul class="small"><li>Rất <b>dễ học</b></li><li>Kết nối nhanh với <b>mô hình người dùng</b> sẵn có</li></ul></div>
+    <div class="card bad f"><span class="lbl bad">RỦI RO</span><ul class="small"><li>Khó tìm ẩn dụ <b>phù hợp</b></li><li>Dễ <b>đánh lừa</b> (thùng rác trên macOS cũ dùng để… đẩy đĩa ra)</li><li>Khó dùng nhất quán mọi nơi</li><li>Phụ thuộc <b>văn hóa</b> (hộp thư Mỹ ≠ hộp thư VN)</li></ul></div>
+  </div>
+</section>
+
+<section class="slide" id="platform" data-part="Phần 2 · Dễ học" data-min="2">
+  <div class="hdr in"><span class="qn">2.13</span><h2>Platform standards: theo chuẩn của nền tảng</h2></div>
+  <div class="cols">
+    <div>
+      <ul>
+        <li class="f">Làm theo hướng dẫn chính thức: <b>Apple Human Interface Guidelines</b>, <b>Google Material Design</b>, <b>Microsoft Fluent</b></li>
+        <li class="f">Người dùng đã học cách dùng nền tảng → app của bạn <b>“được học sẵn”</b> một nửa</li>
+        <li class="f">Học từ các ứng dụng phổ biến cùng loại</li>
+      </ul>
+    </div>
+    <div>
+      <div class="card f"><h3>Ví dụ: thứ tự nút trong hộp thoại</h3>
+        <p class="small"><b>Windows:</b> nút chính bên trái</p>
+        <div class="row" style="justify-content:flex-end;gap:8px"><button class="btn pri sm">OK</button><button class="btn sec sm">Cancel</button></div>
+        <p class="small mt"><b>macOS / iOS:</b> nút chính bên phải</p>
+        <div class="row" style="justify-content:flex-end;gap:8px"><button class="btn sec sm">Cancel</button><button class="btn pri sm">OK</button></div>
+      </div>
+      <div class="note f" style="font-size:18px">Nút “Quay lại”: Android có nút/cử chỉ hệ thống; iOS đặt ở <b>góc trên trái</b> + vuốt từ mép trái.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PART 3 ===================== -->
+<section class="slide" id="p3" data-title="Phần 3 · Nguyên tắc hiệu quả" data-part="Phần 3 · Hiệu quả" data-min="1">
+  <div class="orb" style="width:340px;height:340px;background:#f9a8d4;right:-40px;top:-60px"></div>
+  <div class="part-wrap">
+    <div class="pnum in">03</div>
+    <h1 class="in" style="font-size:60px">Hiệu quả: <span class="grad">nhanh hơn, ít thao tác hơn</span></h1>
+    <div class="chips in"><span class="chip">Xử lý thông tin của con người</span><span class="chip">Định luật Fitts</span><span class="chip">Luật luyện tập</span><span class="chip">Phím tắt · Mặc định · Lịch sử · Gợi ý</span></div>
+    <p class="in muted mt2">Phần 2 giúp người mới <b>dùng được</b>. Phần 3 giúp người đã quen <b>dùng nhanh</b>.</p>
+  </div>
+</section>
+
+<section class="slide" id="hip" data-part="Phần 3 · Hiệu quả" data-min="2">
+  <div class="hdr in"><span class="qn">3.1</span><h2>Con người xử lý thông tin: Nhìn → Nghĩ → Làm</h2></div>
+  <div class="flow in" style="gap:16px;margin-top:20px">
+    <div class="box h f" style="min-width:230px;padding:16px"><div class="icon">👁</div>Bộ xử lý CẢM NHẬN<small>~100 ms (50–200)</small></div><div class="ar f">→</div>
+    <div class="box cpp f" style="min-width:230px;padding:16px"><div class="icon">🧠</div>Bộ xử lý NHẬN THỨC<small>~70 ms (25–170)</small></div><div class="ar f">→</div>
+    <div class="box exe f" style="min-width:230px;padding:16px"><div class="icon">✋</div>Bộ xử lý VẬN ĐỘNG<small>~70 ms (30–100)</small></div>
+  </div>
+  <p class="ctr f mt" style="font-size:20px">Một phản ứng đơn giản “thấy đèn → bấm nút” ≈ <b>240 ms</b>. Mỗi màn hình, mỗi quyết định, mỗi lần di chuột đều cộng thêm thời gian.</p>
+  <div class="note blue f">👉 Muốn hiệu quả: <b>giảm số bước</b>, <b>giảm số quyết định</b> (càng nhiều lựa chọn càng lâu chọn), <b>giảm quãng đường di chuột</b>. Nguồn mô hình: MIT 6.813/6.831 (Model Human Processor).</div>
+</section>
+
+<section class="slide" id="fitts" data-part="Phần 3 · Hiệu quả" data-min="4">
+  <div class="hdr in"><span class="qn">3.2</span><h2>Định luật Fitts: to và gần thì bấm nhanh</h2></div>
+  <div class="cols c46">
+    <div>
+      <div class="formula in">T = a + b · log₂(D / S + 1)</div>
+      <ul class="small mt">
+        <li class="f"><b>T</b>: thời gian di chuyển tới mục tiêu</li>
+        <li class="f"><b>D</b>: khoảng cách từ con trỏ/ngón tay tới mục tiêu</li>
+        <li class="f"><b>S</b>: kích thước mục tiêu (theo hướng di chuyển)</li>
+        <li class="f"><b>a, b</b>: hằng số (phụ thuộc người &amp; thiết bị). <b>log₂(D/S+1)</b> gọi là <b>độ khó</b></li>
+      </ul>
+      <table class="f mt" style="font-size:17px">
+        <tr><th>Trường hợp</th><th>D</th><th>S</th><th>Độ khó</th></tr>
+        <tr><td>To, gần</td><td>120</td><td>120</td><td><b>1,0</b></td></tr>
+        <tr><td>Nhỏ, gần</td><td>120</td><td>20</td><td>2,8</td></tr>
+        <tr><td>Nhỏ, xa</td><td>900</td><td>20</td><td style="color:#be123c"><b>5,5</b></td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="fitts in">
+        <button class="st0" id="fStart">START</button>
+        <button class="tA" id="fA">TO · GẦN</button>
+        <button class="tB" id="fB">nhỏ</button>
+        <div class="res" id="fRes">Bấm START rồi bấm 1 mục tiêu</div>
+      </div>
+      <div class="row mt" style="align-items:flex-start"><span class="lbl good">THỬ NGAY</span><div id="fLog" style="font-family:var(--mono);font-size:15px;line-height:1.5"></div></div>
+      <p class="ex">Làm vài lần mỗi mục tiêu: nút nhỏ ở góc xa luôn tốn thời gian hơn và dễ trượt hơn.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="fitts-impl" data-part="Phần 3 · Hiệu quả" data-min="3">
+  <div class="hdr in"><span class="qn">3.3</span><h2>Áp dụng định luật Fitts</h2></div>
+  <div class="cols3">
+    <div class="card f"><div class="icon">🎯</div><h3>Nút hay dùng → to</h3><p class="small">Nút chính (Mua, Gửi) to hơn nút phụ. Trên điện thoại: vùng chạm tối thiểu <b>44×44 pt</b> (Apple) / <b>48×48 dp</b> (Android).</p></div>
+    <div class="card f"><div class="icon">🧲</div><h3>Nhóm cái hay dùng cùng nhau</h3><p class="small">Thanh công cụ gom nút theo nhóm, lệnh hay dùng đặt ở <b>đầu menu</b>.</p></div>
+    <div class="card f"><div class="icon">📐</div><h3>Tận dụng cạnh &amp; góc</h3><p class="small">Con trỏ “dừng” ở mép màn hình → mục tiêu ở mép như có kích thước <b>vô hạn</b>. VD: menu bar macOS, nút Start Windows.</p></div>
+    <div class="card f"><div class="icon">🥧</div><h3>Menu tròn (pie menu)</h3><p class="small">Mọi mục cách đều con trỏ → nhanh hơn menu dọc khoảng <b>15–20%</b> (Callahan et al.).</p></div>
+    <div class="card f"><div class="icon">📜</div><h3>Tránh menu quá dài</h3><p class="small">Mục ở cuối menu dài rất xa. Chia nhóm, đưa mục hay dùng lên trên.</p></div>
+    <div class="card f"><div class="icon">👍</div><h3>Vùng ngón cái</h3><p class="small">Trên điện thoại, nút quan trọng đặt ở <b>nửa dưới</b> màn hình (thanh tab dưới, nút nổi).</p></div>
+  </div>
+</section>
+
+<section class="slide" id="power" data-part="Phần 3 · Hiệu quả" data-min="2">
+  <div class="hdr in"><span class="qn">3.4</span><h2>Luật luyện tập (Power law of practice)</h2></div>
+  <div class="cols">
+    <div>
+      <div class="formula in">Tₙ = T₁ · n<sup>−a</sup> &nbsp;&nbsp; (a ≈ 0,2 – 0,6)</div>
+      <ul class="mt">
+        <li class="f"><b>Tₙ</b>: thời gian làm 1 việc ở lần thứ n</li>
+        <li class="f">Càng luyện càng nhanh, <b>nhưng</b> càng về sau càng <b>chững lại</b></li>
+        <li class="f">Nhớ lại đường cong học tập của Nielsen ở phần 1</li>
+      </ul>
+      <div class="note f">Muốn người thạo vượt “trần” này → phải cho họ <b>công cụ khác</b>: phím tắt, thao tác hàng loạt, mẫu dựng sẵn.</div>
+    </div>
+    <div class="in">
+      <svg id="pw" viewBox="0 0 460 300" width="460" height="300">
+        <line x1="40" y1="260" x2="440" y2="260" stroke="#64607d" stroke-width="2"/><line x1="40" y1="260" x2="40" y2="20" stroke="#64607d" stroke-width="2"/>
+        <text x="240" y="290" font-size="14" fill="#64607d" text-anchor="middle">Số lần thực hiện n →</text>
+        <text x="16" y="140" font-size="14" fill="#64607d" transform="rotate(-90 16 140)" text-anchor="middle">Thời gian →</text>
+        <path class="draw dr1" style="stroke-dasharray:700;stroke-dashoffset:700" d="M45 30 C 80 170, 140 205, 440 225" fill="none" stroke="#7c3aed" stroke-width="5"/>
+        <text class="fadein fd1" x="300" y="210" font-size="15" fill="#7c3aed">chững lại</text>
+      </svg>
+      <span class="f ghost" data-act="#pw|d1"></span>
+      <style>svg#pw.d1 .dr1{stroke-dashoffset:0!important}</style>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="efficiency" data-part="Phần 3 · Hiệu quả" data-min="3">
+  <div class="hdr in"><span class="qn">3.5</span><h2>6 kỹ thuật tăng hiệu quả</h2></div>
+  <div class="cols" style="grid-template-columns:1.5fr 1fr">
+    <div class="cols3" style="gap:12px;grid-template-columns:1fr 1fr 1fr">
+      <div class="card f"><h3>⌨️ Phím tắt</h3><p class="small"><code class="i">Ctrl+S</code>, <code class="i">Ctrl+Z</code>; ghi phím tắt cạnh mục menu để người dùng tự học.</p></div>
+      <div class="card f"><h3>✅ Mặc định</h3><p class="small">Chọn sẵn giá trị phổ biến nhất: Quốc gia = Việt Nam; giao hàng = địa chỉ lần trước.</p></div>
+      <div class="card f"><h3>🕘 Lịch sử</h3><p class="small">“Tài liệu gần đây”, “Người nhận gần đây”.</p></div>
+      <div class="card f"><h3>✨ Tự hoàn thành</h3><p class="small">Gõ vài chữ, hệ thống đoán phần còn lại.</p></div>
+      <div class="card f"><h3>🔮 Đoán trước</h3><p class="small">Chụp ảnh xong → hiện ngay nút “Chia sẻ”. Gmail gợi ý câu trả lời nhanh.</p></div>
+      <div class="card f"><h3>🎨 Bộ kiểu dựng sẵn</h3><p class="small">Styles trong Word: 1 cú bấm thay vì chỉnh font, cỡ, màu từng lần.</p></div>
+    </div>
+    <div class="card f"><span class="lbl good">THỬ NGAY · Tự hoàn thành</span>
+      <div class="fld"><label>Tỉnh / Thành phố</label><input class="inp" id="acIn" placeholder="Gõ thử: ha, da, ho…" autocomplete="off"></div>
+      <div id="acList" style="border-radius:8px;overflow:hidden;border:1px solid #e2e8f0;font-size:15px"></div>
+      <style>.aci{padding:8px 12px;cursor:pointer;background:#fff;border-bottom:1px solid #f1f5f9}.aci:hover{background:#f3edff}</style>
+      <p class="ex mt">Gõ không dấu vẫn tìm ra (“ho chi” → TP. Hồ Chí Minh). Đây là chi tiết nhỏ nhưng tiết kiệm rất nhiều thao tác.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== BREAK ===================== -->
+<section class="slide" id="break" data-title="☕ Giải lao 10 phút" data-part="Giải lao" data-min="10">
+  <div class="orb" style="width:380px;height:380px;background:#fde68a;left:-60px;top:-80px"></div>
+  <div class="part-wrap" style="align-items:center;text-align:center">
+    <div class="icon in" style="font-size:80px">☕</div>
+    <h1 class="in" style="font-size:56px">Giải lao <span class="grad">10 phút</span></h1>
+    <div class="clockbig in" id="brkClock">10:00</div>
+    <button class="btn pri lg in" id="brkStart">▶ Bắt đầu đếm ngược</button>
+    <p class="in muted mt2">Trong lúc nghỉ: hãy tìm một “Norman door” trên điện thoại của bạn (thứ trông bấm được mà không phải, hoặc ngược lại).</p>
+  </div>
+</section>
+
+<!-- ===================== PART 4 ===================== -->
+<section class="slide" id="p4" data-title="Phần 4 · Bố cục & đồ họa" data-part="Phần 4 · Bố cục & đồ họa" data-min="1">
+  <div class="orb" style="width:340px;height:340px;background:#86efac;right:-40px;top:-60px"></div>
+  <div class="part-wrap">
+    <div class="pnum in">04</div>
+    <h1 class="in" style="font-size:60px">Bố cục &amp; <span class="grad">thiết kế đồ họa</span></h1>
+    <div class="chips in"><span class="chip">Đơn giản</span><span class="chip">Đều đặn</span><span class="chip">Khoảng trắng</span><span class="chip">Gestalt</span><span class="chip">Căn lề</span><span class="chip">Lưới</span><span class="chip">Phân cấp thị giác</span><span class="chip">Khung chứa</span></div>
+    <p class="in muted mt2">Câu hỏi xuyên suốt: <b>mắt người dùng sẽ nhìn vào đâu trước, và có hiểu nhóm nào đi với nhóm nào không?</b></p>
+  </div>
+</section>
+
+<section class="slide" id="philo" data-part="Phần 4 · Bố cục & đồ họa" data-min="2">
+  <div class="hdr in"><span class="qn">4.1</span><h2>Triết lý: đẹp chưa chắc đã dễ dùng</h2></div>
+  <div class="cols">
+    <div>
+      <div class="card f"><h3>Thẩm mỹ ≠ khả dụng</h3><p>Một giao diện đẹp không tự động dễ dùng. Mỗi yếu tố hình ảnh phải <b>mang ý nghĩa</b> và khớp với mô hình người dùng.</p></div>
+      <div class="card f mt"><h3>Ưu tiên</h3><ul class="small"><li>“Ngôn ngữ” đơn giản, tự nhiên</li><li><b>Tiết kiệm</b> yếu tố hình ảnh</li><li>Sạch sẽ, có tổ chức</li></ul></div>
+    </div>
+    <div>
+      <div class="formula f" style="font-size:30px">Less is more.</div>
+      <div class="formula f mt" style="font-size:26px">Keep It Simple, Stupid (KISS)</div>
+      <div class="formula f mt" style="font-size:26px">When in doubt, leave it out.</div>
+      <div class="note blue f">Mỗi phần tử trên màn hình phải có <b>lý do tồn tại</b>, và lý do đó phải <b>rõ ràng</b> với người dùng.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="reduction" data-part="Phần 4 · Bố cục & đồ họa" data-min="3">
+  <div class="hdr in"><span class="qn">4.2</span><h2>Đơn giản hóa bằng cách rút gọn (Reduction)</h2></div>
+  <div class="cols c46">
+    <div>
+      <p class="f small" data-o="1"><b>Bước 1.</b> Xác định điều <b>cốt lõi</b> cần truyền tải: <i>“Tạo tài khoản để mua hàng”</i>.</p>
+      <p class="f small mt" data-o="2"><b>Bước 2.</b> Với từng phần tử, hỏi: <i>“Thiếu nó thì có sao không?”</i> → đánh dấu đỏ những gì không cần.</p>
+      <p class="f small mt" data-o="3"><b>Bước 3.</b> Bỏ đi, hoặc <b>hỏi sau</b> khi thật sự cần (ngày sinh hỏi khi có khuyến mãi sinh nhật).</p>
+      <p class="f small mt" data-o="4"><b>Bước 4.</b> Gộp: “Họ” + “Tên đệm” + “Tên” → <b>Họ và tên</b>. Thêm lối tắt “Tiếp tục với Google”.</p>
+      <div class="note f" data-o="5" style="font-size:18px">Kết quả: 12 ô → 3 ô. Mỗi ô bớt đi là bớt một lý do để người dùng <b>bỏ cuộc</b>.</div>
+    </div>
+    <div class="mock in" id="rf"><div class="wb"><i></i><i></i><i></i>Đăng ký tài khoản</div>
+      <div class="bd" style="display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;font-size:13px">
+        <div class="rfi x">Họ <input class="inp"></div><div class="rfi x">Tên đệm <input class="inp"></div>
+        <div class="rfi x">Tên <input class="inp"></div><div class="rfi kp"><span class="k1">Họ và tên</span> <input class="inp"></div>
+        <div class="rfi x">Giới tính <input class="inp"></div><div class="rfi x">Ngày sinh <input class="inp"></div>
+        <div class="rfi kp">Email <input class="inp"></div><div class="rfi x">Nhập lại email <input class="inp"></div>
+        <div class="rfi kp">Mật khẩu <input class="inp"></div><div class="rfi x">Nhập lại mật khẩu <input class="inp"></div>
+        <div class="rfi x">Số fax <input class="inp"></div><div class="rfi x">Nghề nghiệp <input class="inp"></div>
+        <div class="rfi x">Biết chúng tôi qua đâu? <input class="inp"></div>
+        <div style="grid-column:1/-1;display:flex;flex-direction:column;gap:6px;margin-top:4px"><button class="btn pri sm">Đăng ký</button><button class="btn sec sm rfg">G · Tiếp tục với Google</button></div>
+      </div></div>
+    <span class="f ghost" data-o="2.5" data-act="#rf|r1"></span><span class="f ghost" data-o="3.5" data-act="#rf|r2"></span><span class="f ghost" data-o="4.5" data-act="#rf|r3"></span>
+  </div>
+  <style>
+    #rf .rfi{display:flex;flex-direction:column;gap:2px;transition:all .6s;max-height:60px;overflow:hidden}
+    #rf .rfi .inp{padding:4px 8px;font-size:13px}
+    #rf .k1{display:none}#rf .rfg{display:none}
+    #rf.r1 .rfi.x{background:#fff1f3;outline:2px dashed #e11d48;border-radius:6px;color:#be123c}
+    #rf.r2 .rfi.x{max-height:0;opacity:0;margin:-3px 0}
+    #rf.r2 .bd{grid-template-columns:1fr!important}
+    #rf.r3 .k1{display:inline}#rf.r3 .rfg{display:inline-flex}#rf.r3 .rfi .inp{padding:9px 10px;font-size:14px}
+  </style>
+</section>
+
+<section class="slide" id="regularity" data-part="Phần 4 · Bố cục & đồ họa" data-min="2">
+  <div class="hdr in"><span class="qn">4.3</span><h2>Đều đặn (Regularity) &amp; Gộp vai trò (Combine)</h2></div>
+  <div class="cols">
+    <div>
+      <p class="f">Hạn chế <b>khác biệt không cần thiết</b>: cùng font, cùng màu, cùng độ dày nét, cùng kích thước cho các phần tử cùng loại. Dùng phần tử sẵn có của hệ điều hành mà người dùng đã quen.</p>
+      <div class="card f mt" id="reg"><p class="small muted">Thanh công cụ</p>
+        <div class="row" style="gap:6px;align-items:flex-end">
+          <span class="rg" style="font:700 18px Georgia;padding:10px 14px;background:#fde68a;border-radius:2px">Mới</span>
+          <span class="rg" style="font:400 13px Arial;padding:4px 8px;background:#a7f3d0;border-radius:14px">Mở</span>
+          <span class="rg" style="font:600 15px 'Be Vietnam Pro',sans-serif;padding:7px 22px;background:#fbcfe8;border-radius:8px;border:3px solid #db2777">Lưu</span>
+          <span class="rg" style="font:italic 16px serif;padding:12px 6px;background:#bfdbfe">In</span>
+        </div>
+        <p class="ex" id="regT">Mỗi nút một kiểu: mắt bị kéo đi lung tung, tưởng mỗi nút có ý nghĩa đặc biệt.</p></div>
+      <span class="f ghost" data-act="#reg|ok" data-set="#regT::✓ Cùng kiểu → nhìn như một nhóm, không cái nào “lạc loài”. Sự bất thường nhỏ trong thiết kế đều đặn sẽ bị <b>phóng đại</b>, nên chỉ dùng khác biệt khi muốn nhấn mạnh."></span>
+      <style>#reg.ok .rg{font:600 15px "Be Vietnam Pro",sans-serif!important;padding:9px 16px!important;background:#f3edff!important;border:1.5px solid #c4b5fd!important;border-radius:8px!important;color:#6d28d9;transition:all .6s}#reg .rg{transition:all .6s}</style>
+    </div>
+    <div class="card f"><h3>Một phần tử, nhiều vai trò: thanh cuộn</h3>
+      <div style="display:flex;gap:16px;align-items:stretch">
+        <div style="width:28px;border:1.5px solid #cbd5e1;border-radius:6px;display:flex;flex-direction:column;align-items:center;font-size:12px;background:#f8fafc">
+          <div style="padding:2px">▲</div><div style="height:40px"></div><div style="width:18px;height:60px;background:#a78bfa;border-radius:4px"></div><div style="flex:1;min-height:90px"></div><div style="padding:2px">▼</div></div>
+        <ul class="xs" style="flex:1">
+          <li>▲ ▼: cuộn lên/xuống từng dòng</li>
+          <li>Vị trí con chạy: <b>đang ở đâu</b> trong tài liệu</li>
+          <li>Độ dài con chạy: tài liệu <b>dài cỡ nào</b></li>
+          <li>Khoảng trên con chạy: khoảng cách tới đầu</li>
+          <li>Bấm vào rãnh: nhảy 1 trang</li>
+        </ul>
+      </div>
+      <p class="ex mt">Một phần tử nhỏ làm được 5 việc → ít phần tử hơn mà vẫn đủ thông tin.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="whitespace" data-part="Phần 4 · Bố cục & đồ họa" data-min="3">
+  <div class="hdr in"><span class="qn">4.4</span><h2>Khoảng trắng (white space / negative space)</h2></div>
+  <div class="cols c46">
+    <div>
+      <p class="f">Khoảng trắng là <b>khoảng trống giữa các phần tử</b> (không nhất thiết màu trắng). Nó không phải “chỗ phí”, mà là công cụ.</p>
+      <ul class="small f mt">
+        <li><b>Dẫn mắt</b> và tạo <b>điểm nhấn</b></li>
+        <li><b>Nhóm</b> các mục liên quan (proximity)</li>
+        <li>Giúp mắt <b>nghỉ</b>, chữ <b>dễ đọc</b></li>
+        <li>Giảm <b>bấm nhầm</b> khi các nút quá sát nhau</li>
+        <li>Tạo cảm giác <b>sang trọng, tinh tế</b></li>
+      </ul>
+      <div class="note f" style="font-size:18px">Mẹo: đặt nhãn <b>bên trái</b> ô nhập (form dài, màn rộng) hoặc <b>trên</b> ô nhập (mobile). Dùng khoảng cách theo bội số của 8px.</div>
+    </div>
+    <div>
+      <div class="wsd in" id="wsd">
+        <h4>Thông tin giao hàng</h4>
+        <div class="r"><label>Người nhận</label><input class="inp" value="Nguyễn Văn An"></div>
+        <div class="r"><label>Điện thoại</label><input class="inp" value="0901 234 567"></div>
+        <div class="r"><label>Địa chỉ</label><input class="inp" value="227 Nguyễn Văn Cừ, Q.5"></div>
+        <div class="grp"><div class="r"><label>Ghi chú</label><input class="inp" placeholder="Giao giờ hành chính"></div></div>
+        <div class="ft"><button class="btn sec">Hủy</button><button class="btn pri">Lưu địa chỉ</button></div>
+      </div>
+      <span class="f ghost" data-act="#wsd|air" data-say="Cùng nội dung, chỉ thêm khoảng trắng: dễ đọc, các nhóm tách bạch, 2 nút không còn dính nhau."></span>
+      <div class="say" data-def="Hộp thoại “chật chội”: các thành phần dính sát, không có lề. Nhấn → để thêm khoảng trắng."></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="gestalt1" data-part="Phần 4 · Bố cục & đồ họa" data-min="3">
+  <div class="hdr in"><span class="qn">4.5</span><h2>Gestalt (1): Gần nhau &amp; Giống nhau</h2></div>
+  <p class="in small muted">Các nhà tâm lý học Gestalt (thập niên 1920) mô tả cách mắt <b>tự động gom</b> các phần tử thành nhóm, trước cả khi ta suy nghĩ.</p>
+  <div class="cols mt">
+    <div class="card f ctr"><h3>Proximity – Gần nhau</h3>
+      <div class="dots" id="gp" style="grid-template-columns:repeat(4,26px);column-gap:14px;row-gap:14px">
+        <i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></div>
+      <p class="lab" id="gpt">Khoảng cách đều: chưa thấy nhóm nào</p>
+      <p class="small mt">Các phần tử <b>gần nhau</b> được xem là một nhóm.</p>
+    </div>
+    <div class="card f ctr"><h3>Similarity – Giống nhau</h3>
+      <div class="dots" id="gs" style="grid-template-columns:repeat(4,26px)">
+        <i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></div>
+      <p class="lab" id="gst">Giống hệt nhau: chưa thấy nhóm nào</p>
+      <p class="small mt">Phần tử có <b>thuộc tính giống nhau</b> (màu, hình, cỡ) được xem là một nhóm.</p>
+    </div>
+  </div>
+  <span class="f ghost" data-act="#gp|prox" data-set="#gpt::Gần nhau theo chiều dọc → thấy <b>4 CỘT</b>"></span>
+  <span class="f ghost" data-act="#gs|sv" data-set="#gst::Giống nhau theo hàng ngang → thấy <b>4 HÀNG</b>"></span>
+  <style>#gp.prox{column-gap:44px!important;row-gap:6px!important}#gs.sv .dot:nth-child(n+5):nth-child(-n+8),#gs.sv .dot:nth-child(n+13){background:#f472b6;border-radius:4px}</style>
+</section>
+
+<section class="slide" id="gestalt2" data-part="Phần 4 · Bố cục & đồ họa" data-min="3">
+  <div class="hdr in"><span class="qn">4.6</span><h2>Gestalt (2): Liên tục · Khép kín · Hình–nền · Đối xứng</h2></div>
+  <div class="cols4">
+    <div class="card f ctr"><svg width="200" height="150" viewBox="0 0 200 150"><path d="M10 140 L190 10" stroke="#7c3aed" stroke-width="7"/><path d="M10 10 C 80 60, 120 90, 190 140" stroke="#0891b2" stroke-width="7" fill="none"/></svg><h3>Continuity</h3><p class="xs">Mắt thấy <b>2 đường cắt nhau</b>, không phải 4 đoạn gặp nhau tại 1 điểm.</p></div>
+    <div class="card f ctr"><svg width="200" height="150" viewBox="0 0 200 150"><circle cx="100" cy="22" r="18" fill="#db2777"/><circle cx="35" cy="130" r="18" fill="#db2777"/><circle cx="165" cy="130" r="18" fill="#db2777"/><path d="M100 22 L35 130 L165 130Z" fill="#fff"/></svg><h3>Closure</h3><p class="xs">Thấy một <b>tam giác trắng</b> ở giữa dù cạnh không được vẽ. (Logo IBM sọc ngang vẫn đọc được.)</p></div>
+    <div class="card f ctr"><svg width="200" height="150" viewBox="0 0 200 150"><rect x="25" y="15" width="150" height="120" fill="#a78bfa"/><rect x="70" y="50" width="60" height="50" fill="#fbcfe8"/></svg><h3>Figure–Ground</h3><p class="xs">Phần tử <b>nhỏ hơn</b> được hiểu là nằm <b>phía trước</b> phần lớn. (Hộp thoại nổi trên nền mờ.)</p></div>
+    <div class="card f ctr"><svg width="200" height="150" viewBox="0 0 200 150" font-size="90" font-weight="800" fill="#059669"><text x="20" y="110">[</text><text x="58" y="110">]</text><text x="104" y="110">[</text><text x="142" y="110">]</text></svg><h3>Symmetry</h3><p class="xs">Mắt ưu tiên cách hiểu <b>đối xứng</b>: thấy 2 cặp “[ ]”, không phải “] [” ở giữa.</p></div>
+  </div>
+  <div class="note f">Thêm: <b>Common region</b> – các phần tử nằm chung một khung/nền được xem là một nhóm (đây là nền tảng của <b>card</b> trong giao diện).</div>
+</section>
+
+<section class="slide" id="gestalt-ui" data-part="Phần 4 · Bố cục & đồ họa" data-min="2">
+  <div class="hdr in"><span class="qn">4.7</span><h2>Gestalt trên giao diện thật</h2></div>
+  <div class="cols">
+    <div class="card bad f"><span class="lbl bad">NHÃN THUỘC Ô NÀO?</span>
+      <div style="font-size:15px"><div>Họ và tên</div><div style="height:16px"></div><input class="inp" value=""><div style="height:16px"></div><div>Email</div><div style="height:16px"></div><input class="inp"></div>
+      <p class="ex">Nhãn cách đều ô trên và ô dưới → mơ hồ.</p></div>
+    <div class="card good f"><span class="lbl good">GẦN NHAU = CÙNG NHÓM</span>
+      <div style="font-size:15px"><div>Họ và tên</div><input class="inp" style="margin-top:4px"><div style="height:24px"></div><div>Email</div><input class="inp" style="margin-top:4px"></div>
+      <p class="ex">Khoảng cách <b>trong nhóm</b> &lt; khoảng cách <b>giữa các nhóm</b>.</p></div>
+  </div>
+  <div class="cols mt">
+    <div class="card f"><h3>Similarity</h3><p class="small">Mọi link cùng màu xanh; mọi nút xóa cùng màu đỏ → người dùng tự suy ra chức năng.</p></div>
+    <div class="card f"><h3>Common region</h3><p class="small">Mỗi sản phẩm nằm trong 1 thẻ (card): ảnh, tên, giá, nút “Mua” rõ ràng thuộc về nhau.</p></div>
+  </div>
+</section>
+
+<section class="slide" id="alignment" data-part="Phần 4 · Bố cục & đồ họa" data-min="2">
+  <div class="hdr in"><span class="qn">4.8</span><h2>Căn lề (Alignment)</h2></div>
+  <div class="cols c46">
+    <div>
+      <p class="f">Căn các phần tử theo <b>đường thẳng</b> ngang và dọc để thiết kế đơn giản, có trật tự.</p>
+      <ul class="small f mt">
+        <li>Căn lệch → mắt phải đi <b>zig-zag</b> để tìm ô cần nhập</li>
+        <li>Căn thẳng → mắt đi theo <b>một trục</b>, đọc nhanh hơn</li>
+        <li>Văn bản dài: <b>căn trái</b>. Căn giữa chỉ cho tiêu đề ngắn</li>
+        <li>Số tiền trong bảng: <b>căn phải</b> để hàng đơn vị thẳng nhau</li>
+      </ul>
+      <div class="say" data-def="Nhấn → để căn lề."></div>
+    </div>
+    <div class="al in" id="al">
+      <div class="gl" style="left:40px"></div>
+      <div class="it" style="left:60px;top:18px">Họ tên <input class="inp" style="width:200px"></div>
+      <div class="it" style="left:150px;top:78px">SĐT <input class="inp" style="width:160px"></div>
+      <div class="it" style="left:20px;top:140px">Địa chỉ nhận hàng <input class="inp" style="width:180px"></div>
+      <div class="it" style="left:220px;top:205px"><button class="btn pri sm">Xác nhận</button></div>
+    </div>
+    <span class="f ghost" data-act="#al|on" data-say="Kẻ một <b>trục căn lề</b> bên trái…"></span>
+    <span class="f ghost" data-act="#al|al2" data-say="…và kéo mọi thứ về trục đó. Nhãn ở trên, ô nhập cùng độ rộng, nút cùng trục."></span>
+    <style>
+      #al.al2 .it{left:40px!important;display:flex;flex-direction:column;gap:2px}
+      #al.al2 .it:nth-of-type(2){top:14px!important}#al.al2 .it:nth-of-type(3){top:78px!important}#al.al2 .it:nth-of-type(4){top:142px!important}#al.al2 .it:nth-of-type(5){top:212px!important}
+      #al.al2 .it .inp{width:320px!important}
+    </style>
+  </div>
+</section>
+
+<section class="slide" id="grid" data-part="Phần 4 · Bố cục & đồ họa" data-min="3">
+  <div class="hdr in"><span class="qn">4.9</span><h2>Hệ thống lưới (Grid) &amp; cân bằng</h2></div>
+  <div class="cols c64">
+    <div class="gd in" id="gd">
+      <div class="cols12"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      <div class="ct"><div class="h">Header – 12 cột</div><div class="a">Thẻ – 4 cột</div><div class="b">Thẻ – 4 cột</div><div class="c">Thẻ – 4 cột</div><div class="w">Nội dung chính – 8 cột</div><div class="s">Bên lề – 4 cột</div></div>
+    </div>
+    <div>
+      <p class="small f">Lưới = các <b>cột</b> và <b>rãnh (gutter)</b> vô hình để đặt phần tử. Web thường dùng <b>12 cột</b> (chia được cho 2, 3, 4, 6).</p>
+      <span class="f ghost" data-act="#gd|g1"></span>
+      <p class="small f mt">Bật lưới lên: các khối đang “lệch” khỏi lưới. Bây giờ cho chúng bám lưới:</p>
+      <span class="f ghost" data-act="#gd|g2"></span>
+      <ul class="xs f mt"><li>Rõ ràng, <b>nhất quán</b> giữa các trang</li><li>Thiết kế <b>nhanh hơn</b> (không phải đoán vị trí)</li><li>Dễ <b>phối hợp</b> giữa designer và lập trình viên</li></ul>
+      <div class="note f" style="font-size:16px"><b>Cân bằng:</b> chọn một trục (thường là trục dọc giữa) và phân bố “khối lượng thị giác” đều hai bên. Lưới đều là cách dễ nhất để vừa căn lề vừa cân bằng.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="hierarchy" data-part="Phần 4 · Bố cục & đồ họa" data-min="3">
+  <div class="hdr in"><span class="qn">4.10</span><h2>Phân cấp thị giác: cái gì quan trọng phải nổi nhất</h2></div>
+  <div class="cols">
+    <div>
+      <p class="f">Dùng <b>kích thước, độ đậm, màu, vị trí, khoảng trắng</b> để sắp thứ tự: người dùng nhìn gì <b>trước</b> → <b>sau</b>.</p>
+      <div class="card f mt"><h3>Phép thử “nheo mắt” (squint test)</h3><p class="small">Nheo mắt (hoặc làm mờ ảnh chụp màn hình). Thứ còn nhìn rõ chính là thứ nổi bật nhất. Có đúng là thứ <b>bạn muốn</b> người dùng thấy không?</p></div>
+      <div class="card f mt"><h3>Mẫu đọc F và Z</h3><p class="small">Trang nhiều chữ: mắt quét hình <b>F</b> (dòng đầu, rồi dọc bên trái). Trang ít chữ (landing page): mắt đi hình <b>Z</b> (trái trên → phải trên → chéo xuống → phải dưới, nơi đặt nút hành động).</p></div>
+    </div>
+    <div id="hcw">
+      <div class="hc in" id="hc">
+        <div style="height:120px;border-radius:10px;background:linear-gradient(135deg,#ddd6fe,#fbcfe8);margin-bottom:10px"></div>
+        <div class="meta">Tai nghe · Còn hàng</div>
+        <div class="ti">Tai nghe không dây Aurora</div>
+        <div class="ds">Chống ồn chủ động, pin 30 giờ, sạc nhanh 10 phút dùng 3 giờ.</div>
+        <div class="pr">1.290.000đ</div>
+        <div class="cta">Thêm vào giỏ</div>
+      </div>
+      <span class="f ghost" data-now="#hcw|blur" data-say="Nheo mắt: mọi thứ lẫn vào nhau, không biết nhìn vào đâu."></span>
+      <span class="f ghost" data-act="#hc|h1" data-now="#hcw|blur" data-say="Thêm phân cấp: <b>tên</b> to đậm → <b>giá</b> nổi màu → <b>nút</b> đặc màu chính. Nheo mắt vẫn thấy 3 thứ đó."></span>
+      <span class="f ghost" data-act="#hc|h1" data-say="Thứ tự đọc: <b>Tên → Giá → Thêm vào giỏ</b>. Mô tả và thông tin phụ nhỏ, nhạt hơn."></span>
+      <div class="say" data-def="Thẻ sản phẩm: mọi chữ cùng cỡ, cùng màu."></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="containment" data-part="Phần 4 · Bố cục & đồ họa" data-min="1">
+  <div class="hdr in"><span class="qn">4.11</span><h2>Khung chứa (Containment) &amp; tiết kiệm yếu tố thị giác</h2></div>
+  <div class="cols4">
+    <div class="card f"><h3>Divider</h3><div style="font-size:15px">Mục A<hr style="border:none;border-top:1px solid #e2e8f0;margin:8px 0">Mục B</div><p class="xs mt">Đường kẻ mảnh tách nội dung không liên quan.</p></div>
+    <div class="card f"><h3>Border</h3><div style="border:1.5px solid #c4b5fd;border-radius:8px;padding:10px;font-size:15px">Thông báo quan trọng</div><p class="xs mt">Viền bao quanh một phần tử/khối.</p></div>
+    <div class="card f"><h3>Fill</h3><div style="background:#f3edff;border-radius:8px;padding:10px;font-size:15px">Khối được tô nền</div><p class="xs mt">Màu nền làm khối nổi bật.</p></div>
+    <div class="card f"><h3>Shadow</h3><div style="display:flex;gap:10px"><div style="flex:1;padding:10px;border-radius:8px;background:#fff;box-shadow:0 6px 14px -4px rgba(0,0,0,.25);font-size:13px">Đổ bóng ngoài</div><div style="flex:1;padding:10px;border-radius:8px;background:#f8fafc;box-shadow:inset 0 2px 6px rgba(0,0,0,.2);font-size:13px">Bóng trong</div></div><p class="xs mt">Bóng ngoài: nổi lên (nút). Bóng trong: lõm xuống (ô nhập).</p></div>
+  </div>
+  <div class="note f"><b>Nhưng đừng lạm dụng:</b> khung lồng khung, quá nhiều hiệu ứng 3D, quá nhiều tab, mọi thứ đều có viền. Thường <b>khoảng trắng</b> đã đủ để nhóm, không cần thêm đường kẻ. <b>Less is more… trừ khi more is more.</b></div>
+</section>
+
+<!-- ===================== PART 5 ===================== -->
+<section class="slide" id="p5" data-title="Phần 5 · Chữ, màu, icon" data-part="Phần 5 · Chữ · Màu · Icon" data-min="1">
+  <div class="orb" style="width:340px;height:340px;background:#fdba74;right:-40px;top:-60px"></div>
+  <div class="part-wrap">
+    <div class="pnum in">05</div>
+    <h1 class="in" style="font-size:60px">Chữ · Màu · <span class="grad">Icon</span></h1>
+    <div class="chips in"><span class="chip">Typeface vs Font</span><span class="chip">Thang cỡ chữ</span><span class="chip">Đọc được – đọc dễ – hiểu được</span><span class="chip">Ý nghĩa màu</span><span class="chip">Bánh xe màu</span><span class="chip">60-30-10</span><span class="chip">Tương phản WCAG</span><span class="chip">Mù màu</span><span class="chip">Icon</span></div>
+  </div>
+</section>
+
+<section class="slide" id="type-terms" data-part="Phần 5 · Chữ · Màu · Icon" data-min="3">
+  <div class="hdr in"><span class="qn">5.1</span><h2>Typography: 3 bước chọn chữ</h2></div>
+  <div class="cols3">
+    <div class="card f"><h3>① Phân loại (classification)</h3>
+      <div class="row" style="gap:18px;align-items:flex-end">
+        <div class="ctr"><div style="font:400 54px Georgia,serif">Ag</div><p class="xs">Serif<br>(có chân)</p></div>
+        <div class="ctr"><div style="font:500 54px 'Be Vietnam Pro',Arial,sans-serif">Ag</div><p class="xs">Sans-serif<br>(không chân)</p></div>
+        <div class="ctr"><div style="font:400 46px var(--mono)">Ag</div><p class="xs">Mono<br>(đều nhau)</p></div>
+      </div>
+      <p class="xs mt">Phổ biến nhất trong UI: <b>Serif</b> và <b>Sans-serif</b>.</p></div>
+    <div class="card f"><h3>② Kiểu chữ (typeface)</h3><p class="small">Phong cách chung của một “họ chữ”: độ dày nét, hình dáng, kiểu chân.</p>
+      <p class="mt" style="font:400 22px Georgia,'Times New Roman',serif">Times · Georgia · Cambria</p>
+      <p style="font:400 22px Arial,Helvetica,sans-serif">Arial · Helvetica · Verdana</p></div>
+    <div class="card f"><h3>③ Font</h3><p class="small">Một <b>biến thể cụ thể</b>: cỡ, độ đậm, kiểu nghiêng của typeface.</p>
+      <div style="font-size:21px;line-height:1.35;margin-top:6px"><div style="font-weight:400">Be Vietnam Pro Regular</div><div style="font-weight:500">Be Vietnam Pro Medium</div><div style="font-weight:600">Be Vietnam Pro SemiBold</div><div style="font-weight:700">Be Vietnam Pro Bold</div><div style="font-weight:800">Be Vietnam Pro ExtraBold</div></div></div>
+  </div>
+  <div class="note f"><b>Vì sao typography quan trọng?</b> Chữ chiếm phần lớn giao diện. Chữ tốt giúp <b>dễ đọc</b>, giúp người dùng <b>định hướng</b> trong trang, và thể hiện <b>thương hiệu</b>. Với tiếng Việt: luôn kiểm tra font có <b>đủ dấu</b> (ầ, ữ, ợ…) và dấu không bị chồng lên nhau.</div>
+</section>
+
+<section class="slide" id="type-scale" data-part="Phần 5 · Chữ · Màu · Icon" data-min="2">
+  <div class="hdr in"><span class="qn">5.2</span><h2>Phân cấp chữ: thang cỡ chữ (type scale)</h2></div>
+  <div class="cols c64">
+    <div class="card in" style="padding:18px 24px">
+      <div class="f" style="display:flex;align-items:baseline;gap:16px"><span class="tag" style="width:92px">Display</span><span style="font-size:52px;font-weight:800;line-height:1.1">Mùa hè sale</span></div>
+      <div class="f" style="display:flex;align-items:baseline;gap:16px;margin-top:8px"><span class="tag" style="width:92px">Headline</span><span style="font-size:32px;font-weight:700">Sản phẩm nổi bật</span></div>
+      <div class="f" style="display:flex;align-items:baseline;gap:16px;margin-top:8px"><span class="tag" style="width:92px">Title</span><span style="font-size:22px;font-weight:600">Tai nghe không dây Aurora</span></div>
+      <div class="f" style="display:flex;align-items:baseline;gap:16px;margin-top:8px"><span class="tag" style="width:92px">Body</span><span style="font-size:16px">Chống ồn chủ động, pin 30 giờ, kết nối Bluetooth 5.3.</span></div>
+      <div class="f" style="display:flex;align-items:baseline;gap:16px;margin-top:8px"><span class="tag" style="width:92px">Label</span><span style="font-size:12px;font-weight:600;letter-spacing:.05em">CÒN 12 SẢN PHẨM</span></div>
+    </div>
+    <div>
+      <p class="small f">Sắp xếp cỡ và độ đậm để tạo các <b>tầng</b>, cho người dùng biết <b>nhìn vào đâu</b> và <b>tìm thông tin ở đâu</b>.</p>
+      <ul class="small f mt"><li>Tiêu đề: <b>to, đậm</b></li><li>Đoạn văn dài: <b>nhỏ hơn, thường</b></li><li>Mỗi tầng chênh nhau rõ ràng (VD nhân 1,25 hoặc 1,333)</li></ul>
+      <div class="note blue f" style="font-size:17px">Tên tầng theo Material Design 3: <b>Display → Headline → Title → Body → Label</b>, mỗi tầng có Large/Medium/Small. Cỡ ví dụ: 57 · 32 · 22 · 16 · 12 px.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="type-bp" data-part="Phần 5 · Chữ · Màu · Icon" data-min="3">
+  <div class="hdr in"><span class="qn">5.3</span><h2>Quy tắc dùng chữ</h2></div>
+  <div class="cols">
+    <div>
+      <ul class="small">
+        <li class="f">Tối đa <b>2–3 font</b>. Cần thêm phân cấp? Đổi <b>cỡ/độ đậm</b> trước khi thêm font mới</li>
+        <li class="f">Phối 2 font: chọn cặp <b>tương phản rõ</b> (serif + sans), không chọn 2 font na ná nhau; một font phải <b>nổi trội</b> hơn</li>
+        <li class="f">Không dùng font <b>viết tay/uốn lượn</b> hay <b>CHỮ IN HOA</b> cho đoạn dài; font trang trí chỉ cho tiêu đề</li>
+        <li class="f">Chọn typeface đọc tốt ở <b>nhiều cỡ, nhiều độ đậm</b></li>
+        <li class="f">Chữ thân ≥ <b>16px</b> trên web; khoảng cách dòng <b>1,4–1,6</b>; mỗi dòng <b>45–75 ký tự</b></li>
+        <li class="f">Ưu tiên <b>web-safe</b> hoặc Google Fonts; trẻ em, người mới đọc, người thị lực kém đọc sans-serif dễ hơn</li>
+      </ul>
+    </div>
+    <div>
+      <div class="card" id="tbp" style="padding:14px 18px">
+        <p class="t1">HƯỚNG DẪN ĐỔI MẬT KHẨU</p>
+        <p class="t2">ĐỂ BẢO VỆ TÀI KHOẢN, BẠN NÊN ĐỔI MẬT KHẨU ĐỊNH KỲ 3 THÁNG MỘT LẦN. MẬT KHẨU MỚI CẦN CÓ ÍT NHẤT 8 KÝ TỰ, GỒM CHỮ HOA, CHỮ THƯỜNG VÀ SỐ, KHÔNG TRÙNG VỚI 3 MẬT KHẨU GẦN NHẤT.</p>
+      </div>
+      <span class="f ghost" data-act="#tbp|ok" data-say="Sau khi sửa: 1 font sans-serif, tiêu đề đậm to, thân chữ thường, cỡ 17px, giãn dòng 1,55, chia ý thành danh sách."></span>
+      <div class="say" data-def="Trước: font uốn lượn, in hoa toàn bộ, chữ nhỏ, dòng sát nhau."></div>
+      <style>
+        #tbp .t1{font:700 20px "Brush Script MT","Segoe Script",cursive;color:#334155}
+        #tbp .t2{font:400 14px/1.15 "Brush Script MT","Segoe Script",cursive;color:#64748b}
+        #tbp.ok .t1{font:800 24px "Be Vietnam Pro",sans-serif;text-transform:none;color:#1e1b3a}
+        #tbp.ok .t2{font:400 17px/1.55 "Be Vietnam Pro",sans-serif;color:#334155}
+      </style>
+      <span class="f ghost" data-set="#tbp .t1::Đổi mật khẩu;#tbp .t2::Để bảo vệ tài khoản, hãy đổi mật khẩu 3 tháng một lần. Mật khẩu mới cần:&lt;br&gt;• Ít nhất 8 ký tự&lt;br&gt;• Có chữ hoa, chữ thường và số&lt;br&gt;• Khác 3 mật khẩu gần nhất" data-act="#tbp|ok"></span>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="readability" data-part="Phần 5 · Chữ · Màu · Icon" data-min="2">
+  <div class="hdr in"><span class="qn">5.4</span><h2>Đọc được → Đọc dễ → Hiểu được</h2></div>
+  <div class="cols3">
+    <div class="card f"><h3>Legibility – đọc được</h3><p class="small">Mức thấp nhất: có <b>nhìn rõ, phân biệt</b> được từng ký tự không?</p><ul class="xs mt"><li>Cỡ chữ mặc định đủ lớn, cho phép phóng to</li><li>Tương phản cao giữa chữ và nền</li><li>Typeface sạch sẽ; không xoay chữ nghiêng/dọc</li></ul></div>
+    <div class="card f"><h3>Readability – đọc dễ</h3><p class="small">Độ phức tạp của <b>từ và câu</b>.</p><ul class="xs mt"><li>Từ ngữ thông dụng, càng ngắn càng tốt</li><li>Câu ngắn (nhớ trí nhớ ngắn hạn!)</li><li>Chủ yếu dùng câu chủ động</li><li>Đối tượng phổ thông: viết như cho học sinh lớp 8</li></ul></div>
+    <div class="card f"><h3>Comprehension – hiểu được</h3><p class="small">Người đọc có <b>hiểu đúng ý</b> và hành động được không?</p><ul class="xs mt"><li>Dùng thuật ngữ <b>quen với người dùng</b> (chuyên ngành thì dùng thuật ngữ chuyên ngành)</li><li>Viết <b>kim tự tháp ngược</b>: kết luận trước, chi tiết sau</li><li>Một hình/sơ đồ có khi hơn cả trang chữ</li><li>Mobile: càng ngắn gọn hơn</li></ul></div>
+  </div>
+</section>
+
+<section class="slide" id="color-mean" data-part="Phần 5 · Chữ · Màu · Icon" data-min="2">
+  <div class="hdr in"><span class="qn">5.5</span><h2>Màu sắc: cảm xúc, tín hiệu, thương hiệu</h2></div>
+  <div class="cols c64">
+    <div class="cols3" style="gap:10px">
+      <div class="card f" style="border-top:6px solid #e11d48"><h3 style="color:#e11d48">Đỏ</h3><p class="xs">Gây chú ý mạnh, khẩn cấp, nguy hiểm, lỗi (nút dừng khẩn cấp, biển STOP). Ở VN còn là may mắn, lễ Tết.</p></div>
+      <div class="card f" style="border-top:6px solid #2563eb"><h3 style="color:#2563eb">Xanh dương</h3><p class="xs">Bình tĩnh, tin cậy → ngân hàng, mạng xã hội, link.</p></div>
+      <div class="card f" style="border-top:6px solid #059669"><h3 style="color:#059669">Xanh lá</h3><p class="xs">Thành công, an toàn, “được phép”, tài chính tăng.</p></div>
+      <div class="card f" style="border-top:6px solid #f59e0b"><h3 style="color:#d97706">Vàng / cam</h3><p class="xs">Cảnh báo nhẹ, năng lượng, khuyến mãi.</p></div>
+      <div class="card f" style="border-top:6px solid #7c3aed"><h3 style="color:#7c3aed">Tím</h3><p class="xs">Sáng tạo, cao cấp, bí ẩn.</p></div>
+      <div class="card f" style="border-top:6px solid #475569"><h3 style="color:#475569">Xám / đen</h3><p class="xs">Trung tính: nền, chữ, thứ không cần chú ý.</p></div>
+    </div>
+    <div>
+      <div class="card f"><h3>Màu dùng để làm gì?</h3><ul class="small"><li><b>Nhấn mạnh</b> điểm tập trung (focal point): nút Đăng ký, Mua</li><li><b>Báo trạng thái</b>: thành công, cảnh báo, lỗi</li><li>Thể hiện <b>thương hiệu</b>, nhất quán trên mọi sản phẩm</li><li>Ảnh hưởng tới <b>khả năng tiếp cận</b> (accessibility)</li></ul></div>
+      <div class="note f" style="font-size:17px">Ý nghĩa màu là <b>ràng buộc văn hóa</b>: chứng khoán VN tăng = xanh, chứng khoán TQ tăng = đỏ!</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="color-theory" data-part="Phần 5 · Chữ · Màu · Icon" data-min="2">
+  <div class="hdr in"><span class="qn">5.6</span><h2>Lý thuyết màu cơ bản</h2></div>
+  <div class="cols">
+    <div>
+      <div class="card f"><h3>Màu bậc 1 · bậc 2 · bậc 3 (hệ RYB của họa sĩ)</h3>
+        <p class="small"><b>Bậc 1:</b> Đỏ, Vàng, Lam (không pha ra được).<br><b>Bậc 2:</b> Cam, Lục, Tím (pha 2 màu bậc 1).<br><b>Bậc 3:</b> pha 1 màu bậc 1 + 1 màu bậc 2 (đỏ cam, vàng cam, vàng lục, lam lục, lam tím, đỏ tím).</p></div>
+      <div class="card f mt"><h3>Nóng · lạnh · trung tính</h3>
+        <div class="row" style="gap:6px"><span class="swatch" style="flex:1;background:#ef4444;color:#fff">nóng</span><span class="swatch" style="flex:1;background:#f59e0b">nóng</span><span class="swatch" style="flex:1;background:#0ea5e9;color:#fff">lạnh</span><span class="swatch" style="flex:1;background:#8b5cf6;color:#fff">lạnh</span><span class="swatch" style="flex:1;background:#a8a29e">trung tính</span><span class="swatch" style="flex:1;background:#1e293b;color:#fff">trung tính</span></div></div>
+    </div>
+    <div class="card f"><h3>Hue · Tint · Tone · Shade</h3>
+      <p class="xs"><b>Hue</b>: màu gốc</p>
+      <div class="sw-row"><div class="swatch" style="background:#7c3aed;color:#fff">hue</div></div>
+      <p class="xs"><b>Tint</b>: pha thêm <b>trắng</b> → nhạt dần (làm nền)</p>
+      <div class="sw-row"><div class="swatch" style="background:#7c3aed"></div><div class="swatch" style="background:#9661f1"></div><div class="swatch" style="background:#b08bf5"></div><div class="swatch" style="background:#cbb0f8"></div><div class="swatch" style="background:#e5d8fc"></div><div class="swatch" style="background:#f5f0fe"></div></div>
+      <p class="xs"><b>Tone</b>: pha thêm <b>xám</b> → dịu đi</p>
+      <div class="sw-row"><div class="swatch" style="background:#7c3aed"></div><div class="swatch" style="background:#7a4bc8"></div><div class="swatch" style="background:#7a5aa8"></div><div class="swatch" style="background:#7a6a92"></div><div class="swatch" style="background:#7d7786"></div><div class="swatch" style="background:#808080"></div></div>
+      <p class="xs"><b>Shade</b>: pha thêm <b>đen</b> → đậm dần (chữ, trạng thái nhấn)</p>
+      <div class="sw-row"><div class="swatch" style="background:#7c3aed"></div><div class="swatch" style="background:#652fc2"></div><div class="swatch" style="background:#4f2597"></div><div class="swatch" style="background:#3a1b6f"></div><div class="swatch" style="background:#251147"></div><div class="swatch" style="background:#120822"></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="palettes" data-part="Phần 5 · Chữ · Màu · Icon" data-min="3">
+  <div class="hdr in"><span class="qn">5.7</span><h2>Phối màu trên bánh xe màu</h2></div>
+  <div class="cols c46">
+    <div class="ctr in"><svg class="wheel" id="wheel" viewBox="0 0 300 300" width="380" height="380"><g id="wheelG"></g><circle cx="150" cy="150" r="56" fill="#fff"/><text x="150" y="146" font-size="15" text-anchor="middle" fill="#64607d" id="wname">Bánh xe</text><text x="150" y="166" font-size="15" text-anchor="middle" fill="#64607d">12 màu</text></svg></div>
+    <div>
+      <div class="card" style="min-height:300px">
+        <h3 id="pt">Chọn màu gốc: Lam</h3>
+        <p class="small" id="pd">Nhấn → để xem 5 cách phối màu phổ biến.</p>
+        <div class="palrow mt" id="pr1"><div style="background:#1e5fbf"></div><div style="background:#4f86d6"></div><div style="background:#8fb3e8"></div><div style="background:#d3e2f7"></div><div style="background:#0f2f60"></div></div>
+        <div class="palrow mt" id="pr2"><div style="background:#0f9e9a"></div><div style="background:#1e5fbf"></div><div style="background:#4b3aa8"></div></div>
+        <div class="palrow mt" id="pr3"><div style="background:#1e5fbf;flex:3"></div><div style="background:#f7931e"></div></div>
+        <div class="palrow mt" id="pr4"><div style="background:#1e5fbf;flex:3"></div><div style="background:#f0522a"></div><div style="background:#fbb03b"></div></div>
+        <div class="palrow mt" id="pr5"><div style="background:#1e5fbf;flex:3"></div><div style="background:#e11d2a"></div><div style="background:#fde532"></div></div>
+      </div>
+      <span class="f ghost" data-now="#wheel|pm;#pr1|show" data-set="#pt::① Đơn sắc (Monochromatic);#pd::Các tint/tone/shade của <b>một</b> màu. An toàn, hài hòa, được designer rất ưa chuộng."></span>
+      <span class="f ghost" data-now="#wheel|pa;#pr2|show" data-set="#pt::② Tương đồng (Analogous);#pd::3 màu <b>cạnh nhau</b> trên bánh xe. Êm dịu, ít tương phản, hợp làm nền, banner."></span>
+      <span class="f ghost" data-now="#wheel|pc;#pr3|show" data-set="#pt::③ Bổ túc (Complementary);#pd::2 màu <b>đối diện</b> nhau. Tương phản mạnh: nút cam trên nền lam nổi bật ngay."></span>
+      <span class="f ghost" data-now="#wheel|ps;#pr4|show" data-set="#pt::④ Bổ túc chia đôi (Split-complementary);#pd::Màu gốc + <b>2 màu kề</b> màu đối diện. Vẫn tương phản nhưng mềm hơn, nhiều màu hơn."></span>
+      <span class="f ghost" data-now="#wheel|pt;#pr5|show" data-set="#pt::⑤ Bộ ba (Triadic);#pd::3 màu <b>cách đều</b> nhau. Chọn 1 màu chủ đạo, 2 màu còn lại làm điểm nhấn."></span>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="c603010" data-title="Quy tắc 60-30-10" data-part="Phần 5 · Chữ · Màu · Icon" data-min="2">
+  <div class="hdr in"><span class="qn">5.8</span><h2>Quy tắc 60 – 30 – 10</h2></div>
+  <div class="cols">
+    <div>
+      <div class="card f" style="border-left:8px solid #f1f5f9"><h3 style="color:#475569">60% · màu trung tính</h3><p class="small">Nền, chữ chính, phần lớn thành phần.</p></div>
+      <div class="card f mt" style="border-left:8px solid #1e3a8a"><h3 style="color:#1e3a8a">30% · màu bổ trợ</h3><p class="small">Header, thanh điều hướng, thẻ, phần tử tương tác cần nổi.</p></div>
+      <div class="card f mt" style="border-left:8px solid #f97316"><h3 style="color:#ea580c">10% · màu nhấn (accent)</h3><p class="small">Chỉ cho thứ <b>quan trọng nhất</b>: nút hành động chính, cảnh báo. Ít mới nổi!</p></div>
+    </div>
+    <div class="in">
+      <div class="mock"><div style="background:#1e3a8a;color:#fff;padding:12px 16px;font-weight:700;display:flex;justify-content:space-between">TravelGo <span style="font-weight:400;font-size:14px">Tour · Khách sạn · Vé</span></div>
+        <div style="background:#f8fafc;padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div style="background:#fff;border-radius:10px;padding:12px;border:1px solid #e2e8f0"><div style="height:60px;border-radius:8px;background:#dbeafe"></div><div style="font-weight:700;margin-top:6px">Đà Lạt 3N2Đ</div><div style="font-size:13px;color:#64748b">Từ 2.490.000đ</div></div>
+          <div style="background:#fff;border-radius:10px;padding:12px;border:1px solid #e2e8f0"><div style="height:60px;border-radius:8px;background:#dbeafe"></div><div style="font-weight:700;margin-top:6px">Phú Quốc 4N3Đ</div><div style="font-size:13px;color:#64748b">Từ 4.990.000đ</div></div>
+          <div style="grid-column:1/-1;text-align:center"><span class="btn" style="background:#f97316;color:#fff">Đặt tour ngay</span></div>
+        </div></div>
+      <div class="c603010 mt"><div style="flex:60;background:#f1f5f9;color:#475569">60%</div><div style="flex:30;background:#1e3a8a;color:#fff">30%</div><div style="flex:10;background:#f97316;color:#fff">10%</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="contrast" data-part="Phần 5 · Chữ · Màu · Icon" data-min="3">
+  <div class="hdr in"><span class="qn">5.9</span><h2>Độ tương phản: chuẩn WCAG</h2></div>
+  <div class="cols c46">
+    <div>
+      <table class="in">
+        <tr><th>Nội dung</th><th>Tối thiểu (AA)</th></tr>
+        <tr><td>Chữ thường</td><td><b>4,5 : 1</b></td></tr>
+        <tr><td>Chữ lớn (≥ 24px, hoặc ≥ 18,66px đậm)</td><td><b>3 : 1</b></td></tr>
+        <tr><td>Icon, viền ô nhập, thành phần UI</td><td><b>3 : 1</b></td></tr>
+        <tr><td>Mức cao (AAA), chữ thường</td><td>7 : 1</td></tr>
+      </table>
+      <p class="small f mt">Tỉ lệ từ <b>1:1</b> (cùng màu) đến <b>21:1</b> (đen trên trắng). Người lớn tuổi, người thị lực kém, người dùng dưới <b>nắng</b> đều cần tương phản cao.</p>
+      <div class="row f mt" style="gap:8px"><span class="small">Thử nhanh:</span>
+        <button class="btn sec sm" data-cc="#9ca3af,#ffffff">Xám nhạt/trắng</button><button class="btn sec sm" data-cc="#ffffff,#22c55e">Trắng/xanh lá</button><button class="btn sec sm" data-cc="#ffffff,#7c3aed">Trắng/tím</button><button class="btn sec sm" data-cc="#1e1b3a,#fde68a">Đen/vàng</button></div>
+    </div>
+    <div class="card in"><span class="lbl good">THỬ NGAY · Bộ kiểm tra tương phản</span>
+      <div class="row" style="gap:16px"><label class="small">Chữ <input type="color" id="ccFg" value="#9ca3af" style="width:54px;height:36px;vertical-align:middle"></label><label class="small">Nền <input type="color" id="ccBg" value="#ffffff" style="width:54px;height:36px;vertical-align:middle"></label><span class="big" id="ccRatio" style="margin-left:auto">–</span></div>
+      <div id="ccPrev" style="margin-top:12px;border-radius:12px;padding:16px;border:1px solid #e2e8f0"><div style="font-size:16px">Chữ thường 16px: Đơn hàng của bạn đang được giao.</div><div style="font-size:26px;font-weight:700;margin-top:6px">Chữ lớn 26px đậm</div></div>
+      <div class="row mt" style="gap:10px;font-size:15px"><span>AA chữ thường <span id="ccAA" class="lbl">–</span></span><span>AA chữ lớn <span id="ccAAL" class="lbl">–</span></span><span>AAA <span id="ccAAA" class="lbl">–</span></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="colorblind" data-part="Phần 5 · Chữ · Màu · Icon" data-min="2">
+  <div class="hdr in"><span class="qn">5.10</span><h2>Đừng chỉ dựa vào màu (mù màu)</h2></div>
+  <div class="cols">
+    <div>
+      <p class="f small">Khoảng <b>8% nam giới</b> và <b>0,5% nữ giới</b> có dạng mù màu (phổ biến nhất: <b>đỏ–lục</b>; ngoài ra lam–vàng, mù màu toàn phần).</p>
+      <div class="card f mt"><h3>Cặp màu nên tránh đặt cạnh nhau</h3><p class="xs">Lục &amp; đỏ · Lục &amp; nâu · Lục &amp; lam · Lục &amp; xám · Lục nhạt &amp; vàng · Lục &amp; đen · Lam &amp; tím · Lam &amp; xám</p></div>
+      <div class="card f mt"><h3>Cách làm đúng</h3><ul class="xs"><li>Thêm <b>icon</b> và <b>chữ</b> bên cạnh màu</li><li>Dùng <b>hoa văn/kết cấu</b> (sọc, chấm) trong biểu đồ</li><li>Kiểm tra bằng công cụ mô phỏng (Coblis, Figma plugin)</li></ul></div>
+    </div>
+    <div>
+      <div class="card cbd in" id="cbd">
+        <h3>Trạng thái máy chủ</h3>
+        <div class="st"><span class="d" style="background:#16a34a"></span><span class="ic" style="color:#16a34a">✓</span>Máy chủ A <span class="tx" style="color:#16a34a">· Hoạt động</span></div>
+        <div class="st"><span class="d" style="background:#dc2626"></span><span class="ic" style="color:#dc2626">✕</span>Máy chủ B <span class="tx" style="color:#dc2626">· Lỗi</span></div>
+        <div class="st"><span class="d" style="background:#16a34a"></span><span class="ic" style="color:#16a34a">✓</span>Máy chủ C <span class="tx" style="color:#16a34a">· Hoạt động</span></div>
+        <div class="st"><span class="d" style="background:#ca8a04"></span><span class="ic" style="color:#ca8a04">!</span>Máy chủ D <span class="tx" style="color:#ca8a04">· Chậm</span></div>
+      </div>
+      <span class="f ghost" data-now="#cbd|gray" data-say="Nhìn qua mắt người không phân biệt được màu: <b>máy chủ nào đang lỗi?</b>"></span>
+      <span class="f ghost" data-act="#cbd|fix" data-now="#cbd|gray" data-say="Thêm <b>icon + chữ</b>: dù không thấy màu vẫn hiểu ngay."></span>
+      <span class="f ghost" data-act="#cbd|fix" data-say="Màu trở lại: màu giờ là lớp thông tin <b>bổ sung</b>, không phải duy nhất."></span>
+      <div class="say" data-def="Chỉ dùng chấm màu để báo trạng thái."></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="icons" data-part="Phần 5 · Chữ · Màu · Icon" data-min="2">
+  <div class="hdr in"><span class="qn">5.11</span><h2>Icon: nhỏ nhưng dễ sai</h2></div>
+  <div class="cols">
+    <div>
+      <div class="card f" id="ic"><h3>Đoán nghĩa trong 5 giây</h3>
+        <div class="row" style="gap:18px;justify-content:space-around">
+          <div class="ctr"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg><div class="il">?</div></div>
+          <div class="ctr"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2"><path d="M12 2l3 6.5 7 .8-5.2 4.8 1.4 7L12 17.6 5.8 21l1.4-7L2 9.3l7-.8z"/></svg><div class="il">?</div></div>
+          <div class="ctr"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2"><path d="M4 12h16M4 6h16M4 18h16"/></svg><div class="il">?</div></div>
+          <div class="ctr"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><div class="il">?</div></div>
+          <div class="ctr"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2"><path d="M4 4l16 16M20 4L8 16l-4 4"/><circle cx="12" cy="12" r="9"/></svg><div class="il">?</div></div>
+        </div></div>
+      <span class="f ghost" data-set="#ic .ctr:nth-child(1) .il::Yêu thích? Thích? Lưu?;#ic .ctr:nth-child(2) .il::Đánh giá? Nổi bật? Lưu?;#ic .ctr:nth-child(3) .il::Menu;#ic .ctr:nth-child(4) .il::Cài đặt? Độ sáng?;#ic .ctr:nth-child(5) .il::??? (tự chế)"></span>
+      <div class="note f" style="font-size:17px"><b>Quy tắc 5 giây:</b> nếu phải nghĩ quá 5 giây mới ra nghĩa → icon không hiệu quả. <b>Tim</b> và <b>sao</b> rất dễ gây nhầm. Khi phân vân: <b>icon tốt nhất là một nhãn chữ</b>.</div>
+    </div>
+    <div>
+      <div class="cols" style="gap:12px">
+        <div class="card bad f"><span class="lbl bad">LỖI THƯỜNG GẶP</span><ul class="xs"><li>Không có nhãn chữ đi kèm</li><li>Icon không truyền đạt đúng nghĩa</li><li>Quá “sáng tạo”, tự chế lại cái đã quen</li><li>Quá nhiều chi tiết</li><li>Vùng chạm quá nhỏ trên mobile</li></ul></div>
+        <div class="card good f"><span class="lbl good">NÊN</span><ul class="xs"><li>Dùng icon <b>quen thuộc</b>: home, tìm kiếm, đóng, in, phát</li><li><b>Một bộ icon</b> duy nhất, cùng nét, cùng cỡ</li><li>Nhãn ở <b>bên phải</b> hoặc <b>bên dưới</b> icon</li><li>Không đổi icon loại file (Word = chữ W xanh)</li><li>Đơn giản, dễ phân biệt; không dùng 1 icon cho 2 nghĩa</li></ul></div>
+      </div>
+      <p class="ex f mt">Nguồn icon miễn phí: Material Symbols (fonts.google.com/icons), Lucide, Phosphor. Ảnh minh họa: Unsplash, Blush.</p>
+    </div>
+  </div>
+  <style>#ic .il{font-size:15px;color:#64748b;margin-top:4px;max-width:110px;min-height:34px}</style>
+</section>
+
+<!-- ===================== PART 6 ===================== -->
+<section class="slide" id="p6" data-title="Phần 6 · Design system" data-part="Phần 6 · Design system" data-min="1">
+  <div class="orb" style="width:340px;height:340px;background:#a5b4fc;right:-40px;top:-60px"></div>
+  <div class="part-wrap">
+    <div class="pnum in">06</div>
+    <h1 class="in" style="font-size:60px">Design system: <span class="grad">gom mọi nguyên tắc thành bộ quy chuẩn</span></h1>
+    <div class="chips in"><span class="chip">Vì sao cần?</span><span class="chip">Tokens</span><span class="chip">Components</span><span class="chip">Đổi theme trong 1 giây</span><span class="chip">Các design system nổi tiếng</span></div>
+  </div>
+</section>
+
+<section class="slide" id="ds-what" data-part="Phần 6 · Design system" data-min="3">
+  <div class="hdr in"><span class="qn">6.1</span><h2>Design system là gì?</h2></div>
+  <div class="note blue in" style="font-size:21px">Một bộ <b>thành phần dùng lại được</b> + <b>hướng dẫn sử dụng</b>, giúp cả nhóm thiết kế và phát triển sản phẩm theo <b>cùng một chuẩn</b>.</div>
+  <div class="cols mt">
+    <div>
+      <div class="card f" id="chaos"><h3>Không có design system…</h3>
+        <div class="row" style="gap:6px">
+          <span class="btn sm" style="background:#7c3aed;color:#fff">Lưu</span><span class="btn sm" style="background:#6d28d9;color:#fff;border-radius:2px">Gửi</span><span class="btn sm" style="background:#8b5cf6;color:#fff;border-radius:20px;font-size:12px">OK</span><span class="btn sm" style="background:#5b21b6;color:#fff;padding:12px 20px">Tiếp</span><span class="btn sm" style="background:#a78bfa;color:#1e1b3a">Xong</span></div>
+        <p class="ex" id="chaosT">5 người làm 5 màn hình → 5 sắc tím, 5 kiểu bo góc, 5 cỡ chữ. Sửa màu thương hiệu = sửa tay hàng trăm chỗ.</p></div>
+      <span class="f ghost" data-set="#chaos .row::&lt;span class='btn pri sm'&gt;Lưu&lt;/span&gt;&lt;span class='btn pri sm'&gt;Gửi&lt;/span&gt;&lt;span class='btn pri sm'&gt;OK&lt;/span&gt;&lt;span class='btn pri sm'&gt;Tiếp&lt;/span&gt;&lt;span class='btn pri sm'&gt;Xong&lt;/span&gt;;#chaosT::✓ Có design system: mọi người dùng <b>cùng một component Button</b>. Đổi màu ở 1 nơi → cả sản phẩm đổi theo."></span>
+      <div class="note f" style="font-size:17px"><b>Ví dụ đời thường:</b> bộ LEGO. Viên gạch chuẩn (component) + sách hướng dẫn (guideline) → ai lắp cũng khớp nhau.</div>
+    </div>
+    <div class="f">
+      <h3>Các tầng của một design system</h3>
+      <div class="stack" style="gap:6px;margin-top:6px">
+        <div class="box" style="text-align:left;border-color:#7c3aed;background:#faf5ff">① Nguyên tắc <small>“Rõ ràng trước, đẹp sau”, giọng văn, accessibility</small></div>
+        <div class="box" style="text-align:left;border-color:#0891b2;background:#ecfeff;margin-left:20px">② Tokens <small>màu, chữ, khoảng cách, bo góc, bóng, chuyển động</small></div>
+        <div class="box" style="text-align:left;border-color:#db2777;background:#fdf2f8;margin-left:40px">③ Components <small>Button, Input, Card, Modal, Tabs…</small></div>
+        <div class="box" style="text-align:left;border-color:#f59e0b;background:#fffbeb;margin-left:60px">④ Patterns <small>form đăng nhập, trang tìm kiếm, luồng thanh toán</small></div>
+        <div class="box" style="text-align:left;border-color:#059669;background:#ecfdf5;margin-left:80px">⑤ Màn hình / sản phẩm</div>
+      </div>
+      <p class="ex mt">Gần giống “Atomic design” (Brad Frost): nguyên tử → phân tử → sinh vật → khuôn mẫu → trang.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="tokens" data-part="Phần 6 · Design system" data-min="4">
+  <div class="hdr in"><span class="qn">6.2</span><h2>Design tokens: đặt tên cho các quyết định thiết kế</h2></div>
+  <div class="cols c46">
+    <div>
+      <p class="small in">Token = <b>một cái tên</b> gắn với <b>một giá trị</b>. Thay vì nói “màu #7C3AED”, ta nói “<b>color.primary</b>”.</p>
+      <div class="flow f mt" style="gap:6px;justify-content:flex-start;flex-wrap:wrap">
+        <div class="box" style="font-size:15px">#7C3AED<small>giá trị</small></div><div class="ar">→</div>
+        <div class="box o" style="font-size:15px">violet-600<small>token gốc</small></div><div class="ar">→</div>
+        <div class="box cpp" style="font-size:15px">color.primary<small>token ngữ nghĩa</small></div><div class="ar">→</div>
+        <div class="box exe" style="font-size:15px">button.bg<small>token component</small></div>
+      </div>
+      <div class="note f" style="font-size:17px">Đổi thương hiệu sang xanh lá? Chỉ cần đổi <b>color.primary</b> trỏ sang <b>green-600</b>. Mọi nút, link, icon tự đổi theo.</div>
+      <div class="card f mt"><h3>Các nhóm token thường gặp</h3><p class="xs">Màu (color) · Chữ (font, size, weight, line-height) · Khoảng cách (spacing) · Bo góc (radius) · Bóng/độ nổi (elevation) · Chuyển động (duration, easing) · Breakpoint màn hình</p></div>
+    </div>
+    <div>
+      <div class="card f"><h3>Spacing: thang bội số 4 / 8</h3>
+        <div style="display:flex;flex-direction:column;gap:5px;font-family:var(--mono);font-size:13px">
+          <div class="row" style="gap:10px"><span style="width:120px">space-1 · 4</span><span style="height:12px;width:4px;background:#7c3aed"></span></div>
+          <div class="row" style="gap:10px"><span style="width:120px">space-2 · 8</span><span style="height:12px;width:8px;background:#7c3aed"></span></div>
+          <div class="row" style="gap:10px"><span style="width:120px">space-3 · 12</span><span style="height:12px;width:12px;background:#7c3aed"></span></div>
+          <div class="row" style="gap:10px"><span style="width:120px">space-4 · 16</span><span style="height:12px;width:16px;background:#7c3aed"></span></div>
+          <div class="row" style="gap:10px"><span style="width:120px">space-6 · 24</span><span style="height:12px;width:24px;background:#7c3aed"></span></div>
+          <div class="row" style="gap:10px"><span style="width:120px">space-8 · 32</span><span style="height:12px;width:32px;background:#7c3aed"></span></div>
+          <div class="row" style="gap:10px"><span style="width:120px">space-12 · 48</span><span style="height:12px;width:48px;background:#7c3aed"></span></div>
+        </div><p class="xs mt">Chỉ dùng các giá trị trong thang → khoảng trắng tự nhiên đều đặn.</p></div>
+      <div class="cols f mt" style="gap:10px">
+        <div class="card"><h3>Radius</h3><div class="row" style="gap:8px"><span style="width:34px;height:34px;background:#ddd6fe;border-radius:4px"></span><span style="width:34px;height:34px;background:#ddd6fe;border-radius:8px"></span><span style="width:34px;height:34px;background:#ddd6fe;border-radius:16px"></span><span style="width:34px;height:34px;background:#ddd6fe;border-radius:50%"></span></div><p class="xs">sm · md · lg · full</p></div>
+        <div class="card"><h3>Elevation</h3><div class="row" style="gap:10px"><span style="width:34px;height:34px;background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span><span style="width:34px;height:34px;background:#fff;border-radius:8px;box-shadow:0 4px 10px rgba(0,0,0,.2)"></span><span style="width:34px;height:34px;background:#fff;border-radius:8px;box-shadow:0 12px 24px rgba(0,0,0,.25)"></span></div><p class="xs">1 · 2 · 3</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="components" data-part="Phần 6 · Design system" data-min="3">
+  <div class="hdr in"><span class="qn">6.3</span><h2>Component: một thành phần, nhiều biến thể, đủ trạng thái</h2></div>
+  <div class="cols">
+    <div>
+      <div class="card f"><h3>Giải phẫu (anatomy) của Button</h3>
+        <div class="row" style="gap:22px;align-items:center"><button class="btn pri lg" style="outline:2px dashed #f59e0b;outline-offset:4px">＋ Thêm vào giỏ</button>
+          <div class="xs" style="line-height:1.5"><span style="color:#b45309">① Khung (container): nền, bo góc</span><br><span style="color:#0891b2">② Icon (tùy chọn)</span><br><span style="color:#db2777">③ Nhãn: động từ rõ nghĩa</span><br><span style="color:#7c3aed">④ Padding: lấy từ thang spacing</span></div></div></div>
+      <div class="card f mt"><h3>Biến thể (variants) – khi nào dùng?</h3>
+        <div class="row" style="gap:8px"><button class="btn pri">Primary</button><button class="btn sec">Secondary</button><button class="btn ghost">Tertiary</button><button class="btn dan">Danger</button></div>
+        <p class="xs mt"><b>Primary</b>: hành động chính, mỗi màn hình chỉ 1. <b>Secondary</b>: hành động phụ. <b>Tertiary</b>: ít quan trọng. <b>Danger</b>: xóa, hủy không hoàn tác được.</p></div>
+    </div>
+    <div>
+      <div class="card f"><h3>Kích cỡ</h3><div class="row" style="gap:8px"><button class="btn pri sm">Small</button><button class="btn pri">Medium</button><button class="btn pri lg">Large</button></div></div>
+      <div class="card f mt"><h3>Trạng thái <span class="lbl good">THỬ: rê chuột, bấm, nhấn Tab</span></h3>
+        <div class="row" style="gap:8px"><button class="btn pri">Thử tôi</button><button class="btn sec">Thử tôi</button><button class="btn pri" disabled>Disabled</button><button class="btn pri"><span class="spinr"></span>Loading</button></div>
+        <p class="xs mt">Default · Hover · Pressed · Focus · Disabled · Loading. Design system phải mô tả <b>đủ mọi trạng thái</b>, không chỉ trạng thái “đẹp nhất”.</p></div>
+      <div class="note f" style="font-size:17px">Tài liệu component tốt luôn có: ví dụ đúng ✅ / sai ❌, khi nào dùng / không dùng, yêu cầu accessibility.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="ds-demo" data-part="Phần 6 · Design system" data-min="2">
+  <div class="hdr in"><span class="qn">6.4</span><h2>Sức mạnh của token: đổi theme trong 1 giây</h2></div>
+  <div class="cols c46">
+    <div class="tdemo in" id="tdemo">
+      <div class="tt">Xin chào, Lan 👋</div>
+      <div class="mm">Bạn có 3 lịch hẹn trong tuần này</div>
+      <div class="bx"><div class="av"></div><div><b>Khám tổng quát</b><div class="mm" style="margin:0">Thứ 5 · 09:00 · BS. Minh</div></div></div>
+      <div style="display:flex;gap:10px"><button class="b1">Đặt lịch mới</button><button class="b2">Xem tất cả</button></div>
+    </div>
+    <div>
+      <table class="f" style="font-size:16px" id="ttab">
+        <tr><th>Token</th><th>Giá trị</th></tr>
+        <tr><td>color.primary</td><td id="tv1">#7C3AED (tím)</td></tr>
+        <tr><td>color.background</td><td id="tv2">#FFFFFF</td></tr>
+        <tr><td>radius.base</td><td id="tv3">14px</td></tr>
+        <tr><td>space.base</td><td id="tv4">16px</td></tr>
+      </table>
+      <span class="f ghost" data-now="#tdemo|thb" data-set="#tv1::#059669 (xanh lá);#tv3::4px;#tv4::12px" data-say="Thương hiệu B: đổi <b>3 token</b> → toàn bộ giao diện đổi, không sửa từng nút."></span>
+      <span class="f ghost" data-now="#tdemo|thc" data-set="#tv1::#F472B6 (hồng);#tv2::#18162B (tối);#tv3::22px" data-say="Chế độ tối (dark mode): chỉ là <b>một bộ giá trị token khác</b>."></span>
+      <div class="say" data-def="Toàn bộ thẻ bên trái được vẽ chỉ từ vài token. Nhấn → để đổi."></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="ds-popular" data-part="Phần 6 · Design system" data-min="2">
+  <div class="hdr in"><span class="qn">6.5</span><h2>Lợi ích &amp; các design system nổi tiếng</h2></div>
+  <div class="cols c46">
+    <div class="card f"><h3>Lợi ích</h3><ul class="small"><li><b>Nhất quán</b> cho designer và người dùng</li><li>Củng cố <b>nhận diện thương hiệu</b></li><li>Dễ <b>mở rộng</b> sản phẩm</li><li>Tiết kiệm <b>thời gian, chi phí</b></li><li>Designer và lập trình viên <b>nói chung một ngôn ngữ</b></li></ul></div>
+    <div class="cols3" style="gap:10px">
+      <div class="card f"><h3>Material Design 3</h3><p class="xs">Google · Android, web</p></div>
+      <div class="card f"><h3>Human Interface Guidelines</h3><p class="xs">Apple · iOS, macOS</p></div>
+      <div class="card f"><h3>Fluent 2</h3><p class="xs">Microsoft · Windows, Office</p></div>
+      <div class="card f"><h3>Polaris</h3><p class="xs">Shopify · thương mại điện tử</p></div>
+      <div class="card f"><h3>Carbon</h3><p class="xs">IBM · ứng dụng doanh nghiệp</p></div>
+      <div class="card f"><h3>Ant Design</h3><p class="xs">Ant Group · trang quản trị</p></div>
+      <div class="card f"><h3>Airbnb DLS</h3><p class="xs">Airbnb</p></div>
+      <div class="card f"><h3>U.S. Web Design System</h3><p class="xs">Chính phủ Mỹ</p></div>
+      <div class="card f"><h3>Bắt đầu thế nào?</h3><p class="xs">Lấy 1 UI kit có sẵn trong Figma → chỉnh token màu/chữ theo thương hiệu.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PART 7 ===================== -->
+<section class="slide" id="p7" data-title="Phần 7 · Từ thiết kế đến code" data-part="Phần 7 · Từ thiết kế đến code" data-min="1">
+  <div class="orb" style="width:340px;height:340px;background:#7dd3fc;right:-40px;top:-60px"></div>
+  <div class="part-wrap">
+    <div class="pnum in">07</div>
+    <h1 class="in" style="font-size:60px">Từ thiết kế đến <span class="grad">code giao diện</span></h1>
+    <div class="chips in"><span class="chip">HTML · CSS · JS</span><span class="chip">Box model</span><span class="chip">CSS variables = tokens</span><span class="chip">Flexbox &amp; Grid</span><span class="chip">:hover :focus = feedback</span><span class="chip">Figma → code</span></div>
+    <p class="in muted mt2">Không cần thành lập trình viên. Mục tiêu: <b>đọc hiểu</b> và <b>nói chuyện được</b> với lập trình viên.</p>
+  </div>
+</section>
+
+<section class="slide" id="html-css" data-part="Phần 7 · Từ thiết kế đến code" data-min="3">
+  <div class="hdr in"><span class="qn">7.1</span><h2>HTML là khung, CSS là trang trí, JS là hành vi</h2></div>
+  <div class="cols3 in" style="gap:12px">
+    <div class="card"><h3>🦴 HTML</h3><p class="xs">Cấu trúc &amp; nội dung: đây là tiêu đề, đây là nút. Như <b>khung nhà</b>.</p></div>
+    <div class="card"><h3>🎨 CSS</h3><p class="xs">Hình thức: màu, chữ, khoảng cách, bố cục. Như <b>sơn, nội thất</b>.</p></div>
+    <div class="card"><h3>⚙️ JavaScript</h3><p class="xs">Hành vi: bấm nút thì làm gì. Như <b>điện nước</b>.</p></div>
+  </div>
+  <div class="cols mt" style="grid-template-columns:1fr 1fr 0.8fr">
+    <div><div class="code-title">card.html</div>
+<script type="text/x-code" data-lang="html" id="h1c" class="xs" data-mark="1:a;2:b;3:c;4:d">
+<div class="card">
+  <h3>Tai nghe Aurora</h3>
+  <p>Pin 30 giờ, chống ồn.</p>
+  <button>Mua ngay</button>
+</div>
+</script></div>
+    <div><div class="code-title">style.css</div>
+<script type="text/x-code" data-lang="css" id="c1c" class="xs" data-mark="1-5:a;6:b;7-11:d">
+.card {
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px #0002;
+}
+h3 { font-size: 20px; }
+button {
+  background: #7c3aed;
+  color: white;
+  padding: 10px 16px;
+}
+</script></div>
+    <div><div class="code-title">Kết quả</div>
+      <div id="pv1" style="background:#fff;border:1px solid #e2e8f0;border-radius:2px;padding:4px;font-family:'Be Vietnam Pro',sans-serif;transition:all .5s">
+        <div class="pt" style="font-size:16px;font-weight:700;transition:all .5s">Tai nghe Aurora</div>
+        <div style="font-size:14px;margin:6px 0">Pin 30 giờ, chống ồn.</div>
+        <button class="pb" style="font:14px 'Be Vietnam Pro',sans-serif;padding:2px 6px;border:1px solid #999;background:#eee;transition:all .5s">Mua ngay</button>
+      </div>
+      <style>#pv1.s1{padding:16px!important;border-radius:12px!important;box-shadow:0 4px 12px #0002}#pv1.s2 .pt{font-size:20px!important}#pv1.s3 .pb{background:#7c3aed!important;color:#fff!important;border:none!important;padding:10px 16px!important;border-radius:8px}</style>
+    </div>
+  </div>
+  <span class="f ghost" data-act="#h1c|show-a;#h1c|show-b;#h1c|show-c;#h1c|show-d" data-say="<b>HTML</b> chỉ nói “có gì”: 1 khối card chứa tiêu đề, đoạn văn, nút. Trình duyệt hiển thị kiểu mặc định, rất thô."></span>
+  <span class="f ghost" data-act="#c1c|show-a;#pv1|s1" data-say="<b>CSS</b> cho .card: padding (khoảng trắng bên trong), bo góc, đổ bóng → thành một thẻ."></span>
+  <span class="f ghost" data-act="#c1c|show-b;#pv1|s2" data-say="Tăng cỡ tiêu đề → phân cấp chữ."></span>
+  <span class="f ghost" data-act="#c1c|show-d;#pv1|s3" data-say="Nút có màu chính, chữ trắng, padding đủ lớn → affordance rõ ràng."></span>
+  <div class="say" data-def="Mỗi nguyên tắc ta đã học đều có một dòng CSS tương ứng."></div>
+</section>
+
+<section class="slide" id="box-model" data-part="Phần 7 · Từ thiết kế đến code" data-min="2">
+  <div class="hdr in"><span class="qn">7.2</span><h2>Box model: mọi phần tử là một chiếc hộp</h2></div>
+  <div class="cols">
+    <div class="bm in">
+      <div class="m"><span class="lb">margin – khoảng cách RA NGOÀI</span>
+        <div class="b"><span class="lb">border – viền</span>
+          <div class="p"><span class="lb">padding – đệm BÊN TRONG</span>
+            <div class="cn">content – nội dung<br>“Mua ngay”</div></div></div></div>
+    </div>
+    <div>
+      <ul class="small">
+        <li class="f"><b>content</b>: chữ, ảnh</li>
+        <li class="f"><b>padding</b>: khoảng trắng giữa nội dung và viền → nút “thoáng”, dễ bấm (Fitts!)</li>
+        <li class="f"><b>border</b>: viền (containment)</li>
+        <li class="f"><b>margin</b>: khoảng cách với hộp khác → <b>proximity</b>: margin nhỏ = cùng nhóm, margin lớn = khác nhóm</li>
+      </ul>
+<script type="text/x-code" data-lang="css" class="xs f">
+.button {
+  padding: 12px 20px;   /* đệm trong */
+  border: 2px solid #7c3aed;
+  margin-bottom: 24px;  /* cách khối dưới */
+}
+</script>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="css-vars" data-part="Phần 7 · Từ thiết kế đến code" data-min="3">
+  <div class="hdr in"><span class="qn">7.3</span><h2>CSS variables: design token trong code</h2></div>
+  <div class="cols">
+    <div>
+<script type="text/x-code" data-lang="css" id="v1c" class="sm" data-mark="1-5:a;7-10:b">
+:root {
+  --primary: #7c3aed;
+  --radius: 12px;
+  --space-4: 16px;
+}
+/* component dùng token, không dùng số cứng */
+.button {
+  background: var(--primary);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+}
+</script>
+      <span class="f ghost" data-act="#v1c|show-a" data-say="<b>:root</b> khai báo token một lần, ở một nơi."></span>
+      <span class="f ghost" data-act="#v1c|show-b" data-say="Mọi component gọi token bằng <b>var(--tên)</b>. Đổi giá trị ở :root → cả trang đổi."></span>
+      <div class="say" data-def="Biến CSS bắt đầu bằng hai dấu gạch ngang."></div>
+    </div>
+    <div class="card in"><span class="lbl good">THỬ NGAY · đổi token</span>
+      <p class="small">--primary: <code class="i" id="varVal">#7c3aed</code></p>
+      <div class="row" style="gap:8px;margin:6px 0 10px">
+        <button data-pv="#7c3aed" style="width:36px;height:36px;border-radius:8px;border:none;background:#7c3aed;cursor:pointer"></button>
+        <button data-pv="#059669" style="width:36px;height:36px;border-radius:8px;border:none;background:#059669;cursor:pointer"></button>
+        <button data-pv="#e11d48" style="width:36px;height:36px;border-radius:8px;border:none;background:#e11d48;cursor:pointer"></button>
+        <button data-pv="#0284c7" style="width:36px;height:36px;border-radius:8px;border:none;background:#0284c7;cursor:pointer"></button>
+        <button data-pv="#ea580c" style="width:36px;height:36px;border-radius:8px;border:none;background:#ea580c;cursor:pointer"></button>
+      </div>
+      <p class="small">--radius: <code class="i" id="radVal">12px</code></p>
+      <div class="row" style="gap:8px;margin:6px 0 12px"><button class="btn sec sm" data-rv="0px">0</button><button class="btn sec sm" data-rv="6px">6</button><button class="btn sec sm" data-rv="12px">12</button><button class="btn sec sm" data-rv="999px">999</button></div>
+      <div id="varDemo" style="--primary:#7c3aed;--radius:12px;border:1px solid #e2e8f0;border-radius:var(--radius);padding:16px;transition:all .4s">
+        <div style="font-weight:800;font-size:18px;color:var(--primary)">Gói Premium</div>
+        <div style="font-size:14px;color:#64748b;margin:4px 0 12px">Không quảng cáo, tải nhạc offline.</div>
+        <div class="row" style="gap:8px"><button style="background:var(--primary);color:#fff;border:none;border-radius:var(--radius);padding:10px 16px;font:700 14px 'Be Vietnam Pro',sans-serif">Nâng cấp</button><button style="background:#fff;color:var(--primary);border:2px solid var(--primary);border-radius:var(--radius);padding:8px 14px;font:700 14px 'Be Vietnam Pro',sans-serif">Để sau</button><span style="background:var(--primary);opacity:.15;width:30px;height:30px;border-radius:var(--radius)"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="layout" data-part="Phần 7 · Từ thiết kế đến code" data-min="3">
+  <div class="hdr in"><span class="qn">7.4</span><h2>Flexbox: căn lề &amp; khoảng cách bằng 4 dòng code</h2></div>
+  <div class="cols">
+    <div>
+<script type="text/x-code" data-lang="css" id="fxc" class="sm" data-mark="2:a;3:b;4:c;5:d">
+.toolbar {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+}
+</script>
+      <div class="say" data-def="Ban đầu: các khối nằm tùy ý, không đều."></div>
+      <div class="note blue f" data-o="9" style="font-size:17px">Lưới 12 cột cũng chỉ là: <code class="i">display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px;</code></div>
+    </div>
+    <div>
+      <div class="fx in" id="fxd"><div>Logo</div><div>Tìm kiếm</div><div>Giỏ hàng</div></div>
+      <span class="f ghost" data-act="#fxc|show-a;#fxd|l1" data-say="<b>display: flex</b> → xếp các phần tử con thành một hàng."></span>
+      <span class="f ghost" data-act="#fxc|show-b;#fxd|l2" data-say="<b>gap: 16px</b> → khoảng cách đều, lấy từ thang spacing."></span>
+      <span class="f ghost" data-act="#fxc|show-c;#fxd|l3" data-say="<b>align-items: center</b> → căn giữa theo chiều dọc (alignment)."></span>
+      <span class="f ghost" data-act="#fxc|show-d;#fxd|l4" data-say="<b>justify-content: space-between</b> → dàn đều ra hai mép."></span>
+      <table class="f mt" data-o="9" style="font-size:15px"><tr><th>Trong Figma</th><th>Trong CSS</th></tr><tr><td>Auto layout</td><td>display: flex</td></tr><tr><td>Spacing between items</td><td>gap</td></tr><tr><td>Padding</td><td>padding</td></tr><tr><td>Layout grid</td><td>display: grid</td></tr></table>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="states" data-part="Phần 7 · Từ thiết kế đến code" data-min="2">
+  <div class="hdr in"><span class="qn">7.5</span><h2>Feedback &amp; signifier trong CSS</h2></div>
+  <div class="cols">
+<script type="text/x-code" data-lang="css" class="sm" id="stc" data-mark="2:a;3:a;5-7:b;8:c;9:d">
+.button {
+  cursor: pointer;         /* signifier */
+  transition: all 0.2s;    /* phản hồi mượt */
+}
+.button:hover    { background: #6d28d9; }
+.button:active   { transform: scale(0.97); }
+.button:focus-visible { outline: 3px solid orange; }
+.button:disabled { opacity: 0.4; cursor: not-allowed; }
+/* aria-busy = đang tải, đọc được bằng trình đọc màn hình */
+</script>
+    <div>
+      <div class="card f"><span class="lbl good">THỬ NGAY</span><div class="row" style="gap:10px"><button class="btn pri lg">Rê · Bấm · Tab vào tôi</button><button class="btn pri lg" disabled>Disabled</button></div></div>
+      <ul class="small f mt">
+        <li><b>cursor: pointer</b> = con trỏ bàn tay → signifier “bấm được”</li>
+        <li><b>:hover / :active</b> = feedback tức thì (&lt; 0,1 giây)</li>
+        <li><b>:focus-visible</b> = người dùng <b>bàn phím</b> biết đang ở đâu. <b>Đừng bao giờ</b> xóa outline mà không thay thế!</li>
+        <li><b>:disabled</b> = ràng buộc (constraint) nhìn thấy được</li>
+      </ul>
+    </div>
+  </div>
+  <span class="f ghost" data-act="#stc|show-a"></span><span class="f ghost" data-act="#stc|show-b"></span><span class="f ghost" data-act="#stc|show-c"></span>
+</section>
+
+<section class="slide" id="handoff" data-part="Phần 7 · Từ thiết kế đến code" data-min="1">
+  <div class="hdr in"><span class="qn">7.6</span><h2>Bàn giao thiết kế cho lập trình viên (handoff)</h2></div>
+  <div class="flow in" style="gap:12px">
+    <div class="box h" style="min-width:200px">Figma<small>frame, component, style/variable</small></div><div class="ar">→</div>
+    <div class="box cpp" style="min-width:200px">Dev Mode / Inspect<small>xem kích thước, màu, token</small></div><div class="ar">→</div>
+    <div class="box m" style="min-width:200px">Code<small>HTML + CSS + component</small></div>
+  </div>
+  <div class="cols mt2">
+    <div class="card f"><h3>Checklist trước khi bàn giao</h3><ul class="small"><li>Dùng <b>token/style</b>, không dùng màu “gõ tay”</li><li>Mọi component có <b>đủ trạng thái</b> (hover, lỗi, rỗng, đang tải)</li><li>Có bản <b>mobile</b> và <b>desktop</b></li><li>Đặt tên layer, frame rõ ràng</li></ul></div>
+    <div class="card f"><h3>Những màn hình hay bị quên</h3><ul class="small"><li>Trạng thái <b>rỗng</b> (chưa có đơn hàng nào)</li><li>Trạng thái <b>lỗi</b> (mất mạng, sai mật khẩu)</li><li>Nội dung <b>quá dài</b> (tên 60 ký tự)</li><li>Đang <b>tải</b> (skeleton)</li></ul></div>
+  </div>
+</section>
+
+<!-- ===================== WRAP-UP ===================== -->
+<section class="slide" id="redesign" data-title="Tổng kết: sửa 1 màn hình" data-part="Tổng kết" data-min="3">
+  <div class="hdr in"><span class="qn">TỔNG KẾT</span><h2>Áp dụng tất cả: sửa một màn hình đăng nhập</h2></div>
+  <div class="cols c46">
+    <div class="in">
+      <div class="rd" id="rd">
+        <div class="t">ĐĂNG NHẬP HỆ THỐNG</div>
+        <div class="sub">Phiên bản 2.0.1</div>
+        <div class="r"><label>Tên đăng nhập:</label><input value="lan.nguyen"></div>
+        <div class="r"><label>Mật khẩu:</label><input type="password" value="123" class="bad"><span class="eye">👁 Hiện mật khẩu</span></div>
+        <div class="msg"><span class="od">ERR_AUTH_401</span><span class="nw">Mật khẩu chưa đúng. Còn 4 lần thử. <u>Quên mật khẩu?</u></span></div>
+        <div class="acts"><span>Reset</span><span>Help</span><span>Thoát</span><span class="go">Login</span><span class="lnk">Chưa có tài khoản? Đăng ký</span></div>
+      </div>
+    </div>
+    <div>
+      <ol class="small" style="margin-left:24px;line-height:1.55">
+        <li class="f" data-act="#rd|s1"><b>Căn lề</b>: một trục trái, nhãn trên ô, ô cùng độ rộng</li>
+        <li class="f" data-act="#rd|s2"><b>Khoảng trắng</b>: padding, khoảng cách theo thang 8px</li>
+        <li class="f" data-act="#rd|s3"><b>Phân cấp chữ</b>: tiêu đề to đậm, bỏ IN HOA, chữ phụ nhỏ nhạt</li>
+        <li class="f" data-act="#rd|s4"><b>Một nút chính</b>: màu nhấn 10%, tương phản đạt AA, bỏ nút thừa (Reset, Thoát) → đơn giản hóa</li>
+        <li class="f" data-act="#rd|s5"><b>Ngôn ngữ người dùng</b>: thông báo lỗi nói rõ chuyện gì + cách sửa</li>
+        <li class="f" data-act="#rd|s6"><b>Visibility &amp; constraint</b>: “Hiện mật khẩu”, viền đỏ ô sai</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="checklist" data-title="Checklist nguyên tắc" data-part="Tổng kết" data-min="1">
+  <div class="hdr in"><span class="qn">TỔNG KẾT</span><h2>Checklist: soi một màn hình trong 5 phút</h2><span class="muted" style="font-size:15px">bấm để xem lại</span></div>
+  <div class="agenda in" style="grid-template-columns:repeat(4,1fr);gap:8px">
+    <div class="ag" style="font-size:18px" data-goto="usability"><b>☐</b>Dễ học, hiệu quả, dễ nhớ, ít lỗi, hài lòng?</div>
+    <div class="ag" style="font-size:18px" data-goto="memory"><b>☐</b>Không bắt người dùng nhớ quá 7±2 thứ?</div>
+    <div class="ag" style="font-size:18px" data-goto="recog"><b>☐</b>Nhận ra thay vì nhớ lại?</div>
+    <div class="ag" style="font-size:18px" data-goto="models"><b>☐</b>Khớp mô hình người dùng?</div>
+    <div class="ag" style="font-size:18px" data-goto="affordance"><b>☐</b>Thứ bấm được trông như bấm được?</div>
+    <div class="ag" style="font-size:18px" data-goto="signifier"><b>☐</b>Có signifier rõ ràng?</div>
+    <div class="ag" style="font-size:18px" data-goto="visibility"><b>☐</b>Chức năng chính nhìn thấy được?</div>
+    <div class="ag" style="font-size:18px" data-goto="feedback"><b>☐</b>Mọi thao tác có phản hồi?</div>
+    <div class="ag" style="font-size:18px" data-goto="mapping"><b>☐</b>Điều khiển khớp vị trí kết quả?</div>
+    <div class="ag" style="font-size:18px" data-goto="constraints"><b>☐</b>Ràng buộc ngăn lỗi?</div>
+    <div class="ag" style="font-size:18px" data-goto="consistency"><b>☐</b>Nhất quán trong &amp; ngoài?</div>
+    <div class="ag" style="font-size:18px" data-goto="language"><b>☐</b>Từ ngữ, thông báo lỗi dễ hiểu?</div>
+    <div class="ag" style="font-size:18px" data-goto="fitts"><b>☐</b>Nút chính đủ to, đủ gần?</div>
+    <div class="ag" style="font-size:18px" data-goto="efficiency"><b>☐</b>Phím tắt, mặc định, gợi ý?</div>
+    <div class="ag" style="font-size:18px" data-goto="reduction"><b>☐</b>Bỏ được gì nữa không?</div>
+    <div class="ag" style="font-size:18px" data-goto="whitespace"><b>☐</b>Đủ khoảng trắng, nhóm rõ?</div>
+    <div class="ag" style="font-size:18px" data-goto="alignment"><b>☐</b>Căn lề thẳng, bám lưới?</div>
+    <div class="ag" style="font-size:18px" data-goto="hierarchy"><b>☐</b>Nheo mắt thấy đúng thứ quan trọng?</div>
+    <div class="ag" style="font-size:18px" data-goto="type-bp"><b>☐</b>≤ 3 font, chữ ≥ 16px, dòng 1,5?</div>
+    <div class="ag" style="font-size:18px" data-goto="contrast"><b>☐</b>Tương phản ≥ 4,5:1, không chỉ dựa vào màu?</div>
+  </div>
+</section>
+
+<section class="slide" id="resources" data-title="Tài liệu & bài tập" data-part="Tổng kết" data-min="1">
+  <div class="hdr in"><span class="qn">TỔNG KẾT</span><h2>Tài liệu tham khảo &amp; bài tập về nhà</h2></div>
+  <div class="cols">
+    <div class="card f"><h3>Đọc thêm</h3><ul class="xs">
+      <li>Don Norman – <i>The Design of Everyday Things</i></li>
+      <li>Jakob Nielsen – <i>Usability Engineering</i> (1994) · nngroup.com</li>
+      <li>MIT 6.813/6.831 – User Interface Design &amp; Implementation</li>
+      <li>Laws of UX – lawsofux.com</li>
+      <li>Material Design 3 – m3.material.io · Apple HIG – developer.apple.com/design</li>
+      <li>Công cụ: Google Fonts, Coolors, Color Hunt, WebAIM Contrast Checker, Coblis, Figma</li></ul></div>
+    <div class="card f"><h3>Bài tập về nhà</h3><ol class="xs" style="margin-left:22px;line-height:1.6">
+      <li>Chụp 3 màn hình của một app bạn hay dùng.</li>
+      <li>Dùng <b>checklist</b> ở slide trước, liệt kê ít nhất <b>5 vi phạm</b>, mỗi vi phạm ghi rõ <b>nguyên tắc</b> nào.</li>
+      <li>Vẽ lại (giấy hoặc Figma) <b>1 màn hình</b> đã sửa. Ghi chú lý do cho mỗi thay đổi.</li>
+      <li>Liệt kê <b>token</b> bạn dùng: 1 màu chính, 1 màu nhấn, 3 cỡ chữ, thang khoảng cách.</li></ol></div>
+  </div>
+  <div class="note blue f">“Thiết kế giao diện giống như một câu chuyện cười. Nếu phải giải thích thì nó chưa hay.”</div>
+</section>
+
+<section class="slide" id="end" data-title="Cảm ơn · Hỏi đáp" data-part="Tổng kết" data-min="0">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:30%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// Hết bài · Hỏi đáp</div>
+    <h1 class="in">Cảm ơn!<br><span class="grad">Câu hỏi?</span></h1>
+    <p class="in muted" style="font-size:24px;margin-top:20px">Nhấn <b>G</b> hoặc nút ☰ để quay lại bất kỳ slide nào.</p>
+  </div>
+</section>
+
+</div></div>
+<div id="bar"></div>
+<div id="hint">← → / Space: từng bước · Shift+→: qua slide · G: nhảy slide · A: hiện hết · F: toàn màn hình</div>
+<div id="nav"><span id="clock" title="Bấm để bắt đầu/tạm dừng bấm giờ">⏱ 00:00 / 180:00</span><button id="homebtn" class="wide" title="Về mục lục">⌂</button><button id="jumpbtn" class="wide" title="Nhảy đến slide bất kỳ (phím G)">☰ Đi tới slide</button><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+<div id="jump"><div class="jbox"><div class="jhead"><b>Đi tới slide</b><input id="jnum" type="number" min="1" placeholder="Số slide ↵"><input id="jq" placeholder="Tìm theo tên slide…"><button id="jclose" aria-label="Đóng">✕</button></div><div id="jlist"></div></div></div>
+<script>
+(function(){
+  // ---------- tiny HTML/CSS highlighter ----------
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlCss(line){
+    const re=/(\/\*.*?\*\/)|("(?:[^"\\]|\\.)*")|(--[\w-]+)|(#[0-9a-fA-F]{3,8}\b)|(\b\d+(?:\.\d+)?(?:px|rem|em|%|ms|s|fr|deg)?\b)|([a-z-]+)(?=\s*:(?!hover|focus|active|disabled|root))|(:(?:hover|focus-visible|focus|active|disabled|root))/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1])out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2])out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3])out+='<span class="vr">'+m[3]+'</span>';
+      else if(m[4])out+='<span class="n">'+m[4]+'</span>';
+      else if(m[5])out+='<span class="n">'+m[5]+'</span>';
+      else if(m[6])out+='<span class="pr">'+m[6]+'</span>';
+      else if(m[7])out+='<span class="k">'+m[7]+'</span>';
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  function hlHtml(line){
+    const re=/(&lt;!--.*?--&gt;)|(&lt;\/?)([a-z0-9]+)|([a-z-]+)(=)("[^"]*")|(\/?&gt;)/g;
+    const s=esc(line);let out="",last=0,m;
+    while((m=re.exec(s))){
+      out+=s.slice(last,m.index);
+      if(m[1])out+='<span class="c">'+m[1]+'</span>';
+      else if(m[3])out+=m[2]+'<span class="tg">'+m[3]+'</span>';
+      else if(m[4])out+='<span class="at">'+m[4]+'</span>='+'<span class="s">'+m[6]+'</span>';
+      else if(m[7])out+=m[7];
+      last=re.lastIndex;
+    }
+    return out+s.slice(last);
+  }
+  document.querySelectorAll('script[type="text/x-code"]').forEach(sc=>{
+    const lang=sc.dataset.lang||"css";
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");const [a,b]=r.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id)div.id=sc.id;
+    if(sc.getAttribute("style"))div.setAttribute("style",sc.getAttribute("style"));
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+((lang==="html"?hlHtml(l):hlCss(l))||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+  // ---------- deck engine (same model as lec04) ----------
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")].sort((x,y)=>(+x.dataset.o||0)-(+y.dataset.o||0));
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  const pairs=(v,sep)=>(v||"").split(";").filter(Boolean).map(p=>{const k=p.indexOf(sep);return [p.slice(0,k).trim(),p.slice(k+sep.length)]});
+  function tog(v,on){pairs(v,"|").forEach(([sel,cls])=>{document.querySelectorAll(sel).forEach(t=>t.classList.toggle(cls,on))})}
+  document.querySelectorAll("[data-set]").forEach(f=>pairs(f.dataset.set,"::").forEach(([sel])=>{document.querySelectorAll(sel).forEach(t=>{if(t.dataset.orig===undefined)t.dataset.orig=t.innerHTML})}));
+
+  // planned timing: data-min per slide -> badge + start time
+  let acc=0;const startAt=[];
+  slides.forEach((s,i)=>{startAt[i]=acc;acc+=(+s.dataset.min||0);
+    const h=s.querySelector(".hdr");
+    if(h&&s.dataset.min){const t=document.createElement("span");t.className="tm";t.textContent="⏱ "+s.dataset.min+"′ · phút "+startAt[i]+"–"+acc;h.appendChild(t)}
+  });
+  const titleOf=s=>s.dataset.title||(s.querySelector("h2,h1")||{}).textContent||s.id;
+
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach(f=>{tog(f.dataset.now,false);tog(f.dataset.act,false)});
+      s.querySelectorAll("[data-orig]").forEach(t=>t.innerHTML=t.dataset.orig);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step);f.classList.toggle("on",on);if(on){tog(f.dataset.act,true);pairs(f.dataset.set,"::").forEach(([sel,val])=>document.querySelectorAll(sel).forEach(t=>t.innerHTML=val))}});
+      if(i===cur&&step>0)tog(fs[step-1].dataset.now,true);
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.innerHTML=say||mt.dataset.def||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length;
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    document.querySelectorAll(".jit").forEach(j=>j.classList.toggle("cur",+j.dataset.i===cur));
+    try{history.replaceState(null,"","#"+slides[cur].id)}catch(e){}
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){try{const a=document.activeElement;if(a&&a!==document.body&&a.closest&&a.closest("#deck"))a.blur()}catch(e){}cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+  window.__go=go;
+
+  // ---------- jump overlay ----------
+  const jump=document.getElementById("jump"),jlist=document.getElementById("jlist"),jq=document.getElementById("jq"),jnum=document.getElementById("jnum");
+  let lastPart=null;
+  slides.forEach((s,i)=>{
+    const part=s.dataset.part||"Mở đầu";
+    if(part!==lastPart){lastPart=part;const p=document.createElement("div");p.className="jpart";
+      const mins=slides.filter(x=>(x.dataset.part||"Mở đầu")===part).reduce((a,x)=>a+(+x.dataset.min||0),0);
+      p.innerHTML=part+"<span>"+mins+" phút · bắt đầu phút "+startAt[i]+"</span>";jlist.appendChild(p)}
+    const b=document.createElement("button");b.className="jit";b.dataset.i=i;
+    b.innerHTML="<b>"+(i+1)+"</b><span>"+titleOf(s)+"</span><small>"+startAt[i]+"′</small>";
+    b.onclick=()=>{closeJump();go(i)};jlist.appendChild(b);
+  });
+  function openJump(){jump.classList.add("open");jq.value="";filter();setTimeout(()=>jnum.focus(),30);const c=jlist.querySelector(".jit.cur");if(c)c.scrollIntoView({block:"center"})}
+  function closeJump(){jump.classList.remove("open")}
+  function filter(){const q=jq.value.trim().toLowerCase();jlist.querySelectorAll(".jit").forEach(j=>j.classList.toggle("hidden",q&&!j.textContent.toLowerCase().includes(q)))}
+  jq.oninput=filter;
+  jnum.onkeydown=e=>{if(e.key==="Enter"){const n=+jnum.value;if(n>=1&&n<=slides.length){closeJump();go(n-1)}}};
+  jq.onkeydown=e=>{if(e.key==="Enter"){const v=jlist.querySelector(".jit:not(.hidden)");if(v)v.click()}};
+  document.getElementById("jclose").onclick=closeJump;
+  jump.onclick=e=>{if(e.target===jump)closeJump()};
+  document.getElementById("jumpbtn").onclick=openJump;
+  document.getElementById("homebtn").onclick=()=>go(slides.findIndex(s=>s.id==="agenda"));
+
+  // ---------- presenter clock ----------
+  const clk=document.getElementById("clock");let t0=null,acc0=0,tick=null;
+  const fmt=ms=>{const s=Math.floor(ms/1000);return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")};
+  clk.onclick=()=>{if(tick){acc0+=Date.now()-t0;clearInterval(tick);tick=null;clk.classList.remove("run")}else{t0=Date.now();tick=setInterval(()=>clk.textContent="⏱ "+fmt(acc0+Date.now()-t0)+" / 180:00",1000);clk.classList.add("run")}};
+
+  addEventListener("keydown",e=>{
+    const tgt=e.target;if(tgt&&/INPUT|TEXTAREA|SELECT/.test(tgt.tagName)){if(e.key==="Escape"){tgt.blur();closeJump()}return}
+    if(jump.classList.contains("open")){if(e.key==="Escape")closeJump();return}
+    if(e.key==="g"||e.key==="G"||e.key==="m"||e.key==="M"){e.preventDefault();openJump();return}
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){if(tgt&&tgt.tagName==="BUTTON"&&e.key!=="ArrowRight")return;e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null||jump.classList.contains("open"))return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+
+  // =================== interactive demos ===================
+  const $=s=>document.querySelector(s);
+  // feedback button
+  const fb=$("#fbBtn");if(fb)fb.onclick=()=>{if(fb.dataset.busy)return;fb.dataset.busy=1;fb.innerHTML='<span class="spinr"></span> Đang xử lý…';fb.style.background="#a78bfa";
+    setTimeout(()=>{fb.innerHTML="✓ Đã thanh toán";fb.style.background="#059669";$("#fbToast").style.opacity=1;
+      setTimeout(()=>{fb.innerHTML="Thanh toán 250.000đ";fb.style.background="";$("#fbToast").style.opacity=0;delete fb.dataset.busy},2600)},1400)};
+  const fbNo=$("#fbBtnNo");if(fbNo)fbNo.onclick=()=>{};
+  // constraint form
+  const ce=$("#cEmail"),cc=$("#cAgree"),cb=$("#cBtn"),cm=$("#cMsg");
+  function chk(){const ok=/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(ce.value);ce.classList.toggle("err",ce.value&&!ok);cm.textContent=ce.value&&!ok?"Email chưa đúng dạng, ví dụ: ten@gmail.com":"";cb.disabled=!(ok&&cc.checked)}
+  if(ce){ce.oninput=chk;cc.onchange=chk;chk();cb.onclick=()=>{cb.textContent="✓ Đã gửi!";setTimeout(()=>cb.textContent="Đăng ký nhận tin",1500)}}
+  // autocomplete
+  const prov="An Giang,Bắc Ninh,Cà Mau,Cao Bằng,Cần Thơ,Đà Nẵng,Đắk Lắk,Điện Biên,Đồng Nai,Đồng Tháp,Gia Lai,Hà Nội,Hà Tĩnh,Hải Phòng,Hưng Yên,Huế,Khánh Hòa,Lai Châu,Lâm Đồng,Lạng Sơn,Lào Cai,Nghệ An,Ninh Bình,Phú Thọ,Quảng Ngãi,Quảng Ninh,Quảng Trị,Sơn La,Tây Ninh,Thái Nguyên,Thanh Hóa,TP. Hồ Chí Minh,Tuyên Quang,Vĩnh Long".split(",");
+  const strip=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/đ/g,"d").replace(/Đ/g,"D").toLowerCase();
+  const ac=$("#acIn"),al=$("#acList");
+  if(ac){ac.oninput=()=>{const q=strip(ac.value.trim());al.innerHTML=q?prov.filter(p=>strip(p).includes(q)).slice(0,5).map(p=>'<div class="aci">'+p+'</div>').join(""):"";al.querySelectorAll(".aci").forEach(d=>d.onclick=()=>{ac.value=d.textContent;al.innerHTML=""})}}
+  // fitts game
+  const fs0=$("#fStart");let ft=null,fres=[];
+  if(fs0){fs0.onclick=()=>{ft=performance.now();$("#fRes").textContent="Bấm vào một mục tiêu…"};
+    ["#fA","#fB"].forEach(id=>$(id).onclick=()=>{if(ft==null){$("#fRes").textContent="Bấm START trước!";return}const d=Math.round(performance.now()-ft);ft=null;
+      const n=id==="#fA"?"Nút TO, GẦN":"Nút NHỎ, XA";$("#fRes").innerHTML="<b>"+n+"</b>: "+d+" ms";const r=$("#fLog");r.innerHTML=("<div>"+n+": <b>"+d+" ms</b></div>"+r.innerHTML).split("</div>").slice(0,6).join("</div>")})}
+  // contrast checker
+  function lum(hex){const c=hex.replace("#","").match(/../g).map(x=>parseInt(x,16)/255).map(v=>v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4));return 0.2126*c[0]+0.7152*c[1]+0.0722*c[2]}
+  const fg=$("#ccFg"),bg=$("#ccBg");
+  function cc2(){const a=lum(fg.value),b=lum(bg.value);const r=(Math.max(a,b)+0.05)/(Math.min(a,b)+0.05);
+    $("#ccPrev").style.color=fg.value;$("#ccPrev").style.background=bg.value;$("#ccRatio").textContent=r.toFixed(2)+" : 1";
+    const set=(id,ok)=>{const e=$(id);e.textContent=ok?"ĐẠT":"KHÔNG ĐẠT";e.className="lbl "+(ok?"good":"bad")};
+    set("#ccAA",r>=4.5);set("#ccAAL",r>=3);set("#ccAAA",r>=7)}
+  if(fg){fg.oninput=cc2;bg.oninput=cc2;cc2();document.querySelectorAll("[data-cc]").forEach(b=>b.onclick=()=>{const [x,y]=b.dataset.cc.split(",");fg.value=x;bg.value=y;cc2()})}
+  // css variable live demo
+  document.querySelectorAll("[data-pv]").forEach(b=>b.onclick=()=>{const t=$("#varDemo");t.style.setProperty("--primary",b.dataset.pv);$("#varVal").textContent=b.dataset.pv;document.querySelectorAll("[data-pv]").forEach(x=>x.style.outline="none");b.style.outline="3px solid #1e1b3a"});
+  document.querySelectorAll("[data-rv]").forEach(b=>b.onclick=()=>{const t=$("#varDemo");t.style.setProperty("--radius",b.dataset.rv);$("#radVal").textContent=b.dataset.rv});
+  // break timer
+  const bt=$("#brkStart");let bInt=null;
+  if(bt)bt.onclick=()=>{let left=600;clearInterval(bInt);const show=()=>$("#brkClock").textContent=String(Math.floor(left/60)).padStart(2,"0")+":"+String(left%60).padStart(2,"0");show();bInt=setInterval(()=>{left--;show();if(left<=0){clearInterval(bInt);$("#brkClock").textContent="Hết giờ!"}},1000)};
+  // color wheel (RYB approx)
+  const W=$("#wheelG");
+  if(W){const cols=["#e11d2a","#f0522a","#f7931e","#fbb03b","#fde532","#a3d14a","#22a64a","#0f9e9a","#1e5fbf","#4b3aa8","#7b2d9b","#c2187a"];
+    const names=["Đỏ","Đỏ cam","Cam","Vàng cam","Vàng","Vàng lục","Lục","Lam lục","Lam","Lam tím","Tím","Đỏ tím"];
+    cols.forEach((c,i)=>{const a0=(i*30-105)*Math.PI/180,a1=((i+1)*30-105)*Math.PI/180,R=140,r=62,cx=150,cy=150;
+      const p=`M${cx+r*Math.cos(a0)},${cy+r*Math.sin(a0)} L${cx+R*Math.cos(a0)},${cy+R*Math.sin(a0)} A${R},${R} 0 0 1 ${cx+R*Math.cos(a1)},${cy+R*Math.sin(a1)} L${cx+r*Math.cos(a1)},${cy+r*Math.sin(a1)} A${r},${r} 0 0 0 ${cx+r*Math.cos(a0)},${cy+r*Math.sin(a0)}Z`;
+      const el=document.createElementNS("http://www.w3.org/2000/svg","path");el.setAttribute("d",p);el.setAttribute("fill",c);el.setAttribute("stroke","#fff");el.setAttribute("stroke-width","3");el.setAttribute("class","seg s"+i);
+      const tt=document.createElementNS("http://www.w3.org/2000/svg","title");tt.textContent=names[i];el.appendChild(tt);W.appendChild(el)})}
+})();
+
+</script>
+</body>
+</html>

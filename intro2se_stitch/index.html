@@ -1,0 +1,1131 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thiết kế UI với Google Stitch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+h1{font-size:70px;line-height:1.1;font-weight:800}
+h2{font-size:38px;line-height:1.2;font-weight:800}
+h3{font-size:23px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:22px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:26px;margin:6px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.88em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 6px;border-radius:6px;color:#be185d}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.cols.c64{grid-template-columns:1.25fr 1fr}.cols.c46{grid-template-columns:1fr 1.2fr}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.card.bad{border-color:#fecdd3;background:linear-gradient(180deg,#fff1f3,#fff)}
+.card.good{border-color:#a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff)}
+.lbl{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
+.icon{font-size:34px;margin-bottom:4px}
+.note{margin-top:12px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:20px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.code{font-family:var(--mono);font-size:18px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
+.code.sm{font-size:16.5px}.code.xs{font-size:15px;line-height:1.45}.code.xxs{font-size:13.6px;line-height:1.38;padding:8px 0}
+.code .ln{padding:0 14px 0 8px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.11);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.13);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
+.code-title{font-family:var(--mono);font-size:15px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+.f.zoom{transform:scale(.85)}.f.zoom.on{transform:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:19px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.legend{display:flex;flex-direction:column;gap:10px}
+.leg{border-radius:12px;padding:10px 16px;background:#fff;border:1px solid var(--line)}
+.leg b{display:block;font-size:21px;margin-bottom:2px}
+.leg p{font-size:19px}
+.leg.a{border-left:6px solid #7c3aed}.leg.b{border-left:6px solid #06b6d4}.leg.c{border-left:6px solid #f59e0b}
+.console{font-family:var(--mono);font-size:17px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.mem{display:flex;align-items:center;gap:16px;min-height:130px}
+.frame{border:2px solid #e4dcfb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
+.frame .fname{font-family:var(--mono);font-size:16px;color:var(--muted);margin-bottom:6px}
+.var{display:flex;align-items:center;gap:10px}
+.vn{font-family:var(--mono);font-size:21px;color:var(--t);font-weight:600}
+.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #c4b5fd;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
+.vb .new{display:none}
+.callee,.arw{opacity:0;transform:translateX(-14px);transition:all .5s}
+.mem.s1 .callee,.mem.s1 .arw{opacity:1;transform:none}
+.mem.s2 .chg .old{display:none}.mem.s2 .chg .new{display:inline;animation:pop .5s}
+.mem.s2 .chg{border-color:#f59e0b;box-shadow:0 0 18px rgba(245,158,11,.5)}
+.mem.s3 .callee,.mem.s3 .arw{opacity:.15;transform:translateY(10px)}
+.mem.s3 .result{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.5)}
+.arw{font-family:var(--mono);font-size:16px;color:var(--gold);text-align:center;line-height:1.2;font-weight:600}
+.arw .bar{display:block;font-size:30px}
+.alias{font-size:18px;color:var(--accent2);font-weight:600}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.25)}100%{transform:none;opacity:1}}
+.flow{display:flex;align-items:center;gap:12px;justify-content:center}
+.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:18px;border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:14px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.h{border-color:var(--gold)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#c4b5fd}.box.exe{border-color:#ec4899;background:#fdf2f8}
+.ar{color:var(--muted);font-size:26px;text-align:center}
+.stack{display:flex;flex-direction:column;gap:8px}
+svg text{font-family:var(--mono);font-weight:600}
+.draw{stroke-dasharray:400;stroke-dashoffset:400;transition:stroke-dashoffset 1s ease}
+svg.d1 .dr1,svg.d2 .dr2,svg.d3 .dr3{stroke-dashoffset:0}
+.fadein{opacity:0;transition:opacity .6s}
+svg.d1 .fd1,svg.d2 .fd2,svg.d3 .fd3{opacity:1}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:19px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05)}
+.ag:hover{border-color:#ec4899;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
+.ag b{color:#db2777;margin-right:6px;font-family:var(--mono)}
+.formula{font-family:var(--mono);font-size:23px;text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:16px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+@media (max-width:700px){#hint{display:none}}
+@media print{#nav,#bar,#hint{display:none}}
+
+
+/* ===== Stitch deck additions ===== */
+.cols>*{min-width:0}
+.sec{font-family:var(--mono);font-size:14px;font-weight:700;letter-spacing:.08em;color:var(--sa1);text-transform:uppercase;margin-bottom:-2px}
+.say{font-size:19px;margin-top:12px;min-height:54px;color:var(--muted);line-height:1.4}
+.say b{color:var(--text)}
+.ci{opacity:.12;transition:opacity .45s,background .45s}.ci.show{opacity:1}
+.ci.show.hot{background:#fff3c4;border-radius:4px}
+.small p,.small li{font-size:18px}
+.card p{font-size:18px;line-height:1.4}
+.card.sm p{font-size:16.5px}
+.pill{display:inline-block;font-size:14px;font-weight:700;padding:3px 10px;border-radius:999px;background:#f3edff;color:#6d28d9;margin:2px 4px 2px 0}
+.pill.c{background:#e0f7fb;color:#0e7490}.pill.p{background:#fde7f3;color:#be185d}.pill.o{background:#fff1dc;color:#b45309}.pill.g{background:#d1fae5;color:#047857}
+
+/* flow boxes */
+.flow.v{flex-direction:column}
+.flow .box{font-family:"Be Vietnam Pro",system-ui,sans-serif;font-size:17px}
+.flow .ar{font-size:24px}
+
+/* phone mock */
+.phone{width:230px;height:450px;border-radius:30px;background:#1e1b3a;padding:9px;box-shadow:0 20px 40px -18px rgba(30,27,58,.55);position:relative;flex:none}
+.phone .scr{width:100%;height:100%;border-radius:22px;background:#fff;overflow:hidden;position:relative;font-size:12px;color:#1e1b3a}
+.phone .notch{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:70px;height:16px;background:#1e1b3a;border-radius:0 0 12px 12px;z-index:3}
+.phone.sm{width:150px;height:290px;border-radius:22px;padding:6px}
+.phone.sm .scr{border-radius:17px;font-size:8.5px}
+.phone.sm .notch{width:48px;height:10px;top:6px}
+.scr .pad{padding:26px 14px 12px}
+.sk{height:9px;border-radius:5px;background:#ece8f7;margin:6px 0}
+.shim .sk,.shim .skb{background:linear-gradient(90deg,#ece8f7 0%,#f8f6ff 40%,#ece8f7 80%);background-size:200% 100%;animation:shim 1.1s linear infinite}
+@keyframes shim{to{background-position:-200% 0}}
+.skb{height:60px;border-radius:12px;background:#ece8f7;margin:8px 0}
+.layer{position:absolute;inset:0;opacity:0;transition:opacity .6s}
+.layer.on{opacity:1}
+
+/* app content (booking app) */
+.ap-hi{font-size:11px;color:#64607d}
+.ap-h{font-size:17px;font-weight:800;margin:2px 0 8px;line-height:1.2}
+.ap-search{background:#f3f4f8;border-radius:10px;padding:7px 10px;color:#9ca3b8;font-size:11px;margin-bottom:10px}
+.ap-cats{display:flex;gap:6px;margin-bottom:10px}
+.ap-cats span{flex:1;text-align:center;background:#eef6ff;border-radius:10px;padding:7px 0;font-size:10px;font-weight:600;color:#0e5aa7}
+.ap-card{border:1px solid #ece8f7;border-radius:12px;padding:9px;margin-bottom:8px;display:flex;gap:8px;align-items:center;transition:all .5s}
+.ap-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7dd3fc,#a78bfa);flex:none}
+.ap-card b{display:block;font-size:11.5px}.ap-card small{color:#64607d;font-size:10px}
+.ap-btn{display:block;text-align:center;border-radius:10px;padding:9px;font-weight:700;font-size:12px;background:#e5e7eb;color:#64607d;transition:all .5s;margin-top:6px}
+.ap-nav{position:absolute;left:0;right:0;bottom:0;height:40px;border-top:1px solid #ece8f7;display:flex;justify-content:space-around;align-items:center;font-size:15px;background:#fff;transform:translateY(100%);transition:transform .5s}
+.v2 .ap-btn{background:linear-gradient(135deg,#0ea5e9,#2563eb);color:#fff;box-shadow:0 6px 14px -6px #2563eb}
+.v2 .ap-card{padding:12px 10px;margin-bottom:10px;box-shadow:0 6px 16px -10px rgba(37,99,235,.4)}
+.v3 .ap-nav{transform:none}
+.v3 .ap-h{color:#1d4ed8}
+
+/* principle demos */
+.demo{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 22px;box-shadow:0 10px 30px -16px rgba(124,58,237,.35);position:relative}
+.dh .d-t,.dh .d-s,.dh .d-i,.dh .d-p{font-size:17px;font-weight:400;color:#1e1b3a;transition:all .5s;line-height:1.35}
+.dh .d-s,.dh .d-i{margin-top:6px}
+.dh .d-b{display:flex;gap:10px;margin-top:14px}
+.dh .d-b span{flex:1;text-align:center;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:16px;transition:all .5s;color:#1e1b3a;background:#fff}
+.dh.h1 .d-t{font-size:28px;font-weight:800}
+.dh.h1 .d-p{font-size:24px;font-weight:800;color:#2563eb}
+.dh.h2 .d-s,.dh.h2 .d-i{color:#64607d;font-size:15px}
+.dh.h3 .d-b span:first-child{background:linear-gradient(135deg,#0ea5e9,#2563eb);color:#fff;border-color:transparent;font-weight:700;box-shadow:0 8px 18px -8px #2563eb}
+.dh.h3 .d-b span:last-child{border-color:transparent;color:#64607d}
+.dh.blur{filter:blur(4px)}
+.dsp{position:relative}
+.dsp .it{display:flex;align-items:center;gap:10px;transition:all .5s;margin:2px 0;padding:2px 0}
+.dsp .it:nth-child(2){margin-left:14px}.dsp .it:nth-child(4){margin-left:7px}.dsp .it:nth-child(5){margin-left:20px}
+.dsp .ic{width:34px;height:34px;border-radius:9px;background:#e0f2fe;flex:none}
+.dsp .tx b{display:block;font-size:16px}.dsp .tx small{font-size:14px;color:#64607d;display:block;margin-top:0;transition:all .5s}
+.dsp.al .it{margin-left:0!important}
+.dsp.sp .it{margin:0 0 16px;padding:0}
+.dsp.sp .tx small{margin-top:4px}
+.dsp.gp .it{border-bottom:1px solid #ece8f7;padding-bottom:16px}
+.gridov{position:absolute;inset:0;border-radius:16px;pointer-events:none;opacity:0;transition:opacity .5s;background-image:linear-gradient(rgba(236,72,153,.13) 1px,transparent 1px),linear-gradient(90deg,rgba(236,72,153,.13) 1px,transparent 1px);background-size:8px 8px}
+.gridov.on{opacity:1}
+.ratio{display:flex;height:64px;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+.ratio div{display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;transition:flex .7s;flex:0;overflow:hidden;white-space:nowrap}
+.ratio .r60{background:#f8fafc;color:#334155}.ratio .r30{background:#1e3a8a;color:#fff}.ratio .r10{background:#f97316;color:#fff}
+.ratio.on1 .r60{flex:60}.ratio.on2 .r30{flex:30}.ratio.on3 .r10{flex:10}
+.ctr{display:flex;gap:12px;margin-top:14px}
+.ctr div{flex:1;border-radius:12px;padding:12px;background:#fff;border:1px solid var(--line);font-size:17px}
+.ctr small{display:block;font-family:var(--mono);font-size:13px;margin-top:6px;font-weight:700}
+.sem{display:flex;gap:8px;margin-top:14px}
+.sem span{flex:1;border-radius:10px;padding:8px;color:#fff;font-weight:700;font-size:15px;text-align:center}
+.tscale .row{display:flex;align-items:baseline;gap:14px;border-bottom:1px dashed var(--line);padding:3px 0}
+.tscale .row code{font-family:var(--mono);font-size:13px;color:var(--muted);width:74px;flex:none}
+.tscale .row span{line-height:1.2;font-weight:600}
+
+/* design system pyramid */
+.pyr{display:flex;flex-direction:column;gap:10px;align-items:center}
+.pyr .lv{border-radius:14px;padding:10px 16px;color:#fff;text-align:center;box-shadow:0 10px 24px -14px rgba(30,27,58,.6)}
+.pyr .lv b{display:block;font-size:20px}.pyr .lv span{font-size:15px;opacity:.95}
+.pyr .l4{width:46%;background:linear-gradient(135deg,#059669,#10b981)}
+.pyr .l3{width:62%;background:linear-gradient(135deg,#0891b2,#06b6d4)}
+.pyr .l2{width:80%;background:linear-gradient(135deg,#7c3aed,#a855f7)}
+.pyr .l1{width:98%;background:linear-gradient(135deg,#db2777,#f97316)}
+.sw{display:flex;gap:8px;flex-wrap:wrap}
+.sw div{width:96px;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#fff;font-size:12px;font-family:var(--mono)}
+.sw div i{display:block;height:46px}
+.sw div span{display:block;padding:4px 6px;line-height:1.3}
+.rad{display:flex;gap:12px;align-items:flex-end}
+.rad div{width:58px;height:44px;background:#e0e7ff;border:2px solid #6366f1;display:flex;align-items:flex-end;justify-content:center;font-family:var(--mono);font-size:12px;padding-bottom:2px}
+.spc{display:flex;gap:10px;align-items:flex-end}
+.spc div{background:#f9a8d4;border-radius:3px}
+.spc span{font-family:var(--mono);font-size:12px;color:var(--muted);display:block;text-align:center;margin-top:3px}
+
+/* unify demo */
+.trio{display:flex;gap:16px;justify-content:center}
+.mini{width:150px;border:1px solid var(--line);border-radius:16px;padding:12px;background:#fff;transition:all .6s}
+.mini .mt{font-weight:800;font-size:15px;margin-bottom:8px;transition:all .6s}
+.mini .ml{height:8px;border-radius:4px;background:#ece8f7;margin:6px 0}
+.mini .mb{margin-top:12px;text-align:center;padding:8px;font-size:13px;font-weight:700;color:#fff;transition:all .6s}
+.trio .mini:nth-child(1) .mt{font-family:Georgia,serif;color:#b91c1c}.trio .mini:nth-child(1) .mb{background:#dc2626;border-radius:0}
+.trio .mini:nth-child(2) .mt{color:#15803d;font-size:18px}.trio .mini:nth-child(2) .mb{background:#16a34a;border-radius:999px}
+.trio .mini:nth-child(3) .mt{color:#7c3aed;font-style:italic}.trio .mini:nth-child(3) .mb{background:#a855f7;border-radius:4px}
+.trio.unify .mini .mt{font-family:"Be Vietnam Pro",system-ui,sans-serif;color:#1d4ed8;font-size:15px;font-style:normal}
+.trio.unify .mini .mb{background:linear-gradient(135deg,#0ea5e9,#2563eb);border-radius:10px}
+.trio.unify .mini{border-color:#bfdbfe;box-shadow:0 10px 24px -14px rgba(37,99,235,.5)}
+
+/* stitch app mock */
+.sui{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 14px 34px -18px rgba(30,27,58,.45);font-size:13px}
+.sui .top{height:34px;background:#f7f7fb;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;padding:0 12px;font-weight:700}
+.sui .top i{width:9px;height:9px;border-radius:50%;background:#f9a8d4;display:inline-block}
+.sui .body{display:grid;grid-template-columns:200px 1fr;height:330px}
+.sui .side{border-right:1px solid var(--line);padding:10px;display:flex;flex-direction:column;gap:8px;background:#fcfbff}
+.sui .cv{background-color:#f8fafc;background-image:radial-gradient(#dfe3ee 1px,transparent 1px);background-size:14px 14px;position:relative;display:flex;align-items:center;justify-content:center;gap:16px}
+.zn{border:2px solid transparent;border-radius:10px;transition:all .4s;position:relative}
+.zn.hl{border-color:#f59e0b;box-shadow:0 0 0 4px rgba(245,158,11,.25);background:#fffbeb}
+.zn .num{position:absolute;top:-10px;right:-10px;width:22px;height:22px;border-radius:50%;background:#f59e0b;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(.4);transition:all .35s}
+.zn.hl .num{opacity:1;transform:none}
+.sui .msg{background:#fff;border:1px solid var(--line);border-radius:10px;padding:7px 9px;font-size:12px;color:#64607d;line-height:1.35}
+.sui .seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;font-size:12px}
+.sui .seg span{flex:1;text-align:center;padding:5px}.sui .seg span.on{background:#ede9fe;color:#6d28d9;font-weight:700}
+.sui .inp{margin-top:auto;border:1px solid #c4b5fd;border-radius:10px;padding:8px;color:#64607d;font-size:12px;min-height:58px;background:#fff}
+.sui .tools{display:flex;justify-content:space-between;margin-top:6px;font-size:14px}
+.sui .play{position:absolute;top:10px;right:10px;padding:5px 12px;font-weight:700;font-size:12px;background:#fff;border-radius:8px}
+
+/* prompt box */
+.pbox{font-size:19px;line-height:1.55;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 18px;box-shadow:0 10px 24px -16px rgba(124,58,237,.4)}
+.pbox .lab{font-family:var(--mono);font-size:12px;font-weight:700;padding:1px 7px;border-radius:5px;margin-right:6px;vertical-align:2px;color:#fff}
+.lab.a{background:#7c3aed}.lab.b{background:#0891b2}.lab.c{background:#db2777}.lab.d{background:#d97706}.lab.e{background:#059669}
+.fml{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.fml .chip{border-radius:12px;padding:8px 12px;color:#fff;font-weight:700;font-size:17px;text-align:center;line-height:1.2;opacity:.3;transition:all .4s}
+.fml .chip small{display:block;font-weight:400;font-size:12.5px;opacity:.9}
+.fml .chip.on{opacity:1;transform:translateY(-4px);box-shadow:0 10px 20px -10px rgba(0,0,0,.4)}
+.fml .plus{font-weight:800;color:var(--muted);font-size:20px}
+
+/* screen flow */
+.sflow{display:flex;align-items:center;gap:6px;justify-content:center}
+.sflow .arrow{font-size:26px;color:#f59e0b;font-weight:800}
+.mscr{width:150px;height:270px;border-radius:20px;background:#1e1b3a;padding:6px;flex:none}
+.mscr .in2{background:#fff;border-radius:15px;height:100%;padding:16px 9px 9px;font-size:9.5px;position:relative;overflow:hidden}
+.mscr .tt{font-weight:800;font-size:12px;margin-bottom:6px;color:#1d4ed8}
+.mscr .ln2{height:7px;border-radius:4px;background:#e5e7eb;margin:5px 0}
+.mscr .bx{border:1px solid #e5e7eb;border-radius:8px;padding:6px;margin:5px 0}
+.mscr .bt{position:absolute;left:9px;right:9px;bottom:10px;text-align:center;padding:6px;border-radius:8px;background:linear-gradient(135deg,#0ea5e9,#2563eb);color:#fff;font-weight:700;transition:box-shadow .3s}
+.mscr .bt.tap{box-shadow:0 0 0 5px rgba(245,158,11,.5)}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:6px}
+.slots span{border:1px solid #e5e7eb;border-radius:5px;text-align:center;padding:3px 0}
+.slots span.sel{background:#2563eb;color:#fff;border-color:#2563eb}
+
+/* checklist */
+.chk{display:flex;flex-direction:column;gap:8px}
+.chk div{display:flex;align-items:center;gap:12px;font-size:19px;padding:7px 12px;border-radius:10px;background:#fff;border:1px solid var(--line);transition:all .4s}
+.chk div i{width:26px;height:26px;border-radius:8px;border:2px solid #cbd5e1;flex:none;display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:800;color:transparent;transition:all .4s}
+.chk div.ok{border-color:#a7f3d0;background:#f0fdf4}
+.chk div.ok i{background:#10b981;border-color:#10b981;color:#fff}
+.chk div.no{border-color:#fecdd3;background:#fff1f3}
+.chk div.no i{background:#e11d48;border-color:#e11d48;color:#fff}
+
+/* code stack */
+.cstack{display:flex;flex-direction:column;gap:10px}
+.cstack .cl2{border-radius:12px;padding:10px 14px;display:flex;gap:14px;align-items:center;background:#fff;border:1px solid var(--line)}
+.cstack .cl2 .tag{font-family:var(--mono);font-weight:800;font-size:18px;width:110px;flex:none}
+.cstack .cl2 p{font-size:17px}
+
+/* jump menu */
+#jump{position:fixed;inset:0;background:rgba(30,27,58,.45);backdrop-filter:blur(6px);z-index:20;display:none;align-items:center;justify-content:center;padding:20px}
+#jump.open{display:flex}
+#jump .panel{background:#fff;border-radius:18px;max-width:1100px;width:100%;max-height:90vh;overflow:auto;padding:20px 24px;box-shadow:0 30px 80px -20px rgba(30,27,58,.6)}
+#jump .ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:12px;flex-wrap:wrap}
+#jump .ph b{font-size:22px}
+#jump .ph input{font-family:var(--mono);font-size:15px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;width:220px}
+#jump .ph button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:15px}
+#jump .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
+#jump .it{border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer;font-size:15px;line-height:1.3;display:flex;gap:10px;align-items:flex-start;background:#fff;transition:all .15s;text-align:left;font-family:inherit;color:var(--text)}
+#jump .it:hover{border-color:#ec4899;transform:translateY(-2px);box-shadow:0 8px 18px -10px rgba(236,72,153,.5)}
+#jump .it.cur{background:#f3edff;border-color:#7c3aed}
+#jump .it b{font-family:var(--mono);color:#db2777;min-width:24px}
+#jump .grp{grid-column:1/-1;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.08em;margin-top:6px}
+#nav #menu{width:auto;padding:0 12px;font-family:"Be Vietnam Pro";font-size:14px;font-weight:600;background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;border:none}
+@media print{#jump{display:none!important}}
+tr.f{transform:none}
+.layer{background:#fff}
+#ph16.b1 .ap-btn{background:linear-gradient(135deg,#0ea5e9,#2563eb);color:#fff;box-shadow:0 6px 14px -6px #2563eb;padding:12px}
+#ph16.b2 .ap-card{padding:12px 10px;margin-bottom:14px;box-shadow:0 6px 16px -10px rgba(37,99,235,.45)}
+#ph16.b3 .ap-nav{transform:none}#ph16.b3 .ap-h{color:#1d4ed8}
+
+</style>
+</head>
+<body>
+
+<div id="viewport"><div id="deck">
+<!-- ===================== TITLE ===================== -->
+<section class="slide" id="title" data-title="Trang bìa" data-group="MỞ ĐẦU">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// UI Design · Google Stitch · Cho người mới bắt đầu</div>
+    <h1 class="in">Thiết kế giao diện<br><span class="grad">với Google Stitch</span></h1>
+    <p class="in muted" style="font-size:25px;margin-top:20px;max-width:960px">Không cần biết thiết kế, không cần biết design system, không cần biết code. Học 6 nguyên tắc nền tảng, hiểu design system qua ví dụ, rồi làm từng bước một ứng dụng đặt lịch khám bệnh từ ý tưởng đến prototype bấm thử được.</p>
+    <p class="in" style="margin-top:34px;font-size:18px;color:#8a91b4">← → hoặc Space: chạy từng bước · Shift+→: qua slide · <b>M</b> hoặc nút <b>☰ Mục lục</b>: nhảy tới slide bất kỳ · A: hiện hết · F: toàn màn hình</p>
+  </div>
+</section>
+
+<!-- ===================== AGENDA ===================== -->
+<section class="slide" id="agenda" data-title="Nội dung" data-group="MỞ ĐẦU">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:18px">· bấm vào mục để đi tới</span></div>
+  <div class="in" style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px">
+    <div>
+      <div class="sec" style="color:#7c3aed;margin-bottom:8px">Phần A · Làm quen</div>
+      <div class="stack">
+        <div class="ag" data-goto="s1"><b>01</b>Google Stitch là gì?</div>
+        <div class="ag" data-goto="s2"><b>02</b>Từ điển nhỏ cho người mới</div>
+      </div>
+      <div class="sec" style="color:#0891b2;margin:14px 0 8px">Phần B · Nguyên tắc thiết kế</div>
+      <div class="stack">
+        <div class="ag" data-goto="s3"><b>03</b>Phân cấp thị giác</div>
+        <div class="ag" data-goto="s4"><b>04</b>Căn lề &amp; khoảng trắng</div>
+        <div class="ag" data-goto="s5"><b>05</b>Màu sắc &amp; tương phản</div>
+        <div class="ag" data-goto="s6"><b>06</b>Chữ (Typography)</div>
+        <div class="ag" data-goto="s7"><b>07</b>Nhất quán, dễ chạm, phản hồi</div>
+      </div>
+    </div>
+    <div>
+      <div class="sec" style="color:#db2777;margin-bottom:8px">Phần C · Design system</div>
+      <div class="stack">
+        <div class="ag" data-goto="s8"><b>08</b>Design system là gì?</div>
+        <div class="ag" data-goto="s9"><b>09</b>Design token qua ví dụ</div>
+        <div class="ag" data-goto="s10"><b>10</b>Vì sao AI cần design system</div>
+      </div>
+      <div class="sec" style="color:#059669;margin:14px 0 8px">Phần D · Thực hành Stitch (1)</div>
+      <div class="stack">
+        <div class="ag" data-goto="s11"><b>11</b>B0 · Viết brief</div>
+        <div class="ag" data-goto="s12"><b>12</b>B1 · Mở Stitch, làm quen</div>
+        <div class="ag" data-goto="s13"><b>13</b>B2 · Công thức prompt</div>
+        <div class="ag" data-goto="s14"><b>14</b>Prompt tệ và prompt tốt</div>
+      </div>
+    </div>
+    <div>
+      <div class="sec" style="color:#059669;margin-bottom:8px">Phần D · Thực hành Stitch (2)</div>
+      <div class="stack">
+        <div class="ag" data-goto="s15"><b>15</b>B3 · Tạo màn hình đầu tiên</div>
+        <div class="ag" data-goto="s16"><b>16</b>B4 · Chỉnh sửa từng bước</div>
+        <div class="ag" data-goto="s17"><b>17</b>B5 · Dùng ảnh làm đầu vào</div>
+        <div class="ag" data-goto="s18"><b>18</b>B6 · Áp design system (DESIGN.md)</div>
+        <div class="ag" data-goto="s19"><b>19</b>B7 · Nhiều màn hình &amp; prototype</div>
+        <div class="ag" data-goto="s20"><b>20</b>B8 · Tự kiểm tra thiết kế</div>
+        <div class="ag" data-goto="s21"><b>21</b>B9 · Xuất ra Figma / code</div>
+      </div>
+      <div class="sec" style="color:#d97706;margin:14px 0 8px">Phần E · Tổng kết</div>
+      <div class="stack">
+        <div class="ag" data-goto="s22"><b>22</b>Lỗi thường gặp</div>
+        <div class="ag" data-goto="s23"><b>23</b>Bài tập thực hành</div>
+        <div class="ag" data-goto="end"><b>24</b>Tóm tắt</div>
+      </div>
+    </div>
+  </div>
+  <style>#agenda .ag{padding:8px 12px;font-size:17px;border-left-width:5px}#agenda .stack{gap:6px}</style>
+</section>
+
+<!-- ===================== S1 ===================== -->
+<section class="slide" id="s1" data-title="Google Stitch là gì?" data-group="A · LÀM QUEN">
+  <div class="hdr in"><span class="qn">01</span><h2>Google Stitch là gì?</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr">
+    <div class="in">
+      <ul>
+        <li><b>Công cụ AI của Google Labs</b> biến <b>lời mô tả</b> (hoặc ảnh phác thảo) thành <b>màn hình giao diện</b> cho app di động và website.</li>
+        <li>Chạy trên trình duyệt tại <code class="i">stitch.withgoogle.com</code>, đăng nhập bằng tài khoản Google, <b>miễn phí</b> (có giới hạn số lượt tạo mỗi tháng).</li>
+        <li>Dùng mô hình <b>Gemini</b>: có chế độ <b>nhanh</b> (thử ý tưởng) và chế độ <b>chất lượng cao</b> (kết quả đẹp hơn, ít lượt hơn).</li>
+        <li>Kết quả: ảnh thiết kế + <b>prototype</b> bấm thử + <b>code</b> HTML/CSS + chuyển sang <b>Figma</b>.</li>
+      </ul>
+      <div class="note blue f" data-o="99" style="font-size:18px">Stitch giúp bạn đi <b>nhanh</b>. Nhưng để biết kết quả <b>tốt hay xấu</b> và biết <b>yêu cầu AI sửa gì</b>, bạn cần nắm các nguyên tắc ở Phần B và C.</div>
+    </div>
+    <div>
+      <div class="flow v" style="gap:6px">
+        <div class="box f" style="border-color:#7c3aed;width:360px">💬 Ý tưởng của bạn<small>“App đặt lịch khám cho người lớn tuổi…”</small></div>
+        <div class="ar f">↓</div>
+        <div class="box f" style="border-color:#ec4899;background:#fdf2f8;width:360px">✨ Google Stitch (Gemini)<small>hiểu yêu cầu, chọn bố cục, màu, chữ</small></div>
+        <div class="ar f">↓</div>
+        <div class="flow f" style="gap:10px">
+          <div class="box" style="border-color:#0891b2;min-width:110px">🖼️ Màn hình<small>UI design</small></div>
+          <div class="box" style="border-color:#059669;min-width:110px">▶️ Prototype<small>bấm thử</small></div>
+          <div class="box" style="border-color:#d97706;min-width:110px">🧩 Figma / Code<small>làm tiếp</small></div>
+        </div>
+      </div>
+      <span class="f ghost" data-say="Bạn chỉ cần <b>mô tả bằng lời</b> như đang kể cho một nhà thiết kế nghe."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S2 ===================== -->
+<section class="slide" id="s2" data-title="Từ điển nhỏ cho người mới" data-group="A · LÀM QUEN">
+  <div class="hdr in"><span class="qn">02</span><h2>Từ điển nhỏ: 8 từ bạn sẽ gặp liên tục</h2></div>
+  <div class="cols4">
+    <div class="card sm f"><div class="icon">🖥️</div><h3>UI</h3><p>User Interface: <b>phần nhìn thấy và bấm được</b>: nút, chữ, màu, hình.</p></div>
+    <div class="card sm f"><div class="icon">🧭</div><h3>UX</h3><p>User Experience: <b>cảm giác khi dùng</b>: có dễ hiểu, nhanh xong việc, ít nhầm lẫn không.</p></div>
+    <div class="card sm f"><div class="icon">📱</div><h3>Screen</h3><p>Một <b>màn hình</b> của app: Trang chủ, Đăng nhập, Chi tiết bác sĩ…</p></div>
+    <div class="card sm f"><div class="icon">🧩</div><h3>Component</h3><p><b>Thành phần dùng lại</b>: nút, ô nhập, thẻ (card), thanh điều hướng.</p></div>
+    <div class="card sm f"><div class="icon">📐</div><h3>Layout</h3><p><b>Bố cục</b>: cách sắp xếp các thành phần trên màn hình (trên/dưới, trái/phải, lưới).</p></div>
+    <div class="card sm f"><div class="icon">▶️</div><h3>Prototype</h3><p><b>Bản mẫu bấm thử</b>: nối các màn hình để giả lập app thật, chưa cần code.</p></div>
+    <div class="card sm f"><div class="icon">📚</div><h3>Design system</h3><p><b>Bộ luật chung</b> về màu, chữ, khoảng cách, thành phần để mọi màn hình đồng bộ.</p></div>
+    <div class="card sm f"><div class="icon">🎨</div><h3>Token</h3><p>Một <b>giá trị được đặt tên</b>: <code class="i">primary = #2563EB</code>, <code class="i">radius-md = 12px</code>.</p></div>
+  </div>
+  <div class="note f" data-o="99">Mẹo: khi ra lệnh cho Stitch, dùng đúng các từ này (“đổi <b>component</b> nút chính”, “<b>layout</b> 2 cột”) giúp AI hiểu chính xác hơn.</div>
+</section>
+
+<!-- ===================== S3 ===================== -->
+<section class="slide" id="s3" data-title="Nguyên tắc 1 · Phân cấp thị giác" data-group="B · NGUYÊN TẮC THIẾT KẾ">
+  <div class="hdr in"><span class="qn">NGUYÊN TẮC 1</span><h2>Phân cấp thị giác: cái gì quan trọng thì nổi bật</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div class="in">
+      <p>Mắt người <b>quét</b> màn hình chứ không đọc từng chữ. Ta dùng <b>kích thước, độ đậm, màu</b> và <b>vị trí</b> để dẫn mắt theo thứ tự:</p>
+      <ul style="margin-top:8px">
+        <li><b>Cấp 1</b>: tiêu đề, con số chính, nút hành động chính.</li>
+        <li><b>Cấp 2</b>: thông tin hỗ trợ (chữ nhỏ hơn, màu xám).</li>
+        <li><b>Cấp 3</b>: hành động phụ (nút viền, nút chữ).</li>
+      </ul>
+      <div class="note blue" style="font-size:18px"><b>Mỗi màn hình chỉ 1 hành động chính.</b> Nếu có 2 nút cùng nổi bật, người dùng không biết bấm nút nào.</div>
+      <div class="note" style="font-size:18px">Câu lệnh cho Stitch: <i>“Làm nổi bật giá khám và nút Đặt lịch, các thông tin khác nhỏ và màu xám hơn.”</i></div>
+    </div>
+    <div>
+      <div class="demo dh" id="d3">
+        <div class="lbl info" id="d3l">TRƯỚC</div>
+        <div class="d-t">BS. Nguyễn Minh An</div>
+        <div class="d-s">Chuyên khoa Tim mạch · 12 năm kinh nghiệm</div>
+        <div class="d-i">Phòng khám Quận 3 · Còn 4 lịch hôm nay</div>
+        <div class="d-p" style="margin-top:6px">250.000đ / lần khám</div>
+        <div class="d-b"><span>Đặt lịch</span><span>Xem hồ sơ</span></div>
+      </div>
+      <span class="f ghost" data-now="#d3|blur" data-say="<b>Bài test nheo mắt:</b> làm mờ thiết kế. Bản ‘trước’ mọi thứ như nhau, không biết nhìn vào đâu."></span>
+      <span class="f ghost" data-act="#d3|h1" data-set="#d3l::BƯỚC 1" data-say="<b>Cấp 1</b>: tên bác sĩ và giá to, đậm hơn hẳn."></span>
+      <span class="f ghost" data-act="#d3|h2" data-set="#d3l::BƯỚC 2" data-say="<b>Cấp 2</b>: chuyên khoa và địa chỉ nhỏ lại, màu xám: vẫn đọc được nhưng không tranh chỗ."></span>
+      <span class="f ghost" data-act="#d3|h3" data-set="#d3l::SAU" data-say="<b>Một nút chính</b> tô màu đậm, nút phụ chỉ còn chữ."></span>
+      <span class="f ghost" data-now="#d3|blur" data-say="Nheo mắt lần nữa: dù mờ vẫn nhận ra ngay <b>tên, giá và nút Đặt lịch</b>. Đó là phân cấp tốt."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S4 ===================== -->
+<section class="slide" id="s4" data-title="Nguyên tắc 2 · Căn lề & khoảng trắng" data-group="B · NGUYÊN TẮC THIẾT KẾ">
+  <div class="hdr in"><span class="qn">NGUYÊN TẮC 2</span><h2>Căn lề, khoảng trắng và lưới 8</h2></div>
+  <div class="cols" style="grid-template-columns:1.05fr 1fr">
+    <div class="in">
+      <ul>
+        <li><b>Căn lề (Alignment)</b>: mọi thứ thẳng hàng theo vài đường thẳng tưởng tượng. Lệch vài pixel cũng khiến giao diện trông “ẩu”.</li>
+        <li><b>Khoảng trắng</b> không phải chỗ trống lãng phí, nó giúp mắt <b>nghỉ</b> và <b>phân nhóm</b>.</li>
+        <li><b>Gần nhau = liên quan</b> (luật Proximity): tiêu đề sát nội dung của nó, xa nhóm khác.</li>
+        <li><b>Lưới 8</b>: chỉ dùng khoảng cách là bội số của 8 (<code class="i">8, 16, 24, 32</code>), dùng 4 cho chi tiết nhỏ.</li>
+      </ul>
+      <div class="note" style="font-size:18px">Câu lệnh: <i>“Căn trái tất cả nội dung, lề 16px hai bên, khoảng cách giữa các thẻ 16px, theo lưới 8px.”</i></div>
+    </div>
+    <div>
+      <div class="demo dsp" id="d4">
+        <div class="gridov" id="d4g"></div>
+        <div class="it"><div class="ic"></div><div class="tx"><b>Lịch khám sắp tới</b><small>Thứ 3, 09:00 · BS. An</small></div></div>
+        <div class="it"><div class="ic" style="background:#fce7f3"></div><div class="tx"><b>Kết quả xét nghiệm</b><small>2 kết quả mới</small></div></div>
+        <div class="it"><div class="ic" style="background:#dcfce7"></div><div class="tx"><b>Đơn thuốc</b><small>Còn 5 ngày</small></div></div>
+        <div class="it"><div class="ic" style="background:#fef3c7"></div><div class="tx"><b>Hồ sơ sức khỏe</b><small>Cập nhật 2 tuần trước</small></div></div>
+        <div class="it"><div class="ic" style="background:#ede9fe"></div><div class="tx"><b>Tin nhắn bác sĩ</b><small>1 tin chưa đọc</small></div></div>
+      </div>
+      <span class="f ghost" data-act="#d4|al" data-say="<b>Căn lề</b>: đưa mọi dòng về cùng một mép trái. Ngay lập tức trông gọn hơn."></span>
+      <span class="f ghost" data-act="#d4|sp" data-say="<b>Khoảng trắng</b>: 4px giữa tiêu đề và mô tả (cùng nhóm), 16px giữa các mục (khác nhóm)."></span>
+      <span class="f ghost" data-act="#d4|gp" data-say="<b>Đường phân cách</b> nhẹ tách từng nhóm rõ ràng hơn nữa."></span>
+      <span class="f ghost" data-act="#d4g|on" data-say="<b>Lưới 8px</b>: mọi khoảng cách đều rơi đúng các ô lưới, nên nhìn đều đặn và chuyên nghiệp."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S5 ===================== -->
+<section class="slide" id="s5" data-title="Nguyên tắc 3 · Màu sắc & tương phản" data-group="B · NGUYÊN TẮC THIẾT KẾ">
+  <div class="hdr in"><span class="qn">NGUYÊN TẮC 3</span><h2>Màu sắc: ít màu, có quy luật, đủ tương phản</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr">
+    <div class="in">
+      <ul>
+        <li><b>Quy tắc 60-30-10</b>: 60% màu nền (trung tính), 30% màu phụ, 10% màu nhấn cho thứ cần chú ý (nút chính).</li>
+        <li>Chọn <b>1 màu thương hiệu</b> (primary) + các sắc độ đậm nhạt của nó. Người mới đừng dùng quá 3 màu chính.</li>
+        <li><b>Màu có nghĩa</b>: đỏ = lỗi/nguy hiểm, xanh lá = thành công, vàng = cảnh báo. Đừng dùng đỏ cho nút “Lưu”.</li>
+        <li><b>Tương phản</b> chữ/nền tối thiểu <b>4.5 : 1</b> (chuẩn WCAG) để người lớn tuổi, người dùng ngoài nắng vẫn đọc được.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="ratio" id="d5"><div class="r60">60% nền</div><div class="r30">30%</div><div class="r10">10%</div></div>
+      <div class="ctr f" data-o="5">
+        <div style="color:#c3c7d1">Chữ xám nhạt trên nền trắng<small style="color:#be123c">✗ 1.8 : 1 · khó đọc</small></div>
+        <div style="color:#334155">Chữ xám đậm trên nền trắng<small style="color:#047857">✓ 10.3 : 1 · dễ đọc</small></div>
+      </div>
+      <div class="sem f" data-o="6"><span style="background:#dc2626">Lỗi</span><span style="background:#16a34a">Thành công</span><span style="background:#d97706">Cảnh báo</span><span style="background:#2563eb">Thông tin</span></div>
+      <span class="f ghost" data-act="#d5|on1" data-say="<b>60%</b>: nền trắng/xám rất nhạt chiếm phần lớn diện tích."></span>
+      <span class="f ghost" data-act="#d5|on2" data-say="<b>30%</b>: màu phụ cho thanh tiêu đề, thẻ, vùng nhấn nhẹ."></span>
+      <span class="f ghost" data-act="#d5|on3" data-say="<b>10%</b>: màu nhấn (cam) chỉ dành cho thứ quan trọng nhất, ví dụ nút ‘Đặt lịch’."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S6 ===================== -->
+<section class="slide" id="s6" data-title="Nguyên tắc 4 · Chữ (Typography)" data-group="B · NGUYÊN TẮC THIẾT KẾ">
+  <div class="hdr in"><span class="qn">NGUYÊN TẮC 4</span><h2>Chữ: 1–2 font, một thang cỡ chữ cố định</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div class="in">
+      <ul>
+        <li><b>Tối đa 2 font</b> (thường 1 là đủ). Chọn font hỗ trợ <b>tiếng Việt có dấu</b> tốt: Be Vietnam Pro, Inter, Roboto, Nunito.</li>
+        <li>Dùng <b>thang cỡ chữ</b> cố định thay vì chọn ngẫu nhiên 15, 17, 19px.</li>
+        <li>Chữ nội dung trên mobile <b>≥ 16px</b>; app cho người lớn tuổi nên 18px.</li>
+        <li>Khoảng cách dòng <b>1.4–1.6</b> cho đoạn văn; dòng không quá ~70 ký tự.</li>
+        <li>Phân cấp bằng <b>độ đậm</b> (400/600/700) trước, rồi mới đến cỡ chữ và màu.</li>
+      </ul>
+      <div class="note" style="font-size:18px">Câu lệnh: <i>“Dùng font Be Vietnam Pro cho toàn bộ app, chữ nội dung 16px, tiêu đề màn hình 24px đậm.”</i></div>
+    </div>
+    <div class="demo tscale">
+      <div class="row f"><code>32 · H1</code><span style="font-size:32px;font-weight:800">Xin chào, Lan</span></div>
+      <div class="row f"><code>24 · H2</code><span style="font-size:24px;font-weight:700">Lịch khám sắp tới</span></div>
+      <div class="row f"><code>20 · H3</code><span style="font-size:20px;font-weight:700">BS. Nguyễn Minh An</span></div>
+      <div class="row f"><code>16 · Body</code><span style="font-size:16px;font-weight:400">Khám tổng quát, mang theo sổ khám bệnh cũ.</span></div>
+      <div class="row f"><code>14 · Small</code><span style="font-size:14px;font-weight:400;color:#64607d">Cập nhật 5 phút trước</span></div>
+      <div class="row f"><code>12 · Label</code><span style="font-size:12px;font-weight:700;letter-spacing:.08em;color:#64607d">TRẠNG THÁI</span></div>
+      
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S7 ===================== -->
+<section class="slide" id="s7" data-title="Nguyên tắc 5–6 · Nhất quán, dễ chạm, phản hồi" data-group="B · NGUYÊN TẮC THIẾT KẾ">
+  <div class="hdr in"><span class="qn">NGUYÊN TẮC 5–6</span><h2>Nhất quán, quen thuộc, dễ chạm, có phản hồi</h2></div>
+  <div class="cols3">
+    <div class="card f"><div class="icon">🔁</div><h3>Nhất quán</h3><p>Cùng một việc thì cùng một kiểu: mọi nút chính cùng màu, cùng bo góc; nút “Quay lại” luôn ở góc trái trên.</p></div>
+    <div class="card f"><div class="icon">🏠</div><h3>Quen thuộc</h3><p>Người dùng đã quen app khác. Đặt thanh điều hướng ở dưới, giỏ hàng góc phải, tìm kiếm ở trên. Đừng “sáng tạo” chỗ này.</p></div>
+    <div class="card f"><div class="icon">👆</div><h3>Dễ chạm</h3><p>Vùng chạm tối thiểu <b>44–48px</b>. Các nút cách nhau ≥ 8px. Nút chính nằm trong tầm ngón cái (nửa dưới màn hình).</p></div>
+    <div class="card f"><div class="icon">💡</div><h3>Có phản hồi</h3><p>Mỗi thao tác đều có phản ứng: nút đổi màu khi bấm, vòng xoay khi tải, thông báo thành công/lỗi rõ ràng.</p></div>
+    <div class="card f"><div class="icon">🧹</div><h3>Đơn giản</h3><p>Bớt đi thay vì thêm vào. Mỗi màn hình phục vụ <b>một mục tiêu</b>. Thông tin phụ đưa vào màn hình chi tiết.</p></div>
+    <div class="card f"><div class="icon">♿</div><h3>Ai cũng dùng được</h3><p>Không chỉ dùng màu để báo lỗi (thêm icon/chữ), có nhãn cho ô nhập, chữ phóng to được.</p></div>
+  </div>
+  <div class="note blue f" data-o="99">Thiết kế tốt thường <b>“vô hình”</b>: người dùng không để ý tới giao diện, họ chỉ thấy mình làm xong việc nhanh.</div>
+</section>
+
+<!-- ===================== S8 ===================== -->
+<section class="slide" id="s8" data-title="Design system là gì?" data-group="C · DESIGN SYSTEM">
+  <div class="hdr in"><span class="qn">08</span><h2>Design system là gì? Hãy nghĩ tới bộ LEGO</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr">
+    <div class="in">
+      <p>Design system là <b>bộ quy tắc + thư viện thành phần</b> dùng chung cho cả sản phẩm. Giống LEGO: có sẵn các viên gạch chuẩn, ai lắp cũng khớp.</p>
+      <table style="margin-top:12px;font-size:17px">
+        <tr><th>LEGO</th><th>Design system</th></tr>
+        <tr><td>Màu nhựa, kích thước núm</td><td><b>Token</b>: màu, chữ, khoảng cách, bo góc</td></tr>
+        <tr><td>Viên gạch 2×4, bánh xe</td><td><b>Component</b>: nút, ô nhập, thẻ</td></tr>
+        <tr><td>Cụm bánh xe + trục</td><td><b>Pattern</b>: form đăng nhập, danh sách</td></tr>
+        <tr><td>Chiếc xe hoàn chỉnh</td><td><b>Screen</b>: màn hình app</td></tr>
+      </table>
+      <div class="note f" data-o="99" style="font-size:18px">Ví dụ nổi tiếng: <b>Material Design</b> (Google), <b>Human Interface Guidelines</b> (Apple). Bạn không cần tự tạo từ đầu, chỉ cần <b>chọn và ghi lại</b> vài quy tắc.</div>
+    </div>
+    <div class="pyr">
+      <div class="lv l4 f zoom" data-o="4" data-say="Ghép pattern thành <b>màn hình</b>. Đổi 1 token (ví dụ màu primary) là cả app đổi theo."><b>4 · Screens</b><span>Trang chủ · Đặt lịch · Hồ sơ</span></div>
+      <div class="lv l3 f zoom" data-o="3" data-say="Ghép component thành <b>pattern</b>: form đặt lịch = ô chọn ngày + lưới giờ + nút xác nhận."><b>3 · Patterns</b><span>Form đặt lịch · Danh sách bác sĩ</span></div>
+      <div class="lv l2 f zoom" data-o="2" data-say="Ghép token thành <b>component</b>: nút = màu primary + chữ 16px đậm + bo góc 12 + cao 48px."><b>2 · Components</b><span>Nút · Ô nhập · Thẻ bác sĩ · Thanh tab</span></div>
+      <div class="lv l1 f zoom" data-o="1" data-say="Bắt đầu từ <b>nền móng</b>: các giá trị nhỏ nhất được đặt tên."><b>1 · Tokens (nền móng)</b><span>primary #2563EB · font Be Vietnam Pro · space 8/16/24 · radius 12</span></div>
+      <p class="say" style="text-align:center">Nhấn → để xây từ dưới lên.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S9 ===================== -->
+<section class="slide" id="s9" data-title="Design token qua ví dụ" data-group="C · DESIGN SYSTEM">
+  <div class="hdr in"><span class="qn">09</span><h2>Design token: đặt tên cho mọi lựa chọn</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr">
+    <div>
+      <div class="f">
+        <div class="rowlbl">MÀU (color)</div>
+        <div class="sw">
+          <div><i style="background:#2563EB"></i><span>primary<br>#2563EB</span></div>
+          <div><i style="background:#DBEAFE"></i><span>primary-soft<br>#DBEAFE</span></div>
+          <div><i style="background:#F97316"></i><span>accent<br>#F97316</span></div>
+          <div><i style="background:#0F172A"></i><span>text<br>#0F172A</span></div>
+          <div><i style="background:#F8FAFC"></i><span>bg<br>#F8FAFC</span></div>
+          <div><i style="background:#DC2626"></i><span>error<br>#DC2626</span></div>
+        </div>
+      </div>
+      <div class="f" style="display:flex;gap:30px;margin-top:4px">
+        <div><div class="rowlbl">KHOẢNG CÁCH (space)</div>
+          <div class="spc"><div><div style="width:8px;height:8px"></div><span>4</span></div><div><div style="width:16px;height:16px"></div><span>8</span></div><div><div style="width:24px;height:24px"></div><span>16</span></div><div><div style="width:32px;height:32px"></div><span>24</span></div><div><div style="width:40px;height:40px"></div><span>32</span></div></div>
+        </div>
+        <div><div class="rowlbl">BO GÓC (radius)</div>
+          <div class="rad"><div style="border-radius:4px">4</div><div style="border-radius:8px">8</div><div style="border-radius:12px">12</div><div style="border-radius:22px">full</div></div>
+        </div>
+      </div>
+      <div class="f"><div class="rowlbl">CHỮ (type)</div><p style="font-size:17px">font: <b>Be Vietnam Pro</b> · h1 32/800 · h2 24/700 · body 16/400 · small 14/400</p></div>
+    </div>
+    <div class="in">
+      <div class="card"><h3>Vì sao phải đặt tên?</h3>
+        <p>Thay vì nói “màu xanh hơi đậm”, cả nhóm (và cả AI) cùng nói <code class="i">primary</code>. Muốn đổi thương hiệu sang xanh lá? Chỉ sửa <b>một chỗ</b>.</p></div>
+      <div class="card" style="margin-top:12px"><h3>Người mới chỉ cần 5 nhóm</h3>
+        <p><span class="pill">màu</span><span class="pill c">chữ</span><span class="pill p">khoảng cách</span><span class="pill o">bo góc</span><span class="pill g">đổ bóng</span></p>
+        <p style="margin-top:6px">Mỗi nhóm 4–6 giá trị là đủ cho một app nhỏ.</p></div>
+      <div class="note blue f" data-o="99" style="font-size:17px">Lấy cảm hứng nhanh: dùng bảng màu từ <b>coolors.co</b> hoặc màu thương hiệu sẵn có của công ty. Ở bước 6, ta sẽ đưa đúng các token này vào Stitch.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S10 ===================== -->
+<section class="slide" id="s10" data-title="Vì sao AI cần design system" data-group="C · DESIGN SYSTEM">
+  <div class="hdr in"><span class="qn">10</span><h2>Vì sao làm với AI lại càng cần design system?</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr">
+    <div class="in">
+      <p>Mỗi lần bạn yêu cầu, AI “tự sáng tác” lại từ đầu. Không có luật chung, <b>mỗi màn hình sẽ một kiểu</b>: màu khác, font khác, nút bo góc khác.</p>
+      <ul style="margin-top:8px">
+        <li>App trông như ghép từ 3 sản phẩm khác nhau, người dùng mất niềm tin.</li>
+        <li>Lập trình viên phải viết lại nhiều phiên bản cho cùng một nút.</li>
+        <li>Mỗi lần sửa phải sửa từng màn hình.</li>
+      </ul>
+      <div class="note f" data-o="99" style="font-size:18px">Cách chữa: đưa cho Stitch <b>cùng một bộ luật</b> (theme / DESIGN.md) và luôn nói <i>“giữ nguyên phong cách của dự án”</i> khi tạo màn hình mới.</div>
+    </div>
+    <div>
+      <div class="trio" id="d10">
+        <div class="mini"><div class="mt">Trang chủ</div><div class="ml"></div><div class="ml" style="width:70%"></div><div class="ml"></div><div class="mb">Đặt lịch</div></div>
+        <div class="mini"><div class="mt">Bác sĩ</div><div class="ml" style="width:80%"></div><div class="ml"></div><div class="ml" style="width:60%"></div><div class="mb">Chọn</div></div>
+        <div class="mini"><div class="mt">Xác nhận</div><div class="ml"></div><div class="ml" style="width:50%"></div><div class="ml"></div><div class="mb">Xong</div></div>
+      </div>
+      <span class="f ghost" data-say="<b>Không có design system</b>: 3 màn hình do AI tạo ở 3 lần khác nhau. Font, màu, kiểu nút đều khác."></span>
+      <span class="f ghost" data-act="#d10|unify" data-say="<b>Có design system</b>: cùng token màu, font, bo góc. Ba màn hình nhìn như một sản phẩm."></span>
+      <p class="say" style="text-align:center">Nhấn → để so sánh.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S11 ===================== -->
+<section class="slide" id="s11" data-title="Bước 0 · Viết brief trước khi mở Stitch" data-group="D · THỰC HÀNH STITCH">
+  <div class="hdr in"><span class="qn">BƯỚC 0</span><h2>Viết brief trước khi mở Stitch (5 phút)</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+      <p class="in muted" style="font-size:19px;margin-bottom:8px">Trả lời 6 câu hỏi, viết ra giấy hoặc ghi chú:</p>
+      <div class="chk">
+        <div class="f" data-act="#b1|show"><i>1</i><span><b>Mục tiêu</b>: app giúp ai làm việc gì?</span></div>
+        <div class="f" data-act="#b2|show"><i>2</i><span><b>Người dùng</b>: tuổi, thói quen, khó khăn?</span></div>
+        <div class="f" data-act="#b3|show"><i>3</i><span><b>Nền tảng</b>: App điện thoại hay Web?</span></div>
+        <div class="f" data-act="#b4|show"><i>4</i><span><b>Danh sách màn hình</b> &amp; luồng chính</span></div>
+        <div class="f" data-act="#b5|show"><i>5</i><span><b>Nội dung thật</b>: tên, số liệu, câu chữ</span></div>
+        <div class="f" data-act="#b6|show"><i>6</i><span><b>Phong cách</b>: 3 tính từ + màu + ví dụ tham khảo</span></div>
+      </div>
+    </div>
+    <div class="card in" style="font-size:17px">
+      <div class="lbl info">VÍ DỤ BRIEF · APP “KHÁMNHANH” (giả định)</div>
+      <p class="ci" id="b1" style="font-size:17px"><b>Mục tiêu:</b> đặt lịch khám tại phòng khám trong dưới 1 phút.</p>
+      <p class="ci" id="b2" style="font-size:17px;margin-top:6px"><b>Người dùng:</b> 45–70 tuổi, mắt kém, ít dùng app, sợ bấm nhầm.</p>
+      <p class="ci" id="b3" style="font-size:17px;margin-top:6px"><b>Nền tảng:</b> App điện thoại (Mobile).</p>
+      <p class="ci" id="b4" style="font-size:17px;margin-top:6px"><b>Màn hình:</b> Trang chủ → Chọn bác sĩ → Chọn ngày giờ → Xác nhận.</p>
+      <p class="ci" id="b5" style="font-size:17px;margin-top:6px"><b>Nội dung:</b> BS. Nguyễn Minh An, Tim mạch, 250.000đ, khung giờ 08:00–11:00.</p>
+      <p class="ci" id="b6" style="font-size:17px;margin-top:6px"><b>Phong cách:</b> tin cậy · sạch sẽ · thân thiện. Xanh dương #2563EB, chữ to, nhiều khoảng trắng.</p>
+    </div>
+  </div>
+  <div class="note f" data-o="99">Brief tốt = prompt tốt. <b>80% chất lượng</b> kết quả của Stitch nằm ở việc bạn biết mình muốn gì.</div>
+</section>
+
+<!-- ===================== S12 ===================== -->
+<section class="slide" id="s12" data-title="Bước 1 · Mở Stitch & làm quen giao diện" data-group="D · THỰC HÀNH STITCH">
+  <div class="hdr in"><span class="qn">BƯỚC 1</span><h2>Mở Stitch và làm quen giao diện</h2></div>
+  <div class="cols" style="grid-template-columns:.8fr 1.2fr">
+    <div class="in small">
+      <ul>
+        <li>Vào <code class="i">stitch.withgoogle.com</code> → <b>đăng nhập</b> bằng tài khoản Google.</li>
+        <li>Chọn loại thiết kế <b>App</b> (điện thoại) hoặc <b>Web</b>.</li>
+        <li>Chọn <b>chế độ / mô hình</b>: nhanh để thử nhiều ý, chất lượng cao cho bản chốt.</li>
+        <li>Gõ mô tả vào ô nhập (hoặc đính kèm ảnh) rồi bấm gửi.</li>
+        <li>Kết quả hiện trên <b>canvas</b> (bảng vẽ vô hạn): kéo, phóng to, chọn từng màn hình.</li>
+      </ul>
+      <div class="note" style="font-size:16px">Stitch cập nhật thường xuyên, tên nút và vị trí có thể khác hình minh họa. Hãy tìm theo <b>chức năng</b>.</div>
+    </div>
+    <div>
+      <div class="sui">
+        <div class="top"><i></i><i style="background:#fcd34d"></i><i style="background:#86efac"></i><span style="margin-left:8px">Stitch</span><span class="muted" style="font-weight:400;margin-left:auto">Dự án: KhámNhanh</span></div>
+        <div class="body">
+          <div class="side">
+            <div class="zn" id="z2"><div class="seg"><span class="on">📱 App</span><span>🖥️ Web</span></div><span class="num">1</span></div>
+            <div class="zn" id="z3"><div class="seg"><span>⚡ Nhanh</span><span class="on">💎 Chất lượng</span></div><span class="num">2</span></div>
+            <div class="msg">Bạn: Tạo màn hình trang chủ app đặt lịch khám…</div>
+            <div class="msg" style="background:#f3edff">Stitch: Đã tạo 1 màn hình. Bạn muốn chỉnh gì?</div>
+            <div class="zn" id="z1" style="margin-top:auto"><div class="inp" style="margin-top:0">Mô tả giao diện bạn muốn…<div class="tools"><span class="zn" id="z5" style="padding:0 3px">📎<span class="num">4</span></span><span>🎤 ➤</span></div></div><span class="num">3</span></div>
+          </div>
+          <div class="cv zn" id="z4" style="border-radius:0">
+            <div class="phone sm"><div class="notch"></div><div class="scr"><div class="pad"><div class="sk" style="width:50%"></div><div class="skb"></div><div class="sk"></div><div class="sk" style="width:70%"></div><div class="skb" style="height:40px"></div></div></div></div>
+            <div class="phone sm" style="opacity:.55"><div class="notch"></div><div class="scr"><div class="pad"><div class="sk" style="width:40%"></div><div class="sk"></div><div class="skb" style="height:90px"></div><div class="sk"></div></div></div></div>
+            <span class="play zn" id="z6">▶ Preview / Play<span class="num">6</span></span>
+            <span class="num">5</span>
+          </div>
+        </div>
+      </div>
+      <span class="f ghost" data-now="#z2|hl" data-say="<b>①</b> Chọn <b>App</b> hay <b>Web</b>: quyết định khung hình (dọc điện thoại hay ngang máy tính)."></span>
+      <span class="f ghost" data-now="#z3|hl" data-say="<b>②</b> Chọn chế độ: <b>nhanh</b> để phác thảo nhiều hướng; <b>chất lượng cao</b> (lượt dùng ít hơn) cho bản chốt."></span>
+      <span class="f ghost" data-now="#z1|hl" data-say="<b>③</b> Ô nhập prompt: nơi bạn mô tả và ra lệnh chỉnh sửa, giống như chat."></span>
+      <span class="f ghost" data-now="#z5|hl" data-say="<b>④</b> Đính kèm ảnh: phác thảo tay, ảnh chụp màn hình tham khảo, wireframe."></span>
+      <span class="f ghost" data-now="#z4|hl" data-say="<b>⑤</b> Canvas: các màn hình được sinh ra nằm ở đây. Bấm chọn 1 màn hình để chỉnh riêng, xem code hoặc xuất."></span>
+      <span class="f ghost" data-now="#z6|hl" data-say="<b>⑥</b> Xem trước / Play: chạy thử prototype, bấm qua lại giữa các màn hình."></span>
+      <p class="say">Nhấn → để xem từng khu vực.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S13 ===================== -->
+<section class="slide" id="s13" data-title="Bước 2 · Công thức prompt 5 phần" data-group="D · THỰC HÀNH STITCH">
+  <div class="hdr in"><span class="qn">BƯỚC 2</span><h2>Công thức prompt 5 phần</h2></div>
+  <div class="fml in" style="margin-bottom:16px">
+    <div class="chip" id="p1" style="background:#7c3aed">Sản phẩm<small>app gì, nền tảng</small></div><span class="plus">+</span>
+    <div class="chip" id="p2" style="background:#0891b2">Người dùng<small>ai, đặc điểm</small></div><span class="plus">+</span>
+    <div class="chip" id="p3" style="background:#db2777">Màn hình<small>tên &amp; mục đích</small></div><span class="plus">+</span>
+    <div class="chip" id="p4" style="background:#d97706">Nội dung<small>thành phần, dữ liệu</small></div><span class="plus">+</span>
+    <div class="chip" id="p5" style="background:#059669">Phong cách<small>cảm giác, màu, chữ</small></div>
+  </div>
+  <div class="pbox">
+    <span class="ci" id="t1"><span class="lab a">1</span>Thiết kế màn hình <b>Trang chủ</b> cho <b>ứng dụng di động</b> đặt lịch khám bệnh tên “KhámNhanh”. </span>
+    <span class="ci" id="t2"><span class="lab b">2</span>Người dùng chính 45–70 tuổi, ít dùng công nghệ, cần chữ to và thao tác đơn giản. </span>
+    <span class="ci" id="t3"><span class="lab c">3</span>Mục đích màn hình: giúp người dùng đặt lịch mới hoặc xem lịch sắp tới chỉ với 1–2 lần chạm. </span>
+    <span class="ci" id="t4"><span class="lab d">4</span>Gồm: lời chào “Xin chào, cô Lan”, thanh tìm kiếm bác sĩ, 4 chuyên khoa (Tim mạch, Nhi, Da liễu, Răng hàm mặt), thẻ “Lịch khám sắp tới” (BS. Nguyễn Minh An, Thứ 3 09:00), nút lớn “Đặt lịch khám”, thanh điều hướng dưới 4 mục. </span>
+    <span class="ci" id="t5"><span class="lab e">5</span>Phong cách: tin cậy, sạch sẽ, thân thiện; màu chính xanh dương #2563EB, nền trắng, font Be Vietnam Pro, chữ nội dung ≥ 16px, bo góc 12px, nhiều khoảng trắng. Toàn bộ chữ trên giao diện bằng tiếng Việt.</span>
+  </div>
+  <span class="f ghost" data-act="#p1|on;#t1|show" data-now="#t1|hot"></span>
+  <span class="f ghost" data-act="#p2|on;#t2|show" data-now="#t2|hot"></span>
+  <span class="f ghost" data-act="#p3|on;#t3|show" data-now="#t3|hot"></span>
+  <span class="f ghost" data-act="#p4|on;#t4|show" data-now="#t4|hot"></span>
+  <span class="f ghost" data-act="#p5|on;#t5|show" data-now="#t5|hot"></span>
+  <div class="note blue f" style="font-size:17px">Mẹo: copy nguyên phần <b>5 · Phong cách</b> để dùng lại cho mọi màn hình sau. Ghi rõ <i>“chữ trên giao diện bằng tiếng Việt”</i> để không bị sinh chữ tiếng Anh.</div>
+</section>
+
+<!-- ===================== S14 ===================== -->
+<section class="slide" id="s14" data-title="Prompt tệ và prompt tốt" data-group="D · THỰC HÀNH STITCH">
+  <div class="hdr in"><span class="qn">BƯỚC 2</span><h2>Prompt tệ và prompt tốt</h2></div>
+  <div class="cols">
+    <div class="card bad f"><span class="lbl bad">✗ MƠ HỒ</span>
+      <p style="font-family:var(--mono);font-size:17px;background:#fff;padding:8px 12px;border-radius:8px;border:1px solid #fecdd3">“Làm cho tôi một app y tế đẹp đẹp.”</p>
+      <ul class="small" style="margin-top:8px"><li>Không biết app làm gì, cho ai</li><li>“Đẹp” mỗi người hiểu một kiểu</li><li>AI tự bịa nội dung, chữ tiếng Anh</li><li>Kết quả chung chung, khó sửa tiếp</li></ul></div>
+    <div class="card good f"><span class="lbl good">✓ CỤ THỂ</span>
+      <p style="font-family:var(--mono);font-size:17px;background:#fff;padding:8px 12px;border-radius:8px;border:1px solid #a7f3d0">“Màn hình Chọn giờ khám, app di động. Lưới khung giờ 3 cột, giờ đã kín tô xám và gạch ngang. Nút ‘Xác nhận’ cố định ở đáy, màu #2563EB…”</p>
+      <ul class="small" style="margin-top:8px"><li>Một màn hình, một mục đích</li><li>Mô tả thành phần + trạng thái</li><li>Có màu, vị trí, nội dung thật</li></ul></div>
+  </div>
+  <div class="cols3" style="margin-top:14px">
+    <div class="card sm f"><h3>Một lần, một việc</h3><p>Tạo <b>từng màn hình</b> một, đừng xin cả app 10 màn trong một prompt.</p></div>
+    <div class="card sm f"><h3>Dùng tính từ cảm xúc</h3><p>“tối giản”, “ấm áp”, “chuyên nghiệp”, “vui tươi”… và nêu <b>app tham khảo</b> cùng loại.</p></div>
+    <div class="card sm f"><h3>Nói điều KHÔNG muốn</h3><p>“Không dùng ảnh minh họa”, “không dùng màu đỏ”, “không quá 1 nút chính”.</p></div>
+  </div>
+</section>
+
+<!-- ===================== S15 ===================== -->
+<section class="slide" id="s15" data-title="Bước 3 · Tạo màn hình đầu tiên" data-group="D · THỰC HÀNH STITCH">
+  <div class="hdr in"><span class="qn">BƯỚC 3</span><h2>Tạo màn hình đầu tiên và đánh giá kết quả</h2></div>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr">
+    <div>
+      <div class="in small">
+        <ul>
+          <li>Dán prompt 5 phần vào ô nhập → bấm gửi → chờ khoảng 30 giây đến 1–2 phút.</li>
+          <li>Có thể yêu cầu <b>2–3 phương án</b> (variants) để so sánh, chọn hướng ưng nhất.</li>
+          <li>Đừng chấp nhận ngay bản đầu tiên. Đánh giá bằng <b>3 câu hỏi</b>:</li>
+        </ul>
+      </div>
+      <div class="chk" style="margin-top:8px">
+        <div id="q15a"><i>✓</i><span>Nhìn 3 giây có biết <b>màn hình này để làm gì</b> không?</span></div>
+        <div id="q15b"><i>✓</i><span>Có <b>đúng một</b> hành động chính nổi bật không?</span></div>
+        <div id="q15c"><i>!</i><span>Chữ có <b>đủ to, đủ tương phản</b> cho người lớn tuổi không?</span></div>
+      </div>
+      <p class="say">Nhấn → để xem Stitch tạo màn hình.</p>
+    </div>
+    <div style="display:flex;justify-content:center">
+      <div class="phone"><div class="notch"></div><div class="scr" id="ph15">
+        <div class="layer shim on" id="ph15sk"><div class="pad"><div class="sk" style="width:40%"></div><div class="sk" style="width:70%;height:14px"></div><div class="sk"></div><div style="display:flex;gap:6px"><div class="skb" style="flex:1;height:44px"></div><div class="skb" style="flex:1;height:44px"></div><div class="skb" style="flex:1;height:44px"></div><div class="skb" style="flex:1;height:44px"></div></div><div class="skb" style="height:80px"></div><div class="skb"></div></div></div>
+        <div class="layer" id="ph15ui"><div class="pad">
+          <div class="ap-hi">Chào buổi sáng ☀️</div><div class="ap-h">Xin chào, cô Lan</div>
+          <div class="ap-search">🔍 Tìm bác sĩ, chuyên khoa…</div>
+          <div class="ap-cats"><span>❤️<br>Tim mạch</span><span>👶<br>Nhi</span><span>🧴<br>Da liễu</span><span>🦷<br>Răng</span></div>
+          <div style="font-weight:700;font-size:12px;margin-bottom:6px">Lịch khám sắp tới</div>
+          <div class="ap-card"><div class="ap-av"></div><div><b>BS. Nguyễn Minh An</b><small>Tim mạch · Thứ 3, 09:00</small></div></div>
+          <span class="ap-btn" style="background:linear-gradient(135deg,#0ea5e9,#2563eb);color:#fff">Đặt lịch khám</span>
+        </div><div class="ap-nav" style="transform:none">🏠 📅 💬 👤</div></div>
+      </div></div>
+    </div>
+  </div>
+  <span class="f ghost" data-say="Stitch đang <b>sinh giao diện</b> (khung xám nhấp nháy). Lúc này đọc lại prompt xem có thiếu gì."></span>
+  <span class="f ghost" data-act="#ph15ui|on" data-say="Kết quả: đủ lời chào, tìm kiếm, chuyên khoa, lịch sắp tới, nút chính, thanh điều hướng như prompt yêu cầu."></span>
+  <span class="f ghost" data-act="#ph15ui|on;#q15a|ok" data-say="Câu 1: <b>Đạt</b>, tiêu đề và nút cho biết ngay đây là nơi đặt lịch."></span>
+  <span class="f ghost" data-act="#ph15ui|on;#q15a|ok;#q15b|ok" data-say="Câu 2: <b>Đạt</b>, chỉ có ‘Đặt lịch khám’ được tô màu."></span>
+  <span class="f ghost" data-act="#ph15ui|on;#q15a|ok;#q15b|ok;#q15c|no" data-say="Câu 3: <b>Chưa đạt</b>, chữ phụ và nhãn chuyên khoa hơi nhỏ, nhạt. Ghi lại để sửa ở bước 4."></span>
+</section>
+
+<!-- ===================== S16 ===================== -->
+<section class="slide" id="s16" data-title="Bước 4 · Chỉnh sửa từng bước" data-group="D · THỰC HÀNH STITCH">
+  <div class="hdr in"><span class="qn">BƯỚC 4</span><h2>Chỉnh sửa: mỗi lần một thay đổi, nói rõ chỗ nào</h2></div>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr">
+    <div>
+      <div class="pbox" style="font-size:17px;padding:10px 16px">
+        <p class="ci" id="e1" style="font-size:17px">① <b>“Đổi nút ‘Đặt lịch khám’ thành màu gradient xanh #0EA5E9 → #2563EB, cao 48px, chữ trắng đậm.”</b></p>
+        <p class="ci" id="e2" style="font-size:17px;margin-top:6px">② <b>“Tăng khoảng cách giữa các thẻ lên 16px, thêm bóng đổ nhẹ cho thẻ lịch khám.”</b></p>
+        <p class="ci" id="e3" style="font-size:17px;margin-top:6px">③ <b>“Thêm thanh điều hướng dưới 4 mục: Trang chủ, Lịch hẹn, Tin nhắn, Tài khoản. Tiêu đề màu xanh đậm.”</b></p>
+      </div>
+      <div class="cols" style="margin-top:12px;gap:12px">
+        <div class="card good sm"><span class="lbl good">NÊN</span><p>Chọn đúng màn hình/thành phần trên canvas rồi mới ra lệnh. Gọi đúng tên: “thẻ lịch khám”, “nút chính”.</p></div>
+        <div class="card bad sm"><span class="lbl bad">TRÁNH</span><p>“Sửa lại cho đẹp hơn”, hoặc gộp 6–7 thay đổi trong một lần, vì AI dễ làm hỏng phần đang tốt.</p></div>
+      </div>
+      <p class="say">Nhấn → để áp từng câu lệnh.</p>
+    </div>
+    <div style="display:flex;justify-content:center">
+      <div class="phone"><div class="notch"></div><div class="scr" id="ph16"><div class="pad">
+        <div class="ap-hi">Chào buổi sáng ☀️</div><div class="ap-h">Xin chào, cô Lan</div>
+        <div class="ap-search">🔍 Tìm bác sĩ, chuyên khoa…</div>
+        <div class="ap-card"><div class="ap-av"></div><div><b>BS. Nguyễn Minh An</b><small>Tim mạch · Thứ 3, 09:00</small></div></div>
+        <div class="ap-card"><div class="ap-av" style="background:linear-gradient(135deg,#fda4af,#fcd34d)"></div><div><b>Xét nghiệm máu</b><small>Kết quả đã có</small></div></div>
+        <span class="ap-btn" id="ph16b">Đặt lịch khám</span>
+      </div><div class="ap-nav">🏠 📅 💬 👤</div></div></div>
+    </div>
+  </div>
+  <span class="f ghost" data-act="#e1|show;#ph16|b1" data-now="#e1|hot" data-say="Lệnh ①: chỉ đụng tới <b>một nút</b>. Nút chính giờ nổi bật hẳn."></span>
+  <span class="f ghost" data-act="#e2|show;#ph16|b2" data-now="#e2|hot" data-say="Lệnh ②: <b>khoảng trắng + bóng đổ</b> làm các thẻ tách bạch, dễ đọc."></span>
+  <span class="f ghost" data-act="#e3|show;#ph16|b3" data-now="#e3|hot" data-say="Lệnh ③: thêm <b>điều hướng quen thuộc</b> ở đáy màn hình (nguyên tắc ‘quen thuộc’)."></span>
+</section>
+
+<!-- ===================== S17 ===================== -->
+<section class="slide" id="s17" data-title="Bước 5 · Dùng ảnh làm đầu vào" data-group="D · THỰC HÀNH STITCH">
+  <div class="hdr in"><span class="qn">BƯỚC 5</span><h2>Dùng ảnh làm đầu vào: phác thảo, ảnh chụp, ghi chú</h2></div>
+  <div class="cols3">
+    <div class="card f"><div class="icon">✏️</div><h3>Phác thảo tay</h3><p>Vẽ ô vuông, đường kẻ trên giấy, chụp lại và đính kèm: <i>“Biến phác thảo này thành màn hình hoàn chỉnh theo phong cách…”</i></p></div>
+    <div class="card f"><div class="icon">📸</div><h3>Ảnh tham khảo</h3><p>Ảnh chụp app bạn thích để AI học <b>cảm giác</b> (màu, bố cục): <i>“Lấy cảm hứng bố cục từ ảnh, nhưng nội dung là app khám bệnh.”</i></p></div>
+    <div class="card f"><div class="icon">📝</div><h3>Ảnh có ghi chú</h3><p>Chụp màn hình Stitch vừa tạo, khoanh đỏ chỗ cần sửa, viết chú thích, gửi lại. Rất hiệu quả khi khó diễn tả bằng lời.</p></div>
+  </div>
+  <div class="flow f" style="margin-top:20px">
+    <div class="box" style="border-color:#7c3aed;border-style:dashed">✏️ Phác thảo<small>khung chữ nhật &amp; nhãn</small></div><div class="ar">→</div>
+    <div class="box" style="border-color:#ec4899;background:#fdf2f8">✨ Stitch<small>+ prompt phong cách</small></div><div class="ar">→</div>
+    <div class="box" style="border-color:#059669">📱 Màn hình hoàn chỉnh<small>đúng bố cục bạn vẽ</small></div>
+  </div>
+  <div class="note f">Lưu ý: chỉ dùng ảnh tham khảo để lấy <b>ý tưởng</b>. Không sao chép nguyên logo, hình ảnh, thương hiệu của sản phẩm khác.</div>
+</section>
+
+<!-- ===================== S18 ===================== -->
+<section class="slide" id="s18" data-title="Bước 6 · Áp design system (DESIGN.md)" data-group="D · THỰC HÀNH STITCH">
+  <div class="hdr in"><span class="qn">BƯỚC 6</span><h2>Áp design system vào Stitch</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr">
+    <div class="in small">
+      <p>Có 3 cách, từ dễ tới chuẩn:</p>
+      <ul style="margin-top:6px">
+        <li><b>Cách 1 · Trong prompt</b>: luôn dán đoạn “Phong cách” (màu, font, bo góc, khoảng cách) vào cuối mỗi prompt.</li>
+        <li><b>Cách 2 · Cài đặt theme</b> của dự án: chọn màu chính, font, độ bo góc, chế độ sáng/tối trong phần tùy chỉnh giao diện.</li>
+        <li><b>Cách 3 · DESIGN.md</b>: tệp văn bản mô tả design system bằng ngôn ngữ thường. Stitch có thể <b>trích từ một website</b> có sẵn hoặc bạn <b>tự viết</b>, rồi dùng chung cho nhiều dự án.</li>
+      </ul>
+      <div class="note blue" style="font-size:17px">Sau khi áp, mọi màn hình mới nhớ thêm câu: <i>“Tuân theo design system của dự án.”</i></div>
+    </div>
+    <div>
+      <div class="code-title">DESIGN.md (ví dụ rút gọn)</div>
+<script type="text/x-cpp" class="xs" id="k18" data-mark="1-2:a;3-7:b;8-10:c;11-14:d">
+# KhamNhanh Design System
+Cảm giác: tin cậy, sạch sẽ, thân thiện, cho người lớn tuổi.
+## Colors
+- primary: #2563EB (nút chính, liên kết)
+- accent: #F97316 (chỉ dùng cho huy hiệu, nhắc nhở)
+- text: #0F172A · muted: #64748B · bg: #F8FAFC
+- error: #DC2626 · success: #16A34A
+## Typography
+- Font: Be Vietnam Pro · body 16px · h1 32px/800
+- Không chữ nào nhỏ hơn 14px
+## Components
+- Button: cao 48px, bo góc 12px, chữ 16px đậm
+- Card: nền trắng, bo góc 16px, padding 16px, bóng nhẹ
+- Spacing theo lưới 8px: 8 / 16 / 24 / 32
+</script>
+      <span class="f ghost" data-act="#k18|show-a" data-say="Mở đầu: tên và <b>tính cách</b> của thương hiệu. AI dùng để chọn phong cách tổng thể."></span>
+      <span class="f ghost" data-act="#k18|show-b" data-say="<b>Màu</b>: mỗi màu có tên và <b>công dụng</b>. Nói rõ cam chỉ để nhấn, tránh AI dùng lung tung."></span>
+      <span class="f ghost" data-act="#k18|show-c" data-say="<b>Chữ</b>: font, cỡ chữ và một luật cấm (không nhỏ hơn 14px)."></span>
+      <span class="f ghost" data-act="#k18|show-d" data-say="<b>Component &amp; khoảng cách</b>: kích thước nút, thẻ, lưới 8. Đây chính là token ở slide 09."></span>
+      <p class="say">Nhấn → để đọc từng phần.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S19 ===================== -->
+<section class="slide" id="s19" data-title="Bước 7 · Nhiều màn hình & prototype" data-group="D · THỰC HÀNH STITCH">
+  <div class="hdr in"><span class="qn">BƯỚC 7</span><h2>Tạo cả luồng màn hình và prototype bấm thử</h2></div>
+  <div class="sflow">
+    <div class="mscr f"><div class="in2"><div class="tt">Trang chủ</div><div class="ln2" style="width:60%"></div><div class="bx">❤️ Tim mạch</div><div class="bx">👶 Nhi</div><div class="bt" id="t19a">Đặt lịch khám</div></div></div>
+    <div class="arrow f">→</div>
+    <div class="mscr f"><div class="in2"><div class="tt">Chọn bác sĩ</div><div class="bx"><b>BS. Minh An</b><br>Tim mạch · 4.9★</div><div class="bx"><b>BS. Thu Hà</b><br>Tim mạch · 4.8★</div><div class="bt" id="t19b">Chọn BS. Minh An</div></div></div>
+    <div class="arrow f">→</div>
+    <div class="mscr f"><div class="in2"><div class="tt">Chọn giờ</div><div class="ln2" style="width:50%"></div><div class="slots"><span>08:00</span><span class="sel">09:00</span><span style="color:#cbd5e1;text-decoration:line-through">09:30</span><span>10:00</span><span>10:30</span><span>11:00</span></div><div class="bt" id="t19c">Tiếp tục</div></div></div>
+    <div class="arrow f">→</div>
+    <div class="mscr f"><div class="in2"><div class="tt">Xác nhận</div><div style="text-align:center;font-size:30px;margin:10px 0">✅</div><div class="bx">Thứ 3 · 09:00<br>BS. Minh An · 250.000đ</div><div class="bt">Về trang chủ</div></div></div>
+  </div>
+  <div class="cols" style="margin-top:14px;gap:16px">
+    <div class="pbox f" style="font-size:16px;padding:10px 14px"><b>Prompt màn hình tiếp theo:</b> <i>“Tạo màn hình ‘Chọn giờ’ xuất hiện sau khi bấm ‘Chọn BS. Minh An’. Lưới khung giờ 3 cột, giờ đã kín màu xám gạch ngang, nút ‘Tiếp tục’ ở đáy. Giữ nguyên design system của dự án.”</i></div>
+    <div class="f"><p class="say" style="margin-top:0">Nhấn → để nối luồng.</p></div>
+  </div>
+  <span class="f ghost" data-now="#t19a|tap;#t19b|tap;#t19c|tap" data-say="<b>Prototype</b>: nối nút ở màn hình trước tới màn hình sau (Stitch có thể tự nối khi bạn mô tả luồng). Bấm <b>Play/Preview</b> để thử như app thật."></span>
+  <span class="f ghost" data-say="Cho 2–3 người dùng thật bấm thử. Quan sát chỗ họ <b>dừng lại, bấm nhầm, hỏi lại</b>: đó là chỗ cần sửa."></span>
+</section>
+
+<!-- ===================== S20 ===================== -->
+<section class="slide" id="s20" data-title="Bước 8 · Tự kiểm tra thiết kế" data-group="D · THỰC HÀNH STITCH">
+  <div class="hdr in"><span class="qn">BƯỚC 8</span><h2>Tự kiểm tra trước khi giao: checklist 8 điểm</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr">
+    <div class="chk">
+      <div id="c1"><i>✓</i><span><b>Phân cấp</b>: nheo mắt vẫn thấy tiêu đề và nút chính</span></div>
+      <div id="c2"><i>✓</i><span><b>Căn lề</b>: lề trái/phải đều nhau ở mọi màn hình</span></div>
+      <div id="c3"><i>✓</i><span><b>Khoảng cách</b>: theo lưới 8 (8/16/24/32)</span></div>
+      <div id="c4"><i>✓</i><span><b>Màu</b>: ≤ 3 màu chính, màu nhấn chỉ cho hành động chính</span></div>
+      <div id="c5"><i>✓</i><span><b>Tương phản</b>: chữ trên nền đạt ≥ 4.5:1</span></div>
+      <div id="c6"><i>✓</i><span><b>Chữ</b>: 1 font, ≤ 6 cỡ, nội dung ≥ 16px</span></div>
+      <div id="c7"><i>✓</i><span><b>Nhất quán</b>: cùng loại nút cùng kiểu ở mọi màn hình</span></div>
+      <div id="c8"><i>✓</i><span><b>Trạng thái</b>: có màn hình trống, đang tải, lỗi, thành công</span></div>
+    </div>
+    <div class="in">
+      <div class="card"><h3>Nhờ chính AI soát lỗi</h3><p>Hỏi Stitch: <i>“Đánh giá màn hình này theo phân cấp thị giác, tương phản màu và khả năng dùng cho người lớn tuổi. Liệt kê 5 vấn đề và tự sửa.”</i></p></div>
+      <div class="card" style="margin-top:12px"><h3>Đừng quên trạng thái</h3><p>AI thường chỉ vẽ trạng thái “đẹp”. Hãy yêu cầu thêm: <i>“Tạo phiên bản khi chưa có lịch hẹn nào”</i> và <i>“khi mất kết nối mạng”</i>.</p></div>
+      <p class="say">Nhấn → để chấm từng mục.</p>
+    </div>
+  </div>
+  <span class="f ghost" data-act="#c1|ok" data-say="Bấm lần lượt để đánh dấu."></span>
+  <span class="f ghost" data-act="#c2|ok"></span><span class="f ghost" data-act="#c3|ok"></span><span class="f ghost" data-act="#c4|ok"></span>
+  <span class="f ghost" data-act="#c5|ok"></span><span class="f ghost" data-act="#c6|ok"></span><span class="f ghost" data-act="#c7|ok"></span>
+  <span class="f ghost" data-act="#c8|ok" data-say="Đạt đủ 8/8: sẵn sàng chuyển cho người làm tiếp!"></span>
+</section>
+
+<!-- ===================== S21 ===================== -->
+<section class="slide" id="s21" data-title="Bước 9 · Xuất ra Figma / code" data-group="D · THỰC HÀNH STITCH">
+  <div class="hdr in"><span class="qn">BƯỚC 9</span><h2>Xuất kết quả: cho designer, cho lập trình viên</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+      <div class="cols3" style="grid-template-columns:1fr;gap:10px">
+        <div class="card sm f"><h3>🎨 Sang Figma</h3><p>Dán/xuất sang Figma (giữ các lớp) để designer tinh chỉnh chi tiết, tạo component chuẩn.</p></div>
+        <div class="card sm f"><h3>💻 Lấy code giao diện</h3><p>Chọn màn hình → xem / tải <b>code HTML + CSS (Tailwind)</b> → gửi cho lập trình viên làm điểm khởi đầu.</p></div>
+        <div class="card sm f"><h3>🤖 Sang công cụ AI viết code</h3><p>Gửi thiết kế sang <b>Google AI Studio</b> hoặc trợ lý code (qua MCP/tệp DESIGN.md) để dựng thành app chạy được.</p></div>
+      </div>
+    </div>
+    <div class="in">
+      <h3 style="color:#db2777">Code giao diện là gì? (cho người chưa biết code)</h3>
+      <div class="cstack">
+        <div class="cl2"><span class="tag" style="color:#7c3aed">HTML</span><p><b>Khung xương</b>: có tiêu đề, có ô tìm kiếm, có nút. Giống bản liệt kê đồ đạc trong nhà.</p></div>
+        <div class="cl2"><span class="tag" style="color:#0891b2">CSS<br><small style="font-size:12px">Tailwind</small></span><p><b>Trang trí</b>: màu, cỡ chữ, khoảng cách, bo góc. Chính là các token bạn đã chọn.</p></div>
+        <div class="cl2"><span class="tag" style="color:#d97706">JavaScript</span><p><b>Hành vi</b>: bấm nút thì làm gì, lưu lịch hẹn ở đâu. Phần này lập trình viên (hoặc AI) viết tiếp.</p></div>
+      </div>
+      <div class="note f" data-o="99" style="font-size:17px">Code từ Stitch là <b>bản giao diện tĩnh</b>, chưa có đăng nhập, cơ sở dữ liệu hay đặt lịch thật. Đừng hứa với khách hàng là “app đã xong”.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S22 ===================== -->
+<section class="slide" id="s22" data-title="Lỗi thường gặp & cách sửa" data-group="E · TỔNG KẾT">
+  <div class="hdr in"><span class="qn">22</span><h2>Lỗi thường gặp và cách sửa</h2></div>
+  <table class="in">
+    <tr><th style="width:32%">Hiện tượng</th><th style="width:30%">Nguyên nhân</th><th>Cách sửa</th></tr>
+    <tr class="f"><td>Chữ trên giao diện ra tiếng Anh</td><td>Prompt không nói ngôn ngữ</td><td>Thêm: <i>“Toàn bộ chữ trên giao diện bằng tiếng Việt”</i></td></tr>
+    <tr class="f"><td>Mỗi màn hình một phong cách</td><td>Không có design system</td><td>Áp theme / DESIGN.md, nhắc <i>“giữ phong cách dự án”</i></td></tr>
+    <tr class="f"><td>Sửa 1 chỗ, hỏng 3 chỗ khác</td><td>Gộp quá nhiều yêu cầu</td><td>Mỗi lần 1–2 thay đổi, chọn đúng thành phần trước khi ra lệnh</td></tr>
+    <tr class="f"><td>Giao diện rối, quá nhiều thứ</td><td>Một màn hình ôm nhiều mục tiêu</td><td>Tách màn hình; chỉ giữ 1 nút chính</td></tr>
+    <tr class="f"><td>Kết quả chung chung, nhạt</td><td>Prompt mơ hồ, thiếu nội dung thật</td><td>Dùng công thức 5 phần, nêu tính từ phong cách + app tham khảo</td></tr>
+    <tr class="f"><td>Hết lượt tạo trong tháng</td><td>Dùng chế độ chất lượng cao để thử nghiệm</td><td>Phác thảo bằng chế độ nhanh, chỉ dùng chất lượng cao cho bản chốt</td></tr>
+  </table>
+</section>
+
+<!-- ===================== S23 ===================== -->
+<section class="slide" id="s23" data-title="Bài tập thực hành" data-group="E · TỔNG KẾT">
+  <div class="hdr in"><span class="qn">23</span><h2>Bài tập thực hành: 3 cấp độ</h2></div>
+  <div class="cols3">
+    <div class="card f"><span class="lbl good">CƠ BẢN · 30 phút</span><h3>Một màn hình</h3><p>Viết brief + prompt 5 phần cho màn hình <b>Đăng nhập</b> của app KhámNhanh. Chỉnh ít nhất 3 lần. Chấm theo checklist 8 điểm.</p></div>
+    <div class="card f"><span class="lbl info">TRUNG BÌNH · 1 giờ</span><h3>Một luồng</h3><p>Viết <b>DESIGN.md</b> 15 dòng. Tạo luồng 4 màn hình Trang chủ → Chọn bác sĩ → Chọn giờ → Xác nhận. Nối prototype, cho 1 người bấm thử.</p></div>
+    <div class="card f"><span class="lbl bad">NÂNG CAO · 2 giờ</span><h3>Trọn bộ</h3><p>Thêm trạng thái trống, đang tải, lỗi. Làm thêm phiên bản <b>Web</b> cùng design system. Xuất sang Figma và lấy code HTML.</p></div>
+  </div>
+  <div class="note blue f" data-o="99"><b>Nộp bài gồm:</b> brief · các prompt đã dùng (theo thứ tự) · ảnh trước/sau mỗi lần chỉnh · link prototype · 3 điều học được.</div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="slide" id="end" data-title="Tóm tắt" data-group="E · TỔNG KẾT">
+  <div class="title-wrap" style="align-items:center;text-align:center">
+    <div class="orb" style="width:360px;height:360px;background:#f9a8d4;left:10%;top:10%"></div>
+    <h1 class="in">Tóm tắt <span class="grad">nhanh</span></h1>
+    <div class="cols4 in" style="margin-top:32px;text-align:left;max-width:1180px">
+      <div class="card"><h3>Nguyên tắc</h3><p style="font-size:17px">Phân cấp rõ, căn lề thẳng, khoảng trắng theo lưới 8, ít màu đủ tương phản, 1 font và thang cỡ chữ, nhất quán và dễ chạm.</p></div>
+      <div class="card"><h3>Design system</h3><p style="font-size:17px">Token → Component → Pattern → Screen. Ghi lại thành theme / <code class="i">DESIGN.md</code> để mọi màn hình AI tạo ra đều đồng bộ.</p></div>
+      <div class="card"><h3>Quy trình Stitch</h3><p style="font-size:17px">Brief → prompt 5 phần → tạo → chỉnh từng thay đổi → áp design system → nối luồng &amp; prototype → checklist.</p></div>
+      <div class="card"><h3>Sau Stitch</h3><p style="font-size:17px">Xuất sang Figma cho designer, code HTML/Tailwind cho dev hoặc công cụ AI. Luôn thử với người dùng thật.</p></div>
+    </div>
+  </div>
+</section>
+
+</div></div>
+
+<div id="bar"></div>
+<div id="hint">← → / Space: từng bước · Shift+→: qua slide · M: mục lục · A: hiện hết · F: toàn màn hình</div>
+<div id="nav"><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+
+<script>
+(function(){
+  // ---------- C++ highlighter (same as lec03) ----------
+  const KW=new Set("if else for while do return break continue switch case default struct class using namespace const static new delete true false sizeof public private include pragma auto".split(" "));
+  const TY=new Set("int double float char void bool long short unsigned string".split(" "));
+  const LIB=new Set("cout cin endl sqrt fabs std".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line){
+    if(/^\s*#/.test(line)) return '<span class="p">'+esc(line)+'</span>';
+    const re=/(\/\/.*$)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="n">'+m[3]+'</span>';
+      else if(m[4]){
+        const w=m[4];
+        let cls=KW.has(w)?"k":TY.has(w)?"t":LIB.has(w)?"fn":(m[5]?"fn":"");
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[5]?esc(m[5]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-cpp"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");const [a,b]=r.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+  // ---------- deck engine ----------
+  // .f fragments, shown one per step. Per fragment:
+  //   data-act  "sel|cls;…"   class kept while the fragment is shown
+  //   data-now  "sel|cls;…"   class only while it is the latest fragment
+  //   data-set  "sel::html;…" content set while shown (later fragments win)
+  //   data-say  narration for the .say line
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")].sort((x,y)=>(+x.dataset.o||0)-(+y.dataset.o||0)); // data-o: show later
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  const pairs=(v,sep)=>(v||"").split(";").filter(Boolean).map(p=>{const k=p.indexOf(sep);return [p.slice(0,k).trim(),p.slice(k+sep.length)]});
+  function tog(v,on){pairs(v,"|").forEach(([sel,cls])=>{document.querySelectorAll(sel).forEach(t=>t.classList.toggle(cls,on))})}
+  // remember original content of every data-set target
+  document.querySelectorAll("[data-set]").forEach(f=>pairs(f.dataset.set,"::").forEach(([sel])=>{document.querySelectorAll(sel).forEach(t=>{if(t.dataset.orig===undefined)t.dataset.orig=t.innerHTML})}));
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach(f=>{tog(f.dataset.now,false);tog(f.dataset.act,false)});
+      s.querySelectorAll("[data-orig]").forEach(t=>t.innerHTML=t.dataset.orig);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step);f.classList.toggle("on",on);if(on){tog(f.dataset.act,true);pairs(f.dataset.set,"::").forEach(([sel,val])=>document.querySelectorAll(sel).forEach(t=>t.innerHTML=val))}});
+      if(i===cur&&step>0)tog(fs[step-1].dataset.now,true);
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.innerHTML=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length;
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    try{history.replaceState(null,"","#"+slides[cur].id)}catch(e){}
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+  // ---------- jump menu ----------
+  const jump=document.createElement("div");jump.id="jump";
+  let gh="",lastG=null;
+  slides.forEach((s,i)=>{const g=s.dataset.group||"";if(g!==lastG){gh+='<div class="grp">'+g+'</div>';lastG=g}
+    gh+='<button class="it" data-i="'+i+'"><b>'+(i+1)+'</b><span>'+(s.dataset.title||s.id)+'</span></button>'});
+  jump.innerHTML='<div class="panel"><div class="ph"><b>☰ Nhảy tới slide</b><span><input id="jq" placeholder="Gõ số hoặc từ khóa…"> <button id="jx">✕ Đóng</button></span></div><div class="grid">'+gh+'</div></div>';
+  document.body.appendChild(jump);
+  const items=[...jump.querySelectorAll(".it")],jq=jump.querySelector("#jq");
+  function openJ(){items.forEach(b=>b.classList.toggle("cur",+b.dataset.i===cur));jq.value="";filt();jump.classList.add("open");setTimeout(()=>jq.focus(),30)}
+  function closeJ(){jump.classList.remove("open")}
+  function filt(){const q=jq.value.trim().toLowerCase();items.forEach(b=>{b.style.display=(!q||b.textContent.toLowerCase().includes(q))?"":"none"});jump.querySelectorAll(".grp").forEach(g=>g.style.display=q?"none":"")}
+  jq.addEventListener("input",filt);
+  jq.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Escape")closeJ();if(e.key==="Enter"){const n=parseInt(jq.value);if(n>=1&&n<=slides.length){go(n-1);closeJ();return}const v=items.find(b=>b.style.display!=="none");if(v){go(+v.dataset.i);closeJ()}}});
+  items.forEach(b=>b.onclick=()=>{go(+b.dataset.i);closeJ()});
+  jump.addEventListener("click",e=>{if(e.target===jump)closeJ()});
+  jump.querySelector("#jx").onclick=closeJ;
+  const mb=document.createElement("button");mb.id="menu";mb.textContent="☰ Mục lục";mb.title="Nhảy tới slide bất kỳ (M)";mb.onclick=openJ;
+  document.getElementById("nav").prepend(mb);
+  addEventListener("keydown",e=>{if(jump.classList.contains("open")){if(e.key==="Escape")closeJ();e.stopImmediatePropagation();return}if(e.key==="m"||e.key==="M"){e.preventDefault();e.stopImmediatePropagation();openJ()}},true);
+  addEventListener("keydown",e=>{
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+</script>
+</body>
+</html>

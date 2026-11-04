@@ -1,0 +1,1220 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Java Swing Layout Managers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+.rk{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--sa1);border:2px solid var(--sa1);border-radius:999px;padding:3px 10px;white-space:nowrap;margin-left:auto}
+h1{font-size:70px;line-height:1.1;font-weight:800}
+h2{font-size:36px;line-height:1.2;font-weight:800}
+h3{font-size:22px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:21px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:26px;margin:6px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+ul.sm li{font-size:18px;margin:4px 0}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.86em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 6px;border-radius:6px;color:#be185d}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.cols>*{min-width:0}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.card p{font-size:18px}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.card.bad{border-color:#fecdd3;background:linear-gradient(180deg,#fff1f3,#fff)}
+.card.good{border-color:#a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff)}
+.lbl{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
+.note{margin-top:12px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:18px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.code{font-family:var(--mono);font-size:18px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
+.code.sm{font-size:16.5px}.code.xs{font-size:15px;line-height:1.45}.code.xxs{font-size:13.4px;line-height:1.4;padding:8px 0}
+.code .ln{padding:0 14px 0 8px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.11);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.13);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
+.code.show-e .mark-e{background:rgba(16,185,129,.13);box-shadow:inset 5px 0 #10b981}
+.code.show-f .mark-f{background:rgba(59,130,246,.12);box-shadow:inset 5px 0 #3b82f6}
+.code.show-g .mark-g{background:rgba(249,115,22,.13);box-shadow:inset 5px 0 #f97316}
+.code.show-h .mark-h{background:rgba(225,29,72,.10);box-shadow:inset 5px 0 #e11d48}
+.code-title{font-family:var(--mono);font-size:14px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:17px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:7px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+td code,th code{font-family:var(--mono);font-size:.92em;color:#6d28d9}
+tr.f{transform:none}
+.console{font-family:var(--mono);font-size:16px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.agenda{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:19px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05)}
+.ag:hover{border-color:#ec4899;transform:translateY(-3px);box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
+.ag b{color:#db2777;margin-right:6px;font-family:var(--mono)}
+.ag small{display:block;font-size:14.5px;color:var(--muted);margin-top:3px}
+.say{font-size:19px;margin-top:12px;min-height:56px;color:var(--muted);line-height:1.45}
+.say b{color:var(--text)}
+.say code{font-family:var(--mono);font-size:.9em;color:#be185d}
+
+/* ---------- nav + jump ---------- */
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:6;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;min-width:36px;height:32px;cursor:pointer;font-size:16px;padding:0 8px}
+#nav button:hover{border-color:var(--accent)}
+#nav #menuBtn{font-family:"Be Vietnam Pro",system-ui,sans-serif;font-size:14px;font-weight:700;background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;border:none;padding:0 14px}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+#jump{position:fixed;inset:0;z-index:20;background:rgba(30,27,58,.35);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+#jump.open{opacity:1;pointer-events:auto}
+#jump .pane{width:min(900px,94vw);max-height:86vh;overflow:auto;background:#fff;border-radius:18px;padding:20px 22px;box-shadow:0 30px 80px -20px rgba(30,27,58,.5);transform:translateY(16px) scale(.98);transition:transform .25s}
+#jump.open .pane{transform:none}
+#jump .top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+#jump .top h3{font-size:22px;margin:0;color:var(--text)}
+#jump .top input{margin-left:auto;width:90px;height:34px;border:1px solid var(--line);border-radius:8px;padding:0 10px;font-family:var(--mono);font-size:15px}
+#jump .top .x{border:none;background:#f3edff;color:#6d28d9;border-radius:8px;height:34px;width:34px;font-size:18px;cursor:pointer}
+#jumplist{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+#jumplist button{text-align:left;background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-family:"Be Vietnam Pro",system-ui,sans-serif;font-size:15px;color:var(--text);cursor:pointer;transition:all .15s;line-height:1.3}
+#jumplist button b{font-family:var(--mono);color:#db2777;margin-right:8px}
+#jumplist button:hover{border-color:#ec4899;transform:translateY(-2px);box-shadow:0 8px 18px -10px rgba(236,72,153,.5)}
+#jumplist button.cur{background:linear-gradient(135deg,#f3edff,#fdf2f8);border-color:#c084fc}
+@media (max-width:700px){#hint{display:none}#jumplist{grid-template-columns:1fr 1fr}}
+@media print{#nav,#bar,#hint,#jump{display:none}}
+
+/* ---------- Swing window mock ---------- */
+.stage{display:flex;align-items:center;justify-content:center}
+.win{background:#eef1f6;border:1px solid #a9b3c9;border-radius:10px;box-shadow:0 18px 40px -18px rgba(30,27,58,.45);overflow:hidden;display:flex;flex-direction:column;transition:width .6s ease,height .6s ease}
+.win .tb{height:30px;flex:none;background:linear-gradient(180deg,#e9eef8,#cfd8ea);border-bottom:1px solid #a9b3c9;display:flex;align-items:center;gap:7px;padding:0 10px;font-size:13.5px;font-weight:700;color:#3b4463}
+.win .tb i{width:11px;height:11px;border-radius:50%;display:inline-block;background:#f87171}.win .tb i+i{background:#fbbf24}.win .tb i+i+i{background:#34d399;margin-right:6px}
+.win .bd{flex:1;position:relative;min-height:0}
+.jb{font-family:"Be Vietnam Pro",sans-serif;font-size:14px;font-weight:600;color:#1e2a44;background:linear-gradient(180deg,#ffffff,#d9e1ef);border:1px solid #8a98b6;border-radius:5px;padding:6px 12px;white-space:nowrap;display:flex;align-items:center;justify-content:center;min-height:30px}
+.jtf{background:#fff;border:1px solid #8a98b6;border-radius:3px;padding:4px 8px;font-size:14px;font-family:var(--mono);color:#334;min-height:28px;display:flex;align-items:center}
+.jcb{background:linear-gradient(180deg,#fff,#e6ebf4);border:1px solid #8a98b6;border-radius:4px;padding:4px 30px 4px 10px;font-size:14px;position:relative;min-height:28px;display:inline-flex;align-items:center;white-space:nowrap}
+.jcb::after{content:"▾";position:absolute;right:8px;color:#556}
+.jl{font-size:14px;color:#1e2a44;white-space:nowrap}
+.jr{font-size:14px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.jr::before{content:"";width:13px;height:13px;border-radius:50%;border:1.5px solid #8a98b6;background:#fff;box-sizing:border-box}
+.jr.sel::before{background:radial-gradient(circle,#4f46e5 0 3px,#fff 3.5px)}
+.pop{opacity:0;transform:scale(.6);transition:opacity .45s,transform .5s cubic-bezier(.3,1.5,.5,1)}
+.pop.show{opacity:1;transform:none}
+.ring{box-shadow:0 0 0 3px #f59e0b,0 0 18px rgba(245,158,11,.6)!important}
+.tag{font-family:var(--mono);font-size:11px;font-weight:700;color:#8b5cf6;letter-spacing:.03em}
+.dim{opacity:.25}
+
+/* ranking */
+.rank{display:flex;flex-direction:column;gap:7px}
+.rrow{display:grid;grid-template-columns:44px 230px 1fr 360px;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px 12px;cursor:pointer;transition:all .2s}
+.rrow:hover{border-color:#ec4899;transform:translateX(4px)}
+.rrow .no{font-family:var(--mono);font-weight:800;font-size:20px;color:#db2777}
+.rrow .nm{font-weight:700;font-size:18px}
+.rrow .nm small{display:block;font-weight:500;font-size:13px;color:var(--muted);font-family:var(--mono)}
+.rrow .bar{height:14px;border-radius:999px;background:#f1edfb;overflow:hidden}
+.rrow .bar span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#7c3aed,#ec4899);width:0;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.slide.active .rrow .bar span{width:var(--w)}
+.rrow .why{font-size:14.5px;color:var(--muted);line-height:1.3}
+</style>
+</head>
+<body>
+
+<div id="viewport"><div id="deck">
+<!-- ===================== TITLE ===================== -->
+<section class="slide" id="title" data-title="Trang bìa">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// Java Swing · Layout Managers</div>
+    <h1 class="in">Bố cục giao diện<br><span class="grad">trong Java Swing</span></h1>
+    <p class="in muted" style="font-size:26px;margin-top:20px;max-width:960px">9 chương trình demo của Oracle Java Tutorials, sắp từ layout dùng <b>phổ biến nhất</b> đến <b>ít phổ biến nhất</b>. Mỗi demo chạy từng dòng code và vẽ lại cửa sổ Swing tương ứng.</p>
+    <p class="in" style="margin-top:36px;font-size:19px;color:#8a91b4">← → hoặc Space: chạy từng bước · Shift+→: qua slide · A: hiện hết · M hoặc nút ☰: nhảy tới slide bất kỳ · F: toàn màn hình</p>
+  </div>
+</section>
+
+<!-- ===================== AGENDA ===================== -->
+<section class="slide" id="agenda" data-title="Nội dung">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:18px">· bấm vào mục để đi tới</span></div>
+  <div class="agenda in">
+    <div class="ag" data-goto="rank"><b>00</b>Xếp hạng mức độ phổ biến<small>vì sao thứ tự như vậy</small></div>
+    <div class="ag" data-goto="border1"><b>01</b>BorderLayoutDemo<small>5 vùng · mặc định của JFrame</small></div>
+    <div class="ag" data-goto="flow1"><b>02</b>FlowLayoutDemo<small>xếp hàng, tràn thì xuống dòng</small></div>
+    <div class="ag" data-goto="grid1"><b>03</b>GridLayoutDemo<small>lưới ô bằng nhau</small></div>
+    <div class="ag" data-goto="box1"><b>04</b>BoxLayoutDemo<small>một hàng dọc hoặc ngang</small></div>
+    <div class="ag" data-goto="gbag1"><b>05</b>GridBagLayoutDemo<small>lưới linh hoạt + constraints</small></div>
+    <div class="ag" data-goto="tab"><b>06</b>TabDemo<small>JTabbedPane: nhiều tab</small></div>
+    <div class="ag" data-goto="card1"><b>07</b>CardLayoutDemo<small>chồng thẻ, hiện 1 thẻ</small></div>
+    <div class="ag" data-goto="spring1"><b>08</b>SpringForm<small>SpringLayout: ràng buộc cạnh</small></div>
+    <div class="ag" data-goto="abs"><b>09</b>AbsoluteLayoutDemo<small>null layout · setBounds</small></div>
+    <div class="ag" data-goto="end"><b>10</b>Tóm tắt &amp; chọn layout<small>bảng quyết định nhanh</small></div>
+  </div>
+  <div class="note blue in" style="margin-top:18px">Mã nguồn lấy từ <b>Oracle Java Tutorials</b> (thư mục <code class="i">uiswing/examples/layout</code>). Code trên slide được <b>rút gọn</b> phần <code class="i">main()</code> và Look &amp; Feel để tập trung vào phần bố cục.</div>
+</section>
+
+<!-- ===================== RANK ===================== -->
+<section class="slide" id="rank" data-title="Xếp hạng phổ biến">
+  <div class="hdr in"><span class="qn">TỔNG QUAN</span><h2>Thứ tự trình bày: phổ biến → ít phổ biến</h2></div>
+  <div class="rank in">
+    <div class="rrow" data-goto="border1"><span class="no">1</span><span class="nm">BorderLayout<small>BorderLayoutDemo</small></span><span class="bar"><span style="--w:100%"></span></span><span class="why">Mặc định của content pane trong JFrame/JDialog: gần như cửa sổ nào cũng dùng.</span></div>
+    <div class="rrow" data-goto="flow1"><span class="no">2</span><span class="nm">FlowLayout<small>FlowLayoutDemo</small></span><span class="bar"><span style="--w:92%"></span></span><span class="why">Mặc định của JPanel: thanh nút, hàng control đơn giản.</span></div>
+    <div class="rrow" data-goto="grid1"><span class="no">3</span><span class="nm">GridLayout<small>GridLayoutDemo</small></span><span class="bar"><span style="--w:76%"></span></span><span class="why">Lưới ô đều: bàn phím số, máy tính, bàn cờ, nhóm nút cùng cỡ.</span></div>
+    <div class="rrow" data-goto="box1"><span class="no">4</span><span class="nm">BoxLayout<small>BoxLayoutDemo</small></span><span class="bar"><span style="--w:68%"></span></span><span class="why">Xếp dọc/ngang có khoảng đệm: sidebar, hàng nút OK/Cancel.</span></div>
+    <div class="rrow" data-goto="gbag1"><span class="no">5</span><span class="nm">GridBagLayout<small>GridBagLayoutDemo</small></span><span class="bar"><span style="--w:60%"></span></span><span class="why">Mạnh nhất trong bộ chuẩn, dùng cho form phức tạp; khó viết tay.</span></div>
+    <div class="rrow" data-goto="tab"><span class="no">6</span><span class="nm">JTabbedPane<small>TabDemo</small></span><span class="bar"><span style="--w:50%"></span></span><span class="why">Không phải layout manager, là component chia tab. Dùng thay CardLayout khi cần tab.</span></div>
+    <div class="rrow" data-goto="card1"><span class="no">7</span><span class="nm">CardLayout<small>CardLayoutDemo</small></span><span class="bar"><span style="--w:40%"></span></span><span class="why">Chồng nhiều panel, hiện 1: wizard từng bước, đổi màn hình.</span></div>
+    <div class="rrow" data-goto="spring1"><span class="no">8</span><span class="nm">SpringLayout<small>SpringForm</small></span><span class="bar"><span style="--w:24%"></span></span><span class="why">Thiết kế cho công cụ kéo-thả GUI; viết tay dài dòng.</span></div>
+    <div class="rrow" data-goto="abs"><span class="no">9</span><span class="nm">null (Absolute)<small>AbsoluteLayoutDemo</small></span><span class="bar"><span style="--w:12%"></span></span><span class="why">Toạ độ cứng, không co giãn. Oracle khuyên tránh dùng.</span></div>
+  </div>
+  <p class="in muted" style="font-size:15px;margin-top:10px">Thứ tự là ước lượng theo cách dùng trong code Swing thực tế và giáo trình (không có thống kê chính thức). Bấm vào một dòng để nhảy tới demo đó.</p>
+</section>
+
+<!-- ===================== 1. BORDER (code + window) ===================== -->
+<section class="slide" id="border1" data-title="1 · BorderLayoutDemo (chạy code)">
+  <div class="hdr in"><span class="qn">DEMO 1</span><h2>BorderLayoutDemo</h2><span class="rk">#1 phổ biến nhất</span></div>
+  <div class="cols" style="grid-template-columns:1.08fr 1fr">
+    <div>
+      <div class="code-title">BorderLayoutDemo.java · addComponentsToPane()</div>
+<script type="text/x-java" class="xxs" id="kb1" data-mark="2-5:a;6-7:b;9-11:c;13-14:d;16-17:e;19-20:f;23-24:g;25:h">
+public static void addComponentsToPane(Container pane) {
+    if (RIGHT_TO_LEFT) {
+        pane.setComponentOrientation(
+                java.awt.ComponentOrientation.RIGHT_TO_LEFT);
+    }
+    JButton button = new JButton("Button 1 (PAGE_START)");
+    pane.add(button, BorderLayout.PAGE_START);
+    //Make the center component big
+    button = new JButton("Button 2 (CENTER)");
+    button.setPreferredSize(new Dimension(200, 100));
+    pane.add(button, BorderLayout.CENTER);
+
+    button = new JButton("Button 3 (LINE_START)");
+    pane.add(button, BorderLayout.LINE_START);
+
+    button = new JButton("Long-Named Button 4 (PAGE_END)");
+    pane.add(button, BorderLayout.PAGE_END);
+
+    button = new JButton("5 (LINE_END)");
+    pane.add(button, BorderLayout.LINE_END);
+}
+// createAndShowGUI():
+JFrame frame = new JFrame("BorderLayoutDemo");
+addComponentsToPane(frame.getContentPane()); // BorderLayout
+frame.pack();  frame.setVisible(true);
+</script>
+    </div>
+    <div>
+      <div class="stage" style="height:340px">
+        <div class="win" id="bwin" style="width:540px;height:250px">
+          <div class="tb"><i></i><i></i><i></i>BorderLayoutDemo</div>
+          <div class="bd bl" id="bl">
+            <div class="rg n"><span class="rtag">PAGE_START</span><div class="jb pop" id="bb1">Button 1 (PAGE_START)</div></div>
+            <div class="rg w"><span class="rtag">LINE_START</span><div class="jb pop" id="bb3">Button 3 (LINE_START)</div></div>
+            <div class="rg c"><span class="rtag">CENTER</span><div class="jb pop" id="bb2">Button 2 (CENTER)</div></div>
+            <div class="rg e"><span class="rtag">LINE_END</span><div class="jb pop" id="bb5">5 (LINE_END)</div></div>
+            <div class="rg s"><span class="rtag">PAGE_END</span><div class="jb pop" id="bb4">Long-Named Button 4 (PAGE_END)</div></div>
+          </div>
+        </div>
+      </div>
+      <span class="f ghost" data-now="#kb1|show-g" data-say="Content pane của <b>JFrame</b> đã dùng sẵn <b>BorderLayout</b>, nên demo không cần gọi <code>setLayout</code>. Khung lưới tím là 5 vùng: bắc, nam, tây, đông, giữa."></span>
+      <span class="f ghost" data-now="#kb1|show-b;#bb1|ring" data-act="#bb1|show" data-say="<code>add(button, PAGE_START)</code>: nút nằm ở vùng <b>trên cùng</b>, bị kéo giãn <b>hết chiều ngang</b>, chiều cao giữ theo kích thước ưu tiên."></span>
+      <span class="f ghost" data-now="#kb1|show-c;#bb2|ring" data-act="#bb2|show" data-say="Nút CENTER được đặt preferred size <b>200×100</b>. Vùng giữa chiếm <b>mọi khoảng trống còn lại</b>, đúng cách dùng điển hình của BorderLayout."></span>
+      <span class="f ghost" data-now="#kb1|show-d;#bb3|ring" data-act="#bb3|show" data-say="<code>LINE_START</code> = đầu dòng (bên <b>trái</b> khi đọc trái → phải). Vùng này giãn <b>theo chiều dọc</b>, rộng theo preferred width."></span>
+      <span class="f ghost" data-now="#kb1|show-e;#bb4|ring" data-act="#bb4|show" data-say="<code>PAGE_END</code>: vùng <b>dưới cùng</b>, giãn hết chiều ngang giống PAGE_START."></span>
+      <span class="f ghost" data-now="#kb1|show-f;#bb5|ring" data-act="#bb5|show" data-say="<code>LINE_END</code>: cuối dòng (bên <b>phải</b>). Đủ 5 vùng. Mỗi vùng chỉ chứa <b>1 component</b>; add thêm vào cùng vùng sẽ thay thế component cũ."></span>
+      <span class="f ghost" data-now="#kb1|show-h" data-say="<code>frame.pack()</code> co cửa sổ vừa khít với kích thước ưu tiên của các component, rồi <code>setVisible(true)</code> hiện cửa sổ."></span>
+      <span class="f ghost" data-act="#bwin|big;#bl|bigc" data-say="Kéo <b>to</b> cửa sổ: chỉ <b>CENTER</b> phình ra cả 2 chiều. Bắc/nam chỉ giãn ngang, tây/đông chỉ giãn dọc."></span>
+      <span class="f ghost" data-now="#kb1|show-a" data-act="#bl|rtl" data-say="Đặt <code>RIGHT_TO_LEFT = true</code>: LINE_START chuyển sang <b>phải</b>, LINE_END sang <b>trái</b>. Dùng hằng PAGE_/LINE_ thay vì NORTH/WEST giúp giao diện tự đổi chiều cho tiếng Ả Rập, Do Thái."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+<style>
+.bl{display:grid;grid-template-columns:auto 1fr auto;grid-template-rows:auto 1fr auto;grid-template-areas:"n n n" "w c e" "s s s";gap:0;height:100%}
+.bl.rtl{grid-template-areas:"n n n" "e c w" "s s s"}
+.rg{position:relative;border:1.5px dashed #c4b5fd;display:flex;min-height:34px;min-width:70px;background:rgba(237,233,254,.35)}
+.rg .jb{flex:1;border-radius:3px}
+.rtag{transition:opacity .3s}.rg:has(.jb.show) .rtag{opacity:0}
+.rg.n{grid-area:n}.rg.s{grid-area:s}.rg.w{grid-area:w}.rg.e{grid-area:e}.rg.c{grid-area:c}
+.rtag{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--mono);font-size:11px;font-weight:700;color:#a78bfa;pointer-events:none}
+.win.big{width:620px!important;height:330px!important}
+</style>
+
+<!-- ===================== 1b. BORDER explained ===================== -->
+<section class="slide" id="border2" data-title="1 · BorderLayout: quy tắc">
+  <div class="hdr in"><span class="qn">DEMO 1</span><h2>BorderLayout: quy tắc chia chỗ</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr">
+    <div class="in">
+      <table>
+        <tr><th>Hằng mới (khuyên dùng)</th><th>Hằng cũ</th><th>Giãn theo</th></tr>
+        <tr><td>PAGE_START</td><td>NORTH</td><td>ngang</td></tr>
+        <tr><td>PAGE_END</td><td>SOUTH</td><td>ngang</td></tr>
+        <tr><td>LINE_START</td><td>WEST</td><td>dọc</td></tr>
+        <tr><td>LINE_END</td><td>EAST</td><td>dọc</td></tr>
+        <tr><td>CENTER</td><td>CENTER</td><td>cả hai</td></tr>
+      </table>
+      <div class="note f">Gọi <code class="i">pane.add(comp)</code> <b>không có vùng</b> thì component vào <b>CENTER</b>. Vùng nào trống thì không chiếm chỗ.</div>
+      <div class="note blue f">Khoảng cách giữa các vùng: <code class="i">new BorderLayout(hgap, vgap)</code> hoặc <code class="i">setHgap()</code> / <code class="i">setVgap()</code>.</div>
+    </div>
+    <div>
+      <div class="card f"><h3>Thuật toán chia chỗ (rút gọn)</h3>
+        <ul class="sm">
+          <li>Bắc và nam lấy chiều cao <b>ưu tiên</b>, rộng bằng cả container.</li>
+          <li>Tây và đông lấy chiều rộng <b>ưu tiên</b>, cao bằng phần còn lại.</li>
+          <li>CENTER nhận <b>toàn bộ</b> diện tích dư.</li>
+        </ul>
+      </div>
+      <div class="card f" style="margin-top:12px"><h3>Dùng trong thực tế</h3>
+        <ul class="sm">
+          <li>Toolbar ở PAGE_START, status bar ở PAGE_END.</li>
+          <li>Cây thư mục / menu bên ở LINE_START.</li>
+          <li>Vùng soạn thảo, bảng, canvas ở CENTER.</li>
+          <li>Mỗi vùng thường là một <b>JPanel</b> có layout riêng → lồng layout.</li>
+        </ul>
+      </div>
+      <div class="card bad f" style="margin-top:12px"><h3 style="color:#be123c">Lỗi hay gặp</h3><p>Add 2 component vào cùng 1 vùng: chỉ cái <b>sau cùng</b> hiện ra. Muốn nhiều thứ trong 1 vùng thì gom vào 1 JPanel trước.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 2. FLOW ===================== -->
+<section class="slide" id="flow1" data-title="2 · FlowLayoutDemo (chạy code)">
+  <div class="hdr in"><span class="qn">DEMO 2</span><h2>FlowLayoutDemo</h2><span class="rk">#2</span></div>
+  <div class="cols" style="grid-template-columns:1.08fr 1fr">
+    <div>
+      <div class="code-title">FlowLayoutDemo.java · addComponentsToPane() (rút gọn)</div>
+<script type="text/x-java" class="xxs" id="kf1" data-mark="1:a;3-5:a;7-11:b;12-13:c;15-18:d;19-26:e;27-28:f">
+FlowLayout experimentLayout = new FlowLayout();
+// ...
+final JPanel compsToExperiment = new JPanel();
+compsToExperiment.setLayout(experimentLayout);
+experimentLayout.setAlignment(FlowLayout.TRAILING);
+
+compsToExperiment.add(new JButton("Button 1"));
+compsToExperiment.add(new JButton("Button 2"));
+compsToExperiment.add(new JButton("Button 3"));
+compsToExperiment.add(new JButton("Long-Named Button 4"));
+compsToExperiment.add(new JButton("5"));
+compsToExperiment.setComponentOrientation(
+        ComponentOrientation.LEFT_TO_RIGHT);
+
+JPanel controls = new JPanel();
+controls.setLayout(new FlowLayout());
+controls.add(LtoRbutton); controls.add(RtoLbutton);
+controls.add(applyButton);
+applyButton.addActionListener(new ActionListener(){
+  public void actionPerformed(ActionEvent e){
+    String command = group.getSelection().getActionCommand();
+    if (command.equals("Left to right")) { /* LEFT_TO_RIGHT */ }
+    else compsToExperiment.setComponentOrientation(
+            ComponentOrientation.RIGHT_TO_LEFT);
+    compsToExperiment.validate(); compsToExperiment.repaint();
+  }});
+pane.add(compsToExperiment, BorderLayout.CENTER);
+pane.add(controls, BorderLayout.SOUTH);
+</script>
+    </div>
+    <div>
+      <div class="stage" style="height:330px">
+        <div class="win" id="fwin" style="width:560px;height:200px">
+          <div class="tb"><i></i><i></i><i></i>FlowLayoutDemo</div>
+          <div class="bd" style="display:flex;flex-direction:column">
+            <div class="fl" id="fl">
+              <div class="jb pop" id="fb1">Button 1</div><div class="jb pop" id="fb2">Button 2</div><div class="jb pop" id="fb3">Button 3</div><div class="jb pop" id="fb4">Long-Named Button 4</div><div class="jb pop" id="fb5">5</div>
+            </div>
+            <div class="fctl pop" id="fctl"><span class="jr" id="fr1">Left to right</span><span class="jr" id="fr2">Right to left</span><div class="jb" id="fap">Apply component orientation</div></div>
+          </div>
+        </div>
+      </div>
+      <span class="f ghost" data-now="#kf1|show-a;#fl|ring" data-say="Panel trên dùng <b>FlowLayout</b> với căn lề <code>TRAILING</code>: dồn về <b>cuối dòng</b>, tức bên <b>phải</b> khi đọc trái → phải."></span>
+      <span class="f ghost" data-now="#kf1|show-b" data-act="#fb1|show;#fb2|show;#fb3|show;#fb4|show;#fb5|show" data-say="Thêm 5 nút. FlowLayout giữ <b>đúng kích thước ưu tiên</b> của từng nút (nút 4 dài, nút 5 ngắn) và xếp lần lượt trên một hàng."></span>
+      <span class="f ghost" data-now="#kf1|show-d" data-act="#fctl|show;#fr1|sel" data-say="Panel <code>controls</code> cũng dùng FlowLayout (căn giữa mặc định), chứa 2 radio button và nút Apply. Nó được đặt ở vùng SOUTH của content pane."></span>
+      <span class="f ghost" data-act="#fwin|narrow" data-say="Kéo <b>hẹp</b> cửa sổ: hàng không đủ chỗ thì nút tràn <b>xuống dòng</b> mới, giống chữ trong đoạn văn. Đây là đặc điểm chính của FlowLayout."></span>
+      <span class="f ghost" data-now="#kf1|show-e;#fap|ring" data-act="#fr1|x;#fr2|sel;#fl|rtl" data-set="#fr1::Left to right" data-say="Chọn <b>Right to left</b> rồi bấm Apply: thứ tự đảo ngược (Button 1 ở phải nhất), và <code>TRAILING</code> giờ là bên <b>trái</b>. <code>validate()</code> + <code>repaint()</code> để sắp xếp và vẽ lại."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+<style>
+.fl{flex:1;display:flex;flex-wrap:wrap;justify-content:flex-end;align-content:flex-start;gap:5px;padding:5px;transition:all .4s}
+.fl.rtl{flex-direction:row-reverse}
+.fctl{display:flex;justify-content:center;align-items:center;gap:10px;padding:6px;border-top:1px solid #d5dbe8}
+.win.narrow{width:380px!important;height:230px!important}
+.jr.x::before{background:#fff}
+</style>
+
+<!-- ===================== 2b. FLOW explained ===================== -->
+<section class="slide" id="flow2" data-title="2 · FlowLayout: căn lề & khoảng cách">
+  <div class="hdr in"><span class="qn">DEMO 2</span><h2>FlowLayout: căn lề và khoảng cách</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+      <div class="card in"><h3>Hàm khởi tạo</h3>
+        <div class="code xs" style="border:none;padding:0;background:none"><div class="ln"><span><span class="k">new</span> <span class="t">FlowLayout</span>();                     <span class="c">// CENTER, gap 5</span></span></div><div class="ln"><span><span class="k">new</span> <span class="t">FlowLayout</span>(FlowLayout.LEFT);</span></div><div class="ln"><span><span class="k">new</span> <span class="t">FlowLayout</span>(align, hgap, vgap);</span></div></div>
+      </div>
+      <div class="f" style="margin-top:14px">
+        <div class="code-title">5 kiểu căn lề (setAlignment)</div>
+        <div class="algs">
+          <div><span>LEFT</span><div class="ab" style="justify-content:flex-start"><i></i><i></i><i></i></div></div>
+          <div><span>CENTER</span><div class="ab" style="justify-content:center"><i></i><i></i><i></i></div></div>
+          <div><span>RIGHT</span><div class="ab" style="justify-content:flex-end"><i></i><i></i><i></i></div></div>
+          <div><span>LEADING</span><div class="ab" style="justify-content:flex-start"><i></i><i></i><i></i></div><small>đầu dòng · LTR = trái</small></div>
+          <div><span>TRAILING</span><div class="ab" style="justify-content:flex-end"><i></i><i></i><i></i></div><small>cuối dòng · LTR = phải</small></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card f"><h3>Điểm cần nhớ</h3>
+        <ul class="sm">
+          <li><b>JPanel</b> mặc định dùng FlowLayout(CENTER).</li>
+          <li>Component luôn ở <b>preferred size</b>, không bao giờ bị kéo giãn.</li>
+          <li>Hết chỗ thì xuống dòng, nhưng <code class="i">pack()</code> tính kích thước như thể <b>tất cả trên một hàng</b>.</li>
+          <li>LEADING/TRAILING tự đổi chiều theo <code class="i">ComponentOrientation</code>; LEFT/RIGHT thì không.</li>
+        </ul>
+      </div>
+      <div class="card good f" style="margin-top:12px"><h3 style="color:#047857">Khi nào dùng</h3><p>Một hàng nút nhỏ, thanh công cụ đơn giản, gom vài control vào một vùng của BorderLayout (như panel <code class="i">controls</code> trong demo).</p></div>
+      <div class="card bad f" style="margin-top:12px"><h3 style="color:#be123c">Hạn chế</h3><p>Không canh thẳng cột được, nên không hợp cho form nhãn – ô nhập. Dùng GridBagLayout hoặc SpringLayout cho việc đó.</p></div>
+    </div>
+  </div>
+</section>
+<style>
+.algs{display:grid;grid-template-columns:1fr;gap:6px}
+.algs>div{display:grid;grid-template-columns:110px 1fr 180px;align-items:center;gap:10px;font-family:var(--mono);font-size:14px;font-weight:700;color:#6d28d9}
+.algs small{font-family:"Be Vietnam Pro";font-weight:500;color:var(--muted);font-size:13px}
+.ab{display:flex;gap:4px;border:1.5px dashed #c4b5fd;border-radius:6px;padding:4px;background:#faf8ff}
+.ab i{width:34px;height:16px;border-radius:3px;background:linear-gradient(180deg,#fff,#d9e1ef);border:1px solid #8a98b6}
+</style>
+
+<!-- ===================== 3. GRID ===================== -->
+<section class="slide" id="grid1" data-title="3 · GridLayoutDemo (chạy code)">
+  <div class="hdr in"><span class="qn">DEMO 3</span><h2>GridLayoutDemo</h2><span class="rk">#3</span></div>
+  <div class="cols" style="grid-template-columns:1.08fr 1fr">
+    <div>
+      <div class="code-title">GridLayoutDemo.java · addComponentsToPane() (rút gọn)</div>
+<script type="text/x-java" class="xxs" id="kg1" data-mark="1:a;3-4:a;5-6:b;8-12:c;13-16:d;17-24:e;25-27:f">
+GridLayout experimentLayout = new GridLayout(0,2);
+// ...
+final JPanel compsToExperiment = new JPanel();
+compsToExperiment.setLayout(experimentLayout);
+JPanel controls = new JPanel();
+controls.setLayout(new GridLayout(2,3));
+
+compsToExperiment.add(new JButton("Button 1"));
+compsToExperiment.add(new JButton("Button 2"));
+compsToExperiment.add(new JButton("Button 3"));
+compsToExperiment.add(new JButton("Long-Named Button 4"));
+compsToExperiment.add(new JButton("5"));
+controls.add(new Label("Horizontal gap:"));
+controls.add(new Label("Vertical gap:"));
+controls.add(new Label(" "));  controls.add(horGapComboBox);
+controls.add(verGapComboBox);  controls.add(applyButton);
+applyButton.addActionListener(new ActionListener(){
+  public void actionPerformed(ActionEvent e){
+    String horGap = (String)horGapComboBox.getSelectedItem();
+    String verGap = (String)verGapComboBox.getSelectedItem();
+    experimentLayout.setHgap(Integer.parseInt(horGap));
+    experimentLayout.setVgap(Integer.parseInt(verGap));
+    experimentLayout.layoutContainer(compsToExperiment);
+  }});
+pane.add(compsToExperiment, BorderLayout.NORTH);
+pane.add(new JSeparator(), BorderLayout.CENTER);
+pane.add(controls, BorderLayout.SOUTH);
+</script>
+    </div>
+    <div>
+      <div class="stage" style="height:350px">
+        <div class="win" style="width:440px">
+          <div class="tb"><i></i><i></i><i></i>GridLayoutDemo</div>
+          <div class="bd">
+            <div class="gl" id="gl">
+              <div class="jb pop" id="gb1">Button 1</div><div class="jb pop" id="gb2">Button 2</div><div class="jb pop" id="gb3">Button 3</div><div class="jb pop" id="gb4">Long-Named Button 4</div><div class="jb pop" id="gb5">5</div><div class="gempty pop" id="gb6">(trống)</div>
+            </div>
+            <div class="gctl pop" id="gctl">
+              <span class="jl">Horizontal gap:</span><span class="jl">Vertical gap:</span><span></span>
+              <span class="jcb" id="gh">0</span><span class="jcb" id="gv">0</span><div class="jb" id="gap">Apply gaps</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="f ghost" data-now="#kg1|show-a;#gl|ring" data-say="<code>new GridLayout(0, 2)</code>: <b>0 dòng</b> nghĩa là “bao nhiêu dòng cũng được”, cố định <b>2 cột</b>. Số dòng = ⌈số component / 2⌉."></span>
+      <span class="f ghost" data-now="#kg1|show-c" data-act="#gb1|show;#gb2|show;#gb3|show;#gb4|show;#gb5|show;#gb6|show" data-say="Thêm 5 nút: điền <b>theo hàng</b>, trái → phải, trên → dưới. Mọi ô <b>bằng nhau</b>, kích thước theo nút lớn nhất (“Long-Named Button 4”). Ô thứ 6 để trống."></span>
+      <span class="f ghost" data-now="#kg1|show-b;#kg1|show-d" data-act="#gctl|show" data-say="Panel <code>controls</code> là <code>GridLayout(2, 3)</code>: 2 dòng × 3 cột, gồm 2 nhãn + 1 ô trống ở dòng 1, 2 combo box + nút Apply ở dòng 2."></span>
+      <span class="f ghost" data-now="#kg1|show-e;#gap|ring" data-act="#gl|gap" data-set="#gh::10;#gv::20" data-say="Chọn hgap = <b>10</b>, vgap = <b>20</b> rồi Apply: <code>setHgap/setVgap</code> đổi khoảng cách, <code>layoutContainer()</code> xếp lại ngay. Các ô co lại để chừa khe."></span>
+      <span class="f ghost" data-now="#kg1|show-f" data-say="Content pane (BorderLayout): lưới nút ở <b>NORTH</b>, đường kẻ <code>JSeparator</code> ở CENTER, controls ở <b>SOUTH</b>. Lồng layout là chuyện bình thường trong Swing."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+<style>
+.gl{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:40px;gap:0;padding:6px;transition:gap .5s}
+.gl.gap{gap:20px 10px}
+.gl .jb{border-radius:3px}
+.gempty{border:1.5px dashed #c4b5fd;display:flex;align-items:center;justify-content:center;font-size:12px;color:#a78bfa;font-family:var(--mono)}
+.gctl{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;padding:8px 6px;border-top:2px solid #c7cfdf;align-items:center}
+</style>
+
+<!-- ===================== 3b. GRID explained ===================== -->
+<section class="slide" id="grid2" data-title="3 · GridLayout: dòng, cột, kích thước">
+  <div class="hdr in"><span class="qn">DEMO 3</span><h2>GridLayout: dòng, cột và kích thước ô</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+      <table class="in">
+        <tr><th>Khai báo</th><th>Ý nghĩa</th></tr>
+        <tr><td>GridLayout(3, 2)</td><td>3 dòng × 2 cột (dòng được ưu tiên)</td></tr>
+        <tr><td>GridLayout(0, 2)</td><td>2 cột, số dòng tự tính</td></tr>
+        <tr><td>GridLayout(2, 0)</td><td>2 dòng, số cột tự tính</td></tr>
+        <tr><td>GridLayout(r, c, hg, vg)</td><td>thêm khoảng cách ngang / dọc</td></tr>
+        <tr><td>GridLayout()</td><td>1 dòng, mỗi component 1 cột</td></tr>
+      </table>
+      <div class="note f">Nếu cả <b>rows</b> và <b>cols</b> khác 0 thì <b>cols bị bỏ qua</b>: số cột được tính lại từ số dòng và số component. Không được để cả hai bằng 0 (ném <code class="i">IllegalArgumentException</code>).</div>
+    </div>
+    <div>
+      <div class="card f"><h3>Kích thước ô</h3>
+        <ul class="sm">
+          <li>Mọi ô có cùng kích thước = kích thước ưu tiên <b>lớn nhất</b> trong các component.</li>
+          <li>Component bị kéo giãn <b>lấp đầy</b> ô của nó.</li>
+          <li>Cửa sổ to ra → mọi ô to ra đều nhau.</li>
+        </ul>
+      </div>
+      <div class="f" style="margin-top:12px">
+        <div class="code-title">Ví dụ điển hình: bàn phím máy tính GridLayout(4, 4, 4, 4)</div>
+        <div class="calc"><span>7</span><span>8</span><span>9</span><span>÷</span><span>4</span><span>5</span><span>6</span><span>×</span><span>1</span><span>2</span><span>3</span><span>−</span><span>0</span><span>.</span><span>=</span><span>+</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+<style>
+.calc{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-width:340px;padding:8px;background:#eef1f6;border:1px solid #a9b3c9;border-radius:10px}
+.calc span{font-family:var(--mono);font-weight:700;font-size:18px;height:40px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#fff,#d9e1ef);border:1px solid #8a98b6;border-radius:5px}
+</style>
+
+<!-- ===================== 4. BOX ===================== -->
+<section class="slide" id="box1" data-title="4 · BoxLayoutDemo (chạy code)">
+  <div class="hdr in"><span class="qn">DEMO 4</span><h2>BoxLayoutDemo</h2><span class="rk">#4</span></div>
+  <div class="cols" style="grid-template-columns:1.05fr 1fr">
+    <div>
+      <div class="code-title">BoxLayoutDemo.java</div>
+<script type="text/x-java" class="xxs" id="kx1" data-mark="2:a;4-8:b;11-15:c;18-22:d">
+public static void addComponentsToPane(Container pane) {
+    pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
+
+    addAButton("Button 1", pane);
+    addAButton("Button 2", pane);
+    addAButton("Button 3", pane);
+    addAButton("Long-Named Button 4", pane);
+    addAButton("5", pane);
+}
+
+private static void addAButton(String text, Container container) {
+    JButton button = new JButton(text);
+    button.setAlignmentX(Component.CENTER_ALIGNMENT);
+    container.add(button);
+}
+// createAndShowGUI():
+JFrame frame = new JFrame("BoxLayoutDemo");
+addComponentsToPane(frame.getContentPane());
+frame.pack();
+frame.setVisible(true);
+</script>
+    </div>
+    <div>
+      <div class="stage" style="height:340px">
+        <div class="win" id="xwin" style="width:260px;height:210px">
+          <div class="tb"><i></i><i></i><i></i>BoxLayoutDemo</div>
+          <div class="bd bx" id="bx">
+            <div class="jb pop" id="xb1">Button 1</div><div class="jb pop" id="xb2">Button 2</div><div class="jb pop" id="xb3">Button 3</div><div class="jb pop" id="xb4">Long-Named Button 4</div><div class="jb pop" id="xb5">5</div>
+          </div>
+        </div>
+      </div>
+      <span class="f ghost" data-now="#kx1|show-a;#bx|ring" data-say="Thay BorderLayout mặc định bằng <code>BoxLayout(pane, Y_AXIS)</code>: xếp các component thành <b>một cột dọc</b>, từ trên xuống. Tham số đầu là chính container được quản lý."></span>
+      <span class="f ghost" data-now="#kx1|show-c" data-say="Hàm phụ <code>addAButton</code> tạo nút và gọi <code>setAlignmentX(CENTER_ALIGNMENT)</code>: trục giữa của mọi nút thẳng hàng với nhau."></span>
+      <span class="f ghost" data-now="#kx1|show-b" data-act="#xb1|show;#xb2|show;#xb3|show;#xb4|show;#xb5|show" data-say="5 nút xếp chồng dọc. Mỗi nút giữ <b>chiều rộng ưu tiên</b> (không giãn hết bề ngang như GridLayout) và được căn giữa."></span>
+      <span class="f ghost" data-now="#kx1|show-d" data-act="#xwin|wide" data-say="Kéo rộng cửa sổ: nút <b>không giãn</b> vì JButton có maximum size = preferred size. Phần dư nằm hai bên, các nút vẫn thẳng trục giữa."></span>
+      <span class="f ghost" data-act="#bx|left" data-say="Nếu đổi thành <code>Component.LEFT_ALIGNMENT</code>: mép trái các nút thẳng hàng. Lưu ý: nên dùng <b>cùng một</b> alignmentX cho mọi component, trộn lẫn sẽ cho kết quả khó đoán."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+<style>
+.bx{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:0}
+.bx .jb{border-radius:3px}
+.bx.left{align-items:flex-start}
+.win.wide{width:440px!important;height:250px!important}
+</style>
+
+<!-- ===================== 4b. BOX explained ===================== -->
+<section class="slide" id="box2" data-title="4 · BoxLayout: glue, strut, rigid area">
+  <div class="hdr in"><span class="qn">DEMO 4</span><h2>BoxLayout: chất độn (filler) và trục</h2></div>
+  <div class="cols" style="grid-template-columns:1.05fr 1fr">
+    <div>
+      <div class="code-title">Ví dụ mở rộng (không có trong demo): hàng nút cuối dialog</div>
+<script type="text/x-java" class="xs" id="kx2" data-mark="2:a;3:b;4:c;5:d">
+JPanel row = new JPanel();
+row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
+row.add(Box.createHorizontalGlue());   // đẩy về phải
+row.add(new JButton("Cancel"));
+row.add(Box.createRigidArea(new Dimension(10, 0)));
+row.add(new JButton("OK"));
+</script>
+      <div class="hrow" id="hrow"><span class="glue" id="hg">glue ⟷</span><div class="jb pop" id="hc">Cancel</div><span class="rig pop" id="hr">10px</span><div class="jb pop" id="ho">OK</div></div>
+      <span class="f ghost" data-now="#kx2|show-a" data-say="<code>X_AXIS</code>: xếp theo <b>hàng ngang</b>. (PAGE_AXIS / LINE_AXIS là bản tự đổi chiều theo ngôn ngữ.)"></span>
+      <span class="f ghost" data-now="#kx2|show-b" data-act="#hg|show" data-say="<b>Glue</b> là lò xo vô hình: hút <b>toàn bộ</b> chỗ trống. Đặt ở đầu → các nút bị đẩy sang phải."></span>
+      <span class="f ghost" data-now="#kx2|show-c" data-act="#hc|show" data-say="Thêm nút Cancel ngay sau glue."></span>
+      <span class="f ghost" data-now="#kx2|show-d" data-act="#hr|show;#ho|show" data-say="<b>Rigid area</b> là khối cứng 10px giữa hai nút, không co giãn. Kết quả: nút dồn phải, cách nhau đều 10px, kiểu hộp thoại chuẩn."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <table class="f">
+        <tr><th>Filler</th><th>Tác dụng</th></tr>
+        <tr><td>createRigidArea(d)</td><td>khoảng cố định cả 2 chiều</td></tr>
+        <tr><td>createHorizontalGlue()</td><td>lò xo, chiếm chỗ dư</td></tr>
+        <tr><td>createVerticalGlue()</td><td>lò xo theo chiều dọc</td></tr>
+        <tr><td>new Box.Filler(min,pref,max)</td><td>tự chọn min/pref/max</td></tr>
+      </table>
+      <div class="card f" style="margin-top:12px"><h3>BoxLayout tôn trọng max size</h3>
+        <ul class="sm">
+          <li>Theo trục chính: cố gắng dùng preferred size, có chỗ dư thì giãn tới <b>maximum size</b>.</li>
+          <li>Theo trục phụ: căn theo <code class="i">alignmentX/Y</code>.</li>
+          <li>JTextField có max size rất lớn nên sẽ giãn; JButton thì không.</li>
+        </ul>
+      </div>
+      <div class="note blue f">Lớp tiện ích <code class="i">Box</code> = JPanel đã gắn sẵn BoxLayout: <code class="i">Box.createVerticalBox()</code>, <code class="i">Box.createHorizontalBox()</code>.</div>
+    </div>
+  </div>
+</section>
+<style>
+.hrow{display:flex;align-items:center;gap:0;margin-top:14px;padding:8px;background:#eef1f6;border:1px solid #a9b3c9;border-radius:10px;height:54px}
+.glue{flex:0 0 0;overflow:hidden;opacity:0;font-family:var(--mono);font-size:13px;font-weight:700;color:#a78bfa;text-align:center;border:1.5px dashed #c4b5fd;border-radius:6px;height:34px;display:flex;align-items:center;justify-content:center;transition:flex-grow .7s,opacity .4s}
+.glue.show{flex-grow:1;opacity:1}
+.rig{width:22px;height:34px;background:repeating-linear-gradient(45deg,#fde68a 0 4px,#fff7d6 4px 8px);border-radius:3px;font-size:0}
+</style>
+
+<!-- ===================== 5. GRIDBAG ===================== -->
+<section class="slide" id="gbag1" data-title="5 · GridBagLayoutDemo (chạy code)">
+  <div class="hdr in"><span class="qn">DEMO 5</span><h2>GridBagLayoutDemo</h2><span class="rk">#5</span></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+      <div class="code-title">GridBagLayoutDemo.java · addComponentsToPane() (rút gọn)</div>
+<script type="text/x-java" class="xxs" id="kgb" data-mark="1-3:a;5-7:b;9-10:c;12-13:c;15-18:d;20-26:e">
+pane.setLayout(new GridBagLayout());
+GridBagConstraints c = new GridBagConstraints();
+c.fill = GridBagConstraints.HORIZONTAL; //natural height
+
+button = new JButton("Button 1");
+c.weightx = 0.5;  c.gridx = 0;  c.gridy = 0;
+pane.add(button, c);
+
+button = new JButton("Button 2");
+c.weightx = 0.5; c.gridx = 1; c.gridy = 0; pane.add(button, c);
+
+button = new JButton("Button 3");
+c.weightx = 0.5; c.gridx = 2; c.gridy = 0; pane.add(button, c);
+
+button = new JButton("Long-Named Button 4");
+c.ipady = 40;       //make this component tall
+c.weightx = 0.0;    c.gridwidth = 3;
+c.gridx = 0;        c.gridy = 1;   pane.add(button, c);
+
+button = new JButton("5");
+c.ipady = 0;        //reset to default
+c.weighty = 1.0;    //request any extra vertical space
+c.anchor = GridBagConstraints.PAGE_END; //bottom of space
+c.insets = new Insets(10,0,0,0);  //top padding
+c.gridx = 1;  c.gridwidth = 2;  c.gridy = 2;
+pane.add(button, c);
+</script>
+    </div>
+    <div>
+      <div class="stage" style="height:350px">
+        <div class="win" id="gbwin" style="width:480px;height:260px">
+          <div class="tb"><i></i><i></i><i></i>GridBagLayoutDemo</div>
+          <div class="bd gbg" id="gbg">
+            <span class="gcell" style="grid-area:1/1">(0,0)</span><span class="gcell" style="grid-area:1/2">(1,0)</span><span class="gcell" style="grid-area:1/3">(2,0)</span>
+            <span class="gcell" style="grid-area:2/1">(0,1)</span><span class="gcell" style="grid-area:2/2">(1,1)</span><span class="gcell" style="grid-area:2/3">(2,1)</span>
+            <span class="gcell" style="grid-area:3/1">(0,2)</span><span class="gcell" style="grid-area:3/2">(1,2)</span><span class="gcell" style="grid-area:3/3">(2,2)</span>
+            <div class="jb pop" id="g1" style="grid-area:1/1">Button 1</div>
+            <div class="jb pop" id="g2" style="grid-area:1/2">Button 2</div>
+            <div class="jb pop" id="g3" style="grid-area:1/3">Button 3</div>
+            <div class="jb pop" id="g4" style="grid-area:2/1/3/4;min-height:70px">Long-Named Button 4</div>
+            <div class="jb pop" id="g5" style="grid-area:3/2/4/4;align-self:end;margin-top:10px">5</div>
+          </div>
+        </div>
+      </div>
+      <span class="f ghost" data-now="#kgb|show-a" data-say="Mỗi component đi kèm một <b>GridBagConstraints</b> mô tả ô và cách co giãn. Demo dùng <b>một</b> đối tượng <code>c</code> cho mọi nút, nên giá trị cũ còn giữ nếu không gán lại. <code>fill = HORIZONTAL</code>: giãn ngang hết ô, giữ chiều cao tự nhiên."></span>
+      <span class="f ghost" data-now="#kgb|show-b;#g1|ring" data-act="#g1|show" data-say="Button 1 vào ô <b>(gridx=0, gridy=0)</b>. <code>weightx = 0.5</code>: cột này nhận một phần chỗ trống ngang khi cửa sổ rộng ra."></span>
+      <span class="f ghost" data-now="#kgb|show-c" data-act="#g2|show;#g3|show" data-say="Button 2 ở (1,0), Button 3 ở (2,0), cùng weightx 0.5 → ba cột chia đều phần dư."></span>
+      <span class="f ghost" data-now="#kgb|show-d;#g4|ring" data-act="#g4|show" data-say="Button 4 ở dòng 1, <code>gridwidth = 3</code> → trải <b>3 cột</b>. <code>ipady = 40</code> cộng thêm 40px vào chiều cao (padding bên trong) → nút cao hẳn."></span>
+      <span class="f ghost" data-now="#kgb|show-e;#g5|ring" data-act="#g5|show" data-say="Button 5 ở (1,2), rộng 2 cột (thẳng dưới Button 2–3). <code>weighty = 1</code>: dòng này nhận <b>mọi</b> chỗ trống dọc; <code>anchor = PAGE_END</code> đẩy nút xuống đáy; <code>insets</code> chừa 10px phía trên. <code>ipady</code> được trả về 0."></span>
+      <span class="f ghost" data-act="#gbwin|gbig" data-say="Kéo to cửa sổ: 3 cột giãn đều (weightx), dòng cuối hút hết chiều cao dư (weighty) và nút 5 vẫn bám đáy."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+<style>
+.gbg{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:auto auto 1fr;height:100%}
+.gbg .jb{border-radius:3px;z-index:1}
+.gcell{border:1px dashed #d8ccfb;font-family:var(--mono);font-size:10.5px;color:#b4a3ef;padding:2px 4px;z-index:0;min-height:30px}
+.win.gbig{width:560px!important;height:330px!important}
+</style>
+
+<!-- ===================== 5b. GRIDBAG constraints ===================== -->
+<section class="slide" id="gbag2" data-title="5 · GridBagConstraints: bảng tra">
+  <div class="hdr in"><span class="qn">DEMO 5</span><h2>GridBagConstraints: các trường quan trọng</h2></div>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr">
+    <div>
+      <table class="in">
+        <tr><th>Trường</th><th>Ý nghĩa</th><th>Trong demo</th></tr>
+        <tr><td>gridx, gridy</td><td>cột, dòng của ô (bắt đầu từ 0)</td><td>(0,0) … (1,2)</td></tr>
+        <tr><td>gridwidth/height</td><td>số cột / dòng component trải qua</td><td>nút 4: 3 · nút 5: 2</td></tr>
+        <tr><td>fill</td><td>NONE, HORIZONTAL, VERTICAL, BOTH</td><td>HORIZONTAL</td></tr>
+        <tr><td>ipadx, ipady</td><td>đệm <b>bên trong</b>, cộng vào kích thước</td><td>nút 4: ipady 40</td></tr>
+        <tr><td>insets</td><td>lề <b>bên ngoài</b> component</td><td>nút 5: top 10</td></tr>
+        <tr><td>anchor</td><td>vị trí trong ô khi ô lớn hơn component</td><td>PAGE_END</td></tr>
+        <tr><td>weightx/weighty</td><td>tỉ lệ chia chỗ dư (0 = không nhận)</td><td>0.5 · 1.0</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="card bad f"><h3 style="color:#be123c">Bẫy: tái sử dụng <code class="i">c</code></h3><p>Sau Button 4, <code class="i">gridwidth</code> vẫn = 3 và <code class="i">ipady</code> vẫn = 40. Demo phải <b>tự đặt lại</b> cho Button 5 (<code class="i">ipady = 0</code>, <code class="i">gridwidth = 2</code>). Quên đặt lại là lỗi rất thường gặp.</p></div>
+      <div class="card f" style="margin-top:12px"><h3>weight hoạt động thế nào?</h3><p>Chỗ dư của mỗi cột được chia theo <b>weightx lớn nhất</b> trong cột đó. Nếu mọi weight = 0, toàn bộ lưới co về giữa container.</p></div>
+      <div class="card good f" style="margin-top:12px"><h3 style="color:#047857">Mẹo</h3><p>Viết hàm phụ <code class="i">addAt(comp, x, y, w, h)</code> tạo <code class="i">GridBagConstraints</code> mới mỗi lần để tránh dính giá trị cũ.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 6. TAB ===================== -->
+<section class="slide" id="tab" data-title="6 · TabDemo (JTabbedPane)">
+  <div class="hdr in"><span class="qn">DEMO 6</span><h2>TabDemo · JTabbedPane</h2><span class="rk">#6</span></div>
+  <div class="cols" style="grid-template-columns:1.08fr 1fr">
+    <div>
+      <div class="code-title">TabDemo.java · addComponentToPane()</div>
+<script type="text/x-java" class="xxs" id="kt" data-mark="2:a;4-11:b;12-14:c;16-17:d;19-20:e;22:f">
+public void addComponentToPane(Container pane) {
+    JTabbedPane tabbedPane = new JTabbedPane();
+
+    JPanel card1 = new JPanel() {
+        //Make the panel wider than it really needs, so the
+        //window's wide enough for the tabs to stay in one row.
+        public Dimension getPreferredSize() {
+            Dimension size = super.getPreferredSize();
+            size.width += extraWindowWidth;   // = 100
+            return size;
+        }
+    };
+    card1.add(new JButton("Button 1"));
+    card1.add(new JButton("Button 2"));
+    card1.add(new JButton("Button 3"));
+
+    JPanel card2 = new JPanel();
+    card2.add(new JTextField("TextField", 20));
+
+    tabbedPane.addTab(BUTTONPANEL, card1);  // "Tab with JButtons"
+    tabbedPane.addTab(TEXTPANEL, card2);    // "Tab with JTextField"
+
+    pane.add(tabbedPane, BorderLayout.CENTER);
+}
+</script>
+    </div>
+    <div>
+      <div class="stage" style="height:290px">
+        <div class="win" style="width:480px">
+          <div class="tb"><i></i><i></i><i></i>TabDemo</div>
+          <div class="bd tabw" id="tabw">
+            <div class="tabs"><span class="tab t1 pop" id="tt1">Tab with JButtons</span><span class="tab t2 pop" id="tt2">Tab with JTextField</span></div>
+            <div class="tbody">
+              <div class="pg p1"><div class="jb pop" id="tb1">Button 1</div><div class="jb pop" id="tb2">Button 2</div><div class="jb pop" id="tb3">Button 3</div><span class="extra pop" id="tex">+100px</span></div>
+              <div class="pg p2"><div class="jtf" style="width:250px">TextField</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="f ghost" data-now="#kt|show-a" data-say="<code>JTabbedPane</code> là một <b>component</b> (không phải layout manager) hiển thị nhiều panel, mỗi panel có một tab tiêu đề để bấm chọn."></span>
+      <span class="f ghost" data-now="#kt|show-b;#tex|ring" data-act="#tex|show" data-say="<code>card1</code> là lớp ẩn danh ghi đè <code>getPreferredSize()</code>, cộng thêm <b>100px</b> chiều rộng. Mục đích: cửa sổ đủ rộng để <b>2 tab nằm trên một hàng</b>."></span>
+      <span class="f ghost" data-now="#kt|show-c" data-act="#tb1|show;#tb2|show;#tb3|show" data-say="card1 là JPanel nên dùng FlowLayout mặc định: 3 nút xếp thành hàng, căn giữa."></span>
+      <span class="f ghost" data-now="#kt|show-e" data-act="#tt1|show;#tt2|show" data-say="<code>addTab(tiêu đề, component)</code> tạo 2 tab. Tab đầu tiên được chọn mặc định."></span>
+      <span class="f ghost" data-now="#kt|show-d;#tt2|ring" data-act="#tabw|sel2" data-say="Người dùng bấm tab thứ 2: panel chứa <code>JTextField(&quot;TextField&quot;, 20)</code> hiện ra. Việc chuyển tab do JTabbedPane <b>tự xử lý</b>, không cần viết listener."></span>
+      <span class="f ghost" data-now="#kt|show-f" data-say="Đặt tabbedPane vào CENTER của content pane. Thêm: <code>setTabPlacement(BOTTOM)</code>, <code>setMnemonicAt()</code>, <code>addTab(title, icon, comp, tooltip)</code>."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+<style>
+.tabw{padding:8px}
+.tabs{display:flex;gap:2px;padding-left:4px}
+.tab{font-size:13.5px;padding:6px 14px;border:1px solid #8a98b6;border-bottom:none;border-radius:6px 6px 0 0;background:linear-gradient(180deg,#f6f8fc,#dfe5f0);color:#4a5370;position:relative;top:1px}
+.tabw .t1,.tabw.sel2 .t2{background:#fff;color:#1e2a44;font-weight:700;z-index:1}
+.tabw.sel2 .t1{background:linear-gradient(180deg,#f6f8fc,#dfe5f0);color:#4a5370;font-weight:400}
+.tbody{border:1px solid #8a98b6;background:#fff;height:110px;position:relative}
+.pg{position:absolute;inset:0;display:flex;align-items:flex-start;justify-content:center;gap:5px;padding:8px;transition:opacity .35s}
+.pg.p2,.tabw.sel2 .p1{opacity:0}
+.tabw.sel2 .p2{opacity:1}
+.extra{position:absolute;right:6px;bottom:6px;font-family:var(--mono);font-size:12px;color:#d97706;border:1.5px dashed #f59e0b;border-radius:6px;padding:2px 8px}
+</style>
+
+<!-- ===================== 7. CARD ===================== -->
+<section class="slide" id="card1" data-title="7 · CardLayoutDemo (chạy code)">
+  <div class="hdr in"><span class="qn">DEMO 7</span><h2>CardLayoutDemo</h2><span class="rk">#7</span></div>
+  <div class="cols" style="grid-template-columns:1.08fr 1fr">
+    <div>
+      <div class="code-title">CardLayoutDemo.java (implements ItemListener)</div>
+<script type="text/x-java" class="xxs" id="kc" data-mark="2-7:a;9-14:b;16-18:c;20-21:d;23-26:e">
+public void addComponentToPane(Container pane) {
+    JPanel comboBoxPane = new JPanel(); //use FlowLayout
+    String comboBoxItems[] = { BUTTONPANEL, TEXTPANEL };
+    JComboBox cb = new JComboBox(comboBoxItems);
+    cb.setEditable(false);
+    cb.addItemListener(this);
+    comboBoxPane.add(cb);
+
+    JPanel card1 = new JPanel();
+    card1.add(new JButton("Button 1"));
+    card1.add(new JButton("Button 2"));
+    card1.add(new JButton("Button 3"));
+    JPanel card2 = new JPanel();
+    card2.add(new JTextField("TextField", 20));
+
+    cards = new JPanel(new CardLayout());
+    cards.add(card1, BUTTONPANEL);   // "Card with JButtons"
+    cards.add(card2, TEXTPANEL);     // "Card with JTextField"
+
+    pane.add(comboBoxPane, BorderLayout.PAGE_START);
+    pane.add(cards, BorderLayout.CENTER);
+}
+
+public void itemStateChanged(ItemEvent evt) {
+    CardLayout cl = (CardLayout)(cards.getLayout());
+    cl.show(cards, (String)evt.getItem());
+}
+</script>
+    </div>
+    <div>
+      <div class="stage" style="height:300px">
+        <div class="win" style="width:470px">
+          <div class="tb"><i></i><i></i><i></i>CardLayoutDemo</div>
+          <div class="bd cw" id="cw">
+            <div class="cbp pop" id="ccb"><span class="jcb" id="ccbt">Card with JButtons</span></div>
+            <div class="deckc">
+              <div class="cd c2 pop" id="cd2"><span class="cname">TEXTPANEL</span><div class="jtf" style="width:250px">TextField</div></div>
+              <div class="cd c1 pop" id="cd1"><span class="cname">BUTTONPANEL</span><div class="jb">Button 1</div><div class="jb">Button 2</div><div class="jb">Button 3</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="f ghost" data-now="#kc|show-a;#ccb|ring" data-act="#ccb|show" data-say="Một <b>JComboBox</b> chứa 2 tên thẻ, đặt trong JPanel (FlowLayout) cho đẹp. <code>addItemListener(this)</code>: chính lớp demo sẽ nghe sự kiện chọn mục."></span>
+      <span class="f ghost" data-now="#kc|show-b;#cw|fan" data-act="#cd1|show;#cd2|show" data-say="Tạo 2 “thẻ”: <b>card1</b> chứa 3 nút, <b>card2</b> chứa 1 ô văn bản. Mỗi thẻ là một JPanel bình thường."></span>
+      <span class="f ghost" data-now="#kc|show-c" data-say="Panel <code>cards</code> dùng <b>CardLayout</b>: các thẻ được <b>xếp chồng</b> lên nhau như bộ bài, mỗi thẻ có một <b>tên</b> (chuỗi). Chỉ thẻ thêm vào <b>đầu tiên</b> được hiện."></span>
+      <span class="f ghost" data-now="#kc|show-d" data-say="Content pane: combo box ở PAGE_START, bộ thẻ ở CENTER. Kích thước bộ thẻ = kích thước ưu tiên của thẻ <b>lớn nhất</b>, nên đổi thẻ không làm nhảy cửa sổ."></span>
+      <span class="f ghost" data-now="#kc|show-e;#ccb|ring" data-act="#cw|sel2" data-set="#ccbt::Card with JTextField" data-say="Người dùng chọn “Card with JTextField” → <code>itemStateChanged</code> chạy: lấy CardLayout từ panel rồi <code>cl.show(cards, tên)</code> → thẻ 2 hiện lên."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+<style>
+.cbp{display:flex;justify-content:center;padding:8px}
+.deckc{position:relative;height:120px;margin:4px 10px 12px}
+.cd{position:absolute;inset:0;background:#fff;border:1px solid #8a98b6;border-radius:4px;display:flex;align-items:flex-start;justify-content:center;gap:5px;padding:26px 8px 8px;transition:transform .55s cubic-bezier(.2,.8,.2,1),opacity .45s,box-shadow .4s}
+.cname{position:absolute;left:8px;top:4px;font-family:var(--mono);font-size:11px;font-weight:700;color:#a78bfa}
+.cw .c2.pop.show{opacity:0}
+.cw.fan .c1{transform:translate(-26px,-8px) rotate(-3deg);box-shadow:0 12px 24px -10px rgba(30,27,58,.4)}
+.cw.fan .c2.pop.show{opacity:1;transform:translate(26px,10px) rotate(3deg)}
+.cw.sel2 .c1{opacity:0}
+.cw.sel2 .c2.pop.show{opacity:1}
+</style>
+
+<!-- ===================== 7b. CARD vs TAB ===================== -->
+<section class="slide" id="card2" data-title="7 · CardLayout API & so với JTabbedPane">
+  <div class="hdr in"><span class="qn">DEMO 7</span><h2>CardLayout: điều khiển thẻ &amp; so sánh với tab</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+      <div class="code-title">Ví dụ mở rộng: wizard 3 bước</div>
+<script type="text/x-java" class="xs" id="kc2" data-mark="5:a;6:b;7:c">
+JPanel cards = new JPanel(new CardLayout());
+cards.add(step1, "B1"); cards.add(step2, "B2");
+cards.add(step3, "B3");
+CardLayout cl = (CardLayout) cards.getLayout();
+nextBtn.addActionListener(e -> cl.next(cards));
+backBtn.addActionListener(e -> cl.previous(cards));
+doneBtn.addActionListener(e -> cl.show(cards, "B1"));
+</script>
+      <div class="wiz" id="wiz"><div class="ws w1">Bước 1<small>Thông tin</small></div><div class="ws w2">Bước 2<small>Tuỳ chọn</small></div><div class="ws w3">Bước 3<small>Xác nhận</small></div></div>
+      <span class="f ghost" data-now="#kc2|show-a" data-act="#wiz|s2" data-say="<code>next(parent)</code>: sang thẻ kế tiếp (thẻ cuối thì quay vòng về thẻ đầu)."></span>
+      <span class="f ghost" data-now="#kc2|show-a" data-act="#wiz|s3" data-say="Next lần nữa → Bước 3."></span>
+      <span class="f ghost" data-now="#kc2|show-b;#wiz|back" data-say="<code>previous(parent)</code>: lùi về thẻ trước → Bước 2."></span>
+      <span class="f ghost" data-now="#kc2|show-c;#wiz|home" data-say="<code>show(parent, name)</code>: nhảy thẳng tới thẻ theo tên. Ngoài ra còn <code>first()</code> và <code>last()</code>."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <table class="f">
+        <tr><th></th><th>CardLayout</th><th>JTabbedPane</th></tr>
+        <tr><td>Bản chất</td><td>layout manager</td><td>component</td></tr>
+        <tr><td>Chọn thẻ</td><td>tự viết: combo, nút…</td><td>có sẵn hàng tab</td></tr>
+        <tr><td>Điều khiển</td><td>next / previous / show</td><td>setSelectedIndex</td></tr>
+        <tr><td>Hợp với</td><td>wizard, đổi màn hình</td><td>cài đặt nhiều nhóm</td></tr>
+      </table>
+      <div class="note blue f">TabDemo và CardLayoutDemo cố ý làm <b>cùng một giao diện</b> (2 thẻ: nút / ô chữ) để so sánh: Tab tự lo phần chọn thẻ, Card cần thêm JComboBox + ItemListener.</div>
+      <div class="note f">Nhớ ép kiểu: <code class="i">(CardLayout) cards.getLayout()</code>, vì <code class="i">getLayout()</code> trả về <code class="i">LayoutManager</code>.</div>
+    </div>
+  </div>
+</section>
+<style>
+.wiz{display:flex;gap:10px;margin-top:14px;position:relative}
+.ws{flex:1;text-align:center;padding:14px 8px;border-radius:12px;border:2px solid #e4dcfb;background:#fff;font-weight:700;font-size:18px;transition:all .4s;opacity:.4}
+.ws small{display:block;font-size:13px;color:var(--muted);font-weight:500}
+.wiz .w1{opacity:1;border-color:#7c3aed;background:#f3edff;transform:translateY(-6px)}
+.wiz.s2 .w1,.wiz.s3 .w1{opacity:.4;border-color:#e4dcfb;background:#fff;transform:none}
+.wiz.s2 .w2,.wiz.s3.back .w2{opacity:1;border-color:#7c3aed;background:#f3edff;transform:translateY(-6px)}
+.wiz.s3 .w2{opacity:.4;border-color:#e4dcfb;background:#fff;transform:none}
+.wiz.s3.back .w2{opacity:1;border-color:#7c3aed;background:#f3edff;transform:translateY(-6px)}
+.wiz.s3 .w3{opacity:1;border-color:#7c3aed;background:#f3edff;transform:translateY(-6px)}
+.wiz.s3.back .w3{opacity:.4;border-color:#e4dcfb;background:#fff;transform:none}
+.wiz.s3.home .w1{opacity:1;border-color:#7c3aed;background:#f3edff;transform:translateY(-6px)}
+.wiz.s3.home .w3{opacity:.4;border-color:#e4dcfb;background:#fff;transform:none}
+</style>
+
+<!-- ===================== 8. SPRING ===================== -->
+<section class="slide" id="spring1" data-title="8 · SpringForm (chạy code)">
+  <div class="hdr in"><span class="qn">DEMO 8</span><h2>SpringForm · SpringLayout</h2><span class="rk">#8</span></div>
+  <div class="cols" style="grid-template-columns:1.08fr 1fr">
+    <div>
+      <div class="code-title">SpringForm.java · createAndShowGUI()</div>
+<script type="text/x-java" class="xxs" id="ks" data-mark="1-2:a;4:b;5-11:c;8:d;13-16:e;18-21:f">
+String[] labels = {"Name: ", "Fax: ", "Email: ", "Address: "};
+int numPairs = labels.length;
+
+JPanel p = new JPanel(new SpringLayout());
+for (int i = 0; i < numPairs; i++) {
+    JLabel l = new JLabel(labels[i], JLabel.TRAILING);
+    p.add(l);
+    JTextField textField = new JTextField(10);
+    l.setLabelFor(textField);
+    p.add(textField);
+}
+
+SpringUtilities.makeCompactGrid(p,
+                                numPairs, 2, //rows, cols
+                                6, 6,        //initX, initY
+                                6, 6);       //xPad, yPad
+
+JFrame frame = new JFrame("SpringForm");
+p.setOpaque(true);  //content panes must be opaque
+frame.setContentPane(p);
+frame.pack();  frame.setVisible(true);
+</script>
+      <div class="note blue" style="font-size:16px">Cần thêm file <code class="i">SpringUtilities.java</code> (có trong project mẫu của Oracle), không thuộc JDK.</div>
+    </div>
+    <div>
+      <div class="stage" style="height:300px">
+        <div class="win" style="width:330px">
+          <div class="tb"><i></i><i></i><i></i>SpringForm</div>
+          <div class="bd spr" id="spr">
+            <span class="it lab pop" id="sl0" style="--pw:52px;--y:8px">Name:</span><span class="it tf pop" id="st0" style="--y:8px"></span>
+            <span class="it lab pop" id="sl1" style="--pw:36px;--y:46px">Fax:</span><span class="it tf pop" id="st1" style="--y:46px"></span>
+            <span class="it lab pop" id="sl2" style="--pw:48px;--y:84px">Email:</span><span class="it tf pop" id="st2" style="--y:84px"></span>
+            <span class="it lab pop" id="sl3" style="--pw:66px;--y:122px">Address:</span><span class="it tf pop" id="st3" style="--y:122px"></span>
+            <span class="gd gx pop" id="sgx">6</span><span class="gd gy pop" id="sgy">6</span>
+          </div>
+        </div>
+      </div>
+      <span class="f ghost" data-now="#ks|show-a" data-say="Mảng 4 nhãn → form có <b>4 cặp</b> (nhãn, ô nhập)."></span>
+      <span class="f ghost" data-now="#ks|show-b;#spr|ring" data-say="Panel dùng <b>SpringLayout</b>. Layout này đặt component theo <b>ràng buộc giữa các cạnh</b>; không có ràng buộc thì mọi thứ nằm ở (0, 0)."></span>
+      <span class="f ghost" data-now="#ks|show-c" data-act="#sl0|show;#st0|show;#sl1|show;#st1|show;#sl2|show;#st2|show;#sl3|show;#st3|show" data-say="Vòng lặp thêm 8 component. Chưa có ràng buộc nào nên tất cả <b>chồng lên nhau ở góc (0, 0)</b>. Đây chính là lý do cần bước tiếp theo."></span>
+      <span class="f ghost" data-now="#ks|show-d" data-say="<code>JLabel.TRAILING</code>: chữ nhãn căn về phía ô nhập. <code>setLabelFor</code> nối nhãn với ô nhập (hỗ trợ trình đọc màn hình, phím tắt mnemonic)."></span>
+      <span class="f ghost" data-now="#ks|show-e" data-act="#spr|laid;#sgx|show;#sgy|show" data-say="<code>makeCompactGrid(p, 4, 2, 6, 6, 6, 6)</code> tự sinh ràng buộc: lưới 4 dòng × 2 cột, cách mép 6px, khe 6px. Mỗi cột rộng bằng component <b>rộng nhất trong cột</b> → nhãn thẳng mép phải, ô nhập thẳng mép trái."></span>
+      <span class="f ghost" data-now="#ks|show-f" data-say="Panel được dùng thẳng làm content pane, nên phải <code>setOpaque(true)</code>. <code>pack()</code> lấy kích thước từ ràng buộc cạnh SOUTH/EAST mà makeCompactGrid đã đặt."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+<style>
+.spr{height:164px;position:relative;width:100%;flex:none!important}
+.spr .it{position:absolute;left:0;top:0;height:30px;transition:left .8s cubic-bezier(.2,.8,.2,1),top .8s cubic-bezier(.2,.8,.2,1),width .8s,opacity .45s,transform .5s}
+.spr .lab{width:var(--pw);text-align:right;font-size:14px;line-height:30px;color:#1e2a44;background:rgba(237,233,254,.6);outline:1px dashed #c4b5fd}
+.spr .tf{width:180px;background:#fff;border:1px solid #8a98b6;border-radius:3px;opacity:.0}
+.spr .tf.show{opacity:.75}
+.spr.laid .lab{left:8px;top:var(--y);width:70px;background:none;outline:none}
+.spr.laid .tf{left:84px;top:var(--y);opacity:1}
+.gd{position:absolute;font-family:var(--mono);font-size:10px;font-weight:700;color:#d97706}
+.gx{left:1px;top:56px}.gy{left:104px;top:0}
+</style>
+
+<!-- ===================== 8b. SPRING explained ===================== -->
+<section class="slide" id="spring2" data-title="8 · SpringLayout: putConstraint">
+  <div class="hdr in"><span class="qn">DEMO 8</span><h2>SpringLayout: ràng buộc từng cạnh</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr">
+    <div>
+      <div class="code-title">Không dùng SpringUtilities: tự viết ràng buộc</div>
+<script type="text/x-java" class="xxs" id="ks2" data-mark="7:a;8:b;9:c;10:d">
+import static javax.swing.SpringLayout.*;   // WEST, NORTH, EAST…
+SpringLayout layout = new SpringLayout();
+JPanel p = new JPanel(layout);
+JLabel label = new JLabel("Label: ");
+JTextField tf = new JTextField("Text field", 15);
+p.add(label);  p.add(tf);
+layout.putConstraint(WEST, label, 5, WEST, p);
+layout.putConstraint(NORTH, label, 5, NORTH, p);
+layout.putConstraint(WEST, tf, 5, EAST, label);
+layout.putConstraint(NORTH, tf, 5, NORTH, p);
+</script>
+      <div class="win" style="margin-top:12px;width:100%">
+        <div class="tb"><i></i><i></i><i></i>SpringDemo</div>
+        <div class="bd sp2" id="sp2"><span class="a lab">Label:</span><span class="a tf jtf">Text field</span></div>
+      </div>
+      <span class="f ghost" data-now="#ks2|show-a" data-act="#sp2|s1" data-say="Cạnh <b>trái</b> của label = cạnh trái của panel + 5."></span>
+      <span class="f ghost" data-now="#ks2|show-b" data-act="#sp2|s2" data-say="Cạnh <b>trên</b> của label = cạnh trên của panel + 5."></span>
+      <span class="f ghost" data-now="#ks2|show-c" data-act="#sp2|s3" data-say="Cạnh trái của text field = <b>cạnh phải của label</b> + 5: text field bám theo label."></span>
+      <span class="f ghost" data-now="#ks2|show-d" data-act="#sp2|s4" data-say="Cạnh trên của text field = cạnh trên panel + 5. Xong: 4 lệnh cho 2 component."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div>
+      <div class="card f"><h3>Cú pháp putConstraint</h3><p><code class="i">putConstraint(cạnh1, c1, khoảng, cạnh2, c2)</code><br>nghĩa là: <b>cạnh1 của c1 = cạnh2 của c2 + khoảng</b>. Cạnh: NORTH, SOUTH, WEST, EAST, (và BASELINE, HORIZONTAL_CENTER, VERTICAL_CENTER).</p></div>
+      <div class="card f" style="margin-top:12px"><h3>Spring là gì?</h3><p>Một “lò xo” có 3 giá trị <b>min, preferred, max</b>. Khoảng cách và kích thước đều là Spring, nên có thể co giãn và cộng trừ với nhau.</p></div>
+      <div class="card f" style="margin-top:12px"><h3>SpringUtilities</h3>
+        <ul class="sm">
+          <li><code class="i">makeGrid</code>: mọi ô cùng kích thước (giống GridLayout).</li>
+          <li><code class="i">makeCompactGrid</code>: mỗi dòng/cột lấy kích thước lớn nhất của nó → form gọn.</li>
+        </ul>
+      </div>
+      <div class="note f">Oracle nói rõ SpringLayout được thiết kế cho <b>công cụ GUI builder</b>; viết tay thì dài và dễ sai, nên ít phổ biến.</div>
+    </div>
+  </div>
+</section>
+<style>
+.sp2{position:relative;height:56px;background:#eef1f6;flex:none!important}
+.sp2 .a{position:absolute;left:0;top:0;transition:left .7s cubic-bezier(.2,.8,.2,1),top .7s cubic-bezier(.2,.8,.2,1)}
+.sp2 .lab{font-size:14px;line-height:28px;width:52px;outline:1px dashed #c4b5fd}
+.sp2 .tf{width:200px;opacity:.85}
+.sp2.s1 .lab{left:5px}.sp2.s2 .lab{top:5px}
+.sp2.s3 .tf{left:62px}.sp2.s4 .tf{top:5px}
+</style>
+
+<!-- ===================== 9. ABSOLUTE ===================== -->
+<section class="slide" id="abs" data-title="9 · AbsoluteLayoutDemo (null layout)">
+  <div class="hdr in"><span class="qn">DEMO 9</span><h2>AbsoluteLayoutDemo · <code class="i" style="font-size:28px">setLayout(null)</code></h2><span class="rk">#9 ít dùng nhất</span></div>
+  <div class="cols" style="grid-template-columns:1.08fr 1fr">
+    <div>
+      <div class="code-title">AbsoluteLayoutDemo.java</div>
+<script type="text/x-java" class="xxs" id="ka" data-mark="2:a;4-7:b;9-12:c;13-15:d;16-18:e;21-24:f">
+public static void addComponentsToPane(Container pane) {
+    pane.setLayout(null);
+
+    JButton b1 = new JButton("one");
+    JButton b2 = new JButton("two");
+    JButton b3 = new JButton("three");
+    pane.add(b1);  pane.add(b2);  pane.add(b3);
+
+    Insets insets = pane.getInsets();
+    Dimension size = b1.getPreferredSize();
+    b1.setBounds(25 + insets.left, 5 + insets.top,
+                 size.width, size.height);
+    size = b2.getPreferredSize();
+    b2.setBounds(55 + insets.left, 40 + insets.top,
+                 size.width, size.height);
+    size = b3.getPreferredSize();
+    b3.setBounds(150 + insets.left, 15 + insets.top,
+                 size.width + 50, size.height + 20);
+}
+// createAndShowGUI(): không có layout manager nên không pack()
+JFrame frame = new JFrame("AbsoluteLayoutDemo");
+Insets insets = frame.getInsets();
+frame.setSize(300 + insets.left + insets.right,
+              125 + insets.top + insets.bottom);
+</script>
+    </div>
+    <div>
+      <div class="stage" style="height:300px">
+        <div class="win" id="awin" style="width:484px;height:236px">
+          <div class="tb"><i></i><i></i><i></i>AbsoluteLayoutDemo</div>
+          <div class="bd ab0" id="ab0">
+            <span class="ax">x →</span><span class="ay">y ↓</span>
+            <div class="jb abt b1 pop" id="ab1"><span class="xy">(25, 5)</span>one</div>
+            <div class="jb abt b2 pop" id="ab2"><span class="xy">(55, 40)</span>two</div>
+            <div class="jb abt b3 pop" id="ab3"><span class="xy">(150, 15) · +50 / +20</span>three</div>
+          </div>
+        </div>
+      </div>
+      <span class="f ghost" data-now="#ka|show-a" data-say="<code>setLayout(null)</code>: bỏ layout manager. Từ giờ <b>ta</b> phải tự đặt vị trí và kích thước cho từng component."></span>
+      <span class="f ghost" data-now="#ka|show-b" data-say="Add 3 nút nhưng <b>chưa thấy gì</b>: không có layout manager thì kích thước mặc định là <b>0 × 0</b>. Đây là lỗi hay gặp nhất khi dùng null layout."></span>
+      <span class="f ghost" data-now="#ka|show-c;#ab1|ring" data-act="#ab1|show" data-say="<code>setBounds(x, y, w, h)</code>: b1 ở (25, 5) tính từ góc trên-trái vùng nội dung (cộng <code>insets</code> để tránh viền), kích thước = preferred size."></span>
+      <span class="f ghost" data-now="#ka|show-d;#ab2|ring" data-act="#ab2|show" data-say="b2 ở (55, 40), cũng lấy preferred size."></span>
+      <span class="f ghost" data-now="#ka|show-e;#ab3|ring" data-act="#ab3|show" data-say="b3 ở (150, 15) và <b>to hơn</b> preferred size: rộng thêm 50, cao thêm 20. Null layout cho kiểm soát tuyệt đối từng pixel."></span>
+      <span class="f ghost" data-now="#ka|show-f" data-say="Không có layout manager thì <code>pack()</code> không biết tính kích thước, nên phải <code>setSize</code> thủ công: 300 × 125 cộng phần viền của frame."></span>
+      <span class="f ghost" data-act="#awin|shrink" data-say="Thu nhỏ cửa sổ: nút <b>không dời chỗ</b>, b3 bị cắt mất. Đổi font, đổi Look &amp; Feel hay ngôn ngữ cũng làm vỡ giao diện. Vì vậy Oracle khuyên <b>chỉ dùng khi thật cần</b>."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+<style>
+.ab0{position:relative;background:#eef1f6;overflow:hidden;background-image:linear-gradient(#dfe4ef 1px,transparent 1px),linear-gradient(90deg,#dfe4ef 1px,transparent 1px);background-size:16px 16px}
+.abt{position:absolute;padding:0}
+.abt.b1{left:40px;top:8px;width:96px;height:42px}
+.abt.b2{left:88px;top:64px;width:96px;height:42px}
+.abt.b3{left:240px;top:24px;width:192px;height:74px}
+.xy{position:absolute;left:0;top:-15px;font-family:var(--mono);font-size:10px;color:#d97706;font-weight:700;white-space:nowrap}
+.abt.b1 .xy,.abt.b2 .xy{top:auto;bottom:-15px}
+.ax,.ay{position:absolute;font-family:var(--mono);font-size:10px;color:#94a3b8}
+.ax{right:6px;top:2px}.ay{left:3px;bottom:3px}
+.win.shrink{width:330px!important;height:180px!important}
+</style>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="slide" id="end" data-title="Tóm tắt: chọn layout nào?">
+  <div class="hdr in"><span class="qn">TÓM TẮT</span><h2>Chọn layout nào?</h2></div>
+  <table class="in" style="font-size:16px">
+    <tr><th>#</th><th>Layout</th><th>Mặc định của</th><th>Component có bị kéo giãn?</th><th>Dùng khi cần…</th></tr>
+    <tr><td>1</td><td><b>BorderLayout</b></td><td>JFrame, JDialog</td><td>có, theo vùng; CENTER nhận phần dư</td><td>khung chính: toolbar, nội dung, status bar</td></tr>
+    <tr><td>2</td><td><b>FlowLayout</b></td><td>JPanel</td><td>không, luôn preferred size</td><td>một hàng nút đơn giản, tự xuống dòng</td></tr>
+    <tr><td>3</td><td><b>GridLayout</b></td><td>–</td><td>có, mọi ô bằng nhau</td><td>bàn phím, lưới nút đồng đều</td></tr>
+    <tr><td>4</td><td><b>BoxLayout</b></td><td>Box</td><td>tới maximum size</td><td>một cột / một hàng, có glue và khoảng cứng</td></tr>
+    <tr><td>5</td><td><b>GridBagLayout</b></td><td>–</td><td>tuỳ fill, weight</td><td>form phức tạp, ô trải nhiều dòng/cột</td></tr>
+    <tr><td>6</td><td><b>JTabbedPane</b></td><td>(component)</td><td>panel lấp đầy vùng tab</td><td>nhiều nhóm nội dung, người dùng tự chọn tab</td></tr>
+    <tr><td>7</td><td><b>CardLayout</b></td><td>–</td><td>thẻ lấp đầy panel</td><td>wizard, chuyển màn hình bằng code</td></tr>
+    <tr><td>8</td><td><b>SpringLayout</b></td><td>–</td><td>theo Spring min/pref/max</td><td>form thẳng hàng; công cụ GUI builder</td></tr>
+    <tr><td>9</td><td><b>null</b></td><td>–</td><td>không, tự setBounds</td><td>trường hợp đặc biệt (game, canvas tự vẽ)</td></tr>
+  </table>
+  <div class="note blue in" style="margin-top:12px">Giao diện thật thường <b>lồng nhiều layout</b>: BorderLayout cho khung, bên trong là JPanel dùng Flow / Grid / Box / GridBag cho từng vùng.</div>
+</section>
+</div></div>
+
+<div id="bar"></div>
+<div id="hint">← → / Space: từng bước · Shift+→: qua slide · A: hiện hết · M / ☰: nhảy slide · F: toàn màn hình</div>
+<div id="nav"><button id="menuBtn" title="Nhảy tới slide (M)">☰ Slide</button><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+<div id="jump"><div class="pane">
+  <div class="top"><h3>Nhảy tới slide</h3><input id="jumpnum" type="number" min="1" placeholder="số…"><button class="x" id="jumpx" aria-label="Đóng">✕</button></div>
+  <div id="jumplist"></div>
+</div></div>
+
+<script>
+(function(){
+  // ---------- Java highlighter ----------
+  const KW=new Set("public private protected static final abstract class interface extends implements new return if else for while do break continue switch case default this super true false null try catch finally throw throws instanceof import package".split(" "));
+  const TY=new Set("int double float char void boolean long short byte".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line){
+    const re=/(\/\/.*$)|(\/\*.*?\*\/)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]||m[2]) out+='<span class="c">'+esc(m[1]||m[2])+'</span>';
+      else if(m[3]) out+='<span class="s">'+esc(m[3])+'</span>';
+      else if(m[4]) out+='<span class="n">'+m[4]+'</span>';
+      else if(m[5]){
+        const w=m[5];
+        let cls=KW.has(w)?"k":TY.has(w)?"t":/^[A-Z][A-Z0-9_]+$/.test(w)?"p":/^[A-Z]/.test(w)?"t":(m[6]?"fn":"");
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[6]?esc(m[6]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-java"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");const [a,b]=r.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+  // ---------- deck engine ----------
+  //   data-act  "sel|cls;…"   class kept while the fragment is shown
+  //   data-now  "sel|cls;…"   class only while it is the latest fragment
+  //   data-set  "sel::html;…" content set while shown
+  //   data-say  narration for the .say line
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")].sort((x,y)=>(+x.dataset.o||0)-(+y.dataset.o||0));
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  const pairs=(v,sep)=>(v||"").split(";").filter(Boolean).map(p=>{const k=p.indexOf(sep);return [p.slice(0,k).trim(),p.slice(k+sep.length)]});
+  function tog(v,on){pairs(v,"|").forEach(([sel,cls])=>{document.querySelectorAll(sel).forEach(t=>t.classList.toggle(cls,on))})}
+  document.querySelectorAll("[data-set]").forEach(f=>pairs(f.dataset.set,"::").forEach(([sel])=>{document.querySelectorAll(sel).forEach(t=>{if(t.dataset.orig===undefined)t.dataset.orig=t.innerHTML})}));
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach(f=>{tog(f.dataset.now,false);tog(f.dataset.act,false)});
+      s.querySelectorAll("[data-orig]").forEach(t=>t.innerHTML=t.dataset.orig);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step);f.classList.toggle("on",on);if(on){tog(f.dataset.act,true);pairs(f.dataset.set,"::").forEach(([sel,val])=>document.querySelectorAll(sel).forEach(t=>t.innerHTML=val))}});
+      if(i===cur&&step>0)tog(fs[step-1].dataset.now,true);
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.innerHTML=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length;
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    [...jl.children].forEach((b,i)=>b.classList.toggle("cur",i===cur));
+    try{history.replaceState(null,"","#"+slides[cur].id)}catch(e){}
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+
+  // ---------- jump menu (on every slide) ----------
+  const jump=document.getElementById("jump"),jl=document.getElementById("jumplist"),jn=document.getElementById("jumpnum");
+  slides.forEach((s,i)=>{const b=document.createElement("button");b.innerHTML="<b>"+String(i+1).padStart(2,"0")+"</b>"+(s.dataset.title||s.id);b.onclick=()=>{go(i);closeJ()};jl.appendChild(b)});
+  const isOpen=()=>jump.classList.contains("open");
+  function openJ(){jump.classList.add("open");jn.value="";setTimeout(()=>jn.focus(),50)}
+  function closeJ(){jump.classList.remove("open");jn.blur()}
+  document.getElementById("menuBtn").onclick=()=>isOpen()?closeJ():openJ();
+  document.getElementById("jumpx").onclick=closeJ;
+  jump.addEventListener("click",e=>{if(e.target===jump)closeJ()});
+  jn.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Enter"){const v=parseInt(jn.value,10);if(v>=1&&v<=slides.length){go(v-1);closeJ()}}else if(e.key==="Escape")closeJ()});
+
+  addEventListener("keydown",e=>{
+    if(isOpen()){if(e.key==="Escape"||e.key==="m"||e.key==="M")closeJ();return}
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+    else if(e.key==="m"||e.key==="M"){openJ()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null||isOpen())return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+</script>
+</body>
+</html>

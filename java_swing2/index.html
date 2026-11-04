@@ -1,0 +1,2333 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Java Swing – phần 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+h1{font-size:70px;line-height:1.1;font-weight:800}
+h2{font-size:38px;line-height:1.2;font-weight:800}
+h3{font-size:23px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:22px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:26px;margin:6px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.88em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 6px;border-radius:6px;color:#be185d}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.cols.c64{grid-template-columns:1.25fr 1fr}.cols.c46{grid-template-columns:1fr 1.2fr}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.card.bad{border-color:#fecdd3;background:linear-gradient(180deg,#fff1f3,#fff)}
+.card.good{border-color:#a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff)}
+.lbl{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
+.icon{font-size:34px;margin-bottom:4px}
+.note{margin-top:12px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:20px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.code{font-family:var(--mono);font-size:18px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
+.code.sm{font-size:16.5px}.code.xs{font-size:15px;line-height:1.45}.code.xxs{font-size:13.6px;line-height:1.38;padding:8px 0}
+.code .ln{padding:0 14px 0 8px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.11);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.13);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
+.code-title{font-family:var(--mono);font-size:15px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+.f.zoom{transform:scale(.85)}.f.zoom.on{transform:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:19px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.legend{display:flex;flex-direction:column;gap:10px}
+.leg{border-radius:12px;padding:10px 16px;background:#fff;border:1px solid var(--line)}
+.leg b{display:block;font-size:21px;margin-bottom:2px}
+.leg p{font-size:19px}
+.leg.a{border-left:6px solid #7c3aed}.leg.b{border-left:6px solid #06b6d4}.leg.c{border-left:6px solid #f59e0b}
+.console{font-family:var(--mono);font-size:17px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.mem{display:flex;align-items:center;gap:16px;min-height:130px}
+.frame{border:2px solid #e4dcfb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
+.frame .fname{font-family:var(--mono);font-size:16px;color:var(--muted);margin-bottom:6px}
+.var{display:flex;align-items:center;gap:10px}
+.vn{font-family:var(--mono);font-size:21px;color:var(--t);font-weight:600}
+.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #c4b5fd;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
+.vb .new{display:none}
+.callee,.arw{opacity:0;transform:translateX(-14px);transition:all .5s}
+.mem.s1 .callee,.mem.s1 .arw{opacity:1;transform:none}
+.mem.s2 .chg .old{display:none}.mem.s2 .chg .new{display:inline;animation:pop .5s}
+.mem.s2 .chg{border-color:#f59e0b;box-shadow:0 0 18px rgba(245,158,11,.5)}
+.mem.s3 .callee,.mem.s3 .arw{opacity:.15;transform:translateY(10px)}
+.mem.s3 .result{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.5)}
+.arw{font-family:var(--mono);font-size:16px;color:var(--gold);text-align:center;line-height:1.2;font-weight:600}
+.arw .bar{display:block;font-size:30px}
+.alias{font-size:18px;color:var(--accent2);font-weight:600}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.25)}100%{transform:none;opacity:1}}
+.flow{display:flex;align-items:center;gap:12px;justify-content:center}
+.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:18px;border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:14px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.h{border-color:var(--gold)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#c4b5fd}.box.exe{border-color:#ec4899;background:#fdf2f8}
+.ar{color:var(--muted);font-size:26px;text-align:center}
+.stack{display:flex;flex-direction:column;gap:8px}
+svg text{font-family:var(--mono);font-weight:600}
+.draw{stroke-dasharray:400;stroke-dashoffset:400;transition:stroke-dashoffset 1s ease}
+svg.d1 .dr1,svg.d2 .dr2,svg.d3 .dr3{stroke-dashoffset:0}
+.fadein{opacity:0;transition:opacity .6s}
+svg.d1 .fd1,svg.d2 .fd2,svg.d3 .fd3{opacity:1}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:19px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05)}
+.ag:hover{border-color:#ec4899;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
+.ag b{color:#db2777;margin-right:6px;font-family:var(--mono)}
+.formula{font-family:var(--mono);font-size:23px;text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:16px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+@media (max-width:700px){#hint{display:none}}
+@media print{#nav,#bar,#hint{display:none}}
+
+/* lec03 additions */
+.chain{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pv{display:inline-flex;align-items:center;font-family:var(--mono);font-size:18px;font-weight:700;padding:5px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;white-space:nowrap}
+.pv.yes{background:#d1fae5;border-color:#34d399;color:#047857}
+.pv.no{background:#ffe4e6;border-color:#fb7185;color:#be123c}
+.pv.skip{background:#f1f5f9;border-color:#cbd5e1;color:#94a3b8;text-decoration:line-through;border-style:dashed}
+.op{font-family:var(--mono);font-size:26px;font-weight:800;color:var(--sa1)}
+.tt th,.tt td{text-align:center}.tt td:first-child{color:var(--text);font-weight:400}
+.tt tr.hit td{background:#fdf2f8;color:#be185d}
+tr.f{transform:none}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.code.show-s .mark-s{opacity:.3;text-decoration:line-through}
+.arr{display:flex;gap:12px;justify-content:center;margin-top:6px}
+.cell{width:84px;height:84px;border-radius:16px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:800;transition:all .45s;box-shadow:0 6px 16px -10px rgba(124,58,237,.4)}
+.cell small{font-size:13px;color:var(--muted);font-weight:600}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857;transform:translateY(-6px)}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;transform:translateY(-10px) scale(1.06);box-shadow:0 10px 24px -8px rgba(225,29,72,.5)}
+.cell.skip{opacity:.3;transform:scale(.92)}
+.syn{display:flex;gap:12px;align-items:center;justify-content:center;font-family:var(--mono);font-size:24px;font-weight:700}
+.sy{padding:8px 16px;border-radius:12px;color:#fff}
+.sy.c1{background:linear-gradient(135deg,#7c3aed,#a855f7)}.sy.c2{background:linear-gradient(135deg,#059669,#10b981)}.sy.c3{background:linear-gradient(135deg,#e11d48,#f97316)}
+.spin{display:inline-block;animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* lec04 arrays additions */
+.cell .v{display:block;line-height:1}
+.cell.max{border-color:#db2777;background:#fdf2f8;color:#be185d}
+.cell.empty{border-style:dashed;background:#f8fafc;color:#cbd5e1;box-shadow:none}
+.cell.done{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cell.new{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.cell.out{opacity:.4;border-style:dashed}
+.cell.gone{border-color:#e11d48;background:#fff1f3;color:#be123c;text-decoration:line-through}
+.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(245,158,11,.55)}
+.cell.cmp{border-color:#0891b2;background:#ecfeff;color:#0e7490;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(8,145,178,.5)}
+.cell.dots{border:none;box-shadow:none;background:none;width:40px;color:var(--muted)}
+.arr.sm .cell{width:70px;height:74px;font-size:24px;border-radius:14px}
+.arr.xs .cell{width:56px;height:62px;font-size:19px;border-radius:12px}
+.arr.xs .cell small{font-size:11.5px}
+.arr.left{justify-content:flex-start}
+.addr{display:flex;gap:12px;justify-content:center;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.addr span{width:84px;text-align:center}
+.vars{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.vc{font-family:var(--mono);font-size:19px;font-weight:700;padding:5px 14px;border-radius:12px;background:#fff;border:2px solid #e4dcfb;transition:all .35s}
+.vc b{color:var(--t)}
+.vc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.45)}
+.vc.res{border-color:#10b981;background:#ecfdf5;color:#047857}
+.ci{opacity:0;transition:opacity .4s}.ci.show{opacity:1}
+.say{font-size:20px;margin-top:12px;min-height:56px;color:var(--muted)}
+.say b{color:var(--text)}
+.rowlbl{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted);margin:10px 0 4px}
+.zone{display:flex;gap:6px;justify-content:center;margin-top:8px;font-size:15px;font-weight:700}
+.zone span{padding:3px 10px;border-radius:999px}
+.z1{background:#d1fae5;color:#047857}.z2{background:#f1f5f9;color:#64748b}.z3{background:#ffe4e6;color:#be123c}
+.brace{display:flex;gap:12px;justify-content:center;margin-top:4px}
+.brace div{border-top:3px solid currentColor;padding-top:4px;text-align:center;font-family:var(--mono);font-size:15px;font-weight:700}
+.mx{display:grid;gap:6px;justify-content:center}
+.mc{width:62px;height:52px;border-radius:10px;border:2px solid #e4dcfb;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .4s}
+.mx.sm .mc{width:44px;height:36px;font-size:14px;border-radius:8px}
+.mc.ix{border:none;background:none;color:var(--muted);font-size:14px;font-weight:600;box-shadow:none}
+.mc.unused{border-style:dashed;background:#f8fafc;color:#cbd5e1}
+.mc.used{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.mc.hl{background:#fffbeb;border-color:#fcd34d}
+.mc.cur{border-color:#f59e0b;background:#fde68a;color:#92400e;transform:scale(1.12);box-shadow:0 8px 20px -6px rgba(245,158,11,.6)}
+.mc.bd{border-color:#ec4899;border-width:3px}
+.mc.inr{opacity:.3}
+.mc.pos{border-color:#10b981;background:#d1fae5;color:#047857}
+.mc.neg{background:#fff1f3;color:#be123c}
+.mc.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;border-style:dashed}
+.strip{display:flex;gap:3px;font-family:var(--mono);font-size:12px;flex-wrap:nowrap;overflow:hidden}
+.strip span{padding:6px 5px;border-radius:5px;background:#f3edff;color:#6d28d9;white-space:nowrap}
+.strip span.r1{background:#e0f2fe;color:#0369a1}
+.strip span.gap{background:none;color:var(--muted)}
+.trace td,.trace th{font-size:17px;padding:5px 10px}
+.trace td:first-child{color:var(--text)}
+.trace tr.now td{background:#fffbeb}
+.sig{font-family:var(--mono);font-size:17px;background:#fff;border:1px dashed #c4b5fd;border-radius:10px;padding:6px 12px;color:#6d28d9;display:inline-block}
+
+.cols>*{min-width:0}
+
+/* ================= Swing deck additions ================= */
+/* Java token colours */
+.cst{color:#0e7490;font-weight:600}.an{color:#a16207;font-weight:600}
+/* full-code block: scrollable + copy */
+.code.full{font-size:13.6px;line-height:1.42;max-height:520px;overflow:auto;padding:8px 0}
+.code.full .ln{padding-right:18px}
+.code.full::-webkit-scrollbar{width:10px;height:10px}.code.full::-webkit-scrollbar-thumb{background:#d8ccfb;border-radius:8px}
+.copy{font-family:"Be Vietnam Pro",sans-serif;font-weight:700;font-size:16px;border:none;border-radius:10px;padding:8px 16px;cursor:pointer;color:#fff;background:linear-gradient(135deg,#7c3aed,#ec4899);box-shadow:0 8px 18px -8px #7c3aed;transition:transform .15s}
+.copy:hover{transform:translateY(-2px)}.copy.ok{background:linear-gradient(135deg,#059669,#10b981)}
+.runhint{font-size:16px;color:var(--muted);margin:-6px 0 10px}
+.runhint code{font-family:var(--mono);font-size:14.5px;background:#f3edff;border-radius:6px;padding:1px 6px;color:#6d28d9}
+.hdr .grow{flex:1}
+.tag{font-family:var(--mono);font-size:14px;font-weight:700;padding:3px 10px;border-radius:999px;background:#e0f2fe;color:#0369a1}
+.tag.pink{background:#fce7f3;color:#be185d}.tag.green{background:#d1fae5;color:#047857}.tag.amber{background:#fef3c7;color:#b45309}
+/* show/appear helpers driven by data-act */
+.ap{opacity:0;transform:scale(.92) translateY(8px);transition:all .45s cubic-bezier(.2,.8,.2,1)}
+.ap.show{opacity:1;transform:none}
+.dim{transition:opacity .4s}.dim.off{opacity:.18}
+.glow{transition:box-shadow .4s,border-color .4s,background .4s}
+.glow.hot{box-shadow:0 0 0 3px #f59e0b,0 0 22px rgba(245,158,11,.55)!important;border-color:#f59e0b!important}
+.glow.hot2{box-shadow:0 0 0 3px #7c3aed,0 0 22px rgba(124,58,237,.45)!important;border-color:#7c3aed!important}
+.glow.hot3{box-shadow:0 0 0 3px #10b981,0 0 22px rgba(16,185,129,.45)!important;border-color:#10b981!important}
+small.k2{font-size:15px;color:var(--muted)}
+.cols>*,.cols3>*,.cols4>*{min-width:0}
+p.sm,li.sm,.sm li{font-size:19px}
+ul.sm li{font-size:19px;margin:4px 0}
+ul.xs li{font-size:17.5px;margin:3px 0}
+ul ul{margin-left:6px}
+ul ul li{font-size:.9em}
+ul ul li::before{background:#cbd5e1;width:8px;height:8px;top:.62em}
+.arrow{color:#db2777;font-weight:800}
+/* ---------- mock Swing windows ---------- */
+.win{background:#eef0f5;border:1px solid #c2c9d8;border-radius:10px;box-shadow:0 16px 34px -16px rgba(30,27,58,.4);overflow:hidden;font-family:"Segoe UI",system-ui,sans-serif;transition:all .5s;position:relative;color:#111}
+.win .tb{display:flex;align-items:center;gap:6px;padding:6px 10px;background:linear-gradient(#f8f9fc,#e2e6ee);border-bottom:1px solid #c2c9d8;font-size:14px}
+.win .tb i{width:11px;height:11px;border-radius:50%;background:#ff5f57;display:inline-block;flex:none}.win .tb i+i{background:#febc2e}.win .tb i+i+i{background:#28c840}
+.win .tb span{flex:1;text-align:center;font-weight:600;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.win .bd{padding:10px;position:relative;font-size:15px}
+.win .bd.flow{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center;align-content:flex-start}
+.win .mbar{display:flex;gap:2px;background:#f6f7fa;border-bottom:1px solid #d5dae4;font-size:14.5px;padding:1px 4px}
+.win .mbar>span{padding:3px 10px;border-radius:4px;cursor:pointer;position:relative;user-select:none}
+.win .mbar>span:hover,.win .mbar>span.open{background:#2563eb;color:#fff}
+.win.hidden{opacity:0;transform:scale(.85)}
+.win.ghostwin{opacity:.35;border-style:dashed;filter:grayscale(1)}
+.jb{display:inline-block;padding:4px 14px;border:1px solid #98a2b6;border-radius:6px;background:linear-gradient(#fff,#e7ebf2);font-size:14.5px;cursor:pointer;user-select:none;transition:all .15s;white-space:nowrap;color:#111}
+.jb:hover{border-color:#7c3aed}.jb:active,.jb.press{background:#ddd6fe;transform:translateY(1px)}
+.jb.def{background:linear-gradient(#5b9cff,#2563eb);color:#fff;border-color:#1d4ed8}
+.jtf{display:inline-block;min-width:150px;padding:3px 8px;border:1px solid #98a2b6;background:#fff;border-radius:3px;font-size:14.5px;font-family:inherit;outline:none;color:#111}
+.jtf:focus{border-color:#2563eb;box-shadow:0 0 0 2px #bfdbfe}
+.jl{font-size:14.5px;white-space:nowrap}
+.jcb{display:inline-flex;align-items:center;gap:5px;font-size:14.5px;cursor:pointer;user-select:none}
+.jcb input{width:15px;height:15px;accent-color:#2563eb;cursor:pointer}
+/* drop-down menus */
+.dd{position:absolute;top:100%;left:0;min-width:130px;background:#fff;border:1px solid #c2c9d8;border-radius:6px;box-shadow:0 12px 24px -10px rgba(0,0,0,.35);padding:4px 0;display:none;z-index:5;color:#111}
+.open>.dd,.dd.show{display:block}
+.dd .mi{padding:3px 14px 3px 24px;display:flex;justify-content:space-between;gap:18px;white-space:nowrap;cursor:pointer;position:relative;font-size:14px}
+.dd .mi:hover,.dd .mi.hl{background:#2563eb;color:#fff}
+.dd .mi .acc{color:#64748b;font-size:12.5px}.dd .mi:hover .acc{color:#dbeafe}
+.dd .mi .ck{position:absolute;left:7px}
+.dd .sep{height:1px;background:#e2e8f0;margin:4px 0}
+.dd .mi>.dd{top:-5px;left:100%}
+.dd .mi.sub::after{content:"▸";margin-left:8px}
+.dd .mi.dis{color:#a0a8b8;cursor:default}.dd .mi.dis:hover{background:none;color:#a0a8b8}
+u.mn{text-decoration:underline;text-decoration-thickness:2px}
+/* annotation pill on diagrams */
+.pill{display:inline-block;font-family:var(--mono);font-size:14px;font-weight:700;padding:2px 10px;border-radius:999px;background:#fef3c7;color:#92400e;border:1px solid #fcd34d}
+.pill.v{background:#ede9fe;color:#6d28d9;border-color:#c4b5fd}.pill.c{background:#cffafe;color:#0e7490;border-color:#67e8f9}.pill.p{background:#fce7f3;color:#be185d;border-color:#f9a8d4}.pill.g{background:#d1fae5;color:#047857;border-color:#6ee7b7}
+/* class-hierarchy tree */
+.tree{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.node{font-family:var(--mono);font-size:15px;font-weight:700;padding:4px 10px;border-radius:8px;border:2px solid #c4b5fd;background:#fff;white-space:nowrap;display:inline-block}
+.node.awt{border-color:#fcd34d;background:#fffbeb}.node.top{border-color:#f9a8d4;background:#fdf2f8}.node.lw{border-color:#67e8f9;background:#ecfeff}.node.root{border-color:#cbd5e1;background:#f8fafc}
+.chipgrid{display:grid;gap:6px}
+.chip{font-family:var(--mono);font-size:14.5px;font-weight:600;padding:5px 8px;border-radius:8px;background:#fff;border:1px solid var(--line);white-space:nowrap;transition:all .35s;overflow:hidden;text-overflow:ellipsis}
+.chip.on{background:#f3edff;border-color:#c4b5fd;color:#6d28d9}
+.chip.on2{background:#ecfeff;border-color:#67e8f9;color:#0e7490}
+.chip.on3{background:#fdf2f8;border-color:#f9a8d4;color:#be185d}
+/* stacked panes (JRootPane) */
+.panes{position:relative;height:330px;perspective:1100px}
+.pane{position:absolute;width:250px;height:250px;border-radius:10px;border:2px solid;display:flex;align-items:flex-start;justify-content:center;padding-top:8px;font-weight:800;font-size:16px;transform:rotateY(-38deg);transform-origin:left center;transition:all .6s cubic-bezier(.2,.8,.2,1);opacity:0}
+.pane.show{opacity:1}
+/* layout mini-diagrams */
+.lay{border:2px solid #d8d2ee;border-radius:10px;background:#fff;padding:6px;display:grid;gap:4px;font-size:11.5px;font-family:var(--mono);font-weight:700;height:100%}
+.lay div{background:#ede9fe;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#5b21b6;padding:2px;text-align:center}
+.lay.cyan div{background:#cffafe;color:#0e7490}.lay.pink div{background:#fce7f3;color:#9d174d}.lay.amber div{background:#fef3c7;color:#92400e}.lay.green div{background:#d1fae5;color:#065f46}
+.laycap{font-size:15px;font-weight:700;text-align:center;margin-top:4px}
+/* moving token for event flow */
+.tok{position:absolute;padding:4px 10px;border-radius:999px;background:#f59e0b;color:#fff;font-weight:800;font-size:14px;font-family:var(--mono);opacity:0;transition:all .8s cubic-bezier(.4,0,.2,1);box-shadow:0 6px 14px -6px #b45309;z-index:3}
+.ebox{position:absolute;border-radius:12px;color:#fff;font-weight:800;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:18px;line-height:1.2;transition:all .5s;box-shadow:0 10px 22px -12px rgba(0,0,0,.5)}
+.ebox small{display:block;font-size:13px;font-family:var(--mono);background:rgba(0,0,0,.18);border-radius:6px;padding:2px 8px;margin-top:6px;font-weight:600}
+.elbl{position:absolute;font-weight:700;font-size:15px;color:var(--text);transition:opacity .4s}
+/* dialogs */
+.dlg{background:#eef0f5;border:1px solid #b8c0cf;border-radius:10px;box-shadow:0 24px 50px -18px rgba(0,0,0,.45);overflow:hidden;font-family:"Segoe UI",system-ui,sans-serif;font-size:14px;color:#111}
+.dlg .tb{display:block;padding:5px 48px;text-align:center;font-weight:600;background:linear-gradient(#f8f9fc,#e2e6ee);border-bottom:1px solid #c2c9d8;position:relative;font-size:13.5px}
+.dlg .tb::before{content:"● ● ●";position:absolute;left:8px;top:4px;color:#ff5f57;font-size:10px;letter-spacing:2px}
+.dlg .row{display:flex;gap:14px;align-items:center;padding:14px 16px 8px}
+.ico{width:44px;height:44px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#fff}
+.ico.q{background:#16a34a}.ico.i{background:#2563eb;border-radius:50%}.ico.w{background:#f59e0b;clip-path:polygon(50% 0,100% 100%,0 100%)}.ico.e{background:#dc2626;border-radius:50%}.ico.j{background:#fff;border:1px solid #cbd5e1;color:#ea580c}
+.dlg .btns{display:flex;gap:8px;justify-content:flex-end;padding:6px 14px 12px;flex-wrap:wrap}
+.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(30,27,58,.25);border-radius:inherit;opacity:0;pointer-events:none;transition:opacity .3s;z-index:6}
+.overlay.show{opacity:1;pointer-events:auto}
+.slide:not(.active) .overlay,.slide:not(.active) *{pointer-events:none!important}
+.overlay>.dlg{transform:scale(.85);transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.overlay.show>.dlg{transform:none}
+.keycap{display:inline-block;font-family:var(--mono);font-weight:700;font-size:16px;padding:3px 10px;border-radius:8px;background:#fff;border:2px solid #cbd5e1;border-bottom-width:4px;transition:all .2s}
+.keycap.down{background:#fde68a;border-color:#f59e0b;transform:translateY(2px);border-bottom-width:2px}
+.list{border:1px solid #98a2b6;background:#fff;height:100px;overflow-y:auto;width:130px;font-size:14px}
+.list div{padding:1px 8px;cursor:pointer;user-select:none}
+.list div.sel{background:#2563eb;color:#fff}
+.list div:hover:not(.sel){background:#e0e7ff}
+.tip{position:absolute;background:#fffbe6;border:1px solid #d4b106;color:#333;font-size:12.5px;padding:2px 8px;border-radius:4px;white-space:nowrap;box-shadow:0 4px 10px -4px rgba(0,0,0,.3);opacity:0;transition:opacity .25s;pointer-events:none;z-index:7}
+.hovtip:hover .tip,.tip.show{opacity:1}
+.timeline{display:flex;align-items:flex-start;gap:0;position:relative;margin-top:16px}
+.tl{flex:1;text-align:center;position:relative;padding-top:34px}
+.tl::before{content:"";position:absolute;top:12px;left:0;right:0;height:4px;background:#e4dcfb}
+.tl .dot{position:absolute;top:2px;left:50%;margin-left:-12px;width:24px;height:24px;border-radius:50%;background:#fff;border:4px solid var(--sa1)}
+.tl>b{display:block;font-family:var(--mono);font-size:22px;color:var(--sa1)}
+.tl>p{font-size:17px;line-height:1.35}
+/* ---------- jump-to-slide panel ---------- */
+.sjump{position:absolute;top:10px;right:16px;z-index:4;font-family:"Be Vietnam Pro",sans-serif;font-size:13px;font-weight:700;color:#6d28d9;background:rgba(255,255,255,.85);border:1px solid #ddd6fe;border-radius:999px;padding:4px 12px;cursor:pointer;box-shadow:0 4px 12px -6px rgba(124,58,237,.5)}
+.sjump:hover{background:#7c3aed;color:#fff}
+#nav #jumpBtn{width:auto;padding:0 10px;font-family:"Be Vietnam Pro",sans-serif;font-size:13px;font-weight:700}
+#count{cursor:pointer}
+#jump{position:fixed;inset:0;z-index:30;background:rgba(30,27,58,.45);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;font-family:"Be Vietnam Pro",sans-serif}
+#jump.open{display:flex}
+#jump .jp{background:#fff;border-radius:18px;width:min(1180px,94vw);max-height:88vh;display:flex;flex-direction:column;box-shadow:0 30px 70px -20px rgba(30,27,58,.6);overflow:hidden}
+#jump .jh{display:flex;gap:12px;align-items:center;padding:14px 20px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,#f3eeff,#e8f8ff)}
+#jump .jh b{font-size:20px}
+#jump .jh input{flex:1;font:inherit;font-size:16px;padding:8px 12px;border:1px solid #ddd6fe;border-radius:10px;outline:none}
+#jump .jh input:focus{border-color:#7c3aed}
+#jump .jh button{font:inherit;font-weight:700;border:none;background:#fff;border-radius:10px;padding:8px 14px;cursor:pointer;border:1px solid var(--line)}
+#jump .jg{padding:14px 20px;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+#jump .ji{display:flex;gap:10px;align-items:flex-start;text-align:left;font:inherit;font-size:14.5px;line-height:1.3;padding:8px 10px;border-radius:10px;border:1px solid var(--line);border-left:4px solid #c4b5fd;background:#fff;cursor:pointer;color:var(--text)}
+#jump .ji:hover{border-color:#ec4899;background:#fdf2f8}
+#jump .ji.cur{background:#f3edff;border-left-color:#7c3aed}
+#jump .ji.full{border-left-color:#10b981}
+#jump .ji.sec{border-left-color:#f59e0b;font-weight:700}
+#jump .ji i{font-style:normal;font-family:var(--mono);font-weight:700;color:#db2777;min-width:26px}
+#jump .ji.hide{display:none}
+
+/* deck 2 specifics */
+.code.show-e .mark-e{background:rgba(16,185,129,.13);box-shadow:inset 5px 0 #10b981}
+.code.show-f .mark-f{background:rgba(59,130,246,.13);box-shadow:inset 5px 0 #3b82f6}
+.code.show-g .mark-g{background:rgba(234,88,12,.13);box-shadow:inset 5px 0 #ea580c}
+.ap.show.out{opacity:0;transform:translateY(30px) scale(.9)}
+.win.ghostwin.real{opacity:1;filter:none;border-style:solid}
+.dd.pin{display:block}
+.win.ov{overflow:visible}
+.mbar>span.dis{color:#94a3b8}
+/* menu mocks */
+.mm .bd{height:210px}
+.mm .lab{position:absolute;left:0;right:0;top:46%;text-align:center;font-size:15px;font-weight:600;color:#1e3a8a}
+.mm .dd .mi .ico2{margin-right:6px}
+.mm.withtb .bd{height:190px}
+/* toolbar */
+.jtb{display:flex;gap:4px;padding:4px 6px;background:linear-gradient(#f8fafc,#e5e9f0);border-bottom:1px solid #cbd5e1;align-items:center;transition:all .45s cubic-bezier(.2,.8,.2,1);z-index:2}
+.tbb{min-width:34px;height:30px;padding:0 4px;display:flex;align-items:center;justify-content:center;border:1px solid transparent;border-radius:6px;cursor:pointer;position:relative;font-size:15px;user-select:none}
+.tbb:hover{border-color:#94a3b8;background:#fff}
+.tbb .tip{left:0;top:34px}
+.grip{color:#94a3b8;cursor:move;padding:0 2px;font-weight:900}
+#tbw .jtb{position:absolute;left:0;right:0;top:62px;bottom:auto;width:auto;flex-direction:row}
+#tbw.dk-west .jtb{left:0;right:auto;top:62px;bottom:0;width:46px;flex-direction:column;border-bottom:none;border-right:1px solid #cbd5e1}
+#tbw.dk-east .jtb{left:auto;right:0;top:62px;bottom:0;width:46px;flex-direction:column;border-bottom:none;border-left:1px solid #cbd5e1}
+#tbw.dk-south .jtb{left:0;right:0;top:auto;bottom:0;width:auto;flex-direction:row;border-top:1px solid #cbd5e1}
+#tbw.dk-float{overflow:visible}
+#tbw.dk-float .jtb{left:300px;right:auto;top:180px;bottom:auto;width:auto;flex-direction:row;border:1px solid #94a3b8;border-radius:0 0 8px 8px;box-shadow:0 12px 24px -10px rgba(0,0,0,.4)}
+.tbfloat{position:absolute;left:300px;top:156px;width:150px;height:24px;background:linear-gradient(#f8f9fc,#e2e6ee);border:1px solid #94a3b8;border-bottom:none;border-radius:8px 8px 0 0;font-size:12.5px;font-weight:700;padding:3px 10px;opacity:0;transition:opacity .3s}
+#tbw.dk-float .tbfloat{opacity:1}
+/* owner frame demo */
+#ownF.ic{transform:translate(-30px,150px) scale(.15);opacity:0}
+#ownD.ic{opacity:0;transform:scale(.6)}
+#ownF.gone,#ownD.gone{opacity:0;transform:scale(.85)}
+/* custom dialog */
+#myD.center{left:110px;top:110px}
+.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.overlay .dlg input.jtf{width:100%}
+#ccGrid span,#ccGrid2 span{height:16px;cursor:pointer;border:1px solid rgba(0,0,0,.08);transition:transform .15s}
+#ccGrid span:hover,#ccGrid2 span:hover{transform:scale(1.35);z-index:2;position:relative}
+#ccGrid2 span{height:22px}
+#ccGrid2 span.sel{outline:3px solid #111}
+#jopLog{white-space:pre-wrap}
+
+.hdr .copy{margin-right:118px}
+</style>
+</head>
+<body>
+
+<div id="viewport"><div id="deck">
+<!-- ===================== TITLE ===================== -->
+<section class="slide" id="title" data-title="Week 7: Swing (phần 2)">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// Java Programming · Week 7</div>
+    <h1 class="in">Java Swing<br><span class="grad">phần 2</span></h1>
+    <p class="in muted" style="font-size:25px;margin-top:20px;max-width:980px">Menu (JMenuBar, JMenu, JMenuItem, mnemonic, accelerator, popup menu, toolbar) · Dialog window (JOptionPane, JDialog) · JFileChooser, JColorChooser.</p>
+    <p class="in" style="margin-top:22px;font-size:21px">Giảng viên: <b>HO Tuan Thanh, M.Sc.</b></p>
+    <p class="in" style="margin-top:26px;font-size:18px;color:#8a91b4">← → / Space: chạy từng bước · Shift+→: qua slide · <b>G</b> hoặc nút <b>☰ Mục lục</b>: nhảy tới slide bất kỳ · A: hiện hết · F: toàn màn hình</p>
+  </div>
+</section>
+
+<!-- ===================== PLAN ===================== -->
+<section class="slide" id="agenda" data-title="Plan / Nội dung">
+  <div class="hdr in"><h2>Plan</h2><span class="muted" style="font-size:18px">· bấm vào mục để đi tới</span></div>
+  <div class="cols3 in" style="margin-bottom:14px">
+    <div class="card" style="cursor:pointer" data-goto="menucore"><h3>1. Menu</h3><p class="sm">Menu bar, menu, menu item, phím tắt, popup menu, toolbar.</p></div>
+    <div class="card" style="cursor:pointer" data-goto="dialog1"><h3>2. Dialog window</h3><p class="sm">JOptionPane và dialog tự tạo bằng JDialog.</p></div>
+    <div class="card" style="cursor:pointer" data-goto="filechooser"><h3>3. Other components</h3><p class="sm">JFileChooser, JColorChooser.</p></div>
+  </div>
+  <div class="agenda in" style="gap:9px">
+    <div class="ag" data-goto="menucore"><b>01</b>Core Menu classes</div>
+    <div class="ag" data-goto="jmenubar"><b>02</b>JMenuBar</div>
+    <div class="ag" data-goto="jmenu"><b>03</b>JMenu · JMenuItem</div>
+    <div class="ag" data-goto="menushots"><b>04</b>Example: main menu</div>
+    <div class="ag" data-goto="md1"><b>05</b>MenuDemo code (5 phần)</div>
+    <div class="ag" data-goto="shortcuts"><b>06</b>Mnemonics</div>
+    <div class="ag" data-goto="accel"><b>07</b>Accelerators</div>
+    <div class="ag" data-goto="imgtip"><b>08</b>Images &amp; Tooltips</div>
+    <div class="ag" data-goto="checkradio"><b>09</b>Check box / Radio menu item</div>
+    <div class="ag" data-goto="popup1"><b>10</b>Popup menu</div>
+    <div class="ag" data-goto="toolbar"><b>11</b>Toolbar</div>
+    <div class="ag" data-goto="dialog1"><b>12</b>Dialog window</div>
+    <div class="ag" data-goto="jopmethods"><b>13</b>JOptionPane showXxxDialog</div>
+    <div class="ag" data-goto="custom1"><b>14</b>Custom dialog (JDialog)</div>
+    <div class="ag" data-goto="filechooser"><b>15</b>JFileChooser</div>
+    <div class="ag" data-goto="colorchooser"><b>16</b>JColorChooser</div>
+  </div>
+</section>
+
+<!-- ===================== SECTION MENU ===================== -->
+<section class="slide sec" id="secmenu" data-title="Plan – 1. Menu">
+  <div class="title-wrap">
+    <div class="kicker in">// Plan</div>
+    <div class="in" style="font-size:34px;line-height:1.7;font-weight:700">
+      <div><span class="grad">1. Menu</span></div>
+      <div style="opacity:.35">2. Dialog window</div>
+      <div style="opacity:.35">3. Other components: JFileChooser, JColorChooser</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CORE MENU CLASSES ===================== -->
+<section class="slide" id="menucore" data-title="Core Menu classes">
+  <div class="hdr in"><span class="qn">1 · MENU</span><h2>Core Menu classes</h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr">
+    <table class="in" style="font-size:17.5px">
+      <tr><th>Class</th><th>Description</th></tr>
+      <tr class="glow" id="mcr1"><td>JMenuBar</td><td>Đối tượng chứa menu cấp cao nhất (top-level) của ứng dụng.</td></tr>
+      <tr class="glow" id="mcr2"><td>JMenu</td><td>Một menu chuẩn. Menu gồm một hoặc nhiều JMenuItem.</td></tr>
+      <tr class="glow" id="mcr3"><td>JMenuItem</td><td>Đối tượng tạo nên các mục của menu.</td></tr>
+      <tr class="glow" id="mcr4"><td>JCheckBoxMenuItem</td><td>Một check box menu item.</td></tr>
+      <tr class="glow" id="mcr5"><td>JRadioButtonMenuItem</td><td>Một radio button menu item.</td></tr>
+      <tr class="glow" id="mcr6"><td>JSeparator</td><td>Đường phân cách giữa các menu item.</td></tr>
+      <tr class="glow" id="mcr7"><td>JPopupMenu</td><td>Menu thường được kích hoạt bằng cách <b>click chuột phải</b>.</td></tr>
+    </table>
+    <div>
+      <div class="win ov" style="width:380px;margin:0 auto"><div class="tb"><i></i><i></i><i></i><span>Menu Demo</span></div>
+        <div class="mbar glow" id="mcb"><span class="glow" id="mcm">File</span><span>Options</span><span>Help</span></div>
+        <div class="bd" style="height:230px">
+          <div class="dd pin" style="left:4px;top:0;min-width:170px">
+            <div class="mi glow" id="mci">Open<span class="acc">Ctrl+O</span></div><div class="mi">Save</div>
+            <div class="sep glow" id="mcs" style="height:3px"></div>
+            <div class="mi glow" id="mcc"><span class="ck">☑</span>Bold</div>
+            <div class="mi glow" id="mcrb"><span class="ck">◉</span>High</div><div class="mi"><span class="ck">○</span>Low</div>
+          </div>
+          <div class="dd pin glow" id="mcp" style="left:210px;top:80px;min-width:110px"><div class="mi">Cut</div><div class="mi">Copy</div><div class="mi">Paste</div></div>
+          <span class="pill p" style="position:absolute;left:220px;top:52px;font-size:12px">chuột phải →</span>
+        </div></div>
+    </div>
+  </div>
+  <span class="f ghost" data-now="#mcr1|hot;#mcb|hot" data-say="JMenuBar"></span>
+  <span class="f ghost" data-now="#mcr2|hot;#mcm|hot"></span>
+  <span class="f ghost" data-now="#mcr3|hot;#mci|hot"></span>
+  <span class="f ghost" data-now="#mcr4|hot;#mcc|hot"></span>
+  <span class="f ghost" data-now="#mcr5|hot;#mcrb|hot"></span>
+  <span class="f ghost" data-now="#mcr6|hot;#mcs|hot"></span>
+  <span class="f ghost" data-now="#mcr7|hot;#mcp|hot"></span>
+</section>
+
+<!-- ===================== JMENUBAR ===================== -->
+<section class="slide" id="jmenubar" data-title="JMenuBar, JMenu, JMenuItem · JMenuBar [1][2]">
+  <div class="hdr in"><span class="qn">1 · MENU</span><h2>JMenuBar, JMenu, JMenuItem</h2></div>
+  <ul class="sm">
+    <li class="f">Ba lớp này là <b>tập tối thiểu</b> cần để xây dựng <b>main menu</b> cho ứng dụng.</li>
+    <li class="f">JMenu và JMenuItem cũng được dùng bởi <b>popup menu</b> → là <b>nền tảng</b> của hệ thống menu.</li>
+  </ul>
+  <div class="cols" style="margin-top:10px">
+    <div class="card f"><h3>JMenuBar [1]</h3>
+      <ul class="xs"><li>Về bản chất là một <b>container chứa các menu</b>.</li><li>Kế thừa <b>JComponent</b>.</li>
+        <li>Chỉ có <b>một</b> constructor: constructor mặc định.
+          <ul><li>→ Ban đầu menu bar <b>rỗng</b>.</li><li>→ Bạn phải thêm menu vào trước khi dùng.</li><li>→ Mỗi ứng dụng có <b>một và chỉ một</b> menu bar.</li></ul></li></ul></div>
+    <div class="card f"><h3>JMenuBar: methods [1] [2]</h3>
+      <table style="font-size:15.5px;font-family:var(--mono)">
+        <tr><td>JMenu add(JMenu menu)</td><td style="font-family:'Be Vietnam Pro'">thêm menu vào cuối</td></tr>
+        <tr><td>Component add(Component menu, int idx)</td><td style="font-family:'Be Vietnam Pro'">thêm tại vị trí idx</td></tr>
+        <tr><td>void remove(Component menu)</td><td style="font-family:'Be Vietnam Pro'">xóa menu</td></tr>
+        <tr><td>void remove(int idx)</td><td style="font-family:'Be Vietnam Pro'">xóa theo vị trí</td></tr>
+        <tr><td>int getMenuCount()</td><td style="font-family:'Be Vietnam Pro'">số menu</td></tr>
+        <tr><td>MenuElement[] getSubElements()</td><td style="font-family:'Be Vietnam Pro'">các menu con</td></tr>
+        <tr><td>boolean isSelected()</td><td style="font-family:'Be Vietnam Pro'">có menu đang chọn?</td></tr>
+        <tr><td>void setJMenuBar(JMenuBar mb)</td><td style="font-family:'Be Vietnam Pro'">(của JFrame) gắn menu bar vào frame</td></tr>
+      </table></div>
+  </div>
+</section>
+
+<!-- ===================== JMENU + JMENUITEM ===================== -->
+<section class="slide" id="jmenu" data-title="JMenu [1][2] · JMenuItem">
+  <div class="hdr in"><span class="qn">1 · MENU</span><h2>JMenu &amp; JMenuItem</h2></div>
+  <div class="cols">
+    <div class="card f"><h3>JMenu [1] [2]</h3>
+      <ul class="xs"><li>JMenu đóng gói một menu, được lấp đầy bằng các <b>JMenuItem</b>.</li>
+        <li>JMenu <b>dẫn xuất từ JMenuItem</b> → một JMenu có thể là một lựa chọn trong JMenu khác → menu này là <b>submenu</b> của menu kia.</li>
+        <li>Constructors: <code class="i">JMenu(String name)</code> · <code class="i">JMenu()</code></li>
+        <li>Methods:</li></ul>
+      <div class="code xxs" style="margin-top:4px"><div class="ln"><span class="no">1</span><span><span class="t">JMenuItem</span> <span class="fn">add</span>(<span class="t">JMenuItem</span> item)</span></div><div class="ln"><span class="no">2</span><span><span class="t">Component</span> <span class="fn">add</span>(<span class="t">Component</span> item, <span class="t">int</span> idx)</span></div><div class="ln"><span class="no">3</span><span><span class="t">void</span> <span class="fn">addSeparator</span>()</span></div><div class="ln"><span class="no">4</span><span><span class="t">void</span> <span class="fn">insertSeparator</span>(<span class="t">int</span> idx)</span></div><div class="ln"><span class="no">5</span><span><span class="t">void</span> <span class="fn">remove</span>(<span class="t">JMenuItem</span> menu)</span></div><div class="ln"><span class="no">6</span><span><span class="t">void</span> <span class="fn">remove</span>(<span class="t">int</span> idx)</span></div><div class="ln"><span class="no">7</span><span><span class="t">int</span> <span class="fn">getMenuComponentCount</span>()</span></div><div class="ln"><span class="no">8</span><span><span class="t">Component</span>[ ] <span class="fn">getMenuComponents</span>()</span></div></div></div>
+    <div class="card f"><h3>JMenuItem</h3>
+      <ul class="xs"><li>JMenuItem đóng gói <b>một phần tử</b> của menu.</li>
+        <li>JMenuItem <b>dẫn xuất từ AbstractButton</b>; mỗi item có thể xem là một loại <b>button đặc biệt</b> → khi item được chọn, một <b>action event</b> được sinh ra.</li>
+        <li>Constructors:</li></ul>
+      <div class="code xxs" style="margin-top:4px"><div class="ln"><span class="no">1</span><span><span class="t">JMenuItem</span>(<span class="t">String</span> name)</span></div><div class="ln"><span class="no">2</span><span><span class="t">JMenuItem</span>(<span class="t">Icon</span> image)</span></div><div class="ln"><span class="no">3</span><span><span class="t">JMenuItem</span>(<span class="t">String</span> name, <span class="t">Icon</span> image)</span></div><div class="ln"><span class="no">4</span><span><span class="t">JMenuItem</span>(<span class="t">String</span> name, <span class="t">int</span> mnem)</span></div><div class="ln"><span class="no">5</span><span><span class="t">JMenuItem</span>(<span class="t">Action</span> action)</span></div></div>
+      <ul class="xs" style="margin-top:6px"><li>Method: <code class="i">void setEnabled(boolean enable)</code>: bật/tắt item (item tắt hiện màu xám, không chọn được).</li></ul>
+      <div class="tree" style="margin-top:8px;align-items:center;gap:2px"><span class="node">AbstractButton</span><span class="ar" style="font-size:18px">↑</span><span class="node">JMenuItem</span><span class="ar" style="font-size:18px">↑</span><div style="display:flex;gap:6px"><span class="node lw">JMenu</span><span class="node">JCheckBoxMenuItem</span><span class="node">JRadioButtonMenuItem</span></div></div></div>
+  </div>
+</section>
+
+<!-- ===================== EXAMPLE SCREENSHOTS (interactive) ===================== -->
+<section class="slide" id="menushots" data-title="Example: Creation of main menu (bấm thử)">
+  <div class="hdr in"><span class="qn">1 · MENU</span><h2>Example: Creation of main menu</h2><span class="tag pink">bấm vào menu để thử</span></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div data-menumock="basic" id="mm0" style="width:400px;margin:0 auto"></div>
+    <div>
+      <div class="cols" style="gap:10px">
+        <div class="card f" style="padding:10px"><b>File</b><p style="font-size:16px">Open, Close, Save, <i>separator</i>, Exit</p></div>
+        <div class="card f" style="padding:10px"><b>Options</b><p style="font-size:16px">Colors ▸ (Red, Green, Blue), Priority ▸ (High, Low), <i>separator</i>, Reset</p></div>
+        <div class="card f" style="padding:10px"><b>Help</b><p style="font-size:16px">About</p></div>
+        <div class="card f" style="padding:10px"><b>Kết quả</b><p style="font-size:16px">Chọn một item → label hiện “<i>tên</i> Selected”. Chọn Exit → thoát chương trình.</p></div>
+      </div>
+      <div class="note blue f" style="font-size:18px">Cấu trúc: <b>JMenuBar</b> chứa 3 <b>JMenu</b>; menu <b>Options</b> chứa 2 JMenu con (<b>submenu</b>) Colors và Priority. Code ở 5 slide tiếp theo.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MENUDEMO CODE 1 ===================== -->
+<section class="slide" id="md1" data-title="MenuDemo code [1] – frame, label, JMenuBar">
+  <div class="hdr in"><span class="qn">MENUDEMO 1/5</span><h2>Khởi tạo frame và menu bar</h2></div>
+  <div class="cols" style="grid-template-columns:1.3fr 1fr">
+    <div>
+<script type="text/x-java" class="xxs" id="kmd1" data-mark="2-4:a;5-6:b;8-15:c;16-17:d;18-19:e">
+//Demonstrate a simple main menu.
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+class MenuDemo implements ActionListener {
+     JLabel jlab;
+     MenuDemo() {
+          // Create a new JFrame container.
+          JFrame jfrm = new JFrame("Menu Demo");
+          // Specify FlowLayout for the layout manager.
+          jfrm.setLayout(new FlowLayout());
+          // Give the frame an initial size.
+          jfrm.setSize(220, 200);
+          //Terminate the program when the user closes the application.
+          jfrm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+          // Create a label that will display the menu selection.
+          jlab = new JLabel();
+          // Create the menu bar.
+          JMenuBar jmb = new JMenuBar();
+</script>
+    </div>
+    <div>
+      <div class="win ap ghostwin" id="m1w" style="width:300px;margin:0 auto"><div class="tb"><i></i><i></i><i></i><span>Menu Demo</span></div>
+        <div class="mbar ap" id="m1b" style="min-height:24px;border:2px dashed #7c3aed"></div>
+        <div class="bd" style="height:150px;text-align:center"><span class="jl ap" id="m1l" style="color:#94a3b8">[jlab rỗng]</span></div></div>
+      <span class="f ghost" data-act="#kmd1|show-a" data-say="Cần 3 package: <code class='i'>java.awt</code> (FlowLayout), <code class='i'>java.awt.event</code> (ActionListener, ActionEvent), <code class='i'>javax.swing</code>."></span>
+      <span class="f ghost" data-act="#kmd1|show-b" data-say="Lớp implements <code class='i'>ActionListener</code>: một listener cho <b>mọi</b> menu item. <code class='i'>jlab</code> là field vì actionPerformed cần nó."></span>
+      <span class="f ghost" data-act="#kmd1|show-c;#m1w|show" data-say="Frame 220 × 200, FlowLayout, đóng thì thoát."></span>
+      <span class="f ghost" data-act="#kmd1|show-d;#m1l|show" data-say="Label rỗng sẽ hiển thị item được chọn."></span>
+      <span class="f ghost" data-act="#kmd1|show-e;#m1b|show" data-say="<code class='i'>new JMenuBar()</code>: menu bar <b>rỗng</b>, chưa gắn vào frame (khung tím nét đứt chỉ để minh họa)."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MENUDEMO CODE 2: File ===================== -->
+<section class="slide" id="md2" data-title="MenuDemo code [2] – File menu">
+  <div class="hdr in"><span class="qn">MENUDEMO 2/5</span><h2>Tạo menu File</h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+    <div>
+<script type="text/x-java" class="xs" id="kmd2" data-mark="2:a;3-6:b;7-9:c;10:d;11:e;12:f">
+// Create the File menu.
+JMenu jmFile = new JMenu("File");
+JMenuItem jmiOpen = new JMenuItem("Open");
+JMenuItem jmiClose = new JMenuItem("Close");
+JMenuItem jmiSave = new JMenuItem("Save");
+JMenuItem jmiExit = new JMenuItem("Exit");
+jmFile.add(jmiOpen);
+jmFile.add(jmiClose);
+jmFile.add(jmiSave);
+jmFile.addSeparator();
+jmFile.add(jmiExit);
+jmb.add(jmFile);
+</script>
+    </div>
+    <div>
+      <div class="win ov" style="width:320px;margin:0 auto"><div class="tb"><i></i><i></i><i></i><span>Menu Demo</span></div>
+        <div class="mbar" style="min-height:26px;border:2px dashed #7c3aed"><span class="ap glow" id="m2F" style="background:#2563eb;color:#fff">File</span></div>
+        <div class="bd" style="height:190px">
+          <div class="dd ap" id="m2d" style="display:block;left:4px;top:0;min-width:150px;min-height:30px;border-style:dashed">
+            <div class="mi ap" id="m2o">Open</div><div class="mi ap" id="m2c">Close</div><div class="mi ap" id="m2s">Save</div><div class="sep ap" id="m2p"></div><div class="mi ap" id="m2e">Exit</div></div>
+          <div class="ap" id="m2pool" style="position:absolute;left:180px;top:6px;display:grid;gap:4px"><span class="pill v">jmiOpen</span><span class="pill v">jmiClose</span><span class="pill v">jmiSave</span><span class="pill v">jmiExit</span></div>
+        </div></div>
+      <span class="f ghost" data-act="#kmd2|show-a;#m2d|show" data-say="Tạo menu <b>File</b> (JMenu). Menu còn rỗng và <b>chưa</b> nằm trên menu bar."></span>
+      <span class="f ghost" data-act="#kmd2|show-b;#m2pool|show" data-say="Tạo 4 JMenuItem. Mỗi item giống một button: được chọn thì sinh ActionEvent."></span>
+      <span class="f ghost" data-act="#kmd2|show-c;#m2o|show;#m2c|show;#m2s|show" data-say="<code class='i'>jmFile.add(...)</code>: thêm item vào menu theo thứ tự từ trên xuống."></span>
+      <span class="f ghost" data-act="#kmd2|show-d;#m2p|show" data-say="<code class='i'>addSeparator()</code>: thêm đường phân cách (một JSeparator)."></span>
+      <span class="f ghost" data-act="#kmd2|show-e;#m2e|show" data-say="Exit nằm dưới đường phân cách, tách khỏi các lệnh thông thường."></span>
+      <span class="f ghost" data-act="#kmd2|show-f;#m2F|show" data-now="#m2F|hot" data-say="<code class='i'>jmb.add(jmFile)</code>: đặt menu File lên menu bar."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MENUDEMO CODE 3: Options ===================== -->
+<section class="slide" id="md3" data-title="MenuDemo code [3] – Options menu, submenus">
+  <div class="hdr in"><span class="qn">MENUDEMO 3/5</span><h2>Menu Options với 2 submenu</h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+    <div>
+<script type="text/x-java" class="xxs" id="kmd3" data-mark="2:a;4-10:b;11:c;13-17:d;18:e">
+// Create the Options menu.
+JMenu jmOptions = new JMenu("Options");
+// Create the Colors submenu.
+JMenu jmColors = new JMenu("Colors");
+JMenuItem jmiRed = new JMenuItem("Red");
+JMenuItem jmiGreen = new JMenuItem("Green");
+JMenuItem jmiBlue = new JMenuItem("Blue");
+jmColors.add(jmiRed);
+jmColors.add(jmiGreen);
+jmColors.add(jmiBlue);
+jmOptions.add(jmColors);
+// Create the Priority submenu.
+JMenu jmPriority = new JMenu("Priority");
+JMenuItem jmiHigh = new JMenuItem("High");
+JMenuItem jmiLow = new JMenuItem("Low");
+jmPriority.add(jmiHigh);
+jmPriority.add(jmiLow);
+jmOptions.add(jmPriority);
+</script>
+    </div>
+    <div>
+      <div class="win ov" style="width:360px;margin:0 auto"><div class="tb"><i></i><i></i><i></i><span>Menu Demo</span></div>
+        <div class="mbar" style="min-height:26px"><span>File</span><span class="ap" id="m3O" style="background:#2563eb;color:#fff">Options</span></div>
+        <div class="bd" style="height:190px">
+          <div class="dd ap" id="m3d" style="display:block;left:44px;top:0;min-width:130px;min-height:30px;border-style:dashed">
+            <div class="mi sub ap glow" id="m3c">Colors<div class="dd ap" id="m3cd" style="display:block;top:-5px"><div class="mi">Red</div><div class="mi">Green</div><div class="mi">Blue</div></div></div>
+            <div class="mi sub ap glow" id="m3p" style="margin-top:62px">Priority<div class="dd ap" id="m3pd" style="display:block;top:-5px"><div class="mi">High</div><div class="mi">Low</div></div></div>
+          </div></div></div>
+      <span class="f ghost" data-act="#kmd3|show-a;#m3d|show" data-say="Tạo menu <b>Options</b>."></span>
+      <span class="f ghost" data-act="#kmd3|show-b;#m3cd|show" data-say="Tạo menu <b>Colors</b> (cũng là JMenu) và thêm 3 item Red, Green, Blue vào nó."></span>
+      <span class="f ghost" data-act="#kmd3|show-c;#m3c|show" data-now="#m3c|hot" data-say="<code class='i'>jmOptions.add(jmColors)</code>: thêm <b>một JMenu vào một JMenu</b> → Colors thành <b>submenu</b> (có mũi tên ▸). Làm được vì JMenu kế thừa JMenuItem."></span>
+      <span class="f ghost" data-act="#kmd3|show-d;#m3pd|show" data-say="Tương tự, tạo submenu <b>Priority</b> với High, Low."></span>
+      <span class="f ghost" data-act="#kmd3|show-e;#m3p|show;#m3O|show" data-now="#m3p|hot" data-say="Thêm Priority vào Options. (Trong mock, hai submenu được mở cùng lúc để dễ nhìn; thực tế chỉ mở một.)"></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MENUDEMO CODE 4: Reset, Help, listeners ===================== -->
+<section class="slide" id="md4" data-title="MenuDemo code [4] – Reset, Help, action listeners">
+  <div class="hdr in"><span class="qn">MENUDEMO 4/5</span><h2>Reset, Help và đăng ký listener</h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+    <div>
+<script type="text/x-java" class="xxs" id="kmd4" data-mark="2-3:a;5:b;7-9:c;11-21:d">
+// Create the Reset menu item.
+JMenuItem jmiReset = new JMenuItem("Reset");
+jmOptions.addSeparator(); jmOptions.add(jmiReset);
+// Finally, add the entire options menu to the menu bar
+jmb.add(jmOptions);
+// Create the Help menu.
+JMenu jmHelp = new JMenu("Help");
+JMenuItem jmiAbout = new JMenuItem("About");
+jmHelp.add(jmiAbout); jmb.add(jmHelp);
+// Add action listeners for the menu items.
+jmiOpen.addActionListener(this);
+jmiClose.addActionListener(this);
+jmiSave.addActionListener(this);
+jmiExit.addActionListener(this);
+jmiRed.addActionListener(this);
+jmiGreen.addActionListener(this);
+jmiBlue.addActionListener(this);
+jmiHigh.addActionListener(this);
+jmiLow.addActionListener(this);
+jmiReset.addActionListener(this);
+jmiAbout.addActionListener(this);
+</script>
+    </div>
+    <div>
+      <div class="win ov" style="width:340px;margin:0 auto"><div class="tb"><i></i><i></i><i></i><span>Menu Demo</span></div>
+        <div class="mbar" style="min-height:26px"><span>File</span><span class="glow" id="m4O">Options</span><span class="ap glow" id="m4H">Help</span></div>
+        <div class="bd" style="height:130px">
+          <div class="dd" style="display:block;left:44px;top:0;min-width:120px"><div class="mi sub">Colors</div><div class="mi sub">Priority</div><div class="sep ap" id="m4s"></div><div class="mi ap" id="m4r">Reset</div></div>
+          <div class="dd ap" id="m4hd" style="display:block;left:110px;top:0;min-width:100px;left:118px"><div class="mi">About</div></div>
+        </div></div>
+      <div class="chipgrid ap" id="m4l" style="grid-template-columns:repeat(4,1fr);margin-top:12px"><span class="chip on">Open</span><span class="chip on">Close</span><span class="chip on">Save</span><span class="chip on">Exit</span><span class="chip on2">Red</span><span class="chip on2">Green</span><span class="chip on2">Blue</span><span class="chip on3">High</span><span class="chip on3">Low</span><span class="chip on3">Reset</span><span class="chip on">About</span></div>
+      <span class="f ghost" data-act="#kmd4|show-a;#m4s|show;#m4r|show" data-say="Thêm separator và item <b>Reset</b> vào cuối menu Options."></span>
+      <span class="f ghost" data-act="#kmd4|show-b" data-now="#m4O|hot" data-say="Options đã đầy đủ → đặt lên menu bar, sau File."></span>
+      <span class="f ghost" data-act="#kmd4|show-c;#m4H|show;#m4hd|show" data-say="Menu <b>Help</b> chỉ có một item <b>About</b>, đặt cuối menu bar."></span>
+      <span class="f ghost" data-act="#kmd4|show-d;#m4l|show" data-say="Đăng ký <b>this</b> làm listener cho <b>11 item</b>. Không đăng ký cho JMenu (File, Colors…) vì chọn menu chỉ mở menu con, không phải hành động."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MENUDEMO CODE 5: setJMenuBar + actionPerformed ===================== -->
+<section class="slide" id="md5" data-title="MenuDemo code [5] – setJMenuBar, actionPerformed, main">
+  <div class="hdr in"><span class="qn">MENUDEMO 5/5</span><h2>setJMenuBar &amp; actionPerformed</h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+    <div>
+<script type="text/x-java" class="xxs" id="kmd5" data-mark="1:a;3:b;4:c;7-9:d;11:e;13:f;15-20:g">
+          jfrm.add(jlab); // Add the label to the content pane.
+          // Add the menu bar to the frame.
+          jfrm.setJMenuBar(jmb);
+          jfrm.setVisible(true); // Display the frame.
+     }
+     //Handle menu item action events.
+     public void actionPerformed(ActionEvent ae) {
+          // Get the action command from the menu selection.
+          String comStr = ae.getActionCommand();
+          // If user chooses Exit, then exit the program.
+          if (comStr.equals("Exit")) System.exit(0);
+          // Otherwise, display the selection.
+          jlab.setText(comStr + " Selected");
+     }
+     public static void main(String args[]) {
+          // Create the frame on the event dispatching thread.
+          SwingUtilities.invokeLater(new Runnable() {
+                public void run() { new MenuDemo(); }
+          });
+     }
+}
+</script>
+    </div>
+    <div>
+      <div data-menumock="basic" id="mm5" style="width:360px;margin:0 auto"></div>
+      <div class="vars" style="justify-content:center"><span class="vc" id="m5c"><b>comStr</b> = ?</span></div>
+      <span class="f ghost" data-act="#kmd5|show-a" data-say="Thêm label vào content pane."></span>
+      <span class="f ghost" data-act="#kmd5|show-b" data-say="<code class='i'>setJMenuBar(jmb)</code>: menu bar <b>không</b> nằm trong content pane mà được JRootPane/layered pane đặt ở <b>phía trên</b> content pane."></span>
+      <span class="f ghost" data-act="#kmd5|show-c" data-say="Hiển thị frame."></span>
+      <span class="f ghost" data-act="#kmd5|show-d" data-set="#m5c::<b>comStr</b> = &quot;Red&quot;" data-say="Chọn Options ▸ Colors ▸ Red: action command mặc định của JMenuItem là <b>text</b> của nó → comStr = “Red”."></span>
+      <span class="f ghost" data-act="#kmd5|show-f" data-set="#m5c::<b>comStr</b> = &quot;Red&quot;" data-say="Label hiển thị “Red Selected”."></span>
+      <span class="f ghost" data-act="#kmd5|show-e" data-set="#m5c::<b>comStr</b> = &quot;Exit&quot;" data-say="Chọn File ▸ Exit → <code class='i'>System.exit(0)</code> kết thúc chương trình (trong mock chỉ hiển thị thông báo)."></span>
+      <span class="f ghost" data-act="#kmd5|show-g" data-say="main tạo GUI trên EDT. <b>Bấm thử</b> menu trong cửa sổ bên trên."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="full-MenuDemo" data-title="Code full: MenuDemo.java">
+  <div class="hdr in"><span class="qn">CODE FULL</span><h2>MenuDemo.java</h2><span class="grow"></span><button class="copy" data-copy="src-MenuDemo">📋 Copy code</button></div>
+  <p class="runhint in">Ví dụ MenuDemo đầy đủ: menu File, Options (Colors, Priority), Help; mọi item dùng chung một ActionListener.<br>Chạy: lưu thành <code>MenuDemo.java</code> → <code>javac MenuDemo.java</code> → <code>java MenuDemo</code> &nbsp;(Java 11+ chạy thẳng: <code>java MenuDemo.java</code>) · cuộn trong khung để xem hết.</p>
+<script type="text/x-java" class="full" id="src-MenuDemo">
+// Demonstrate a simple main menu.
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+public class MenuDemo implements ActionListener {
+    JLabel jlab;
+
+    MenuDemo() {
+        // Create a new JFrame container.
+        JFrame jfrm = new JFrame("Menu Demo");
+        // Specify FlowLayout for the layout manager.
+        jfrm.setLayout(new FlowLayout());
+        // Give the frame an initial size.
+        jfrm.setSize(220, 200);
+        // Terminate the program when the user closes the application.
+        jfrm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // Create a label that will display the menu selection.
+        jlab = new JLabel();
+        // Create the menu bar.
+        JMenuBar jmb = new JMenuBar();
+
+        // Create the File menu.
+        JMenu jmFile = new JMenu("File");
+        JMenuItem jmiOpen = new JMenuItem("Open");
+        JMenuItem jmiClose = new JMenuItem("Close");
+        JMenuItem jmiSave = new JMenuItem("Save");
+        JMenuItem jmiExit = new JMenuItem("Exit");
+        jmFile.add(jmiOpen);
+        jmFile.add(jmiClose);
+        jmFile.add(jmiSave);
+        jmFile.addSeparator();
+        jmFile.add(jmiExit);
+        jmb.add(jmFile);
+
+        // Create the Options menu.
+        JMenu jmOptions = new JMenu("Options");
+        // Create the Colors submenu.
+        JMenu jmColors = new JMenu("Colors");
+        JMenuItem jmiRed = new JMenuItem("Red");
+        JMenuItem jmiGreen = new JMenuItem("Green");
+        JMenuItem jmiBlue = new JMenuItem("Blue");
+        jmColors.add(jmiRed);
+        jmColors.add(jmiGreen);
+        jmColors.add(jmiBlue);
+        jmOptions.add(jmColors);
+        // Create the Priority submenu.
+        JMenu jmPriority = new JMenu("Priority");
+        JMenuItem jmiHigh = new JMenuItem("High");
+        JMenuItem jmiLow = new JMenuItem("Low");
+        jmPriority.add(jmiHigh);
+        jmPriority.add(jmiLow);
+        jmOptions.add(jmPriority);
+        // Create the Reset menu item.
+        JMenuItem jmiReset = new JMenuItem("Reset");
+        jmOptions.addSeparator(); jmOptions.add(jmiReset);
+        // Finally, add the entire options menu to the menu bar
+        jmb.add(jmOptions);
+
+        // Create the Help menu.
+        JMenu jmHelp = new JMenu("Help");
+        JMenuItem jmiAbout = new JMenuItem("About");
+        jmHelp.add(jmiAbout); jmb.add(jmHelp);
+
+        // Add action listeners for the menu items.
+        jmiOpen.addActionListener(this);
+        jmiClose.addActionListener(this);
+        jmiSave.addActionListener(this);
+        jmiExit.addActionListener(this);
+        jmiRed.addActionListener(this);
+        jmiGreen.addActionListener(this);
+        jmiBlue.addActionListener(this);
+        jmiHigh.addActionListener(this);
+        jmiLow.addActionListener(this);
+        jmiReset.addActionListener(this);
+        jmiAbout.addActionListener(this);
+
+        jfrm.add(jlab); // Add the label to the content pane.
+        // Add the menu bar to the frame.
+        jfrm.setJMenuBar(jmb);
+        jfrm.setVisible(true); // Display the frame.
+    }
+
+    // Handle menu item action events.
+    public void actionPerformed(ActionEvent ae) {
+        // Get the action command from the menu selection.
+        String comStr = ae.getActionCommand();
+        // If user chooses Exit, then exit the program.
+        if (comStr.equals("Exit")) System.exit(0);
+        // Otherwise, display the selection.
+        jlab.setText(comStr + " Selected");
+    }
+
+    public static void main(String args[]) {
+        // Create the frame on the event dispatching thread.
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() { new MenuDemo(); }
+        });
+    }
+}
+</script>
+</section>
+
+<!-- ===================== MNEMONICS & ACCELERATORS OVERVIEW ===================== -->
+<section class="slide" id="shortcuts" data-title="Add Mnemonics and Accelerators to Menu Items · mnemonic [1][2]">
+  <div class="hdr in"><span class="qn">1 · SHORTCUTS</span><h2>Mnemonics &amp; Accelerators</h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+    <div>
+      <ul class="xs">
+        <li class="f">Trong ứng dụng thực tế, menu thường hỗ trợ <b>phím tắt</b> → chọn menu item nhanh. Có <b>hai dạng</b>: <b>mnemonics</b> và <b>accelerators</b>.
+          <ul><li><b>Mnemonic</b> cho phép dùng bàn phím để chọn một item từ menu <b>đang được hiển thị</b>.</li>
+          <li><b>Accelerator</b> là phím cho phép chọn menu item <b>mà không cần mở menu trước</b>.</li></ul></li>
+        <li class="f">Mnemonic [1]: có thể đặt cho cả <b>JMenuItem</b> và <b>JMenu</b>. Hai cách đặt mnemonic cho JMenuItem:
+          <ul><li>Dùng constructor: <code class="i">JMenuItem(String name, int mnem)</code></li>
+          <li>Đặt sau: <code class="i">void setMnemonic(int mnem)</code></li>
+          <li><b>mnem</b>: một hằng số trong <code class="i">java.awt.event.KeyEvent</code>, như <code class="i">KeyEvent.VK_F</code> hay <code class="i">KeyEvent.VK_Z</code>.</li>
+          <li>Mnemonic <b>không phân biệt</b> chữ hoa/thường.</li></ul></li>
+        <li class="f">Mnemonic [2]: mặc định, <b>chữ đầu tiên khớp</b> trong tên item được gạch dưới.
+          <ul><li>Muốn gạch dưới chữ khác (không phải chữ khớp đầu tiên): <code class="i">void setDisplayedMnemonicIndex(int idx)</code>, <b>idx</b> là vị trí chữ cần gạch dưới.</li></ul></li>
+      </ul>
+    </div>
+    <div>
+      <div class="cols" style="gap:10px">
+        <div class="card f" style="padding:10px 12px"><span class="lbl info">MNEMONIC</span><p style="font-size:16px">Menu <b>đang mở</b>, gõ chữ gạch dưới.<br><span class="keycap">Alt</span>+<span class="keycap">F</span> → <span class="keycap">O</span></p></div>
+        <div class="card f" style="padding:10px 12px"><span class="lbl good">ACCELERATOR</span><p style="font-size:16px"><b>Không cần</b> mở menu.<br><span class="keycap">Ctrl</span>+<span class="keycap">O</span></p></div>
+      </div>
+      <div class="win ov f" style="width:330px;margin:12px auto 0"><div class="tb"><i></i><i></i><i></i><span>Mnemonic</span></div>
+        <div class="mbar"><span style="background:#2563eb;color:#fff"><u class="mn">F</u>ile</span><span><u class="mn">O</u>ptions</span><span><u class="mn">H</u>elp</span></div>
+        <div class="bd" style="height:150px"><div class="dd" style="display:block;left:4px;top:0;min-width:160px"><div class="mi"><span><u class="mn">O</u>pen</span><span class="acc">Ctrl+O</span></div><div class="mi"><span><u class="mn">C</u>lose</span><span class="acc">Ctrl+C</span></div><div class="mi"><span><u class="mn">S</u>ave</span><span class="acc">Ctrl+S</span></div><div class="sep"></div><div class="mi"><span>E<u class="mn">x</u>it</span><span class="acc">Ctrl+E</span></div></div>
+          <div style="position:absolute;left:190px;top:100px;font-size:13px;color:#be185d;line-height:1.3">← Exit: dùng<br>setDisplayedMnemonicIndex(1)<br>để gạch “x”</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ACCELERATOR ===================== -->
+<section class="slide" id="accel" data-title="Accelerator [1][2] – setAccelerator, KeyStroke, InputEvent masks">
+  <div class="hdr in"><span class="qn">1 · SHORTCUTS</span><h2>Accelerator [1] [2]</h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr">
+    <ul class="xs">
+      <li class="f">Accelerator có thể gắn với đối tượng <b>JMenuItem</b>.</li>
+      <li class="f">Đặt bằng cách gọi <code class="i">void setAccelerator(KeyStroke ks)</code>
+        <ul><li><b>ks</b>: tổ hợp phím được nhấn để chọn menu item.</li>
+        <li><code class="i">KeyStroke</code> là lớp chứa nhiều <b>factory method</b> tạo ra các loại keystroke accelerator.</li></ul></li>
+      <li class="f">Ví dụ:
+        <ul><li><code class="i">static KeyStroke getKeyStroke(char ch)</code></li>
+        <li><code class="i">static KeyStroke getKeyStroke(Character ch, int modifier)</code></li>
+        <li><code class="i">static KeyStroke getKeyStroke(int ch, int modifier)</code></li>
+        <li><b>ch</b>: ký tự accelerator.</li></ul></li>
+      <li class="f"><b>modifier</b> phải là một hoặc nhiều hằng số sau, định nghĩa trong lớp <code class="i">java.awt.event.InputEvent</code> (kết hợp nhiều cái bằng toán tử <code class="i">|</code>):</li>
+    </ul>
+    <div>
+      <table class="f" style="font-family:var(--mono);font-size:15.5px"><tr><th>modifier</th><th>phím</th></tr>
+        <tr><td>InputEvent.ALT_DOWN_MASK</td><td>Alt</td></tr><tr><td>InputEvent.ALT_GRAPH_DOWN_MASK</td><td>AltGr</td></tr>
+        <tr><td>InputEvent.CTRL_DOWN_MASK</td><td>Ctrl</td></tr><tr><td>InputEvent.META_DOWN_MASK</td><td>⌘ Cmd</td></tr>
+        <tr><td>InputEvent.SHIFT_DOWN_MASK</td><td>Shift</td></tr></table>
+      <div class="note f" style="font-size:17.5px">Truyền <code class="i">VK_A</code> làm ký tự và <code class="i">InputEvent.CTRL_DOWN_MASK</code> làm modifier → tổ hợp accelerator là <b>CTRL-A</b>.</div>
+      <div class="formula f" style="font-size:16px;margin-top:10px">KeyStroke.getKeyStroke(KeyEvent.VK_A,<br>InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)<br><small class="muted">→ Ctrl+Shift+A</small></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ACCELERATOR CODE ===================== -->
+<section class="slide" id="accelcode" data-title="File menu with mnemonics and accelerators (code + thử phím)">
+  <div class="hdr in"><span class="qn">1 · SHORTCUTS</span><h2>File menu có mnemonic + accelerator</h2><span class="tag pink">thử nhấn Ctrl+O / Ctrl+S</span></div>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr">
+    <div>
+<script type="text/x-java" class="xxs" id="kac" data-mark="2:a;3:b;4-5:c;6-14:d">
+// Create the File menu with mnemonics and accelerators.
+jmFile.setMnemonic(KeyEvent.VK_F);
+JMenuItem jmiOpen = new JMenuItem("Open", KeyEvent.VK_O);
+jmiOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
+                                     InputEvent.CTRL_DOWN_MASK));
+JMenuItem jmiClose = new JMenuItem("Close", KeyEvent.VK_C);
+jmiClose.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,
+                                     InputEvent.CTRL_DOWN_MASK));
+JMenuItem jmiSave = new JMenuItem("Save", KeyEvent.VK_S);
+jmiSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
+                                     InputEvent.CTRL_DOWN_MASK));
+JMenuItem jmiExit = new JMenuItem("Exit", KeyEvent.VK_E);
+jmiExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E,
+                                     InputEvent.CTRL_DOWN_MASK));
+</script>
+      <div class="flow f" style="margin-top:14px;gap:8px"><span class="keycap" id="kcC">Ctrl</span><span>+</span><span class="keycap" id="kcK">O</span><span class="ar">→</span><span class="jl" id="kcR" style="font-size:18px;font-weight:700">…</span></div>
+    </div>
+    <div>
+      <div data-menumock="full" id="mmA" style="width:360px;margin:0 auto"></div>
+      <span class="f ghost" data-act="#kac|show-a" data-say="<code class='i'>setMnemonic(VK_F)</code> cho menu <b>File</b>: chữ F được gạch dưới, nhấn <b>Alt+F</b> để mở menu."></span>
+      <span class="f ghost" data-act="#kac|show-b" data-say="Constructor <code class='i'>JMenuItem(&quot;Open&quot;, VK_O)</code> đặt mnemonic <b>O</b>: khi menu File đang mở, gõ O để chọn Open."></span>
+      <span class="f ghost" data-act="#kac|show-c" data-say="<code class='i'>setAccelerator(...)</code>: <b>Ctrl+O</b> chọn Open ngay cả khi menu đóng. Swing tự hiển thị “Ctrl+O” bên phải item."></span>
+      <span class="f ghost" data-act="#kac|show-d" data-say="Làm tương tự cho Close (C), Save (S), Exit (E). <b>Thử nhấn Ctrl+O, Ctrl+C, Ctrl+S hoặc Ctrl+E</b> khi đang ở slide này (trên macOS dùng ⌘)."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== IMAGES + TOOLTIPS ===================== -->
+<section class="slide" id="imgtip" data-title="Add Images and Tooltips to Menu Items [1][2] · Tooltip">
+  <div class="hdr in"><span class="qn">1 · MENU</span><h2>Images &amp; Tooltips cho menu item</h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr">
+    <ul class="xs">
+      <li class="f">Có thể thêm <b>hình ảnh</b> vào menu item, hoặc dùng hình <b>thay cho</b> text.
+        <ul><li>Constructors: <code class="i">JMenuItem(Icon image)</code> · <code class="i">JMenuItem(String name, Icon image)</code></li>
+        <li>Ví dụ: <code class="i">ImageIcon icon = new ImageIcon("AboutIcon.gif");</code><br><code class="i">JMenuItem jmiAbout = new JMenuItem("About", icon);</code></li></ul></li>
+      <li class="f">Các phương thức (kế thừa từ <b>AbstractButton</b>):
+        <ul><li>Thêm icon cho menu item: <code class="i">void setIcon(Icon defaultIcon)</code></li>
+        <li>Căn ngang hình: <code class="i">void setHorizontalAlignment(int alignment)</code></li>
+        <li>Icon khi item bị vô hiệu: <code class="i">void setDisabledIcon(Icon disabledIcon)</code></li></ul></li>
+      <li class="f"><b>Tooltip</b> là một thông điệp nhỏ mô tả một item.
+        <ul><li>Tự động hiện ra nếu con trỏ chuột <b>dừng trên item</b> một lúc.</li>
+        <li>Thêm tooltip cho menu item: <code class="i">void setToolTipText(String msg)</code></li>
+        <li>Ví dụ: <code class="i">jmiAbout.setToolTipText("Info about the MenuDemo program.");</code></li></ul></li>
+    </ul>
+    <div>
+      <div class="win ov f" style="width:330px;margin:0 auto"><div class="tb"><i></i><i></i><i></i><span>Rê chuột lên “About”</span></div>
+        <div class="mbar"><span>File</span><span>Options</span><span style="background:#2563eb;color:#fff">Help</span></div>
+        <div class="bd" style="height:140px"><div class="dd" style="display:block;left:118px;top:0;min-width:130px"><div class="mi hovtip" style="position:relative;padding-left:8px"><span>ℹ️ About</span><span class="tip" style="left:30px;top:30px">Info about the MenuDemo program.</span></div><div class="mi dis" style="padding-left:8px">🚫 Disabled item</div></div></div></div>
+      <div class="note blue f" style="font-size:17px">Thiếu file ảnh thì <code class="i">ImageIcon</code> rỗng nhưng không báo lỗi; item vẫn hiện text. Tooltip dùng được cho <b>mọi</b> JComponent (button, text field…).</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CHECK / RADIO MENU ITEMS ===================== -->
+<section class="slide" id="checkradio" data-title="JCheckBoxMenuItem & JRadioButtonMenuItem">
+  <div class="hdr in"><span class="qn">1 · MENU</span><h2>JRadioButtonMenuItem &amp; JCheckBoxMenuItem</h2></div>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr">
+    <div>
+      <ul class="xs">
+        <li class="f">Menu item thường dùng nhiều nhất, nhưng Swing định nghĩa thêm hai loại: <b>check box</b> và <b>radio button</b>.
+          <ul><li>Giúp menu cung cấp chức năng mà nếu không thì phải dùng component <b>riêng lẻ</b>.</li>
+          <li>Đôi khi đặt check box hay radio button trong menu là <b>chỗ tự nhiên nhất</b> cho một nhóm tính năng.</li></ul></li>
+        <li class="f">Thêm check box vào menu: tạo <code class="i">JCheckBoxMenuItem</code>: <code class="i">(String name)</code> · <code class="i">(String name, boolean state)</code> · <code class="i">(String name, Icon icon)</code></li>
+        <li class="f"><code class="i">JRadioButtonMenuItem</code>: <code class="i">(String name)</code> · <code class="i">(String name, boolean state)</code> · <code class="i">(String name, Icon icon, boolean state)</code></li>
+      </ul>
+<script type="text/x-java" class="xxs" id="kcr" data-mark="3-5:a;6-9:b;11-12:c">
+// Use check boxes for colors. This allows the user to select more than one color.
+JCheckBoxMenuItem jmiRed = new JCheckBoxMenuItem("Red", true);
+JCheckBoxMenuItem jmiGreen = new JCheckBoxMenuItem("Green", false);
+JCheckBoxMenuItem jmiBlue = new JCheckBoxMenuItem("Blue", false);
+JRadioButtonMenuItem jmiHigh =
+               new JRadioButtonMenuItem("High", true);
+JRadioButtonMenuItem jmiLow =
+               new JRadioButtonMenuItem("Low");
+// Create button group for the radio button menu items.
+ButtonGroup bg = new ButtonGroup();
+bg.add(jmiHigh); bg.add(jmiLow);
+</script>
+    </div>
+    <div>
+      <div class="win ov" style="width:340px;margin:0 auto"><div class="tb"><i></i><i></i><i></i><span>Bấm thử các item</span></div>
+        <div class="mbar"><span>File</span><span style="background:#2563eb;color:#fff">Options</span></div>
+        <div class="bd" style="height:170px">
+          <div class="dd" style="display:block;left:44px;top:0;min-width:120px"><div class="mi sub">Colors<div class="dd" style="top:-5px;display:block" id="crC"><div class="mi" data-chk><span class="ck">☑</span>Red</div><div class="mi" data-chk><span class="ck">☐</span>Green</div><div class="mi" data-chk><span class="ck">☐</span>Blue</div></div></div>
+            <div class="mi sub" style="margin-top:58px">Priority<div class="dd" style="top:-5px;display:block" id="crP"><div class="mi" data-rad><span class="ck">◉</span>High</div><div class="mi" data-rad><span class="ck">○</span>Low</div></div></div></div></div></div>
+      <div class="vars" style="justify-content:center"><span class="vc" id="crS">Colors: Red · Priority: High</span></div>
+      <span class="f ghost" data-act="#kcr|show-a" data-say="Colors dùng <b>JCheckBoxMenuItem</b>: chọn được <b>nhiều</b> màu cùng lúc. Tham số thứ 2 là trạng thái ban đầu (Red = true)."></span>
+      <span class="f ghost" data-act="#kcr|show-b" data-say="Priority dùng <b>JRadioButtonMenuItem</b>: High được chọn sẵn."></span>
+      <span class="f ghost" data-act="#kcr|show-c" data-say="<b>ButtonGroup</b> làm các radio item <b>loại trừ nhau</b>: chọn Low thì High tự bỏ chọn. Không có ButtonGroup thì chúng hoạt động như check box. Đọc trạng thái bằng <code class='i'>isSelected()</code>."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== POPUP MENU THEORY ===================== -->
+<section class="slide" id="popup1" data-title="Create a Popup Menu [1][2][3]">
+  <div class="hdr in"><span class="qn">1 · POPUP</span><h2>Create a Popup Menu</h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr">
+    <ul class="xs">
+      <li class="f">Popup menu là lựa chọn <b>thay thế hoặc bổ sung</b> phổ biến cho menu bar; được kích hoạt bằng <b>click chuột phải</b> trên một component.</li>
+      <li class="f">Constructors: <code class="i">JPopupMenu()</code> · <code class="i">JPopupMenu(String label)</code></li>
+      <li class="f">Popup menu được xây dựng <b>giống menu thường</b>: tạo đối tượng JPopupMenu rồi thêm menu item vào; lựa chọn item cũng xử lý giống vậy: lắng nghe <b>action event</b>.</li>
+      <li class="f">Khác biệt chính: <b>quá trình kích hoạt</b>.
+        <ol style="margin:4px 0 0 34px;font-size:16.5px;line-height:1.45"><li>Phải đăng ký listener cho <b>mouse event</b>.</li><li>Trong mouse event handler, theo dõi <b>popup trigger</b>.</li><li>Khi nhận popup trigger, hiển thị popup menu bằng <code class="i">show()</code>.</li></ol></li>
+      <li class="f">Lắng nghe popup trigger: implements interface <code class="i">MouseListener</code> và đăng ký bằng <code class="i">addMouseListener()</code>.</li>
+    </ul>
+    <div>
+      <div class="card f"><h3>Methods of MouseListener</h3><div class="code xxs"><div class="ln"><span class="no">1</span><span><span class="t">void</span> <span class="fn">mouseClicked</span>(<span class="t">MouseEvent</span> me)</span></div><div class="ln"><span class="no">2</span><span><span class="t">void</span> <span class="fn">mouseEntered</span>(<span class="t">MouseEvent</span> me)</span></div><div class="ln"><span class="no">3</span><span><span class="t">void</span> <span class="fn">mouseExited</span>(<span class="t">MouseEvent</span> me)</span></div><div class="ln"><span class="no">4</span><span><span class="t">void</span> <span class="fn">mousePressed</span>(<span class="t">MouseEvent</span> me)</span></div><div class="ln"><span class="no">5</span><span><span class="t">void</span> <span class="fn">mouseReleased</span>(<span class="t">MouseEvent</span> me)</span></div></div></div>
+      <div class="card f" style="margin-top:10px"><h3>4 method của MouseEvent hay dùng</h3><table style="font-size:15px"><tr><td>int getX( ) / int getY( )</td><td>tọa độ chuột trong component</td></tr><tr><td>boolean isPopupTrigger( )</td><td>đây có phải thao tác mở popup?</td></tr><tr><td>Component getComponent( )</td><td>component nhận sự kiện</td></tr></table></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== POPUP CODE ===================== -->
+<section class="slide" id="popup2" data-title="Popup menu code (chuột phải để thử)">
+  <div class="hdr in"><span class="qn">1 · POPUP</span><h2>Edit popup menu</h2><span class="tag pink">click chuột phải vào vùng bên phải</span></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr">
+    <div>
+<script type="text/x-java" class="xxs" id="kpu" data-mark="2:a;4-8:b;10:c;11-14:d;15-18:e">
+// Create an Edit popup menu.
+JPopupMenu jpu = new JPopupMenu();
+// Create the popup menu items
+JMenuItem jmiCut = new JMenuItem("Cut");
+JMenuItem jmiCopy = new JMenuItem("Copy");
+JMenuItem jmiPaste = new JMenuItem("Paste");
+// Add the menu items to the popup menu.
+jpu.add(jmiCut); jpu.add(jmiCopy); jpu.add(jmiPaste);
+// Add a listener for for the popup trigger.
+jfrm.addMouseListener(new MouseAdapter() {
+ public void mousePressed(MouseEvent me) {
+      if(me.isPopupTrigger())
+       jpu.show(me.getComponent(), me.getX(), me.getY());
+ }
+ public void mouseReleased(MouseEvent me) {
+  if(me.isPopupTrigger())
+       jpu.show(me.getComponent(), me.getX(), me.getY());
+ }
+});
+</script>
+    </div>
+    <div>
+      <div class="win ov" style="width:100%"><div class="tb"><i></i><i></i><i></i><span>Menu Demo</span></div>
+        <div class="bd" id="puArea" style="height:230px;cursor:context-menu;display:flex;align-items:center;justify-content:center;color:#64748b;text-align:center"><span id="puMsg">Click chuột phải ở đây</span>
+          <div class="dd" id="puMenu" style="min-width:110px"><div class="mi">Cut</div><div class="mi">Copy</div><div class="mi">Paste</div></div></div></div>
+      <span class="f ghost" data-act="#kpu|show-a" data-say="Tạo một <b>JPopupMenu</b> rỗng."></span>
+      <span class="f ghost" data-act="#kpu|show-b" data-say="Tạo và thêm các item Cut, Copy, Paste giống hệt menu thường (có thể <code class='i'>addActionListener</code> cho chúng)."></span>
+      <span class="f ghost" data-act="#kpu|show-c" data-say="<code class='i'>MouseAdapter</code> là lớp implements sẵn MouseListener với các method <b>rỗng</b> → chỉ cần override method mình cần, không phải viết đủ 5 method."></span>
+      <span class="f ghost" data-act="#kpu|show-d;#kpu|show-e" data-say="Popup trigger xảy ra ở <b>mousePressed</b> trên Linux/macOS nhưng ở <b>mouseReleased</b> trên Windows → kiểm tra <code class='i'>isPopupTrigger()</code> ở <b>cả hai</b> để chạy đúng mọi nơi. <code class='i'>show(comp, x, y)</code> hiện menu tại vị trí chuột."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TOOLBAR THEORY ===================== -->
+<section class="slide" id="toolbar" data-title="Toolbar · Create a Toolbar [1]">
+  <div class="hdr in"><span class="qn">1 · TOOLBAR</span><h2>Toolbar</h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr">
+    <ul class="xs">
+      <li class="f">Toolbar là component vừa có thể <b>thay thế</b>, vừa có thể <b>bổ sung</b> cho menu.</li>
+      <li class="f">Toolbar chứa một danh sách button (hoặc component khác) cho người dùng <b>truy cập tức thì</b> các tùy chọn của chương trình.</li>
+      <li class="f">Thông thường:
+        <ul><li>Button trên toolbar hiển thị <b>icon</b> thay vì text (dùng cả hai cũng được).</li>
+        <li><b>Tooltip</b> thường đi kèm các button chỉ có icon.</li></ul></li>
+      <li class="f">Toolbar có thể đặt ở <b>bất kỳ cạnh nào</b> của cửa sổ bằng cách kéo, hoặc kéo <b>ra ngoài</b> cửa sổ, khi đó nó trở thành <b>free floating</b>.</li>
+      <li class="f">Tạo toolbar: lớp <code class="i">JToolBar</code>. Constructors: <code class="i">JToolBar()</code> · <code class="i">JToolBar(String title)</code> · <code class="i">JToolBar(int how)</code> · <code class="i">JToolBar(String title, int how)</code>
+        <ul><li><b>title</b>: tiêu đề hiện khi toolbar đang trôi nổi; <b>how</b>: <code class="i">JToolBar.HORIZONTAL</code> hoặc <code class="i">VERTICAL</code>.</li></ul></li>
+      <li class="f">Thêm button (hoặc component khác) vào toolbar: dùng <code class="i">add()</code>.</li>
+    </ul>
+    <div>
+      <div class="win" id="tbw" style="width:100%;height:280px;position:relative"><div class="tb"><i></i><i></i><i></i><span>Toolbar Demo</span></div>
+        <div class="mbar"><span>File</span><span>Options</span><span>Debug</span></div>
+        <div class="jtb" id="jtb"><span class="grip">⋮</span><span class="tbb hovtip">🔴<span class="tip">Set Breakpoint</span></span><span class="tbb hovtip">⭕<span class="tip">Clear Breakpoint</span></span><span class="tbb hovtip">▶️<span class="tip">Resume</span></span></div>
+        <div class="tbfloat" id="tbf">Debug</div>
+      </div>
+      <div class="flow" style="gap:6px;margin-top:10px;flex-wrap:wrap"><span class="jb" data-dock="north">NORTH</span><span class="jb" data-dock="west">WEST</span><span class="jb" data-dock="east">EAST</span><span class="jb" data-dock="south">SOUTH</span><span class="jb" data-dock="float">Floating</span></div>
+      <span class="f ghost" data-act="#tbw|dk-west" data-say="Kéo toolbar sang cạnh trái: nó tự xoay thành <b>dọc</b>."></span>
+      <span class="f ghost" data-act="#tbw|dk-float" data-say="Kéo ra ngoài cửa sổ: toolbar thành cửa sổ nhỏ <b>free floating</b>, tiêu đề là <b>title</b> (“Debug”). Rê chuột lên các nút để xem tooltip."></span>
+      <p class="say">Nhấn → hoặc bấm các nút để đổi vị trí toolbar.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TOOLBAR CODE ===================== -->
+<section class="slide" id="toolbarcode" data-title="Create a Debug toolbar (code)">
+  <div class="hdr in"><span class="qn">1 · TOOLBAR</span><h2>Create a Debug toolbar</h2></div>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr">
+    <div>
+<script type="text/x-java" class="xxs" id="ktb" data-mark="2:a;4-6:b;8-10:c;11-16:d;18:e;19:f">
+// Create a Debug tool bar.
+JToolBar jtb = new JToolBar("Debug");
+// Load the images.
+ImageIcon set = new ImageIcon("setBP.gif");
+ImageIcon clear = new ImageIcon("clearBP.gif");
+ImageIcon resume = new ImageIcon("resume.gif");
+// Create the tool bar buttons.
+JButton jbtnSet = new JButton(set);
+jbtnSet.setActionCommand("Set Breakpoint");
+jbtnSet.setToolTipText("Set Breakpoint");
+JButton jbtnClear = new JButton(clear);
+jbtnClear.setActionCommand("Clear Breakpoint");
+jbtnClear.setToolTipText("Clear Breakpoint");
+JButton jbtnResume = new JButton(resume);
+jbtnResume.setActionCommand("Resume");
+jbtnResume.setToolTipText("Resume");
+// Add the buttons to the toolbar.
+jtb.add(jbtnSet); jtb.add(jbtnClear); jtb.add(jbtnResume);
+jfrm.add(jtb, BorderLayout.NORTH);
+</script>
+    </div>
+    <div>
+      <div class="win" style="width:100%"><div class="tb"><i></i><i></i><i></i><span>Menu Demo</span></div>
+        <div class="jtb ap" id="ttb" style="position:static"><span class="grip">⋮</span><span class="tbb ap" id="tt1">🔴</span><span class="tbb ap" id="tt2">⭕</span><span class="tbb ap" id="tt3">▶️</span></div>
+        <div class="bd" style="height:110px;display:flex;align-items:center;justify-content:center;color:#94a3b8">CENTER</div></div>
+      <span class="f ghost" data-act="#ktb|show-a" data-say="Tạo toolbar có tiêu đề “Debug” (hiện khi toolbar trôi nổi)."></span>
+      <span class="f ghost" data-act="#ktb|show-b" data-say="Nạp 3 ảnh .gif cho 3 nút."></span>
+      <span class="f ghost" data-act="#ktb|show-c" data-say="Nút <b>chỉ có icon</b> nên text rỗng → action command mặc định cũng rỗng. Vì vậy phải tự đặt <code class='i'>setActionCommand(&quot;Set Breakpoint&quot;)</code> để actionPerformed phân biệt được, và đặt <b>tooltip</b> để người dùng biết nút làm gì."></span>
+      <span class="f ghost" data-act="#ktb|show-d" data-say="Làm tương tự cho Clear và Resume."></span>
+      <span class="f ghost" data-act="#ktb|show-e;#tt1|show;#tt2|show;#tt3|show" data-say="Thêm 3 nút vào toolbar bằng <code class='i'>add()</code>. (Bài giảng thiếu dấu <b>;</b> ở cuối dòng 18; code full đã sửa.)"></span>
+      <span class="f ghost" data-act="#ktb|show-f;#ttb|show" data-say="Đặt toolbar ở vùng <b>NORTH</b> của content pane (BorderLayout) → có thể kéo sang cạnh khác. Frame nên dùng BorderLayout để toolbar kéo/thả được đúng."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MENUDEMOFULL PREVIEW ===================== -->
+<section class="slide" id="menufullpreview" data-title="MenuDemoFull – tất cả tính năng menu (thử)">
+  <div class="hdr in"><span class="qn">1 · TỔNG HỢP</span><h2>MenuDemoFull: gộp mọi tính năng</h2><span class="tag pink">bấm menu · chuột phải · Ctrl+O</span></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div data-menumock="full" data-toolbar="1" data-popup="1" id="mmF" style="width:440px;margin:0 auto"></div>
+    <div>
+      <table style="font-size:16.5px" class="in">
+        <tr><th>Tính năng</th><th>Code</th></tr>
+        <tr><td>Mnemonic</td><td><code class="i">setMnemonic(KeyEvent.VK_F)</code></td></tr>
+        <tr><td>Accelerator</td><td><code class="i">setAccelerator(KeyStroke…)</code></td></tr>
+        <tr><td>Icon + tooltip</td><td><code class="i">new JMenuItem("About", icon)</code></td></tr>
+        <tr><td>Check box item</td><td><code class="i">JCheckBoxMenuItem</code></td></tr>
+        <tr><td>Radio item</td><td><code class="i">JRadioButtonMenuItem</code> + <code class="i">ButtonGroup</code></td></tr>
+        <tr><td>Popup menu</td><td><code class="i">JPopupMenu</code> + <code class="i">MouseAdapter</code></td></tr>
+        <tr><td>Toolbar</td><td><code class="i">JToolBar</code> ở <code class="i">BorderLayout.NORTH</code></td></tr>
+      </table>
+      <div class="note f" style="font-size:17px">Code full ở slide sau gộp các đoạn code trong bài thành <b>một chương trình chạy được</b>. Nếu không có file ảnh (.gif), nút toolbar tự hiển thị chữ.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="full-MenuDemoFull" data-title="Code full: MenuDemoFull.java">
+  <div class="hdr in"><span class="qn">CODE FULL</span><h2>MenuDemoFull.java</h2><span class="grow"></span><button class="copy" data-copy="src-MenuDemoFull">📋 Copy code</button></div>
+  <p class="runhint in">MenuDemo mở rộng: mnemonic, accelerator, icon + tooltip, JCheckBoxMenuItem, JRadioButtonMenuItem, popup menu, toolbar.<br>Chạy: lưu thành <code>MenuDemoFull.java</code> → <code>javac MenuDemoFull.java</code> → <code>java MenuDemoFull</code> &nbsp;(Java 11+ chạy thẳng: <code>java MenuDemoFull.java</code>) · cuộn trong khung để xem hết.</p>
+<script type="text/x-java" class="full" id="src-MenuDemoFull">
+// MenuDemo extended with everything in part 2:
+// mnemonics, accelerators, icon + tooltip, JCheckBoxMenuItem,
+// JRadioButtonMenuItem, a popup menu and a toolbar.
+// Image files (AboutIcon.gif, setBP.gif, ...) are optional:
+// if a file is missing, the item/button simply shows its text.
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+public class MenuDemoFull implements ActionListener {
+    JLabel jlab;
+    JFrame jfrm;
+
+    MenuDemoFull() {
+        jfrm = new JFrame("Menu Demo");
+        jfrm.setSize(360, 240);
+        jfrm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // JFrame's default layout is BorderLayout: toolbar NORTH, label CENTER.
+        jlab = new JLabel("Right-click anywhere for the Edit popup.", JLabel.CENTER);
+
+        JMenuBar jmb = new JMenuBar();
+
+        // ---------- File menu: mnemonics + accelerators ----------
+        JMenu jmFile = new JMenu("File");
+        jmFile.setMnemonic(KeyEvent.VK_F);
+        JMenuItem jmiOpen = new JMenuItem("Open", KeyEvent.VK_O);
+        jmiOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
+                InputEvent.CTRL_DOWN_MASK));
+        JMenuItem jmiClose = new JMenuItem("Close", KeyEvent.VK_C);
+        jmiClose.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,
+                InputEvent.CTRL_DOWN_MASK));
+        JMenuItem jmiSave = new JMenuItem("Save", KeyEvent.VK_S);
+        jmiSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
+                InputEvent.CTRL_DOWN_MASK));
+        JMenuItem jmiExit = new JMenuItem("Exit", KeyEvent.VK_E);
+        jmiExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E,
+                InputEvent.CTRL_DOWN_MASK));
+        jmFile.add(jmiOpen); jmFile.add(jmiClose); jmFile.add(jmiSave);
+        jmFile.addSeparator(); jmFile.add(jmiExit);
+        jmb.add(jmFile);
+
+        // ---------- Options menu ----------
+        JMenu jmOptions = new JMenu("Options");
+        jmOptions.setMnemonic(KeyEvent.VK_O);
+        // Use check boxes for colors. This allows the user to select more than one color.
+        JMenu jmColors = new JMenu("Colors");
+        JCheckBoxMenuItem jmiRed = new JCheckBoxMenuItem("Red", true);
+        JCheckBoxMenuItem jmiGreen = new JCheckBoxMenuItem("Green", false);
+        JCheckBoxMenuItem jmiBlue = new JCheckBoxMenuItem("Blue", false);
+        jmColors.add(jmiRed); jmColors.add(jmiGreen); jmColors.add(jmiBlue);
+        jmOptions.add(jmColors);
+        // Use radio buttons for the priority setting: only one can be selected.
+        JMenu jmPriority = new JMenu("Priority");
+        JRadioButtonMenuItem jmiHigh = new JRadioButtonMenuItem("High", true);
+        JRadioButtonMenuItem jmiLow = new JRadioButtonMenuItem("Low");
+        jmPriority.add(jmiHigh); jmPriority.add(jmiLow);
+        jmOptions.add(jmPriority);
+        // Create button group for the radio button menu items.
+        ButtonGroup bg = new ButtonGroup();
+        bg.add(jmiHigh); bg.add(jmiLow);
+        JMenuItem jmiReset = new JMenuItem("Reset");
+        jmOptions.addSeparator(); jmOptions.add(jmiReset);
+        jmb.add(jmOptions);
+
+        // ---------- Help menu: image + tooltip ----------
+        JMenu jmHelp = new JMenu("Help");
+        jmHelp.setMnemonic(KeyEvent.VK_H);
+        ImageIcon icon = new ImageIcon("AboutIcon.gif");
+        JMenuItem jmiAbout = new JMenuItem("About", icon);
+        jmiAbout.setToolTipText("Info about the MenuDemo program.");
+        jmHelp.add(jmiAbout);
+        jmb.add(jmHelp);
+
+        // One listener (this) for every menu item.
+        JMenuItem[] all = { jmiOpen, jmiClose, jmiSave, jmiExit, jmiRed, jmiGreen,
+                jmiBlue, jmiHigh, jmiLow, jmiReset, jmiAbout };
+        for (JMenuItem mi : all) mi.addActionListener(this);
+
+        // ---------- Popup (Edit) menu ----------
+        JPopupMenu jpu = new JPopupMenu();
+        JMenuItem jmiCut = new JMenuItem("Cut");
+        JMenuItem jmiCopy = new JMenuItem("Copy");
+        JMenuItem jmiPaste = new JMenuItem("Paste");
+        jpu.add(jmiCut); jpu.add(jmiCopy); jpu.add(jmiPaste);
+        jmiCut.addActionListener(this);
+        jmiCopy.addActionListener(this);
+        jmiPaste.addActionListener(this);
+        // The popup trigger is mousePressed on Linux/macOS and mouseReleased on Windows,
+        // so both methods are checked. The listener is added to the label, which fills the window.
+        jlab.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent me) {
+                if (me.isPopupTrigger())
+                    jpu.show(me.getComponent(), me.getX(), me.getY());
+            }
+            public void mouseReleased(MouseEvent me) {
+                if (me.isPopupTrigger())
+                    jpu.show(me.getComponent(), me.getX(), me.getY());
+            }
+        });
+
+        // ---------- Debug toolbar ----------
+        JToolBar jtb = new JToolBar("Debug");
+        JButton jbtnSet = toolButton("setBP.gif", "Set");
+        jbtnSet.setActionCommand("Set Breakpoint");
+        jbtnSet.setToolTipText("Set Breakpoint");
+        JButton jbtnClear = toolButton("clearBP.gif", "Clear");
+        jbtnClear.setActionCommand("Clear Breakpoint");
+        jbtnClear.setToolTipText("Clear Breakpoint");
+        JButton jbtnResume = toolButton("resume.gif", "Resume");
+        jbtnResume.setActionCommand("Resume");
+        jbtnResume.setToolTipText("Resume");
+        jbtnSet.addActionListener(this);
+        jbtnClear.addActionListener(this);
+        jbtnResume.addActionListener(this);
+        jtb.add(jbtnSet); jtb.add(jbtnClear); jtb.add(jbtnResume);
+
+        jfrm.add(jtb, BorderLayout.NORTH);
+        jfrm.add(jlab, BorderLayout.CENTER);
+        jfrm.setJMenuBar(jmb);
+        jfrm.setVisible(true);
+    }
+
+    // Use the image if the file exists, otherwise fall back to text.
+    JButton toolButton(String file, String text) {
+        ImageIcon ii = new ImageIcon(file);
+        return ii.getIconWidth() > 0 ? new JButton(ii) : new JButton(text);
+    }
+
+    public void actionPerformed(ActionEvent ae) {
+        String comStr = ae.getActionCommand();
+        if (comStr.equals("Exit")) System.exit(0);
+        jlab.setText(comStr + " Selected");
+    }
+
+    public static void main(String args[]) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() { new MenuDemoFull(); }
+        });
+    }
+}
+</script>
+</section>
+
+<!-- ===================== SECTION DIALOG ===================== -->
+<section class="slide sec" id="secdialog" data-title="Plan – 2. Dialog window">
+  <div class="title-wrap">
+    <div class="kicker in">// Plan</div>
+    <div class="in" style="font-size:34px;line-height:1.7;font-weight:700">
+      <div style="opacity:.35">1. Menu</div>
+      <div><span class="grad">2. Dialog window</span></div>
+      <div style="opacity:.35">3. Other components: JFileChooser, JColorChooser</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DIALOG WINDOW ===================== -->
+<section class="slide" id="dialog1" data-title="Dialog window · Examples of Dialog windows">
+  <div class="hdr in"><span class="qn">2 · DIALOG</span><h2>Dialog window</h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+    <div>
+      <ul class="xs">
+        <li class="f">Là một <b>cửa sổ con độc lập</b>, dùng để đưa ra thông báo <b>tạm thời</b>, tách khỏi cửa sổ chính của ứng dụng Swing.</li>
+        <li class="f">Phần lớn dialog hiển thị <b>thông báo lỗi</b> hoặc <b>cảnh báo</b>, nhưng dialog có thể hiển thị hình ảnh, cây thư mục, hay gần như bất cứ thứ gì tương thích với ứng dụng Swing quản lý nó.</li>
+        <li class="f">Nhiều lớp component Swing có thể <b>trực tiếp</b> tạo và hiển thị dialog.</li>
+      </ul>
+      <h3 class="f" style="margin-top:12px">Examples of Dialog windows</h3>
+      <ul class="xs">
+        <li class="f">Dialog chuẩn, đơn giản: dùng lớp <code class="i">JOptionPane</code>.</li>
+        <li class="f">Lớp <code class="i">ProgressMonitor</code> hiển thị dialog cho biết <b>tiến độ</b> một thao tác.</li>
+        <li class="f"><code class="i">JColorChooser</code> và <code class="i">JFileChooser</code> cung cấp các dialog chuẩn.</li>
+        <li class="f">Hiển thị dialog in: dùng <b>Printing API</b>.</li>
+        <li class="f">Tạo dialog <b>tùy chỉnh</b>: dùng trực tiếp lớp <code class="i">JDialog</code>.</li>
+      </ul>
+    </div>
+    <div class="win" id="dlgFrame1" style="height:440px"><div class="tb"><i></i><i></i><i></i><span>Main application window</span></div>
+      <div class="bd" style="height:405px">
+        <div class="dlg ap" id="dx1" style="position:absolute;left:20px;top:16px;width:300px"><div class="tb">Message</div><div class="row"><div class="ico e">✕</div><div>File not found!</div></div><div class="btns"><span class="jb def">OK</span></div></div>
+        <div class="dlg ap" id="dx2" style="position:absolute;left:150px;top:150px;width:300px"><div class="tb">Progress</div><div style="padding:14px">Copying files… 62%<div style="height:14px;border:1px solid #98a2b6;background:#fff;margin-top:8px"><div style="width:62%;height:100%;background:#2563eb"></div></div></div><div class="btns"><span class="jb">Cancel</span></div></div>
+        <div class="dlg ap" id="dx3" style="position:absolute;left:60px;top:265px;width:340px"><div class="tb">Open</div><div style="padding:10px;font-size:13px;line-height:1.5">📁 Documents<br>📄 report.txt</div><div class="btns"><span class="jb">Cancel</span><span class="jb def">Open</span></div></div>
+      </div></div>
+  </div>
+  <span class="f ghost" data-o="5" data-act="#dx1|show"></span>
+  <span class="f ghost" data-o="6" data-act="#dx2|show"></span>
+  <span class="f ghost" data-o="7" data-act="#dx3|show"></span>
+</section>
+
+<!-- ===================== OVERVIEW OF DIALOGS ===================== -->
+<section class="slide" id="dialog2" data-title="Overview of Dialogs [1][2] – owner frame, modal">
+  <div class="hdr in"><span class="qn">2 · DIALOG</span><h2>Overview of Dialogs [1] [2]</h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr">
+    <ul class="xs">
+      <li class="f">Mọi dialog <b>phụ thuộc</b> vào một Frame:
+        <ul><li>Khi Frame bị <b>hủy</b>: các dialog phụ thuộc cũng bị hủy.</li>
+        <li>Khi Frame bị <b>thu nhỏ</b> (iconified): các dialog phụ thuộc cũng biến khỏi màn hình.</li>
+        <li>Khi Frame được <b>phục hồi</b> (deiconified): các dialog quay lại màn hình.</li>
+        <li>Lớp <code class="i">JDialog</code> của Swing thừa hưởng hành vi này từ lớp AWT <code class="i">Dialog</code>.</li></ul></li>
+      <li class="f">Dialog có thể là <b>modal</b> (chặn mọi input tới các cửa sổ khác cho tới khi đóng).
+        <ul><li><code class="i">JOptionPane</code> tạo các JDialog <b>modal</b>.</li><li>Muốn dialog <b>không modal</b>: dùng trực tiếp lớp <code class="i">JDialog</code>.</li></ul></li>
+      <li class="f">Từ <b>JDK 7</b>: có thể thay đổi hành vi modality bằng <b>Modality API</b> mới (<code class="i">Dialog.ModalityType</code>).</li>
+      <li class="f"><code class="i">JDialog</code> là lớp con của AWT <code class="i">java.awt.Dialog</code>: bổ sung một <b>root pane container</b> và hỗ trợ <b>default close operation</b>.</li>
+      <li class="f">Khi dùng <code class="i">JOptionPane</code>, bạn <b>vẫn đang dùng JDialog</b> ở hậu trường: JOptionPane chỉ là một container tự động tạo JDialog và tự thêm nó vào content pane của JDialog đó.</li>
+    </ul>
+    <div>
+      <div style="position:relative;height:300px;border:2px dashed #e4dcfb;border-radius:14px;background:#fbfaff" id="dsk">
+        <span class="muted" style="position:absolute;left:10px;top:6px;font-size:13px">màn hình (desktop)</span>
+        <div class="win" id="ownF" style="position:absolute;left:24px;top:34px;width:300px;height:200px;transition:all .45s"><div class="tb"><i></i><i></i><i></i><span>Owner Frame</span></div><div class="bd">Cửa sổ chính</div></div>
+        <div class="dlg" id="ownD" style="position:absolute;left:170px;top:120px;width:220px;transition:all .45s"><div class="tb">Dependent JDialog</div><div class="row" style="padding:10px"><div class="ico i">i</div><div>Tôi thuộc Owner Frame</div></div></div>
+        <div id="dock" style="position:absolute;left:0;right:0;bottom:0;height:34px;background:#e2e8f0;border-radius:0 0 12px 12px;display:flex;align-items:center;padding-left:10px;gap:8px;font-size:13px"><span id="dockIcon" style="opacity:0;transition:opacity .3s" class="pill v">🗔 Owner Frame</span></div>
+      </div>
+      <div class="flow" style="gap:8px;margin-top:10px"><span class="jb" data-own="iconify">Iconify frame</span><span class="jb" data-own="restore">Deiconify</span><span class="jb" data-own="dispose">Dispose frame</span><span class="jb" data-own="reset">↺</span></div>
+      <p id="ownSay" style="min-height:40px;font-size:18px;margin-top:10px;color:var(--muted)">Bấm các nút để thấy dialog đi theo frame của nó.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== JOPTIONPANE FEATURES ===================== -->
+<section class="slide" id="jopfeat" data-title="JOptionPane Features – icons">
+  <div class="hdr in"><span class="qn">2 · JOPTIONPANE</span><h2>JOptionPane Features</h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr">
+    <ul class="sm">
+      <li class="f"><code class="i">JOptionPane</code> hỗ trợ sắp xếp các dialog chuẩn, cung cấp <b>icon</b>, chỉ định <b>tiêu đề</b> và <b>nội dung</b> dialog, và tùy biến <b>text của button</b>.</li>
+      <li class="f">Cho phép tùy biến các component mà dialog hiển thị và chỉ định <b>vị trí</b> dialog xuất hiện trên màn hình.</li>
+      <li class="f">Thậm chí có thể yêu cầu option pane tự đặt vào một <b>internal frame</b> (<code class="i">JInternalFrame</code>) thay vì JDialog (các method <code class="i">showInternalXxxDialog</code>).</li>
+    </ul>
+    <table class="f" style="font-size:17px;text-align:center">
+      <tr><th colspan="3" style="text-align:center">Icons used by JOptionPane</th></tr>
+      <tr><th>Icon description</th><th>Java look and feel</th><th>Windows look and feel</th></tr>
+      <tr><td>question</td><td><div class="ico q" style="margin:auto;width:34px;height:34px;font-size:20px;border-radius:6px">?</div></td><td><div class="ico i" style="margin:auto;width:34px;height:34px;font-size:20px;background:#3b82f6">?</div></td></tr>
+      <tr><td>information</td><td><div class="ico i" style="margin:auto;width:34px;height:34px;font-size:20px;background:#a5b4fc">i</div></td><td><div class="ico i" style="margin:auto;width:34px;height:34px;font-size:20px">i</div></td></tr>
+      <tr><td>warning</td><td><div class="ico w" style="margin:auto;width:36px;height:32px;font-size:18px;padding-top:8px">!</div></td><td><div class="ico w" style="margin:auto;width:36px;height:32px;font-size:18px;padding-top:8px;background:#facc15;color:#111">!</div></td></tr>
+      <tr><td>error</td><td><div class="ico e" style="margin:auto;width:34px;height:34px;font-size:18px;background:#f87171">✕</div></td><td><div class="ico e" style="margin:auto;width:34px;height:34px;font-size:18px">✕</div></td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== SHOWMESSAGEDIALOG EXAMPLE ===================== -->
+<section class="slide" id="jopex" data-title="Example: showMessageDialog">
+  <div class="hdr in"><span class="qn">2 · JOPTIONPANE</span><h2>Example: <code class="i" style="font-size:30px">showMessageDialog</code></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+      <div class="code f" style="font-size:19px"><div class="ln"><span class="no">1</span><span><span class="t">JOptionPane</span>.<span class="fn">showMessageDialog</span>(frame,</span></div><div class="ln"><span class="no">2</span><span>        <span class="s">"Eggs are not supposed to be green."</span>);</span></div></div>
+      <ul class="xs" style="margin-top:14px">
+        <li class="f"><b>frame</b>: cửa sổ cha; dialog hiện <b>giữa</b> cửa sổ này. Truyền <code class="i">null</code> thì dialog hiện giữa màn hình.</li>
+        <li class="f">Là phương thức <b>static</b>: không cần <code class="i">new JOptionPane()</code>.</li>
+        <li class="f">Dialog <b>modal</b>: dòng lệnh tiếp theo chỉ chạy <b>sau khi</b> người dùng bấm OK hoặc đóng dialog.</li>
+        <li class="f">Mặc định: tiêu đề “Message”, icon <b>information</b>, một nút <b>OK</b>.</li>
+      </ul>
+    </div>
+    <div class="win" style="height:300px"><div class="tb"><i></i><i></i><i></i><span>frame</span></div>
+      <div class="bd" style="height:265px;display:flex;align-items:center;justify-content:center"><span class="jb" data-jop="msg1">Mở showMessageDialog</span>
+        <div class="overlay" id="ovEx"></div></div></div>
+  </div>
+  <span class="f ghost" data-act="#ovEx|show" data-o="9" data-say=""></span>
+</section>
+
+<!-- ===================== JOPTIONPANE METHODS ===================== -->
+<section class="slide" id="jopmethods" data-title="Methods of JOptionPane – showXxxDialog (thử)">
+  <div class="hdr in"><span class="qn">2 · JOPTIONPANE</span><h2>Methods of JOptionPane</h2><span class="tag pink">bấm để mở dialog</span></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr">
+    <div>
+      <table class="in" style="font-size:17.5px">
+        <tr><th>Method</th><th>Mục đích</th><th>Trả về</th></tr>
+        <tr><td>showConfirmDialog()</td><td>Hỏi một câu xác nhận, như yes/no/cancel.</td><td><code class="i">int</code></td></tr>
+        <tr><td>showInputDialog()</td><td>Yêu cầu nhập một giá trị.</td><td><code class="i">String</code>/<code class="i">Object</code></td></tr>
+        <tr><td>showMessageDialog()</td><td>Báo cho người dùng biết điều gì đó đã xảy ra.</td><td><code class="i">void</code></td></tr>
+        <tr><td>showOptionDialog()</td><td>“Grand Unification” của ba loại trên.</td><td><code class="i">int</code></td></tr>
+      </table>
+      <p class="f" style="margin-top:12px">→ Gọi chung là <b>showXxxDialog</b>.</p>
+      <div class="console f" id="jopLog" style="margin-top:10px;min-height:120px;font-size:14px">// giá trị trả về
+</div>
+    </div>
+    <div class="win" style="height:470px"><div class="tb"><i></i><i></i><i></i><span>JOptionPane Demo</span></div>
+      <div class="bd" style="height:435px">
+        <div class="flow"><span class="jb" data-jop="message">Message</span><span class="jb" data-jop="confirm">Confirm</span><span class="jb" data-jop="option">Option</span><span class="jb" data-jop="input">Input</span></div>
+        <div class="overlay" id="ovM"></div></div></div>
+  </div>
+</section>
+
+<!-- ===================== ARGUMENTS ===================== -->
+<section class="slide" id="jopargs" data-title="Arguments of showXxxDialog [1][2]">
+  <div class="hdr in"><span class="qn">2 · JOPTIONPANE</span><h2>Arguments of showXxxDialog [1] [2]</h2></div>
+  <table class="in" style="font-size:16.5px">
+    <tr><th>Tham số</th><th>Ý nghĩa</th><th>Giá trị</th></tr>
+    <tr class="f"><td>Component parentComponent</td><td>Component cha, phải là một Frame, một component nằm trong Frame, hoặc null.</td><td><code class="i">frame</code>, <code class="i">null</code></td></tr>
+    <tr class="f"><td>Object message</td><td>Nội dung hiển thị ở <b>vùng chính</b> của dialog.</td><td>thường là String</td></tr>
+    <tr class="f"><td>String title</td><td><b>Tiêu đề</b> của dialog.</td><td>“A Silly Question”</td></tr>
+    <tr class="f"><td>int optionType</td><td>Tập <b>nút</b> xuất hiện ở đáy dialog.</td><td><code class="i">DEFAULT_OPTION</code>, <code class="i">YES_NO_OPTION</code>, <code class="i">YES_NO_CANCEL_OPTION</code>, <code class="i">OK_CANCEL_OPTION</code></td></tr>
+    <tr class="f"><td>int messageType</td><td>Quyết định <b>icon</b> hiển thị.</td><td><code class="i">PLAIN_MESSAGE</code> (không icon), <code class="i">ERROR_MESSAGE</code>, <code class="i">INFORMATION_MESSAGE</code>, <code class="i">WARNING_MESSAGE</code>, <code class="i">QUESTION_MESSAGE</code></td></tr>
+    <tr class="f"><td>Icon icon</td><td>Icon tự chọn để hiển thị.</td><td><code class="i">null</code> = icon theo messageType</td></tr>
+    <tr class="f"><td>Object[] options</td><td>Chuỗi hiển thị trên <b>từng nút</b> ở đáy dialog.</td><td><code class="i">{"Yes, please", …}</code></td></tr>
+    <tr class="f"><td>Object initialValue</td><td>Giá trị (nút) <b>được chọn mặc định</b>.</td><td><code class="i">options[2]</code></td></tr>
+  </table>
+</section>
+
+<!-- ===================== SHOWOPTIONDIALOG ===================== -->
+<section class="slide" id="jopoption" data-title="Example: showOptionDialog – custom button text">
+  <div class="hdr in"><span class="qn">2 · JOPTIONPANE</span><h2>Example: custom button text</h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+    <div>
+<script type="text/x-java" class="xs" id="kop" data-mark="2-3:a;4:b;5:c;6:d;7:e;7-8:f">
+//Custom button text
+Object[] options = {"Yes, please", "No, thanks",
+           "No eggs, no ham!"};
+int n = JOptionPane.showOptionDialog(frame,
+    "Would you like some green eggs to go with that ham?",
+    "A Silly Question", JOptionPane.YES_NO_CANCEL_OPTION,
+          JOptionPane.QUESTION_MESSAGE, null, options,
+          options[2]);
+</script>
+      <div class="vars"><span class="vc" id="opN"><b>n</b> = ?</span></div>
+      <p class="say">Nhấn → để chạy từng bước, hoặc bấm nút trong dialog.</p>
+    </div>
+    <div class="win" style="height:330px"><div class="tb"><i></i><i></i><i></i><span>frame</span></div>
+      <div class="bd" style="height:295px">
+        <div class="dlg" style="position:absolute;left:12px;right:12px;top:40px">
+          <div class="tb glow" id="opT">A Silly Question</div>
+          <div class="row"><div class="ico q glow" id="opI">?</div><div class="glow" id="opM" style="padding:4px">Would you like some green eggs to go with that ham?</div></div>
+          <div class="btns glow" id="opB" style="justify-content:flex-start"><span class="jb" data-opt="0">Yes, please</span><span class="jb" data-opt="1">No, thanks</span><span class="jb glow" id="opD" data-opt="2">No eggs, no ham!</span></div></div></div></div>
+  </div>
+  <span class="f ghost" data-act="#kop|show-a" data-now="#opB|hot" data-say="Mảng <code class='i'>options</code>: mỗi phần tử là text của một nút (thay cho Yes/No/Cancel)."></span>
+  <span class="f ghost" data-act="#kop|show-b" data-say="<code class='i'>showOptionDialog</code> trả về <b>chỉ số</b> nút được bấm trong mảng options (0, 1, 2), hoặc <code class='i'>CLOSED_OPTION</code> (−1) nếu đóng dialog."></span>
+  <span class="f ghost" data-act="#kop|show-c" data-now="#opM|hot" data-say="Tham số <b>message</b>."></span>
+  <span class="f ghost" data-act="#kop|show-d" data-now="#opT|hot" data-say="Tham số <b>title</b> và <b>optionType</b>. Khi đã truyền options thì optionType gần như bị bỏ qua."></span>
+  <span class="f ghost" data-act="#kop|show-e" data-now="#opI|hot" data-say="<code class='i'>QUESTION_MESSAGE</code> chọn icon dấu hỏi; icon = <code class='i'>null</code> nghĩa là dùng icon mặc định của messageType."></span>
+  <span class="f ghost" data-act="#kop|show-f;#opD|def" data-now="#opD|hot" data-set="#opN::<b>n</b> = 2 nếu bấm “No eggs, no ham!”" data-say="<code class='i'>initialValue = options[2]</code>: nút “No eggs, no ham!” là nút <b>mặc định</b> (có focus, nhấn Enter là chọn)."></span>
+</section>
+
+<!-- ===================== SHOWINPUTDIALOG ===================== -->
+<section class="slide" id="jopinput" data-title="Obtaining user input from a dialog window (showInputDialog)">
+  <div class="hdr in"><span class="qn">2 · JOPTIONPANE</span><h2>Obtaining user input from a dialog window</h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+    <div>
+      <ul class="xs"><li class="f">Chỉ <b>showInputDialog</b> trả về một <code class="i">Object</code>.
+        <ul><li>Object này thường là một <b>String</b> phản ánh lựa chọn/nội dung người dùng nhập (là <code class="i">null</code> nếu bấm Cancel).</li></ul></li></ul>
+<script type="text/x-java" class="xs" id="kin" data-mark="1-4:a;6-9:b">
+String name = JOptionPane.showInputDialog(frame,
+                  "Please enter your name: ",
+                  "Personal information",
+                   JOptionPane.QUESTION_MESSAGE);
+
+JOptionPane.showMessageDialog(frame, "Your name is " + name,
+                  "Your information",
+                   JOptionPane.INFORMATION_MESSAGE);
+</script>
+      <div class="vars"><span class="vc" id="inN"><b>name</b> = ?</span></div>
+      <span class="f ghost" data-act="#kin|show-a" data-say="Dialog có ô nhập, nút OK và Cancel. Chương trình <b>dừng chờ</b> ở dòng này. <b>Hãy gõ tên rồi bấm OK</b> trong cửa sổ bên phải."></span>
+      <span class="f ghost" data-act="#kin|show-b" data-say="Sau khi có <code class='i'>name</code>, hiện dialog thông báo “Your name is …” với icon information. Nên kiểm tra <code class='i'>name != null</code> trước khi dùng."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+    <div class="win" style="height:330px"><div class="tb"><i></i><i></i><i></i><span>frame (Result)</span></div>
+      <div class="bd" style="height:295px;display:flex;align-items:center;justify-content:center"><span class="jb" data-jop="input2">Chạy lại showInputDialog</span>
+        <div class="overlay" id="ovIn"></div></div></div>
+  </div>
+</section>
+
+<section class="slide" id="full-OptionPaneDemo" data-title="Code full: OptionPaneDemo.java">
+  <div class="hdr in"><span class="qn">CODE FULL</span><h2>OptionPaneDemo.java</h2><span class="grow"></span><button class="copy" data-copy="src-OptionPaneDemo">📋 Copy code</button></div>
+  <p class="runhint in">Bốn nút gọi showMessageDialog, showConfirmDialog, showOptionDialog, showInputDialog và hiển thị giá trị trả về.<br>Chạy: lưu thành <code>OptionPaneDemo.java</code> → <code>javac OptionPaneDemo.java</code> → <code>java OptionPaneDemo</code> &nbsp;(Java 11+ chạy thẳng: <code>java OptionPaneDemo.java</code>) · cuộn trong khung để xem hết.</p>
+<script type="text/x-java" class="full" id="src-OptionPaneDemo">
+// The four showXxxDialog() methods of JOptionPane.
+import java.awt.*;
+import javax.swing.*;
+
+public class OptionPaneDemo {
+    JFrame frame;
+    JLabel jlab = new JLabel("Click a button to open a dialog.");
+
+    OptionPaneDemo() {
+        frame = new JFrame("JOptionPane Demo");
+        frame.setLayout(new FlowLayout());
+        frame.setSize(520, 130);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
+
+        JButton jbMessage = new JButton("Message");
+        JButton jbConfirm = new JButton("Confirm");
+        JButton jbOption = new JButton("Option");
+        JButton jbInput = new JButton("Input");
+
+        // 1. showMessageDialog: tell the user about something.
+        jbMessage.addActionListener(e ->
+            JOptionPane.showMessageDialog(frame,
+                    "Eggs are not supposed to be green."));
+
+        // 2. showConfirmDialog: yes / no / cancel question.
+        jbConfirm.addActionListener(e -> {
+            int r = JOptionPane.showConfirmDialog(frame,
+                    "Would you like green eggs and ham?",
+                    "An Inane Question", JOptionPane.YES_NO_CANCEL_OPTION);
+            String s = r == JOptionPane.YES_OPTION ? "YES"
+                     : r == JOptionPane.NO_OPTION ? "NO"
+                     : r == JOptionPane.CANCEL_OPTION ? "CANCEL" : "CLOSED";
+            jlab.setText("showConfirmDialog returned " + r + " (" + s + ")");
+        });
+
+        // 3. showOptionDialog: custom button text.
+        jbOption.addActionListener(e -> {
+            Object[] options = {"Yes, please", "No, thanks",
+                    "No eggs, no ham!"};
+            int n = JOptionPane.showOptionDialog(frame,
+                    "Would you like some green eggs to go with that ham?",
+                    "A Silly Question", JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, options,
+                    options[2]);
+            jlab.setText("showOptionDialog returned index " + n
+                    + (n >= 0 ? " = \"" + options[n] + "\"" : " (closed)"));
+        });
+
+        // 4. showInputDialog: the only one that returns an Object (a String here).
+        jbInput.addActionListener(e -> {
+            String name = JOptionPane.showInputDialog(frame,
+                    "Please enter your name: ",
+                    "Personal information",
+                    JOptionPane.QUESTION_MESSAGE);
+            if (name != null) {          // null when the user presses Cancel
+                JOptionPane.showMessageDialog(frame, "Your name is " + name,
+                        "Your information",
+                        JOptionPane.INFORMATION_MESSAGE);
+                jlab.setText("Name = " + name);
+            } else {
+                jlab.setText("Input cancelled.");
+            }
+        });
+
+        frame.add(jbMessage); frame.add(jbConfirm);
+        frame.add(jbOption); frame.add(jbInput);
+        frame.add(jlab);
+        frame.setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() { new OptionPaneDemo(); }
+        });
+    }
+}
+</script>
+</section>
+
+<!-- ===================== CUSTOM DIALOG ===================== -->
+<section class="slide" id="custom1" data-title="Create a custom dialog – class MyDialog extends JDialog">
+  <div class="hdr in"><span class="qn">2 · JDIALOG</span><h2>Create a custom dialog</h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr">
+    <div>
+      <ul class="sm"><li class="f">Tạo một lớp <b>kế thừa JDialog</b>.</li></ul>
+<script type="text/x-java" class="xs" id="kmy" data-mark="1:a;2:b;4:c;6:d;8:e;10:f;12:g">
+public class MyDialog extends JDialog {
+    MyDialog(JFrame parent, String title, boolean modal){
+          // We call the corresponding JDialog constructor
+        super(parent, title, modal);
+        // We specify the size of the dialog
+        this.setSize(200, 80);
+        // The position
+        this.setLocationRelativeTo(null);
+        // The box should not be resizable
+        this.setResizable(false);
+        // Finally we display it
+        this.setVisible(true);
+    }
+}
+</script>
+    </div>
+    <div>
+      <div style="position:relative;height:270px;border:2px dashed #e4dcfb;border-radius:14px;background:#fbfaff"><span class="muted" style="position:absolute;left:10px;top:6px;font-size:13px">màn hình</span>
+        <div class="dlg ap" id="myD" style="position:absolute;left:30px;top:40px;width:240px;transition:all .5s"><div class="tb" id="myT">(title)</div><div style="height:70px"></div></div>
+        <span class="pill ap" id="myS" style="position:absolute;left:280px;top:60px">200 × 80</span>
+      </div>
+      <span class="f ghost" data-act="#kmy|show-a" data-say="<code class='i'>MyDialog</code> <b>là một</b> JDialog → có sẵn mọi khả năng của dialog (title, modal, content pane…)."></span>
+      <span class="f ghost" data-act="#kmy|show-b" data-say="Constructor nhận <b>parent</b> (frame sở hữu), <b>title</b>, <b>modal</b>."></span>
+      <span class="f ghost" data-act="#kmy|show-c;#myD|show" data-set="#myT::Hello, my dialog" data-say="<code class='i'>super(parent, title, modal)</code> gọi constructor <code class='i'>JDialog(Frame owner, String title, boolean modal)</code>; phải là lệnh <b>đầu tiên</b> trong constructor."></span>
+      <span class="f ghost" data-act="#kmy|show-d;#myS|show" data-say="Đặt kích thước 200 × 80."></span>
+      <span class="f ghost" data-act="#kmy|show-e;#myD|center" data-say="<code class='i'>setLocationRelativeTo(null)</code>: đặt dialog ở <b>giữa màn hình</b> (truyền một component thì đặt giữa component đó)."></span>
+      <span class="f ghost" data-act="#kmy|show-f" data-say="<code class='i'>setResizable(false)</code>: người dùng không kéo giãn được."></span>
+      <span class="f ghost" data-act="#kmy|show-g" data-say="<code class='i'>setVisible(true)</code>: hiện dialog. Với dialog <b>modal</b>, lệnh này <b>chặn</b> (không trả về) cho tới khi dialog đóng."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MYDIALOGDEMO ===================== -->
+<section class="slide" id="custom2" data-title="MyDialogDemo – mở dialog modal từ JFrame">
+  <div class="hdr in"><span class="qn">2 · JDIALOG</span><h2>MyDialogDemo: mở dialog từ frame</h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr">
+    <div>
+<script type="text/x-java" class="xxs" id="kmd" data-mark="1-3:a;5-9:b;10-14:c;12:d;17-19:e">
+public class MyDialogDemo extends JFrame {
+private JButton button = new
+                                JButton("Invoke MyDialog");
+public MyDialogDemo() {
+     setTitle("My JFrame"); setSize(300, 100);
+     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+     setLocationRelativeTo(null);
+     getContentPane().setLayout(new FlowLayout());
+     getContentPane().add(button);
+     button.addActionListener(new ActionListener(){
+          public void actionPerformed(ActionEvent ae) {
+               new MyDialog(null, "Hello, my dialog", true);
+           }
+     });
+     this.setVisible(true);
+}
+public static void main(String[] args){
+     new MyDialogDemo();
+}
+</script>
+    </div>
+    <div>
+      <div class="win" id="mdF" style="height:330px"><div class="tb"><i></i><i></i><i></i><span>My JFrame</span></div>
+        <div class="bd" style="height:295px"><div class="flow"><span class="jb" id="mdBtn">Invoke MyDialog</span></div>
+          <div class="overlay" id="ovMy"><div class="dlg" style="width:250px"><div class="tb">Hello, my dialog</div><div style="padding:16px;text-align:center">(MyDialog: modal)</div><div class="btns" style="justify-content:center"><span class="jb" id="mdClose">✕ đóng</span></div></div></div></div></div>
+      <p class="muted" id="mdSay" style="font-size:16px;margin-top:6px">Bấm nút trong frame. Khi dialog modal đang mở, thử bấm vào frame: không được.</p>
+      <span class="f ghost" data-act="#kmd|show-a" data-say="Button là <b>field</b> khởi tạo ngay khi khai báo."></span>
+      <span class="f ghost" data-act="#kmd|show-b" data-say="Lớp kế thừa JFrame; content pane dùng FlowLayout và chứa button."></span>
+      <span class="f ghost" data-act="#kmd|show-c" data-say="Bấm button → tạo <code class='i'>MyDialog</code>. Constructor của MyDialog tự <code class='i'>setVisible(true)</code> nên dialog hiện ngay."></span>
+      <span class="f ghost" data-act="#kmd|show-d;#ovMy|show" data-say="Ở đây parent = <code class='i'>null</code> (dialog không có frame chủ). <code class='i'>modal = true</code> → frame bị chặn input cho tới khi đóng dialog. Code full truyền <code class='i'>MyDialogDemo.this</code> làm parent."></span>
+      <span class="f ghost" data-act="#kmd|show-e" data-say="main tạo frame trực tiếp (bài giảng không dùng invokeLater; code full đã bổ sung cho đúng quy tắc EDT)."></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== IMPROVED ===================== -->
+<section class="slide" id="custom3" data-title="Example (improved version) – initComponent()">
+  <div class="hdr in"><span class="qn">2 · JDIALOG</span><h2>Example (improved version)</h2></div>
+  <div class="cols" style="grid-template-columns:1.2fr 1fr">
+    <div>
+<script type="text/x-java" class="xs" id="kim" data-mark="7:a;10-15:b;8:c">
+public class MyDialog extends JDialog {
+    MyDialog(JFrame parent, String title, boolean modal){
+          super(parent, title, modal);
+        this.setSize(200, 80);
+        this.setLocationRelativeTo(null);
+        this.setResizable(false);
+           this.initComponent();
+        this.setVisible(true);
+    }
+    public void initComponent() {
+          /* initialize components and add them into the
+            content pane by calling
+            this.getContentPane().add(...);
+          */
+    }
+}
+</script>
+    </div>
+    <div>
+      <span class="f ghost" data-act="#kim|show-a" data-say="Tách việc tạo component ra phương thức riêng <b>initComponent()</b>, gọi trước <code class='i'>setVisible(true)</code>."></span>
+      <span class="f ghost" data-act="#kim|show-b" data-say="Trong initComponent: tạo label, text field, button… và thêm vào content pane bằng <code class='i'>this.getContentPane().add(...)</code>."></span>
+      <span class="f ghost" data-act="#kim|show-c" data-say="Thứ tự quan trọng: <b>thêm component trước, hiển thị sau</b>. Với dialog modal, code sau <code class='i'>setVisible(true)</code> chỉ chạy khi dialog đã đóng."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+      <div class="code xxs f" style="margin-top:8px"><div class="ln"><span class="no">1</span><span><span class="c">// ví dụ thân initComponent() trong code full</span></span></div><div class="ln"><span class="no">2</span><span><span class="k">this</span>.<span class="fn">getContentPane</span>().<span class="fn">setLayout</span>(<span class="k">new</span> <span class="t">FlowLayout</span>());</span></div><div class="ln"><span class="no">3</span><span><span class="k">this</span>.<span class="fn">getContentPane</span>().<span class="fn">add</span>(<span class="k">new</span> <span class="t">JLabel</span>(<span class="s">"This is MyDialog."</span>));</span></div><div class="ln"><span class="no">4</span><span><span class="t">JButton</span> jbClose = <span class="k">new</span> <span class="t">JButton</span>(<span class="s">"Close"</span>);</span></div><div class="ln"><span class="no">5</span><span>jbClose.<span class="fn">addActionListener</span>(e -&gt; <span class="fn">dispose</span>());</span></div><div class="ln"><span class="no">6</span><span><span class="k">this</span>.<span class="fn">getContentPane</span>().<span class="fn">add</span>(jbClose);</span></div></div>
+      <div class="dlg f" style="width:250px;margin:12px auto 0"><div class="tb">Hello, my dialog</div><div style="padding:12px;text-align:center">This is MyDialog. <span class="jb">Close</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="full-MyDialogDemo" data-title="Code full: MyDialogDemo.java">
+  <div class="hdr in"><span class="qn">CODE FULL</span><h2>MyDialogDemo.java</h2><span class="grow"></span><button class="copy" data-copy="src-MyDialogDemo">📋 Copy code</button></div>
+  <p class="runhint in">MyDialogDemo (JFrame) mở MyDialog (extends JDialog, phiên bản improved có initComponent) ở chế độ modal.<br>Chạy: lưu thành <code>MyDialogDemo.java</code> → <code>javac MyDialogDemo.java</code> → <code>java MyDialogDemo</code> &nbsp;(Java 11+ chạy thẳng: <code>java MyDialogDemo.java</code>) · cuộn trong khung để xem hết.</p>
+<script type="text/x-java" class="full" id="src-MyDialogDemo">
+// A custom dialog: a class that extends JDialog (improved version with initComponent()).
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+public class MyDialogDemo extends JFrame {
+    private JButton button = new
+            JButton("Invoke MyDialog");
+
+    public MyDialogDemo() {
+        setTitle("My JFrame"); setSize(300, 100);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        getContentPane().setLayout(new FlowLayout());
+        getContentPane().add(button);
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                // parent = this frame, modal = true
+                new MyDialog(MyDialogDemo.this, "Hello, my dialog", true);
+            }
+        });
+        this.setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() { new MyDialogDemo(); }
+        });
+    }
+}
+
+class MyDialog extends JDialog {
+    MyDialog(JFrame parent, String title, boolean modal) {
+        // We call the corresponding JDialog constructor
+        super(parent, title, modal);
+        // We specify the size of the dialog
+        this.setSize(240, 110);
+        // The position
+        this.setLocationRelativeTo(null);
+        // The box should not be resizable
+        this.setResizable(false);
+        this.initComponent();
+        // Finally we display it (a modal dialog blocks here until it is closed)
+        this.setVisible(true);
+    }
+
+    public void initComponent() {
+        // Initialize components and add them into the content pane.
+        this.getContentPane().setLayout(new FlowLayout());
+        this.getContentPane().add(new JLabel("This is MyDialog."));
+        JButton jbClose = new JButton("Close");
+        jbClose.addActionListener(e -> dispose());
+        this.getContentPane().add(jbClose);
+    }
+}
+</script>
+</section>
+
+<!-- ===================== SECTION OTHER ===================== -->
+<section class="slide sec" id="secother" data-title="Plan – 3. Other components">
+  <div class="title-wrap">
+    <div class="kicker in">// Plan</div>
+    <div class="in" style="font-size:34px;line-height:1.7;font-weight:700">
+      <div style="opacity:.35">1. Menu</div>
+      <div style="opacity:.35">2. Dialog window</div>
+      <div><span class="grad">3. Other components: JFileChooser, JColorChooser</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FILE CHOOSER ===================== -->
+<section class="slide" id="filechooser" data-title="File Choosers + Example">
+  <div class="hdr in"><span class="qn">3 · CHOOSERS</span><h2>File Choosers</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr">
+    <div>
+      <ul class="xs">
+        <li class="f">Cung cấp GUI để <b>duyệt hệ thống file</b>, rồi chọn một file/thư mục từ danh sách, hoặc gõ tên file/thư mục.</li>
+        <li class="f">Hiển thị file chooser: dùng API <code class="i">JFileChooser</code> để hiện một <b>dialog modal</b> chứa file chooser.
+          <ul><li>Cách khác: thêm một instance JFileChooser vào một container.</li></ul></li>
+        <li class="f">API JFileChooser giúp dễ dàng tạo dialog <b>open</b> và <b>save</b>.</li>
+        <li class="f">Tìm hiểu thêm: Oracle Java Tutorial, mục <b>How to Use File Choosers</b> (<code class="i">…/uiswing/components/filechooser.html</code>)</li>
+      </ul>
+<script type="text/x-java" class="xxs" id="kfc" data-mark="2:a;5:b;9-11:c;12-14:d">
+//Create a file chooser
+final JFileChooser fc = new JFileChooser();
+// ...
+//In response to a button click:
+int returnVal = fc.showOpenDialog(aComponent);
+// ...
+if (returnVal == JFileChooser.APPROVE_OPTION) {
+    File file = fc.getSelectedFile();
+    // ...
+} else {
+    // ...
+}
+</script>
+    </div>
+    <div>
+      <div class="win" style="height:370px"><div class="tb"><i></i><i></i><i></i><span>File Chooser Demo</span></div>
+        <div class="bd" style="height:335px"><div class="flow"><span class="jb" id="fcOpen">Open...</span><span class="jl" id="fcRes">No file chosen.</span></div>
+          <div class="overlay" id="ovFc"><div class="dlg" style="width:360px"><div class="tb">Open</div>
+            <div style="padding:8px 12px;font-size:13px">Look in: <b>📁 Documents ▾</b></div>
+            <div class="list" id="fcList" style="width:auto;margin:0 12px;height:120px"><div>📁 Projects</div><div>📄 HelloSwing.java</div><div>📄 report.pdf</div><div>📄 notes.txt</div><div>🖼️ photo.png</div></div>
+            <div style="padding:8px 12px;font-size:13px">File Name: <span class="jtf" id="fcName" style="min-width:180px">&nbsp;</span></div>
+            <div class="btns"><span class="jb" id="fcCancel">Cancel</span><span class="jb def" id="fcOk">Open</span></div></div></div></div></div>
+      <div class="vars" style="justify-content:center"><span class="vc" id="fcRV"><b>returnVal</b> = ?</span></div>
+      <span class="f ghost" data-act="#kfc|show-a" data-say="Tạo <b>một</b> JFileChooser và dùng lại (nó nhớ thư mục lần trước)."></span>
+      <span class="f ghost" data-act="#kfc|show-b;#ovFc|show" data-say="<code class='i'>showOpenDialog(parent)</code> hiện dialog <b>modal</b> “Open”. Dùng <code class='i'>showSaveDialog</code> cho dialog “Save”. Hãy chọn một file rồi bấm Open hoặc Cancel."></span>
+      <span class="f ghost" data-act="#kfc|show-c" data-set="#fcRV::<b>returnVal</b> = APPROVE_OPTION" data-say="Bấm Open → trả về <code class='i'>APPROVE_OPTION</code>; <code class='i'>getSelectedFile()</code> cho đối tượng <code class='i'>java.io.File</code>."></span>
+      <span class="f ghost" data-act="#kfc|show-d" data-set="#fcRV::<b>returnVal</b> = CANCEL_OPTION" data-say="Bấm Cancel hoặc đóng dialog → <code class='i'>CANCEL_OPTION</code> (hoặc <code class='i'>ERROR_OPTION</code> nếu lỗi)."></span>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="full-FileChooserDemo" data-title="Code full: FileChooserDemo.java">
+  <div class="hdr in"><span class="qn">CODE FULL</span><h2>FileChooserDemo.java</h2><span class="grow"></span><button class="copy" data-copy="src-FileChooserDemo">📋 Copy code</button></div>
+  <p class="runhint in">Hai nút Open... / Save... dùng chung một JFileChooser; hiển thị file được chọn hoặc thông báo hủy.<br>Chạy: lưu thành <code>FileChooserDemo.java</code> → <code>javac FileChooserDemo.java</code> → <code>java FileChooserDemo</code> &nbsp;(Java 11+ chạy thẳng: <code>java FileChooserDemo.java</code>) · cuộn trong khung để xem hết.</p>
+<script type="text/x-java" class="full" id="src-FileChooserDemo">
+// JFileChooser: open dialog and save dialog.
+import java.awt.*;
+import java.io.File;
+import javax.swing.*;
+
+public class FileChooserDemo {
+    FileChooserDemo() {
+        JFrame jfrm = new JFrame("File Chooser Demo");
+        jfrm.setLayout(new FlowLayout());
+        jfrm.setSize(420, 120);
+        jfrm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JLabel jlab = new JLabel("No file chosen.");
+        JButton jbOpen = new JButton("Open...");
+        JButton jbSave = new JButton("Save...");
+
+        // Create a file chooser
+        final JFileChooser fc = new JFileChooser();
+
+        // In response to a button click:
+        jbOpen.addActionListener(e -> {
+            int returnVal = fc.showOpenDialog(jfrm);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                jlab.setText("Open: " + file.getAbsolutePath());
+            } else {
+                jlab.setText("Open command cancelled by user.");
+            }
+        });
+        jbSave.addActionListener(e -> {
+            int returnVal = fc.showSaveDialog(jfrm);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                jlab.setText("Save as: " + file.getName());
+            } else {
+                jlab.setText("Save command cancelled by user.");
+            }
+        });
+
+        jfrm.add(jbOpen); jfrm.add(jbSave); jfrm.add(jlab);
+        jfrm.setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() { new FileChooserDemo(); }
+        });
+    }
+}
+</script>
+</section>
+
+<!-- ===================== COLOR CHOOSER ===================== -->
+<section class="slide" id="colorchooser" data-title="Color Choosers">
+  <div class="hdr in"><span class="qn">3 · CHOOSERS</span><h2>Color Choosers</h2></div>
+  <div class="cols" style="grid-template-columns:1.05fr 1fr">
+    <div>
+      <ul class="xs">
+        <li class="f">Cho phép người dùng chọn màu từ một <b>bảng màu</b> (palette).</li>
+        <li class="f">Là một <b>component</b> có thể đặt <b>ở bất kỳ đâu</b> trong GUI chương trình.</li>
+        <li class="f">API <code class="i">JColorChooser</code> cũng giúp dễ dàng hiện một <b>dialog</b> (modal hoặc không) chứa color chooser.</li>
+        <li class="f">Tìm hiểu thêm: Oracle Java Tutorial, mục <b>How to Use Color Choosers</b> (<code class="i">…/uiswing/components/colorchooser.html</code>)</li>
+      </ul>
+      <div class="code xxs f" style="margin-top:8px"><div class="ln"><span class="no">1</span><span><span class="c">// 1. Dùng như một component</span></span></div><div class="ln"><span class="no">2</span><span><span class="t">JColorChooser</span> tcc = <span class="k">new</span> <span class="t">JColorChooser</span>(banner.<span class="fn">getForeground</span>());</span></div><div class="ln"><span class="no">3</span><span>tcc.<span class="fn">getSelectionModel</span>().<span class="fn">addChangeListener</span>(e -&gt;</span></div><div class="ln"><span class="no">4</span><span>        banner.<span class="fn">setForeground</span>(tcc.<span class="fn">getColor</span>()));</span></div><div class="ln"><span class="no">5</span><span><span class="c">// 2. Dùng như một dialog modal (null = Cancel)</span></span></div><div class="ln"><span class="no">6</span><span><span class="t">Color</span> c = <span class="t">JColorChooser</span>.<span class="fn">showDialog</span>(jfrm,</span></div><div class="ln"><span class="no">7</span><span>        <span class="s">"Choose Background Color"</span>, banner.<span class="fn">getBackground</span>());</span></div><div class="ln"><span class="no">8</span><span><span class="k">if</span> (c != <span class="k">null</span>) banner.<span class="fn">setBackground</span>(c);</span></div></div>
+    </div>
+    <div class="win f"><div class="tb"><i></i><i></i><i></i><span>Color Chooser Demo (bấm vào ô màu)</span></div>
+      <div id="ccBanner" style="background:#0000ff;color:#ffff00;font-weight:800;font-size:22px;text-align:center;padding:16px 6px;transition:all .3s">Welcome to the Tutorial Zone!</div>
+      <div class="bd"><div style="display:flex;gap:6px;font-size:12.5px;margin-bottom:6px"><span class="tag" style="font-size:12px">Swatches</span><span class="muted">HSV · HSL · RGB · CMYK</span></div>
+        <div id="ccGrid" style="display:grid;grid-template-columns:repeat(16,1fr);gap:2px"></div>
+        <div class="flow" style="margin-top:10px;justify-content:space-between"><span class="jl" id="ccVal">Foreground: #FFFF00</span><span class="jb" id="ccBg">Choose background...</span></div>
+        <div class="overlay" id="ovCc"><div class="dlg" style="width:300px"><div class="tb">Choose Background Color</div><div id="ccGrid2" style="display:grid;grid-template-columns:repeat(10,1fr);gap:3px;padding:12px"></div><div class="btns"><span class="jb" id="ccCancel">Cancel</span><span class="jb def" id="ccOk">OK</span></div></div></div></div></div>
+  </div>
+</section>
+
+<section class="slide" id="full-ColorChooserDemo" data-title="Code full: ColorChooserDemo.java">
+  <div class="hdr in"><span class="qn">CODE FULL</span><h2>ColorChooserDemo.java</h2><span class="grow"></span><button class="copy" data-copy="src-ColorChooserDemo">📋 Copy code</button></div>
+  <p class="runhint in">JColorChooser đặt trực tiếp trong GUI (đổi màu chữ) và JColorChooser.showDialog (đổi màu nền).<br>Chạy: lưu thành <code>ColorChooserDemo.java</code> → <code>javac ColorChooserDemo.java</code> → <code>java ColorChooserDemo</code> &nbsp;(Java 11+ chạy thẳng: <code>java ColorChooserDemo.java</code>) · cuộn trong khung để xem hết.</p>
+<script type="text/x-java" class="full" id="src-ColorChooserDemo">
+// JColorChooser: as a modal dialog, and as a component placed in the GUI.
+import java.awt.*;
+import javax.swing.*;
+
+public class ColorChooserDemo {
+    ColorChooserDemo() {
+        JFrame jfrm = new JFrame("Color Chooser Demo");
+        jfrm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        JLabel banner = new JLabel("Welcome to the Tutorial Zone!", JLabel.CENTER);
+        banner.setFont(new Font("SansSerif", Font.BOLD, 24));
+        banner.setOpaque(true);
+        banner.setForeground(Color.YELLOW);
+        banner.setBackground(Color.BLUE);
+        banner.setPreferredSize(new Dimension(100, 65));
+
+        // 1. A color chooser placed directly in the GUI (a component).
+        JColorChooser tcc = new JColorChooser(banner.getForeground());
+        tcc.getSelectionModel().addChangeListener(e ->
+                banner.setForeground(tcc.getColor()));
+
+        // 2. A modal dialog that contains a color chooser.
+        JButton jbBack = new JButton("Choose background...");
+        jbBack.addActionListener(e -> {
+            Color c = JColorChooser.showDialog(jfrm, "Choose Background Color",
+                    banner.getBackground());
+            if (c != null) banner.setBackground(c);   // null = Cancel
+        });
+
+        jfrm.add(banner, BorderLayout.NORTH);
+        jfrm.add(tcc, BorderLayout.CENTER);
+        jfrm.add(jbBack, BorderLayout.SOUTH);
+        jfrm.pack();
+        jfrm.setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() { new ColorChooserDemo(); }
+        });
+    }
+}
+</script>
+</section>
+
+<!-- ===================== END ===================== -->
+<section class="slide" id="end" data-title="QUESTION? · Tóm tắt">
+  <div class="title-wrap" style="align-items:center;text-align:center">
+    <div class="orb" style="width:360px;height:360px;background:#f9a8d4;left:10%;top:10%"></div>
+    <h1 class="in">QUESTION <span class="grad">?</span></h1>
+    <div class="cols4 in" style="margin-top:30px;text-align:left;max-width:1180px">
+      <div class="card"><h3>Menu</h3><p style="font-size:16.5px"><b>JMenuBar</b> ⊃ <b>JMenu</b> ⊃ <b>JMenuItem</b>; JMenu lồng JMenu = submenu. Gắn bằng <code class="i">setJMenuBar</code>. Item sinh <b>ActionEvent</b>.</p></div>
+      <div class="card"><h3>Phím tắt &amp; tiện ích</h3><p style="font-size:16.5px">Mnemonic (menu đang mở), accelerator (<code class="i">KeyStroke</code>), icon, tooltip, check box / radio item, <b>JPopupMenu</b>, <b>JToolBar</b>.</p></div>
+      <div class="card"><h3>Dialog</h3><p style="font-size:16.5px"><b>JOptionPane.showXxxDialog</b>: Message, Confirm, Input, Option (modal). Dialog riêng: lớp <b>extends JDialog</b>.</p></div>
+      <div class="card"><h3>Choosers</h3><p style="font-size:16.5px"><b>JFileChooser</b>: showOpenDialog / showSaveDialog → APPROVE_OPTION. <b>JColorChooser</b>: component hoặc <code class="i">showDialog</code>.</p></div>
+    </div>
+  </div>
+</section>
+
+</div></div>
+
+<div id="bar"></div>
+<div id="hint">← → / Space: từng bước · Shift+→: qua slide · G / ☰: đi tới slide bất kỳ · A: hiện hết · F: toàn màn hình</div>
+<div id="nav"><button id="jumpBtn" title="Đi tới slide bất kỳ (G)">☰ Slide</button><button id="prev" aria-label="Trước">‹</button><span id="count" title="Bấm để chọn slide">1/1</span><button id="next" aria-label="Sau">›</button></div>
+<div id="jump"><div class="jp"><div class="jh"><b>Đi tới slide</b><input placeholder="Gõ số slide rồi Enter, hoặc gõ từ khóa để lọc…"><button class="jx">✕ Đóng (Esc)</button></div><div class="jg"></div></div></div>
+
+<script>
+(function(){
+  // ---------- Java highlighter ----------
+  const KW=new Set("abstract assert break case catch class continue default do else extends final finally for if implements import instanceof interface new package private protected public return static super switch this throw throws try while null true false var".split(" "));
+  const TY=new Set("int double float char void boolean long short byte".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  let inBlock=false;               // inside a /* ... */ comment that spans lines
+  function hlLine(line){
+    let out="",rest=line;
+    if(inBlock){
+      const e=rest.indexOf("*/");
+      if(e<0) return '<span class="c">'+esc(rest)+'</span>';
+      out+='<span class="c">'+esc(rest.slice(0,e+2))+'</span>';rest=rest.slice(e+2);inBlock=false;
+    }
+    const re=/(\/\/.*$|\/\*.*?(?:\*\/|$))|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(@[A-Za-z]\w*)|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let last=0,m;
+    while((m=re.exec(rest))){
+      out+=esc(rest.slice(last,m.index));
+      if(m[1]){out+='<span class="c">'+esc(m[1])+'</span>';if(m[1].startsWith("/*")&&!m[1].endsWith("*/"))inBlock=true}
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="an">'+m[3]+'</span>';
+      else if(m[4]) out+='<span class="n">'+m[4]+'</span>';
+      else if(m[5]){
+        const w=m[5];
+        let cls=KW.has(w)?"k":TY.has(w)?"t":/^[A-Z][A-Z0-9_]+$/.test(w)&&w.length>1?"cst":/^[A-Z]/.test(w)?"t":(m[6]?"fn":"");
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[6]?esc(m[6]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(rest.slice(last));
+  }
+  const RAW={};   // raw source of each code block, used by the Copy buttons
+  document.querySelectorAll('script[type="text/x-java"]').forEach(sc=>{
+    const text=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"");
+    const lines=text.split("\n");
+    const start=+(sc.dataset.start||1);
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");const [a,b]=r.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);
+    });
+    inBlock=false;
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id){div.id=sc.id;RAW[sc.id]=text+"\n"}
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+start)+'</span><span>'+(hlLine(l)||" ")+'</span></div>').join("");
+    if(sc.className.includes("full")) div.querySelectorAll(".no").forEach(n=>n.style.width="30px");
+    sc.replaceWith(div);
+  });
+
+  // ---------- Copy buttons ----------
+  function copyText(t){
+    if(navigator.clipboard&&window.isSecureContext) return navigator.clipboard.writeText(t);
+    return new Promise((res,rej)=>{const ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();
+      try{document.execCommand("copy")?res():rej()}catch(e){rej(e)}ta.remove()});
+  }
+  document.querySelectorAll(".copy[data-copy]").forEach(b=>{
+    const label=b.innerHTML;
+    b.addEventListener("click",e=>{e.stopPropagation();
+      copyText(RAW[b.dataset.copy]||"").then(()=>{b.classList.add("ok");b.innerHTML="✓ Đã copy"},()=>{b.innerHTML="Hãy bôi đen và Ctrl+C"})
+        .finally(()=>setTimeout(()=>{b.classList.remove("ok");b.innerHTML=label},1800));
+    });
+  });
+
+  // ---------- deck engine ----------
+  // .f fragments, shown one per step. Per fragment:
+  //   data-act  "sel|cls;…"   class kept while the fragment is shown
+  //   data-now  "sel|cls;…"   class only while it is the latest fragment
+  //   data-set  "sel::html;…" content set while shown (later fragments win)
+  //   data-say  narration for the .say line
+  //   data-o    order (higher = later)
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")].sort((x,y)=>(+x.dataset.o||0)-(+y.dataset.o||0));
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  const pairs=(v,sep)=>(v||"").split(";").filter(Boolean).map(p=>{const k=p.indexOf(sep);return [p.slice(0,k).trim(),p.slice(k+sep.length)]});
+  function tog(v,on){pairs(v,"|").forEach(([sel,cls])=>{document.querySelectorAll(sel).forEach(t=>t.classList.toggle(cls,on))})}
+  document.querySelectorAll("[data-set]").forEach(f=>pairs(f.dataset.set,"::").forEach(([sel])=>{document.querySelectorAll(sel).forEach(t=>{if(t.dataset.orig===undefined)t.dataset.orig=t.innerHTML})}));
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach(f=>{tog(f.dataset.now,false);tog(f.dataset.act,false)});
+      s.querySelectorAll("[data-orig]").forEach(t=>t.innerHTML=t.dataset.orig);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step);f.classList.toggle("on",on);if(on){tog(f.dataset.act,true);pairs(f.dataset.set,"::").forEach(([sel,val])=>document.querySelectorAll(sel).forEach(t=>t.innerHTML=val))}});
+      if(i===cur&&step>0)tog(fs[step-1].dataset.now,true);
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.innerHTML=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length;
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    try{history.replaceState(null,"","#"+slides[cur].id)}catch(e){}
+    document.dispatchEvent(new CustomEvent("slidechange",{detail:{id:slides[cur].id,step}}));
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+  window.deckGo=id=>go(slides.findIndex(s=>s.id===id));
+
+  // ---------- jump-to-slide panel (button on every slide + nav + key G) ----------
+  const titleOf=s=>s.dataset.title||(s.querySelector("h2,h1")||{}).textContent||s.id;
+  const jump=document.getElementById("jump"),jg=jump.querySelector(".jg"),jin=jump.querySelector("input");
+  slides.forEach((s,i)=>{
+    const b=document.createElement("button");b.className="ji"+(s.id.startsWith("full-")?" full":"")+(s.classList.contains("sec")?" sec":"");
+    b.innerHTML="<i>"+(i+1)+"</i><span>"+esc(titleOf(s).replace(/\s+/g," ").trim())+"</span>";
+    b.onclick=()=>{closeJump();go(i)};jg.appendChild(b);
+    const sj=document.createElement("button");sj.className="sjump";sj.textContent="☰ Mục lục";sj.title="Đi tới slide bất kỳ (phím G)";
+    sj.onclick=e=>{e.stopPropagation();openJump()};s.appendChild(sj);
+  });
+  function openJump(){jump.classList.add("open");jin.value="";filter();[...jg.children].forEach((b,i)=>b.classList.toggle("cur",i===cur));jin.focus();setTimeout(()=>jg.children[cur]?.scrollIntoView({block:"center"}),30)}
+  function closeJump(){jump.classList.remove("open");jin.blur()}
+  function filter(){const q=jin.value.trim().toLowerCase();[...jg.children].forEach(b=>b.classList.toggle("hide",q&&!b.textContent.toLowerCase().includes(q)))}
+  jin.addEventListener("input",filter);
+  jin.addEventListener("keydown",e=>{
+    if(e.key==="Enter"){const n=parseInt(jin.value,10);
+      if(!isNaN(n)&&String(n)===jin.value.trim()){closeJump();go(n-1)}
+      else{const v=[...jg.children].find(b=>!b.classList.contains("hide"));if(v)v.click()}}
+    else if(e.key==="Escape")closeJump();
+    e.stopPropagation();
+  });
+  jump.addEventListener("click",e=>{if(e.target===jump)closeJump()});
+  jump.querySelector(".jx").onclick=closeJump;
+  document.getElementById("jumpBtn").onclick=openJump;
+  document.getElementById("count").onclick=openJump;
+
+  addEventListener("keydown",e=>{
+    if(jump.classList.contains("open")){if(e.key==="Escape")closeJump();return}
+    const tg=e.target.tagName;
+    if(tg==="INPUT"||tg==="TEXTAREA"||tg==="SELECT"){if(e.key==="Escape")e.target.blur();return}   // typing inside a mock text field
+    if(tg==="BUTTON"&&(e.key===" "||e.key==="Enter"))return;
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+    else if(e.key==="g"||e.key==="G"||e.key==="m"||e.key==="M"){e.preventDefault();openJump()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>{tx=e.target.closest(".code,.win,.dlg,#jump")?null:e.touches[0].clientX},{passive:true});
+  addEventListener("touchend",e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+
+  // ---------- small helpers for interactive mock windows ----------
+  // data-click="sel::html;..."  sets content when the element is clicked
+  document.querySelectorAll("[data-click]").forEach(el=>el.addEventListener("click",e=>{e.stopPropagation();
+    pairs(el.dataset.click,"::").forEach(([sel,val])=>document.querySelectorAll(sel).forEach(t=>t.innerHTML=val));
+    el.classList.add("press");setTimeout(()=>el.classList.remove("press"),150)}));
+  // menu bars: click a top-level menu to open it, click elsewhere to close
+  document.querySelectorAll(".mbar>span").forEach(m=>m.addEventListener("click",e=>{
+    if(e.target.closest(".dd"))return;e.stopPropagation();
+    const was=m.classList.contains("open");document.querySelectorAll(".mbar>span.open").forEach(x=>x.classList.remove("open"));
+    if(!was)m.classList.add("open")}));
+  document.querySelectorAll(".dd .mi.sub").forEach(mi=>{mi.addEventListener("mouseenter",()=>{mi.parentElement.querySelectorAll(":scope>.mi.sub.open").forEach(x=>x!==mi&&x.classList.remove("open"));mi.classList.add("open")});mi.addEventListener("click",e=>{e.stopPropagation();mi.classList.add("open")})});
+  document.addEventListener("click",()=>document.querySelectorAll(".mbar>span.open,.mi.sub.open,.dd.show:not(.ap)").forEach(x=>x.classList.remove("open","show")));
+
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+
+</script>
+<script>
+(function(){
+  const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+  const flash=b=>{b.classList.add("press");setTimeout(()=>b.classList.remove("press"),150)};
+
+  // =============== Menu mocks (MenuDemo / MenuDemoFull) ===============
+  function item(t,o={}){
+    const label=o.mn?t.replace(o.mn,'<u class="mn">'+o.mn+'</u>'):t;
+    return '<div class="mi" data-cmd="'+t+'"'+(o.tip?' title="'+o.tip+'"':'')+(o.kind?' data-kind="'+o.kind+'"':'')+'>'
+      +(o.kind?'<span class="ck">'+(o.on?(o.kind==="chk"?"☑":"◉"):(o.kind==="chk"?"☐":"○"))+'</span>':'')
+      +'<span>'+(o.icon?'<span class="ico2">'+o.icon+'</span>':'')+label+'</span>'+(o.acc?'<span class="acc">'+o.acc+'</span>':'')+'</div>';
+  }
+  function buildMenu(el){
+    const full=el.dataset.menumock==="full",tb=el.dataset.toolbar,pu=el.dataset.popup;
+    const F=full?
+      [item("Open",{mn:"O",acc:"Ctrl+O"}),item("Close",{mn:"C",acc:"Ctrl+C"}),item("Save",{mn:"S",acc:"Ctrl+S"}),'<div class="sep"></div>',item("Exit",{mn:"E",acc:"Ctrl+E"})]:
+      [item("Open"),item("Close"),item("Save"),'<div class="sep"></div>',item("Exit")];
+    const C=full?[item("Red",{kind:"chk",on:1}),item("Green",{kind:"chk"}),item("Blue",{kind:"chk"})]:[item("Red"),item("Green"),item("Blue")];
+    const P=full?[item("High",{kind:"rad",on:1}),item("Low",{kind:"rad"})]:[item("High"),item("Low")];
+    const H=full?[item("About",{icon:"ℹ️",tip:"Info about the MenuDemo program."})]:[item("About")];
+    const top=(n,mn)=>full?'<u class="mn">'+n[0]+'</u>'+n.slice(1):n;
+    el.innerHTML='<div class="win ov mm'+(tb?" withtb":"")+'"><div class="tb"><i></i><i></i><i></i><span>Menu Demo</span></div>'
+      +'<div class="mbar"><span>'+top("File")+'<div class="dd">'+F.join("")+'</div></span>'
+      +'<span>'+top("Options")+'<div class="dd"><div class="mi sub"><span>Colors</span><div class="dd">'+C.join("")+'</div></div><div class="mi sub"><span>Priority</span><div class="dd">'+P.join("")+'</div></div><div class="sep"></div>'+item("Reset")+'</div></span>'
+      +'<span>'+top("Help")+'<div class="dd" style="left:auto;right:0">'+H.join("")+'</div></span></div>'
+      +(tb?'<div class="jtb"><span class="grip">⋮</span><span class="tbb hovtip" data-cmd="Set Breakpoint">🔴<span class="tip">Set Breakpoint</span></span><span class="tbb hovtip" data-cmd="Clear Breakpoint">⭕<span class="tip">Clear Breakpoint</span></span><span class="tbb hovtip" data-cmd="Resume">▶️<span class="tip">Resume</span></span></div>':'')
+      +'<div class="bd"'+(pu?' data-pu="1" style="cursor:context-menu"':'')+'><div class="lab">'+(pu?"Right-click anywhere for the Edit popup.":"")+'</div>'
+      +(pu?'<div class="dd pud">'+item("Cut")+item("Copy")+item("Paste")+'</div>':'')+'</div></div>';
+    const lab=el.querySelector(".lab");
+    const say=t=>{lab.textContent=t;lab.animate([{transform:"scale(1.15)"},{transform:"none"}],{duration:300})};
+    el.querySelectorAll(".mbar>span").forEach(m=>m.addEventListener("click",e=>{
+      if(e.target.closest(".dd"))return;e.stopPropagation();
+      const was=m.classList.contains("open");document.querySelectorAll(".mbar>span.open").forEach(x=>x.classList.remove("open"));if(!was)m.classList.add("open")}));
+    el.querySelectorAll(".mi.sub").forEach(mi=>{mi.addEventListener("mouseenter",()=>{mi.parentElement.querySelectorAll(":scope>.mi.sub").forEach(x=>x!==mi&&x.classList.remove("open"));mi.classList.add("open")});mi.addEventListener("click",e=>{e.stopPropagation();mi.classList.add("open")})});
+    el.querySelectorAll("[data-cmd]").forEach(mi=>mi.addEventListener("click",e=>{e.stopPropagation();
+      const k=mi.dataset.kind,c=mi.dataset.cmd;
+      if(k==="chk"){const ck=mi.querySelector(".ck");ck.textContent=ck.textContent==="☑"?"☐":"☑"}
+      if(k==="rad"){mi.parentElement.querySelectorAll("[data-kind=rad] .ck").forEach(x=>x.textContent="○");mi.querySelector(".ck").textContent="◉"}
+      document.querySelectorAll(".mbar>span.open,.mi.sub.open,.pud.show").forEach(x=>x.classList.remove("open","show"));
+      if(c==="Exit"){say("Exit → System.exit(0): chương trình kết thúc");return}
+      say(c+" Selected");
+      const m5=$("#m5c");if(m5&&el.id==="mm5")m5.innerHTML='<b>comStr</b> = "'+c+'"';
+    }));
+    if(pu){const area=el.querySelector("[data-pu]"),pm=el.querySelector(".pud");
+      area.addEventListener("contextmenu",e=>{e.preventDefault();e.stopPropagation();const r=area.getBoundingClientRect(),sc=r.width/area.offsetWidth;
+        pm.style.left=((e.clientX-r.left)/sc)+"px";pm.style.top=((e.clientY-r.top)/sc)+"px";pm.classList.add("show")});}
+    el._say=say;
+  }
+  $$("[data-menumock]").forEach(buildMenu);
+
+  // accelerators: Ctrl/Cmd + O C S E on slides that contain a "full" menu mock
+  addEventListener("keydown",e=>{
+    if(!(e.ctrlKey||e.metaKey))return;
+    const sl=document.querySelector(".slide.active");const mm=sl&&sl.querySelector('[data-menumock="full"]');if(!mm)return;
+    const map={o:"Open",c:"Close",s:"Save",e:"Exit"};const k=e.key.toLowerCase();if(!map[k])return;
+    e.preventDefault();e.stopPropagation();
+    mm._say(map[k]==="Exit"?"Exit → System.exit(0): chương trình kết thúc":map[k]+" Selected");
+    const kc=$("#kcK");if(kc&&sl.contains(kc)){kc.textContent=k.toUpperCase();$("#kcR").textContent=map[k]+" Selected";
+      [$("#kcC"),kc].forEach(x=>{x.classList.add("down");setTimeout(()=>x.classList.remove("down"),250)})}
+  },true);
+
+  // =============== Check box / radio menu items ===============
+  function crSum(){const c=$$("#crC [data-chk]").filter(x=>x.querySelector(".ck").textContent==="☑").map(x=>x.textContent.slice(1));
+    const p=$$("#crP [data-rad]").find(x=>x.querySelector(".ck").textContent==="◉");
+    $("#crS").textContent="Colors: "+(c.join(", ")||"(none)")+" · Priority: "+(p?p.textContent.slice(1):"?")}
+  $$("[data-chk]").forEach(m=>m.addEventListener("click",e=>{e.stopPropagation();const ck=m.querySelector(".ck");ck.textContent=ck.textContent==="☑"?"☐":"☑";crSum()}));
+  $$("[data-rad]").forEach(m=>m.addEventListener("click",e=>{e.stopPropagation();$$("#crP .ck").forEach(x=>x.textContent="○");m.querySelector(".ck").textContent="◉";crSum()}));
+
+  // =============== Popup menu slide ===============
+  const pa=$("#puArea"),pm=$("#puMenu");
+  if(pa){pa.addEventListener("contextmenu",e=>{e.preventDefault();e.stopPropagation();const r=pa.getBoundingClientRect(),sc=r.width/pa.offsetWidth;
+      pm.style.left=((e.clientX-r.left)/sc)+"px";pm.style.top=((e.clientY-r.top)/sc)+"px";pm.classList.add("show");
+      $("#puMsg").innerHTML="isPopupTrigger() = true → jpu.show(comp, "+Math.round((e.clientX-r.left)/sc)+", "+Math.round((e.clientY-r.top)/sc)+")"});
+    pm.querySelectorAll(".mi").forEach(mi=>mi.addEventListener("click",e=>{e.stopPropagation();pm.classList.remove("show");$("#puMsg").textContent=mi.textContent+" Selected"}));}
+
+  // =============== Toolbar docking ===============
+  $$("[data-dock]").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();const w=$("#tbw");
+    w.classList.remove("dk-west","dk-east","dk-south","dk-float","dk-north");w.classList.add("dk-"+b.dataset.dock);flash(b)}));
+
+  // =============== Owner frame / dependent dialog ===============
+  $$("[data-own]").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();const F=$("#ownF"),D=$("#ownD"),ic=$("#dockIcon"),s=$("#ownSay"),a=b.dataset.own;flash(b);
+    if(a==="iconify"){F.classList.add("ic");D.classList.add("ic");ic.style.opacity=1;s.innerHTML="Frame bị <b>iconify</b> → dialog phụ thuộc cũng biến mất."}
+    if(a==="restore"&&!F.classList.contains("gone")){F.classList.remove("ic");D.classList.remove("ic");ic.style.opacity=0;s.innerHTML="Frame được <b>deiconify</b> → dialog quay lại màn hình."}
+    if(a==="dispose"){F.classList.add("gone");D.classList.add("gone");ic.style.opacity=0;s.innerHTML="Frame bị <b>hủy</b> (dispose) → dialog phụ thuộc cũng bị hủy."}
+    if(a==="reset"){F.className="win";D.className="dlg";ic.style.opacity=0;s.textContent="Bấm các nút để thấy dialog đi theo frame của nó."}}));
+
+  // =============== JOptionPane mock dialogs ===============
+  const ICON={q:'<div class="ico q">?</div>',i:'<div class="ico i">i</div>',w:'<div class="ico w" style="padding-top:12px;font-size:18px">!</div>',e:'<div class="ico e">✕</div>'};
+  function dialog(ov,cfg){
+    return new Promise(res=>{
+      ov.innerHTML='<div class="dlg" style="width:'+(cfg.w||330)+'px"><div class="tb">'+cfg.title+'</div><div class="row">'+(cfg.icon?ICON[cfg.icon]:"")+'<div style="flex:1">'+cfg.msg
+        +(cfg.input?'<input class="jtf" style="margin-top:6px;width:100%" />':'')+'</div></div><div class="btns">'
+        +cfg.buttons.map((t,i)=>'<span class="jb'+(i===cfg.def?" def":"")+'" data-i="'+i+'">'+t+'</span>').join("")+'</div></div>';
+      ov.classList.add("show");
+      const inp=ov.querySelector("input");
+      if(inp){inp.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Enter")done(cfg.okIndex??0);if(e.key==="Escape")inp.blur()});setTimeout(()=>{if(ov.classList.contains("show")&&ov.closest(".slide.active"))inp.focus()},50)}
+      function done(i){ov.classList.remove("show");res({i,text:inp?inp.value:null})}
+      ov.querySelectorAll("[data-i]").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();done(+b.dataset.i)}));
+    });
+  }
+  const log=t=>{const l=$("#jopLog");if(!l)return;l.textContent+=t+"\n";const ls=l.textContent.split("\n");if(ls.length>8)l.textContent=ls[0]+"\n"+ls.slice(-7).join("\n")};
+  const MSG={title:"Message",icon:"i",msg:"Eggs are not supposed to be green.",buttons:["OK"],def:0};
+  // prefill the example overlay so the slide step can show it
+  const ovEx=$("#ovEx");
+  function prepEx(){dialog(ovEx,MSG).then(prepEx);ovEx.classList.remove("show")}
+  if(ovEx){prepEx()}
+  $$("[data-jop]").forEach(b=>b.addEventListener("click",async e=>{e.stopPropagation();flash(b);const k=b.dataset.jop,ov=$("#ovM");
+    if(k==="msg1"){ovEx.classList.add("show");return}
+    if(k==="message"){await dialog(ov,MSG);log("showMessageDialog → void (không trả về gì)")}
+    if(k==="confirm"){const r=await dialog(ov,{title:"An Inane Question",icon:"q",msg:"Would you like green eggs and ham?",buttons:["Yes","No","Cancel"],def:0});
+      log("showConfirmDialog → "+r.i+"  ("+["YES_OPTION","NO_OPTION","CANCEL_OPTION"][r.i]+")")}
+    if(k==="option"){const o=["Yes, please","No, thanks","No eggs, no ham!"];const r=await dialog(ov,{title:"A Silly Question",icon:"q",msg:"Would you like some green eggs to go with that ham?",buttons:o,def:2,w:420});
+      log('showOptionDialog → '+r.i+'  (options['+r.i+'] = "'+o[r.i]+'")')}
+    if(k==="input"){const r=await dialog(ov,{title:"Personal information",icon:"q",msg:"Please enter your name:",input:1,buttons:["Cancel","OK"],def:1,okIndex:1});
+      log("showInputDialog → "+(r.i===1?'"'+r.text+'"':"null (Cancel)"))}
+    if(k==="input2")runInput(true);
+  }));
+  // input dialog slide
+  const ovIn=$("#ovIn");
+  async function runInput(show){
+    const p=dialog(ovIn,{title:"Personal information",icon:"q",msg:"Please enter your name:",input:1,buttons:["Cancel","OK"],def:1,okIndex:1});
+    if(!show)ovIn.classList.remove("show");
+    const r=await p;
+    if(r.i===1){$("#inN").innerHTML='<b>name</b> = "'+r.text+'"';
+      await dialog(ovIn,{title:"Your information",icon:"i",msg:"Your name is "+r.text,buttons:["OK"],def:0})}
+    else $("#inN").innerHTML="<b>name</b> = null (Cancel)";
+    runInput(false);
+  }
+  if(ovIn){runInput(false);document.addEventListener("slidechange",e=>{if(e.detail.id==="jopinput"&&e.detail.step===1){ovIn.classList.add("show");const i=ovIn.querySelector("input");if(i)setTimeout(()=>i.focus(),60)}})}
+  // showOptionDialog slide buttons
+  $$("[data-opt]").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();flash(b);const o=["Yes, please","No, thanks","No eggs, no ham!"];
+    $("#opN").innerHTML='<b>n</b> = '+b.dataset.opt+'  ("'+o[b.dataset.opt]+'")'}));
+
+  // =============== MyDialogDemo: modal behaviour ===============
+  const mdBtn=$("#mdBtn");
+  if(mdBtn){mdBtn.addEventListener("click",e=>{e.stopPropagation();flash(mdBtn);$("#ovMy").classList.add("show");$("#mdSay").textContent="new MyDialog(null, \"Hello, my dialog\", true) → dialog modal hiện ra."});
+    $("#mdClose").addEventListener("click",e=>{e.stopPropagation();$("#ovMy").classList.remove("show");$("#mdSay").textContent="Dialog đóng → setVisible(true) trong constructor MyDialog mới trả về."});
+    $("#ovMy").addEventListener("click",e=>{if(e.target.id==="ovMy"){e.stopPropagation();const f=$("#mdF");f.classList.remove("shake");void f.offsetWidth;f.classList.add("shake");$("#mdSay").textContent="Modal: frame không nhận click khi dialog đang mở!"}})}
+
+  // =============== File chooser ===============
+  const fcOpen=$("#fcOpen");let fcSel=null;
+  if(fcOpen){fcOpen.addEventListener("click",e=>{e.stopPropagation();flash(fcOpen);$("#ovFc").classList.add("show")});
+    $$("#fcList div").forEach(d=>d.addEventListener("click",e=>{e.stopPropagation();$$("#fcList div").forEach(x=>x.classList.remove("sel"));d.classList.add("sel");fcSel=d.textContent.slice(2).trim();$("#fcName").textContent=fcSel}));
+    $("#fcOk").addEventListener("click",e=>{e.stopPropagation();$("#ovFc").classList.remove("show");
+      if(fcSel){$("#fcRV").innerHTML="<b>returnVal</b> = APPROVE_OPTION";$("#fcRes").textContent="Open: /Users/me/Documents/"+fcSel}
+      else{$("#fcRV").innerHTML="<b>returnVal</b> = APPROVE_OPTION";$("#fcRes").textContent="(chưa chọn file)"}});
+    $("#fcCancel").addEventListener("click",e=>{e.stopPropagation();$("#ovFc").classList.remove("show");$("#fcRV").innerHTML="<b>returnVal</b> = CANCEL_OPTION";$("#fcRes").textContent="Open command cancelled by user."})}
+
+  // =============== Color chooser ===============
+  const g=$("#ccGrid");
+  if(g){const cols=[];for(let r=0;r<5;r++)for(let c=0;c<16;c++){const h=c*22.5,l=[30,45,58,72,85][r];cols.push(c===15?"hsl(0,0%,"+(r*24)+"%)":"hsl("+h+",80%,"+l+"%)")}
+    const hex=c=>{const d=document.createElement("div");d.style.color=c;document.body.appendChild(d);const m=getComputedStyle(d).color.match(/\d+/g).map(Number);d.remove();return "#"+m.slice(0,3).map(x=>x.toString(16).padStart(2,"0")).join("").toUpperCase()};
+    g.innerHTML=cols.map(c=>'<span style="background:'+c+'"></span>').join("");
+    g.querySelectorAll("span").forEach((s,i)=>s.addEventListener("click",e=>{e.stopPropagation();$("#ccBanner").style.color=cols[i];$("#ccVal").textContent="Foreground: "+hex(cols[i])}));
+    const g2=$("#ccGrid2");let pick=null;const c2=cols.filter((_,i)=>i%2===0).slice(0,40);
+    g2.innerHTML=c2.map(c=>'<span style="background:'+c+'"></span>').join("");
+    g2.querySelectorAll("span").forEach((s,i)=>s.addEventListener("click",e=>{e.stopPropagation();g2.querySelectorAll("span").forEach(x=>x.classList.remove("sel"));s.classList.add("sel");pick=c2[i]}));
+    $("#ccBg").addEventListener("click",e=>{e.stopPropagation();pick=null;$("#ovCc").classList.add("show")});
+    $("#ccOk").addEventListener("click",e=>{e.stopPropagation();$("#ovCc").classList.remove("show");if(pick){$("#ccBanner").style.background=pick;$("#ccVal").textContent="showDialog → "+hex(pick)}});
+    $("#ccCancel").addEventListener("click",e=>{e.stopPropagation();$("#ovCc").classList.remove("show");$("#ccVal").textContent="showDialog → null (Cancel)"})}
+})();
+
+</script>
+</body>
+</html>
