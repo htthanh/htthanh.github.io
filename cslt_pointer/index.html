@@ -1,0 +1,1924 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bộ nhớ &amp; Con trỏ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:16px;padding-right:150px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+.lvl{font-size:14px;font-weight:700;color:var(--muted);white-space:nowrap;margin-left:auto}
+.lvl b{color:#f59e0b;letter-spacing:2px}.lvl s{color:#d9d6e8;text-decoration:none;letter-spacing:2px}
+h1{font-size:66px;line-height:1.1;font-weight:800}
+h2{font-size:30px;line-height:1.2;font-weight:800}
+h3{font-size:21px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:20px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:24px;margin:5px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:9px;height:9px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.86em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 5px;border-radius:6px;color:#be185d;white-space:nowrap}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+.cols>*{min-width:0}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.card p,.card li{font-size:17px}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.note{margin-top:10px;padding:8px 14px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:17px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.note.red{border-color:#e11d48;background:linear-gradient(90deg,#fff1f3,#fffafa)}
+.code{font-family:var(--mono);font-size:15px;line-height:1.45;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:8px 0;overflow:hidden;position:relative}
+.code.sm{font-size:14px;line-height:1.42}.code.xs{font-size:13px;line-height:1.4}.code.xxs{font-size:12px;line-height:1.36;padding:6px 0}
+.code.x4{font-size:11.4px;line-height:1.33;padding:6px 0}
+.code .ln{padding:0 12px 0 6px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:22px;flex:none;text-align:right;margin-right:10px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.13);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.15);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.18);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.14);box-shadow:inset 5px 0 #ec4899}
+.code.show-e .mark-e{background:rgba(16,185,129,.15);box-shadow:inset 5px 0 #10b981}
+.code.show-f .mark-f{background:rgba(124,58,237,.13);box-shadow:inset 5px 0 #7c3aed}
+.code.show-g .mark-g{background:rgba(6,182,212,.15);box-shadow:inset 5px 0 #06b6d4}
+.code.show-h .mark-h{background:rgba(245,158,11,.18);box-shadow:inset 5px 0 #f59e0b}
+.code.show-i .mark-i{background:rgba(236,72,153,.14);box-shadow:inset 5px 0 #ec4899}
+.code.show-j .mark-j{background:rgba(16,185,129,.15);box-shadow:inset 5px 0 #10b981}
+.hide0{opacity:0;transform:translateY(8px) scale(.96);transition:all .45s}
+.hide0.sh{opacity:1;transform:none}
+.win.pre.sh:not(.vis){opacity:.35;filter:grayscale(1)}
+.gone.sh{display:none}
+.stage{position:relative;display:flex;align-items:center;justify-content:center}
+.chip{display:inline-block;font-family:var(--mono);font-size:12.5px;font-weight:700;padding:2px 9px;border-radius:999px;background:#fef3c7;color:#b45309;border:1px solid #fcd34d}
+.chip.v{background:#ede9fe;color:#6d28d9;border-color:#c4b5fd}.chip.g{background:#d1fae5;color:#047857;border-color:#6ee7b7}.chip.r{background:#ffe4e6;color:#be123c;border-color:#fda4af}
+.hlo{outline:3px solid #f59e0b;outline-offset:3px;border-radius:6px}
+.jb.dis.en{color:#111;border-color:#9aa1b3;background:linear-gradient(180deg,#fff,#e6e8ee)}.jb.dis.en .ico{filter:none;opacity:1}
+.jb.dis.en.dis2{color:#a0a4ad;border-color:#ccd0d8;background:#f1f2f5}
+.rad.on.off::before,.chk.on.off::before{background:#fff;content:""}
+.code-title{font-family:var(--mono);font-size:13px;color:var(--muted);margin:0 0 4px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:16px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:6px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.3}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+table.t1 td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.console{font-family:var(--mono);font-size:13.5px;line-height:1.45;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:8px 14px;color:#e6f0ff;white-space:pre;min-height:40px;overflow:hidden}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:10px;letter-spacing:3px;margin-bottom:3px}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.flow{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap}
+.box{border-radius:12px;padding:8px 12px;text-align:center;font-family:var(--mono);font-size:15px;border:2px solid var(--line);background:#fff;min-width:110px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:12.5px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.a{border-color:#7c3aed}.box.b{border-color:#0891b2}.box.c{border-color:#ec4899;background:#fdf2f8}.box.d{border-color:#f59e0b;background:#fffbeb}.box.e{border-color:#10b981;background:#ecfdf5}
+.ar{color:var(--muted);font-size:22px;text-align:center}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.say{font-size:17px;margin-top:10px;min-height:50px;color:var(--muted);line-height:1.42}
+.say b{color:var(--text)}
+.vars{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.vc{font-family:var(--mono);font-size:15px;font-weight:700;padding:4px 12px;border-radius:10px;background:#fff;border:2px solid #e4dcfb;transition:all .35s}
+.vc b{color:var(--t)}
+.vc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.45)}
+.vc.res{border-color:#10b981;background:#ecfdf5;color:#047857}
+.arr{display:flex;gap:8px;justify-content:center}
+.cell{width:52px;height:56px;border-radius:12px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .45s}
+.cell small{font-size:11px;color:var(--muted);font-weight:600}
+.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-6px)}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c}
+.cell.dim{opacity:.35}
+.cell.wide{width:auto;padding:0 10px;font-size:14px}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.15)}100%{transform:none;opacity:1}}
+.pop{animation:pop .45s}
+
+/* ===== agenda ===== */
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 10px}
+.sec{grid-column:1/-1;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.08em;margin-top:4px;text-transform:uppercase}
+.ag{background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 10px;cursor:pointer;transition:all .2s;font-size:15.5px;line-height:1.25;box-shadow:0 2px 6px rgba(40,50,110,.05);font-family:var(--mono);font-weight:600}
+.ag:hover{border-color:#ec4899;transform:translateY(-2px);box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag b{color:#db2777;margin-right:6px}
+.ag.g1{border-left:5px solid #7c3aed}.ag.g2{border-left:5px solid #0891b2}.ag.g3{border-left:5px solid #ec4899}.ag.g4{border-left:5px solid #f59e0b}
+.ag.g5{border-left:5px solid #10b981}.ag.g6{border-left:5px solid #6366f1}.ag.g7{border-left:5px solid #f97316}.ag.g8{border-left:5px solid #0ea5e9}
+
+/* ===== mock Swing windows ===== */
+.win{border:1px solid #cfc8e6;border-radius:10px;background:#eef0f4;box-shadow:0 18px 40px -18px rgba(30,27,58,.45);font-family:"Segoe UI",system-ui,sans-serif;font-size:14px;color:#222;transition:all .5s;overflow:hidden;position:relative}
+.wt{height:28px;background:linear-gradient(180deg,#f7f7fa,#e2e4ea);border-bottom:1px solid #cfd2da;display:flex;align-items:center;gap:6px;padding:0 10px;font-weight:600;font-size:13px;color:#333}
+.wt i{width:11px;height:11px;border-radius:50%;background:#ff5f57;display:inline-block}.wt i:nth-child(2){background:#febc2e}.wt i:nth-child(3){background:#28c840}
+.wt span{margin-left:8px}
+.wb{padding:12px;position:relative}
+.win.ghost{opacity:.25;filter:grayscale(1)}
+.win.undec .wt{display:none}
+.jb{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid #9aa1b3;border-radius:5px;background:linear-gradient(180deg,#fff,#e6e8ee);font-size:13.5px;color:#111;transition:all .3s;white-space:nowrap;cursor:default}
+.jb.dis{color:#a0a4ad;border-color:#ccd0d8;background:#f1f2f5}
+.jb.dis .ico{filter:grayscale(1);opacity:.5}
+.jb.press{background:linear-gradient(180deg,#cfd8ea,#b9c6e2);border-color:#5b74b5;transform:scale(.96)}
+.jb.def{box-shadow:0 0 0 2px #7aa2f7}
+.jb.vert{flex-direction:column}
+.jb u{text-decoration:underline}
+.ico{display:inline-block;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#a7f3d0,#059669);flex:none}
+.ico.l{border-radius:4px;background:linear-gradient(135deg,#60a5fa,#2563eb);clip-path:polygon(100% 0,0 50%,100% 100%)}
+.ico.r{border-radius:4px;background:linear-gradient(135deg,#f472b6,#db2777);clip-path:polygon(0 0,100% 50%,0 100%)}
+.splat{display:inline-block;width:34px;height:30px;background:radial-gradient(circle at 50% 50%,#f59e0b 0 30%,transparent 31%),radial-gradient(circle at 25% 30%,#ec4899 0 18%,transparent 19%),radial-gradient(circle at 75% 35%,#7c3aed 0 18%,transparent 19%),radial-gradient(circle at 40% 78%,#0891b2 0 17%,transparent 18%),radial-gradient(circle at 78% 75%,#10b981 0 15%,transparent 16%)}
+.chk,.rad{display:block;padding:3px 0;font-size:14px;transition:all .3s;white-space:nowrap}
+.chk::before,.rad::before{display:inline-block;vertical-align:-2px;margin-right:7px}
+.chk::before{content:"";width:14px;height:14px;border:1px solid #7b8394;border-radius:3px;background:#fff;flex:none;font-size:12px;line-height:14px;text-align:center;font-weight:900;color:#1d4ed8}
+.chk.on::before{content:"✓";background:#dbe7ff}
+.rad::before{content:"";width:14px;height:14px;border:1px solid #7b8394;border-radius:50%;background:#fff;flex:none;box-sizing:border-box}
+.rad.on::before{background:radial-gradient(circle,#1d4ed8 0 35%,#fff 40%)}
+.chk.hl,.rad.hl{background:#fff3c4;border-radius:4px}
+.tf{display:inline-block;min-width:120px;min-height:26px;border:1px solid #8c93a3;background:#fff;padding:3px 7px;font-family:var(--mono);font-size:13.5px;border-radius:3px;transition:all .3s;white-space:pre;vertical-align:middle}
+.tf.err{background:#ffd1dc}
+.tf.ro{background:#f3f4f6}
+.tf .cur{display:inline-block;width:1px;height:15px;background:#111;vertical-align:middle;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.ta{border:1px solid #8c93a3;background:#fff;padding:6px 8px;font-family:var(--mono);font-size:12.5px;line-height:1.5;border-radius:3px;white-space:pre-wrap;overflow:hidden}
+/* text area that stays scrolled to bottom */
+.ta.bottom{display:flex;flex-direction:column;justify-content:flex-end}
+mark{background:#d1d5db;color:inherit;border-radius:2px;padding:0 1px}
+mark.sel{background:#bfdbfe}
+.combo{display:inline-flex;align-items:center;justify-content:space-between;min-width:170px;border:1px solid #8c93a3;border-radius:4px;background:linear-gradient(180deg,#fff,#eceef3);padding:4px 8px;font-size:14px;gap:10px;position:relative}
+.combo::after{content:"▾";color:#555}
+.combo.ed{background:#fff}
+.dd{position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid #8c93a3;box-shadow:0 8px 18px -8px rgba(0,0,0,.35);z-index:3;display:none;text-align:left}
+.dd div{padding:3px 8px;font-size:13.5px}
+.dd div.s{background:#3b6fd8;color:#fff}
+.open .dd{display:block}
+.lst{border:1px solid #8c93a3;background:#fff;font-size:14px;min-height:90px}
+.lst div{padding:3px 8px;transition:all .3s}
+.lst div.s{background:#3b6fd8;color:#fff}
+.lst div.nw{animation:pop .5s}
+.jt{border-collapse:collapse;width:100%;font-size:13px;border:1px solid #9aa1b3;border-radius:0;background:#fff;font-family:"Segoe UI",system-ui,sans-serif}
+.jt th{background:linear-gradient(180deg,#fafafa,#e3e5ea);border:1px solid #b9bec9;padding:3px 6px;font-weight:600;font-size:12.5px;white-space:nowrap;text-align:left}
+.jt td{border:1px solid #e1e3e8;padding:3px 6px;color:#111;font-weight:400;white-space:nowrap;vertical-align:middle}
+.jt td.num{text-align:right}
+.jt td.ck{text-align:center}
+.jt tr.s td{background:#3b6fd8;color:#fff}
+.jt td.s{background:#3b6fd8;color:#fff}
+.jt td.edit{outline:2px solid #f59e0b;background:#fffbeb}
+.jt th.sorted::after{content:" ▲";color:#3b6fd8}
+.jt th.sorted.desc::after{content:" ▼"}
+.jt tr.hide{display:none}
+.jt .cb{display:inline-block;width:13px;height:13px;border:1px solid #7b8394;border-radius:2px;background:#fff;vertical-align:middle;font-size:11px;line-height:12px;text-align:center;font-weight:900;color:#1d4ed8}
+.jt .cb.on::before{content:"✓"}
+.pb{height:20px;border:1px solid #8c93a3;border-radius:4px;background:#e5e7eb;position:relative;overflow:hidden;min-width:180px}
+.pb .fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(180deg,#7aa2f7,#3b6fd8);transition:width .6s}
+.pb .txt{position:absolute;inset:0;text-align:center;font-size:12px;line-height:18px;font-weight:600;color:#111}
+.pb.ind .fill{width:30%!important;animation:ind 1.2s linear infinite alternate}
+.pb.ind .txt{opacity:0}
+@keyframes ind{from{left:0}to{left:70%}}
+.mbar{display:flex;gap:2px;background:linear-gradient(180deg,#fbfbfc,#e9ebf0);border-bottom:1px solid #cfd2da;padding:2px 6px;font-size:13.5px;position:relative}
+.mbar>span{padding:2px 8px;border-radius:3px}
+.mbar>span.s{background:#3b6fd8;color:#fff}
+.menu{position:absolute;top:26px;left:6px;background:#fff;border:1px solid #9aa1b3;box-shadow:0 10px 24px -8px rgba(0,0,0,.4);min-width:250px;z-index:4;display:none;font-size:13px}
+.menu.open{display:block;animation:pop .3s}
+.mi{display:flex;align-items:center;gap:6px;padding:3px 10px;white-space:nowrap}
+.mi .acc{margin-left:auto;color:#666;font-size:12px;padding-left:16px}
+.mi.s{background:#3b6fd8;color:#fff}.mi.s .acc{color:#e0e7ff}
+.msep{height:1px;background:#d9dce3;margin:3px 0}
+.mi .mk{width:14px;text-align:center;font-weight:900;flex:none}
+.dlgwrap{position:absolute;inset:0;background:rgba(30,27,58,.18);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;z-index:6}
+.dlgwrap.on{opacity:1}
+.dlgwrap.on .win{animation:pop .4s}
+.dlgwrap.nomodal{background:none}
+.dlgico{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:20px;flex:none;background:#3b82f6}
+.dlgico.q{background:#10b981}.dlgico.e{background:#e11d48}.dlgico.w{background:#f59e0b;border-radius:6px}
+.tabs{display:flex;gap:2px;border-bottom:1px solid #9aa1b3;margin-bottom:8px}
+.tabs span{padding:3px 10px;border:1px solid #b9bec9;border-bottom:none;border-radius:5px 5px 0 0;background:#e6e8ee;font-size:12.5px}
+.tabs span.s{background:#fff;font-weight:600}
+.tip{position:absolute;background:#ffffe1;border:1px solid #777;font-size:12px;padding:2px 6px;box-shadow:2px 2px 4px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;white-space:nowrap;z-index:5}
+.tip.on{opacity:1}
+.pic{display:flex;align-items:center;justify-content:center;font-size:64px;min-height:110px;transition:all .4s}
+.thumb{width:34px;height:34px;border-radius:5px;border:1px solid #888;display:inline-block;transition:all .4s}
+.lane{display:grid;grid-template-columns:110px 1fr;gap:6px;align-items:center;font-size:13px}
+.lane .ln2{height:30px;border-radius:8px;background:#f8fafc;border:1px dashed #cbd5e1;display:flex;align-items:center;gap:6px;padding:0 8px;overflow:hidden}
+.ev{font-family:var(--mono);font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:6px;background:#ede9fe;color:#6d28d9;white-space:nowrap}
+.ev.b{background:#cffafe;color:#0e7490}.ev.c{background:#fce7f3;color:#be185d}.ev.d{background:#fef3c7;color:#b45309}
+.kv{font-family:var(--mono);font-size:13px}
+.swatch{display:inline-block;width:100%;height:100%;border-radius:4px}
+
+/* ===== nav / jump ===== */
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;min-width:36px;height:32px;cursor:pointer;font-size:16px;padding:0 8px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+.jumpbtn{position:absolute;top:26px;right:30px;z-index:7;font-family:"Be Vietnam Pro",sans-serif;font-size:14px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));border:none;border-radius:999px;padding:7px 14px;cursor:pointer;box-shadow:0 6px 16px -6px var(--sa1);transition:transform .2s}
+.jumpbtn:hover{transform:translateY(-2px) scale(1.04)}
+#jump{position:fixed;inset:0;z-index:20;background:rgba(30,27,58,.45);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
+#jump.on{display:flex}
+#jbox{width:min(1100px,94vw);max-height:88vh;overflow:auto;background:#fff;border-radius:18px;padding:20px 24px;box-shadow:0 30px 70px -20px rgba(30,27,58,.6);animation:pop .3s}
+#jbox .jh{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+#jbox .jh h3{font-size:22px;color:#7c3aed;margin:0}
+#jbox .jh input{margin-left:auto;font-family:var(--mono);font-size:15px;padding:6px 10px;border:2px solid var(--line);border-radius:10px;width:260px;outline:none}
+#jbox .jh input:focus{border-color:#a78bfa}
+#jbox .jh button{border:none;background:#f1eaff;color:#6d28d9;font-weight:800;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:18px}
+#jlist{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+#jlist .ji{display:flex;gap:8px;align-items:center;padding:7px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:14.5px;transition:all .15s;background:#fff}
+#jlist .ji:hover,#jlist .ji.k{border-color:#ec4899;background:#fdf2f8}
+#jlist .ji.cur{background:#f3edff;border-color:#a78bfa}
+#jlist .ji b{font-family:var(--mono);color:#db2777;min-width:26px}
+#jlist .ji span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:700px){#hint{display:none}#jlist{grid-template-columns:1fr}}
+@media print{#nav,#bar,#hint,.jumpbtn{display:none}}
+
+/* ===== OOP deck extras ===== */
+.code.nonum .no{display:none}
+.code .mark-z{display:none}
+.code.alt .mark-z{display:flex}
+.code.alt .mark-y{display:none}
+.code.show-z .mark-z{background:rgba(250,204,21,.32);box-shadow:inset 5px 0 #eab308}
+.code.show-y .mark-y{background:rgba(225,29,72,.12);box-shadow:inset 5px 0 #e11d48}
+.code .ln.ok-l::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px}
+.code .ln.bad-l::after{content:"✗ lỗi";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}
+.code.done .ok-x::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px}
+.code.done .bad-x::after{content:"✗ lỗi";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro";font-size:.92em}
+.obj{border:2.5px solid #ec4899;border-radius:14px;padding:8px 12px 10px;background:#fff;position:relative;transition:all .45s}
+.obj>.lab,.part>.lab{font-family:var(--mono);font-size:12.5px;font-weight:800;color:#be185d;margin-bottom:5px;display:flex;justify-content:space-between;gap:10px}
+.part{border:2px dashed #7c3aed;border-radius:10px;padding:6px 10px;background:#f7f3ff;margin-bottom:6px;transition:all .45s}
+.part>.lab{color:#6d28d9}
+.part.b{border-color:#0891b2;background:#ecfeff}.part.b>.lab{color:#0e7490}
+.fld{font-family:var(--mono);font-size:14px;display:flex;gap:8px;padding:2px 0;align-items:center}
+.fld>span:first-child{color:var(--muted);min-width:110px}
+.fld b{font-weight:700;color:#111;transition:all .3s;padding:0 4px;border-radius:5px}
+.fld b.new{background:#fef3c7;color:#b45309}
+.fld b.def{background:#ffe4e6;color:#be123c}
+.fld b.okv{background:#d1fae5;color:#047857}
+.glow{box-shadow:0 0 0 4px rgba(245,158,11,.35),0 0 22px rgba(245,158,11,.45)}
+.dimx{opacity:.3;filter:grayscale(.8)}
+.stack{display:flex;flex-direction:column-reverse;gap:6px;min-height:40px}
+.fr{font-family:var(--mono);font-size:14px;font-weight:700;padding:6px 12px;border-radius:10px;border:2px solid #c4b5fd;background:#f5f3ff;color:#5b21b6}
+.fr.b{border-color:#67e8f9;background:#ecfeff;color:#0e7490}
+.fr.d{border-color:#fcd34d;background:#fffbeb;color:#b45309}
+.fr small{display:block;font-family:"Be Vietnam Pro";font-weight:500;font-size:12px;color:var(--muted)}
+.hide0.sh.rm{opacity:.1;transform:translateY(-10px) scale(.94)}
+.big-ok{color:#059669;font-weight:800}.big-bad{color:#e11d48;font-weight:800}
+.mem{display:flex;gap:16px;align-items:flex-end;justify-content:center;flex-wrap:wrap}
+.mc{display:flex;flex-direction:column;align-items:center;gap:4px}
+.mc .addr{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.mc .nm{font-family:var(--mono);font-size:14px;font-weight:800;color:#6d28d9}
+.mc .val{min-width:96px;height:52px;border-radius:12px;border:3px solid #e4dcfb;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:18px;font-weight:800;transition:all .45s;padding:0 8px}
+.mc.hot .val{border-color:#f59e0b;background:#fffbeb;color:#b45309}
+.mc.orph .val{border-color:#e11d48;background:#fff1f3;color:#be123c;border-style:dashed}
+.mc.ptr .val{border-color:#0891b2;background:#ecfeff;color:#0e7490}
+/* UML */
+.uml{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;align-items:flex-start}
+.umlc{display:flex;flex-direction:column;align-items:center}
+.ucls{min-width:120px;border:2px solid #1e1b3a;background:#fffbe6;border-radius:4px;font-family:var(--mono);font-size:14px;font-weight:700;text-align:center;box-shadow:4px 4px 0 #e6e2f3}
+.ucls div{padding:4px 10px}.ucls i{display:block;height:9px;border-top:1.5px solid #1e1b3a}
+.conn{position:relative;width:2px;height:64px;background:#1e1b3a;margin:0 auto}
+.conn.isa::before{content:"";position:absolute;top:-1px;left:50%;transform:translateX(-50%);border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:16px solid #1e1b3a}
+.conn.isa::after{content:"";position:absolute;top:3px;left:50%;transform:translateX(-50%);border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:10px solid #fff}
+.conn.hasa::before{content:"";position:absolute;top:0;left:50%;width:13px;height:13px;background:#fff;border:2px solid #1e1b3a;transform:translate(-50%,-3px) rotate(45deg)}
+.conn .mul{position:absolute;bottom:2px;right:8px;font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.house{display:flex;flex-direction:column;align-items:center;gap:3px}
+.house .roof{width:0;height:0;border-left:130px solid transparent;border-right:130px solid transparent;border-bottom:80px solid #ec4899}
+.house .wall{width:220px;height:90px;background:linear-gradient(180deg,#a78bfa,#7c3aed);border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+.house .base{width:280px;height:34px;background:linear-gradient(180deg,#94a3b8,#475569);border-radius:4px;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px}
+.house .roof-l{position:relative;top:-46px;color:#fff;font-weight:700;font-size:14px;height:0}
+.onion{position:relative;width:300px;height:300px;margin:0 auto}
+.onion>div{position:absolute;border-radius:50%;display:flex;align-items:flex-start;justify-content:center;font-family:var(--mono);font-weight:800;font-size:14px;padding-top:14px}
+.tick{display:inline-flex;width:26px;height:26px;border-radius:50%;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:15px}
+.tick.y{background:#10b981}.tick.n{background:#e11d48}
+table.acc td,table.acc th{text-align:center;font-size:17px;padding:8px 10px}
+table.acc td:first-child,table.acc th:first-child{text-align:left}
+table.acc td.hl{background:#fffbeb;box-shadow:inset 0 0 0 2px #f59e0b}
+.pill{display:inline-block;font-family:var(--mono);font-weight:700;font-size:14px;padding:3px 10px;border-radius:999px;border:2px solid #c4b5fd;background:#f5f3ff;color:#5b21b6;transition:all .35s}
+.pill.b{border-color:#67e8f9;background:#ecfeff;color:#0e7490}.pill.c{border-color:#f9a8d4;background:#fdf2f8;color:#be185d}.pill.d{border-color:#fcd34d;background:#fffbeb;color:#b45309}.pill.x{border-color:#e5e7eb;background:#f3f4f6;color:#9ca3af;text-decoration:line-through}
+.vt{font-family:var(--mono);font-size:13.5px;border:2px solid #0891b2;border-radius:10px;background:#ecfeff;padding:6px 10px}
+.vt div{padding:2px 0}
+.strike{position:relative}
+.strike.on::after{content:"";position:absolute;left:-4px;right:-4px;top:50%;height:3px;background:#e11d48;transform:rotate(-4deg)}
+.code.r1 .mark-o1::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r1 .mark-x1::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r2 .mark-o2::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r2 .mark-x2::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r3 .mark-o3::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r3 .mark-x3::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r4 .mark-o4::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r4 .mark-x4::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r5 .mark-o5::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r5 .mark-x5::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r6 .mark-o6::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r6 .mark-x6::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r7 .mark-o7::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r7 .mark-x7::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r8 .mark-o8::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r8 .mark-x8::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r9 .mark-o9::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r9 .mark-x9::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r10 .mark-o10::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r10 .mark-x10::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r11 .mark-o11::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r11 .mark-x11::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r12 .mark-o12::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r12 .mark-x12::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r13 .mark-o13::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r13 .mark-x13::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r14 .mark-o14::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r14 .mark-x14::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r15 .mark-o15::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r15 .mark-x15::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r16 .mark-o16::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r16 .mark-x16::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r17 .mark-o17::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r17 .mark-x17::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r18 .mark-o18::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r18 .mark-x18::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r19 .mark-o19::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r19 .mark-x19::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r20 .mark-o20::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r20 .mark-x20::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r21 .mark-o21::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r21 .mark-x21::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r22 .mark-o22::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r22 .mark-x22::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r23 .mark-o23::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r23 .mark-x23::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r24 .mark-o24::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r24 .mark-x24::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}
+/* larger sizing for lecture decks */
+.slide.z1>*:not(.hdr):not(.jumpbtn):not(.orb){zoom:1.15}.slide.z2>*:not(.hdr):not(.jumpbtn):not(.orb){zoom:1.3}.slide.z3>*:not(.hdr):not(.jumpbtn):not(.orb){zoom:1.42}
+p,li{font-size:21px}.card p,.card li{font-size:18.5px}
+.code{font-size:17px;line-height:1.5}.code.sm{font-size:15.5px}.code.xs{font-size:14.5px;line-height:1.45}
+.code-title{font-size:14px}
+.fld{font-size:16px}.pill{font-size:16px;padding:3px 12px}
+.ucls{font-size:16px;min-width:130px}.ucls div{padding:6px 12px}.conn{height:96px}
+.box{font-size:17px;padding:12px 16px}.box small{font-size:14px}
+table{font-size:18px}th,td{padding:9px 12px}
+.say{font-size:19px}.console{font-size:15.5px;line-height:1.55}
+.chip{font-size:15px;padding:3px 12px}.vc{font-size:17px}
+.note{font-size:18.5px}.fr{font-size:16px}.obj>.lab,.part>.lab{font-size:14px}
+
+/* ===== memory / pointer deck extras ===== */
+.ram{display:grid;grid-template-columns:repeat(var(--cols,8),1fr);gap:24px 6px}
+.bc{position:relative;height:48px;border-radius:9px;border:2px solid #e4dcfb;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;font-weight:700;color:#b9b4cf;transition:all .45s}
+.bc .ad{position:absolute;top:100%;margin-top:3px;font-size:11px;color:var(--muted);font-weight:600;white-space:nowrap}
+.bc.u{border-color:#7c3aed;background:#f3edff;color:#5b21b6}
+.bc.u2{border-color:#0891b2;background:#ecfeff;color:#0e7490}
+.bc.u3{border-color:#ec4899;background:#fdf2f8;color:#be185d}
+.bc.u4{border-color:#f59e0b;background:#fffbeb;color:#b45309}
+.bc.fz{border-color:#cbd5e1;border-style:dashed;background:repeating-linear-gradient(45deg,#fafafa 0 6px,#eef0f4 6px 12px);color:#9ca3af}
+.bc.bad{border-color:#e11d48;border-style:solid;background:#fff1f3;color:#be123c}
+.bc.hot{box-shadow:0 0 0 4px rgba(245,158,11,.35),0 0 18px rgba(245,158,11,.5);transform:translateY(-4px)}
+.bc.sm{height:40px;font-size:13px}
+.brks{display:grid;grid-template-columns:repeat(var(--cols,8),1fr);gap:6px;margin-top:26px}
+.brk{position:relative;border-top:3px solid currentColor;text-align:center;font-family:var(--mono);font-size:13px;font-weight:700;padding-top:4px;color:#6d28d9;white-space:nowrap}
+.brk::before,.brk::after{content:"";position:absolute;top:-10px;width:3px;height:10px;background:currentColor}
+.brk::before{left:0}.brk::after{right:0}
+.brk.b{color:#0e7490}.brk.c{color:#be185d}.brk.d{color:#b45309}.brk.r{color:#e11d48}
+.rowlab{font-family:var(--mono);font-size:13px;font-weight:800;color:var(--muted);margin:10px 0 6px;letter-spacing:.04em}
+.tape{display:flex;gap:6px}
+.tape .bc{flex:1}
+.tape.go .bc{animation:scan .45s calc(var(--i)*.3s) both}
+.tape.go .bc.tgt{animation:hold .45s calc(var(--i)*.3s) both}
+.tape.direct.go .bc{animation:none}
+.tape.direct.go .bc.tgt{animation:hold .45s .1s both}
+@keyframes scan{50%{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-6px)}}
+@keyframes hold{to{border-color:#10b981;background:#ecfdf5;color:#047857;transform:translateY(-6px);box-shadow:0 0 16px rgba(16,185,129,.45)}}
+.race{display:grid;grid-template-columns:118px 1fr 130px;gap:12px 12px;align-items:center}
+.race .lb{font-weight:800;font-size:18px}
+.track{height:28px;border-radius:999px;background:#f1eef9;overflow:hidden;position:relative}
+.track i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:999px;background:linear-gradient(90deg,var(--c1),var(--c2));transition:width var(--t) cubic-bezier(.3,.7,.3,1)}
+.track.go i{width:var(--w)}
+.race .vl{font-family:var(--mono);font-weight:700;font-size:16px}
+.region{border:2px dashed #c4b5fd;border-radius:14px;padding:22px 12px 12px;position:relative;background:rgba(255,255,255,.65);transition:all .45s}
+.region>.rl{position:absolute;top:-13px;left:14px;font-family:var(--mono);font-size:13px;font-weight:800;padding:2px 10px;border-radius:999px;background:#7c3aed;color:#fff;letter-spacing:.04em}
+.region.heap{border-color:#67e8f9}.region.heap>.rl{background:#0891b2}
+.region.fn{border-color:#f9a8d4}.region.fn>.rl{background:#db2777}
+.mrow{display:flex;align-items:center;gap:14px;justify-content:center;flex-wrap:wrap}
+.mc .val{transition:all .45s}
+.mc.u .val{border-color:#7c3aed;background:#f3edff;color:#5b21b6}
+.mc.fz .val{border-color:#cbd5e1;border-style:dashed;background:repeating-linear-gradient(45deg,#fafafa 0 6px,#eef0f4 6px 12px);color:#9ca3af}
+.mc.bad .val{border-color:#e11d48;background:#fff1f3;color:#be123c}
+.mc.glow .val,.mc.hot .val{box-shadow:0 0 0 4px rgba(245,158,11,.35),0 0 18px rgba(245,158,11,.5)}
+.mc .val.sm{min-width:70px}
+.arw{font-family:var(--mono);font-weight:800;color:#0891b2;font-size:26px;line-height:1;white-space:nowrap}
+.arw.dg{color:#e11d48}
+.arw small{display:block;font-size:12px;text-align:center;font-family:"Be Vietnam Pro";font-weight:600;color:var(--muted)}
+.szr{display:grid;grid-template-columns:118px 1fr 58px;gap:10px;align-items:center;margin:6px 0}
+.szr code{font-family:var(--mono);font-weight:700;color:#7c3aed;font-size:17px}
+.szr>b{font-family:var(--mono);font-size:19px;text-align:right}
+.bytes{display:flex;gap:3px;flex-wrap:wrap}
+.bytes i{width:24px;height:24px;border-radius:5px;background:linear-gradient(135deg,#a78bfa,#7c3aed)}
+.bytes i.b{background:linear-gradient(135deg,#67e8f9,#0891b2)}
+.bytes i.c{background:linear-gradient(135deg,#f9a8d4,#db2777)}
+.bytes i.d{background:linear-gradient(135deg,#fcd34d,#d97706)}
+.bytes i.o{background:none;border:2px dashed #c4b5fd}
+.tight p,.tight li{font-size:17px;line-height:1.4}
+.tight ul li{margin:3px 0}
+.boom{display:inline-block;font-family:var(--mono);font-weight:800;color:#fff;background:#e11d48;padding:4px 12px;border-radius:10px;box-shadow:0 8px 20px -8px #e11d48}
+.code.show-y .mark-y::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}
+.meter{height:22px;border-radius:999px;background:#f1eef9;overflow:hidden;position:relative;border:1px solid var(--line)}
+.meter i{position:absolute;left:0;top:0;bottom:0;width:6%;background:linear-gradient(90deg,#f59e0b,#e11d48);transition:width .9s}
+.meter span{position:absolute;inset:0;text-align:center;font-family:var(--mono);font-size:13px;font-weight:700;line-height:20px}
+table.cmp td,table.cmp th{font-size:15.5px;padding:7px 10px}
+table.cmp td:first-child{font-weight:700;color:var(--muted);white-space:nowrap}
+tr.f td{transition:opacity .45s}
+#q21m.full{width:96%}
+.mc.u4 .val{border-color:#f59e0b;background:#fffbeb;color:#b45309}
+.mc.bad .val{border-color:#e11d48;border-style:solid;background:#fff1f3;color:#be123c}
+.mc.orph .val{border-color:#e11d48;border-style:dashed;background:#fff1f3;color:#be123c}
+.code,.console,code.i,.vc,.chip,.bc,.mc .val{font-variant-ligatures:none}
+</style>
+</head>
+<body>
+
+<div id="viewport"><div id="deck">
+<!-- ===================== TITLE ===================== -->
+<section class="slide" id="title" data-title="Trang bìa">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// Kỹ thuật lập trình · C++</div>
+    <h1 class="in">Bộ nhớ &amp; Con trỏ<br><span class="grad">Memory · Pointer</span></h1>
+    <p class="in muted" style="font-size:24px;margin-top:20px;max-width:1000px">RAM, ô nhớ, địa chỉ → toán tử <code class="i">&amp;</code> và <code class="i">*</code> → con trỏ &amp; mảng → cấp phát động <code class="i">new / delete</code> → các lỗi kinh điển: <b>memory leak</b>, <b>double delete</b>, <b>dangling pointer</b>, <b>tràn mảng</b>. 28 câu hỏi, mỗi câu có giải thích, ví dụ input/output.</p>
+    <p class="in" style="margin-top:34px;font-size:18px;color:#8a91b4">← → hoặc Space: chạy từng bước · Shift+→: qua slide · <b>G</b> hoặc nút <b>☰ Đi tới slide</b>: nhảy tới slide bất kỳ · A: hiện hết · F: toàn màn hình</p>
+    <p class="in" style="margin-top:8px;font-size:15px;color:#8a91b4">Địa chỉ trong ví dụ (0x1000, 0x9A0…) là địa chỉ minh họa; khi chạy thật mỗi lần sẽ khác. Kích thước kiểu theo máy 64-bit.</p>
+  </div>
+</section>
+
+<!-- ===================== AGENDA ===================== -->
+<section class="slide" id="agenda" data-title="Nội dung">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:17px">· bấm vào mục để đi tới</span></div>
+  <div class="agenda in" style="gap:7px 10px">
+    <div class="sec">1 · Bộ nhớ</div>
+    <div class="ag g1" data-goto="q01"><b>Q01</b>RAM · RAM vs HDD vs SSD</div>
+    <div class="ag g1" data-goto="q02"><b>Q02</b>Ô nhớ · khối nhớ · địa chỉ</div>
+    <div class="ag g1" data-goto="q03"><b>Q03</b>sizeof các kiểu dữ liệu</div>
+    <div class="ag g1" data-goto="q04"><b>Q04</b>Toán tử &amp;</div>
+    <div class="ag g1" data-goto="q05"><b>Q05</b>Ô nhớ used vs free</div>
+    <div class="sec">2 · Con trỏ</div>
+    <div class="ag g2" data-goto="q06"><b>Q06</b>Pointer là gì?</div>
+    <div class="ag g2" data-goto="q07"><b>Q07</b>sizeof con trỏ</div>
+    <div class="ag g2" data-goto="q08"><b>Q08</b>int* vs double* vs char*</div>
+    <div class="ag g2" data-goto="q09"><b>Q09</b>Pointer reference</div>
+    <div class="ag g2" data-goto="q10"><b>Q10</b>nullptr</div>
+    <div class="ag g2" data-goto="q11"><b>Q11</b>Pointer de-reference</div>
+    <div class="ag g2" data-goto="q12"><b>Q12</b>foo(int*) vs foo(int*&amp;)</div>
+    <div class="ag g2" data-goto="q13"><b>Q13</b>p-&gt;member</div>
+    <div class="sec">3 · Con trỏ &amp; mảng · 4 · new / delete</div>
+    <div class="ag g3" data-goto="q14"><b>Q14</b>Pointer vs array</div>
+    <div class="ag g3" data-goto="q15"><b>Q15</b>a[i] vs a+i</div>
+    <div class="ag g3" data-goto="q16"><b>Q16</b>p++ / p--</div>
+    <div class="ag g4" data-goto="q17"><b>Q17</b>Từ khóa new</div>
+    <div class="ag g4" data-goto="q18"><b>Q18</b>Từ khóa delete</div>
+    <div class="ag g4" data-goto="q19"><b>Q19</b>new int(3) vs &amp;a</div>
+    <div class="ag g4" data-goto="q20"><b>Q20</b>Mảng tĩnh vs mảng động</div>
+    <div class="sec">5 · Lỗi &amp; phân biệt</div>
+    <div class="ag g5" data-goto="q21"><b>Q21</b>Memory leak</div>
+    <div class="ag g5" data-goto="q22"><b>Q22</b>Delete 2 lần</div>
+    <div class="ag g5" data-goto="q23"><b>Q23</b>delete biến trên stack</div>
+    <div class="ag g5" data-goto="q24"><b>Q24</b>new int(3) vs new int[3]</div>
+    <div class="ag g5" data-goto="q25"><b>Q25</b>q = p; delete q; delete p</div>
+    <div class="ag g5" data-goto="q26"><b>Q26</b>delete vs delete[]</div>
+    <div class="ag g5" data-goto="q27"><b>Q27</b>Dùng *p sau delete</div>
+    <div class="ag g5" data-goto="q28"><b>Q28</b>new int[100] trước cin &gt;&gt; n</div>
+    <div class="ag g6" data-goto="summary"><b>✓</b>Tổng kết</div>
+  </div>
+</section>
+
+<!-- ===================== Q01a ===================== -->
+<section class="slide z1" id="q01" data-title="Q01 · RAM là gì? (truy cập ngẫu nhiên)">
+  <div class="hdr in"><span class="qn">Q01</span><h2>Random Access Memory (RAM) là gì?</h2></div>
+  <div class="cols" style="grid-template-columns:1.05fr 1fr">
+    <div>
+      <div class="card in tight"><ul>
+        <li><b>RAM</b> là bộ nhớ chính: nơi chương trình <b>đang chạy</b> đặt mã lệnh, biến, mảng, đối tượng. CPU chỉ xử lý trực tiếp dữ liệu nằm trong RAM.</li>
+        <li><b>Random access</b> (truy cập ngẫu nhiên): muốn đọc/ghi ô nào chỉ cần đưa <b>địa chỉ</b> → tới <b>thẳng</b> ô đó; thời gian gần như <b>như nhau</b> cho mọi ô, dù ở đầu hay cuối.</li>
+        <li>Trái với <b>truy cập tuần tự</b> (băng từ, cassette): muốn tới ô #6 phải lướt qua 0, 1, …, 5.</li>
+        <li><b>Volatile</b> (khả biến): tắt máy / mất điện → mất toàn bộ dữ liệu trong RAM.</li>
+      </ul></div>
+<script type="text/x-cpp" class="xs" id="q1code" data-title="Ví dụ: truy cập phần tử mảng (mảng nằm trong RAM)" data-mark="2:a;3:b;4-5:c">
+int a[1000000];      // biến toàn cục: 4 MB trong RAM
+a[0]      = 1;       // địa chỉ = a + 0 * 4
+a[999999] = 2;       // địa chỉ = a + 999999 * 4
+// Hai lệnh nhanh như nhau: CPU tính địa chỉ rồi
+// truy cập thẳng, không "đi qua" các ô ở giữa.
+</script>
+    </div>
+    <div>
+      <div class="card in">
+        <h3>Demo: yêu cầu đọc ô <span style="color:#059669">#6</span></h3>
+        <div class="rowlab">BĂNG TỪ — TRUY CẬP TUẦN TỰ <span class="chip r hide0" id="q1t1">⏱ lướt qua 7 ô</span></div>
+        <div class="tape" id="q1tape">
+          <div class="bc" style="--i:0">0</div><div class="bc" style="--i:1">1</div><div class="bc" style="--i:2">2</div><div class="bc" style="--i:3">3</div><div class="bc" style="--i:4">4</div><div class="bc" style="--i:5">5</div><div class="bc tgt" style="--i:6">6</div><div class="bc" style="--i:7">7</div>
+        </div>
+        <div class="rowlab" style="margin-top:18px">RAM — TRUY CẬP NGẪU NHIÊN <span class="chip g hide0" id="q1t2">⏱ 1 bước, tới thẳng</span></div>
+        <div class="tape direct" id="q1ram">
+          <div class="bc">0</div><div class="bc">1</div><div class="bc">2</div><div class="bc">3</div><div class="bc">4</div><div class="bc">5</div><div class="bc tgt">6</div><div class="bc">7</div>
+        </div>
+      </div>
+      <span class="f ghost" data-act="#q1tape|go;#q1t1|sh" data-say="<b>Truy cập tuần tự</b>: đầu đọc phải lướt qua lần lượt các ô 0 → 5 rồi mới tới ô 6. Ô càng xa càng tốn thời gian."></span>
+      <span class="f ghost" data-act="#q1ram|go;#q1t2|sh" data-say="<b>RAM</b>: đưa địa chỉ của ô 6 → mạch điện chọn thẳng ô đó. Ô 0 hay ô 6 hay ô cuối cùng đều tốn thời gian như nhau → <b>random access</b>."></span>
+      <span class="f ghost" data-now="#q1code|show-a" data-say="Ví dụ C++: phần tử <b>a[0]</b> nằm ở địa chỉ a + 0×4."></span>
+      <span class="f ghost" data-now="#q1code|show-b" data-say="Phần tử <b>a[999999]</b> ở địa chỉ a + 999999×4: CPU chỉ cần một phép nhân-cộng để ra địa chỉ."></span>
+      <span class="f ghost" data-now="#q1code|show-c" data-say="Nhờ RAM truy cập ngẫu nhiên, <b>a[i]</b> luôn là thao tác O(1) — đây là nền tảng cho mảng, con trỏ ở các câu sau."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q01b ===================== -->
+<section class="slide z1" id="q01b" data-title="Q01 · Đọc từ RAM vs HDD vs SSD">
+  <div class="hdr in"><span class="qn">Q01</span><h2>So sánh đọc dữ liệu: RAM vs SSD vs HDD</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.08fr">
+    <div>
+      <div class="card in">
+        <h3>Thời gian đọc 1 khối 4 KB ở vị trí ngẫu nhiên</h3>
+        <p class="muted" style="font-size:14px;margin-bottom:10px">thang logarit · số liệu điển hình</p>
+        <div class="race">
+          <span class="lb" style="color:#7c3aed">RAM</span><div class="track" id="q1r1" style="--w:17%;--t:.4s;--c1:#a78bfa;--c2:#7c3aed"><i></i></div><span class="vl hide0" id="q1v1">~100 ns</span>
+          <span class="lb" style="color:#0891b2">SSD</span><div class="track" id="q1r2" style="--w:67%;--t:1.5s;--c1:#67e8f9;--c2:#0891b2"><i></i></div><span class="vl hide0" id="q1v2">~20–100 µs</span>
+          <span class="lb" style="color:#db2777">HDD</span><div class="track" id="q1r3" style="--w:100%;--t:3s;--c1:#f9a8d4;--c2:#db2777"><i></i></div><span class="vl hide0" id="q1v3">~5–10 ms</span>
+        </div>
+      </div>
+      <div class="note f" data-o="2" style="font-size:17.5px" data-say="Chênh lệch rất lớn: đó là lý do RAM được dùng làm nơi làm việc của CPU, còn SSD/HDD dùng để lưu trữ.">🧠 Phóng to cho dễ hình dung: nếu đọc RAM mất <b>1 giây</b> thì đọc SSD mất khoảng <b>17 phút</b>, còn HDD mất khoảng <b>1 ngày</b>.</div>
+      <div class="note blue f" data-o="3" style="font-size:17px" data-say="Đổi lại, RAM <b>mất dữ liệu khi tắt máy</b> và đắt; SSD/HDD giữ dữ liệu lâu dài và rẻ hơn nhiều.">Vì vậy chương trình luôn <b>nạp dữ liệu từ đĩa vào RAM</b> rồi mới xử lý: <code class="i">ifstream f("data.txt"); f &gt;&gt; x;</code> chậm (đọc đĩa) — còn <code class="i">x = a[i];</code> nhanh (đọc RAM).</div>
+    </div>
+    <div>
+      <table class="cmp in">
+        <tr><th>Tiêu chí</th><th style="color:#7c3aed">RAM</th><th style="color:#0891b2">SSD</th><th style="color:#db2777">HDD</th></tr>
+        <tr><td>Cấu tạo</td><td>Mạch điện (DRAM)</td><td>Chip nhớ flash, không bộ phận cơ</td><td>Đĩa từ quay + đầu đọc cơ học</td></tr>
+        <tr><td>Độ trễ</td><td>~100 ns</td><td>~20–100 µs</td><td>~5–10 ms (chờ quay + dời đầu đọc)</td></tr>
+        <tr><td>Đọc tuần tự</td><td>20–60 GB/s</td><td>0,5–7 GB/s</td><td>0,1–0,25 GB/s</td></tr>
+        <tr><td>Đọc ngẫu nhiên</td><td>Rất nhanh</td><td>Nhanh</td><td>Rất chậm</td></tr>
+        <tr><td>Mất điện</td><td><b style="color:#e11d48">Mất dữ liệu</b></td><td>Còn</td><td>Còn</td></tr>
+        <tr><td>Giá / GB</td><td>Đắt nhất</td><td>Trung bình</td><td>Rẻ nhất</td></tr>
+        <tr><td>Vai trò</td><td>Dữ liệu đang xử lý</td><td colspan="2">Lưu trữ lâu dài (file, hệ điều hành, chương trình)</td></tr>
+      </table>
+      <span class="f ghost" data-o="1" data-act="#q1r1|go;#q1r2|go;#q1r3|go;#q1v1|sh;#q1v2|sh;#q1v3|sh" data-say="Cùng đọc 1 khối dữ liệu ở vị trí ngẫu nhiên: RAM xong gần như tức thì, SSD chậm hơn khoảng <b>1.000 lần</b>, HDD chậm hơn khoảng <b>100.000 lần</b> (phải chờ đĩa quay và dời đầu đọc tới đúng chỗ)."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q02 ===================== -->
+<section class="slide z1" id="q02" data-title="Q02 · Memory cell, block, address">
+  <div class="hdr in"><span class="qn">Q02</span><h2>Memory cell · memory block · memory address</h2></div>
+  <div class="cols" style="grid-template-columns:.95fr 1.1fr">
+    <div>
+      <div class="cols3" style="grid-template-columns:1fr;gap:10px">
+        <div class="card f tight" id="q2d1" data-o="0" data-now="#q2c3|hot" data-act="#q2bits|sh" data-say="Mỗi ô vuông là một <b>memory cell</b>: chứa đúng 1 byte = 8 bit. Ô chưa dùng có giá trị không xác định (?)."><h3>🔲 Memory cell — ô nhớ</h3><p>Đơn vị nhỏ nhất có địa chỉ riêng: <b>1 byte = 8 bit</b>. RAM 8 GB ≈ 8,6 tỷ ô nhớ xếp liên tiếp.</p></div>
+        <div class="card f tight" id="q2d2" data-o="1" data-now="#q2c0|hot;#q2c1|hot;#q2c2|hot;#q2c3|hot;#q2c4|hot;#q2c5|hot;#q2c6|hot;#q2c7|hot" data-say="Số in dưới mỗi ô là <b>địa chỉ</b>: tăng dần 1 đơn vị cho mỗi byte. Hai ô khác nhau không bao giờ trùng địa chỉ."><h3>📍 Memory address — địa chỉ</h3><p>Số thứ tự <b>duy nhất</b> của mỗi ô, thường viết hệ 16: <code class="i">0x1000</code>, <code class="i">0x1001</code>… Biết địa chỉ → truy cập được ô.</p></div>
+        <div class="card f tight" id="q2d3" data-o="2" data-now="#q2code|show-a" data-act="#q2c0|u;#q2c1|u;#q2c2|u;#q2c3|u;#q2bx|sh;#q2le|sh" data-set="#q2v0::02;#q2v1::01;#q2v2::00;#q2v3::00;#q2v4::?" data-say="<b>int x = 258;</b> chiếm một <b>khối</b> 4 ô liên tiếp 0x1000..0x1003. Giá trị 258 được tách thành 4 byte 02 01 00 00 (máy Intel/ARM lưu byte thấp trước)."><h3>🧱 Memory block — khối nhớ</h3><p>Nhiều ô <b>liên tiếp</b> dùng chung cho một dữ liệu. <code class="i">int</code> cần khối 4 ô. Địa chỉ của khối = địa chỉ <b>ô đầu tiên</b>.</p></div>
+      </div>
+<script type="text/x-cpp" class="xs" id="q2code" data-title="Ví dụ" data-mark="1:a;2:b;3:c;4:d" style="margin-top:10px">
+int   x = 258;   // khối 4 ô: 0x1000..0x1003
+char  c = 'A';   // khối 1 ô: 0x1004
+short s = 7;     // khối 2 ô: 0x1006..0x1007
+cout << &x;      // in 0x1000 (ô đầu của khối)
+</script>
+    </div>
+    <div>
+      <div class="card in" style="padding:16px 16px 14px">
+        <div class="ram" id="q2ram">
+          <div class="bc" id="q2c0"><b id="q2v0">?</b><span class="ad">0x1000</span></div>
+          <div class="bc" id="q2c1"><b id="q2v1">?</b><span class="ad">0x1001</span></div>
+          <div class="bc" id="q2c2"><b id="q2v2">?</b><span class="ad">0x1002</span></div>
+          <div class="bc" id="q2c3"><b id="q2v3">?</b><span class="ad">0x1003</span></div>
+          <div class="bc" id="q2c4"><b id="q2v4">?</b><span class="ad">0x1004</span></div>
+          <div class="bc" id="q2c5"><b id="q2v5">?</b><span class="ad">0x1005</span></div>
+          <div class="bc" id="q2c6"><b id="q2v6">?</b><span class="ad">0x1006</span></div>
+          <div class="bc" id="q2c7"><b id="q2v7">?</b><span class="ad">0x1007</span></div>
+        </div>
+        <div class="brks">
+          <div class="brk hide0" id="q2bx" style="grid-column:1/span 4">int x (4 byte)</div>
+          <div class="brk c hide0" id="q2bc" style="grid-column:5/span 1">c</div>
+          <div class="brk b hide0" id="q2bs" style="grid-column:7/span 2">short s</div>
+        </div>
+        <div class="vars hide0" id="q2bits" style="margin-top:14px"><span class="vc">ô 0x1003 = <b>1 byte</b></span><span class="vc">= 8 bit</span><span class="vc res">0 0 0 0 0 0 0 0</span></div>
+        <div class="vars hide0" id="q2le"><span class="vc">258 = 0x00000102</span><span class="vc res">lưu: 02 01 00 00</span><span class="chip v">little-endian: byte thấp trước</span></div>
+      </div>
+      <span class="f ghost" data-o="3" data-now="#q2code|show-b" data-act="#q2c4|u3;#q2bc|sh" data-set="#q2v4::41" data-say="<b>char c = 'A';</b> chỉ cần khối 1 ô: mã ASCII của 'A' là 65 = 0x41."></span>
+      <span class="f ghost" data-o="4" data-now="#q2code|show-c" data-act="#q2c6|u2;#q2c7|u2;#q2bs|sh" data-set="#q2v6::07;#q2v7::00" data-say="<b>short s = 7;</b> khối 2 ô. Ô 0x1005 bỏ trống (compiler thường căn lề để short bắt đầu ở địa chỉ chẵn)."></span>
+      <span class="f ghost" data-o="5" data-now="#q2code|show-d;#q2c0|hot" data-say="<b>&amp;x</b> cho ra <b>0x1000</b>: địa chỉ của một khối nhớ chính là địa chỉ ô đầu tiên của khối. Kiểu dữ liệu (int) cho biết khối dài bao nhiêu ô."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q03 ===================== -->
+<section class="slide z1" id="q03" data-title="Q03 · sizeof các kiểu dữ liệu">
+  <div class="hdr in"><span class="qn">Q03</span><h2>Kích thước (sizeof) của các kiểu dữ liệu thông dụng</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+<script type="text/x-cpp" class="xs" id="q3code" data-title="sizeof.cpp" data-mark="4:a;5:b;6:c;7:d;8:e;9:f;10:g;1-2:h">
+struct PhanSo { int tu; int mau; };
+int main() {
+    cout << sizeof(char)   << endl;
+    cout << sizeof(short)  << endl;
+    cout << sizeof(int)    << endl;
+    cout << sizeof(long)   << endl;
+    cout << sizeof(float)  << endl;
+    cout << sizeof(double) << endl;
+    cout << sizeof(PhanSo) << endl;
+}
+</script>
+      <div class="cols" style="grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+        <div class="console" style="min-height:190px"><span class="cl" id="q3o1">1</span><span class="cl" id="q3o2">2</span><span class="cl" id="q3o3">4</span><span class="cl" id="q3o4">8   <span style="color:#9ca3b8">(Linux/macOS)</span></span><span class="cl" id="q3o5">4</span><span class="cl" id="q3o6">8</span><span class="cl" id="q3o7">8</span></div>
+        <div class="note blue f" data-o="9" style="margin-top:0;font-size:15.5px"><b>sizeof</b> trả về số <b>byte</b> (kiểu <code class="i">size_t</code>), tính lúc biên dịch. Chuẩn C++ chỉ bảo đảm <code class="i">sizeof(char) == 1</code> và char ≤ short ≤ int ≤ long; số cụ thể tùy máy/compiler.</div>
+      </div>
+    </div>
+    <div>
+      <div class="card in" style="padding:10px 16px">
+        <div class="szr f" data-o="1" data-now="#q3code|show-a" data-act="#q3o1|show" data-say="<b>char</b>: 1 byte — đủ cho 1 ký tự ASCII (−128..127)."><code>char</code><div class="bytes"><i class="c"></i></div><b>1</b></div>
+        <div class="szr f" data-o="2" data-now="#q3code|show-b" data-act="#q3o2|show" data-say="<b>short</b>: 2 byte (−32768..32767)."><code>short</code><div class="bytes"><i class="b"></i><i class="b"></i></div><b>2</b></div>
+        <div class="szr f" data-o="3" data-now="#q3code|show-c" data-act="#q3o3|show" data-say="<b>int</b>: 4 byte (khoảng ±2,1 tỷ) trên hầu hết máy hiện nay."><code>int</code><div class="bytes"><i></i><i></i><i></i><i></i></div><b>4</b></div>
+        <div class="szr f" data-o="4" data-now="#q3code|show-d" data-act="#q3o4|show" data-say="<b>long</b>: <b>4 byte</b> trên Windows (MSVC), <b>8 byte</b> trên Linux/macOS 64-bit. Muốn chắc chắn 8 byte → dùng <b>long long</b>."><code>long</code><div class="bytes"><i></i><i></i><i></i><i></i><i class="o"></i><i class="o"></i><i class="o"></i><i class="o"></i></div><b>4/8</b></div>
+        <div class="szr f" data-o="5" data-now="#q3code|show-e" data-act="#q3o5|show" data-say="<b>float</b>: 4 byte, số thực độ chính xác khoảng 7 chữ số."><code>float</code><div class="bytes"><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i></div><b>4</b></div>
+        <div class="szr f" data-o="6" data-now="#q3code|show-f" data-act="#q3o6|show" data-say="<b>double</b>: 8 byte, độ chính xác khoảng 15–16 chữ số."><code>double</code><div class="bytes"><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i></div><b>8</b></div>
+        <div class="szr f" data-o="7" data-now="#q3code|show-g;#q3code|show-h" data-act="#q3o7|show" data-say="<b>PhanSo</b> gồm 2 int (tu, mau) → 4 + 4 = <b>8 byte</b>."><code>PhanSo</code><div class="bytes"><i></i><i></i><i></i><i></i><i class="b"></i><i class="b"></i><i class="b"></i><i class="b"></i></div><b>8</b></div>
+        <p class="muted" style="font-size:13px;margin-top:2px">mỗi ô vuông = 1 byte · PhanSo: <span style="color:#7c3aed">■ tu</span> <span style="color:#0891b2">■ mau</span> · ô viền đứt: chỉ có trên Linux/macOS</p>
+      </div>
+      <div class="note f" data-o="8" style="font-size:16px" data-say="Compiler chèn 3 byte trống sau <b>c</b> để <b>x</b> bắt đầu ở địa chỉ chia hết cho 4 → CPU đọc nhanh hơn.">⚠️ sizeof của struct có thể <b>lớn hơn</b> tổng các thành phần do căn lề (padding): <code class="i">struct S { char c; int x; };</code> → sizeof(S) = <b>8</b>, không phải 5.</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q04 ===================== -->
+<section class="slide z1" id="q04" data-title="Q04 · Toán tử & (lấy địa chỉ)">
+  <div class="hdr in"><span class="qn">Q04</span><h2>Toán tử <code style="font-family:var(--mono)">&amp;</code> — lấy địa chỉ (address-of)</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+      <div class="card in tight"><ul>
+        <li><code class="i">&amp;x</code> đọc là “<b>địa chỉ của x</b>”: trả về địa chỉ ô đầu tiên của khối nhớ chứa x.</li>
+        <li>Kết quả có kiểu <b>con trỏ</b>: x là <code class="i">int</code> thì <code class="i">&amp;x</code> là <code class="i">int*</code>; d là <code class="i">double</code> thì <code class="i">&amp;d</code> là <code class="i">double*</code>.</li>
+        <li>Chỉ áp dụng cho thứ <b>có vùng nhớ</b> (biến, phần tử mảng…): <code class="i">&amp;5</code>, <code class="i">&amp;(a+b)</code> → lỗi biên dịch.</li>
+      </ul></div>
+<script type="text/x-cpp" class="xs" id="q4code" data-title="address.cpp" data-mark="1:a;2:b;3:c;4:d;5:e;6:f" style="margin-top:10px">
+int x = 10;
+double d = 3.14;
+cout << "x  = " << x  << endl;
+cout << "&x = " << &x << endl;
+cout << "&d = " << &d << endl;
+int* p = &x;      // cất địa chỉ vào con trỏ (Q06)
+</script>
+      <div class="console" style="margin-top:8px;min-height:84px"><span class="cl" id="q4o1">x  = 10</span><span class="cl" id="q4o2">&amp;x = 0x7ffee4b1a9ac</span><span class="cl" id="q4o3">&amp;d = 0x7ffee4b1a9a0</span></div>
+    </div>
+    <div>
+      <div class="card in" style="padding:18px 16px">
+        <div class="mrow" style="gap:30px">
+          <div class="mc hide0" id="q4x"><span class="nm">x</span><div class="val">10</div><span class="addr" id="q4xa">0x7ffee4b1a9ac</span></div>
+          <div class="mc hide0" id="q4d"><span class="nm">d</span><div class="val">3.14</div><span class="addr" id="q4da">0x7ffee4b1a9a0</span></div>
+          <div class="arw hide0" id="q4ar">⟵<small>p = &amp;x</small></div>
+          <div class="mc ptr hide0" id="q4p"><span class="nm">p</span><div class="val" style="font-size:14px">0x7ffee4b1a9ac</div><span class="addr">int*</span></div>
+        </div>
+      </div>
+      <div class="card f tight" data-o="7" style="margin-top:12px"><h3>Ký hiệu &amp; có 3 nghĩa trong C++</h3>
+        <table class="t1" style="font-size:16px">
+          <tr><td><code class="i">&amp;x</code></td><td>trong biểu thức, 1 toán hạng → <b>lấy địa chỉ</b> (câu này)</td></tr>
+          <tr><td><code class="i">int&amp; r = x;</code></td><td>trong khai báo → <b>tham chiếu</b> (bí danh của x)</td></tr>
+          <tr><td><code class="i">a &amp; b</code></td><td>2 toán hạng → phép <b>AND</b> từng bit</td></tr>
+        </table></div>
+      <span class="f ghost" data-o="1" data-now="#q4code|show-a" data-act="#q4x|sh" data-say="Khai báo <b>int x = 10;</b> → hệ thống dành cho x một khối 4 byte ở một địa chỉ nào đó."></span>
+      <span class="f ghost" data-o="2" data-now="#q4code|show-b" data-act="#q4d|sh" data-say="<b>double d</b> được cấp khối 8 byte ở địa chỉ khác."></span>
+      <span class="f ghost" data-o="3" data-now="#q4code|show-c" data-act="#q4o1|show" data-say="In <b>x</b> → in <b>giá trị</b> 10."></span>
+      <span class="f ghost" data-o="4" data-now="#q4code|show-d;#q4x|glow" data-act="#q4o2|show" data-say="In <b>&amp;x</b> → in <b>địa chỉ</b> của x (hệ 16). Mỗi lần chạy có thể khác nhau."></span>
+      <span class="f ghost" data-o="5" data-now="#q4code|show-e;#q4d|glow" data-act="#q4o3|show" data-say="<b>&amp;d</b>: địa chỉ của d. Hai biến luôn có địa chỉ khác nhau."></span>
+      <span class="f ghost" data-o="6" data-now="#q4code|show-f" data-act="#q4ar|sh;#q4p|sh" data-say="Công dụng chính của &amp;: lấy địa chỉ để <b>gán cho con trỏ</b> — p giữ địa chỉ của x."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q05 ===================== -->
+<section class="slide z1" id="q05" data-title="Q05 · Ô nhớ occupied/used vs free">
+  <div class="hdr in"><span class="qn">Q05</span><h2>Ô nhớ <span style="color:#7c3aed">occupied / used</span> vs <span style="color:#64748b">free</span></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr">
+    <div>
+      <div class="card in tight"><ul>
+        <li><b>Used / occupied</b> (đang dùng): ô đã được <b>cấp</b> cho một biến/đối tượng. Chương trình đang sở hữu nó; không được cấp cho ai khác.</li>
+        <li><b>Free</b> (trống): ô chưa cấp hoặc <b>đã trả lại</b> → có thể cấp cho biến mới.</li>
+        <li>Ô free <b>không có nghĩa là bằng 0</b>: nó vẫn giữ các bit cũ (giá trị rác). “Free” nói về <b>quyền sở hữu</b>, không phải nội dung.</li>
+      </ul></div>
+<script type="text/x-cpp" class="xs" id="q5code" data-title="Ví dụ" data-mark="2:a;4:b;5:c;6:d;7:e;8:f" style="margin-top:10px">
+void f() {
+    int a = 5;            // khối của a: USED
+    {
+        int b = 7;        // khối của b: USED
+    }                     // hết khối: b -> FREE
+    int* p = new int(9);  // 4 ô trên heap: USED
+    delete p;             // ô heap -> FREE
+}                         // hết hàm: a, p -> FREE
+</script>
+    </div>
+    <div>
+      <div class="card in" style="padding:14px 16px">
+        <div class="rowlab" style="margin-top:0">STACK (biến cục bộ)</div>
+        <div class="ram">
+          <div class="bc" id="q5s0"><b id="q5v0">?</b><span class="ad">a</span></div><div class="bc" id="q5s1"><b id="q5v1">?</b></div><div class="bc" id="q5s2"><b id="q5v2">?</b></div><div class="bc" id="q5s3"><b id="q5v3">?</b></div>
+          <div class="bc" id="q5s4"><b id="q5v4">?</b><span class="ad">b</span></div><div class="bc" id="q5s5"><b id="q5v5">?</b></div><div class="bc" id="q5s6"><b id="q5v6">?</b></div><div class="bc" id="q5s7"><b id="q5v7">?</b></div>
+        </div>
+        <div class="rowlab" style="margin-top:26px">HEAP (cấp phát động)</div>
+        <div class="ram">
+          <div class="bc" id="q5h0"><b id="q5w0">?</b><span class="ad">*p</span></div><div class="bc" id="q5h1"><b id="q5w1">?</b></div><div class="bc" id="q5h2"><b id="q5w2">?</b></div><div class="bc" id="q5h3"><b id="q5w3">?</b></div>
+          <div class="bc"><b>?</b></div><div class="bc"><b>?</b></div><div class="bc"><b>?</b></div><div class="bc"><b>?</b></div>
+        </div>
+        <div class="vars" style="margin-top:28px"><span class="chip v">■ USED</span><span class="chip" style="background:#f1f5f9;color:#64748b;border-color:#cbd5e1">▨ FREE (vẫn còn số cũ)</span><span class="chip" style="background:#fff;color:#9ca3b8;border-color:#e4dcfb">? chưa từng dùng</span></div>
+      </div>
+      <span class="f ghost" data-now="#q5code|show-a" data-act="#q5s0|u;#q5s1|u;#q5s2|u;#q5s3|u" data-set="#q5v0::05;#q5v1::00;#q5v2::00;#q5v3::00" data-say="<b>int a = 5;</b> → 4 ô trên stack chuyển sang <b>USED</b>, thuộc về a."></span>
+      <span class="f ghost" data-now="#q5code|show-b" data-act="#q5s4|u2;#q5s5|u2;#q5s6|u2;#q5s7|u2" data-set="#q5v4::07;#q5v5::00;#q5v6::00;#q5v7::00" data-say="<b>int b = 7;</b> → thêm 4 ô USED cho b."></span>
+      <span class="f ghost" data-now="#q5code|show-c" data-act="#q5s4|fz;#q5s5|fz;#q5s6|fz;#q5s7|fz" data-say="Ra khỏi khối <b>{ }</b>: b hết tầm vực → 4 ô của b trở thành <b>FREE</b>. Chú ý: số 07 <b>vẫn nằm đó</b>, chỉ là không ai sở hữu nữa."></span>
+      <span class="f ghost" data-now="#q5code|show-d" data-act="#q5h0|u3;#q5h1|u3;#q5h2|u3;#q5h3|u3" data-set="#q5w0::09;#q5w1::00;#q5w2::00;#q5w3::00" data-say="<b>new int(9)</b> → 4 ô trên <b>heap</b> chuyển sang USED. Chúng sẽ USED cho tới khi gọi delete."></span>
+      <span class="f ghost" data-now="#q5code|show-e" data-act="#q5h0|fz;#q5h1|fz;#q5h2|fz;#q5h3|fz" data-say="<b>delete p;</b> → trả 4 ô heap về: FREE. Lần new sau có thể nhận lại đúng những ô này."></span>
+      <span class="f ghost" data-now="#q5code|show-f" data-act="#q5s0|fz;#q5s1|fz;#q5s2|fz;#q5s3|fz" data-say="Hàm kết thúc → biến cục bộ a (và p) tự động FREE. <b>Biến cục bộ</b> tự giải phóng; vùng <b>new</b> phải tự <b>delete</b>."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q06 ===================== -->
+<section class="slide" id="q06" data-title="Q06 · Pointer là gì?">
+  <div class="hdr in"><span class="qn">Q06</span><h2>Pointer (con trỏ) là gì?</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+      <div class="card in tight"><ul>
+        <li><b>Con trỏ</b> là một <b>biến</b> dùng để lưu <b>địa chỉ</b> của một vùng nhớ khác. Ta nói con trỏ “<b>trỏ tới</b>” vùng nhớ đó.</li>
+        <li>Khai báo: <code class="i">KiểuDữLiệu* tên;</code> — kiểu là kiểu của vùng nhớ được trỏ tới: <code class="i">int* p;</code> trỏ tới int.</li>
+        <li>Bản thân con trỏ cũng là biến → có <b>địa chỉ riêng</b> và chiếm bộ nhớ (8 byte).</li>
+        <li>Dùng để: truy cập gián tiếp, truyền tham số, mảng, cấp phát động, cấu trúc liên kết (danh sách liên kết, cây…).</li>
+      </ul></div>
+<script type="text/x-cpp" class="xs" id="q6code" data-title="pointer.cpp" data-mark="1:a;2:b;3:c;4:d;5:e;6:f;7:g" style="margin-top:10px">
+int x = 10;
+int* p;              // con trỏ tới int (chưa có giá trị!)
+p = &x;              // p lưu địa chỉ của x -> p trỏ tới x
+cout << x  << endl;  // giá trị của x
+cout << p  << endl;  // giá trị của p = địa chỉ của x
+cout << *p << endl;  // giá trị tại địa chỉ p
+cout << &p << endl;  // địa chỉ của chính p
+</script>
+    </div>
+    <div>
+      <div class="card in" style="padding:22px 16px">
+        <div class="mrow" style="gap:18px">
+          <div class="mc ptr hide0" id="q6p"><span class="nm">p &nbsp;<span style="color:#9ca3b8;font-weight:600">int*</span></span><div class="val" id="q6pv">???</div><span class="addr">0x2000</span></div>
+          <div class="arw hide0" id="q6ar">──▶<small>trỏ tới</small></div>
+          <div class="mc u hide0" id="q6x"><span class="nm">x &nbsp;<span style="color:#9ca3b8;font-weight:600">int</span></span><div class="val">10</div><span class="addr">0x1000</span></div>
+        </div>
+      </div>
+      <div class="console" style="margin-top:12px;min-height:116px"><span class="cl" id="q6o1">10</span><span class="cl" id="q6o2">0x1000</span><span class="cl" id="q6o3">10</span><span class="cl" id="q6o4">0x2000</span></div>
+      <span class="f ghost" data-now="#q6code|show-a" data-act="#q6x|sh" data-say="Biến <b>x</b> nằm ở địa chỉ 0x1000, chứa giá trị 10."></span>
+      <span class="f ghost" data-now="#q6code|show-b" data-act="#q6p|sh" data-say="<b>int* p;</b> tạo biến con trỏ p ở địa chỉ 0x2000. Chưa gán → chứa địa chỉ rác, <b>chưa được dùng *p</b>."></span>
+      <span class="f ghost" data-now="#q6code|show-c" data-act="#q6ar|sh" data-set="#q6pv::0x1000" data-say="<b>p = &amp;x;</b> → giá trị của p là 0x1000 = địa chỉ của x. Ta vẽ mũi tên: p <b>trỏ tới</b> x."></span>
+      <span class="f ghost" data-now="#q6code|show-d;#q6x|glow" data-act="#q6o1|show" data-say="<b>x</b> → 10."></span>
+      <span class="f ghost" data-now="#q6code|show-e;#q6p|glow" data-act="#q6o2|show" data-say="<b>p</b> → 0x1000: in <b>nội dung của p</b>, tức là một địa chỉ."></span>
+      <span class="f ghost" data-now="#q6code|show-f;#q6x|glow" data-act="#q6o3|show" data-say="<b>*p</b> → đi theo mũi tên tới 0x1000 và lấy giá trị ở đó: 10 (de-reference, xem Q11)."></span>
+      <span class="f ghost" data-now="#q6code|show-g" data-act="#q6o4|show" data-say="<b>&amp;p</b> → 0x2000: con trỏ cũng là biến nên cũng có địa chỉ riêng."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q07 ===================== -->
+<section class="slide z1" id="q07" data-title="Q07 · sizeof một con trỏ">
+  <div class="hdr in"><span class="qn">Q07</span><h2>sizeof của một con trỏ</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+<script type="text/x-cpp" class="xs" id="q7code" data-title="sizeof_pointer.cpp" data-mark="3:a;4:b;5:c;6:d;7:e;8:f;9:g">
+struct PhanSo { int tu, mau; };
+int* p; double* q; char* s; PhanSo* ps;
+cout << sizeof(p)   << endl;
+cout << sizeof(q)   << endl;
+cout << sizeof(s)   << endl;
+cout << sizeof(ps)  << endl;
+cout << sizeof(*q)  << endl;   // kích thước double
+cout << sizeof(*s)  << endl;   // kích thước char
+cout << sizeof(*ps) << endl;   // kích thước PhanSo
+</script>
+      <div class="console" style="margin-top:10px;min-height:180px"><span class="cl" id="q7o1">8</span><span class="cl" id="q7o2">8</span><span class="cl" id="q7o3">8</span><span class="cl" id="q7o4">8</span><span class="cl" id="q7o5">8</span><span class="cl" id="q7o6">1</span><span class="cl" id="q7o7">8</span></div>
+    </div>
+    <div>
+      <div class="card in tight"><ul>
+        <li>Con trỏ chỉ lưu <b>một địa chỉ</b>. Độ dài địa chỉ do <b>kiến trúc máy</b> quyết định: máy/chương trình <b>64-bit → 8 byte</b>, <b>32-bit → 4 byte</b>.</li>
+        <li>Vì vậy mọi con trỏ (int*, double*, char*, PhanSo*…) đều có <b>cùng kích thước</b>, dù vùng nhớ nó trỏ tới lớn hay nhỏ.</li>
+        <li>Phân biệt: <code class="i">sizeof(p)</code> = kích thước con trỏ; <code class="i">sizeof(*p)</code> = kích thước vùng được trỏ.</li>
+      </ul></div>
+      <div class="card f" data-o="5" style="margin-top:12px;padding:10px 16px" data-say="Tóm tắt: hộp con trỏ luôn 8 byte; vùng nhớ ở đầu mũi tên mới có kích thước khác nhau. Biên dịch 32-bit (vd. -m32) thì con trỏ là 4 byte.">
+        <div class="szr"><code>p, q, s, ps</code><div class="bytes"><i class="b"></i><i class="b"></i><i class="b"></i><i class="b"></i><i class="b"></i><i class="b"></i><i class="b"></i><i class="b"></i></div><b>8</b></div>
+        <div class="szr"><code>*q double</code><div class="bytes"><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i></div><b>8</b></div>
+        <div class="szr"><code>*s char</code><div class="bytes"><i class="c"></i></div><b>1</b></div>
+        <div class="szr"><code>*ps PhanSo</code><div class="bytes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><b>8</b></div>
+      </div>
+      <span class="f ghost" data-o="1" data-now="#q7code|show-a" data-act="#q7o1|show" data-say="<b>sizeof(int*)</b> = 8 trên máy 64-bit."></span>
+      <span class="f ghost" data-o="2" data-now="#q7code|show-b;#q7code|show-c;#q7code|show-d" data-act="#q7o2|show;#q7o3|show;#q7o4|show" data-say="double*, char*, PhanSo* cũng đều là <b>8</b> — dù char chỉ 1 byte. Con trỏ char* vẫn cần đủ 8 byte để chứa một địa chỉ."></span>
+      <span class="f ghost" data-o="3" data-now="#q7code|show-e;#q7code|show-f;#q7code|show-g" data-act="#q7o5|show;#q7o6|show;#q7o7|show" data-say="Còn <b>sizeof(*q)</b>, <b>sizeof(*s)</b>, <b>sizeof(*ps)</b> là kích thước của <b>vùng được trỏ</b>: 8, 1, 8. (sizeof không thực sự truy cập *p nên dùng được kể cả khi p chưa trỏ đâu.)"></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q08 ===================== -->
+<section class="slide" id="q08" data-title="Q08 · int* p, double* q, char* s: giống & khác">
+  <div class="hdr in"><span class="qn">Q08</span><h2><code style="font-family:var(--mono)">int* p</code>, <code style="font-family:var(--mono)">double* q</code>, <code style="font-family:var(--mono)">char* s</code> — giống &amp; khác</h2></div>
+  <div class="cols" style="grid-template-columns:1.05fr 1fr">
+    <div>
+<script type="text/x-cpp" class="xs" id="q8code" data-title="compare.cpp" data-mark="1-2:a;3:b;4:c;5:d;6:e;7:f;8:y">
+int a = 65;  double b = 2.5;  char c[] = "Hi";
+int* p = &a;  double* q = &b;  char* s = c;
+cout << *p << " " << *q << " " << *s << endl;
+cout << p << " " << p + 1 << endl;
+cout << q << " " << q + 1 << endl;
+cout << s << endl;
+cout << (void*)s << " " << (void*)(s + 1) << endl;
+// q = p;   lỗi: không đổi int* sang double* được
+</script>
+      <div class="console" style="margin-top:10px;min-height:120px"><span class="cl" id="q8o1">65 2.5 H</span><span class="cl" id="q8o2">0x1000 0x1004    <span style="color:#fbbf24">← +4</span></span><span class="cl" id="q8o3">0x2000 0x2008    <span style="color:#fbbf24">← +8</span></span><span class="cl" id="q8o4">Hi                <span style="color:#fbbf24">← in chuỗi, không in địa chỉ!</span></span><span class="cl" id="q8o5">0x3000 0x3001    <span style="color:#fbbf24">← +1</span></span></div>
+    </div>
+    <div>
+      <div class="card f tight" data-o="1" style="border-top:5px solid #10b981"><h3 style="color:#059669">Giống nhau</h3><ul>
+        <li>Đều là <b>biến lưu địa chỉ</b>; cùng kích thước (<b>8 byte</b> trên 64-bit).</li>
+        <li>Đều dùng được <code class="i">&amp;</code>, <code class="i">*</code>, <code class="i">++</code>, <code class="i">--</code>, <code class="i">==</code>, gán <code class="i">nullptr</code>, <code class="i">new</code>/<code class="i">delete</code>.</li>
+      </ul></div>
+      <div class="card f tight" data-o="2" style="border-top:5px solid #ec4899;margin-top:10px"><h3 style="color:#db2777">Khác nhau — do <b>kiểu được trỏ</b></h3><ul>
+        <li><b>*p</b> đọc 4 byte hiểu là int; <b>*q</b> đọc 8 byte là double; <b>*s</b> đọc 1 byte là ký tự.</li>
+        <li><b>Bước nhảy</b>: p+1 tăng 4 byte, q+1 tăng 8, s+1 tăng 1 (= sizeof kiểu được trỏ).</li>
+        <li><b>Không gán lẫn</b> cho nhau nếu không ép kiểu: <code class="i">q = p;</code> lỗi biên dịch.</li>
+        <li><code class="i">cout &lt;&lt; s</code> với <b>char*</b> in ra <b>chuỗi</b> tới ký tự '\0'; muốn in địa chỉ phải ép <code class="i">(void*)s</code>.</li>
+      </ul></div>
+      <span class="f ghost" data-o="3" data-now="#q8code|show-a" data-say="Ba con trỏ trỏ tới ba kiểu khác nhau: p → int a, q → double b, s → mảng char c (ký tự đầu)."></span>
+      <span class="f ghost" data-o="4" data-now="#q8code|show-b" data-act="#q8o1|show" data-say="Cùng là phép <b>*</b> nhưng đọc ra 3 kiểu khác nhau: 65 (int), 2.5 (double), 'H' (char)."></span>
+      <span class="f ghost" data-o="5" data-now="#q8code|show-c" data-act="#q8o2|show" data-say="<b>p + 1</b>: nhảy tới int kế tiếp → +4 byte."></span>
+      <span class="f ghost" data-o="6" data-now="#q8code|show-d" data-act="#q8o3|show" data-say="<b>q + 1</b>: nhảy tới double kế tiếp → +8 byte."></span>
+      <span class="f ghost" data-o="7" data-now="#q8code|show-e" data-act="#q8o4|show" data-say="Đặc biệt: cout coi <b>char*</b> là chuỗi kiểu C → in <b>Hi</b>."></span>
+      <span class="f ghost" data-o="8" data-now="#q8code|show-f" data-act="#q8o5|show" data-say="Ép sang <b>void*</b> để in địa chỉ: s + 1 chỉ tăng 1 byte."></span>
+      <span class="f ghost" data-o="9" data-now="#q8code|show-y" data-say="Gán <b>double* = int*</b> bị compiler chặn: nếu cho phép, *q sẽ đọc 8 byte từ chỗ chỉ có 4 byte của int → sai dữ liệu."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q09 ===================== -->
+<section class="slide" id="q09" data-title="Q09 · Pointer reference (tham chiếu)">
+  <div class="hdr in"><span class="qn">Q09</span><h2>Pointer reference — cho con trỏ tham chiếu tới biến</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+      <div class="card in tight"><ul>
+        <li><b>Reference</b> (tham chiếu) một con trỏ: gán cho nó <b>địa chỉ</b> của một biến bằng <code class="i">&amp;</code> → con trỏ “tham chiếu tới / trỏ tới” biến đó: <code class="i">p = &amp;x;</code></li>
+        <li>Một con trỏ có thể <b>đổi</b> biến được tham chiếu bất cứ lúc nào; nhiều con trỏ có thể cùng tham chiếu <b>một</b> biến.</li>
+        <li>Chiều ngược lại — đi theo địa chỉ để lấy giá trị — là <b>de-reference</b> <code class="i">*p</code> (Q11).</li>
+        <li><b>Tham chiếu tới con trỏ</b> <code class="i">int*&amp; rp = p;</code>: rp là <b>bí danh</b> của chính p (dùng ở Q12).</li>
+      </ul></div>
+<script type="text/x-cpp" class="xs" id="q9code" data-title="reference.cpp" data-mark="1:a;2:b;3:c;4:d;5:e;6:f;7:g;8:h;9:i" style="margin-top:10px">
+int x = 10, y = 20;
+int* p = &x;            // p tham chiếu tới x
+int* q = p;             // q cũng tham chiếu tới x
+cout << *p << " " << *q << endl;
+p = &y;                 // p chuyển sang tham chiếu y
+cout << *p << " " << *q << endl;
+int*& rp = p;           // rp là bí danh của con trỏ p
+rp = &x;                // đổi rp = đổi chính p
+cout << *p << endl;
+</script>
+    </div>
+    <div>
+      <div class="card in" style="padding:20px 16px">
+        <div style="display:grid;grid-template-columns:auto auto auto;gap:18px 18px;align-items:center;justify-content:center">
+          <div class="mc ptr hide0" id="q9p"><span class="nm" id="q9pn">p</span><div class="val" id="q9pv">?</div></div>
+          <div class="arw hide0" id="q9pa">──▶</div>
+          <div class="mc u hide0" id="q9x"><span class="nm">x</span><div class="val">10</div><span class="addr">0x1000</span></div>
+          <div class="mc ptr hide0" id="q9q"><span class="nm">q</span><div class="val">0x1000</div></div>
+          <div class="arw hide0" id="q9qa">──▶<small>x</small></div>
+          <div class="mc u hide0" id="q9y"><span class="nm">y</span><div class="val">20</div><span class="addr">0x1004</span></div>
+        </div>
+      </div>
+      <div class="console" style="margin-top:12px;min-height:84px"><span class="cl" id="q9o1">10 10</span><span class="cl" id="q9o2">20 10</span><span class="cl" id="q9o3">10</span></div>
+      <span class="f ghost" data-now="#q9code|show-a" data-act="#q9x|sh;#q9y|sh" data-say="Hai biến x (0x1000) và y (0x1004)."></span>
+      <span class="f ghost" data-now="#q9code|show-b;#q9x|glow" data-act="#q9p|sh;#q9pa|sh" data-set="#q9pv::0x1000;#q9pa::──▶&lt;small&gt;x&lt;/small&gt;" data-say="<b>p = &amp;x</b>: p giữ 0x1000 → p <b>tham chiếu tới x</b>."></span>
+      <span class="f ghost" data-now="#q9code|show-c" data-act="#q9q|sh;#q9qa|sh" data-say="<b>q = p</b>: copy địa chỉ 0x1000 sang q → q cũng tham chiếu x. Không có bản sao nào của x được tạo ra."></span>
+      <span class="f ghost" data-now="#q9code|show-d" data-act="#q9o1|show" data-say="*p và *q cùng đọc ô 0x1000 → <b>10 10</b>."></span>
+      <span class="f ghost" data-now="#q9code|show-e;#q9y|glow" data-set="#q9pv::0x1004;#q9pa::──▶&lt;small&gt;y&lt;/small&gt;" data-say="<b>p = &amp;y</b>: p đổi sang tham chiếu y. q <b>không</b> bị ảnh hưởng — q vẫn trỏ x."></span>
+      <span class="f ghost" data-now="#q9code|show-f" data-act="#q9o2|show" data-say="Kết quả <b>20 10</b>."></span>
+      <span class="f ghost" data-now="#q9code|show-g;#q9p|glow" data-set="#q9pv::0x1004;#q9pa::──▶&lt;small&gt;y&lt;/small&gt;;#q9pn::p ≡ rp" data-say="<b>int*&amp; rp = p;</b> → rp không phải con trỏ mới, mà là <b>tên thứ hai</b> của p (cùng một hộp nhớ)."></span>
+      <span class="f ghost" data-now="#q9code|show-h;#q9x|glow" data-set="#q9pv::0x1000;#q9pa::──▶&lt;small&gt;x&lt;/small&gt;;#q9pn::p ≡ rp" data-say="<b>rp = &amp;x</b> → chính p được đổi, giờ p lại trỏ x."></span>
+      <span class="f ghost" data-now="#q9code|show-i" data-act="#q9o3|show" data-say="<b>*p</b> = 10."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q10 ===================== -->
+<section class="slide" id="q10" data-title="Q10 · nullptr">
+  <div class="hdr in"><span class="qn">Q10</span><h2><code style="font-family:var(--mono)">nullptr</code> — con trỏ rỗng</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+      <div class="card in tight"><ul>
+        <li><b>nullptr</b> (từ C++11) là giá trị đặc biệt nghĩa là “<b>không trỏ tới đâu cả</b>”. Có kiểu riêng <code class="i">std::nullptr_t</code>, gán được cho <b>mọi kiểu con trỏ</b> nhưng không phải số nguyên.</li>
+        <li>Dùng để: <b>khởi tạo</b> con trỏ chưa có chỗ trỏ; <b>đánh dấu</b> sau khi delete; báo “không tìm thấy”; kiểm tra <code class="i">if (p != nullptr)</code>.</li>
+        <li><code class="i">*p</code> khi p là nullptr → <b>lỗi lúc chạy</b> (Segmentation fault / Access violation).</li>
+        <li><code class="i">delete p;</code> khi p là nullptr → an toàn, không làm gì.</li>
+      </ul></div>
+      <div class="card f tight" data-o="5" style="margin-top:10px"><h3>Vì sao không dùng NULL hoặc 0?</h3><p><code class="i">NULL</code> thực chất là số <b>0</b> (kiểu số nguyên) → khi có 2 hàm nạp chồng <code class="i">f(int)</code> và <code class="i">f(int*)</code>, <code class="i">f(NULL)</code> gọi nhầm <code class="i">f(int)</code> hoặc báo lỗi mơ hồ. <code class="i">nullptr</code> luôn là con trỏ.</p></div>
+    </div>
+    <div>
+<script type="text/x-cpp" class="xs" id="q10code" data-title="nullptr.cpp" data-mark="4:a;5-6:b;7:c;8:d;9:e;10:y">
+void f(int x)  { cout << "f(int)"  << endl; }
+void f(int* p) { cout << "f(int*)" << endl; }
+
+int* p = nullptr;          // chưa trỏ tới đâu
+if (p == nullptr)
+    cout << "p rong" << endl;
+f(0);                      // 0 là số nguyên
+f(NULL);                   // tùy compiler
+f(nullptr);                // đúng ý: bản con trỏ
+cout << *p;                // Segmentation fault!
+</script>
+      <div class="mrow" style="margin-top:12px">
+        <div class="mc ptr hide0" id="q10p"><span class="nm">p</span><div class="val">nullptr</div><span class="addr">= 0x0</span></div>
+        <div class="arw hide0" id="q10a">──▶ <span style="font-size:30px;color:#9ca3b8">∅</span></div>
+        <div class="console" style="flex:1;min-height:110px"><span class="cl" id="q10o1">p rong</span><span class="cl" id="q10o2">f(int)</span><span class="cl" id="q10o3">f(int) / lỗi: 'f' is ambiguous</span><span class="cl" id="q10o4">f(int*)</span><span class="cl" id="q10o5" style="color:#fda4af">Segmentation fault (core dumped)</span></div>
+      </div>
+      <span class="f ghost" data-o="1" data-now="#q10code|show-a" data-act="#q10p|sh;#q10a|sh" data-say="<b>int* p = nullptr;</b> — khởi tạo con trỏ rõ ràng: p không trỏ tới vùng nhớ nào. Tốt hơn nhiều so với để rác."></span>
+      <span class="f ghost" data-o="2" data-now="#q10code|show-b" data-act="#q10o1|show" data-say="Có thể kiểm tra trước khi dùng: <b>if (p == nullptr)</b> (hoặc gọn hơn: <b>if (!p)</b>)."></span>
+      <span class="f ghost" data-o="3" data-now="#q10code|show-c;#q10code|show-d" data-act="#q10o2|show;#q10o3|show" data-say="<b>f(0)</b> gọi f(int). <b>f(NULL)</b>: MSVC gọi f(int), g++/clang báo lỗi mơ hồ — đều không phải điều ta muốn."></span>
+      <span class="f ghost" data-o="4" data-now="#q10code|show-e" data-act="#q10o4|show" data-say="<b>f(nullptr)</b> chắc chắn gọi bản <b>f(int*)</b>."></span>
+      <span class="f ghost" data-o="6" data-now="#q10code|show-y;#q10p|bad" data-act="#q10o5|show" data-say="Truy cập <b>*p</b> khi p == nullptr: hệ điều hành chặn truy cập địa chỉ 0 → chương trình bị dừng. Luôn kiểm tra trước khi de-reference."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q11 ===================== -->
+<section class="slide z1" id="q11" data-title="Q11 · Pointer de-reference (*p)">
+  <div class="hdr in"><span class="qn">Q11</span><h2>Pointer de-reference — toán tử <code style="font-family:var(--mono)">*p</code></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+      <div class="card in tight"><ul>
+        <li><code class="i">*p</code> = “<b>giá trị tại địa chỉ p</b>”: đi theo mũi tên tới vùng nhớ được trỏ. Ngược với <code class="i">&amp;</code>: <code class="i">*(&amp;x)</code> chính là x.</li>
+        <li>Dùng để <b>đọc</b> (<code class="i">y = *p;</code>) và <b>ghi</b> (<code class="i">*p = 20;</code>) — ghi qua *p là thay đổi <b>chính biến</b> được trỏ.</li>
+        <li>Kiểu của <code class="i">*p</code> là kiểu được trỏ: p là <code class="i">int*</code> thì <code class="i">*p</code> là <code class="i">int</code>.</li>
+        <li>Dấu <code class="i">*</code> trong <b>khai báo</b> (<code class="i">int* p</code>) chỉ nói “p là con trỏ”; dấu <code class="i">*</code> trong <b>biểu thức</b> mới là de-reference.</li>
+        <li>Chỉ de-reference khi p trỏ tới vùng <b>hợp lệ</b>: không nullptr, đã khởi tạo, chưa delete.</li>
+      </ul></div>
+    </div>
+    <div>
+<script type="text/x-cpp" class="xs" id="q11code" data-title="deref.cpp" data-mark="1-2:a;3:b;4:c;5:d;6:e;7:f;8:g;9:y">
+int x = 10;
+int* p = &x;
+cout << *p << endl;   // đọc qua con trỏ
+*p = 20;              // ghi qua con trỏ
+cout << x  << endl;   // x đã bị đổi!
+(*p)++;               // tăng giá trị được trỏ
+cout << x  << endl;
+int* q;               // chưa khởi tạo: địa chỉ rác
+*q = 5;               // UB: ghi vào nơi không biết
+</script>
+      <div class="card in" style="margin-top:12px;padding:16px">
+        <div class="mrow">
+          <div class="mc ptr" id="q11p"><span class="nm">p</span><div class="val">0x1000</div></div>
+          <div class="arw" id="q11a">──▶<small id="q11al">*p</small></div>
+          <div class="mc u" id="q11x"><span class="nm">x</span><div class="val" id="q11xv">10</div><span class="addr">0x1000</span></div>
+          <div class="console" style="flex:1;min-height:84px;margin-left:8px"><span class="cl" id="q11o1">10</span><span class="cl" id="q11o2">20</span><span class="cl" id="q11o3">21</span></div>
+        </div>
+      </div>
+      <span class="f ghost" data-now="#q11code|show-a" data-say="p trỏ tới x (0x1000)."></span>
+      <span class="f ghost" data-now="#q11code|show-b;#q11x|glow" data-act="#q11o1|show" data-say="<b>Đọc</b>: *p → tới ô 0x1000 → lấy 10."></span>
+      <span class="f ghost" data-now="#q11code|show-c;#q11x|glow" data-set="#q11xv::20" data-say="<b>Ghi</b>: *p = 20 → ghi 20 vào ô 0x1000, tức là ghi vào x."></span>
+      <span class="f ghost" data-now="#q11code|show-d" data-set="#q11xv::20" data-act="#q11o2|show" data-say="In x → <b>20</b>. Ta đã đổi x mà không hề viết tên x."></span>
+      <span class="f ghost" data-now="#q11code|show-e;#q11x|glow" data-set="#q11xv::21" data-say="<b>(*p)++</b> tăng giá trị được trỏ. Cần ngoặc: <b>*p++</b> lại có nghĩa khác (dời con trỏ, xem Q16)."></span>
+      <span class="f ghost" data-now="#q11code|show-f" data-set="#q11xv::21" data-act="#q11o3|show" data-say="x = <b>21</b>."></span>
+      <span class="f ghost" data-now="#q11code|show-g;#q11code|show-y" data-set="#q11xv::21" data-say="<b>Lỗi</b>: q chưa khởi tạo mang địa chỉ rác; <b>*q = 5</b> ghi vào nơi không biết → Undefined Behavior (crash hoặc phá dữ liệu khác)."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q12 ===================== -->
+<section class="slide" id="q12" data-title="Q12 · foo(int *p) vs foo(int *&p)">
+  <div class="hdr in"><span class="qn">Q12</span><h2><code style="font-family:var(--mono)">void foo(int *p)</code> vs <code style="font-family:var(--mono)">void foo(int *&amp;p)</code></h2></div>
+  <div class="cols" style="grid-template-columns:1.05fr 1fr">
+    <div>
+<script type="text/x-cpp" class="xs" id="q12code" data-title="ref_pointer.cpp" data-mark="1:a;2:b;5:c;6:d;7:e;8:f;9:g">
+void capPhat1(int* p)  { p = new int(5); }  // p: BẢN SAO
+void capPhat2(int*& p) { p = new int(5); }  // p: BÍ DANH
+
+int main() {
+    int* a = nullptr;
+    capPhat1(a);
+    cout << (a == nullptr) << endl;
+    capPhat2(a);
+    cout << *a << endl;
+    delete a;
+}
+</script>
+      <table class="cmp f" data-o="9" style="margin-top:10px">
+        <tr><th></th><th>foo(int* p)</th><th>foo(int*&amp; p)</th></tr>
+        <tr><td>Truyền</td><td>giá trị: <b>copy</b> địa chỉ</td><td>tham chiếu: <b>chính</b> con trỏ</td></tr>
+        <tr><td>Sửa <code class="i">*p</code></td><td>✓ ảnh hưởng biến được trỏ</td><td>✓ như bên trái</td></tr>
+        <tr><td>Sửa <code class="i">p = …</code></td><td>✗ chỉ đổi bản sao</td><td>✓ đổi con trỏ của bên gọi</td></tr>
+        <tr><td>Đối số</td><td><code class="i">&amp;x</code>, <code class="i">a+1</code>, <code class="i">nullptr</code> đều được</td><td>phải là <b>biến</b> con trỏ</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="region" style="margin-bottom:16px"><span class="rl">main()</span>
+        <div class="mrow"><div class="mc ptr" id="q12a"><span class="nm">a</span><div class="val" id="q12av">nullptr</div></div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="region fn hide0" id="q12f1"><span class="rl">capPhat1</span>
+          <div class="mrow"><div class="mc ptr" id="q12p1"><span class="nm">p (bản sao)</span><div class="val" id="q12p1v">nullptr</div></div></div></div>
+        <div class="region fn hide0" id="q12f2"><span class="rl">capPhat2</span>
+          <div class="mrow"><div class="mc" id="q12p2"><span class="nm">p ≡ a</span><div class="val" style="font-size:14px">(không có hộp riêng)</div></div></div></div>
+      </div>
+      <div class="region heap" style="margin-top:16px"><span class="rl">HEAP</span>
+        <div class="mrow" style="gap:30px">
+          <div class="mc hide0" id="q12h1"><span class="nm">vùng #1</span><div class="val">5</div><span class="addr">0x9A0</span></div>
+          <div class="mc u hide0" id="q12h2"><span class="nm">vùng #2</span><div class="val">5</div><span class="addr">0xB40</span></div>
+          <div class="console" style="flex:1;min-height:62px"><span class="cl" id="q12o1">1</span><span class="cl" id="q12o2">5</span></div>
+        </div>
+      </div>
+      <span class="f ghost" data-o="1" data-now="#q12code|show-c" data-say="Trong main, con trỏ <b>a</b> ban đầu là nullptr."></span>
+      <span class="f ghost" data-o="2" data-now="#q12code|show-d;#q12code|show-a" data-act="#q12f1|sh" data-say="Gọi <b>capPhat1(a)</b>: tham số p là một biến <b>mới</b>, nhận <b>bản sao</b> giá trị của a (nullptr)."></span>
+      <span class="f ghost" data-o="3" data-now="#q12code|show-a;#q12p1|glow" data-act="#q12h1|sh" data-set="#q12p1v::0x9A0" data-say="<b>p = new int(5)</b>: chỉ bản sao p nhận địa chỉ 0x9A0. Biến a ở main <b>không đổi</b>."></span>
+      <span class="f ghost" data-o="4" data-now="#q12code|show-e" data-act="#q12f1|rm;#q12h1|orph;#q12o1|show" data-set="#q12p1v::0x9A0" data-say="Hàm kết thúc → p biến mất. a vẫn nullptr (in <b>1</b> = true), vùng #1 <b>không còn ai trỏ tới</b> → rò rỉ bộ nhớ (Q21)."></span>
+      <span class="f ghost" data-o="5" data-now="#q12code|show-f;#q12code|show-b;#q12a|glow" data-act="#q12f2|sh" data-say="Gọi <b>capPhat2(a)</b>: p là <b>tham chiếu</b> tới a → p và a là <b>cùng một hộp nhớ</b>."></span>
+      <span class="f ghost" data-o="6" data-now="#q12code|show-b;#q12a|glow" data-act="#q12h2|sh" data-set="#q12av::0xB40" data-say="<b>p = new int(5)</b> → chính a nhận địa chỉ 0xB40."></span>
+      <span class="f ghost" data-o="7" data-now="#q12code|show-g" data-act="#q12f2|rm;#q12o2|show" data-set="#q12av::0xB40" data-say="Sau khi hàm kết thúc, a trỏ tới vùng chứa 5 → <b>*a = 5</b>."></span>
+      <span class="f ghost" data-o="8" data-set="#q12av::0xB40" data-say="Kết luận: muốn hàm <b>thay đổi con trỏ</b> của bên gọi (cấp phát, dời con trỏ, gán nullptr…) → dùng <b>int*&amp;</b>. Chỉ cần sửa <b>giá trị được trỏ</b> → <b>int*</b> là đủ."></span>
+      <span class="f ghost" data-o="9" data-set="#q12av::0xB40" data-say="Bảng tóm tắt so sánh hai cách truyền."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q13 ===================== -->
+<section class="slide z1" id="q13" data-title="Q13 · Truy cập thành phần struct qua con trỏ">
+  <div class="hdr in"><span class="qn">Q13</span><h2>Access struct member through pointer: <code style="font-family:var(--mono)">p-&gt;tu</code></h2></div>
+  <div class="cols" style="grid-template-columns:1.05fr 1fr">
+    <div>
+<script type="text/x-cpp" class="xs" id="q13code" data-title="struct_pointer.cpp" data-mark="1:a;3-4:b;5:c;6-7:d;8:e;10:f;11:g;12:h;14:y">
+struct PhanSo { int tu; int mau; };
+
+PhanSo a = {1, 2};
+PhanSo* p = &a;
+cout << (*p).tu << "/" << (*p).mau << endl;
+p->tu  = 3;          // giống (*p).tu = 3
+p->mau = 4;
+cout << a.tu << "/" << a.mau << endl;
+
+PhanSo* q = new PhanSo{5, 6};
+cout << q->tu << "/" << q->mau << endl;
+delete q;
+
+cout << *p.tu;       // lỗi biên dịch
+</script>
+      <div class="console" style="margin-top:10px;min-height:84px"><span class="cl" id="q13o1">1/2</span><span class="cl" id="q13o2">3/4</span><span class="cl" id="q13o3">5/6</span></div>
+    </div>
+    <div>
+      <div class="card in tight"><ul>
+        <li>Có biến struct <code class="i">a</code> → dùng dấu chấm: <code class="i">a.tu</code>.</li>
+        <li>Có <b>con trỏ</b> <code class="i">p</code> tới struct → 2 cách: <code class="i">(*p).tu</code> hoặc gọn hơn <code class="i">p-&gt;tu</code>. Hai cách <b>hoàn toàn tương đương</b>.</li>
+        <li>Bắt buộc có ngoặc ở <code class="i">(*p).tu</code> vì <code class="i">.</code> ưu tiên cao hơn <code class="i">*</code>: <code class="i">*p.tu</code> bị hiểu là <code class="i">*(p.tu)</code> → lỗi.</li>
+      </ul></div>
+      <div class="card in" style="margin-top:12px;padding:16px">
+        <div class="mrow">
+          <div class="mc ptr hide0" id="q13p"><span class="nm">p</span><div class="val">0x1000</div></div>
+          <div class="arw hide0" id="q13pa">──▶</div>
+          <div class="obj hide0" id="q13a" style="min-width:190px;border-color:#7c3aed"><div class="lab" style="color:#6d28d9">a : PhanSo <span>0x1000</span></div>
+            <div class="fld"><span>tu</span><b id="q13tu">1</b></div><div class="fld"><span>mau</span><b id="q13mau">2</b></div></div>
+        </div>
+        <div class="mrow" style="margin-top:14px">
+          <div class="mc ptr hide0" id="q13q"><span class="nm">q</span><div class="val">0x9A0</div></div>
+          <div class="arw hide0" id="q13qa">──▶</div>
+          <div class="obj hide0" id="q13h" style="min-width:190px;border-color:#0891b2"><div class="lab" style="color:#0e7490">(heap) PhanSo <span>0x9A0</span></div>
+            <div class="fld"><span>tu</span><b>5</b></div><div class="fld"><span>mau</span><b>6</b></div></div>
+        </div>
+      </div>
+      <span class="f ghost" data-now="#q13code|show-a" data-say="Struct <b>PhanSo</b> có 2 thành phần tu, mau."></span>
+      <span class="f ghost" data-now="#q13code|show-b" data-act="#q13a|sh;#q13p|sh;#q13pa|sh" data-say="a = 1/2; p trỏ tới a."></span>
+      <span class="f ghost" data-now="#q13code|show-c;#q13a|glow" data-act="#q13o1|show" data-say="<b>(*p).tu</b>: trước hết *p là cả struct a, rồi lấy .tu → 1/2."></span>
+      <span class="f ghost" data-now="#q13code|show-d;#q13a|glow" data-set="#q13tu::&lt;b class='new'&gt;3&lt;/b&gt;;#q13mau::&lt;b class='new'&gt;4&lt;/b&gt;" data-say="<b>p-&gt;tu = 3</b>: mũi tên <b>-&gt;</b> = de-reference + chấm. Ghi trực tiếp vào a."></span>
+      <span class="f ghost" data-now="#q13code|show-e" data-set="#q13tu::3;#q13mau::4" data-act="#q13o2|show" data-say="In a → <b>3/4</b>: a đã bị sửa qua con trỏ."></span>
+      <span class="f ghost" data-now="#q13code|show-f" data-set="#q13tu::3;#q13mau::4" data-act="#q13q|sh;#q13qa|sh;#q13h|sh" data-say="Rất thường gặp: struct cấp phát động bằng <b>new</b> — chỉ truy cập được qua con trỏ q."></span>
+      <span class="f ghost" data-now="#q13code|show-g;#q13h|glow" data-set="#q13tu::3;#q13mau::4" data-act="#q13o3|show" data-say="<b>q-&gt;tu</b>, <b>q-&gt;mau</b> → 5/6."></span>
+      <span class="f ghost" data-now="#q13code|show-h" data-set="#q13tu::3;#q13mau::4" data-act="#q13h|rm;#q13qa|rm" data-say="Dùng xong thì <b>delete q</b>."></span>
+      <span class="f ghost" data-now="#q13code|show-y" data-set="#q13tu::3;#q13mau::4" data-say="<b>*p.tu</b> sai: compiler hiểu là *(p.tu), mà p là con trỏ nên không có thành phần .tu → lỗi biên dịch. Viết <b>p-&gt;tu</b>."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q14 ===================== -->
+<section class="slide" id="q14" data-title="Q14 · Pointer vs array: int a[100]">
+  <div class="hdr in"><span class="qn">Q14</span><h2>Liên hệ giữa con trỏ và mảng: <code style="font-family:var(--mono)">int a[100];</code></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+      <div class="card in tight"><ul>
+        <li><code class="i">int a[100];</code> = 100 int <b>liên tiếp</b> trong bộ nhớ = 400 byte.</li>
+        <li>Trong hầu hết biểu thức, tên mảng <code class="i">a</code> tự chuyển thành <b>con trỏ tới phần tử đầu</b>: <code class="i">a</code> ≡ <code class="i">&amp;a[0]</code>, kiểu <code class="i">int*</code>.</li>
+        <li>Do đó: <code class="i">a[i]</code> ≡ <code class="i">*(a+i)</code>; với <code class="i">int* p = a;</code> thì <code class="i">p[i]</code> ≡ <code class="i">a[i]</code>.</li>
+        <li><b>Nhưng mảng không phải con trỏ</b>: không gán lại được (<code class="i">a = p</code>, <code class="i">a++</code> lỗi); <code class="i">sizeof(a)</code> = 400 còn <code class="i">sizeof(p)</code> = 8.</li>
+        <li>Truyền mảng vào hàm → chỉ truyền <b>con trỏ</b>: <code class="i">void f(int x[])</code> chính là <code class="i">void f(int* x)</code>, mất thông tin kích thước → phải truyền thêm n.</li>
+      </ul></div>
+    </div>
+    <div>
+<script type="text/x-cpp" class="xs" id="q14code" data-title="array_pointer.cpp" data-mark="1:a;2:b;3:c;4:d;5:e;6:f;7:g;8:y">
+int a[100] = {10, 20, 30, 40};
+int* p = a;                          // p = &a[0]
+cout << a << " " << &a[0] << endl;
+cout << *a << " " << p[1] << endl;
+cout << *(a + 2) << endl;
+cout << sizeof(a) << " " << sizeof(p) << endl;
+p++;  cout << *p << endl;           // OK
+a++;                                 // lỗi biên dịch
+</script>
+      <div class="card in" style="margin-top:10px;padding:12px 14px 14px">
+        <div class="ram" style="--cols:6">
+          <div class="bc u" id="q14c0">10<span class="ad">a[0] 0x1000</span></div>
+          <div class="bc u" id="q14c1">20<span class="ad">a[1] 0x1004</span></div>
+          <div class="bc u" id="q14c2">30<span class="ad">a[2] 0x1008</span></div>
+          <div class="bc u" id="q14c3">40<span class="ad">a[3] 0x100C</span></div>
+          <div class="bc u">0<span class="ad">a[4]</span></div>
+          <div class="bc u" style="font-size:13px">…<span class="ad">…a[99]</span></div>
+        </div>
+        <div class="ram" style="--cols:6;margin-top:22px;gap:6px">
+          <div class="arw" id="q14m0" style="text-align:center;font-size:15px"></div><div class="arw" id="q14m1" style="text-align:center;font-size:15px"></div><div class="arw" id="q14m2" style="text-align:center;font-size:15px"></div><div></div><div></div><div></div>
+        </div>
+      </div>
+      <div class="console" style="margin-top:10px;min-height:110px"><span class="cl" id="q14o1">0x1000 0x1000</span><span class="cl" id="q14o2">10 20</span><span class="cl" id="q14o3">30</span><span class="cl" id="q14o4">400 8</span><span class="cl" id="q14o5">20</span></div>
+      <span class="f ghost" data-now="#q14code|show-a" data-say="Mảng a: các phần tử nằm sát nhau, mỗi phần tử cách nhau 4 byte. Các phần tử chưa khởi tạo tường minh được gán 0."></span>
+      <span class="f ghost" data-now="#q14code|show-b;#q14c0|hot" data-set="#q14m0::▲ p, a" data-say="<b>int* p = a;</b> → không cần &amp;: tên mảng tự chuyển thành địa chỉ phần tử đầu."></span>
+      <span class="f ghost" data-now="#q14code|show-c" data-set="#q14m0::▲ p, a" data-act="#q14o1|show" data-say="a và &amp;a[0] in ra <b>cùng một địa chỉ</b>."></span>
+      <span class="f ghost" data-now="#q14code|show-d;#q14c0|hot;#q14c1|hot" data-set="#q14m0::▲ p, a" data-act="#q14o2|show" data-say="<b>*a</b> = a[0] = 10. <b>p[1]</b>: con trỏ cũng dùng được cú pháp [] → 20."></span>
+      <span class="f ghost" data-now="#q14code|show-e;#q14c2|hot" data-set="#q14m0::▲ p, a;#q14m2::▲ a+2" data-act="#q14o3|show" data-say="<b>*(a + 2)</b> = a[2] = 30."></span>
+      <span class="f ghost" data-now="#q14code|show-f" data-set="#q14m0::▲ p, a;#q14m2::" data-act="#q14o4|show" data-say="Điểm khác: <b>sizeof(a)</b> = 100 × 4 = 400 (cả mảng); <b>sizeof(p)</b> = 8 (chỉ là con trỏ)."></span>
+      <span class="f ghost" data-now="#q14code|show-g;#q14c1|hot" data-set="#q14m0::▲ a;#q14m1::▲ p;#q14m2::" data-act="#q14o5|show" data-say="<b>p++</b> hợp lệ: p là biến, dời sang a[1] → in 20."></span>
+      <span class="f ghost" data-now="#q14code|show-y" data-set="#q14m0::▲ a;#q14m1::▲ p;#q14m2::" data-say="<b>a++</b> lỗi: a là tên mảng, gắn cố định với vùng nhớ của nó, không phải biến con trỏ để thay đổi."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q15 ===================== -->
+<section class="slide" id="q15" data-title="Q15 · a[i] vs a+i">
+  <div class="hdr in"><span class="qn">Q15</span><h2>Khác biệt giữa <code style="font-family:var(--mono)">a[i]</code> và <code style="font-family:var(--mono)">a+i</code></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+      <table class="cmp in">
+        <tr><th></th><th><code class="i">a[i]</code></th><th><code class="i">a + i</code></th></tr>
+        <tr><td>Là gì</td><td><b>Giá trị</b> phần tử thứ i</td><td><b>Địa chỉ</b> phần tử thứ i</td></tr>
+        <tr><td>Kiểu</td><td><code class="i">int</code></td><td><code class="i">int*</code></td></tr>
+        <tr><td>Tương đương</td><td><code class="i">*(a + i)</code></td><td><code class="i">&amp;a[i]</code></td></tr>
+        <tr><td>Gán vào được?</td><td>✓ <code class="i">a[i] = 99;</code></td><td>✗ <code class="i">a + i = 99;</code></td></tr>
+        <tr><td>Ví dụ (i=2)</td><td><b>30</b></td><td><b>0x1008</b></td></tr>
+      </table>
+      <div class="note blue f" data-o="6" style="font-size:17px">Công thức: địa chỉ <code class="i">a + i</code> = a + i × <b>sizeof(int)</b> byte. Compiler tự nhân với kích thước phần tử, ta chỉ viết <b>+ i</b>.</div>
+    </div>
+    <div>
+<script type="text/x-cpp" class="xs" id="q15code" data-title="index_vs_address.cpp" data-mark="1-2:a;3:b;4:c;5:d;6:e;7-8:f;9:y">
+int a[4] = {10, 20, 30, 40};
+int i = 2;
+cout << a[i]     << endl;
+cout << a + i    << endl;
+cout << *(a + i) << endl;
+cout << &a[i]    << endl;
+a[i] = 99;          // ghi vào phần tử
+*(a + i) = 99;      // tương đương
+a + i = 99;         // lỗi: a+i không phải biến
+</script>
+      <div class="card in" style="margin-top:10px;padding:14px 14px 16px">
+        <div class="ram" style="--cols:4">
+          <div class="bc u" id="q15c0">10<span class="ad">0x1000</span></div>
+          <div class="bc u" id="q15c1">20<span class="ad">0x1004</span></div>
+          <div class="bc u" id="q15c2"><b id="q15v2">30</b><span class="ad">0x1008</span></div>
+          <div class="bc u" id="q15c3">40<span class="ad">0x100C</span></div>
+        </div>
+        <div class="vars hide0" id="q15f" style="margin-top:26px"><span class="vc">a + 2</span><span class="vc">= 0x1000 + 2 × 4</span><span class="vc res">= 0x1008</span></div>
+      </div>
+      <div class="console" style="margin-top:10px;min-height:110px"><span class="cl" id="q15o1">30</span><span class="cl" id="q15o2">0x1008</span><span class="cl" id="q15o3">30</span><span class="cl" id="q15o4">0x1008</span></div>
+      <span class="f ghost" data-o="1" data-now="#q15code|show-b;#q15c2|hot" data-act="#q15o1|show" data-say="<b>a[i]</b> → nội dung của ô thứ 2: <b>30</b>."></span>
+      <span class="f ghost" data-o="2" data-now="#q15code|show-c" data-act="#q15o2|show;#q15f|sh" data-say="<b>a + i</b> → không đọc ô nào cả, chỉ <b>tính địa chỉ</b>: 0x1000 + 2×4 = <b>0x1008</b>."></span>
+      <span class="f ghost" data-o="3" data-now="#q15code|show-d;#q15c2|hot" data-act="#q15o3|show" data-say="<b>*(a + i)</b>: lấy địa chỉ rồi de-reference → đúng bằng a[i]. Thực ra compiler dịch a[i] thành *(a+i)."></span>
+      <span class="f ghost" data-o="4" data-now="#q15code|show-e" data-act="#q15o4|show" data-say="<b>&amp;a[i]</b>: lấy địa chỉ của phần tử → đúng bằng a + i."></span>
+      <span class="f ghost" data-o="5" data-now="#q15code|show-f;#q15c2|hot" data-set="#q15v2::99" data-say="a[i] là một <b>ô nhớ</b> nên gán được: ô 0x1008 thành 99."></span>
+      <span class="f ghost" data-o="6" data-now="#q15code|show-y" data-set="#q15v2::99" data-say="<b>a + i</b> chỉ là một <b>con số địa chỉ</b> tạm thời (như 2 + 3), không phải ô nhớ → không gán được."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q16 ===================== -->
+<section class="slide z1" id="q16" data-title="Q16 · Pointer increment / decrement">
+  <div class="hdr in"><span class="qn">Q16</span><h2>Pointer increment <code style="font-family:var(--mono)">p++</code> vs decrement <code style="font-family:var(--mono)">p--</code></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr">
+    <div>
+      <div class="card in tight"><ul>
+        <li><code class="i">p++</code> / <code class="i">++p</code>: p dời tới <b>phần tử kế tiếp</b> → địa chỉ tăng <b>sizeof(*p)</b> byte (int: +4, double: +8, char: +1).</li>
+        <li><code class="i">p--</code> / <code class="i">--p</code>: lùi về <b>phần tử trước</b>. Tương tự <code class="i">p += k</code>, <code class="i">p -= k</code>.</li>
+        <li><code class="i">q - p</code> = <b>số phần tử</b> giữa 2 con trỏ (không phải số byte).</li>
+        <li><code class="i">*p++</code> ≡ <code class="i">*(p++)</code>: lấy giá trị hiện tại <b>rồi</b> dời p. Khác <code class="i">(*p)++</code>: tăng giá trị.</li>
+        <li>Chỉ dời trong phạm vi mảng (được phép đứng ngay sau phần tử cuối nhưng không đọc ở đó).</li>
+      </ul></div>
+      <div class="console" style="margin-top:10px;min-height:110px"><span class="cl" id="q16o1">2</span><span class="cl" id="q16o2">4</span><span class="cl" id="q16o3">3</span><span class="cl" id="q16o4">1 2 3 4 5</span><span class="cl" id="q16o5">5 4 3 2 1</span></div>
+    </div>
+    <div>
+<script type="text/x-cpp" class="xs" id="q16code" data-title="incdec.cpp" data-mark="2:a;3-4:b;5-6:c;7-8:d;9-10:e;11-13:f">
+int a[5] = {1, 2, 3, 4, 5};
+int* p = a;                  // p -> a[0]
+p++;                         // p -> a[1]
+cout << *p << endl;
+p += 2;                      // p -> a[3]
+cout << *p << endl;
+p--;                         // p -> a[2]
+cout << *p << endl;
+for (int* q = a; q < a + 5; q++)
+    cout << *q << " ";       // duyệt xuôi
+int* q = a + 5;              // ngay sau phần tử cuối
+while (q > a) {
+    q--;  cout << *q << " "; // duyệt ngược
+}
+</script>
+      <div class="card in" style="margin-top:10px;padding:12px 14px 12px">
+        <div class="ram" style="--cols:5">
+          <div class="bc u" id="q16c0">1<span class="ad">0x1000</span></div>
+          <div class="bc u" id="q16c1">2<span class="ad">0x1004</span></div>
+          <div class="bc u" id="q16c2">3<span class="ad">0x1008</span></div>
+          <div class="bc u" id="q16c3">4<span class="ad">0x100C</span></div>
+          <div class="bc u" id="q16c4">5<span class="ad">0x1010</span></div>
+        </div>
+        <div class="ram" style="--cols:5;margin-top:22px;gap:6px">
+          <div class="arw" id="q16m0" style="text-align:center;font-size:15px"></div><div class="arw" id="q16m1" style="text-align:center;font-size:15px"></div><div class="arw" id="q16m2" style="text-align:center;font-size:15px"></div><div class="arw" id="q16m3" style="text-align:center;font-size:15px"></div><div class="arw" id="q16m4" style="text-align:center;font-size:15px"></div>
+        </div>
+      </div>
+      <span class="f ghost" data-now="#q16code|show-a;#q16c0|hot" data-set="#q16m0::▲ p&lt;small&gt;0x1000&lt;/small&gt;;#q16m1::;#q16m2::;#q16m3::;#q16m4::" data-say="p trỏ a[0], giữ địa chỉ 0x1000."></span>
+      <span class="f ghost" data-now="#q16code|show-b;#q16c1|hot" data-set="#q16m0::;#q16m1::▲ p&lt;small&gt;0x1004&lt;/small&gt;;#q16m2::;#q16m3::;#q16m4::" data-act="#q16o1|show" data-say="<b>p++</b>: địa chỉ +4 (không phải +1) → p trỏ a[1] → in <b>2</b>."></span>
+      <span class="f ghost" data-now="#q16code|show-c;#q16c3|hot" data-set="#q16m0::;#q16m1::;#q16m2::;#q16m3::▲ p&lt;small&gt;0x100C&lt;/small&gt;;#q16m4::" data-act="#q16o2|show" data-say="<b>p += 2</b>: tiến 2 phần tử = +8 byte → a[3] → in <b>4</b>."></span>
+      <span class="f ghost" data-now="#q16code|show-d;#q16c2|hot" data-set="#q16m0::;#q16m1::;#q16m2::▲ p&lt;small&gt;0x1008&lt;/small&gt;;#q16m3::;#q16m4::" data-act="#q16o3|show" data-say="<b>p--</b>: lùi 1 phần tử = −4 byte → a[2] → in <b>3</b>."></span>
+      <span class="f ghost" data-now="#q16code|show-e;#q16c0|hot;#q16c1|hot;#q16c2|hot;#q16c3|hot;#q16c4|hot" data-set="#q16m0::▲ q → … →;#q16m1::;#q16m2::;#q16m3::;#q16m4::" data-act="#q16o4|show" data-say="Duyệt mảng <b>xuôi</b> bằng con trỏ: bắt đầu từ a, q++ cho tới khi q chạm a + 5."></span>
+      <span class="f ghost" data-now="#q16code|show-f;#q16c4|hot;#q16c3|hot;#q16c2|hot;#q16c1|hot;#q16c0|hot" data-set="#q16m0::;#q16m1::;#q16m2::;#q16m3::;#q16m4::← … ← q ▲" data-act="#q16o5|show" data-say="Duyệt <b>ngược</b>: q bắt đầu ở a + 5 (ngay sau phần tử cuối), mỗi vòng q-- rồi mới đọc → không bao giờ trỏ ra trước a."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q17 ===================== -->
+<section class="slide" id="q17" data-title="Q17 · Từ khóa new">
+  <div class="hdr in"><span class="qn">Q17</span><h2>Công dụng của từ khóa <code style="font-family:var(--mono)">new</code></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr">
+    <div>
+      <div class="card in tight"><ul>
+        <li><code class="i">new</code> <b>cấp phát động</b> một vùng nhớ trên <b>HEAP</b> lúc chương trình <b>đang chạy</b>, khởi tạo giá trị/đối tượng, rồi <b>trả về địa chỉ</b> → phải cất vào con trỏ.</li>
+        <li>Vùng nhớ đó <b>không có tên</b>, chỉ truy cập qua con trỏ; <b>tồn tại cho tới khi delete</b> — không tự mất khi ra khỏi khối/hàm.</li>
+        <li>Cho phép kích thước <b>biết lúc chạy</b> (<code class="i">new int[n]</code>) và trả dữ liệu ra khỏi hàm.</li>
+        <li>Hết bộ nhớ → ném ngoại lệ <code class="i">std::bad_alloc</code> (hoặc <code class="i">new (nothrow)</code> trả về nullptr).</li>
+      </ul></div>
+      <table class="cmp f" data-o="8" style="margin-top:10px">
+        <tr><th>Cú pháp</th><th>Ý nghĩa</th></tr>
+        <tr><td><code class="i">new T</code></td><td>1 phần tử, int/double chưa khởi tạo (rác)</td></tr>
+        <tr><td><code class="i">new T(v)</code></td><td>1 phần tử, giá trị v</td></tr>
+        <tr><td><code class="i">new T[n]</code></td><td>mảng n phần tử (<code class="i">new T[n]()</code> → toàn 0)</td></tr>
+        <tr><td><code class="i">new T{a, b}</code></td><td>khởi tạo struct/mảng bằng danh sách</td></tr>
+      </table>
+    </div>
+    <div>
+<script type="text/x-cpp" class="xs" id="q17code" data-title="new.cpp     input: 3" data-mark="1:a;2:b;3:c;4:d;5:e;6:f;7:g">
+int* p = new int;              // 1 int, giá trị rác
+int* q = new int(7);           // 1 int = 7
+int n;  cin >> n;              // nhập n = 3
+int* a = new int[n]();         // mảng n int, toàn 0
+PhanSo* ps = new PhanSo{1, 2};
+cout << *q << " " << a[2] << " " << ps->mau << endl;
+delete p;  delete q;  delete[] a;  delete ps;
+</script>
+      <div style="display:grid;grid-template-columns:150px 1fr;gap:12px;margin-top:20px">
+        <div class="region"><span class="rl">STACK</span>
+          <div class="fld"><span style="min-width:30px">p</span><b id="q17s1">?</b></div>
+          <div class="fld"><span style="min-width:30px">q</span><b id="q17s2">?</b></div>
+          <div class="fld"><span style="min-width:30px">n</span><b id="q17s3">?</b></div>
+          <div class="fld"><span style="min-width:30px">a</span><b id="q17s4">?</b></div>
+          <div class="fld"><span style="min-width:30px">ps</span><b id="q17s5">?</b></div>
+        </div>
+        <div class="region heap" id="q17heap"><span class="rl">HEAP</span>
+          <div style="display:flex;flex-wrap:wrap;gap:10px 8px;align-items:flex-start">
+            <div class="mc hide0" id="q17h1"><div class="val sm">rác</div><span class="addr">0x900</span></div>
+            <div class="mc u hide0" id="q17h2"><div class="val sm">7</div><span class="addr">0x910</span></div>
+            <div class="mc hide0" id="q17h3"><div style="display:flex;gap:3px"><div class="bc sm u2" style="width:40px">0</div><div class="bc sm u2" style="width:40px">0</div><div class="bc sm u2" style="width:40px">0</div></div><span class="addr">0x920 (3 int)</span></div>
+            <div class="mc hide0" id="q17h4"><div class="val sm" style="font-size:14px">tu 1 · mau 2</div><span class="addr">0x940</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="console" style="margin-top:10px;min-height:36px"><span class="cl" id="q17o1">7 0 2</span></div>
+      <span class="f ghost" data-o="1" data-now="#q17code|show-a" data-act="#q17h1|sh" data-set="#q17s1::0x900" data-say="<b>new int</b>: xin 4 byte trên heap; giá trị chưa khởi tạo. p giữ địa chỉ 0x900."></span>
+      <span class="f ghost" data-o="2" data-now="#q17code|show-b" data-act="#q17h2|sh" data-set="#q17s1::0x900;#q17s2::0x910" data-say="<b>new int(7)</b>: khởi tạo luôn giá trị 7."></span>
+      <span class="f ghost" data-o="3" data-now="#q17code|show-c" data-set="#q17s1::0x900;#q17s2::0x910;#q17s3::3" data-say="Input: người dùng nhập <b>n = 3</b> — kích thước chỉ biết lúc chạy."></span>
+      <span class="f ghost" data-o="4" data-now="#q17code|show-d" data-act="#q17h3|sh" data-set="#q17s1::0x900;#q17s2::0x910;#q17s3::3;#q17s4::0x920" data-say="<b>new int[n]()</b>: mảng đúng 3 phần tử, () khởi tạo toàn 0. Mảng tĩnh int a[n] không làm được điều này trong C++ chuẩn."></span>
+      <span class="f ghost" data-o="5" data-now="#q17code|show-e" data-act="#q17h4|sh" data-set="#q17s1::0x900;#q17s2::0x910;#q17s3::3;#q17s4::0x920;#q17s5::0x940" data-say="new dùng được cho struct/class: <b>new PhanSo{1, 2}</b>."></span>
+      <span class="f ghost" data-o="6" data-now="#q17code|show-f" data-act="#q17o1|show" data-set="#q17s1::0x900;#q17s2::0x910;#q17s3::3;#q17s4::0x920;#q17s5::0x940" data-say="Output: <b>7 0 2</b>."></span>
+      <span class="f ghost" data-o="7" data-now="#q17code|show-g" data-act="#q17h1|rm;#q17h2|rm;#q17h3|rm;#q17h4|rm" data-set="#q17s1::0x900;#q17s2::0x910;#q17s3::3;#q17s4::0x920;#q17s5::0x940" data-say="Mỗi <b>new</b> phải có đúng một <b>delete</b> (mảng: <b>delete[]</b>) tương ứng — xem Q18."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q18 ===================== -->
+<section class="slide" id="q18" data-title="Q18 · Từ khóa delete">
+  <div class="hdr in"><span class="qn">Q18</span><h2>Công dụng của từ khóa <code style="font-family:var(--mono)">delete</code></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+      <div class="card in tight"><ul>
+        <li><code class="i">delete p;</code> <b>giải phóng</b> vùng nhớ heap mà p trỏ tới (nếu là đối tượng thì gọi <b>hàm hủy</b> trước) → các ô trở về trạng thái <b>FREE</b>, có thể cấp lại.</li>
+        <li><code class="i">delete</code> <b>không xóa biến p</b> và <b>không đổi giá trị p</b>: p vẫn giữ địa chỉ cũ → <b>dangling pointer</b>. Nên gán <code class="i">p = nullptr;</code>.</li>
+        <li>Quy tắc: <code class="i">new</code> ↔ <code class="i">delete</code>, <code class="i">new[]</code> ↔ <code class="i">delete[]</code>; mỗi vùng delete <b>đúng 1 lần</b>; chỉ delete vùng do <b>new</b> cấp.</li>
+        <li><code class="i">delete nullptr</code> là an toàn (không làm gì).</li>
+      </ul></div>
+    </div>
+    <div>
+<script type="text/x-cpp" class="xs" id="q18code" data-title="delete.cpp" data-mark="1:a;2:b;3:c;4:d;5:e;6:f;8-9:g">
+int* p = new int(5);
+cout << p << " " << *p << endl;
+delete p;                  // trả vùng nhớ về heap
+cout << p << endl;         // p vẫn giữ địa chỉ cũ!
+p = nullptr;               // thói quen tốt
+delete p;                  // an toàn: không làm gì
+
+int* a = new int[10];
+delete[] a;   a = nullptr; // mảng: delete[]
+</script>
+      <div class="card in" style="margin-top:12px;padding:18px 16px">
+        <div class="mrow">
+          <div class="mc ptr" id="q18p"><span class="nm">p</span><div class="val" id="q18pv">0x9A0</div></div>
+          <div class="arw" id="q18a">──▶</div>
+          <div class="mc u" id="q18h"><span class="nm">heap</span><div class="val" id="q18hv">5</div><span class="addr" id="q18ha">0x9A0 · USED</span></div>
+        </div>
+      </div>
+      <div class="console" style="margin-top:10px;min-height:62px"><span class="cl" id="q18o1">0x9A0 5</span><span class="cl" id="q18o2">0x9A0</span></div>
+      <span class="f ghost" data-now="#q18code|show-a" data-say="p trỏ tới một int trên heap chứa 5."></span>
+      <span class="f ghost" data-now="#q18code|show-b" data-act="#q18o1|show" data-say="In địa chỉ và giá trị: <b>0x9A0 5</b>."></span>
+      <span class="f ghost" data-now="#q18code|show-c" data-act="#q18h|fz;#q18a|dg" data-set="#q18ha::0x9A0 · FREE;#q18a::┄┄▶&lt;small&gt;dangling&lt;/small&gt;" data-say="<b>delete p</b>: vùng 0x9A0 được trả lại (FREE). Nhưng mũi tên vẫn còn — p trở thành <b>con trỏ treo</b>."></span>
+      <span class="f ghost" data-now="#q18code|show-d;#q18p|glow" data-act="#q18o2|show" data-set="#q18ha::0x9A0 · FREE;#q18a::┄┄▶&lt;small&gt;dangling&lt;/small&gt;" data-say="Bằng chứng: in p vẫn ra <b>0x9A0</b>. Nếu lỡ dùng *p lúc này là lỗi (Q27); delete p lần nữa là lỗi (Q22)."></span>
+      <span class="f ghost" data-now="#q18code|show-e" data-act="#q18h|fz" data-set="#q18ha::0x9A0 · FREE;#q18pv::nullptr;#q18a::  " data-say="<b>p = nullptr</b>: cắt mũi tên; từ giờ ai cũng biết p không trỏ tới đâu."></span>
+      <span class="f ghost" data-now="#q18code|show-f" data-act="#q18h|fz" data-set="#q18ha::0x9A0 · FREE;#q18pv::nullptr;#q18a::  " data-say="<b>delete nullptr</b> không làm gì → an toàn. Đây là lý do nên gán nullptr sau delete."></span>
+      <span class="f ghost" data-now="#q18code|show-g" data-act="#q18h|fz" data-set="#q18ha::0x9A0 · FREE;#q18pv::nullptr;#q18a::  " data-say="Vùng cấp bằng <b>new[]</b> phải giải phóng bằng <b>delete[]</b> (Q26)."></span>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q19 ===================== -->
+<section class="slide" id="q19" data-title="Q19 · new int(3) vs int a = 3; p = &a">
+  <div class="hdr in"><span class="qn">Q19</span><h2><code style="font-family:var(--mono)">int *p = new int(3);</code> vs <code style="font-family:var(--mono)">int a = 3; int *p = &amp;a;</code></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="card in" style="border-top:5px solid #0891b2;padding:10px 12px">
+          <h3 style="color:#0891b2;font-size:17px">① new int(3)</h3>
+          <div class="region" style="margin-top:14px;padding:18px 8px 8px"><span class="rl">STACK</span><div class="mrow"><div class="mc ptr"><span class="nm">p</span><div class="val sm">0x9A0</div></div></div></div>
+          <div class="arw" style="text-align:center;margin:4px 0">▼</div>
+          <div class="region heap" style="padding:18px 8px 8px"><span class="rl">HEAP</span><div class="mrow"><div class="mc u" id="q19h"><span class="nm">(không tên)</span><div class="val sm">3</div></div></div></div>
+        </div>
+        <div class="card in" style="border-top:5px solid #7c3aed;padding:10px 12px">
+          <h3 style="font-size:17px">② int a = 3; &amp;a</h3>
+          <div class="region" style="margin-top:14px;padding:18px 8px 8px"><span class="rl">STACK</span>
+            <div class="mrow" style="flex-direction:column;gap:4px"><div class="mc ptr"><span class="nm">p</span><div class="val sm">0x7F0</div></div><div class="arw">▼</div><div class="mc u" id="q19a"><span class="nm">a</span><div class="val sm">3</div></div></div></div>
+          <p class="muted" style="font-size:13px;margin-top:6px">Heap: không dùng</p>
+        </div>
+      </div>
+<script type="text/x-cpp" class="xs" id="q19code" data-title="Trả con trỏ ra khỏi hàm" data-mark="1:a;2:y" style="margin-top:10px">
+int* f1() { int* p = new int(3); return p; }  // OK
+int* f2() { int a = 3; return &a; }  // a chết khi f2 kết thúc
+</script>
+    </div>
+    <div>
+      <table class="cmp">
+        <tr><th>Tiêu chí</th><th style="color:#0891b2">① new int(3)</th><th>② int a = 3; p = &amp;a</th></tr>
+        <tr class="f"><td>Số 3 nằm ở</td><td><b>Heap</b></td><td><b>Stack</b> (biến cục bộ a)</td></tr>
+        <tr class="f"><td>Có tên?</td><td>Không, chỉ qua <code class="i">*p</code></td><td>Có: <code class="i">a</code> hoặc <code class="i">*p</code></td></tr>
+        <tr class="f"><td>Sống tới khi</td><td>Gọi <code class="i">delete p</code></td><td>Ra khỏi khối/hàm chứa a</td></tr>
+        <tr class="f"><td>Giải phóng</td><td><b>Thủ công</b>: phải <code class="i">delete p;</code> (quên → leak)</td><td><b>Tự động</b>; <b style="color:#e11d48">cấm</b> <code class="i">delete p;</code> (Q23)</td></tr>
+        <tr class="f"><td>Trả ra khỏi hàm</td><td>✓ an toàn (f1)</td><td>✗ con trỏ treo (f2)</td></tr>
+        <tr class="f"><td>Tốc độ</td><td>Chậm hơn (gọi bộ cấp phát)</td><td>Rất nhanh</td></tr>
+      </table>
+      <div class="note blue f" style="font-size:16.5px">Giống nhau: cả hai đều có <code class="i">p</code> kiểu <code class="i">int*</code> và <code class="i">*p == 3</code>; đọc/ghi qua <code class="i">*p</code> như nhau. Khác nhau ở <b>vùng nhớ</b> và <b>ai chịu trách nhiệm giải phóng</b>.</div>
+      <span class="f ghost" data-now="#q19code|show-a" data-say="<b>f1</b> trả về địa chỉ vùng heap: vùng này vẫn sống sau khi f1 kết thúc → bên gọi dùng được (và phải delete)."></span>
+      <span class="f ghost" data-now="#q19code|show-y" data-say="<b>f2</b> trả về &amp;a, nhưng a là biến cục bộ, bị giải phóng khi f2 kết thúc → con trỏ nhận được là <b>con trỏ treo</b>, dùng *p là Undefined Behavior."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q20 ===================== -->
+<section class="slide" id="q20" data-title="Q20 · Mảng tĩnh vs mảng động">
+  <div class="hdr in"><span class="qn">Q20</span><h2>Mảng tĩnh <code style="font-family:var(--mono)">int a[100]</code> vs mảng động <code style="font-family:var(--mono)">new int[n]</code></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr">
+    <div>
+<script type="text/x-cpp" class="xs" id="q20code" data-title="input: n = 5" data-mark="2-3:a;6-7:b;9:c">
+// Mảng tĩnh: kích thước cố định lúc biên dịch
+int a[100];
+int n;  cin >> n;          // n=5: phí 95 ô, n=200: tràn
+// ...
+// Mảng động: kích thước theo n lúc chạy
+int n;  cin >> n;          // n = 5
+int* b = new int[n];       // vừa đủ 5 ô (trên heap)
+// ...
+delete[] b;                // bắt buộc tự giải phóng
+</script>
+      <div class="card in" style="margin-top:10px;padding:12px 14px">
+        <div class="rowlab" style="margin-top:0">int a[100] với n = 5</div>
+        <div class="ram" style="--cols:12;gap:4px">
+          <div class="bc sm" id="q20a0">a0</div><div class="bc sm" id="q20a1">a1</div><div class="bc sm" id="q20a2">a2</div><div class="bc sm" id="q20a3">a3</div><div class="bc sm" id="q20a4">a4</div><div class="bc sm fz" id="q20a5"></div><div class="bc sm fz"></div><div class="bc sm fz"></div><div class="bc sm fz"></div><div class="bc sm fz"></div><div class="bc sm fz"></div><div class="bc sm fz" style="font-size:11px">…99</div>
+        </div>
+        <div class="rowlab">new int[n] với n = 5</div>
+        <div class="ram" style="--cols:12;gap:4px">
+          <div class="bc sm hide0" id="q20b0">b0</div><div class="bc sm hide0" id="q20b1">b1</div><div class="bc sm hide0" id="q20b2">b2</div><div class="bc sm hide0" id="q20b3">b3</div><div class="bc sm hide0" id="q20b4">b4</div>
+        </div>
+      </div>
+      <div class="note f" data-o="5" style="font-size:15.5px">⚠️ <code class="i">int a[n];</code> (VLA) <b>không phải C++ chuẩn</b> (g++ cho qua như phần mở rộng, MSVC báo lỗi). Thực tế nên dùng <code class="i">std::vector&lt;int&gt; a(n);</code> — mảng động tự giải phóng.</div>
+    </div>
+    <div>
+      <table class="cmp in">
+        <tr><th>Tiêu chí</th><th>Tĩnh <code class="i">int a[100]</code></th><th>Động <code class="i">new int[n]</code></th></tr>
+        <tr><td>Kích thước</td><td>Hằng số, biết lúc biên dịch</td><td>Biến, biết lúc chạy</td></tr>
+        <tr><td>Vùng nhớ</td><td>Stack (cục bộ) / vùng static (toàn cục)</td><td>Heap</td></tr>
+        <tr><td>Giới hạn</td><td>Nhỏ: stack ~1–8 MB</td><td>Lớn: tới RAM còn trống</td></tr>
+        <tr><td>Cấp/giải phóng</td><td>Tự động</td><td>Thủ công <code class="i">new[]</code>/<code class="i">delete[]</code></td></tr>
+        <tr><td><code class="i">sizeof</code></td><td>400 (cả mảng)</td><td>8 (chỉ con trỏ)</td></tr>
+      </table>
+      <div class="cols" style="gap:10px;margin-top:10px">
+        <div class="card f tight" data-o="3"><h3 style="font-size:17px">Mảng tĩnh</h3><p>✅ Đơn giản, rất nhanh, tự giải phóng, không leak.<br>❌ Kích thước cố định: thừa thì <b>phí</b>, thiếu thì <b>tràn</b>; mảng lớn dễ <b>stack overflow</b>.</p></div>
+        <div class="card f tight" data-o="4"><h3 style="font-size:17px;color:#0891b2">Mảng động</h3><p>✅ Đúng kích thước cần, rất lớn được, tồn tại ngoài hàm.<br>❌ Phải nhớ <code class="i">delete[]</code> (leak, double delete), cấp phát chậm hơn chút.</p></div>
+      </div>
+      <span class="f ghost" data-o="1" data-now="#q20code|show-a" data-act="#q20a0|u;#q20a1|u;#q20a2|u;#q20a3|u;#q20a4|u" data-say="Mảng tĩnh luôn chiếm <b>100 ô</b> dù chỉ dùng 5 → 95 ô bị phí. Nếu n = 200 thì không đủ chỗ."></span>
+      <span class="f ghost" data-o="2" data-now="#q20code|show-b" data-act="#q20b0|sh;#q20b1|sh;#q20b2|sh;#q20b3|sh;#q20b4|sh;#q20b0|u2;#q20b1|u2;#q20b2|u2;#q20b3|u2;#q20b4|u2" data-say="Mảng động cấp <b>đúng 5 ô</b> sau khi đã biết n."></span>
+      <span class="f ghost" data-o="4" data-now="#q20code|show-c" data-say="Đổi lại, mảng động phải tự <b>delete[] b</b> khi dùng xong."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q21 ===================== -->
+<section class="slide" id="q21" data-title="Q21 · Memory leak">
+  <div class="hdr in"><span class="qn">Q21</span><h2>Lỗi memory leak (rò rỉ bộ nhớ)</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+      <div class="card in tight"><ul>
+        <li><b>Memory leak</b>: vùng nhớ cấp bằng <code class="i">new</code> nhưng <b>không delete</b>, và chương trình đã <b>mất hết con trỏ</b> tới nó → không bao giờ giải phóng được nữa (tới khi chương trình kết thúc).</li>
+        <li><b>Hậu quả</b>: chương trình chạy lâu (server, game, app) → RAM tăng dần → máy chậm, cuối cùng bị hệ điều hành dừng hoặc <code class="i">bad_alloc</code>.</li>
+        <li><b>Nguyên nhân</b>: quên delete; gán đè con trỏ; return/throw sớm; biến con trỏ cục bộ hết tầm vực.</li>
+        <li><b>Phòng tránh</b>: mỗi new có đúng 1 delete; delete trước khi gán đè; dùng <code class="i">std::vector</code>, <code class="i">std::unique_ptr</code>. Phát hiện bằng Valgrind, <code class="i">-fsanitize=address</code>.</li>
+      </ul></div>
+    </div>
+    <div>
+<script type="text/x-cpp" class="xs" id="q21code" data-title="leak.cpp" data-mark="1-4:a;6-7:b;8:c;9:d;10:e">
+void xuLy() {
+    int* p = new int[1000];  // 4000 byte
+    // ... dùng p ... quên delete[] p;
+}                            // p mất, vùng nhớ còn
+int main() {
+    for (int i = 0; i < 1000000; i++)
+        xuLy();              // rò rỉ ~4 GB!
+    int* q = new int(1);
+    q = new int(2);          // vùng chứa 1 bị bỏ rơi
+    delete q;                // chỉ giải phóng vùng chứa 2
+}
+</script>
+      <div class="card in" style="margin-top:10px;padding:16px 14px">
+        <div class="rowlab" style="margin-top:0">RAM chương trình đang dùng</div>
+        <div class="meter"><i id="q21m"></i><span id="q21mt">40 MB</span></div>
+        <div class="mrow" style="margin-top:16px;justify-content:flex-start">
+          <div class="mc ptr hide0" id="q21q"><span class="nm">q</span><div class="val" id="q21qv">0x900</div></div>
+          <div class="arw hide0" id="q21qa">──▶<small id="q21qt">tới 0x900</small></div>
+          <div class="mc u hide0" id="q21h1"><span class="nm" id="q21h1n">heap</span><div class="val">1</div><span class="addr">0x900</span></div>
+          <div class="mc u hide0" id="q21h2"><span class="nm">heap</span><div class="val">2</div><span class="addr">0x940</span></div>
+        </div>
+      </div>
+      <span class="f ghost" data-now="#q21code|show-a" data-say="Mỗi lần gọi xuLy(): cấp 4000 byte, nhưng khi hàm kết thúc biến p biến mất mà vùng heap thì <b>vẫn còn</b> và không ai trỏ tới."></span>
+      <span class="f ghost" data-now="#q21code|show-b" data-act="#q21m|full" data-set="#q21mt::4 GB và vẫn tăng…" data-say="Gọi 1 triệu lần → rò rỉ khoảng <b>4 GB</b>. Bộ nhớ tăng mãi cho tới khi chương trình bị dừng."></span>
+      <span class="f ghost" data-now="#q21code|show-c" data-act="#q21m|full;#q21q|sh;#q21qa|sh;#q21h1|sh" data-set="#q21mt::4 GB và vẫn tăng…" data-say="Kiểu leak thứ hai: q trỏ tới vùng chứa 1."></span>
+      <span class="f ghost" data-now="#q21code|show-d" data-act="#q21m|full;#q21q|sh;#q21qa|sh;#q21h1|sh;#q21h2|sh;#q21h1|orph" data-set="#q21mt::4 GB và vẫn tăng…;#q21qv::0x940;#q21h1n::mồ côi!;#q21qt::tới 0x940" data-say="<b>q = new int(2)</b>: q bị gán đè sang 0x940. Vùng 0x900 <b>không còn con trỏ nào</b> → không thể delete được nữa → leak."></span>
+      <span class="f ghost" data-now="#q21code|show-e" data-act="#q21m|full;#q21q|sh;#q21h1|sh;#q21h2|sh;#q21h1|orph;#q21h2|fz" data-set="#q21mt::4 GB và vẫn tăng…;#q21qv::0x940;#q21h1n::mồ côi!;#q21qt::tới 0x940" data-say="delete q chỉ giải phóng vùng chứa 2. Sửa: <b>delete q;</b> trước khi gán <b>q = new int(2);</b>"></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q22 ===================== -->
+<section class="slide z1" id="q22" data-title="Q22 · Delete vùng nhớ 2 lần">
+  <div class="hdr in"><span class="qn">Q22</span><h2>Lỗi delete vùng nhớ 2 lần (double delete / double free)</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+      <div class="card in tight"><ul>
+        <li>Gọi <code class="i">delete</code> <b>hai lần</b> trên <b>cùng một</b> vùng nhớ. Lần 1 hợp lệ; tới lần 2, vùng đó đã thuộc về bộ cấp phát (thậm chí đã được cấp cho biến khác).</li>
+        <li>Kết quả là <b>Undefined Behavior</b>: crash ngay, <b>hỏng cấu trúc heap</b>, hoặc lỗi bùng phát ở chỗ khác rất khó tìm.</li>
+        <li><b>Phòng tránh</b>: gán <code class="i">p = nullptr;</code> ngay sau delete (delete nullptr không làm gì); mỗi vùng nhớ chỉ có <b>một “chủ”</b> chịu trách nhiệm delete; dùng <code class="i">std::unique_ptr</code>.</li>
+      </ul></div>
+      <div class="console" style="margin-top:12px;min-height:60px"><span class="cl" id="q22o1" style="color:#fda4af">free(): double free detected in tcache 2</span><span class="cl" id="q22o2" style="color:#fda4af">Aborted (core dumped)              <span style="color:#9ca3b8">// Linux, g++</span></span></div>
+    </div>
+    <div>
+<script type="text/x-cpp" class="xs" id="q22code" data-title="double_delete.cpp" data-mark="1:a;2:b;3:c;4:y;6-8:e">
+int* p = new int(5);
+delete p;               // lần 1: hợp lệ
+int* q = new int(7);    // có thể nhận lại đúng 0x9A0
+delete p;               // lần 2: lỗi!
+
+// Cách sửa
+delete p;
+p = nullptr;
+delete p;               // vô hại
+</script>
+      <div class="card in" style="margin-top:12px;padding:18px 16px">
+        <div class="mrow">
+          <div class="mc ptr" id="q22p"><span class="nm">p</span><div class="val">0x9A0</div></div>
+          <div class="arw" id="q22a">──▶</div>
+          <div class="mc u" id="q22h"><span class="nm" id="q22hn">heap</span><div class="val" id="q22hv">5</div><span class="addr" id="q22ha">0x9A0 · USED</span></div>
+          <div class="arw hide0" id="q22qa">◀──</div>
+          <div class="mc ptr hide0" id="q22q"><span class="nm">q</span><div class="val">0x9A0</div></div>
+        </div>
+        <div style="text-align:center;margin-top:12px"><span class="boom hide0" id="q22b">💥 delete p lần 2</span></div>
+      </div>
+      <span class="f ghost" data-now="#q22code|show-a" data-say="p trỏ tới vùng 0x9A0 chứa 5."></span>
+      <span class="f ghost" data-now="#q22code|show-b" data-act="#q22h|fz;#q22a|dg" data-set="#q22ha::0x9A0 · FREE;#q22a::┄┄▶" data-say="<b>delete p</b> lần 1: vùng 0x9A0 thành FREE. p vẫn giữ 0x9A0 (dangling)."></span>
+      <span class="f ghost" data-now="#q22code|show-c" data-act="#q22a|dg;#q22qa|sh;#q22q|sh;#q22h|u4" data-set="#q22a::┄┄▶;#q22hv::7;#q22ha::0x9A0 · của q" data-say="Bộ cấp phát rất hay <b>tái sử dụng</b> vùng vừa trả: q = new int(7) có thể nhận đúng 0x9A0."></span>
+      <span class="f ghost" data-now="#q22code|show-y" data-act="#q22a|dg;#q22qa|sh;#q22q|sh;#q22h|bad;#q22b|sh;#q22o1|show;#q22o2|show" data-set="#q22a::┄┄▶;#q22hv::7;#q22ha::0x9A0 · ???" data-say="<b>delete p</b> lần 2: hoặc chương trình bị dừng ngay (như output), hoặc tệ hơn — vô tình giải phóng <b>vùng nhớ của q</b>, q thành con trỏ treo mà không ai biết."></span>
+      <span class="f ghost" data-now="#q22code|show-e" data-say="<b>Cách sửa</b>: sau delete gán nullptr. Lỡ gọi delete lần nữa cũng vô hại."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q23 ===================== -->
+<section class="slide" id="q23" data-title="Q23 · int a = 3; int *p = &a; delete p;">
+  <div class="hdr in"><span class="qn">Q23</span><h2>Lỗi: <code style="font-family:var(--mono)">int a = 3; int *p = &amp;a; delete p;</code></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+<script type="text/x-cpp" class="sm" id="q23code" data-title="bug.cpp" data-mark="1:a;2:b;3:y">
+int a = 3;       // a: biến cục bộ trên STACK
+int *p = &a;     // p trỏ tới a
+delete p;        // delete vùng nhớ KHÔNG do new cấp
+</script>
+      <div class="card in tight" style="margin-top:12px"><h3 style="color:#e11d48">Lỗi ở đâu?</h3><ul>
+        <li><code class="i">delete</code> chỉ dùng cho vùng nhớ <b>được cấp bằng new</b> (trên heap). <code class="i">a</code> nằm trên <b>stack</b>, do compiler tự quản lý.</li>
+        <li>delete nhận một địa chỉ mà bộ quản lý heap <b>không hề cấp</b> → <b>Undefined Behavior</b>, thường crash ngay.</li>
+        <li>Thêm nữa, a sẽ tự giải phóng khi ra khỏi khối → nếu delete “lọt” thì a bị giải phóng <b>2 lần</b>.</li>
+      </ul></div>
+      <div class="console" style="margin-top:10px;min-height:60px"><span class="cl" id="q23o1" style="color:#fda4af">free(): invalid pointer               <span style="color:#9ca3b8">// Linux</span></span><span class="cl" id="q23o2" style="color:#fda4af">pointer being freed was not allocated <span style="color:#9ca3b8">// macOS</span></span></div>
+    </div>
+    <div>
+      <div class="card in" style="padding:22px 16px 16px">
+        <div class="region" id="q23st"><span class="rl">STACK — tự động quản lý</span>
+          <div class="mrow">
+            <div class="mc ptr hide0" id="q23p"><span class="nm">p</span><div class="val">0x7F0</div></div>
+            <div class="arw hide0" id="q23a">──▶</div>
+            <div class="mc u" id="q23x"><span class="nm">a</span><div class="val">3</div><span class="addr">0x7F0</span></div>
+          </div>
+        </div>
+        <div class="region heap" style="margin-top:22px"><span class="rl">HEAP — do new / delete quản lý</span>
+          <p class="muted" style="font-size:15px;text-align:center" id="q23hp">(không có vùng nào do new cấp)</p>
+        </div>
+        <div style="text-align:center;margin-top:14px"><span class="boom hide0" id="q23b">💥 0x7F0 không phải địa chỉ heap!</span></div>
+      </div>
+      <div class="card f tight" data-o="4" style="margin-top:12px;border-top:5px solid #10b981"><h3 style="color:#059669">Cách sửa</h3>
+        <p>• Bỏ <code class="i">delete p;</code> — a tự giải phóng.<br>• Hoặc nếu thật sự cần heap: <code class="i">int *p = new int(3); … delete p;</code></p></div>
+      <span class="f ghost" data-o="1" data-now="#q23code|show-a" data-say="a nằm trên <b>stack</b>: được cấp khi vào khối, tự giải phóng khi ra khỏi khối."></span>
+      <span class="f ghost" data-o="2" data-now="#q23code|show-b" data-act="#q23p|sh;#q23a|sh" data-say="p trỏ tới a — hợp lệ, dùng *p thoải mái."></span>
+      <span class="f ghost" data-o="3" data-now="#q23code|show-y" data-act="#q23p|sh;#q23a|sh;#q23x|bad;#q23b|sh;#q23o1|show;#q23o2|show" data-say="<b>delete p</b>: yêu cầu bộ quản lý heap thu hồi địa chỉ 0x7F0 — nhưng nó chưa bao giờ cấp địa chỉ này → chương trình bị dừng. Quy tắc: <b>chỉ delete những gì đã new</b>."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q24 ===================== -->
+<section class="slide" id="q24" data-title="Q24 · new int(3) vs new int[3]">
+  <div class="hdr in"><span class="qn">Q24</span><h2><code style="font-family:var(--mono)">new int(3)</code> vs <code style="font-family:var(--mono)">new int[3]</code></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+      <table class="cmp in">
+        <tr><th></th><th style="color:#7c3aed"><code class="i">new int(3)</code></th><th style="color:#0891b2"><code class="i">new int[3]</code></th></tr>
+        <tr><td>Cấp phát</td><td><b>1</b> số nguyên</td><td><b>Mảng 3</b> số nguyên</td></tr>
+        <tr><td>Số 3 là</td><td><b>giá trị khởi tạo</b> <code class="i">( )</code></td><td><b>số phần tử</b> <code class="i">[ ]</code></td></tr>
+        <tr><td>Kích thước</td><td>4 byte</td><td>12 byte</td></tr>
+        <tr><td>Giá trị ban đầu</td><td>3</td><td>rác (chưa khởi tạo)</td></tr>
+        <tr><td>Truy cập</td><td><code class="i">*p</code></td><td><code class="i">p[0]</code>, <code class="i">p[1]</code>, <code class="i">p[2]</code></td></tr>
+        <tr><td>Giải phóng</td><td><code class="i">delete p;</code></td><td><code class="i">delete[] p;</code></td></tr>
+      </table>
+      <div class="note blue f" data-o="6" style="font-size:16.5px">Khởi tạo mảng: <code class="i">new int[3]()</code> → 0 0 0 · <code class="i">new int[3]{1, 2, 3}</code> → 1 2 3. Nhầm <code class="i">()</code> với <code class="i">[]</code> vẫn biên dịch được nhưng chương trình sai → rất dễ bị bỏ sót.</div>
+    </div>
+    <div>
+<script type="text/x-cpp" class="xs" id="q24code" data-title="paren_vs_bracket.cpp" data-mark="1:a;2:b;3:y;4:c;6:d;7:e;8:f;9:g">
+int *p = new int(3);
+cout << *p << endl;
+p[1] = 7;            // lỗi: chỉ có 1 int!
+delete p;
+
+int *q = new int[3];
+q[0] = 1;  q[1] = 2;  q[2] = 3;
+cout << q[0] + q[1] + q[2] << endl;
+delete[] q;
+</script>
+      <div class="card in" style="margin-top:12px;padding:14px 14px 18px">
+        <div class="rowlab" style="margin-top:0">p = new int(3)</div>
+        <div class="ram" style="--cols:4">
+          <div class="bc u hide0" id="q24p0">3<span class="ad">0x900</span></div>
+          <div class="bc hide0" id="q24p1" style="border-style:dashed">?<span class="ad">không phải của p</span></div>
+        </div>
+        <div class="rowlab" style="margin-top:26px">q = new int[3]</div>
+        <div class="ram" style="--cols:4">
+          <div class="bc u2 hide0" id="q24q0"><b id="q24v0">?</b><span class="ad">q[0]</span></div>
+          <div class="bc u2 hide0" id="q24q1"><b id="q24v1">?</b><span class="ad">q[1]</span></div>
+          <div class="bc u2 hide0" id="q24q2"><b id="q24v2">?</b><span class="ad">q[2]</span></div>
+        </div>
+      </div>
+      <div class="console" style="margin-top:22px;min-height:60px"><span class="cl" id="q24o1">3</span><span class="cl" id="q24o2">6</span></div>
+      <span class="f ghost" data-o="1" data-now="#q24code|show-a;#q24code|show-b" data-act="#q24p0|sh;#q24o1|show" data-say="<b>new int(3)</b>: một ô int duy nhất, giá trị 3 → *p in 3."></span>
+      <span class="f ghost" data-o="2" data-now="#q24code|show-y" data-act="#q24p0|sh;#q24p1|sh;#q24p1|bad" data-say="Tưởng là mảng mà dùng <b>p[1]</b> → ghi ra <b>ngoài</b> vùng được cấp → phá dữ liệu khác (Undefined Behavior)."></span>
+      <span class="f ghost" data-o="3" data-now="#q24code|show-c;#q24code|show-d" data-act="#q24p0|sh;#q24p0|fz;#q24q0|sh;#q24q1|sh;#q24q2|sh" data-say="<b>delete p</b>. Rồi <b>new int[3]</b>: 3 ô liên tiếp, giá trị chưa khởi tạo (rác)."></span>
+      <span class="f ghost" data-o="4" data-now="#q24code|show-e;#q24code|show-f" data-act="#q24p0|sh;#q24p0|fz;#q24q0|sh;#q24q1|sh;#q24q2|sh;#q24o2|show" data-set="#q24v0::1;#q24v1::2;#q24v2::3" data-say="Gán q[0..2] rồi tính tổng → <b>6</b>."></span>
+      <span class="f ghost" data-o="5" data-now="#q24code|show-g" data-act="#q24p0|sh;#q24p0|fz;#q24q0|sh;#q24q1|sh;#q24q2|sh;#q24q0|fz;#q24q1|fz;#q24q2|fz" data-set="#q24v0::1;#q24v1::2;#q24v2::3" data-say="Mảng → <b>delete[] q</b> (không phải delete q, xem Q26)."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q25 ===================== -->
+<section class="slide z1" id="q25" data-title="Q25 · q = p; delete q; delete p;">
+  <div class="hdr in"><span class="qn">Q25</span><h2 style="font-size:25px">Lỗi: <code style="font-family:var(--mono)">int *p = new int; int *q; q = p; delete q; delete p;</code></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+<script type="text/x-cpp" class="sm" id="q25code" data-title="bug.cpp" data-mark="1:a;2:b;3:c;4:d;5:y">
+int *p = new int;   // cấp 1 int trên heap
+int *q;             // q chưa khởi tạo
+q = p;              // chỉ copy ĐỊA CHỈ
+delete q;           // giải phóng vùng nhớ
+delete p;           // giải phóng LẦN 2!
+</script>
+      <div class="card in tight" style="margin-top:12px"><h3 style="color:#e11d48">Lỗi: double delete (Q22)</h3><ul>
+        <li><code class="i">q = p</code> <b>không</b> tạo vùng nhớ mới, chỉ làm q trỏ <b>cùng chỗ</b> với p (2 con trỏ, 1 vùng nhớ).</li>
+        <li><code class="i">delete q</code> đã giải phóng vùng đó → p thành <b>dangling</b>.</li>
+        <li><code class="i">delete p</code> giải phóng <b>lần 2</b> cùng một vùng → Undefined Behavior, thường crash.</li>
+      </ul></div>
+      <div class="console" style="margin-top:10px;min-height:60px"><span class="cl" id="q25o1" style="color:#fda4af">free(): double free detected in tcache 2</span><span class="cl" id="q25o2" style="color:#fda4af">Aborted (core dumped)</span></div>
+    </div>
+    <div>
+      <div class="card in" style="padding:22px 16px">
+        <div class="mrow" style="gap:12px">
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <div class="mrow"><div class="mc ptr hide0" id="q25p"><span class="nm">p</span><div class="val">0x9A0</div></div><div class="arw hide0" id="q25pa">──▶</div></div>
+            <div class="mrow"><div class="mc ptr hide0" id="q25q"><span class="nm">q</span><div class="val" id="q25qv">rác</div></div><div class="arw hide0" id="q25qa">──▶</div></div>
+          </div>
+          <div class="mc u hide0" id="q25h"><span class="nm">heap (1 vùng duy nhất)</span><div class="val" id="q25hv">?</div><span class="addr" id="q25ha">0x9A0 · USED</span></div>
+        </div>
+        <div style="text-align:center;margin-top:14px"><span class="boom hide0" id="q25b">💥 0x9A0 bị giải phóng lần 2</span></div>
+      </div>
+      <div class="card f tight" data-o="6" style="margin-top:12px;border-top:5px solid #10b981"><h3 style="color:#059669">Cách sửa</h3>
+        <p>• Chỉ delete <b>một lần</b>: <code class="i">delete p; p = q = nullptr;</code><br>• Muốn 2 vùng độc lập thì copy <b>giá trị</b>: <code class="i">q = new int(*p);</code> (*p phải được gán trước) → khi đó mới <code class="i">delete p; delete q;</code></p></div>
+      <span class="f ghost" data-o="1" data-now="#q25code|show-a" data-act="#q25p|sh;#q25pa|sh;#q25h|sh" data-say="<b>new int</b>: một vùng 4 byte (giá trị chưa khởi tạo), p trỏ tới."></span>
+      <span class="f ghost" data-o="2" data-now="#q25code|show-b" data-act="#q25p|sh;#q25pa|sh;#q25h|sh;#q25q|sh" data-say="<b>int *q;</b> — q chứa địa chỉ rác (chưa sao vì ngay sau đó được gán)."></span>
+      <span class="f ghost" data-o="3" data-now="#q25code|show-c" data-act="#q25p|sh;#q25pa|sh;#q25h|sh;#q25q|sh;#q25qa|sh" data-set="#q25qv::0x9A0" data-say="<b>q = p</b>: q = 0x9A0. Bây giờ <b>hai mũi tên cùng chỉ vào một vùng</b>."></span>
+      <span class="f ghost" data-o="4" data-now="#q25code|show-d" data-act="#q25p|sh;#q25pa|sh;#q25h|sh;#q25q|sh;#q25qa|sh;#q25h|fz;#q25pa|dg;#q25qa|dg" data-set="#q25qv::0x9A0;#q25ha::0x9A0 · FREE" data-say="<b>delete q</b>: vùng 0x9A0 được trả lại. Cả p và q đều thành con trỏ treo."></span>
+      <span class="f ghost" data-o="5" data-now="#q25code|show-y" data-act="#q25p|sh;#q25pa|sh;#q25h|sh;#q25q|sh;#q25qa|sh;#q25h|bad;#q25pa|dg;#q25qa|dg;#q25b|sh;#q25o1|show;#q25o2|show" data-set="#q25qv::0x9A0;#q25ha::0x9A0 · ???" data-say="<b>delete p</b>: p mang đúng địa chỉ 0x9A0 vừa giải phóng → <b>double free</b>."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q26 ===================== -->
+<section class="slide z1" id="q26" data-title="Q26 · delete p vs delete[] p">
+  <div class="hdr in"><span class="qn">Q26</span><h2><code style="font-family:var(--mono)">delete p;</code> vs <code style="font-family:var(--mono)">delete[] p;</code></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+      <div class="card in tight"><ul>
+        <li><code class="i">delete p;</code> — giải phóng <b>một đối tượng</b> cấp bằng <code class="i">new T</code>: gọi hàm hủy <b>1 lần</b>, trả vùng nhớ.</li>
+        <li><code class="i">delete[] p;</code> — giải phóng <b>mảng</b> cấp bằng <code class="i">new T[n]</code>: gọi hàm hủy cho <b>cả n phần tử</b> (thứ tự ngược), rồi trả <b>toàn bộ khối</b>. (new[] thường cất thêm số n ở đầu khối để delete[] biết có bao nhiêu phần tử.)</li>
+        <li>Phải dùng <b>đúng cặp</b>: <code class="i">new</code>–<code class="i">delete</code>, <code class="i">new[]</code>–<code class="i">delete[]</code>. Dùng lệch → <b>Undefined Behavior</b>: hàm hủy không được gọi đủ, rò rỉ, hoặc crash.</li>
+        <li>Với kiểu đơn giản (<code class="i">int</code>), dùng sai đôi khi “có vẻ chạy được” — nhưng vẫn là lỗi.</li>
+      </ul></div>
+      <div class="console" style="margin-top:10px;min-height:84px"><span class="cl" id="q26o1">A() ~A()</span><span class="cl" id="q26o2">A() A() A() ~A() ~A() ~A()</span><span class="cl" id="q26o3">A() A() A() ~A() <span style="color:#fda4af">→ crash / rò rỉ (UB)</span></span></div>
+    </div>
+    <div>
+<script type="text/x-cpp" class="xs" id="q26code" data-title="delete_array.cpp" data-mark="1-4:a;6:b;7:c;8:y">
+struct A {
+    A()  { cout << "A() ";  }
+    ~A() { cout << "~A() "; }
+};
+int main() {
+    A* x = new A;        delete x;
+    A* arr = new A[3];   delete[] arr;
+    A* bad = new A[3];   delete bad;    // sai cặp!
+}
+</script>
+      <div class="card in" style="margin-top:12px;padding:16px 14px">
+        <div class="mrow" style="gap:8px">
+          <div class="mc u hide0" id="q26a0"><span class="nm" id="q26n0">arr[0]</span><div class="val sm">A</div></div>
+          <div class="mc u hide0" id="q26a1"><span class="nm" id="q26n1">arr[1]</span><div class="val sm">A</div></div>
+          <div class="mc u hide0" id="q26a2"><span class="nm" id="q26n2">arr[2]</span><div class="val sm">A</div></div>
+        </div>
+        <div style="text-align:center;margin-top:12px"><span class="boom hide0" id="q26b">💥 chỉ 1 hàm hủy · khối nhớ trả sai</span></div>
+      </div>
+      <span class="f ghost" data-now="#q26code|show-a" data-say="Struct A in ra khi được tạo (A()) và khi bị hủy (~A()), giúp ta thấy delete làm gì."></span>
+      <span class="f ghost" data-now="#q26code|show-b" data-act="#q26o1|show" data-say="<b>new A</b> + <b>delete x</b>: 1 lần tạo, 1 lần hủy."></span>
+      <span class="f ghost" data-now="#q26code|show-c" data-act="#q26a0|sh;#q26a1|sh;#q26a2|sh" data-say="<b>new A[3]</b>: tạo 3 đối tượng → in A() A() A()."></span>
+      <span class="f ghost" data-now="#q26code|show-c" data-act="#q26a0|sh;#q26a1|sh;#q26a2|sh;#q26a0|fz;#q26a1|fz;#q26a2|fz;#q26o2|show" data-say="<b>delete[] arr</b>: hủy <b>cả 3</b> (arr[2], arr[1], arr[0]) rồi trả khối nhớ → đúng."></span>
+      <span class="f ghost" data-now="#q26code|show-y" data-act="#q26a0|sh;#q26a1|sh;#q26a2|sh;#q26a0|fz;#q26a1|bad;#q26a2|bad;#q26b|sh;#q26o3|show" data-set="#q26n0::bad[0];#q26n1::bad[1];#q26n2::bad[2]" data-say="<b>delete bad</b> (thiếu []): chỉ gọi hàm hủy cho phần tử đầu, và trả về một địa chỉ không khớp với khối đã cấp → crash hoặc rò rỉ."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q27 ===================== -->
+<section class="slide" id="q27" data-title="Q27 · Dùng *p sau khi delete p">
+  <div class="hdr in"><span class="qn">Q27</span><h2>Lỗi: <code style="font-family:var(--mono)">int *p = new int; *p = 5; delete p; cout &lt;&lt; *p;</code></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+<script type="text/x-cpp" class="sm" id="q27code" data-title="bug.cpp" data-mark="1:a;2:b;3:c;4:y">
+int *p = new int;
+*p = 5;
+delete p;          // vùng nhớ đã trả lại
+cout << *p;        // dùng sau khi giải phóng!
+</script>
+      <div class="card in tight" style="margin-top:12px"><h3 style="color:#e11d48">Lỗi: use-after-free (dangling pointer)</h3><ul>
+        <li>Sau <code class="i">delete p</code>, vùng nhớ <b>không còn thuộc về ta</b>, nhưng p vẫn giữ địa chỉ cũ → <b>con trỏ treo</b>.</li>
+        <li><code class="i">*p</code> đọc vùng đã giải phóng → <b>Undefined Behavior</b>: có thể in 5 (chưa ai ghi đè), in số rác, hoặc crash.</li>
+        <li>“Chạy ra 5” <b>không</b> có nghĩa là code đúng: chỉ là may mắn, đổi máy/compiler là khác. Nếu <b>ghi</b> <code class="i">*p = …</code> còn có thể phá dữ liệu của biến khác.</li>
+      </ul></div>
+      <div class="card f tight" data-o="5" style="margin-top:10px;border-top:5px solid #10b981"><h3 style="color:#059669">Cách sửa</h3><p>Dùng <code class="i">*p</code> <b>trước</b> khi delete; sau delete gán <code class="i">p = nullptr;</code> (lỡ dùng thì crash rõ ràng, dễ tìm). Kiểm tra bằng <code class="i">-fsanitize=address</code> → báo <b>heap-use-after-free</b>.</p></div>
+    </div>
+    <div>
+      <div class="card in" style="padding:22px 16px">
+        <div class="mrow">
+          <div class="mc ptr" id="q27p"><span class="nm">p</span><div class="val">0x9A0</div></div>
+          <div class="arw" id="q27a">──▶</div>
+          <div class="mc hide0" id="q27h"><span class="nm" id="q27hn">heap</span><div class="val" id="q27hv">?</div><span class="addr" id="q27ha">0x9A0 · USED</span></div>
+        </div>
+      </div>
+      <div class="console" style="margin-top:12px;min-height:84px"><span class="cl" id="q27o1">5            <span style="color:#9ca3b8">← có thể (may mắn)</span></span><span class="cl" id="q27o2">-1163005939  <span style="color:#9ca3b8">← có thể (rác)</span></span><span class="cl" id="q27o3" style="color:#fda4af">Segmentation fault   <span style="color:#9ca3b8">← có thể</span></span></div>
+      <span class="f ghost" data-o="1" data-now="#q27code|show-a" data-act="#q27h|sh;#q27h|u" data-say="Cấp 1 int trên heap ở 0x9A0."></span>
+      <span class="f ghost" data-o="2" data-now="#q27code|show-b" data-act="#q27h|sh;#q27h|u" data-set="#q27hv::5" data-say="Ghi 5 vào vùng đó: hợp lệ."></span>
+      <span class="f ghost" data-o="3" data-now="#q27code|show-c" data-act="#q27h|sh;#q27h|fz;#q27a|dg" data-set="#q27hv::5;#q27ha::0x9A0 · FREE;#q27a::┄┄▶" data-say="<b>delete p</b>: vùng 0x9A0 trả về heap. Số 5 có thể vẫn nằm đó, nhưng <b>không còn là của ta</b>."></span>
+      <span class="f ghost" data-o="4" data-now="#q27code|show-y" data-act="#q27h|sh;#q27h|bad;#q27a|dg;#q27o1|show;#q27o2|show;#q27o3|show" data-set="#q27hv::5 / ??;#q27ha::0x9A0 · của ai?;#q27a::┄┄▶" data-say="<b>cout &lt;&lt; *p</b>: đọc vùng đã giải phóng. Kết quả không đoán trước — 5, số rác, hoặc crash. Nếu chương trình đã new vùng khác trùng 0x9A0, ta đọc nhầm dữ liệu của người khác."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Q28 ===================== -->
+<section class="slide" id="q28" data-title="Q28 · new int[100] rồi mới cin >> n">
+  <div class="hdr in"><span class="qn">Q28</span><h2>Lỗi: <code style="font-family:var(--mono)">int *a = new int[100]; int n; cin &gt;&gt; n;</code></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+<script type="text/x-cpp" class="xs" id="q28code" data-title="bug.cpp     input: n = 150" data-mark="1:a;2-3:b;4-5:y">
+int *a = new int[100];   // kích thước chốt TRƯỚC
+int n;
+cin >> n;                // mới biết n = 150
+for (int i = 0; i < n; i++)
+    cin >> a[i];         // i = 100..149: tràn!
+</script>
+      <div class="card in tight" style="margin-top:10px"><h3 style="color:#e11d48">Lỗi ở đâu?</h3><ul>
+        <li>Mảng được cấp <b>100 phần tử trước khi biết n</b> → mất ý nghĩa của cấp phát động.</li>
+        <li><b>n &gt; 100</b> (vd. 150): ghi <code class="i">a[100]…a[149]</code> ra <b>ngoài vùng cấp phát</b> (heap buffer overflow) → phá dữ liệu khác, crash. C++ không kiểm tra chỉ số.</li>
+        <li><b>n nhỏ</b> (vd. 5): phí 95 ô. <b>n ≤ 0</b>: chưa kiểm tra. Và chưa có <code class="i">delete[] a;</code>.</li>
+      </ul></div>
+      <div class="console" style="margin-top:10px;min-height:40px"><span class="cl" id="q28o1" style="color:#fda4af">free(): invalid next size (normal) · Aborted   <span style="color:#9ca3b8">// có thể</span></span></div>
+    </div>
+    <div>
+      <div class="card in" style="padding:14px 14px 18px">
+        <div class="rowlab" style="margin-top:0">new int[100] — vùng được cấp ║ ngoài vùng</div>
+        <div class="ram" style="--cols:10;gap:22px 4px">
+          <div class="bc sm u" id="q28c0">0<span class="ad">a[0]</span></div><div class="bc sm u">1</div><div class="bc sm u">…</div><div class="bc sm u">98</div><div class="bc sm u" id="q28c4">99<span class="ad">a[99]</span></div>
+          <div class="bc sm" id="q28x0" style="border-style:dashed">?<span class="ad">a[100]</span></div><div class="bc sm" id="q28x1" style="border-style:dashed">?</div><div class="bc sm" id="q28x2" style="border-style:dashed">…</div><div class="bc sm" id="q28x3" style="border-style:dashed">?</div><div class="bc sm" id="q28x4" style="border-style:dashed">?<span class="ad">a[149]</span></div>
+        </div>
+        <div class="brks" style="--cols:10;gap:4px">
+          <div class="brk" style="grid-column:1/span 5">100 int của a</div>
+          <div class="brk r hide0" id="q28br" style="grid-column:6/span 5">dữ liệu người khác!</div>
+        </div>
+      </div>
+<script type="text/x-cpp" class="xs" id="q28fix" data-title="Cách sửa: nhập n trước, rồi mới cấp phát" data-mark="1-3:e;4:e;6:e" style="margin-top:10px">
+int n;
+cin >> n;
+if (n <= 0) return 1;           // kiểm tra input
+int *a = new int[n];            // cấp đúng n phần tử
+for (int i = 0; i < n; i++) cin >> a[i];
+delete[] a;                     // hoặc: vector<int> a(n);
+</script>
+      <span class="f ghost" data-now="#q28code|show-a" data-say="Cấp 100 int ngay từ đầu, lúc chưa biết người dùng cần bao nhiêu."></span>
+      <span class="f ghost" data-now="#q28code|show-b" data-say="Input: <b>n = 150</b>."></span>
+      <span class="f ghost" data-now="#q28code|show-y" data-act="#q28x0|bad;#q28x1|bad;#q28x2|bad;#q28x3|bad;#q28x4|bad;#q28br|sh;#q28o1|show" data-say="Vòng lặp ghi tới a[149]: 50 phần tử cuối nằm <b>ngoài</b> vùng được cấp → ghi đè lên vùng quản lý heap / dữ liệu biến khác. Lỗi thường lộ ra muộn (lúc delete[] hoặc new tiếp theo)."></span>
+      <span class="f ghost" data-now="#q28fix|show-e" data-say="<b>Sửa</b>: đọc n trước → kiểm tra → <b>new int[n]</b> đúng kích thước → nhớ <b>delete[]</b>. Tốt nhất dùng <b>vector&lt;int&gt; a(n)</b>."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="slide" id="summary" data-title="Tổng kết">
+  <div class="hdr in"><span class="qn">✓</span><h2>Tổng kết</h2></div>
+  <div class="cols4" style="margin-top:10px">
+    <div class="card f"><h3>Bộ nhớ</h3><p>RAM: truy cập ngẫu nhiên, nhanh hơn SSD ~1.000×, HDD ~100.000×. Ô nhớ = 1 byte, có địa chỉ; biến chiếm một khối ô liên tiếp.</p></div>
+    <div class="card f"><h3>Con trỏ</h3><p>Biến chứa địa chỉ, luôn 8 byte (64-bit). <code class="i">&amp;x</code> lấy địa chỉ, <code class="i">*p</code> đi theo địa chỉ, <code class="i">p-&gt;m</code> = <code class="i">(*p).m</code>, chưa trỏ đâu → <code class="i">nullptr</code>.</p></div>
+    <div class="card f"><h3>Mảng</h3><p><code class="i">a[i]</code> ≡ <code class="i">*(a+i)</code>. <code class="i">p++</code> nhảy <b>sizeof(*p)</b> byte. Muốn hàm đổi con trỏ → <code class="i">int*&amp;</code>.</p></div>
+    <div class="card f"><h3>new / delete</h3><p>new → heap, sống tới khi delete. <code class="i">new</code>↔<code class="i">delete</code>, <code class="i">new[]</code>↔<code class="i">delete[]</code>. Ưu tiên <code class="i">vector</code>, <code class="i">unique_ptr</code>.</p></div>
+  </div>
+  <table class="cmp f" style="margin-top:16px">
+    <tr><th>Lỗi</th><th>Biểu hiện</th><th>Quy tắc tránh</th></tr>
+    <tr><td>Memory leak (Q21)</td><td>new mà không delete, mất con trỏ</td><td>Mỗi new có đúng 1 delete; delete trước khi gán đè</td></tr>
+    <tr><td>Double delete (Q22, Q25)</td><td>delete 2 lần cùng vùng (kể cả qua 2 con trỏ)</td><td>Một “chủ” duy nhất; <code class="i">p = nullptr</code> sau delete</td></tr>
+    <tr><td>Delete vùng không do new (Q23)</td><td><code class="i">delete &amp;a</code></td><td>Chỉ delete những gì đã new</td></tr>
+    <tr><td>Sai cặp (Q24, Q26)</td><td>new[] + delete, nhầm () và []</td><td>new ↔ delete, new[] ↔ delete[]</td></tr>
+    <tr><td>Use-after-free (Q27)</td><td>dùng *p sau delete</td><td>Dùng xong mới delete; gán nullptr</td></tr>
+    <tr><td>Tràn mảng (Q28)</td><td>chỉ số vượt kích thước cấp phát</td><td>Biết n rồi mới cấp; kiểm tra chỉ số</td></tr>
+  </table>
+</section>
+
+</div></div>
+
+<div id="bar"></div>
+<div id="hint">← → / Space: từng bước · Shift+→: qua slide · G: đi tới slide bất kỳ · A: hiện hết · F: toàn màn hình</div>
+<div id="nav"><button id="jumpNav" title="Đi tới slide (G)">☰</button><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+<div id="jump"><div id="jbox"><div class="jh"><h3>Đi tới slide</h3><span class="muted" style="font-size:14px">gõ số hoặc tên slide rồi Enter</span><input id="jq" placeholder="vd: 5 hoặc hàm ảo" autocomplete="off"><button id="jx" aria-label="Đóng">×</button></div><div id="jlist"></div></div></div>
+
+<script>
+(function(){
+  // ---------- C++ highlighter ----------
+  const KW=new Set("class struct public private protected virtual const this new delete return if else for while do switch case break continue default friend operator static using namespace include true false nullptr sizeof".split(" "));
+  const PRIM=new Set("bool char double float int long short void unsigned auto".split(" "));
+  const STD=new Set("cout cin endl".split(" "));const LIBT=new Set("string vector".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line){
+    const re=/(\/\/.*$|\/\*.*?\*\/)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(^\s*#\w+.*$)|\b(\d+(?:\.\d+)?[fFL]?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="p">'+m[3]+'</span>';
+      else if(m[4]) out+='<span class="n">'+m[4]+'</span>';
+      else if(m[5]){
+        const w=m[5];let cls="";
+        if(PRIM.has(w)||LIBT.has(w))cls="t";else if(KW.has(w))cls="k";else if(STD.has(w))cls="fn";
+        else if(m[6])cls="fn";
+        else if(/^[A-Z][A-Z0-9_]+$/.test(w))cls="n";
+        else if(/^[A-Z]/.test(w))cls="t";
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[6]?esc(m[6]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-cpp"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");r.split(",").forEach(rr=>{const [a,b]=rr.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);});
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    if(sc.dataset.title){const t=document.createElement("div");t.className="code-title";t.textContent=sc.dataset.title;sc.before(t)}
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+  // ---------- deck engine ----------
+  //   .f = fragment, one per step.  data-act "sel|cls;…" (kept while shown) · data-now "sel|cls;…" (only on latest step)
+  //   data-set "sel::html;…" (content while shown) · data-say narration · data-o order
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")].sort((x,y)=>(+x.dataset.o||0)-(+y.dataset.o||0));
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  const pairs=(v,sep)=>(v||"").split(/;(?=\s*#)/).filter(s=>s.trim()).map(p=>{const k=p.indexOf(sep);return [p.slice(0,k).trim(),p.slice(k+sep.length)]});
+  function tog(v,on){pairs(v,"|").forEach(([sel,cls])=>{document.querySelectorAll(sel).forEach(t=>cls.split(" ").forEach(c=>c&&t.classList.toggle(c,on)))})}
+  document.querySelectorAll("[data-set]").forEach(f=>pairs(f.dataset.set,"::").forEach(([sel])=>{document.querySelectorAll(sel).forEach(t=>{if(t.dataset.orig===undefined)t.dataset.orig=t.innerHTML})}));
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach(f=>{tog(f.dataset.now,false);tog(f.dataset.act,false)});
+      s.querySelectorAll("[data-orig]").forEach(t=>t.innerHTML=t.dataset.orig);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step);f.classList.toggle("on",on);if(on){tog(f.dataset.act,true);pairs(f.dataset.set,"::").forEach(([sel,val])=>document.querySelectorAll(sel).forEach(t=>t.innerHTML=val))}});
+      if(i===cur&&step>0)tog(fs[step-1].dataset.now,true);
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.innerHTML=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length+(fs.length?" · "+step+"/"+fs.length:"");
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    try{history.replaceState(null,"","#"+slides[cur].id)}catch(e){}
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+
+  // ---------- jump-to-slide panel ----------
+  const jump=document.getElementById("jump"),jlist=document.getElementById("jlist"),jq=document.getElementById("jq");
+  const titleOf=s=>s.dataset.title||(s.querySelector("h2,h1")||{}).textContent||s.id;
+  slides.forEach((s,i)=>{
+    const d=document.createElement("div");d.className="ji";d.dataset.i=i;
+    d.innerHTML="<b>"+String(i+1).padStart(2,"0")+"</b><span>"+esc(titleOf(s).replace(/\s+/g," ").trim())+"</span>";
+    d.onclick=()=>{closeJump();go(i)};jlist.appendChild(d);
+    const b=document.createElement("button");b.className="jumpbtn";b.type="button";b.innerHTML="☰ Đi tới slide";b.title="Mở danh sách slide (phím G)";
+    b.onclick=e=>{e.stopPropagation();openJump()};s.appendChild(b);
+  });
+  function filterJump(){
+    const q=jq.value.trim().toLowerCase();let first=null;
+    [...jlist.children].forEach(d=>{const i=+d.dataset.i;const ok=!q||String(i+1)===q||d.textContent.toLowerCase().includes(q);d.style.display=ok?"":"none";d.classList.remove("k");if(ok&&!first)first=d});
+    if(first&&q)first.classList.add("k");return first;
+  }
+  function openJump(){jump.classList.add("on");jq.value="";filterJump();[...jlist.children].forEach(d=>d.classList.toggle("cur",+d.dataset.i===cur));setTimeout(()=>jq.focus(),30)}
+  function closeJump(){jump.classList.remove("on");jq.blur()}
+  jq.addEventListener("input",filterJump);
+  jq.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Escape")closeJump();else if(e.key==="Enter"){const q=jq.value.trim();const n=parseInt(q,10);if(String(n)===q&&n>=1&&n<=slides.length){closeJump();go(n-1)}else{const f=filterJump();if(f){closeJump();go(+f.dataset.i)}}}});
+  jump.addEventListener("click",e=>{if(e.target===jump)closeJump()});
+  document.getElementById("jx").onclick=closeJump;
+  document.getElementById("jumpNav").onclick=openJump;
+
+  addEventListener("keydown",e=>{
+    if(jump.classList.contains("on")){if(e.key==="Escape")closeJump();return}
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="g"||e.key==="G"){e.preventDefault();openJump()}
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null||jump.classList.contains("on"))return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+</script>
+</body>
+</html>
