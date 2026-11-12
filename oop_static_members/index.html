@@ -1,0 +1,1152 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thành phần tĩnh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:16px;padding-right:150px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+.lvl{font-size:14px;font-weight:700;color:var(--muted);white-space:nowrap;margin-left:auto}
+.lvl b{color:#f59e0b;letter-spacing:2px}.lvl s{color:#d9d6e8;text-decoration:none;letter-spacing:2px}
+h1{font-size:66px;line-height:1.1;font-weight:800}
+h2{font-size:30px;line-height:1.2;font-weight:800}
+h3{font-size:21px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:20px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+ul{list-style:none}
+ul li{position:relative;padding-left:24px;margin:5px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:9px;height:9px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.86em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 5px;border-radius:6px;color:#be185d;white-space:nowrap}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+.cols>*{min-width:0}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.card p,.card li{font-size:17px}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.note{margin-top:10px;padding:8px 14px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:17px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.note.red{border-color:#e11d48;background:linear-gradient(90deg,#fff1f3,#fffafa)}
+.code{font-family:var(--mono);font-size:15px;line-height:1.45;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:8px 0;overflow:hidden;position:relative}
+.code.sm{font-size:14px;line-height:1.42}.code.xs{font-size:13px;line-height:1.4}.code.xxs{font-size:12px;line-height:1.36;padding:6px 0}
+.code.x4{font-size:11.4px;line-height:1.33;padding:6px 0}
+.code .ln{padding:0 12px 0 6px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c9c3e0;width:22px;flex:none;text-align:right;margin-right:10px;user-select:none}
+.k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
+.code.show-a .mark-a{background:rgba(124,58,237,.13);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.15);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.18);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.14);box-shadow:inset 5px 0 #ec4899}
+.code.show-e .mark-e{background:rgba(16,185,129,.15);box-shadow:inset 5px 0 #10b981}
+.code.show-f .mark-f{background:rgba(124,58,237,.13);box-shadow:inset 5px 0 #7c3aed}
+.code.show-g .mark-g{background:rgba(6,182,212,.15);box-shadow:inset 5px 0 #06b6d4}
+.code.show-h .mark-h{background:rgba(245,158,11,.18);box-shadow:inset 5px 0 #f59e0b}
+.code.show-i .mark-i{background:rgba(236,72,153,.14);box-shadow:inset 5px 0 #ec4899}
+.code.show-j .mark-j{background:rgba(16,185,129,.15);box-shadow:inset 5px 0 #10b981}
+.hide0{opacity:0;transform:translateY(8px) scale(.96);transition:all .45s}
+.hide0.sh{opacity:1;transform:none}
+.win.pre.sh:not(.vis){opacity:.35;filter:grayscale(1)}
+.gone.sh{display:none}
+.stage{position:relative;display:flex;align-items:center;justify-content:center}
+.chip{display:inline-block;font-family:var(--mono);font-size:12.5px;font-weight:700;padding:2px 9px;border-radius:999px;background:#fef3c7;color:#b45309;border:1px solid #fcd34d}
+.chip.v{background:#ede9fe;color:#6d28d9;border-color:#c4b5fd}.chip.g{background:#d1fae5;color:#047857;border-color:#6ee7b7}.chip.r{background:#ffe4e6;color:#be123c;border-color:#fda4af}
+.hlo{outline:3px solid #f59e0b;outline-offset:3px;border-radius:6px}
+.jb.dis.en{color:#111;border-color:#9aa1b3;background:linear-gradient(180deg,#fff,#e6e8ee)}.jb.dis.en .ico{filter:none;opacity:1}
+.jb.dis.en.dis2{color:#a0a4ad;border-color:#ccd0d8;background:#f1f2f5}
+.rad.on.off::before,.chk.on.off::before{background:#fff;content:""}
+.code-title{font-family:var(--mono);font-size:13px;color:var(--muted);margin:0 0 4px 4px;font-weight:600}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:16px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:6px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.3}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+tr:last-child td{border-bottom:none}
+table.t1 td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+.console{font-family:var(--mono);font-size:13.5px;line-height:1.45;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:8px 14px;color:#e6f0ff;white-space:pre;min-height:40px;overflow:hidden}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:10px;letter-spacing:3px;margin-bottom:3px}
+.cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
+.flow{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap}
+.box{border-radius:12px;padding:8px 12px;text-align:center;font-family:var(--mono);font-size:15px;border:2px solid var(--line);background:#fff;min-width:110px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:12.5px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.a{border-color:#7c3aed}.box.b{border-color:#0891b2}.box.c{border-color:#ec4899;background:#fdf2f8}.box.d{border-color:#f59e0b;background:#fffbeb}.box.e{border-color:#10b981;background:#ecfdf5}
+.ar{color:var(--muted);font-size:22px;text-align:center}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translate(30px,-25px)}}
+.say{font-size:17px;margin-top:10px;min-height:50px;color:var(--muted);line-height:1.42}
+.say b{color:var(--text)}
+.vars{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.vc{font-family:var(--mono);font-size:15px;font-weight:700;padding:4px 12px;border-radius:10px;background:#fff;border:2px solid #e4dcfb;transition:all .35s}
+.vc b{color:var(--t)}
+.vc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.45)}
+.vc.res{border-color:#10b981;background:#ecfdf5;color:#047857}
+.arr{display:flex;gap:8px;justify-content:center}
+.cell{width:52px;height:56px;border-radius:12px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .45s}
+.cell small{font-size:11px;color:var(--muted);font-weight:600}
+.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-6px)}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c}
+.cell.dim{opacity:.35}
+.cell.wide{width:auto;padding:0 10px;font-size:14px}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.15)}100%{transform:none;opacity:1}}
+.pop{animation:pop .45s}
+
+/* ===== agenda ===== */
+.agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 10px}
+.sec{grid-column:1/-1;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.08em;margin-top:4px;text-transform:uppercase}
+.ag{background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 10px;cursor:pointer;transition:all .2s;font-size:15.5px;line-height:1.25;box-shadow:0 2px 6px rgba(40,50,110,.05);font-family:var(--mono);font-weight:600}
+.ag:hover{border-color:#ec4899;transform:translateY(-2px);box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag b{color:#db2777;margin-right:6px}
+.ag.g1{border-left:5px solid #7c3aed}.ag.g2{border-left:5px solid #0891b2}.ag.g3{border-left:5px solid #ec4899}.ag.g4{border-left:5px solid #f59e0b}
+.ag.g5{border-left:5px solid #10b981}.ag.g6{border-left:5px solid #6366f1}.ag.g7{border-left:5px solid #f97316}.ag.g8{border-left:5px solid #0ea5e9}
+
+/* ===== mock Swing windows ===== */
+.win{border:1px solid #cfc8e6;border-radius:10px;background:#eef0f4;box-shadow:0 18px 40px -18px rgba(30,27,58,.45);font-family:"Segoe UI",system-ui,sans-serif;font-size:14px;color:#222;transition:all .5s;overflow:hidden;position:relative}
+.wt{height:28px;background:linear-gradient(180deg,#f7f7fa,#e2e4ea);border-bottom:1px solid #cfd2da;display:flex;align-items:center;gap:6px;padding:0 10px;font-weight:600;font-size:13px;color:#333}
+.wt i{width:11px;height:11px;border-radius:50%;background:#ff5f57;display:inline-block}.wt i:nth-child(2){background:#febc2e}.wt i:nth-child(3){background:#28c840}
+.wt span{margin-left:8px}
+.wb{padding:12px;position:relative}
+.win.ghost{opacity:.25;filter:grayscale(1)}
+.win.undec .wt{display:none}
+.jb{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid #9aa1b3;border-radius:5px;background:linear-gradient(180deg,#fff,#e6e8ee);font-size:13.5px;color:#111;transition:all .3s;white-space:nowrap;cursor:default}
+.jb.dis{color:#a0a4ad;border-color:#ccd0d8;background:#f1f2f5}
+.jb.dis .ico{filter:grayscale(1);opacity:.5}
+.jb.press{background:linear-gradient(180deg,#cfd8ea,#b9c6e2);border-color:#5b74b5;transform:scale(.96)}
+.jb.def{box-shadow:0 0 0 2px #7aa2f7}
+.jb.vert{flex-direction:column}
+.jb u{text-decoration:underline}
+.ico{display:inline-block;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#a7f3d0,#059669);flex:none}
+.ico.l{border-radius:4px;background:linear-gradient(135deg,#60a5fa,#2563eb);clip-path:polygon(100% 0,0 50%,100% 100%)}
+.ico.r{border-radius:4px;background:linear-gradient(135deg,#f472b6,#db2777);clip-path:polygon(0 0,100% 50%,0 100%)}
+.splat{display:inline-block;width:34px;height:30px;background:radial-gradient(circle at 50% 50%,#f59e0b 0 30%,transparent 31%),radial-gradient(circle at 25% 30%,#ec4899 0 18%,transparent 19%),radial-gradient(circle at 75% 35%,#7c3aed 0 18%,transparent 19%),radial-gradient(circle at 40% 78%,#0891b2 0 17%,transparent 18%),radial-gradient(circle at 78% 75%,#10b981 0 15%,transparent 16%)}
+.chk,.rad{display:block;padding:3px 0;font-size:14px;transition:all .3s;white-space:nowrap}
+.chk::before,.rad::before{display:inline-block;vertical-align:-2px;margin-right:7px}
+.chk::before{content:"";width:14px;height:14px;border:1px solid #7b8394;border-radius:3px;background:#fff;flex:none;font-size:12px;line-height:14px;text-align:center;font-weight:900;color:#1d4ed8}
+.chk.on::before{content:"✓";background:#dbe7ff}
+.rad::before{content:"";width:14px;height:14px;border:1px solid #7b8394;border-radius:50%;background:#fff;flex:none;box-sizing:border-box}
+.rad.on::before{background:radial-gradient(circle,#1d4ed8 0 35%,#fff 40%)}
+.chk.hl,.rad.hl{background:#fff3c4;border-radius:4px}
+.tf{display:inline-block;min-width:120px;min-height:26px;border:1px solid #8c93a3;background:#fff;padding:3px 7px;font-family:var(--mono);font-size:13.5px;border-radius:3px;transition:all .3s;white-space:pre;vertical-align:middle}
+.tf.err{background:#ffd1dc}
+.tf.ro{background:#f3f4f6}
+.tf .cur{display:inline-block;width:1px;height:15px;background:#111;vertical-align:middle;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.ta{border:1px solid #8c93a3;background:#fff;padding:6px 8px;font-family:var(--mono);font-size:12.5px;line-height:1.5;border-radius:3px;white-space:pre-wrap;overflow:hidden}
+/* text area that stays scrolled to bottom */
+.ta.bottom{display:flex;flex-direction:column;justify-content:flex-end}
+mark{background:#d1d5db;color:inherit;border-radius:2px;padding:0 1px}
+mark.sel{background:#bfdbfe}
+.combo{display:inline-flex;align-items:center;justify-content:space-between;min-width:170px;border:1px solid #8c93a3;border-radius:4px;background:linear-gradient(180deg,#fff,#eceef3);padding:4px 8px;font-size:14px;gap:10px;position:relative}
+.combo::after{content:"▾";color:#555}
+.combo.ed{background:#fff}
+.dd{position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid #8c93a3;box-shadow:0 8px 18px -8px rgba(0,0,0,.35);z-index:3;display:none;text-align:left}
+.dd div{padding:3px 8px;font-size:13.5px}
+.dd div.s{background:#3b6fd8;color:#fff}
+.open .dd{display:block}
+.lst{border:1px solid #8c93a3;background:#fff;font-size:14px;min-height:90px}
+.lst div{padding:3px 8px;transition:all .3s}
+.lst div.s{background:#3b6fd8;color:#fff}
+.lst div.nw{animation:pop .5s}
+.jt{border-collapse:collapse;width:100%;font-size:13px;border:1px solid #9aa1b3;border-radius:0;background:#fff;font-family:"Segoe UI",system-ui,sans-serif}
+.jt th{background:linear-gradient(180deg,#fafafa,#e3e5ea);border:1px solid #b9bec9;padding:3px 6px;font-weight:600;font-size:12.5px;white-space:nowrap;text-align:left}
+.jt td{border:1px solid #e1e3e8;padding:3px 6px;color:#111;font-weight:400;white-space:nowrap;vertical-align:middle}
+.jt td.num{text-align:right}
+.jt td.ck{text-align:center}
+.jt tr.s td{background:#3b6fd8;color:#fff}
+.jt td.s{background:#3b6fd8;color:#fff}
+.jt td.edit{outline:2px solid #f59e0b;background:#fffbeb}
+.jt th.sorted::after{content:" ▲";color:#3b6fd8}
+.jt th.sorted.desc::after{content:" ▼"}
+.jt tr.hide{display:none}
+.jt .cb{display:inline-block;width:13px;height:13px;border:1px solid #7b8394;border-radius:2px;background:#fff;vertical-align:middle;font-size:11px;line-height:12px;text-align:center;font-weight:900;color:#1d4ed8}
+.jt .cb.on::before{content:"✓"}
+.pb{height:20px;border:1px solid #8c93a3;border-radius:4px;background:#e5e7eb;position:relative;overflow:hidden;min-width:180px}
+.pb .fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(180deg,#7aa2f7,#3b6fd8);transition:width .6s}
+.pb .txt{position:absolute;inset:0;text-align:center;font-size:12px;line-height:18px;font-weight:600;color:#111}
+.pb.ind .fill{width:30%!important;animation:ind 1.2s linear infinite alternate}
+.pb.ind .txt{opacity:0}
+@keyframes ind{from{left:0}to{left:70%}}
+.mbar{display:flex;gap:2px;background:linear-gradient(180deg,#fbfbfc,#e9ebf0);border-bottom:1px solid #cfd2da;padding:2px 6px;font-size:13.5px;position:relative}
+.mbar>span{padding:2px 8px;border-radius:3px}
+.mbar>span.s{background:#3b6fd8;color:#fff}
+.menu{position:absolute;top:26px;left:6px;background:#fff;border:1px solid #9aa1b3;box-shadow:0 10px 24px -8px rgba(0,0,0,.4);min-width:250px;z-index:4;display:none;font-size:13px}
+.menu.open{display:block;animation:pop .3s}
+.mi{display:flex;align-items:center;gap:6px;padding:3px 10px;white-space:nowrap}
+.mi .acc{margin-left:auto;color:#666;font-size:12px;padding-left:16px}
+.mi.s{background:#3b6fd8;color:#fff}.mi.s .acc{color:#e0e7ff}
+.msep{height:1px;background:#d9dce3;margin:3px 0}
+.mi .mk{width:14px;text-align:center;font-weight:900;flex:none}
+.dlgwrap{position:absolute;inset:0;background:rgba(30,27,58,.18);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;z-index:6}
+.dlgwrap.on{opacity:1}
+.dlgwrap.on .win{animation:pop .4s}
+.dlgwrap.nomodal{background:none}
+.dlgico{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:20px;flex:none;background:#3b82f6}
+.dlgico.q{background:#10b981}.dlgico.e{background:#e11d48}.dlgico.w{background:#f59e0b;border-radius:6px}
+.tabs{display:flex;gap:2px;border-bottom:1px solid #9aa1b3;margin-bottom:8px}
+.tabs span{padding:3px 10px;border:1px solid #b9bec9;border-bottom:none;border-radius:5px 5px 0 0;background:#e6e8ee;font-size:12.5px}
+.tabs span.s{background:#fff;font-weight:600}
+.tip{position:absolute;background:#ffffe1;border:1px solid #777;font-size:12px;padding:2px 6px;box-shadow:2px 2px 4px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;white-space:nowrap;z-index:5}
+.tip.on{opacity:1}
+.pic{display:flex;align-items:center;justify-content:center;font-size:64px;min-height:110px;transition:all .4s}
+.thumb{width:34px;height:34px;border-radius:5px;border:1px solid #888;display:inline-block;transition:all .4s}
+.lane{display:grid;grid-template-columns:110px 1fr;gap:6px;align-items:center;font-size:13px}
+.lane .ln2{height:30px;border-radius:8px;background:#f8fafc;border:1px dashed #cbd5e1;display:flex;align-items:center;gap:6px;padding:0 8px;overflow:hidden}
+.ev{font-family:var(--mono);font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:6px;background:#ede9fe;color:#6d28d9;white-space:nowrap}
+.ev.b{background:#cffafe;color:#0e7490}.ev.c{background:#fce7f3;color:#be185d}.ev.d{background:#fef3c7;color:#b45309}
+.kv{font-family:var(--mono);font-size:13px}
+.swatch{display:inline-block;width:100%;height:100%;border-radius:4px}
+
+/* ===== nav / jump ===== */
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;min-width:36px;height:32px;cursor:pointer;font-size:16px;padding:0 8px}
+#nav button:hover{border-color:var(--accent)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+.jumpbtn{position:absolute;top:26px;right:30px;z-index:7;font-family:"Be Vietnam Pro",sans-serif;font-size:14px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));border:none;border-radius:999px;padding:7px 14px;cursor:pointer;box-shadow:0 6px 16px -6px var(--sa1);transition:transform .2s}
+.jumpbtn:hover{transform:translateY(-2px) scale(1.04)}
+#jump{position:fixed;inset:0;z-index:20;background:rgba(30,27,58,.45);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
+#jump.on{display:flex}
+#jbox{width:min(1100px,94vw);max-height:88vh;overflow:auto;background:#fff;border-radius:18px;padding:20px 24px;box-shadow:0 30px 70px -20px rgba(30,27,58,.6);animation:pop .3s}
+#jbox .jh{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+#jbox .jh h3{font-size:22px;color:#7c3aed;margin:0}
+#jbox .jh input{margin-left:auto;font-family:var(--mono);font-size:15px;padding:6px 10px;border:2px solid var(--line);border-radius:10px;width:260px;outline:none}
+#jbox .jh input:focus{border-color:#a78bfa}
+#jbox .jh button{border:none;background:#f1eaff;color:#6d28d9;font-weight:800;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:18px}
+#jlist{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+#jlist .ji{display:flex;gap:8px;align-items:center;padding:7px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:14.5px;transition:all .15s;background:#fff}
+#jlist .ji:hover,#jlist .ji.k{border-color:#ec4899;background:#fdf2f8}
+#jlist .ji.cur{background:#f3edff;border-color:#a78bfa}
+#jlist .ji b{font-family:var(--mono);color:#db2777;min-width:26px}
+#jlist .ji span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:700px){#hint{display:none}#jlist{grid-template-columns:1fr}}
+@media print{#nav,#bar,#hint,.jumpbtn{display:none}}
+
+/* ===== OOP deck extras ===== */
+.code.nonum .no{display:none}
+.code .mark-z{display:none}
+.code.alt .mark-z{display:flex}
+.code.alt .mark-y{display:none}
+.code.show-z .mark-z{background:rgba(250,204,21,.32);box-shadow:inset 5px 0 #eab308}
+.code.show-y .mark-y{background:rgba(225,29,72,.12);box-shadow:inset 5px 0 #e11d48}
+.code .ln.ok-l::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px}
+.code .ln.bad-l::after{content:"✗ lỗi";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}
+.code.done .ok-x::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px}
+.code.done .bad-x::after{content:"✗ lỗi";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro";font-size:.92em}
+.obj{border:2.5px solid #ec4899;border-radius:14px;padding:8px 12px 10px;background:#fff;position:relative;transition:all .45s}
+.obj>.lab,.part>.lab{font-family:var(--mono);font-size:12.5px;font-weight:800;color:#be185d;margin-bottom:5px;display:flex;justify-content:space-between;gap:10px}
+.part{border:2px dashed #7c3aed;border-radius:10px;padding:6px 10px;background:#f7f3ff;margin-bottom:6px;transition:all .45s}
+.part>.lab{color:#6d28d9}
+.part.b{border-color:#0891b2;background:#ecfeff}.part.b>.lab{color:#0e7490}
+.fld{font-family:var(--mono);font-size:14px;display:flex;gap:8px;padding:2px 0;align-items:center}
+.fld>span:first-child{color:var(--muted);min-width:110px}
+.fld b{font-weight:700;color:#111;transition:all .3s;padding:0 4px;border-radius:5px}
+.fld b.new{background:#fef3c7;color:#b45309}
+.fld b.def{background:#ffe4e6;color:#be123c}
+.fld b.okv{background:#d1fae5;color:#047857}
+.glow{box-shadow:0 0 0 4px rgba(245,158,11,.35),0 0 22px rgba(245,158,11,.45)}
+.dimx{opacity:.3;filter:grayscale(.8)}
+.stack{display:flex;flex-direction:column-reverse;gap:6px;min-height:40px}
+.fr{font-family:var(--mono);font-size:14px;font-weight:700;padding:6px 12px;border-radius:10px;border:2px solid #c4b5fd;background:#f5f3ff;color:#5b21b6}
+.fr.b{border-color:#67e8f9;background:#ecfeff;color:#0e7490}
+.fr.d{border-color:#fcd34d;background:#fffbeb;color:#b45309}
+.fr small{display:block;font-family:"Be Vietnam Pro";font-weight:500;font-size:12px;color:var(--muted)}
+.hide0.sh.rm{opacity:.1;transform:translateY(-10px) scale(.94)}
+.big-ok{color:#059669;font-weight:800}.big-bad{color:#e11d48;font-weight:800}
+.mem{display:flex;gap:16px;align-items:flex-end;justify-content:center;flex-wrap:wrap}
+.mc{display:flex;flex-direction:column;align-items:center;gap:4px}
+.mc .addr{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.mc .nm{font-family:var(--mono);font-size:14px;font-weight:800;color:#6d28d9}
+.mc .val{min-width:96px;height:52px;border-radius:12px;border:3px solid #e4dcfb;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:18px;font-weight:800;transition:all .45s;padding:0 8px}
+.mc.hot .val{border-color:#f59e0b;background:#fffbeb;color:#b45309}
+.mc.orph .val{border-color:#e11d48;background:#fff1f3;color:#be123c;border-style:dashed}
+.mc.ptr .val{border-color:#0891b2;background:#ecfeff;color:#0e7490}
+/* UML */
+.uml{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;align-items:flex-start}
+.umlc{display:flex;flex-direction:column;align-items:center}
+.ucls{min-width:120px;border:2px solid #1e1b3a;background:#fffbe6;border-radius:4px;font-family:var(--mono);font-size:14px;font-weight:700;text-align:center;box-shadow:4px 4px 0 #e6e2f3}
+.ucls div{padding:4px 10px}.ucls i{display:block;height:9px;border-top:1.5px solid #1e1b3a}
+.conn{position:relative;width:2px;height:64px;background:#1e1b3a;margin:0 auto}
+.conn.isa::before{content:"";position:absolute;top:-1px;left:50%;transform:translateX(-50%);border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:16px solid #1e1b3a}
+.conn.isa::after{content:"";position:absolute;top:3px;left:50%;transform:translateX(-50%);border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:10px solid #fff}
+.conn.hasa::before{content:"";position:absolute;top:0;left:50%;width:13px;height:13px;background:#fff;border:2px solid #1e1b3a;transform:translate(-50%,-3px) rotate(45deg)}
+.conn .mul{position:absolute;bottom:2px;right:8px;font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.house{display:flex;flex-direction:column;align-items:center;gap:3px}
+.house .roof{width:0;height:0;border-left:130px solid transparent;border-right:130px solid transparent;border-bottom:80px solid #ec4899}
+.house .wall{width:220px;height:90px;background:linear-gradient(180deg,#a78bfa,#7c3aed);border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+.house .base{width:280px;height:34px;background:linear-gradient(180deg,#94a3b8,#475569);border-radius:4px;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px}
+.house .roof-l{position:relative;top:-46px;color:#fff;font-weight:700;font-size:14px;height:0}
+.onion{position:relative;width:300px;height:300px;margin:0 auto}
+.onion>div{position:absolute;border-radius:50%;display:flex;align-items:flex-start;justify-content:center;font-family:var(--mono);font-weight:800;font-size:14px;padding-top:14px}
+.tick{display:inline-flex;width:26px;height:26px;border-radius:50%;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:15px}
+.tick.y{background:#10b981}.tick.n{background:#e11d48}
+table.acc td,table.acc th{text-align:center;font-size:17px;padding:8px 10px}
+table.acc td:first-child,table.acc th:first-child{text-align:left}
+table.acc td.hl{background:#fffbeb;box-shadow:inset 0 0 0 2px #f59e0b}
+.pill{display:inline-block;font-family:var(--mono);font-weight:700;font-size:14px;padding:3px 10px;border-radius:999px;border:2px solid #c4b5fd;background:#f5f3ff;color:#5b21b6;transition:all .35s}
+.pill.b{border-color:#67e8f9;background:#ecfeff;color:#0e7490}.pill.c{border-color:#f9a8d4;background:#fdf2f8;color:#be185d}.pill.d{border-color:#fcd34d;background:#fffbeb;color:#b45309}.pill.x{border-color:#e5e7eb;background:#f3f4f6;color:#9ca3af;text-decoration:line-through}
+.vt{font-family:var(--mono);font-size:13.5px;border:2px solid #0891b2;border-radius:10px;background:#ecfeff;padding:6px 10px}
+.vt div{padding:2px 0}
+.strike{position:relative}
+.strike.on::after{content:"";position:absolute;left:-4px;right:-4px;top:50%;height:3px;background:#e11d48;transform:rotate(-4deg)}
+.code.r1 .mark-o1::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r1 .mark-x1::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r2 .mark-o2::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r2 .mark-x2::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r3 .mark-o3::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r3 .mark-x3::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r4 .mark-o4::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r4 .mark-x4::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r5 .mark-o5::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r5 .mark-x5::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r6 .mark-o6::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r6 .mark-x6::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r7 .mark-o7::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r7 .mark-x7::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r8 .mark-o8::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r8 .mark-x8::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r9 .mark-o9::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r9 .mark-x9::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r10 .mark-o10::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r10 .mark-x10::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r11 .mark-o11::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r11 .mark-x11::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r12 .mark-o12::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r12 .mark-x12::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r13 .mark-o13::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r13 .mark-x13::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r14 .mark-o14::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r14 .mark-x14::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r15 .mark-o15::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r15 .mark-x15::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r16 .mark-o16::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r16 .mark-x16::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r17 .mark-o17::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r17 .mark-x17::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r18 .mark-o18::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r18 .mark-x18::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r19 .mark-o19::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r19 .mark-x19::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r20 .mark-o20::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r20 .mark-x20::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r21 .mark-o21::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r21 .mark-x21::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r22 .mark-o22::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r22 .mark-x22::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r23 .mark-o23::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r23 .mark-x23::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r24 .mark-o24::after{content:"✓";margin-left:auto;color:#059669;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}.code.r24 .mark-x24::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}
+/* larger sizing for lecture decks */
+.slide.z1>*:not(.hdr):not(.jumpbtn):not(.orb){zoom:1.15}.slide.z2>*:not(.hdr):not(.jumpbtn):not(.orb){zoom:1.3}.slide.z3>*:not(.hdr):not(.jumpbtn):not(.orb){zoom:1.42}
+p,li{font-size:21px}.card p,.card li{font-size:18.5px}
+.code{font-size:17px;line-height:1.5}.code.sm{font-size:15.5px}.code.xs{font-size:14.5px;line-height:1.45}
+.code-title{font-size:14px}
+.fld{font-size:16px}.pill{font-size:16px;padding:3px 12px}
+.ucls{font-size:16px;min-width:130px}.ucls div{padding:6px 12px}.conn{height:96px}
+.box{font-size:17px;padding:12px 16px}.box small{font-size:14px}
+table{font-size:18px}th,td{padding:9px 12px}
+.say{font-size:19px}.console{font-size:15.5px;line-height:1.55}
+.chip{font-size:15px;padding:3px 12px}.vc{font-size:17px}
+.note{font-size:18.5px}.fr{font-size:16px}.obj>.lab,.part>.lab{font-size:14px}
+
+/* ===== memory / pointer deck extras ===== */
+.ram{display:grid;grid-template-columns:repeat(var(--cols,8),1fr);gap:24px 6px}
+.bc{position:relative;height:48px;border-radius:9px;border:2px solid #e4dcfb;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;font-weight:700;color:#b9b4cf;transition:all .45s}
+.bc .ad{position:absolute;top:100%;margin-top:3px;font-size:11px;color:var(--muted);font-weight:600;white-space:nowrap}
+.bc.u{border-color:#7c3aed;background:#f3edff;color:#5b21b6}
+.bc.u2{border-color:#0891b2;background:#ecfeff;color:#0e7490}
+.bc.u3{border-color:#ec4899;background:#fdf2f8;color:#be185d}
+.bc.u4{border-color:#f59e0b;background:#fffbeb;color:#b45309}
+.bc.fz{border-color:#cbd5e1;border-style:dashed;background:repeating-linear-gradient(45deg,#fafafa 0 6px,#eef0f4 6px 12px);color:#9ca3af}
+.bc.bad{border-color:#e11d48;border-style:solid;background:#fff1f3;color:#be123c}
+.bc.hot{box-shadow:0 0 0 4px rgba(245,158,11,.35),0 0 18px rgba(245,158,11,.5);transform:translateY(-4px)}
+.bc.sm{height:40px;font-size:13px}
+.brks{display:grid;grid-template-columns:repeat(var(--cols,8),1fr);gap:6px;margin-top:26px}
+.brk{position:relative;border-top:3px solid currentColor;text-align:center;font-family:var(--mono);font-size:13px;font-weight:700;padding-top:4px;color:#6d28d9;white-space:nowrap}
+.brk::before,.brk::after{content:"";position:absolute;top:-10px;width:3px;height:10px;background:currentColor}
+.brk::before{left:0}.brk::after{right:0}
+.brk.b{color:#0e7490}.brk.c{color:#be185d}.brk.d{color:#b45309}.brk.r{color:#e11d48}
+.rowlab{font-family:var(--mono);font-size:13px;font-weight:800;color:var(--muted);margin:10px 0 6px;letter-spacing:.04em}
+.tape{display:flex;gap:6px}
+.tape .bc{flex:1}
+.tape.go .bc{animation:scan .45s calc(var(--i)*.3s) both}
+.tape.go .bc.tgt{animation:hold .45s calc(var(--i)*.3s) both}
+.tape.direct.go .bc{animation:none}
+.tape.direct.go .bc.tgt{animation:hold .45s .1s both}
+@keyframes scan{50%{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-6px)}}
+@keyframes hold{to{border-color:#10b981;background:#ecfdf5;color:#047857;transform:translateY(-6px);box-shadow:0 0 16px rgba(16,185,129,.45)}}
+.race{display:grid;grid-template-columns:118px 1fr 130px;gap:12px 12px;align-items:center}
+.race .lb{font-weight:800;font-size:18px}
+.track{height:28px;border-radius:999px;background:#f1eef9;overflow:hidden;position:relative}
+.track i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:999px;background:linear-gradient(90deg,var(--c1),var(--c2));transition:width var(--t) cubic-bezier(.3,.7,.3,1)}
+.track.go i{width:var(--w)}
+.race .vl{font-family:var(--mono);font-weight:700;font-size:16px}
+.region{border:2px dashed #c4b5fd;border-radius:14px;padding:22px 12px 12px;position:relative;background:rgba(255,255,255,.65);transition:all .45s}
+.region>.rl{position:absolute;top:-13px;left:14px;font-family:var(--mono);font-size:13px;font-weight:800;padding:2px 10px;border-radius:999px;background:#7c3aed;color:#fff;letter-spacing:.04em}
+.region.heap{border-color:#67e8f9}.region.heap>.rl{background:#0891b2}
+.region.fn{border-color:#f9a8d4}.region.fn>.rl{background:#db2777}
+.mrow{display:flex;align-items:center;gap:14px;justify-content:center;flex-wrap:wrap}
+.mc .val{transition:all .45s}
+.mc.u .val{border-color:#7c3aed;background:#f3edff;color:#5b21b6}
+.mc.fz .val{border-color:#cbd5e1;border-style:dashed;background:repeating-linear-gradient(45deg,#fafafa 0 6px,#eef0f4 6px 12px);color:#9ca3af}
+.mc.bad .val{border-color:#e11d48;background:#fff1f3;color:#be123c}
+.mc.glow .val,.mc.hot .val{box-shadow:0 0 0 4px rgba(245,158,11,.35),0 0 18px rgba(245,158,11,.5)}
+.mc .val.sm{min-width:70px}
+.arw{font-family:var(--mono);font-weight:800;color:#0891b2;font-size:26px;line-height:1;white-space:nowrap}
+.arw.dg{color:#e11d48}
+.arw small{display:block;font-size:12px;text-align:center;font-family:"Be Vietnam Pro";font-weight:600;color:var(--muted)}
+.szr{display:grid;grid-template-columns:118px 1fr 58px;gap:10px;align-items:center;margin:6px 0}
+.szr code{font-family:var(--mono);font-weight:700;color:#7c3aed;font-size:17px}
+.szr>b{font-family:var(--mono);font-size:19px;text-align:right}
+.bytes{display:flex;gap:3px;flex-wrap:wrap}
+.bytes i{width:24px;height:24px;border-radius:5px;background:linear-gradient(135deg,#a78bfa,#7c3aed)}
+.bytes i.b{background:linear-gradient(135deg,#67e8f9,#0891b2)}
+.bytes i.c{background:linear-gradient(135deg,#f9a8d4,#db2777)}
+.bytes i.d{background:linear-gradient(135deg,#fcd34d,#d97706)}
+.bytes i.o{background:none;border:2px dashed #c4b5fd}
+.tight p,.tight li{font-size:17px;line-height:1.4}
+.tight ul li{margin:3px 0}
+.boom{display:inline-block;font-family:var(--mono);font-weight:800;color:#fff;background:#e11d48;padding:4px 12px;border-radius:10px;box-shadow:0 8px 20px -8px #e11d48}
+.code.show-y .mark-y::after{content:"✗";margin-left:auto;color:#e11d48;font-weight:800;padding-left:10px;font-family:"Be Vietnam Pro"}
+.meter{height:22px;border-radius:999px;background:#f1eef9;overflow:hidden;position:relative;border:1px solid var(--line)}
+.meter i{position:absolute;left:0;top:0;bottom:0;width:6%;background:linear-gradient(90deg,#f59e0b,#e11d48);transition:width .9s}
+.meter span{position:absolute;inset:0;text-align:center;font-family:var(--mono);font-size:13px;font-weight:700;line-height:20px}
+table.cmp td,table.cmp th{font-size:15.5px;padding:7px 10px}
+table.cmp td:first-child{font-weight:700;color:var(--muted);white-space:nowrap}
+tr.f td{transition:opacity .45s}
+#q21m.full{width:96%}
+.mc.u4 .val{border-color:#f59e0b;background:#fffbeb;color:#b45309}
+.mc.bad .val{border-color:#e11d48;border-style:solid;background:#fff1f3;color:#be123c}
+.mc.orph .val{border-color:#e11d48;border-style:dashed;background:#fff1f3;color:#be123c}
+.code,.console,code.i,.vc,.chip,.bc,.mc .val{font-variant-ligatures:none}
+/* ===== patterns / smart pointer deck extras ===== */
+.rgrid{display:grid;grid-template-columns:30px 1fr 1fr;gap:8px 10px;align-items:center}
+.rh{font-weight:800;font-size:17px}
+.rn{font-family:var(--mono);font-weight:800;color:var(--muted);text-align:center}
+.rc{border:2px solid #e4dcfb;border-radius:10px;padding:7px 12px;font-size:17px;background:#fff;transition:all .45s}
+.rc.same{border-color:#10b981;background:#ecfdf5;color:#047857;font-weight:600}
+.rc.diff{border-color:#ec4899;background:#fdf2f8;color:#be185d;font-weight:600}
+.ucls.uml2 .ur{text-align:left;font-weight:500;font-size:14.5px;display:flex;justify-content:space-between;gap:12px;transition:background .3s;padding:3px 10px}
+.ucls .ut{font-family:"Be Vietnam Pro";font-size:12px;color:var(--muted);font-style:normal}
+.ucls .ur.on{background:#fde68a}
+tr.hlr td{background:#fffbeb;font-weight:700}
+tr.skip td{color:#9ca3af;text-decoration:line-through}
+.thr{display:grid;grid-template-columns:90px 1fr;gap:10px;align-items:center}
+.tl{font-weight:800;font-size:16px;color:#6d28d9}
+.tln{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;height:42px;border-radius:10px;background:#f8fafc;border:1px dashed #cbd5e1;padding:5px;align-items:center}
+.thr .ev{font-size:12.5px;padding:6px 4px;text-align:center;white-space:nowrap;overflow:hidden}
+.cblk{border:2px solid #f59e0b;background:#fffbeb;border-radius:10px;padding:6px 10px;transition:all .45s}
+.cblk .lab{font-family:var(--mono);font-size:13px;font-weight:800;color:#b45309;margin-bottom:3px}
+.cblk .fld>span:first-child{min-width:150px}
+.cnt{font-size:18px}
+.obj.bad2{border-color:#e11d48!important;border-style:dashed;background:#fff1f3}
+.hide0.sh.dimx{opacity:.3;filter:grayscale(.8)}
+.mc.u2:not(.fz) .val{border-color:#0891b2;background:#ecfeff;color:#0e7490}
+.code.nonum{margin-top:4px}
+
+/* ===== static deck extras ===== */
+.ogrid{display:grid;grid-template-columns:repeat(3,1fr);grid-template-areas:"a1 . a2" "a3 cA a4" ". a5 .";gap:12px 18px;justify-items:center;align-items:start}
+.ob{border:2px solid #1e1b3a;background:#fff;border-radius:6px;font-family:var(--mono);font-size:14px;min-width:120px;box-shadow:3px 3px 0 #e6e2f3;transition:all .45s}
+.ob .h{padding:4px 8px;font-weight:800;text-decoration:underline;text-align:center;border-bottom:1.5px solid #1e1b3a}
+.ob .r{padding:2px 10px}
+.ob .r.fn2{color:var(--muted);border-top:1px dashed #d9d6e8}
+.ob .r.ref{background:#fffbeb;color:#b45309;font-weight:700;border-top:1px dashed #fcd34d}
+.ob.cls{background:#fffbe6;min-width:140px}.ob.cls .h{text-decoration:none}
+.ob .r.sv{background:#fde68a;font-weight:800}
+</style>
+</head>
+<body>
+
+<div id="viewport"><div id="deck">
+<svg width="0" height="0" style="position:absolute"><defs>
+  <marker id="tri" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="16" markerHeight="16" markerUnits="userSpaceOnUse" orient="auto"><path d="M1,1 L13,7 L1,13 z" fill="#fff" stroke="#1e1b3a" stroke-width="1.6"/></marker>
+  <marker id="triR" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="16" markerHeight="16" markerUnits="userSpaceOnUse" orient="auto"><path d="M1,1 L13,7 L1,13 z" fill="#fff" stroke="#e11d48" stroke-width="1.6"/></marker>
+  <marker id="triG" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="16" markerHeight="16" markerUnits="userSpaceOnUse" orient="auto"><path d="M1,1 L13,7 L1,13 z" fill="#fff" stroke="#059669" stroke-width="1.6"/></marker>
+</defs></svg>
+<!-- ===================== TITLE ===================== -->
+<section class="slide" id="title" data-title="Trang bìa">
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="title-wrap">
+    <div class="kicker in">// Lập trình hướng đối tượng · C++</div>
+    <h1 class="in">Thành phần tĩnh<br><span class="grad">static attributes · static methods</span></h1>
+    <p class="in muted" style="font-size:24px;margin-top:20px;max-width:1080px">Thành phần <b>của đối tượng</b> vs thành phần <b>của lớp</b> → <b>thuộc tính tĩnh</b> (khai báo, định nghĩa lại, cách dùng) → <b>hàm tĩnh</b> (không có <code class="i">this</code>) → quyền truy xuất → ứng dụng: <b>đếm số đối tượng PhanSo</b>, hàm <b>UCLN</b>, lớp <b>Math</b> → static &amp; Singleton.</p>
+    <p class="in" style="margin-top:34px;font-size:18px;color:#8a91b4">← → hoặc Space: chạy từng bước · Shift+→: qua slide · <b>G</b> hoặc nút <b>☰ Đi tới slide</b>: nhảy tới slide bất kỳ · A: hiện hết · F: toàn màn hình</p>
+    <p class="in" style="margin-top:8px;font-size:15px;color:#8a91b4">Code theo chuẩn C++17, đã chạy thử bằng clang++. Các ví dụ cần <code class="i">#include &lt;iostream&gt;</code> và <code class="i">using namespace std;</code></p>
+  </div>
+</section>
+
+<!-- ===================== AGENDA ===================== -->
+<section class="slide" id="agenda" data-title="Nội dung">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:17px">· bấm vào mục để đi tới</span></div>
+  <div class="agenda in" style="gap:9px 10px">
+    <div class="sec">1 · Thành phần của đối tượng vs của lớp</div>
+    <div class="ag g1" data-goto="st1"><b>1.1</b>Đối tượng a1..a5 và lớp A</div>
+    <div class="sec">2 · Thuộc tính tĩnh</div>
+    <div class="ag g2" data-goto="st2"><b>2.1</b>Khai báo · định nghĩa · sử dụng</div>
+    <div class="ag g2" data-goto="st3"><b>2.2</b>Quên định nghĩa → lỗi link · C++17</div>
+    <div class="ag g2" data-goto="st4"><b>2.3</b>Cách truy cập: A::t vs a.t</div>
+    <div class="sec">3 · Hàm tĩnh</div>
+    <div class="ag g3" data-goto="st5"><b>3.1</b>Khai báo · gọi · không có this</div>
+    <div class="ag g3" data-goto="st6"><b>3.2</b>Hàm nào truy xuất được gì?</div>
+    <div class="sec">4 · Ứng dụng</div>
+    <div class="ag g4" data-goto="st7"><b>4.1</b>Đếm PhanSo: biến toàn cục</div>
+    <div class="ag g4" data-goto="st8"><b>4.2</b>Đếm PhanSo: thành phần tĩnh</div>
+    <div class="ag g4" data-goto="st9"><b>4.3</b>Hàm tĩnh UCLN</div>
+    <div class="ag g4" data-goto="st10"><b>4.4</b>Lớp Math</div>
+    <div class="sec">5 · Mở rộng</div>
+    <div class="ag g5" data-goto="st11"><b>5.1</b>static &amp; Singleton</div>
+    <div class="ag g6" data-goto="summary"><b>✓</b>Tổng kết</div>
+  </div>
+</section>
+
+<!-- ===================== ST1 ===================== -->
+<section class="slide" id="st1" data-title="1.1 · Thành phần của đối tượng vs của lớp">
+  <div class="hdr in"><span class="qn">1.1</span><h2>Thành phần <b>của đối tượng</b> vs thành phần <b>của lớp</b></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr">
+    <div>
+<script type="text/x-cpp" class="xs" id="st1code" data-title="members.cpp" data-mark="3:a;4:b;6:b;5:c;8:d;10:e;11-12:f;13:g;14:h">
+class A {
+public:
+    int x;                        // của đối tượng
+    static int t;                 // của lớp (tĩnh)
+    void f() {}  void g() {}      // hàm của đối tượng
+    static void p() {}  static void q() {} // hàm của lớp
+};
+int A::t = 0;
+int main() {
+    A a1, a2, a3, a4, a5;
+    a1.x = 7;  a2.x = 9;  a3.x = 10;
+    a4.x = -5; a5.x = -12;
+    A::t = 5;
+    cout << A::t << "\n";
+}
+</script>
+      <div class="console" style="margin-top:10px;min-height:52px"><span class="cl" id="st1o1">5</span></div>
+      <div class="note blue f" data-o="8" style="font-size:16.5px">Thành phần <b>của đối tượng</b>: mỗi đối tượng một bản (x). Thành phần <b>của lớp</b> = thành phần <b>tĩnh</b> (<code class="i">static</code>): cả lớp chỉ có <b>một bản</b>, mọi đối tượng dùng chung (t, p, q).</div>
+    </div>
+    <div>
+      <div class="card in" style="padding:14px">
+        <div class="ogrid">
+          <div class="ob hide0 st1obj" id="st1a1" style="grid-area:a1"><div class="h">a1: A</div><div class="r">x = <b id="st1x1">?</b></div><div class="r fn2">f() g()</div><div class="r ref hide0 st1ref">t → <b>5</b></div></div>
+          <div class="ob hide0 st1obj" id="st1a2" style="grid-area:a2"><div class="h">a2: A</div><div class="r">x = <b id="st1x2">?</b></div><div class="r fn2">f() g()</div><div class="r ref hide0 st1ref">t → <b>5</b></div></div>
+          <div class="ob hide0 st1obj" id="st1a3" style="grid-area:a3"><div class="h">a3: A</div><div class="r">x = <b id="st1x3">?</b></div><div class="r fn2">f() g()</div><div class="r ref hide0 st1ref">t → <b>5</b></div></div>
+          <div class="ob cls" id="st1A" style="grid-area:cA"><div class="h">A <span class="muted" style="font-size:11px;font-weight:500">(lớp)</span></div><div class="r sv">t = <b id="st1t">?</b></div><div class="r">f() g()</div><div class="r sv">p() q()</div></div>
+          <div class="ob hide0 st1obj" id="st1a4" style="grid-area:a4"><div class="h">a4: A</div><div class="r">x = <b id="st1x4">?</b></div><div class="r fn2">f() g()</div><div class="r ref hide0 st1ref">t → <b>5</b></div></div>
+          <div class="ob hide0 st1obj" id="st1a5" style="grid-area:a5"><div class="h">a5: A</div><div class="r">x = <b id="st1x5">?</b></div><div class="r fn2">f() g()</div><div class="r ref hide0 st1ref">t → <b>5</b></div></div>
+        </div>
+        <p class="muted" style="font-size:13.5px;text-align:center;margin-top:8px">Ô vàng: thành phần của lớp (static) — chỉ có 1 bản, nằm ở lớp A</p>
+      </div>
+      <span class="f ghost" data-o="1" data-now="#st1code|show-a" data-say="<b>int x</b>: thuộc tính bình thường (đã học các tuần trước) — gọi là <b>thuộc tính của đối tượng</b>: mỗi đối tượng tạo ra sẽ có <b>một ô x riêng</b>."></span>
+      <span class="f ghost" data-o="2" data-now="#st1code|show-b;#st1A|glow" data-say="Thêm từ khóa <b>static</b> → <b>thành phần của lớp</b> (thành phần tĩnh). t, p(), q() thuộc về <b>lớp A</b>, không thuộc riêng đối tượng nào."></span>
+      <span class="f ghost" data-o="3" data-now="#st1code|show-c" data-say="f(), g(): <b>hàm của đối tượng</b> — gọi qua một đối tượng cụ thể (a1.f()), bên trong biết đang làm việc với đối tượng nào (qua <code class='i'>this</code>)."></span>
+      <span class="f ghost" data-o="4" data-now="#st1code|show-d;#st1A|glow" data-set="#st1t::0" data-say="<code class='i'>int A::t = 0;</code> — ô nhớ của t được tạo <b>ngay khi chương trình bắt đầu</b>, trước cả main, khi <b>chưa có đối tượng nào</b>."></span>
+      <span class="f ghost" data-o="5" data-now="#st1code|show-e" data-act=".st1obj|sh" data-set="#st1t::0" data-say="Tạo 5 đối tượng → có <b>5 ô x</b> khác nhau. Nhưng <b>không</b> có thêm ô t nào: t vẫn chỉ có một, nằm ở lớp."></span>
+      <span class="f ghost" data-o="6" data-now="#st1code|show-f" data-set="#st1t::0;#st1x1::7;#st1x2::9;#st1x3::10;#st1x4::-5;#st1x5::-12" data-say="Gán x của từng đối tượng: mỗi đối tượng giữ giá trị riêng (7, 9, 10, -5, -12) — sửa a1.x không ảnh hưởng a2.x."></span>
+      <span class="f ghost" data-o="7" data-now="#st1code|show-g;#st1A|glow" data-act=".st1ref|sh;#st1o1|show" data-set="#st1t::<span style='color:#b45309'>5</span>;#st1x1::7;#st1x2::9;#st1x3::10;#st1x4::-5;#st1x5::-12" data-say="<b>A::t = 5</b>: chỉ sửa <b>một chỗ</b> (ở lớp) nhưng <b>cả 5 đối tượng</b> đều “thấy” t = 5, vì t là của chung. In ra 5."></span>
+      <span class="f ghost" data-o="8" data-set="#st1t::<span style='color:#b45309'>5</span>;#st1x1::7;#st1x2::9;#st1x3::10;#st1x4::-5;#st1x5::-12" data-say="Vì vậy mới gọi: x, f, g là thành phần <b>của đối tượng</b>; t, p, q là thành phần <b>của lớp</b>."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ST2 ===================== -->
+<section class="slide" id="st2" data-title="2.1 · Thuộc tính tĩnh: khai báo, định nghĩa, sử dụng">
+  <div class="hdr in"><span class="qn">2.1</span><h2>Thuộc tính tĩnh: khai báo · định nghĩa lại · sử dụng</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+<script type="text/x-cpp" class="xs" id="st2code" data-title="static_attr.cpp" data-mark="4:a;7:b;10:c;11:d;12:e;13:f;14:g">
+class A {
+    int x;
+public:
+    static int t;              // (1) KHAI BÁO trong lớp
+    A(int v) : x(v) {}
+};
+int A::t = 0;                  // (2) ĐỊNH NGHĨA lại ngoài lớp
+
+int main() {
+    cout << A::t << "\n";      // chưa có đối tượng nào
+    A::t = 3;                  // (3) TenLop::TenThuocTinh
+    A a(1), b(2);
+    cout << A::t << "\n";
+    cout << sizeof(A) << "\n"; // chỉ tính x
+}
+</script>
+      <div class="console" style="margin-top:10px;min-height:96px"><span class="cl" id="st2o1">0</span><span class="cl" id="st2o2">3</span><span class="cl" id="st2o3">4</span></div>
+    </div>
+    <div>
+      <div class="card in tight"><h3>3 bước khi dùng thuộc tính tĩnh</h3><ul>
+        <li><b>Khai báo</b>: thêm từ khóa <code class="i">static</code> ở đằng trước, trong thân lớp.</li>
+        <li><b>Định nghĩa lại</b> ở ngoài lớp, trước main: <code class="i">KieuDuLieu TenLop::TenThuocTinh = giá_trị;</code> (không ghi lại chữ static). Bước này C++ bắt buộc, Java/C# thì không.</li>
+        <li><b>Sử dụng</b>: <code class="i">TenLop::TenThuocTinh</code></li>
+      </ul></div>
+      <div class="card in" style="margin-top:12px;padding:24px 14px 14px">
+        <div class="region" id="st2sr"><span class="rl">VÙNG NHỚ TĨNH — có từ khi chương trình bắt đầu</span>
+          <div class="mrow"><div class="mc" id="st2t"><span class="nm">A::t</span><div class="val" id="st2tv">?</div></div></div>
+        </div>
+        <div class="region fn" style="margin-top:22px"><span class="rl">STACK — main()</span>
+          <div class="mrow" style="gap:20px;min-height:70px">
+            <div class="obj hide0" id="st2a"><div class="lab"><span>a</span><span>4 byte</span></div><div class="fld"><span style="min-width:24px">x</span><b>1</b></div></div>
+            <div class="obj hide0" id="st2b"><div class="lab"><span>b</span><span>4 byte</span></div><div class="fld"><span style="min-width:24px">x</span><b>2</b></div></div>
+          </div>
+        </div>
+      </div>
+      <span class="f ghost" data-now="#st2code|show-a" data-say="<b>(1) Khai báo</b> trong lớp: chỉ báo cho compiler “lớp A có một thuộc tính dùng chung tên t”. Dòng này <b>chưa cấp phát</b> ô nhớ."></span>
+      <span class="f ghost" data-now="#st2code|show-b;#st2t|hot" data-act="#st2t|u" data-set="#st2tv::0" data-say="<b>(2) Định nghĩa</b> ngoài lớp: đây mới là chỗ <b>tạo ô nhớ</b> cho t (đúng một lần trong cả chương trình) và gán giá trị đầu 0. Ô này nằm ở <b>vùng nhớ tĩnh</b>, không nằm trong đối tượng nào."></span>
+      <span class="f ghost" data-now="#st2code|show-c" data-act="#st2o1|show" data-set="#st2tv::0" data-say="Dùng được A::t <b>ngay cả khi chưa có đối tượng nào</b> → in 0."></span>
+      <span class="f ghost" data-now="#st2code|show-d;#st2t|hot" data-set="#st2tv::3" data-say="<b>(3) Sử dụng</b> theo cú pháp <b>TenLop::TenThuocTinh</b>: A::t = 3."></span>
+      <span class="f ghost" data-now="#st2code|show-e" data-act="#st2a|sh;#st2b|sh" data-set="#st2tv::3" data-say="Tạo a, b trên stack: mỗi đối tượng chỉ chứa <b>x</b>. t vẫn nằm ở vùng tĩnh, không bị nhân bản."></span>
+      <span class="f ghost" data-now="#st2code|show-f" data-act="#st2o2|show" data-set="#st2tv::3" data-say="Tạo đối tượng <b>không</b> làm thay đổi t → in 3."></span>
+      <span class="f ghost" data-now="#st2code|show-g;#st2a|glow;#st2b|glow" data-act="#st2o3|show" data-set="#st2tv::3" data-say="<b>sizeof(A) = 4</b>: chỉ tính thuộc tính của đối tượng (int x). Thuộc tính tĩnh <b>không</b> nằm trong đối tượng nên không được tính."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ST3 ===================== -->
+<section class="slide" id="st3" data-title="2.2 · Quên định nghĩa lại → lỗi link; cách viết C++17">
+  <div class="hdr in"><span class="qn">2.2</span><h2>Quên định nghĩa lại → <span style="color:#e11d48">lỗi khi link</span> · cách viết C++17</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+<script type="text/x-cpp" class="sm" id="st3code" data-title="bug.cpp" data-mark="3:a;5:y;7:b">
+class Counter {
+public:
+    static int count;        // chỉ KHAI BÁO
+};
+// int Counter::count = 0;   // QUÊN dòng này!
+int main() {
+    Counter::count = 1;      // biên dịch OK...
+}
+</script>
+      <div class="console" style="margin-top:10px;min-height:150px"><span class="cl" id="st3o1" style="color:#9ca3b8">// Linux, g++ (GNU ld):</span><span class="cl" id="st3o2" style="color:#fda4af">undefined reference to `Counter::count'</span><span class="cl" id="st3o3" style="color:#9ca3b8">// macOS, clang++:</span><span class="cl" id="st3o4" style="color:#fda4af">Undefined symbols for architecture arm64:
+  "Counter::count", referenced from: _main</span></div>
+      <div class="card f tight" data-o="3" style="margin-top:10px"><h3>Vì sao biên dịch OK mà link lỗi?</h3><p style="font-size:16.5px">Compiler chỉ cần <b>khai báo</b> để kiểm tra kiểu → biên dịch được. Đến bước <b>link</b>, cần tìm ô nhớ thật của <code class="i">Counter::count</code> — nhưng không file nào <b>định nghĩa</b> nó → lỗi.</p></div>
+    </div>
+    <div>
+<script type="text/x-cpp" class="sm" id="st3b" data-title="Các cách khởi tạo ngay trong lớp" data-mark="3:c;4-5:d">
+class Config {
+public:
+    static const int MAX = 100;        // hằng nguyên
+    inline static int count = 0;       // C++17
+    inline static string name = "app"; // C++17
+};
+</script>
+      <div class="card f tight" data-o="4" style="margin-top:10px"><ul>
+        <li><code class="i">static const int</code> (kiểu nguyên, hằng) được gán giá trị ngay trong lớp.</li>
+        <li>Từ <b>C++17</b>: <code class="i">inline static</code> → khai báo + định nghĩa cùng một chỗ, <b>không cần</b> dòng <code class="i">int Config::count = 0;</code> nữa.</li>
+        <li>Trong môn học (và code C++ cũ) vẫn dùng cách chuẩn: khai báo trong lớp + định nghĩa lại ngoài lớp.</li></ul></div>
+      <span class="f ghost" data-o="1" data-now="#st3code|show-a;#st3code|show-y" data-say="Chỉ có dòng khai báo, còn dòng định nghĩa <code class='i'>int Counter::count = 0;</code> bị quên."></span>
+      <span class="f ghost" data-o="2" data-now="#st3code|show-b" data-act="#st3o1|show;#st3o2|show;#st3o3|show;#st3o4|show" data-say="Biên dịch (compile) thành công, nhưng bước <b>link</b> báo lỗi: không tìm thấy ô nhớ của Counter::count."></span>
+      <span class="f ghost" data-o="3" data-say="Cách sửa: thêm <code class='i'>int Counter::count = 0;</code> ở ngoài lớp (trong file .cpp, đúng <b>một lần</b>)."></span>
+      <span class="f ghost" data-o="4" data-now="#st3b|show-c;#st3b|show-d" data-say="Các trường hợp không cần định nghĩa lại: hằng số nguyên <b>static const</b>, và <b>inline static</b> (C++17). Đã chạy thử: in 100 1 app sau khi Config::count++."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ST4 ===================== -->
+<section class="slide" id="st4" data-title="2.3 · Truy cập thuộc tính tĩnh: A::t vs a.t">
+  <div class="hdr in"><span class="qn">2.3</span><h2>Truy cập thuộc tính tĩnh: <code style="font-family:var(--mono)">A::t</code> hay <code style="font-family:var(--mono)">a.t</code>?</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+<script type="text/x-cpp" class="xs" id="st4code" data-title="access.cpp" data-mark="5:a;6:b;7:c;8:d;9:e;15:f;16:g;17:h;18:y;19:i">
+class A {
+    int x = 1;
+public:
+    static int t;
+    void f() {               // hàm của đối tượng
+        x++;                 // thuộc tính của đối tượng
+        A::t++;              // ✓ thuộc tính tĩnh
+        t++;                 // ✓ viết tắt (trong lớp)
+        this->t++;           // biên dịch được, không nên
+    }
+};
+int A::t = 0;
+int main() {
+    A a;
+    a.f();
+    cout << A::t << "\n";
+    A::t = 10;               // ✓ nên dùng
+    a.t = 20;                // ⚠ được, nhưng dễ hiểu nhầm
+    cout << A::t << "\n";
+}
+</script>
+      <div class="console" style="margin-top:10px;min-height:76px"><span class="cl" id="st4o1">3</span><span class="cl" id="st4o2">20</span></div>
+    </div>
+    <div>
+      <div class="card in" style="padding:24px 14px 14px">
+        <div class="mrow" style="gap:30px">
+          <div class="obj" id="st4a"><div class="lab"><span>a (đối tượng)</span></div><div class="fld"><span style="min-width:24px">x</span><b id="st4x">1</b></div></div>
+          <div class="region" style="padding:20px 14px 10px"><span class="rl">static</span><div class="mc" id="st4t"><span class="nm">A::t</span><div class="val sm" id="st4tv">0</div></div></div>
+        </div>
+      </div>
+      <div class="card f tight" data-o="9" style="margin-top:12px;border-top:5px solid #7c3aed"><h3>Quy ước của môn học</h3><ul>
+        <li>Trong <b>hàm của đối tượng</b>: truy xuất thuộc tính tĩnh thoải mái.</li>
+        <li>Khi truy cập thuộc tính tĩnh, dùng <b>TenLop::TenThuocTinh</b>, <b>không</b> dùng <code class="i">this-&gt;t</code> hay <code class="i">tenDoiTuong.t</code>.</li>
+        <li>Thực tế C++ <b>vẫn biên dịch được</b> <code class="i">a.t</code>, <code class="i">this-&gt;t</code> — nhưng người đọc dễ tưởng t là của riêng a. Viết <code class="i">A::t</code> nhìn vào là biết ngay “của lớp”.</li></ul></div>
+      <span class="f ghost" data-o="1" data-now="#st4code|show-a" data-say="f() là <b>hàm của đối tượng</b>: bên trong có this trỏ tới đối tượng đang gọi."></span>
+      <span class="f ghost" data-o="2" data-now="#st4code|show-b;#st4a|glow" data-set="#st4x::2" data-say="Gọi a.f(): x++ → x của <b>a</b> tăng lên 2."></span>
+      <span class="f ghost" data-o="3" data-now="#st4code|show-c;#st4t|hot" data-set="#st4x::2;#st4tv::1" data-say="Hàm của đối tượng <b>truy xuất được thuộc tính tĩnh</b>: A::t++ → t = 1."></span>
+      <span class="f ghost" data-o="4" data-now="#st4code|show-d;#st4t|hot" data-set="#st4x::2;#st4tv::2" data-say="Trong thân lớp có thể viết tắt <b>t</b> — vẫn là A::t → t = 2."></span>
+      <span class="f ghost" data-o="5" data-now="#st4code|show-e;#st4t|hot" data-set="#st4x::2;#st4tv::3" data-say="<b>this-&gt;t</b> cũng tới đúng A::t (t = 3), nhưng gây hiểu nhầm “t thuộc về this” → theo quy ước <b>không nên</b> viết."></span>
+      <span class="f ghost" data-o="6" data-now="#st4code|show-f;#st4code|show-g" data-act="#st4o1|show" data-set="#st4x::2;#st4tv::3" data-say="Kết quả sau a.f(): t = <b>3</b> (tăng 3 lần)."></span>
+      <span class="f ghost" data-o="7" data-now="#st4code|show-h;#st4t|hot" data-set="#st4x::2;#st4tv::10" data-say="Ngoài lớp: dùng <b>A::t</b> — cách viết được khuyến nghị."></span>
+      <span class="f ghost" data-o="8" data-now="#st4code|show-y;#st4code|show-i;#st4t|hot" data-act="#st4o2|show" data-set="#st4x::2;#st4tv::20" data-say="<b>a.t = 20</b> biên dịch được, nhưng thực chất sửa <b>A::t</b> (dùng chung) chứ không phải “t của a” → in 20. Người đọc dễ hiểu sai → tránh."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ST5 ===================== -->
+<section class="slide" id="st5" data-title="3.1 · Hàm tĩnh: khai báo, gọi, không có this">
+  <div class="hdr in"><span class="qn">3.1</span><h2>Hàm tĩnh: khai báo · cách gọi · <b>không có</b> <code style="font-family:var(--mono)">this</code></h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+<script type="text/x-cpp" class="xs" id="st5code" data-title="static_func.cpp" data-mark="5-6:a;8:b;11:c;12:d;14:y">
+class A {
+    int x = 0;
+    static int t;                       // private
+public:
+    static void setT(int v) { t = v; }  // hàm tĩnh
+    static int getT() { return t; }     // hàm tĩnh
+};
+int A::t = 0;   // chỉ thuộc tính cần dòng này
+
+int main() {
+    A::setT(7);                 // chưa có đối tượng nào
+    cout << A::getT() << "\n";
+    A a;
+    cout << a.getT() << "\n";   // được, nhưng không nên
+}
+</script>
+      <div class="console" style="margin-top:10px;min-height:76px"><span class="cl" id="st5o1">7</span><span class="cl" id="st5o2">7</span></div>
+      <div class="note blue f" data-o="6" style="font-size:16px">Nếu viết thân hàm ngoài lớp thì <b>không</b> ghi lại chữ static: <code class="i">int A::getT() { return t; }</code></div>
+    </div>
+    <div>
+      <div class="card in tight"><ul>
+        <li><b>Khai báo</b>: thêm <code class="i">static</code> ở đằng trước.</li>
+        <li><b>Sử dụng</b>: <code class="i">TenLop::TenHam(CacThamSo);</code></li>
+        <li>Có cần định nghĩa lại trước main như thuộc tính tĩnh? → <b>KHÔNG</b>.</li>
+      </ul></div>
+      <div class="card in" style="margin-top:12px">
+        <h3>Compiler gọi hàm như thế nào?</h3>
+        <div class="flow" style="flex-direction:column;align-items:stretch;gap:10px">
+          <div class="mrow" style="gap:10px;justify-content:flex-start"><div class="box a" style="min-width:150px">a.f()<small>hàm của đối tượng</small></div><span class="ar">⇒</span><div class="box e hide0" id="st5f">A::f(this = &amp;a)<small>có địa chỉ đối tượng</small></div></div>
+          <div class="mrow" style="gap:10px;justify-content:flex-start"><div class="box c" style="min-width:150px">A::getT()<small>hàm tĩnh</small></div><span class="ar">⇒</span><div class="box d hide0" id="st5g">A::getT()<small>KHÔNG có this</small></div></div>
+        </div>
+        <div class="mrow" style="margin-top:12px"><div class="mc" id="st5t"><span class="nm">A::t (static, private)</span><div class="val sm" id="st5tv">0</div></div></div>
+      </div>
+      <span class="f ghost" data-o="1" data-now="#st5code|show-a" data-say="<b>Hàm tĩnh</b> = hàm của lớp: khai báo bằng từ khóa static. Ở đây getT/setT dùng để đọc/ghi thuộc tính tĩnh <b>private</b> t."></span>
+      <span class="f ghost" data-o="2" data-now="#st5code|show-b" data-say="Thuộc tính tĩnh t vẫn phải định nghĩa lại ngoài lớp; còn hàm tĩnh thì <b>không cần</b> dòng nào như vậy."></span>
+      <span class="f ghost" data-o="3" data-now="#st5code|show-c;#st5t|hot" data-act="#st5f|sh;#st5g|sh" data-set="#st5tv::7" data-say="<b>A::setT(7)</b>: gọi qua tên lớp, <b>chưa cần đối tượng nào</b>. Khác hàm của đối tượng: a.f() được compiler truyền ngầm địa chỉ a vào làm <b>this</b>; hàm tĩnh thì <b>không có this</b>."></span>
+      <span class="f ghost" data-o="4" data-now="#st5code|show-d" data-act="#st5o1|show" data-set="#st5tv::7" data-say="A::getT() trả về 7."></span>
+      <span class="f ghost" data-o="5" data-now="#st5code|show-y" data-act="#st5o2|show" data-set="#st5tv::7" data-say="<b>a.getT()</b> vẫn biên dịch được (a chỉ dùng để biết kiểu A, không truyền làm this) — nhưng theo quy ước môn học: gọi hàm tĩnh bằng <b>TenLop::TenHam</b>, không dùng TenDoiTuong.TenHam."></span>
+      <span class="f ghost" data-o="6" data-set="#st5tv::7"></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ST6 ===================== -->
+<section class="slide" id="st6" data-title="3.2 · Quyền truy xuất: hàm đối tượng vs hàm tĩnh">
+  <div class="hdr in"><span class="qn">3.2</span><h2>Hàm nào truy xuất được gì?</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.02fr">
+    <div>
+<script type="text/x-cpp" class="xs" id="st6code" data-title="access_rules.cpp" data-mark="5:a;9:b;10:c;11:y;12:y;13:y">
+class A {
+    int x = 0;
+    static int t;
+public:
+    void f() { x = 1; t = 2; g(); p(); }  // ✓ tất cả
+    void g() {}
+    static void p() {}
+    static void q() {
+        t = 3;          // ✓ thuộc tính tĩnh
+        p();            // ✓ hàm tĩnh
+        x = 4;          // ✗
+        f();            // ✗
+        this->x = 5;    // ✗
+    }
+};
+</script>
+      <div class="console" style="margin-top:10px;min-height:98px;font-size:13px"><span class="cl" id="st6o1" style="color:#fda4af">11: error: invalid use of member 'x' in static member function</span><span class="cl" id="st6o2" style="color:#fda4af">12: error: call to non-static member function without an object argument</span><span class="cl" id="st6o3" style="color:#fda4af">13: error: invalid use of 'this' outside of a non-static member function</span></div>
+      <p class="muted" style="font-size:13px;margin-top:4px">Thông báo lỗi của clang++ (đã chạy thử). g++ báo tương tự, ví dụ “cannot call member function … without object”.</p>
+    </div>
+    <div>
+      <table class="cmp acc in">
+        <tr><th>Gọi từ ↓ · truy xuất →</th><th>thuộc tính<br>đối tượng (x)</th><th>thuộc tính<br>tĩnh (t)</th><th>hàm<br>đối tượng (g)</th><th>hàm<br>tĩnh (p)</th></tr>
+        <tr><td>Hàm của đối tượng (f)</td><td id="st6c1"></td><td id="st6c2"></td><td id="st6c3"></td><td id="st6c4"></td></tr>
+        <tr><td>Hàm tĩnh (q)</td><td id="st6c5"></td><td id="st6c6"></td><td id="st6c7"></td><td id="st6c8"></td></tr>
+      </table>
+      <div class="card f tight" data-o="4" style="margin-top:12px;border-top:5px solid #e11d48"><h3 style="color:#e11d48">Vì sao hàm tĩnh không dùng được x, f()?</h3>
+        <p style="font-size:16.5px">Hàm tĩnh <b>không có this</b> → không biết đang nói tới x của <b>đối tượng nào</b> (a1.x? a2.x? hay chưa có đối tượng nào?). Muốn dùng thì phải có đối tượng cụ thể truyền vào: <code class="i">static void q(A&amp; a) { a.x = 4; a.f(); }</code> ✓</p></div>
+      <span class="f ghost" data-o="1" data-now="#st6code|show-a" data-set="#st6c1::<span class='tick y'>✓</span>;#st6c2::<span class='tick y'>✓</span>;#st6c3::<span class='tick y'>✓</span>;#st6c4::<span class='tick y'>✓</span>" data-say="<b>Hàm của đối tượng</b> truy xuất được <b>tất cả</b>: thuộc tính của đối tượng, thuộc tính của lớp, hàm của đối tượng, hàm của lớp."></span>
+      <span class="f ghost" data-o="2" data-now="#st6code|show-b;#st6code|show-c" data-set="#st6c1::<span class='tick y'>✓</span>;#st6c2::<span class='tick y'>✓</span>;#st6c3::<span class='tick y'>✓</span>;#st6c4::<span class='tick y'>✓</span>;#st6c6::<span class='tick y'>✓</span>;#st6c8::<span class='tick y'>✓</span>" data-say="<b>Hàm của lớp</b> (hàm tĩnh) truy xuất được thuộc tính tĩnh và hàm tĩnh."></span>
+      <span class="f ghost" data-o="3" data-now="#st6code|show-y" data-act="#st6o1|show;#st6o2|show;#st6o3|show" data-set="#st6c1::<span class='tick y'>✓</span>;#st6c2::<span class='tick y'>✓</span>;#st6c3::<span class='tick y'>✓</span>;#st6c4::<span class='tick y'>✓</span>;#st6c6::<span class='tick y'>✓</span>;#st6c8::<span class='tick y'>✓</span>;#st6c5::<span class='tick n'>✗</span>;#st6c7::<span class='tick n'>✗</span>" data-say="Nhưng hàm tĩnh <b>KHÔNG THỂ</b> truy xuất thuộc tính của đối tượng và hàm của đối tượng, cũng không dùng được this → 3 lỗi biên dịch."></span>
+      <span class="f ghost" data-o="4" data-set="#st6c1::<span class='tick y'>✓</span>;#st6c2::<span class='tick y'>✓</span>;#st6c3::<span class='tick y'>✓</span>;#st6c4::<span class='tick y'>✓</span>;#st6c6::<span class='tick y'>✓</span>;#st6c8::<span class='tick y'>✓</span>;#st6c5::<span class='tick n'>✗</span>;#st6c7::<span class='tick n'>✗</span>" data-say="Lý do: hàm tĩnh không gắn với đối tượng nào."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ST7 ===================== -->
+<section class="slide" id="st7" data-title="4.1 · Đếm số PhanSo: giải pháp 1 biến toàn cục">
+  <div class="hdr in"><span class="qn">4.1</span><h2>VD1: đếm số đối tượng PhanSo — giải pháp 1: <b>biến toàn cục</b></h2></div>
+  <div class="cols" style="grid-template-columns:1.12fr 1fr">
+    <div>
+<script type="text/x-cpp" class="xxs" id="st7code" data-title="global_counter.cpp" data-mark="1:a;6:b;7:b;8:c;11:d;12:e;13:y;14:f">
+int soDoiTuongPhanSo = 0;              // biến toàn cục
+
+class PhanSo {
+    int tu, mau;
+public:
+    PhanSo(int t = 0, int m = 1) : tu(t), mau(m) { soDoiTuongPhanSo++; }
+    PhanSo(const PhanSo& p) : tu(p.tu), mau(p.mau) { soDoiTuongPhanSo++; }
+    ~PhanSo() { soDoiTuongPhanSo--; }
+};
+int main() {
+    PhanSo a, b(7);
+    cout << soDoiTuongPhanSo << "\n";
+    soDoiTuongPhanSo = 100;             // ai cũng sửa được!
+    cout << soDoiTuongPhanSo << "\n";
+}
+</script>
+      <div class="console" style="margin-top:10px;min-height:76px"><span class="cl" id="st7o1">2</span><span class="cl" id="st7o2">100      <span style="color:#fda4af">← sai: chỉ có 2 phân số</span></span></div>
+      <div class="note f" data-o="4" style="font-size:16px">Ý tưởng: khi một đối tượng PhanSo được tạo ra → một hàm dựng chắc chắn được gọi → tăng biến đếm trong <b>mọi</b> hàm dựng (kể cả hàm dựng sao chép), giảm trong hàm hủy.</div>
+    </div>
+    <div>
+      <div class="card in" style="padding:22px 14px 14px">
+        <div class="region"><span class="rl">BIẾN TOÀN CỤC</span><div class="mrow"><div class="mc" id="st7g"><span class="nm">soDoiTuongPhanSo</span><div class="val" id="st7gv">0</div></div></div></div>
+        <div class="mrow" style="margin-top:14px;gap:14px"><div class="box a hide0" id="st7a">a<small>0/1</small></div><div class="box a hide0" id="st7b">b<small>7/1</small></div><div class="box c hide0" id="st7h">main()<small>sửa bừa</small></div></div>
+      </div>
+      <div class="card f tight" data-o="6" style="margin-top:12px;border-top:5px solid #e11d48"><h3 style="color:#e11d48">Vấn đề của biến toàn cục</h3><ul>
+        <li><b>Ai cũng sửa được</b> (main, hàm bất kỳ…) → số đếm có thể sai, vi phạm tính đóng gói.</li>
+        <li><b>Không gắn với lớp</b>: nhìn vào lớp PhanSo không thấy biến đếm; 10 lớp cần đếm → 10 biến toàn cục rời rạc.</li>
+        <li>Dễ <b>trùng tên</b> với biến toàn cục khác khi dự án có nhiều file.</li></ul></div>
+      <span class="f ghost" data-o="1" data-now="#st7code|show-a;#st7g|hot" data-say="Nhu cầu: <b>đếm số đối tượng PhanSo</b> đang tồn tại. Giải pháp 1: khai báo một biến đếm <b>toàn cục</b>."></span>
+      <span class="f ghost" data-o="2" data-now="#st7code|show-b" data-say="Trong <b>các hàm dựng</b> (mặc định và sao chép), tăng biến đếm lên 1."></span>
+      <span class="f ghost" data-o="3" data-now="#st7code|show-c" data-say="Trong <b>hàm hủy</b>, giảm biến đếm đi 1 → biến luôn bằng số đối tượng còn sống."></span>
+      <span class="f ghost" data-o="4" data-now="#st7code|show-d;#st7g|hot" data-act="#st7a|sh;#st7b|sh" data-set="#st7gv::2" data-say="Tạo a và b → mỗi đối tượng gọi hàm dựng một lần → biến đếm = 2."></span>
+      <span class="f ghost" data-o="5" data-now="#st7code|show-e;#st7code|show-y;#st7g|hot" data-act="#st7o1|show;#st7o2|show;#st7h|sh;#st7g|bad" data-set="#st7gv::100" data-say="In 2 — đúng. Nhưng main gán <b>soDoiTuongPhanSo = 100</b>: compiler không ngăn được vì biến toàn cục ai cũng truy cập → in 100, <b>sai</b>."></span>
+      <span class="f ghost" data-o="6" data-set="#st7gv::100" data-say="→ Cần một biến <b>dùng chung</b> cho mọi đối tượng PhanSo (như biến toàn cục), nhưng <b>thuộc về lớp</b> và có thể đặt <b>private</b>. Đó chính là thuộc tính tĩnh."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ST8 ===================== -->
+<section class="slide" id="st8" data-title="4.2 · Đếm số PhanSo: giải pháp 2 thành phần tĩnh">
+  <div class="hdr in"><span class="qn">4.2</span><h2>VD1 — giải pháp 2: <b>thuộc tính tĩnh</b> + <b>hàm tĩnh</b></h2></div>
+  <div class="cols" style="grid-template-columns:1.12fr 1fr">
+    <div>
+<script type="text/x-cpp" class="xxs" id="st8code" data-title="static_counter.cpp" data-mark="3:a;5:b;6:c;7:d;8:e;10:f;13:g;14:h;15:i;17:j;18:j;19:j;20:d;22:y">
+class PhanSo {
+    int tu, mau;
+    static int soDoiTuong;               // private: chỉ lớp sửa được
+public:
+    PhanSo(int t = 0, int m = 1) : tu(t), mau(m) { soDoiTuong++; }
+    PhanSo(const PhanSo& p) : tu(p.tu), mau(p.mau) { soDoiTuong++; }
+    ~PhanSo() { soDoiTuong--; }
+    static int laySoDoiTuong() { return soDoiTuong; }
+};
+int PhanSo::soDoiTuong = 0;
+
+int main() {
+    cout << PhanSo::laySoDoiTuong() << "\n";
+    PhanSo a, b(7);
+    cout << PhanSo::laySoDoiTuong() << "\n";
+    {
+        PhanSo c(6, 9);
+        PhanSo d = a;                    // hàm dựng sao chép
+        cout << PhanSo::laySoDoiTuong() << "\n";
+    }                                    // d, c bị hủy
+    cout << PhanSo::laySoDoiTuong() << "\n";
+    // PhanSo::soDoiTuong = 100;         // ✗ private
+}
+</script>
+      <div class="console" style="margin-top:8px;min-height:120px;font-size:14px;line-height:1.45"><span class="cl" id="st8o1">0</span><span class="cl" id="st8o2">2</span><span class="cl" id="st8o3">4</span><span class="cl" id="st8o4">2</span><span class="cl" id="st8o5" style="color:#fda4af">error: 'soDoiTuong' is a private member of 'PhanSo'</span></div>
+    </div>
+    <div>
+      <div class="card in" style="padding:22px 14px 14px">
+        <div class="region"><span class="rl">VÙNG TĨNH — của lớp PhanSo</span><div class="mrow"><div class="mc" id="st8s"><span class="nm">PhanSo::soDoiTuong (private)</span><div class="val" id="st8sv">0</div></div></div></div>
+        <div class="region fn" style="margin-top:22px"><span class="rl">STACK — main()</span>
+          <div class="mrow" style="gap:10px;min-height:66px">
+            <div class="box a hide0" id="st8a">a<small>0/1</small></div><div class="box a hide0" id="st8b">b<small>7/1</small></div>
+            <div class="box b hide0" id="st8c">c<small>6/9</small></div><div class="box c hide0" id="st8d">d<small>bản sao a</small></div>
+          </div>
+        </div>
+      </div>
+      <div class="note blue f" data-o="10" style="font-size:16px">So với biến toàn cục: số đếm <b>gắn với lớp</b> PhanSo, đặt <b>private</b> nên chỉ hàm dựng/hàm hủy sửa được; bên ngoài chỉ <b>đọc</b> qua hàm tĩnh <code class="i">PhanSo::laySoDoiTuong()</code> — gọi được cả khi chưa có phân số nào.</div>
+      <span class="f ghost" data-o="1" data-now="#st8code|show-a;#st8code|show-f;#st8s|hot" data-say="Thuộc tính tĩnh <b>soDoiTuong</b>: dùng chung cho mọi PhanSo, đặt <b>private</b>. Định nghĩa lại ngoài lớp với giá trị đầu 0."></span>
+      <span class="f ghost" data-o="2" data-now="#st8code|show-b;#st8code|show-c;#st8code|show-d" data-say="Hàm dựng mặc định và hàm dựng <b>sao chép</b> đều tăng; hàm hủy giảm. (Quên hàm dựng sao chép là lỗi hay gặp: copy đối tượng mà không đếm.)"></span>
+      <span class="f ghost" data-o="3" data-now="#st8code|show-e" data-say="Hàm <b>tĩnh</b> laySoDoiTuong(): chỉ đọc thuộc tính tĩnh, không cần đối tượng nào."></span>
+      <span class="f ghost" data-o="4" data-now="#st8code|show-g" data-act="#st8o1|show" data-say="Chưa có phân số nào, vẫn gọi được <b>PhanSo::laySoDoiTuong()</b> → 0."></span>
+      <span class="f ghost" data-o="5" data-now="#st8code|show-h;#st8s|hot" data-act="#st8a|sh;#st8b|sh" data-set="#st8sv::2" data-say="Tạo a (0/1) và b (7/1): hàm dựng chạy 2 lần → soDoiTuong = 2."></span>
+      <span class="f ghost" data-o="6" data-now="#st8code|show-i" data-act="#st8o2|show" data-set="#st8sv::2" data-say="In <b>2</b>."></span>
+      <span class="f ghost" data-o="7" data-now="#st8code|show-j;#st8s|hot" data-act="#st8c|sh;#st8d|sh;#st8o3|show" data-set="#st8sv::4" data-say="Trong khối { }: c(6, 9) → 3; <b>d = a</b> gọi hàm dựng <b>sao chép</b> → 4. In <b>4</b>."></span>
+      <span class="f ghost" data-o="8" data-now="#st8code|show-d;#st8s|hot" data-act="#st8c|dimx;#st8d|dimx;#st8o4|show" data-set="#st8sv::2" data-say="Ra khỏi khối: d rồi c bị hủy, hàm hủy chạy 2 lần → 2. In <b>2</b>."></span>
+      <span class="f ghost" data-o="9" data-now="#st8code|show-y" data-act="#st8o5|show" data-set="#st8sv::2" data-say="Thử gán từ main như giải pháp 1 → <b>lỗi biên dịch</b>: soDoiTuong là private. Không ai làm sai số đếm được nữa."></span>
+      <span class="f ghost" data-o="10" data-set="#st8sv::2"></span>
+      <p class="say" style="font-size:16.5px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ST9 ===================== -->
+<section class="slide" id="st9" data-title="4.3 · Hàm tĩnh UCLN">
+  <div class="hdr in"><span class="qn">4.3</span><h2>VD2: hàm <b>UCLN</b> nên là hàm tĩnh</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr">
+    <div>
+<script type="text/x-cpp" class="xs" id="st9code" data-title="ucln.cpp" data-mark="5:a;6:b;7:c;9:d;13:e;14:f;15:g">
+class PhanSo {
+    int tu, mau;
+public:
+    PhanSo(int t, int m) : tu(t), mau(m) { rutGon(); }
+    static int UCLN(int a, int b) {   // không dùng tu, mau
+        while (b != 0) { int r = a % b; a = b; b = r; }
+        return a < 0 ? -a : a;
+    }
+    void rutGon() { int u = UCLN(tu, mau); tu /= u; mau /= u; }
+    void xuat() { cout << tu << "/" << mau << "\n"; }
+};
+int main() {
+    cout << PhanSo::UCLN(12, 18) << "\n"; // không cần đ.tượng
+    PhanSo p(6, 9);
+    p.xuat();
+}
+</script>
+      <div class="console" style="margin-top:10px;min-height:76px"><span class="cl" id="st9o1">6</span><span class="cl" id="st9o2">2/3</span></div>
+    </div>
+    <div>
+      <div class="card in tight"><p>Hàm UCLN chỉ làm việc với <b>2 tham số a, b</b>, không truy xuất thuộc tính (tu, mau) hay hàm (rutGon, xuat…) của đối tượng → khai báo là <b>hàm tĩnh</b>. Hàm tĩnh dùng để <b>thay thế hàm của đối tượng</b> khi các thao tác không cần tới đối tượng.</p></div>
+      <div class="card in" style="margin-top:12px">
+        <h3>Chạy UCLN(12, 18) — thuật toán Euclid</h3>
+        <div class="vars"><span class="vc" id="st9a">a = <b id="st9av">12</b></span><span class="vc" id="st9b">b = <b id="st9bv">18</b></span><span class="vc" id="st9r">r = <b id="st9rv">—</b></span></div>
+        <table class="cmp" style="margin-top:10px">
+          <tr><th>vòng</th><th>r = a % b</th><th>a ← b</th><th>b ← r</th></tr>
+          <tr class="hide0" id="st9l1"><td>1</td><td>12 % 18 = 12</td><td>18</td><td>12</td></tr>
+          <tr class="hide0" id="st9l2"><td>2</td><td>18 % 12 = 6</td><td>12</td><td>6</td></tr>
+          <tr class="hide0" id="st9l3"><td>3</td><td>12 % 6 = 0</td><td>6</td><td>0 → dừng</td></tr>
+        </table>
+      </div>
+      <span class="f ghost" data-o="1" data-now="#st9code|show-a" data-say="UCLN khai báo <b>static</b>: nó không cần biết đang ở phân số nào."></span>
+      <span class="f ghost" data-o="2" data-now="#st9code|show-e" data-say="Gọi trực tiếp qua tên lớp <b>PhanSo::UCLN(12, 18)</b>, không cần tạo phân số nào."></span>
+      <span class="f ghost" data-o="3" data-now="#st9code|show-b;#st9r|hot" data-act="#st9l1|sh" data-set="#st9av::18;#st9bv::12;#st9rv::12" data-say="Vòng 1: r = 12 % 18 = 12, a = 18, b = 12."></span>
+      <span class="f ghost" data-o="4" data-now="#st9code|show-b;#st9r|hot" data-act="#st9l2|sh" data-set="#st9av::12;#st9bv::6;#st9rv::6" data-say="Vòng 2: r = 18 % 12 = 6, a = 12, b = 6."></span>
+      <span class="f ghost" data-o="5" data-now="#st9code|show-b;#st9code|show-c;#st9a|res" data-act="#st9l3|sh;#st9o1|show" data-set="#st9av::6;#st9bv::0;#st9rv::0" data-say="Vòng 3: r = 0, a = 6, b = 0 → dừng, trả về <b>6</b>."></span>
+      <span class="f ghost" data-o="6" data-now="#st9code|show-f;#st9code|show-d" data-set="#st9av::6;#st9bv::0;#st9rv::0" data-say="Tạo p(6, 9): hàm dựng gọi rutGon() — hàm của đối tượng — bên trong gọi hàm tĩnh UCLN(6, 9) = 3 (hàm đối tượng gọi được hàm tĩnh)."></span>
+      <span class="f ghost" data-o="7" data-now="#st9code|show-g" data-act="#st9o2|show" data-set="#st9av::6;#st9bv::0;#st9rv::0" data-say="6/3 = 2, 9/3 = 3 → in <b>2/3</b>."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ST10 ===================== -->
+<section class="slide" id="st10" data-title="4.4 · Lớp Math dùng hàm tĩnh">
+  <div class="hdr in"><span class="qn">4.4</span><h2>VD3: lớp <code style="font-family:var(--mono)">Math</code> — không dùng vs dùng hàm tĩnh</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+<script type="text/x-cpp" class="xs" id="st10a" data-title="✗ Không dùng hàm tĩnh" data-mark="3:a;7-8:b">
+class Math {
+public:
+    int max(int a, int b) { return a > b ? a : b; }
+    int abs(int a) { return a < 0 ? -a : a; }
+};
+int main() {
+    Math m;                         // tạo đối tượng "thừa"
+    cout << m.max(3, 8) << "\n";
+}
+</script>
+      <div class="card f tight" data-o="2" style="margin-top:10px;border-top:5px solid #e11d48"><p style="font-size:16.5px">Lớp Math <b>không có thuộc tính</b> nào; m không chứa dữ liệu gì, chỉ để gọi hàm → tạo đối tượng là <b>vô nghĩa</b>, lại phải truyền this không dùng tới.</p></div>
+    </div>
+    <div>
+<script type="text/x-cpp" class="xs" id="st10b" data-title="✓ Dùng hàm tĩnh" data-mark="3-4:c;5-9:d;12-14:e">
+class Math {
+public:
+    static int max(int a, int b) { return a > b ? a : b; }
+    static int abs(int a) { return a < 0 ? -a : a; }
+    static double pow(double x, int n) {
+        double r = 1;
+        while (n-- > 0) r *= x;
+        return r;
+    }
+};
+int main() {
+    cout << Math::max(3, 8) << "\n";
+    cout << Math::abs(-5) << "\n";
+    cout << Math::pow(2, 10) << "\n";
+}
+</script>
+      <div class="console" style="margin-top:10px;min-height:96px"><span class="cl" id="st10o1">8</span><span class="cl" id="st10o2">5</span><span class="cl" id="st10o3">1024</span></div>
+      <span class="f ghost" data-o="1" data-now="#st10a|show-a;#st10a|show-b" data-say="Cách 1: hàm của đối tượng → muốn gọi max phải <b>tạo đối tượng</b> Math m trước."></span>
+      <span class="f ghost" data-o="2" data-say="Nhưng các hàm này chỉ tính toán trên <b>tham số</b>, không dùng thuộc tính nào của đối tượng."></span>
+      <span class="f ghost" data-o="3" data-now="#st10b|show-c;#st10b|show-d" data-say="Cách 2: khai báo tất cả là <b>hàm tĩnh</b> → Math trở thành một “hộp công cụ” gom các hàm toán học liên quan."></span>
+      <span class="f ghost" data-o="4" data-now="#st10b|show-e" data-act="#st10o1|show;#st10o2|show;#st10o3|show" data-say="Gọi trực tiếp <b>Math::max</b>, <b>Math::abs</b>, <b>Math::pow</b> — không cần đối tượng. In 8, 5, 1024. (Java có sẵn lớp Math kiểu này; C++ thường dùng hàm trong namespace như std::max, std::abs.)"></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ST11 ===================== -->
+<section class="slide" id="st11" data-title="5.1 · static và Singleton">
+  <div class="hdr in"><span class="qn">5.1</span><h2>static &amp; Singleton</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr">
+    <div>
+<script type="text/x-cpp" class="xs" id="st11code" data-title="logger.h — Singleton dùng thành phần tĩnh" data-mark="2:a;3:b;5-8:c;11:a">
+class Logger {
+    static Logger* inst;              // thuộc tính tĩnh
+    Logger() {}                       // constructor private
+public:
+    static Logger* getInstance() {    // hàm tĩnh
+        if (inst == nullptr) inst = new Logger();
+        return inst;
+    }
+    void log(const string& s) { cout << s << "\n"; }
+};
+Logger* Logger::inst = nullptr;
+</script>
+      <p class="muted" style="font-size:14.5px;margin-top:8px">Chi tiết Singleton (Logger, đa luồng…): xem file <code class="i">cpp_singleton.html</code>.</p>
+    </div>
+    <div>
+      <div class="card f tight" data-o="1"><ul>
+        <li><b>Singleton</b> cần đúng một đối tượng của lớp. Nó dựa trên đúng 2 thứ của bài này: <b>thuộc tính tĩnh</b> giữ con trỏ tới đối tượng duy nhất, và <b>hàm tĩnh</b> getInstance() — gọi được khi <b>chưa có đối tượng</b> nào.</li>
+      </ul></div>
+      <table class="cmp f" data-o="2" style="margin-top:12px">
+        <tr><th></th><th>Lớp toàn static (Math)</th><th>Singleton (Logger)</th></tr>
+        <tr><td>Số đối tượng</td><td>0 (không cần)</td><td>đúng 1</td></tr>
+        <tr><td>Trạng thái</td><td>biến static rời rạc</td><td>thuộc tính của 1 đối tượng</td></tr>
+        <tr><td>Kế thừa, hàm ảo</td><td>✗ (hàm tĩnh không virtual)</td><td>✓</td></tr>
+        <tr><td>Truyền làm tham số</td><td>✗</td><td>✓ (Logger&amp;)</td></tr>
+        <tr><td>Khởi tạo</td><td>khi chương trình chạy</td><td>lazy: lần gọi đầu</td></tr>
+        <tr><td>Dùng khi</td><td>hàm tiện ích không trạng thái</td><td>tài nguyên dùng chung có trạng thái</td></tr>
+      </table>
+      <span class="f ghost" data-o="1" data-now="#st11code|show-a;#st11code|show-b;#st11code|show-c" data-say="Singleton = constructor private + <b>thuộc tính tĩnh</b> giữ đối tượng + <b>hàm tĩnh</b> trả về đối tượng."></span>
+      <p class="say" style="font-size:17px;margin-top:8px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="slide" id="summary" data-title="Tổng kết">
+  <div class="hdr in"><span class="qn">✓</span><h2>Tổng kết</h2></div>
+  <table class="cmp f" style="margin-top:6px">
+    <tr><th></th><th style="color:#7c3aed">Thuộc tính tĩnh</th><th style="color:#0891b2">Hàm tĩnh</th></tr>
+    <tr><td>Khai báo</td><td><code class="i">static int t;</code> trong lớp</td><td><code class="i">static void p();</code> trong lớp</td></tr>
+    <tr><td>Định nghĩa lại ngoài lớp</td><td><b>Bắt buộc</b>: <code class="i">int A::t = 0;</code> (trừ <code class="i">inline static</code> C++17)</td><td>Không cần</td></tr>
+    <tr><td>Sử dụng</td><td><code class="i">A::t</code></td><td><code class="i">A::p(...)</code></td></tr>
+    <tr><td>Số bản</td><td>1 bản cho cả lớp, có trước mọi đối tượng</td><td>Không có <code class="i">this</code></td></tr>
+    <tr><td>Truy xuất được</td><td>Mọi hàm của lớp</td><td>Chỉ thuộc tính tĩnh &amp; hàm tĩnh</td></tr>
+  </table>
+  <div class="cols3" style="margin-top:14px">
+    <div class="card f"><h3>Khi nào dùng thuộc tính tĩnh?</h3><p>Biến “toàn cục” <b>cho một lớp</b>: bộ đếm đối tượng, mã tự tăng, cấu hình chung, đối tượng duy nhất của Singleton.</p></div>
+    <div class="card f"><h3>Khi nào dùng hàm tĩnh?</h3><p>Hàm <b>không cần</b> thuộc tính/hàm của đối tượng: UCLN, Math::max, hàm đọc thuộc tính tĩnh, getInstance().</p></div>
+    <div class="card f"><h3>Lỗi hay gặp</h3><p>Quên <code class="i">int A::t = 0;</code> → lỗi link · dùng x/this trong hàm tĩnh → lỗi biên dịch · quên đếm trong hàm dựng sao chép.</p></div>
+  </div>
+</section>
+
+</div></div>
+
+<div id="bar"></div>
+<div id="hint">← → / Space: từng bước · Shift+→: qua slide · G: đi tới slide bất kỳ · A: hiện hết · F: toàn màn hình</div>
+<div id="nav"><button id="jumpNav" title="Đi tới slide (G)">☰</button><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+<div id="jump"><div id="jbox"><div class="jh"><h3>Đi tới slide</h3><span class="muted" style="font-size:14px">gõ số hoặc tên slide rồi Enter</span><input id="jq" placeholder="vd: 5 hoặc hàm ảo" autocomplete="off"><button id="jx" aria-label="Đóng">×</button></div><div id="jlist"></div></div></div>
+
+<script>
+(function(){
+  // ---------- C++ highlighter ----------
+  const KW=new Set("class struct public private protected virtual const this new delete return if else for while do switch case break continue default friend operator static using namespace include true false nullptr sizeof inline template typename override final explicit noexcept default".split(" "));
+  const PRIM=new Set("bool char double float int long short void unsigned auto".split(" "));
+  const STD=new Set("cout cin endl move make_shared make_unique".split(" "));const LIBT=new Set("string vector shared_ptr weak_ptr unique_ptr".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line){
+    const re=/(\/\/.*$|\/\*.*?\*\/)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(^\s*#\w+.*$)|\b(\d+(?:\.\d+)?[fFL]?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="p">'+m[3]+'</span>';
+      else if(m[4]) out+='<span class="n">'+m[4]+'</span>';
+      else if(m[5]){
+        const w=m[5];let cls="";
+        if(PRIM.has(w)||LIBT.has(w))cls="t";else if(KW.has(w))cls="k";else if(STD.has(w))cls="fn";
+        else if(m[6])cls="fn";
+        else if(/^[A-Z][A-Z0-9_]+$/.test(w))cls="n";
+        else if(/^[A-Z]/.test(w))cls="t";
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[6]?esc(m[6]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-cpp"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");r.split(",").forEach(rr=>{const [a,b]=rr.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);});
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    if(sc.dataset.title){const t=document.createElement("div");t.className="code-title";t.textContent=sc.dataset.title;sc.before(t)}
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+  // ---------- deck engine ----------
+  //   .f = fragment, one per step.  data-act "sel|cls;…" (kept while shown) · data-now "sel|cls;…" (only on latest step)
+  //   data-set "sel::html;…" (content while shown) · data-say narration · data-o order
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")].sort((x,y)=>(+x.dataset.o||0)-(+y.dataset.o||0));
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  const pairs=(v,sep)=>(v||"").split(/;(?=\s*#)/).filter(s=>s.trim()).map(p=>{const k=p.indexOf(sep);return [p.slice(0,k).trim(),p.slice(k+sep.length)]});
+  function tog(v,on){pairs(v,"|").forEach(([sel,cls])=>{document.querySelectorAll(sel).forEach(t=>cls.split(" ").forEach(c=>c&&t.classList.toggle(c,on)))})}
+  document.querySelectorAll("[data-set]").forEach(f=>pairs(f.dataset.set,"::").forEach(([sel])=>{document.querySelectorAll(sel).forEach(t=>{if(t.dataset.orig===undefined)t.dataset.orig=t.innerHTML})}));
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach(f=>{tog(f.dataset.now,false);tog(f.dataset.act,false)});
+      s.querySelectorAll("[data-orig]").forEach(t=>t.innerHTML=t.dataset.orig);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step);f.classList.toggle("on",on);if(on){tog(f.dataset.act,true);pairs(f.dataset.set,"::").forEach(([sel,val])=>document.querySelectorAll(sel).forEach(t=>t.innerHTML=val))}});
+      if(i===cur&&step>0)tog(fs[step-1].dataset.now,true);
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.innerHTML=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length+(fs.length?" · "+step+"/"+fs.length:"");
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    try{history.replaceState(null,"","#"+slides[cur].id)}catch(e){}
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+
+  // ---------- jump-to-slide panel ----------
+  const jump=document.getElementById("jump"),jlist=document.getElementById("jlist"),jq=document.getElementById("jq");
+  const titleOf=s=>s.dataset.title||(s.querySelector("h2,h1")||{}).textContent||s.id;
+  slides.forEach((s,i)=>{
+    const d=document.createElement("div");d.className="ji";d.dataset.i=i;
+    d.innerHTML="<b>"+String(i+1).padStart(2,"0")+"</b><span>"+esc(titleOf(s).replace(/\s+/g," ").trim())+"</span>";
+    d.onclick=()=>{closeJump();go(i)};jlist.appendChild(d);
+    const b=document.createElement("button");b.className="jumpbtn";b.type="button";b.innerHTML="☰ Đi tới slide";b.title="Mở danh sách slide (phím G)";
+    b.onclick=e=>{e.stopPropagation();openJump()};s.appendChild(b);
+  });
+  function filterJump(){
+    const q=jq.value.trim().toLowerCase();let first=null;
+    [...jlist.children].forEach(d=>{const i=+d.dataset.i;const ok=!q||String(i+1)===q||d.textContent.toLowerCase().includes(q);d.style.display=ok?"":"none";d.classList.remove("k");if(ok&&!first)first=d});
+    if(first&&q)first.classList.add("k");return first;
+  }
+  function openJump(){jump.classList.add("on");jq.value="";filterJump();[...jlist.children].forEach(d=>d.classList.toggle("cur",+d.dataset.i===cur));setTimeout(()=>jq.focus(),30)}
+  function closeJump(){jump.classList.remove("on");jq.blur()}
+  jq.addEventListener("input",filterJump);
+  jq.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Escape")closeJump();else if(e.key==="Enter"){const q=jq.value.trim();const n=parseInt(q,10);if(String(n)===q&&n>=1&&n<=slides.length){closeJump();go(n-1)}else{const f=filterJump();if(f){closeJump();go(+f.dataset.i)}}}});
+  jump.addEventListener("click",e=>{if(e.target===jump)closeJump()});
+  document.getElementById("jx").onclick=closeJump;
+  document.getElementById("jumpNav").onclick=openJump;
+
+  addEventListener("keydown",e=>{
+    if(jump.classList.contains("on")){if(e.key==="Escape")closeJump();return}
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="g"||e.key==="G"){e.preventDefault();openJump()}
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null||jump.classList.contains("on"))return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+</script>
+</body>
+</html>
