@@ -1,0 +1,1208 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mimo Toán 5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#2b2350; --muted:#6b6790; --pri:#7c3aed; --pri-d:#5b21b6; --pri-l:#ede9fe;
+  --ok:#22c55e; --ok-d:#15803d; --okbg:#dcfce7; --bad:#ef4444; --badbg:#fee2e2;
+  --yel:#fcd34d; --yel-d:#d97706; --hl:#fde68a; --blue:#2563eb; --line:#e7e3f7; --card:#fff;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{font-family:"Baloo 2",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);font-size:19px;line-height:1.4;
+  background:linear-gradient(180deg,#7dd3fc 0%,#bae6fd 35%,#e0f7ff 65%,#d9f99d 100%) fixed;min-height:100vh;overflow-x:hidden}
+body.padon{padding-bottom:250px}
+button{font-family:inherit;font-size:inherit;cursor:pointer;color:inherit}
+input{font-family:inherit}
+.cloud{position:fixed;font-size:90px;opacity:.85;z-index:0;pointer-events:none;animation:drift linear infinite;filter:drop-shadow(0 6px 0 #ffffff55)}
+@keyframes drift{from{transform:translateX(-30vw)}to{transform:translateX(130vw)}}
+.wrap{max-width:900px;margin:0 auto;padding:12px 16px 90px;position:relative;z-index:1}
+/* HUD */
+.hud{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.round,.avatar{width:52px;height:52px;border-radius:50%;border:none;background:#fff;font-size:1.5rem;font-weight:800;box-shadow:0 5px 0 #0000001f;flex:0 0 auto}
+.avatar{font-size:1.9rem;background:#fff7d6}
+.hname{flex:1;font-weight:800;font-size:1.25rem;color:#1e3a8a;text-shadow:0 2px 0 #fff;min-width:120px}
+.progress{flex:1;min-width:120px;height:22px;background:#ffffffaa;border-radius:999px;overflow:hidden;box-shadow:inset 0 3px 0 #0000001a}
+.progress .bar{height:100%;width:0;background:linear-gradient(90deg,#34d399,#22c55e);border-radius:999px;transition:width .5s cubic-bezier(.3,1.5,.6,1);box-shadow:inset 0 -5px 0 #0000001a}
+.chipn{background:#fff;border-radius:999px;padding:4px 12px;font-weight:800;box-shadow:0 4px 0 #0000001a;white-space:nowrap}
+.tog{width:44px;height:44px;border-radius:14px;border:none;background:#fff;font-size:1.2rem;box-shadow:0 4px 0 #0000001a}
+/* buttons */
+.btn{border:none;border-radius:18px;padding:10px 18px;font-weight:800;background:#fff;box-shadow:0 5px 0 #d6d3e8;transition:transform .08s}
+.btn:active:not(:disabled){transform:translateY(4px);box-shadow:0 1px 0 #d6d3e8}
+.btn.pri{background:var(--pri);color:#fff;box-shadow:0 5px 0 var(--pri-d)}
+.btn.go{background:var(--ok);color:#fff;box-shadow:0 5px 0 var(--ok-d);padding:8px 18px}
+.btn.y{background:var(--yel);box-shadow:0 5px 0 var(--yel-d)}
+.btn.big{font-size:1.25rem;padding:14px 26px;border-radius:22px}
+.btn:disabled{opacity:.5;cursor:default}
+.card{background:var(--card);border-radius:28px;padding:16px 18px;box-shadow:0 8px 0 #00000014,0 12px 30px #0000000f;margin-bottom:16px}
+.small{font-size:.9rem;color:var(--muted)}
+.center{text-align:center}
+/* mascot */
+.mimo{flex:0 0 auto;position:relative}
+.mimo svg{width:100%;height:100%;overflow:visible;animation:bob 2.6s ease-in-out infinite;transform-origin:50% 100%}
+@keyframes bob{50%{transform:translateY(-5px) scale(1.02,.98)}}
+.mimo .e-happy,.mimo .e-sad,.mimo .m-happy,.mimo .m-sad,.mimo .m-think,.mimo .a-up{display:none}
+.mimo.mood-happy .e-open,.mimo.mood-happy .m-idle,.mimo.mood-happy .a-down{display:none}
+.mimo.mood-happy .e-happy,.mimo.mood-happy .m-happy,.mimo.mood-happy .a-up{display:inline}
+.mimo.mood-happy svg{animation:hop .55s ease 2}
+.mimo.mood-sad .m-idle{display:none}.mimo.mood-sad .m-sad,.mimo.mood-sad .e-sad{display:inline}
+.mimo.mood-sad svg{animation:wob .5s}
+.mimo.mood-think .m-idle{display:none}.mimo.mood-think .m-think{display:inline}
+.mimo.mood-think .pupil{transform:translate(3px,-4px)}
+.mimo .pupil{transition:transform .3s}
+.mimo .e-open{animation:blink 4.5s infinite;transform-box:fill-box;transform-origin:center}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+@keyframes hop{30%{transform:translateY(-22px) rotate(-6deg)}60%{transform:translateY(0) scale(1.08,.92)}80%{transform:translateY(-6px) rotate(4deg)}}
+@keyframes wob{20%,60%{transform:rotate(-7deg)}40%,80%{transform:rotate(7deg)}}
+.mimo.dance svg{animation:dance .8s ease-in-out infinite}
+@keyframes dance{25%{transform:rotate(-10deg) translateY(-10px)}50%{transform:translateY(0)}75%{transform:rotate(10deg) translateY(-10px)}}
+/* scene + bubble */
+.scene{display:flex;align-items:flex-end;gap:10px;margin:4px 0 14px}
+.bwrap{flex:1;position:relative;margin-bottom:18px}
+.bubble{background:#fff;border-radius:24px;padding:12px 48px 12px 16px;position:relative;min-height:56px;font-weight:600;
+  box-shadow:0 6px 0 #00000014;border:3px solid #fff;transition:border-color .2s}
+.bubble:before{content:"";position:absolute;left:-14px;bottom:14px;border:10px solid transparent;border-right:16px solid #fff}
+.bubble.sad{border-color:#fca5a5}.bubble.happy{border-color:#86efac}.bubble.think{border-color:#fcd34d}
+.spk{border:none;background:var(--pri-l);color:var(--pri);border-radius:14px;padding:4px 10px;font-weight:800;box-shadow:0 3px 0 #c4b5fd}
+.bwrap>.spk{position:absolute;right:8px;top:8px;width:36px;height:36px;padding:0;border-radius:50%}
+/* map */
+.hero{display:flex;align-items:center;gap:8px}
+.island{border-radius:34px;padding:14px 12px 10px;margin-bottom:22px;background:linear-gradient(180deg,var(--c1),var(--c2));box-shadow:0 10px 0 #00000014;position:relative;overflow:hidden}
+.banner{display:flex;align-items:center;gap:10px;background:#fff;border-radius:22px;padding:8px 14px;box-shadow:0 5px 0 #0000001a;position:relative;z-index:2}
+.banner .be{font-size:2.2rem}
+.banner b{font-size:1.15rem}
+.banner .bc{margin-left:auto;background:var(--pri);color:#fff;border-radius:999px;padding:2px 12px;font-weight:800;white-space:nowrap}
+.path{position:relative;width:320px;margin:0 auto}
+.road{position:absolute;left:0;top:0}
+.road path{fill:none;stroke:#ffffffcc;stroke-width:16;stroke-linecap:round}
+.road path.d{stroke:#00000014;stroke-width:4;stroke-dasharray:2 14}
+.node{position:absolute;width:78px;height:78px;border-radius:50%;border:none;font-size:1.7rem;font-weight:800;background:#fff;color:var(--pri);
+  box-shadow:0 7px 0 #c9c3e6;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;transition:transform .15s}
+.node:hover{transform:scale(1.08)}
+.node:active{transform:translateY(5px);box-shadow:0 2px 0 #c9c3e6}
+.node .ns{font-size:.7rem;letter-spacing:1px;color:#d1d5db;margin-top:2px}
+.node .ns b{color:#f59e0b}
+.node.done{background:linear-gradient(#fde047,#facc15);color:#7c2d12;box-shadow:0 7px 0 #ca8a04}
+.node.next{background:var(--pri);color:#fff;box-shadow:0 7px 0 var(--pri-d);animation:pulse 1.6s infinite}
+@keyframes pulse{0%{box-shadow:0 7px 0 var(--pri-d),0 0 0 0 #a78bfa99}70%{box-shadow:0 7px 0 var(--pri-d),0 0 0 18px #a78bfa00}}
+.here{position:absolute;font-size:2.4rem;animation:hop 1.4s infinite;pointer-events:none;z-index:3}
+.deco{position:absolute;font-size:2.2rem;opacity:.9;pointer-events:none}
+/* question */
+.qcard{background:linear-gradient(180deg,#fff 60%,var(--c1))}
+.qhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.qnum{width:44px;height:44px;border-radius:14px;background:var(--pri);color:#fff;font-weight:800;font-size:1.3rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 0 var(--pri-d)}
+.chip{background:var(--pri-l);color:var(--pri);border-radius:999px;padding:2px 12px;font-weight:800;font-size:.9rem}
+.qhead .spk{margin-left:auto}
+.qtext{font-size:1.2rem;margin:10px 0 6px;font-weight:600}
+details.en{color:var(--muted);font-size:.95rem}
+details.en summary{cursor:pointer}
+.bottombar{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:center}
+.hintbtn{width:64px;height:64px;border-radius:50%;border:none;background:var(--yel);font-size:1.9rem;box-shadow:0 6px 0 var(--yel-d);animation:glow 3s infinite}
+@keyframes glow{0%,85%,100%{transform:scale(1)}90%{transform:scale(1.12) rotate(-8deg)}95%{transform:scale(1.12) rotate(8deg)}}
+/* fractions */
+.mx{display:inline-flex;align-items:center;vertical-align:middle;gap:2px;margin:0 2px}
+.mw{font-weight:800}
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.05;font-size:.92em}
+.fr>span:first-child,.fr>input:first-child{border-bottom:2.5px solid currentColor;padding:0 3px}
+.fr>span{padding:0 3px}
+/* steps */
+.steps{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+.step{display:flex;gap:10px;align-items:flex-start;border-radius:22px;padding:12px 14px;background:#f8f7ff;border:3px solid var(--line);animation:slidein .35s ease}
+@keyframes slidein{from{opacity:0;transform:translateY(16px) scale(.97)}}
+.step.cur{border-color:#a78bfa;background:#fff;box-shadow:0 6px 0 #ddd6fe}
+.step.done{border-color:#86efac;background:#f0fdf4}
+.snum{flex:0 0 36px;height:36px;border-radius:12px;background:var(--pri);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;box-shadow:0 3px 0 var(--pri-d)}
+.step.done .snum{background:var(--ok);box-shadow:0 3px 0 var(--ok-d);font-size:0}
+.step.done .snum:after{content:"✓";font-size:1.2rem}
+.sbody{flex:1;min-width:0}
+.sq{margin-bottom:8px;font-weight:600}
+.sok{color:var(--ok-d);font-size:.95rem;margin-top:6px}
+.inline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.inp{width:4.2em;font-size:1.3rem;font-weight:800;padding:4px 6px;border:3px solid #d4cff0;border-radius:14px;text-align:center;background:#fff;color:var(--ink);caret-color:var(--pri)}
+.inp:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 4px #ddd6fe}
+.fr .inp{width:3.2em;margin:2px 0;padding:2px 4px;font-size:1.1rem}
+.mx .inp.w{width:2.6em}
+.choices{display:flex;flex-wrap:wrap;gap:10px}
+.choice{border:3px solid #ddd6fe;background:#fff;border-radius:18px;padding:8px 14px;font-weight:700;box-shadow:0 5px 0 #ddd6fe;transition:transform .1s}
+.choice:hover:not(:disabled){transform:translateY(-2px);border-color:#a78bfa}
+.choice.right{border-color:var(--ok);background:var(--okbg);box-shadow:0 5px 0 #86efac;animation:popin .4s}
+.choice.wrongc{border-color:var(--bad);background:var(--badbg);box-shadow:0 5px 0 #fca5a5}
+@keyframes popin{50%{transform:scale(1.1)}}
+.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+.visual{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin:8px 0;align-items:center;font-size:1.3rem}
+/* numpad */
+.numpad{position:fixed;left:0;right:0;bottom:0;z-index:40;background:#fff;border-radius:28px 28px 0 0;box-shadow:0 -8px 30px #0000002a;padding:10px 12px 14px;transform:translateY(110%);transition:transform .25s}
+.numpad.show{transform:none}
+.numpad .grid4{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;max-width:620px;margin:0 auto}
+.numpad button{border:none;border-radius:16px;height:52px;font-size:1.45rem;font-weight:800;background:var(--pri-l);color:var(--pri);box-shadow:0 4px 0 #c4b5fd}
+.numpad button:active{transform:translateY(3px);box-shadow:0 1px 0 #c4b5fd}
+.numpad .k-ok{grid-column:span 2;background:var(--ok);color:#fff;box-shadow:0 4px 0 var(--ok-d);font-size:1.15rem}
+.numpad .k-del{background:#fee2e2;color:#b91c1c;box-shadow:0 4px 0 #fca5a5}
+.numpad .k-nav{background:#e0f2fe;color:#0369a1;box-shadow:0 4px 0 #7dd3fc;font-size:1.1rem}
+.numpad .k-x{background:#f1f5f9;color:#64748b;box-shadow:0 4px 0 #cbd5e1;font-size:1rem}
+/* long division */
+.ldwrap{display:flex;justify-content:center;margin:10px 0}
+.ldiv{display:flex;font-family:"Courier New",monospace;font-size:1.7rem;font-weight:700;background:#fffdf2;border-radius:22px;padding:14px 22px;border:3px dashed #fcd34d}
+.ldleft{display:grid;gap:0;padding-right:10px}
+.ldc{width:1.25em;height:1.5em;text-align:center}
+.ldc.hl{background:var(--hl);border-radius:8px}
+.ldc.new{color:var(--blue)}
+.ldright{border-left:3px solid var(--ink);padding-left:10px;min-width:4em}
+.ldright .dv{border-bottom:3px solid var(--ink);padding-bottom:2px}
+.ldright .qt{color:var(--pri)}
+.digits{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:6px}
+.digits button{width:54px;height:54px;border-radius:18px;border:none;background:linear-gradient(#c4b5fd,#a78bfa);font-weight:800;font-size:1.4rem;color:#fff;box-shadow:0 5px 0 var(--pri-d)}
+.digits button:active{transform:translateY(4px);box-shadow:0 1px 0 var(--pri-d)}
+.trial{text-align:center;margin:8px 0;min-height:1.5em;font-weight:600}
+/* expressions */
+.locks{text-align:center;font-size:2rem;letter-spacing:4px}
+.expr{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:5px;font-size:1.8rem;font-weight:800;margin:10px 0;padding:12px;background:#f5f3ff;border-radius:22px}
+.expr .num{padding:0 4px;border-radius:10px}
+.expr .num.f,.expr .opbtn.f{background:var(--hl)}
+.expr .par{color:#a5a1c4}
+.opbtn{border:none;background:#fff;color:var(--pri);font-weight:800;font-size:1.6rem;width:48px;height:48px;border-radius:16px;box-shadow:0 5px 0 #c4b5fd}
+.opbtn:active{transform:translateY(4px);box-shadow:0 1px 0 #c4b5fd}
+.opbtn.flash{animation:flash 1s 2}
+@keyframes flash{50%{background:#facc15;transform:scale(1.15)}}
+.exhist{font-size:1.15rem;margin:6px auto;max-width:600px;background:#fffdf2}
+.exhist div{padding:2px 8px}
+/* units */
+.utable{margin:8px auto;border-collapse:collapse;font-size:1.4rem;font-weight:800;background:#fffdf2;border-radius:18px}
+.utable td{padding:4px 10px;text-align:right;min-width:3.5em}
+.utable .u{font-size:.85rem;color:var(--muted);font-weight:600}
+.utable tr.res td{border-top:3px solid var(--ink);color:var(--pri)}
+.utable td.fc{background:var(--hl);border-radius:8px}
+.utable .carry{font-size:.85rem;color:var(--bad);height:1.2em}
+.utable s{color:#a5a1c4}
+.utable .nt{color:var(--blue);font-size:.9rem;display:block}
+/* ninja */
+.bigfrac{font-size:3.2rem;font-weight:800;text-align:center;margin:10px 0;color:var(--pri)}
+.ninja{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.ninja .nb{border:none;background:#312e81;color:#fff;border-radius:16px;padding:10px 14px;font-weight:800;box-shadow:0 5px 0 #1e1b4b}
+.ninja .nb:active{transform:translateY(4px);box-shadow:0 1px 0 #1e1b4b}
+.slash{animation:slash .5s}
+@keyframes slash{0%{transform:scale(1)}40%{transform:scale(1.3) rotate(-8deg);color:#f43f5e}100%{transform:scale(1)}}
+.hist{margin:8px auto;max-width:520px;font-size:1.2rem}
+/* grids & boards */
+.grid{display:inline-grid;gap:4px;background:#a5a1c4;padding:4px;border-radius:10px}
+.grid .cell{width:44px;height:44px;background:#fff;border:none;border-radius:6px}
+.grid .cell.on{background:#6d28d9}
+.grid .cell.bad{outline:3px solid var(--bad);outline-offset:-3px}
+.flipx{transition:transform 1s;transform-style:preserve-3d}
+.board{display:grid;grid-template-columns:repeat(10,1fr) 52px;gap:4px;max-width:620px;margin:0 auto}
+.board button{border:none;border-radius:10px;background:#f1effc;padding:6px 0;font-weight:800;font-size:1rem;box-shadow:0 3px 0 #ddd6fe}
+.board button.on{background:#86efac;box-shadow:0 3px 0 #22c55e}
+.board button.no{background:#fecaca}
+.board .cnt{display:flex;align-items:center;justify-content:center;font-size:.85rem;color:var(--muted)}
+.found{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:8px 0}
+.found span{background:var(--pri-l);border-radius:14px;padding:4px 12px;font-weight:800;min-width:60px;text-align:center;animation:popin .4s}
+.found span.empty{background:#f1f5f9;color:#c4c1d9;animation:none}
+.cards{display:flex;gap:10px;justify-content:center;margin:10px 0}
+.ncard{width:58px;height:76px;border-radius:16px;border:none;background:linear-gradient(#f9a8d4,#ec4899);color:#fff;font-size:2rem;font-weight:800;box-shadow:0 6px 0 #be185d}
+.ncard:active{transform:translateY(4px)}
+.ncard:disabled{opacity:.35}
+.slot{font-size:2.3rem;font-weight:800;letter-spacing:8px;text-align:center;min-height:1.6em;color:var(--pri)}
+.machine{display:grid;grid-template-columns:auto auto auto auto auto;gap:8px 10px;align-items:center;justify-content:center;font-weight:800;font-size:1.25rem}
+.machine .sqr,.machine .hex,.machine .cir{width:54px;height:54px;display:flex;align-items:center;justify-content:center}
+.machine .sqr{background:#ffedd5;border:3px solid #fb923c;border-radius:10px}
+.machine .hex{background:#fecdd3;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)}
+.machine .cir{background:#fff1f2;border:3px solid #fda4af;border-radius:50%}
+.machine .q{background:#fff;color:var(--pri);outline:3px dashed #a78bfa}
+.arrow{color:#60a5fa}
+.diamond{position:relative;margin:10px auto}
+.diamond div{position:absolute;width:58px;height:34px;border:2px solid #3b3561;display:flex;align-items:center;justify-content:center;font-weight:800;background:#fff}
+.diamond div.g{background:#cbd5e1}
+.diamond div.h{background:var(--hl)}
+.diamond div.ans{color:var(--pri)}
+.layers{display:flex;flex-wrap:wrap;gap:16px;justify-content:center}
+.layer{text-align:center}
+.layer .grid .cell{width:38px;height:38px;font-weight:800}
+.layer .grid .cell.x{background:repeating-linear-gradient(45deg,#e5e7eb 0 4px,#f3f4f6 4px 8px);cursor:default}
+.layer .grid .cell.m{background:#facc15}
+/* overlays */
+.modal,.celebrate{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal{background:#2b235099}
+.celebrate{background:radial-gradient(circle at 50% 40%,#fef9c3ee,#c4b5fdee 70%)}
+.modal .box,.celebrate .box{background:#fff;border-radius:32px;padding:22px;max-width:440px;width:100%;text-align:center;animation:pop .35s cubic-bezier(.3,1.6,.6,1);box-shadow:0 10px 0 #00000022}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+.bigstars{display:flex;justify-content:center;gap:6px;margin:6px 0}
+.bigstars span{font-size:3.4rem;opacity:0;animation:starpop .5s cubic-bezier(.3,1.8,.6,1) forwards}
+.bigstars span.off{filter:grayscale(1);}
+.bigstars span.off{animation-name:starpopoff}
+@keyframes starpop{from{opacity:0;transform:scale(0) rotate(-90deg)}to{opacity:1;transform:scale(1)}}
+@keyframes starpopoff{from{opacity:0;transform:scale(0)}to{opacity:.25;transform:scale(.85)}}
+.coins{font-size:1.4rem;font-weight:800;color:#b45309}
+.sticker{display:inline-flex;flex-direction:column;align-items:center;background:linear-gradient(#fff,#fef3c7);border:4px dashed #f59e0b;border-radius:24px;padding:8px 18px;margin:8px 0;animation:flipin .8s .9s both}
+.sticker .se{font-size:3.6rem;line-height:1.1}
+@keyframes flipin{from{transform:rotateY(90deg) scale(.5);opacity:0}}
+.album{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:12px}
+.slotS{background:#fff;border-radius:22px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 6px 0 #0000001a;border:none}
+.slotS .se{font-size:2.6rem;line-height:1.1}
+.slotS.no .se{filter:brightness(0) opacity(.15)}
+.slotS:active .se{animation:wob .5s}
+.avs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0}
+.avs button{width:56px;height:56px;border-radius:50%;border:3px solid transparent;background:#f5f3ff;font-size:1.9rem}
+.avs button.sel{border-color:var(--pri);background:#ede9fe;transform:scale(1.1)}
+.nameinp{font-size:1.3rem;font-weight:700;padding:8px 14px;border-radius:16px;border:3px solid #ddd6fe;text-align:center;width:100%;max-width:280px;color:var(--ink)}
+.conf{position:fixed;top:-40px;font-size:1.8rem;z-index:60;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(115vh) rotate(600deg)}}
+@media (max-width:560px){
+  body{font-size:17px}
+  .expr{font-size:1.35rem}
+  .opbtn{width:40px;height:40px;font-size:1.25rem}
+  .ldiv{font-size:1.3rem;padding:10px 12px}
+  .grid .cell{width:34px;height:34px}
+  .board button{font-size:.8rem;padding:4px 0}
+  .board{grid-template-columns:repeat(10,1fr) 40px;gap:2px}
+  .numpad button{height:46px}
+  .chipn{padding:3px 8px;font-size:.9rem}
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+"use strict";
+/* ================= tiện ích ================= */
+const LS='g5_2012_minigame_v1';
+let P={};
+try{P=JSON.parse(localStorage.getItem(LS))||{}}catch(e){P={}}
+if(!P.stars)P.stars={};
+const save=()=>{try{localStorage.setItem(LS,JSON.stringify(P))}catch(e){}};
+const app=document.getElementById('app');
+function h(tag,props,...kids){
+  const e=document.createElement(tag);
+  for(const [k,v] of Object.entries(props||{})){
+    if(v==null||v===false)continue;
+    if(k==='class')e.className=v;
+    else if(k==='html')e.innerHTML=v;
+    else if(k==='style')e.style.cssText=v;
+    else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);
+    else e.setAttribute(k,v);
+  }
+  for(const c of kids.flat()){if(c==null||c===false)continue;e.append(c.nodeType?c:document.createTextNode(c));}
+  return e;
+}
+const gcd=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a};
+const fr=(w,n,d)=>`<span class="mx">${w?`<b class="mw">${w}</b>`:''}<span class="fr"><span>${n}</span><span>${d}</span></span></span>`;
+// {4 6/7} hoặc {6/7} -> phân số đẹp
+const T=s=>String(s==null?'':s).replace(/\{(?:(\d+) )?(\d+)\/(\d+)\}/g,(m,w,n,d)=>fr(w,n,d));
+const fmt=n=>{const s=String(Math.round(n*1000)/1000).replace('.',',');const [i,d]=s.split(',');return i.replace(/\B(?=(\d{3})+(?!\d))/g,'.')+(d?','+d:'')};
+const parseNum=s=>{s=String(s).trim().replace(/\s/g,'');if(s==='')return NaN;
+  // 91,02 -> 91.02 ; 5.428 (kiểu VN hàng nghìn) -> 5428
+  if(s.includes(','))s=s.replace(/\./g,'').replace(',','.');
+  else if(/^\d{1,3}(\.\d{3})+$/.test(s))s=s.replace(/\./g,'');
+  return Number(s)};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+
+/* âm thanh */
+let AC=null;
+function beep(f=660,d=.12,type='sine',vol=.12){
+  if(P.mute)return;
+  try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;
+    g.gain.setValueAtTime(vol,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);
+    o.connect(g).connect(AC.destination);o.start();o.stop(AC.currentTime+d);}catch(e){}
+}
+const sOk=()=>{beep(660);setTimeout(()=>beep(880),90)};
+const sBad=()=>beep(180,.22,'square',.06);
+const sWin=()=>[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.18),i*130));
+
+/* ================= trạng thái 1 lượt chơi ================= */
+const G={q:null,mist:0,hint:0,hintFn:null,bubble:null,owl:null,finished:false};
+function say(html,mood=''){
+  if(!G.bubble)return;
+  G.bubble.className='bubble '+mood;G.bubble.innerHTML=T(html);G.lastSay=html;
+  setMood(mood);speak(html);
+}
+const PRAISE=['Giỏi quá! 🎉','Chính xác! 👏','Tuyệt vời! ⭐','Đúng rồi, tiếp tục nào! 🚀','Bạn làm tốt lắm! 💪','Xuất sắc! 🌟'];
+const OOPS=['Chưa đúng rồi, thử lại nhé! 🤔','Gần đúng rồi! Kiểm tra lại phép tính nha.','Ôi, sai mất rồi. Bình tĩnh tính lại nhé!','Thử lại một lần nữa nào, bạn làm được mà!'];
+function praise(extra){say((extra?extra+' ':'')+pick(PRAISE),'happy')}
+function bad(msg,node){G.mist++;sBad();say(msg||pick(OOPS),'sad');if(node){node.classList.remove('shake');void node.offsetWidth;node.classList.add('shake')}}
+function useHint(){
+  if(G.finished)return;
+  const t=G.hintFn?G.hintFn():null;
+  if(!t){say('Bạn đang làm rất tốt, cứ tiếp tục nhé!','think');return}
+  G.hint++;say('💡 '+t,'think');
+}
+
+/* ================= bước hướng dẫn (quest) ================= */
+const FORM={ 'form-simp':'Đúng giá trị rồi! Nhưng hãy <b>rút gọn</b> phân số đến tối giản nhé.',
+  'form-mixed':'Đúng giá trị rồi! Hãy viết thành <b>hỗn số</b> (phần phân số phải nhỏ hơn 1).',
+  'form-imp':'Ở bước này hãy viết dạng <b>phân số</b> (không có phần nguyên) nhé.',
+  'empty':'Bạn điền đủ các ô trước đã nhé!' };
+function parseFracStr(s){const m=String(s).match(/^(?:(\d+) )?(\d+)\/(\d+)$/);return [m[1]?+m[1]:0,+m[2],+m[3]]}
+function makeInput(inp){
+  const t=inp.t||'num';
+  if(t==='num'){
+    const e=h('input',{class:'inp',inputmode:'none',autocomplete:'off',style:`width:${Math.max(3.2,String(inp.a).length*0.75+1.6)}em`});
+    return [e,()=>{const v=parseNum(e.value);if(isNaN(v))return'empty';return Math.abs(v-inp.a)<1e-9?'ok':'wrong'}];
+  }
+  if(t==='fnum'){ // tử số cần điền, mẫu cố định
+    const e=h('input',{class:'inp',inputmode:'none',autocomplete:'off'});
+    const node=h('span',{class:'mx'},h('span',{class:'fr'},e,h('span',{},String(inp.den))));
+    return [node,()=>{const v=parseNum(e.value);if(isNaN(v))return'empty';return v===inp.a?'ok':'wrong'}];
+  }
+  // frac
+  const ew=inp.whole?h('input',{class:'inp w',inputmode:'none',autocomplete:'off'}):null;
+  const en=h('input',{class:'inp',inputmode:'none',autocomplete:'off'});
+  const ed=h('input',{class:'inp',inputmode:'none',autocomplete:'off'});
+  const node=h('span',{class:'mx'},ew,h('span',{class:'fr'},en,ed));
+  return [node,()=>{
+    const ws=ew?ew.value.trim():'';const w=ws===''?0:parseInt(ws),n=parseInt(en.value),d=parseInt(ed.value);
+    if(isNaN(n)||isNaN(d)||isNaN(w))return 'empty';
+    if(d===0)return 'wrong';
+    const [aw,an,ad]=parseFracStr(inp.a);
+    if((w*d+n)*ad!==(aw*ad+an)*d)return 'wrong';
+    if(inp.form==='final'){if(n!==0&&gcd(n,d)!==1)return'form-simp';if(n>=d)return'form-mixed'}
+    if(inp.form==='imp'&&w!==0)return'form-imp';
+    return 'ok';
+  }];
+}
+function quest(box,steps,done){
+  const wrap=h('div',{class:'steps'});box.append(wrap);
+  let i=0;
+  const run=()=>{
+    G.prog&&G.prog(i,steps.length);
+    if(i>=steps.length){G.hintFn=null;(done||finish)();return}
+    const st=steps[i];
+    st.onShow&&st.onShow();
+    G.hintFn=()=>st.hint||'Đọc thật kỹ câu hỏi, rồi tính từng bước nhé!';
+    const row=h('div',{class:'step cur'});
+    const body=h('div',{class:'sbody'});
+    row.append(h('div',{class:'snum'},String(i+1)),body);
+    body.append(h('div',{class:'sq',html:T(st.q)}));
+    const okDone=()=>{
+      row.classList.remove('cur');row.classList.add('done');
+      body.querySelectorAll('input,button').forEach(e=>e.disabled=true);
+      if(st.ok)body.append(h('div',{class:'sok',html:'✅ '+T(st.ok)}));
+      sOk();praise();st.onOk&&st.onOk();i++;setTimeout(run,300);
+    };
+    if(st.choices){
+      const cw=h('div',{class:'choices'});
+      st.choices.forEach((c,k)=>{const b=h('button',{class:'choice',html:T(c),onclick:()=>{
+        if(k===st.ans){b.classList.add('right');okDone()}
+        else{b.classList.add('wrongc');bad(st.why&&st.why[k],row)}}});cw.append(b)});
+      body.append(cw);
+    }else{
+      const line=h('div',{class:'inline'});const checks=[];
+      st.inputs.forEach(inp=>{
+        if(inp.pre)line.append(h('span',{html:T(inp.pre)}));
+        const [node,chk]=makeInput(inp);line.append(node);checks.push(chk);
+        if(inp.post)line.append(h('span',{html:T(inp.post)}));
+      });
+      const btn=h('button',{class:'btn go',onclick:()=>{
+        let res='ok';for(const c of checks){const r=c();if(r!=='ok'){res=r;break}}
+        if(res==='ok')okDone();else if(FORM[res])say(FORM[res],'think');else bad(st.wrong,row);
+      }},'Kiểm tra');
+      line.append(btn);body.append(line);
+      line.addEventListener('keydown',e=>{if(e.key==='Enter'&&!btn.disabled)btn.click()});
+      setTimeout(()=>{const f=line.querySelector('input');f&&f.focus({preventScroll:true})},50);
+    }
+    wrap.append(row);
+    setTimeout(()=>row.scrollIntoView({behavior:'smooth',block:'nearest'}),60);
+  };
+  run();
+}
+
+/* ================= các loại trò chơi ================= */
+
+/* ---- 1. Chia kiểu cột: "Đoán thương" ---- */
+function gameDiv(area,{a,b}){
+  const ds=String(a).split('').map(Number);
+  const plan=[];let idx=0,p=0;
+  do{p=p*10+ds[idx];idx++}while(p<b&&idx<ds.length);
+  for(;;){const q=Math.floor(p/b),r=p-q*b;plan.push({p,q,r,end:idx-1});if(idx>=ds.length)break;p=r*10+ds[idx];idx++}
+  const rows=[];let k=0,qstr='',phase='guess';
+  const box=h('div',{class:'ldiv'});area.append(h('div',{class:'ldwrap'},box));
+  const trial=h('div',{class:'trial'});const ctrl=h('div');area.append(trial,ctrl);
+  const N=ds.length;
+  function draw(){
+    box.innerHTML='';
+    const left=h('div',{class:'ldleft',style:`grid-template-columns:repeat(${N},1.25em)`});
+    ds.forEach((d,j)=>left.append(h('div',{class:'ldc'+(k===0&&phase!=='end'&&j<=plan[0].end?' hl':'')},String(d))));
+    rows.forEach((r,ri)=>{
+      const s=r.str;const start=r.end-s.length+1;
+      for(let j=0;j<N;j++){const ch=(j>=start&&j<=r.end)?s[j-start]:'';
+        left.append(h('div',{class:'ldc'+(r.cur&&ch?' hl':'')+(r.newIdx===j?' new':'')},ch))}
+    });
+    const right=h('div',{class:'ldright'},h('div',{class:'dv'},String(b)),h('div',{class:'qt'},qstr+(phase==='end'?'':'?')));
+    box.append(left,right);
+  }
+  function guess(){
+    phase='guess';const st=plan[k];draw();trial.innerHTML='';
+    ctrl.innerHTML='';
+    ctrl.append(h('div',{class:'center',html:`Lấy <b>${st.p}</b> chia cho <b>${b}</b> được mấy? Bấm để thử:`}));
+    const dg=h('div',{class:'digits'});
+    for(let g=0;g<=9;g++)dg.append(h('button',{onclick:()=>tryG(g)},String(g)));
+    ctrl.append(dg);
+    G.hintFn=()=>{
+      if(b<10)return `Nhớ bảng nhân ${b}: tìm số lớn nhất mà ${b} × số đó không vượt quá ${st.p}. Ví dụ ${b} × ${st.q} = ${b*st.q}, còn ${b} × ${st.q+1} = ${b*(st.q+1)}.`;
+      const pw=Math.pow(10,String(b).length-1),br=Math.round(b/pw)*pw;
+      return `Làm tròn ${b} ≈ ${br}. Ước lượng: ${st.p} : ${br} ≈ ${Math.floor(st.p/br)}. Thử số đó xem, nếu lớn quá thì giảm đi 1 nhé!`;
+    };
+    say(k===0?`Bắt đầu từ trái sang: lấy <b>${st.p}</b> (số nhỏ nhất ở đầu số bị chia mà chia được cho ${b}).`:`Bây giờ chia <b>${st.p}</b> cho <b>${b}</b>.`);
+  }
+  function tryG(g){
+    const st=plan[k],pr=g*b;
+    if(pr>st.p){trial.innerHTML=`${g} × ${b} = ${pr} &gt; ${st.p} → <b style="color:var(--bad)">Lớn quá!</b> Chọn số nhỏ hơn.`;sBad();say('Lớn quá rồi, giảm xuống nhé!','think');return}
+    if(st.p-pr>=b){trial.innerHTML=`${g} × ${b} = ${pr}; còn dư ${st.p} − ${pr} = ${st.p-pr} ≥ ${b} → <b style="color:var(--warn)">Còn chia được nữa!</b> Chọn số lớn hơn.`;sBad();say('Số dư vẫn lớn hơn số chia, tăng lên nhé!','think');return}
+    trial.innerHTML=`${g} × ${b} = ${pr} ≤ ${st.p} ✓`;qstr+=String(g);sOk();praise(`Viết <b>${g}</b> vào thương.`);remStep();
+  }
+  function remStep(){
+    phase='rem';draw();const st=plan[k];ctrl.innerHTML='';
+    const e=h('input',{class:'inp',inputmode:'none'});
+    const go=()=>{const v=parseNum(e.value);if(isNaN(v)){say(FORM.empty,'think');return}
+      if(v!==st.r){bad(`Tính lại nhé: ${st.p} − ${st.q*b} = ?`,ctrl);return}
+      sOk();rows.forEach(r=>r.cur=false);G.prog&&G.prog(k+1,plan.length+1);
+      if(k<plan.length-1){bring()}else{rows.push({str:String(st.r),end:st.end,cur:false});finalStep()}};
+    e.addEventListener('keydown',ev=>{if(ev.key==='Enter')go()});
+    ctrl.append(h('div',{class:'inline',style:'justify-content:center'},
+      h('span',{html:`${st.q} nhân ${b} bằng ${st.q*b}. &nbsp;${st.p} − ${st.q*b} = `}),e,h('button',{class:'btn go',onclick:go},'Kiểm tra')));
+    G.hintFn=()=>`Lấy ${st.p} trừ đi ${st.q*b}.`;
+    setTimeout(()=>e.focus({preventScroll:true}),50);
+  }
+  function bring(){
+    phase='bring';const st=plan[k],nx=plan[k+1];
+    const digit=ds[nx.end];
+    ctrl.innerHTML='';
+    ctrl.append(h('div',{class:'center'},h('button',{class:'btn y',onclick:()=>{
+      rows.push({str:String(st.r)+String(digit),end:nx.end,cur:true,newIdx:nx.end});k++;praise(`Hạ ${digit} xuống, được ${nx.p}.`);guess()}},`⬇️ Hạ chữ số ${digit} xuống`)));
+    say(`Số dư là ${st.r}. Bây giờ hạ chữ số tiếp theo xuống nhé!`);
+    G.hintFn=()=>`Bấm nút vàng để hạ chữ số ${digit} xuống cạnh số dư ${st.r}.`;
+  }
+  function finalStep(){
+    phase='end';draw();ctrl.innerHTML='';trial.innerHTML='';
+    const q=Math.floor(a/b),r=a%b;
+    quest(ctrl,[{q:`Vậy ${fmt(a)} : ${b} = ? (dư ?)`,inputs:[{a:q},{a:r,pre:'dư'}],
+      hint:`Thương là số màu tím bên phải, số dư là số cuối cùng bên trái.`,
+      ok:`Thử lại: ${q} × ${b} + ${r} = ${fmt(a)} ✓`}]);
+  }
+  guess();
+}
+
+/* ---- 2. Biểu thức: "Mở khóa rương" ---- */
+function tokenize(s){const out=[];const re=/\d+|[-+×÷()]/g;let m;while((m=re.exec(s))){const x=m[0];
+  if(/\d/.test(x))out.push({t:'n',v:+x});else if(x==='('||x===')')out.push({t:x});else out.push({t:'op',v:x})}return out}
+function simpPar(tk){let ch=true;while(ch){ch=false;for(let j=0;j+2<tk.length;j++){if(tk[j].t==='('&&tk[j+1].t==='n'&&tk[j+2].t===')'){tk.splice(j,3,tk[j+1]);ch=true;break}}}}
+function nextOp(tk){
+  let lo=0,hi=tk.length-1;const close=tk.findIndex(x=>x.t===')');
+  if(close>=0){let open=close;while(tk[open].t!=='(')open--;lo=open+1;hi=close-1}
+  for(let j=lo;j<=hi;j++)if(tk[j].t==='op'&&(tk[j].v==='×'||tk[j].v==='÷'))return{j,lo,hi};
+  for(let j=lo;j<=hi;j++)if(tk[j].t==='op')return{j,lo,hi};
+}
+const SYM={'+':'+','-':'−','×':'×','÷':':'};
+const exprStr=tk=>tk.map(t=>t.t==='n'?fmt(t.v):t.t==='op'?SYM[t.v]:t.t).join(' ').replace(/\( /g,'(').replace(/ \)/g,')');
+function gameExpr(area,{e}){
+  const tk=tokenize(e);simpPar(tk);
+  const total=tk.filter(t=>t.t==='op').length;let opened=0;
+  const locks=h('div',{class:'locks'}),ex=h('div',{class:'expr'}),ask=h('div',{class:'center'}),hist=h('div',{class:'exhist card'});
+  area.append(h('div',{class:'center small'},'Mỗi phép tính đúng mở được 1 ổ khóa. Mở hết để lấy kho báu! Bấm vào phép tính phải làm TRƯỚC.'),locks,ex,ask,hist);
+  hist.append(h('div',{},exprStr(tk)));
+  let focus=null;
+  function draw(){
+    locks.textContent='🔓'.repeat(opened)+'🔒'.repeat(total-opened)+'  '+(opened===total?'💎':'🎁');
+    ex.innerHTML='';
+    tk.forEach((t,j)=>{
+      const f=focus!=null&&j>=focus-1&&j<=focus+1;
+      if(t.t==='op')ex.append(h('button',{class:'opbtn'+(f?' f':''),'data-j':j,onclick:()=>choose(j)},SYM[t.v]));
+      else ex.append(h('span',{class:(t.t==='n'?'num':'par')+(f?' f':'')},t.t==='n'?fmt(t.v):t.t));
+    });
+  }
+  function reason(j){const n=nextOp(tk);
+    if(tk.some(t=>t.t==='(')&&(j<n.lo||j>n.hi))return'Có dấu ngoặc! Phải làm phép tính <b>trong ngoặc</b> (ngoặc trong cùng) trước nhé.';
+    if((tk[j].v==='+'||tk[j].v==='-')&&(tk[n.j].v==='×'||tk[n.j].v==='÷'))return'Nhớ quy tắc: <b>nhân, chia trước — cộng, trừ sau</b>!';
+    return'Các phép tính cùng loại thì làm <b>từ trái sang phải</b> nhé!'}
+  function choose(j){
+    if(focus!=null)return;
+    const n=nextOp(tk);
+    if(j!==n.j){bad(reason(j),ex);return}
+    focus=j;draw();
+    const A=tk[j-1].v,B=tk[j+1].v,op=tk[j].v;
+    const res=op==='+'?A+B:op==='-'?A-B:op==='×'?A*B:A/B;
+    ask.innerHTML='';
+    const inp=h('input',{class:'inp',inputmode:'none'});
+    const go=()=>{const v=parseNum(inp.value);if(isNaN(v)){say(FORM.empty,'think');return}
+      if(v!==res){bad(`Tính lại: ${A} ${SYM[op]} ${B} = ?`,ask);return}
+      tk.splice(j-1,3,{t:'n',v:res});simpPar(tk);opened++;G.prog&&G.prog(opened,total);focus=null;ask.innerHTML='';sOk();
+      hist.append(h('div',{},'= '+exprStr(tk)));
+      draw();
+      if(tk.length===1){say(`Mở hết khóa rồi! Kết quả là <b>${fmt(res)}</b> 💎`,'happy');G.hintFn=null;setTimeout(finish,600)}
+      else {praise();G.hintFn=hintNext}};
+    inp.addEventListener('keydown',ev=>{if(ev.key==='Enter')go()});
+    ask.append(h('div',{class:'inline',style:'justify-content:center;font-size:1.3rem'},h('span',{},`${fmt(A)} ${SYM[op]} ${fmt(B)} = `),inp,h('button',{class:'btn go',onclick:go},'Kiểm tra')));
+    G.hintFn=()=>`Tính ${A} ${SYM[op]} ${B}.`;
+    setTimeout(()=>inp.focus({preventScroll:true}),50);
+    say('Đúng phép tính cần làm trước rồi! Giờ tính kết quả nào.','happy');
+  }
+  function hintNext(){const n=nextOp(tk);const b=ex.querySelector(`[data-j="${n.j}"]`);if(b){b.classList.remove('flash');void b.offsetWidth;b.classList.add('flash')}
+    return 'Thứ tự: ① trong ngoặc trước ② nhân, chia ③ cộng, trừ — cùng loại thì trái sang phải. Phép tính nhấp nháy là phép cần làm!'}
+  G.hintFn=hintNext;
+  draw();
+  say('Nhìn kỹ biểu thức: có ngoặc không? có nhân chia không? Bấm vào phép tính phải làm trước tiên!');
+}
+
+/* ---- 3. Cộng trừ số đo nhiều đơn vị: "Máy đổi đơn vị" ---- */
+function gameUnits(area,{names,base,top,bot,op,done}){
+  const n=names.length,res=Array(n).fill(null),carry=Array(n).fill(0),nt=Array(n).fill(null);let fc=n-1;
+  const tbl=h('table',{class:'utable'});area.append(tbl);
+  function draw(){
+    tbl.innerHTML='';
+    const rc=h('tr');rc.append(h('td'));for(let i=0;i<n;i++)rc.append(h('td',{class:'carry'},op==='+'&&carry[i]?`+${carry[i]} nhớ`:''));tbl.append(rc);
+    const r1=h('tr');r1.append(h('td'));for(let i=0;i<n;i++){const td=h('td',{class:i===fc?'fc':''});
+      if(nt[i]!=null)td.innerHTML=`<span class="nt">${nt[i]}</span><s>${top[i]}</s> <span class="u">${names[i]}</span>`;
+      else td.innerHTML=`${top[i]} <span class="u">${names[i]}</span>`;r1.append(td)}tbl.append(r1);
+    const r2=h('tr');r2.append(h('td',{},op==='+'?'+':'−'));for(let i=0;i<n;i++)r2.append(h('td',{class:i===fc?'fc':'',html:bot[i]==null?'':`${bot[i]} <span class="u">${names[i]}</span>`}));tbl.append(r2);
+    const r3=h('tr',{class:'res'});r3.append(h('td'));for(let i=0;i<n;i++)r3.append(h('td',{html:res[i]==null?'?':`${res[i]} <span class="u">${names[i]}</span>`}));tbl.append(r3);
+  }
+  const B=i=>bot[i]||0;
+  const steps=[];
+  if(op==='+'){let c=0;
+    for(let i=n-1;i>=0;i--){const s=top[i]+B(i)+c;const cc=c;
+      const st={q:`Cột <b>${names[i]}</b>: ${top[i]} + ${B(i)}${cc?` + ${cc} (nhớ)`:''} = ?`,inputs:[{a:s,post:names[i]}],
+        hint:`Cộng các số ở cột ${names[i]}${cc?', đừng quên số nhớ '+cc:''}.`,onShow:()=>{fc=i;draw()}};
+      steps.push(st);
+      if(i>0&&s>=base[i]){const nc=Math.floor(s/base[i]),r=s%base[i];
+        steps.push({q:`${s} ${names[i]} ≥ ${base[i]} ${names[i]} nên phải đổi! (1 ${names[i-1]} = ${fmt(base[i])} ${names[i]})<br>${fmt(s)} ${names[i]} = ? ${names[i-1]} ? ${names[i]}`,
+          inputs:[{a:nc,post:names[i-1]},{a:r,post:names[i]}],hint:`${fmt(s)} − ${fmt(base[i])} = ${fmt(s-base[i])}. Vậy ${fmt(s)} ${names[i]} = 1 ${names[i-1]} ${fmt(s-base[i])} ${names[i]}.`,
+          ok:`Viết ${r} ${names[i]}, nhớ ${nc} ${names[i-1]} sang cột bên trái.`,onOk:()=>{res[i]=r;carry[i-1]=nc;draw()}});c=nc;
+      }else{st.onOk=()=>{res[i]=s;draw()};c=0}
+    }
+  }else{let bw=0;
+    for(let i=n-1;i>=0;i--){const t=top[i]-bw;
+      if(t<B(i)&&i>0){const t2=t+base[i];
+        steps.push({q:`Cột <b>${names[i]}</b>: ${t} &lt; ${B(i)} nên không trừ được! Mượn 1 ${names[i-1]} = ${fmt(base[i])} ${names[i]}.<br>${t} + ${fmt(base[i])} = ?`,
+          inputs:[{a:t2,post:names[i]}],hint:`Cộng thêm ${fmt(base[i])} vào ${t}.`,onShow:()=>{fc=i;draw()},
+          onOk:()=>{nt[i]=t2;nt[i-1]=top[i-1]-1;draw()}});
+        steps.push({q:`${fmt(t2)} − ${B(i)} = ?`,inputs:[{a:t2-B(i),post:names[i]}],hint:`Trừ như bình thường: ${fmt(t2)} − ${B(i)}.`,onOk:()=>{res[i]=t2-B(i);draw()}});bw=1;
+      }else{
+        steps.push({q:`Cột <b>${names[i]}</b>${bw?` (đã cho mượn 1 nên còn ${t})`:''}: ${t} − ${B(i)} = ?`,inputs:[{a:t-B(i),post:names[i]}],
+          hint:bw?`Cột này đã cho mượn 1, nên lấy ${t} (không phải ${top[i]}) trừ ${B(i)}.`:`Trừ ${t} − ${B(i)}.`,onShow:()=>{fc=i;draw()},onOk:()=>{res[i]=t-B(i);draw()}});bw=0;
+      }
+    }
+  }
+  draw();
+  say('Làm từ cột <b>đơn vị nhỏ nhất</b> (bên phải) sang trái. Nhớ đổi đơn vị khi cần nhé!');
+  quest(area,steps,()=>{fc=-1;draw();const s=res.map((v,i)=>`${v} ${names[i]}`).join(' ');say(`Kết quả: <b>${s}</b> 🎉`,'happy');if(done)done(res);else setTimeout(finish,500)});
+}
+
+/* ---- 4. Rút gọn phân số: "Ninja chém phân số" ---- */
+function gameSimplify(area,{n,d}){
+  let cn=n,cd=d;
+  const big=h('div',{class:'bigfrac',html:fr(0,cn,cd)});
+  const hist=h('div',{class:'hist center'});
+  const btns=h('div',{class:'ninja'});
+  [2,3,5,7,11,13,17].forEach(p=>btns.append(h('button',{class:'nb',onclick:()=>cut(p)},`🗡️ : ${p}`)));
+  const doneB=h('button',{class:'btn pri',onclick:()=>{if(gcd(cn,cd)===1){G.hintFn=null;say(`Phân số ${fr(0,cn,cd)} đã tối giản! Vậy ${fr(0,n,d)} = ${fr(0,cn,cd)}.`,'happy');btns.querySelectorAll('button').forEach(b=>b.disabled=true);doneB.disabled=true;setTimeout(finish,500)}
+    else bad(`Chưa đâu! ${cn} và ${cd} vẫn cùng chia hết cho một số nữa.`,big)}},'✋ Tối giản rồi!');
+  area.append(h('div',{class:'center small'},'Chọn thanh kiếm để chia CẢ tử số và mẫu số cho cùng một số. Chém đến khi không chia được nữa!'),big,btns,h('div',{class:'center',style:'margin-top:10px'},doneB),hist);
+  function cut(p){
+    if(cn%p===0&&cd%p===0){hist.append(h('div',{html:`${fr(0,cn,cd)} = ${fr(0,cn+' : '+p,cd+' : '+p)} = ${fr(0,cn/p,cd/p)}`}));
+      cn/=p;cd/=p;big.innerHTML=fr(0,cn,cd);big.classList.remove('slash');void big.offsetWidth;big.classList.add('slash');sOk();praise('Xoẹt!')}
+    else bad(`${cn%p?cn:cd} không chia hết cho ${p}. Thử số khác nhé!`,big);
+  }
+  G.hintFn=()=>{for(const p of [2,3,5,7,11,13,17])if(cn%p===0&&cd%p===0)return `Cả ${cn} và ${cd} đều chia hết cho <b>${p}</b>. (Mẹo: số chẵn chia hết cho 2; tổng các chữ số chia hết cho 3 thì số đó chia hết cho 3.)`;
+    return 'Không còn số nào chia hết cả tử và mẫu (trừ 1) → bấm "Tối giản rồi!".'};
+  say(`Rút gọn ${fr(0,n,d)}. Tìm số mà cả ${n} và ${d} đều chia hết nhé!`);
+}
+
+/* ---- hình vẽ hỗ trợ ---- */
+function pie(k,d,sz=58,col='#f97316'){
+  let s=`<svg width="${sz}" height="${sz}" viewBox="-1.1 -1.1 2.2 2.2">`;
+  for(let i=0;i<d;i++){const a0=-Math.PI/2+i*2*Math.PI/d,a1=a0+2*Math.PI/d;
+    s+=`<path d="M0 0 L${Math.cos(a0).toFixed(3)} ${Math.sin(a0).toFixed(3)} A1 1 0 0 1 ${Math.cos(a1).toFixed(3)} ${Math.sin(a1).toFixed(3)} Z" fill="${i<k?col:'#fff7ed'}" stroke="#7c2d12" stroke-width="0.04"/>`}
+  return s+'</svg>';
+}
+function pies(w,n,d,col){let s='';for(let i=0;i<w;i++)s+=pie(d,d,46,col);if(n)s+=pie(n,d,46,col);return `<span style="display:inline-flex;gap:3px;flex-wrap:wrap;vertical-align:middle">${s}</span>`}
+function crossFig(qd,sz=72){const c=sz/2,L=sz*.4,sx=qd[1]==='L'?-1:1,sy=qd[0]==='U'?-1:1;
+  return `<svg viewBox="0 0 ${sz} ${sz}" width="${sz}" height="${sz}"><g stroke="#1e293b" stroke-width="3" fill="none" stroke-linecap="round"><line x1="${c-L}" y1="${c}" x2="${c+L}" y2="${c}"/><line x1="${c}" y1="${c-L}" x2="${c}" y2="${c+L}"/><line x1="${c+sx*L}" y1="${c}" x2="${c}" y2="${c+sy*L}"/></g></svg>`}
+function dotsFig(n,s=22){const m=n+1,W=n*s+12;let t=`<svg width="${W}" height="${W}" viewBox="-6 -6 ${W} ${W}">`;
+  for(let i=0;i<m;i++){t+=`<line x1="0" y1="${i*s}" x2="${n*s}" y2="${i*s}" stroke="#94a3b8" stroke-dasharray="3 3"/><line x1="${i*s}" y1="0" x2="${i*s}" y2="${n*s}" stroke="#94a3b8" stroke-dasharray="3 3"/>`}
+  for(let i=0;i<m;i++)for(let j=0;j<m;j++)t+=`<circle cx="${j*s}" cy="${i*s}" r="3.6" fill="#1e293b"/>`;return t+'</svg>'}
+
+/* ================= 50 câu hỏi ================= */
+const SECS=[
+ {e:'🍬',t:'Chia kẹo — Phép chia',s:'Đặt tính rồi tính, đoán từng chữ số của thương'},
+ {e:'🔐',t:'Mở khóa rương — Biểu thức',s:'Tìm phép tính phải làm trước'},
+ {e:'⚖️',t:'Máy đổi đơn vị',s:'Cộng, trừ số đo có nhiều đơn vị'},
+ {e:'🍕',t:'Vương quốc Phân số',s:'Rút gọn, cộng, trừ, nhân, chia phân số – hỗn số'},
+ {e:'📐',t:'Xưởng hình học',s:'Diện tích hình thang, hình ghép'},
+ {e:'📖',t:'Thám tử toán đố',s:'Bài toán có lời văn'},
+ {e:'🧠',t:'Đấu trường tư duy',s:'Quy luật, đếm, hình học không gian'},
+];
+const D=(a,b)=>({sec:0,pts:1.5,vi:`Đặt tính rồi tính: <b>${fmt(a)} : ${b}</b>`,en:`Calculate. ${b})${a}`,play:ar=>gameDiv(ar,{a,b})});
+const E=e=>({sec:1,pts:1.5,vi:`Tính giá trị biểu thức: <b>${exprStr(tokenize(e))}</b>`,en:`Calculate. ${e}`,play:ar=>gameExpr(ar,{e})});
+const S=(n,d)=>({sec:3,pts:1.5,vi:`Rút gọn phân số về tối giản: ${fr(0,n,d)}`,en:`Simplify the fraction to its lowest terms: ${n}/${d}`,play:ar=>gameSimplify(ar,{n,d})});
+const pieVis=(ar,html)=>ar.append(h('div',{class:'visual',html}));
+
+const QS=[
+ D(83,6),D(97,8),D(845,52),D(2807,37),D(7789,29),D(2468,213),
+ E('(25-15)÷2+3×7'),E('75-(8+(60-40)÷5)×5'),E('((12+8)×5-10)÷9'),E('63+72÷(4+5)-71'),
+ E('8×(12-(27+3)÷3)+14'),E('100-15×6+49÷7'),E('45-91÷((11-2)×4-23)'),E('(73-37)÷3+(26-(9+7)-5)×2'),
+ {sec:2,pts:1.5,vi:'Tính: <b>11 km 20 m + 900 m</b>',en:'11 km 20 m + 900 m',play:ar=>gameUnits(ar,{names:['km','m'],base:[null,1000],top:[11,20],bot:[null,900],op:'+'})},
+ {sec:2,pts:1.5,vi:'Tính: <b>15 kg 700 g + 4 kg 500 g</b>',en:'15 kg 700 g + 4 kg 500 g',play:ar=>gameUnits(ar,{names:['kg','g'],base:[null,1000],top:[15,700],bot:[4,500],op:'+'})},
+ {sec:2,pts:1.5,vi:'Tính: <b>4 l 373 ml − 2 l 620 ml</b>',en:'4 L 373 mL − 2 L 620 mL',play:ar=>gameUnits(ar,{names:['l','ml'],base:[null,1000],top:[4,373],bot:[2,620],op:'-'})},
+ {sec:2,pts:1.5,vi:'Tính: <b>2 giờ 27 phút 33 giây + 4 giờ 53 phút 37 giây</b>',en:'2 hr 27 min 33 sec + 4 hr 53 min 37 sec',play:ar=>gameUnits(ar,{names:['giờ','phút','giây'],base:[null,60,60],top:[2,27,33],bot:[4,53,37],op:'+'})},
+ {sec:2,pts:1.5,vi:'Tính: <b>6 giờ 36 phút 42 giây − 4 giờ 54 phút 59 giây</b>',en:'6 hr 36 min 42 sec − 4 hr 54 min 59 sec',play:ar=>gameUnits(ar,{names:['giờ','phút','giây'],base:[null,60,60],top:[6,36,42],bot:[4,54,59],op:'-'})},
+ S(40,48),S(28,49),S(34,51),
+ // 23
+ {sec:3,pts:1.5,vi:'Tính (rút gọn tối giản): {4 6/7} + {2 4/7}',en:'Calculate. Simplify to the lowest terms. 4 6/7 + 2 4/7',play:ar=>{
+   pieVis(ar,pies(4,6,7)+' <b style="font-size:2rem">+</b> '+pies(2,4,7,'#22c55e'));
+   quest(ar,[
+    {q:'Cộng phần nguyên: 4 + 2 = ?',inputs:[{a:6}],hint:'Phần nguyên là số to đứng trước phân số.'},
+    {q:'Cộng phần phân số: {6/7} + {4/7} = ?',inputs:[{t:'fnum',den:7,a:10}],hint:'Hai phân số cùng mẫu: giữ nguyên mẫu số 7, cộng hai tử số.',ok:'Cùng mẫu số → cộng tử số: 6 + 4 = 10.'},
+    {q:'{10/7} lớn hơn 1 (10 miếng, mỗi bánh chỉ có 7 miếng). Đổi ra hỗn số: {10/7} = ?',inputs:[{t:'frac',whole:true,form:'final',a:'1 3/7'}],hint:'10 : 7 = 1 dư 3 → 1 cái bánh nguyên và 3/7.'},
+    {q:'Gộp lại: 6 + {1 3/7} = ?',inputs:[{t:'frac',whole:true,form:'final',a:'7 3/7'}],hint:'6 + 1 = 7, giữ nguyên 3/7.',ok:'{4 6/7} + {2 4/7} = {7 3/7}'}]);}},
+ // 24
+ {sec:3,pts:1.5,vi:'Tính (rút gọn tối giản): {7 1/9} − {5 8/9}',en:'7 1/9 − 5 8/9',play:ar=>{
+   pieVis(ar,pies(7,1,9));
+   quest(ar,[
+    {q:'Phần phân số: có trừ được {1/9} − {8/9} không?',choices:['Được','Không được, vì {1/9} &lt; {8/9} → phải mượn 1 từ phần nguyên'],ans:1,why:{0:'1 miếng thì không lấy ra 8 miếng được đâu!'},hint:'So sánh tử số 1 và 8.'},
+    {q:'Mượn 1 = {9/9}: {7 1/9} = 6 + {9/9} + {1/9}. Vậy {7 1/9} = 6 và mấy phần 9?',inputs:[{pre:'6',t:'fnum',den:9,a:10}],hint:'9/9 + 1/9 = 10/9'},
+    {q:'{10/9} − {8/9} = ?',inputs:[{t:'fnum',den:9,a:2}],hint:'Cùng mẫu: 10 − 8.'},
+    {q:'Phần nguyên: 6 − 5 = ?',inputs:[{a:1}]},
+    {q:'Kết quả {7 1/9} − {5 8/9} = ?',inputs:[{t:'frac',whole:true,form:'final',a:'1 2/9'}],hint:'Ghép phần nguyên 1 và phân số 2/9.'}]);}},
+ // 25
+ {sec:3,pts:1.5,vi:'Tính (rút gọn tối giản): {2 7/12} + {7 8/15}',en:'2 7/12 + 7 8/15',play:ar=>quest(ar,[
+    {q:'Hai mẫu số 12 và 15 khác nhau. Mẫu số chung nhỏ nhất (MSC) của 12 và 15 là?',inputs:[{a:60}],hint:'Đếm bội của 15: 15, 30, 45, 60… Số nào chia hết cho 12?'},
+    {q:'Quy đồng: {7/12} = ?',inputs:[{t:'fnum',den:60,a:35}],hint:'60 : 12 = 5 → nhân cả tử và mẫu với 5.'},
+    {q:'Quy đồng: {8/15} = ?',inputs:[{t:'fnum',den:60,a:32}],hint:'60 : 15 = 4 → nhân cả tử và mẫu với 4.'},
+    {q:'Cộng phần nguyên: 2 + 7 = ?',inputs:[{a:9}]},
+    {q:'{35/60} + {32/60} = ?',inputs:[{t:'fnum',den:60,a:67}]},
+    {q:'{67/60} lớn hơn 1, đổi ra hỗn số:',inputs:[{t:'frac',whole:true,form:'final',a:'1 7/60'}],hint:'67 : 60 = 1 dư 7.'},
+    {q:'Kết quả: 9 + {1 7/60} = ?',inputs:[{t:'frac',whole:true,form:'final',a:'10 7/60'}]}])},
+ // 26
+ {sec:3,pts:1.5,vi:'Tính (rút gọn tối giản): {4 1/4} − {2 9/14}',en:'4 1/4 − 2 9/14',play:ar=>quest(ar,[
+    {q:'MSC của 4 và 14 là?',inputs:[{a:28}],hint:'Bội của 14: 14, 28… số nào chia hết cho 4?'},
+    {q:'{1/4} = ?',inputs:[{t:'fnum',den:28,a:7}],hint:'28 : 4 = 7'},
+    {q:'{9/14} = ?',inputs:[{t:'fnum',den:28,a:18}],hint:'28 : 14 = 2'},
+    {q:'Bây giờ là {4 7/28} − {2 18/28}. Vì {7/28} &lt; {18/28}, ta làm gì?',choices:['Mượn 1 từ phần nguyên: {4 7/28} = {3 35/28}','Lấy 18 − 7 cho dễ','Bỏ qua phần phân số'],ans:0,why:{1:'Không được đổi chỗ số bị trừ và số trừ đâu!',2:'Phân số cũng quan trọng mà!'}},
+    {q:'{35/28} − {18/28} = ?',inputs:[{t:'fnum',den:28,a:17}]},
+    {q:'Phần nguyên: 3 − 2 = ?',inputs:[{a:1}]},
+    {q:'Kết quả:',inputs:[{t:'frac',whole:true,form:'final',a:'1 17/28'}],hint:'Ghép 1 và 17/28 (17 và 28 không cùng chia hết cho số nào).'}])},
+ // 27
+ {sec:3,pts:1.5,vi:'Tính (rút gọn tối giản): {6 1/4} × {1/3} × 0,2',en:'6 1/4 × 1/3 × 0.2',play:ar=>quest(ar,[
+    {q:'Đổi hỗn số ra phân số: {6 1/4} = ?',inputs:[{t:'frac',form:'imp',a:'25/4'}],hint:'Tử số = 6 × 4 + 1 = 25, giữ mẫu số 4.'},
+    {q:'Đổi số thập phân ra phân số tối giản: 0,2 = ?',inputs:[{t:'frac',form:'final',a:'1/5'}],hint:'0,2 = {2/10}, rút gọn cho 2.'},
+    {q:'{25/4} × {1/3} × {1/5} = ? (tối giản)',inputs:[{t:'frac',form:'final',a:'5/12'}],hint:'Tử nhân tử: 25 × 1 × 1; mẫu nhân mẫu: 4 × 3 × 5 = 60. Được {25/60}, rút gọn cho 5.'}])},
+ // 28
+ {sec:3,pts:1.5,vi:'Tính (rút gọn tối giản): {2 10/27} : {8 1/3}',en:'2 10/27 ÷ 8 1/3',play:ar=>quest(ar,[
+    {q:'{2 10/27} = ? (phân số)',inputs:[{t:'frac',form:'imp',a:'64/27'}],hint:'2 × 27 + 10 = 64'},
+    {q:'{8 1/3} = ? (phân số)',inputs:[{t:'frac',form:'imp',a:'25/3'}],hint:'8 × 3 + 1 = 25'},
+    {q:'Chia cho một phân số thì ta…',choices:['Nhân với phân số đảo ngược: {3/25}','Nhân với chính nó: {25/3}','Cộng với {3/25}'],ans:0},
+    {q:'{64/27} × {3/25} = ? (tối giản)',inputs:[{t:'frac',form:'final',a:'64/225'}],hint:'Rút gọn 3 và 27 trước (chia cả hai cho 3): còn {64/9} × {1/25} = {64/225}.'}])},
+ // 29
+ {sec:4,pts:1.5,vi:'Tính diện tích hình thang (đáy bé 6 cm, đáy lớn 8 cm, chiều cao 4 cm).',en:'Find the area of trapezoid.',play:ar=>{
+   const s=28,svg=h('div',{class:'visual',html:`<svg width="${14*s+60}" height="${4*s+50}" viewBox="-30 -25 ${14*s+60} ${4*s+50}">
+     <polygon points="0,0 ${6*s},0 ${8*s},${4*s} 0,${4*s}" fill="#fde68a" stroke="#92400e" stroke-width="2"/>
+     <polygon id="cp" points="${6*s},0 ${14*s},0 ${14*s},${4*s} ${8*s},${4*s}" fill="#bfdbfe" stroke="#1e40af" stroke-width="2" style="opacity:0;transition:opacity 1s"/>
+     <text x="${3*s}" y="-6" text-anchor="middle" font-size="14">6 cm</text><text x="${4*s}" y="${4*s+18}" text-anchor="middle" font-size="14">8 cm</text>
+     <text x="-6" y="${2*s+5}" text-anchor="end" font-size="14">4 cm</text>
+     <text id="cpt" x="${10*s}" y="${2*s+5}" text-anchor="middle" font-size="13" style="opacity:0;transition:opacity 1s">hình thang thứ 2</text></svg>`});
+   ar.append(svg);
+   quest(ar,[
+    {q:'Công thức tính diện tích hình thang là?',choices:['(đáy lớn + đáy bé) × chiều cao : 2','đáy lớn × đáy bé : 2','(đáy lớn + đáy bé) × 2'],ans:0,
+     ok:'Ghép 2 hình thang giống nhau được 1 hình chữ nhật dài (8 + 6) cm, rộng 4 cm. Hình thang là một nửa!',onOk:()=>{svg.querySelector('#cp').style.opacity=1;svg.querySelector('#cpt').style.opacity=1}},
+    {q:'Đáy lớn + đáy bé = 8 + 6 = ?',inputs:[{a:14,post:'cm'}]},
+    {q:'Nhân chiều cao: 14 × 4 = ?',inputs:[{a:56,post:'cm²'}],ok:'Đây là diện tích hình chữ nhật ghép.'},
+    {q:'Chia 2: 56 : 2 = ? → diện tích hình thang',inputs:[{a:28,post:'cm²'}]}]);}},
+ // 30
+ {sec:4,pts:1.5,vi:'Tính diện tích phần tô màu (hình mũi tên).',en:'Find the area of shaded section.',play:ar=>{
+   const s=16,svg=h('div',{class:'visual',html:`<svg width="${18*s+70}" height="${18*s+30}" viewBox="-40 ${-4*s-15} ${18*s+70} ${18*s+30}">
+     <rect id="r1" x="0" y="0" width="${12*s}" height="${10*s}" fill="#fef9c3" stroke="#a16207" stroke-width="2"/>
+     <polygon id="t1" points="${12*s},${-4*s} ${18*s},${5*s} ${12*s},${14*s}" fill="#fef9c3" stroke="#a16207" stroke-width="2"/>
+     <line x1="0" y1="${5*s}" x2="${18*s}" y2="${5*s}" stroke="#64748b" stroke-dasharray="4 3"/>
+     <text x="${6*s}" y="-6" text-anchor="middle" font-size="13">12 cm</text><text x="-6" y="${5*s+5}" text-anchor="end" font-size="13">10 cm</text>
+     <text x="${9*s}" y="${5*s-5}" text-anchor="middle" font-size="13">18 cm</text>
+     <text x="${12*s-4}" y="${-2*s}" text-anchor="end" font-size="13">4 cm</text><text x="${12*s-4}" y="${12*s+4}" text-anchor="end" font-size="13">4 cm</text></svg>`});
+   ar.append(svg);const R=()=>svg.querySelector('#r1'),Tr=()=>svg.querySelector('#t1');
+   const hl=(r,t)=>{R().setAttribute('fill',r?'#fde047':'#fef9c3');Tr().setAttribute('fill',t?'#86efac':'#fef9c3')};
+   quest(ar,[
+    {q:'Hình mũi tên được ghép từ những hình nào?',choices:['Hình chữ nhật + hình tam giác','Hai hình vuông','Hình thang + hình tròn'],ans:0,onOk:()=>hl(1,1)},
+    {q:'Diện tích hình chữ nhật (màu vàng): 12 × 10 = ?',inputs:[{a:120,post:'cm²'}],onShow:()=>hl(1,0)},
+    {q:'Đáy tam giác (cạnh thẳng đứng bên trái của tam giác): 4 + 10 + 4 = ?',inputs:[{a:18,post:'cm'}],onShow:()=>hl(0,1)},
+    {q:'Chiều cao tam giác: từ mép trái đến mũi tên dài 18 cm, hình chữ nhật dài 12 cm. Chiều cao = 18 − 12 = ?',inputs:[{a:6,post:'cm'}],hint:'Chiều cao tam giác là phần từ cạnh phải hình chữ nhật đến đỉnh mũi tên.'},
+    {q:'Diện tích tam giác: 18 × 6 : 2 = ?',inputs:[{a:54,post:'cm²'}],hint:'Diện tích tam giác = đáy × chiều cao : 2'},
+    {q:'Diện tích phần tô màu: 120 + 54 = ?',inputs:[{a:174,post:'cm²'}],onShow:()=>hl(1,1)}]);}},
+ // 31
+ {sec:5,pts:2,vi:'Bảy tá bút chì được chia đều cho 5 người. Mỗi người nhận được nhiều nhất bao nhiêu bút chì và còn thừa bao nhiêu bút chì?',en:'Seven dozen pencils need to be equally divided among 5 people. How many pencils will each person get maximally and how many will be left?',play:ar=>{
+   const vis=h('div',{class:'visual',html:'✏️'.repeat(12)+' × 7 tá'});ar.append(vis);
+   quest(ar,[
+    {q:'1 tá = ? cái',inputs:[{a:12}],hint:'Giống "1 tá trứng" – 1 tá là 12.'},
+    {q:'7 tá = 7 × 12 = ? bút chì',inputs:[{a:84}]},
+    {q:'Chia đều 84 bút cho 5 người: 84 : 5 = ? dư ?',inputs:[{a:16,post:'bút/người,'},{a:4,pre:'thừa',post:'bút'}],hint:'5 × 16 = 80; 84 − 80 = 4.',
+     onOk:()=>{vis.innerHTML=Array.from({length:5},(_,i)=>`<div class="card" style="padding:6px;margin:0">🧒 ${16} ✏️</div>`).join('')+'<div class="card" style="padding:6px;margin:0">Thừa: ✏️✏️✏️✏️</div>'}}]);}},
+ // 32
+ {sec:5,pts:2,vi:'Tất cả 5 428 học sinh ở trường của Margaret đi tham quan. Mỗi xe buýt chở được 40 học sinh. Cần bao nhiêu xe buýt?',en:"All 5,428 students in Margaret's school are going on a trip. If 40 students can ride on each bus, how many buses are needed for the trip?",play:ar=>{
+   ar.append(h('div',{class:'visual',html:'🚌🚌🚌🚌🚌 … 🧒🧒🧒'}));
+   quest(ar,[
+    {q:'5 428 : 40 = ? dư ?',inputs:[{a:135},{a:28,pre:'dư'}],hint:'40 × 100 = 4 000; 40 × 135 = 5 400; 5 428 − 5 400 = 28.'},
+    {q:'135 xe đã đầy, còn 28 học sinh. Phải làm sao?',choices:['Để 28 bạn ở nhà','Cần thêm 1 xe nữa cho 28 bạn','Nhét 28 bạn vào các xe đã đầy'],ans:1,why:{0:'Ai cũng được đi chơi chứ! 😢',2:'Mỗi xe chỉ chở tối đa 40 bạn thôi, không an toàn!'}},
+    {q:'Số xe buýt cần: 135 + 1 = ?',inputs:[{a:136,post:'xe'}]}]);}},
+ // 33
+ {sec:5,pts:2,vi:'Silvia có 15 viên bi đỏ và 5 viên bi xanh. Số bi của Sally ít hơn 3 lần số bi của Silvia là 5 viên. Hỏi Sally có bao nhiêu viên bi?',en:'Silvia has 15 red marbles and 5 blue marbles. Sally has 5 less than 3 times the number of marbles Silvia has. How many marbles does Sally have?',play:ar=>{
+   ar.append(h('div',{class:'visual',html:'🔴'.repeat(15)+' '+'🔵'.repeat(5)}));
+   quest(ar,[
+    {q:'Silvia có tất cả: 15 + 5 = ?',inputs:[{a:20,post:'viên'}]},
+    {q:'Gấp 3 lần số bi của Silvia: 3 × 20 = ?',inputs:[{a:60,post:'viên'}]},
+    {q:'Ít hơn 5 viên: 60 − 5 = ?',inputs:[{a:55,post:'viên'}],hint:'"Ít hơn 5" nghĩa là trừ đi 5.'}]);}},
+ // 34
+ {sec:5,pts:2,vi:'Peter mang 10 đô-la đi mua 1 hộp bút màu giá 3 đô-la và 3 con rô-bốt (giá 40 đô-la cho 5 con), nhưng không đủ tiền. Peter cần thêm bao nhiêu tiền?',en:'Peter took $10 to get a $3 pack of pencil crayons, and 3 robots that cost $40 for 5, but he did not have enough money. How much more money does Peter need?',play:ar=>{
+   ar.append(h('div',{class:'visual',html:'🖍️ $3 &nbsp; 🤖🤖🤖🤖🤖 = $40 &nbsp; 👛 $10'}));
+   quest(ar,[
+    {q:'Giá 1 con rô-bốt: 40 : 5 = ?',inputs:[{a:8,post:'đô-la'}]},
+    {q:'3 con rô-bốt: 3 × 8 = ?',inputs:[{a:24,post:'đô-la'}]},
+    {q:'Tổng tiền cần (cả bút màu): 24 + 3 = ?',inputs:[{a:27,post:'đô-la'}]},
+    {q:'Peter có 10 đô-la, cần thêm: 27 − 10 = ?',inputs:[{a:17,post:'đô-la'}]}]);}},
+ // 35
+ {sec:5,pts:2,vi:'Jamie làm tình nguyện ở Trung tâm Người cao tuổi. Bạn ấy rời nhà lúc 8 giờ 25 phút 10 giây sáng, đi mất 1 giờ 30 phút 45 giây. Hỏi Jamie đến Trung tâm lúc mấy giờ?',en:'Jamie left his house at 8:25:10 A.M., and his trip took 1 hour 30 minutes and 45 seconds. What time did Jamie get to the Senior Citizen Center?',play:ar=>{
+   say('Thời điểm đến = thời điểm đi + thời gian đi đường.');
+   gameUnits(ar,{names:['giờ','phút','giây'],base:[null,60,60],top:[8,25,10],bot:[1,30,45],op:'+',done:r=>{say(`Jamie đến lúc <b>${r[0]} : ${r[1]} : ${r[2]}</b> sáng 🕘`,'happy');setTimeout(finish,500)}});}},
+ // 36
+ {sec:5,pts:2,vi:'Jenny và Shirley thi nhảy xa. Jenny nhảy được {2 1/9} m, Shirley nhảy được {1 8/9} m. Jenny nhảy xa hơn Shirley bao nhiêu mét?',en:'Jenny jumped 2 1/9 m, and Shirley jumped 1 8/9 m. How much farther did Jenny jump than Shirley?',play:ar=>quest(ar,[
+    {q:'Muốn biết xa hơn bao nhiêu, ta làm phép tính:',choices:['{2 1/9} − {1 8/9}','{2 1/9} + {1 8/9}'],ans:0},
+    {q:'{1/9} &lt; {8/9} nên mượn 1: {2 1/9} = 1 và mấy phần 9?',inputs:[{pre:'1',t:'fnum',den:9,a:10}],hint:'{9/9} + {1/9} = {10/9}'},
+    {q:'{1 10/9} − {1 8/9} = ? (mét)',inputs:[{t:'frac',form:'final',a:'2/9',post:'m'}],hint:'1 − 1 = 0; {10/9} − {8/9} = {2/9}'}])},
+ // 37
+ {sec:5,pts:2,vi:'Fred hái được {2 1/5} kg ngô, Lori hái được {1 1/5} kg. Họ biếu hàng xóm {1 4/5} kg. Hỏi còn lại bao nhiêu ki-lô-gam ngô?',en:'Fred picked 2 1/5 kg and Lori picked 1 1/5 kg. They gave 1 4/5 kg to a neighbor. How many kilograms of corn are left?',play:ar=>{
+   ar.append(h('div',{class:'visual',html:'🌽'.repeat(6)}));
+   quest(ar,[
+    {q:'Cả hai hái được: {2 1/5} + {1 1/5} = ?',inputs:[{t:'frac',whole:true,form:'final',a:'3 2/5',post:'kg'}]},
+    {q:'Còn lại: {3 2/5} − {1 4/5}. Vì {2/5} &lt; {4/5} nên mượn 1: {3 2/5} = 2 và mấy phần 5?',inputs:[{pre:'2',t:'fnum',den:5,a:7}],hint:'{5/5} + {2/5} = {7/5}'},
+    {q:'{2 7/5} − {1 4/5} = ?',inputs:[{t:'frac',whole:true,form:'final',a:'1 3/5',post:'kg'}],hint:'2 − 1 = 1; {7/5} − {4/5} = {3/5}'}]);}},
+ // 38
+ {sec:5,pts:2,vi:'Có 153,8 l xăng. Nếu đã dùng 62,78 l trong 2 ngày thì còn lại bao nhiêu lít xăng?',en:'We have 153.8 L of gasoline. If 62.78 L were used in 2 days, how much gasoline is left?',play:ar=>{
+   ar.append(h('div',{class:'visual',html:'⛽ 153,8 l'}));
+   quest(ar,[
+    {q:'Thông tin "trong 2 ngày" có cần dùng để tính không?',choices:['Có, phải chia cho 2','Không, chỉ cần lấy số xăng ban đầu trừ số đã dùng'],ans:1,why:{0:'Đề hỏi số xăng còn lại, không hỏi mỗi ngày dùng bao nhiêu.'},ok:'Đây là thông tin "gây nhiễu" – thám tử giỏi phải nhận ra!'},
+    {q:'Đặt tính thẳng hàng dấu phẩy (viết thêm 0: 153,8 = 153,80):<br><code>153,80 − 62,78 = ?</code>',inputs:[{a:91.02,post:'l'}],hint:'Trừ như số tự nhiên: 15380 − 6278 = 9102, rồi đặt dấu phẩy cách 2 chữ số từ phải sang.'}]);}},
+ // 39
+ {sec:5,pts:2,vi:'Mẹ của Monica dùng 2 kg dâu làm được {4/15} l nước dâu, và dùng 3 kg nho làm được {7/20} l nước nho. Hỏi mẹ làm được tất cả bao nhiêu lít nước ép?',en:"Monica's mother used 2 kg of strawberries to make 4/15 L of strawberry juice, and 3 kg of grapes to make 7/20 L of grape juice. How many L of juice did she make in total?",play:ar=>{
+   ar.append(h('div',{class:'visual',html:'🍓🧃 + 🍇🧃'}));
+   quest(ar,[
+    {q:'Số ki-lô-gam dâu, nho có cần dùng không?',choices:['Không – chỉ cần cộng số lít nước ép','Có – phải cộng 2 kg + 3 kg'],ans:0,why:{1:'Đề hỏi số LÍT nước ép, kg là thông tin gây nhiễu.'}},
+    {q:'MSC của 15 và 20 = ?',inputs:[{a:60}],hint:'Bội của 20: 20, 40, 60… số nào chia hết cho 15?'},
+    {q:'{4/15} = ?',inputs:[{t:'fnum',den:60,a:16}],hint:'60 : 15 = 4'},
+    {q:'{7/20} = ?',inputs:[{t:'fnum',den:60,a:21}],hint:'60 : 20 = 3'},
+    {q:'Tổng: {16/60} + {21/60} = ?',inputs:[{t:'frac',form:'final',a:'37/60',post:'l'}]}]);}},
+ // 40
+ {sec:5,pts:2,vi:'Charlie nặng 40 kg. Bố của Charlie nặng gấp {1 4/5} lần Charlie. Hỏi bố của Charlie nặng bao nhiêu ki-lô-gam?',en:"Charlie weighs 40 kg. Charlie's father weighs 1 4/5 times more than Charlie. How much does Charlie's father weigh?",play:ar=>{
+   ar.append(h('div',{class:'visual',html:'👦 40 kg &nbsp;&nbsp; 👨 ? kg'}));
+   quest(ar,[
+    {q:'"Nặng gấp {1 4/5} lần" nghĩa là ta làm phép tính:',choices:['40 × {1 4/5}','40 + {1 4/5}','40 : {1 4/5}'],ans:0},
+    {q:'{1 4/5} = ? (phân số)',inputs:[{t:'frac',form:'imp',a:'9/5'}],hint:'1 × 5 + 4 = 9'},
+    {q:'40 × {9/5} = ?',inputs:[{a:72,post:'kg'}],hint:'40 : 5 = 8, rồi 8 × 9.'}]);}},
+ // 41
+ {sec:6,pts:2.3,vi:'Vẽ hình đúng vào ô trống để hoàn thành quy luật.',en:'Draw the correct object in □ to complete the pattern.',play:ar=>{
+   const box=h('span',{style:'display:inline-flex;width:76px;height:76px;border:3px dashed #a78bfa;border-radius:8px;align-items:center;justify-content:center;font-size:2rem;color:#a78bfa'},'?');
+   ar.append(h('div',{class:'visual'},h('span',{html:crossFig('UL')}),h('span',{html:crossFig('LL')}),h('span',{style:'border-left:3px solid #94a3b8;height:90px;margin:0 6px',title:'trục lật'}),box,h('span',{html:crossFig('UR')})));
+   ar.append(h('div',{class:'center small'},'Đường thẳng đứng màu xám là trục (gương) – có ký hiệu lật qua trục đứng.'));
+   quest(ar,[
+    {q:'Hình 2 có được từ hình 1 bằng cách nào?',choices:['Lật từ trên xuống dưới','Lật từ trái sang phải','Không thay đổi'],ans:0,hint:'Hình tam giác của hình 1 ở góc trên-trái, hình 2 ở góc dưới-trái.'},
+    {q:'Bên phải trục là "ảnh trong gương" của bên trái. Hình cuối là gương của hình 1. Vậy ô trống là gương của hình 2. Chọn hình đúng:',
+     choices:[crossFig('UL',60),crossFig('LR',60),crossFig('UR',60),crossFig('LL',60)],ans:1,hint:'Hình 2 có tam giác ở góc dưới-TRÁI. Soi gương qua trục đứng thì trái ↔ phải.',
+     why:{0:'Đây là hình 1 rồi.',2:'Đây là hình cuối cùng.',3:'Đây là hình 2 – chưa lật qua gương.'},
+     onOk:()=>{box.innerHTML=crossFig('LR',70);box.style.borderStyle='solid'},ok:'Kiểm tra: ô trống lật trên–dưới thì ra hình cuối, đúng quy luật xen kẽ!'}]);}},
+ // 42
+ {sec:6,pts:2.3,vi:'Vẽ hình lật của hình đã cho (lật qua trục nằm ngang).',en:'Draw a reflection of the figure.',play:ar=>{
+   const orig=new Set([0,1,5,9,10,15]),target=new Set([3,5,6,9,12,13]),mine=new Set();
+   const mk=(clickable)=>{const g=h('div',{class:'grid',style:'grid-template-columns:repeat(4,auto)'});
+     for(let i=0;i<16;i++){const c=h('button',{class:'cell'+(!clickable&&orig.has(i)?' on':''),'aria-label':'ô '+(i+1)});
+       if(clickable)c.onclick=()=>{mine.has(i)?mine.delete(i):mine.add(i);c.classList.toggle('on');c.classList.remove('bad')};else c.disabled=true;g.append(c)}return g};
+   const g1=mk(false),g2=mk(true);g1.classList.add('flipx');
+   ar.append(h('div',{class:'visual'},g1,h('div',{class:'center',html:'<div style="font-size:2rem">⬍</div><div class="small">lật qua<br>trục ngang</div>'}),g2));
+   let hi=0;
+   G.hintFn=()=>{const r=hi++%4;const src=3-r;const cols=[0,1,2,3].filter(c=>orig.has(src*4+c)).map(c=>c+1);
+     return `Hàng ${r+1} (từ trên xuống) của hình mới = hàng ${src+1} của hình cũ → tô ô thứ ${cols.join(' và ')}.`};
+   const chk=h('button',{class:'btn pri',onclick:()=>{
+     let wrong=0;g2.querySelectorAll('.cell').forEach((c,i)=>{const ok=mine.has(i)===target.has(i);if(!ok){wrong++;c.classList.add('bad')}});
+     if(wrong){bad(`Còn ${wrong} ô chưa đúng (viền đỏ). Nhớ: lật ngang thì hàng trên cùng ↔ hàng dưới cùng.`,g2)}
+     else{chk.disabled=true;g2.querySelectorAll('.cell').forEach(c=>c.disabled=true);g1.style.transform='rotateX(180deg)';sOk();say('Hoàn hảo! Xem hình bên trái lật xuống giống hệt hình của bạn 🪞','happy');G.hintFn=null;setTimeout(finish,1300)}}},'Kiểm tra hình');
+   ar.append(h('div',{class:'center'},chk));
+   say('Bấm vào các ô bên phải để tô màu hình lật. Lật qua trục ngang: trên ↔ dưới, trái phải giữ nguyên.');}},
+ // 43
+ {sec:6,pts:3.3,vi:'Theo quy luật, tìm giá trị của A và B.',en:'Follow the pattern and find the values of A and B.',play:ar=>{
+   const rows=[[1,2,5],[2,4,'A'],[4,'B',17],[7,14,29]];const m=h('div',{class:'machine'});
+   rows.forEach(r=>{m.append(h('div',{class:'sqr'+(typeof r[0]=='string'?' q':'')},String(r[0])),h('span',{class:'arrow'},'➡'),h('div',{class:'hex'+(typeof r[1]=='string'?' q':'')},String(r[1])),h('span',{class:'arrow'},'➡'),h('div',{class:'cir'+(typeof r[2]=='string'?' q':'')},String(r[2])))});
+   ar.append(m);
+   quest(ar,[
+    {q:'Quy luật từ ô vuông ➡ lục giác (1→2, 2→4, 7→14) là:',choices:['Cộng 1','Nhân 2','Cộng 2'],ans:1,why:{0:'1+1=2 đúng, nhưng 2+1=3 chứ không phải 4.',2:'2+2=4 đúng, nhưng 1+2=3 chứ không phải 2.'},hint:'Thử quy luật với TẤT CẢ các hàng đã biết.'},
+    {q:'Quy luật từ lục giác ➡ hình tròn (2→5, 14→29) là:',choices:['Cộng 3','Nhân 2 rồi cộng 1','Nhân 3 rồi trừ 1'],ans:1,why:{0:'2+3=5 đúng, nhưng 14+3=17 chứ không phải 29.',2:'2×3−1=5 đúng, nhưng 14×3−1=41 chứ không phải 29.'}},
+    {q:'A = 4 × 2 + 1 = ?',inputs:[{a:9}]},
+    {q:'B = 4 × 2 = ?  (Kiểm tra: B × 2 + 1 phải bằng 17)',inputs:[{a:8}],ok:'8 × 2 + 1 = 17 ✓'}]);}},
+ // 44
+ {sec:6,pts:3.3,vi:'Có bao nhiêu số có hai chữ số mà chữ số hàng đơn vị nhỏ hơn chữ số hàng chục?',en:'How many two digit numbers have a ones digit that is less than their tens digit?',play:ar=>{
+   const bd=h('div',{class:'board'}),cnt=[],marked=new Set();let asked=false;
+   for(let t=1;t<=9;t++){for(let u=0;u<=9;u++){const v=t*10+u;const b=h('button',{onclick:()=>{
+       if(asked)return;if(u<t){if(!marked.has(v)){marked.add(v);b.classList.add('on');sOk();upd(t)}}
+       else{b.classList.add('no');setTimeout(()=>b.classList.remove('no'),600);bad(`Số ${v}: chữ số đơn vị ${u} ${u===t?'bằng':'lớn hơn'} chữ số hàng chục ${t} → không được!`)}}},String(v));bd.append(b)}
+     const c=h('div',{class:'cnt'},'0');cnt[t]=c;bd.append(c)}
+   function upd(t){cnt[t].textContent=[...marked].filter(v=>Math.floor(v/10)===t).length+(([...marked].filter(v=>Math.floor(v/10)===t).length===t)?' ✓':'');
+     if(!asked&&[1,2,3].every(r=>[...marked].filter(v=>Math.floor(v/10)===r).length===r)){asked=true;say('Bạn thấy quy luật chưa? Hàng chục 1 có 1 số, hàng chục 2 có 2 số, hàng chục 3 có 3 số…','think');
+       quest(ar,[
+        {q:'Hàng chục 9 (từ 90 đến 99) có bao nhiêu số thỏa mãn?',inputs:[{a:9}],hint:'Chữ số đơn vị có thể là 0, 1, 2, …, 8.',onOk:()=>{for(let tt=1;tt<=9;tt++)for(let u=0;u<tt;u++){marked.add(tt*10+u)}bd.querySelectorAll('button').forEach(b=>{const v=+b.textContent;if(v%10<Math.floor(v/10))b.classList.add('on')});for(let tt=1;tt<=9;tt++)cnt[tt].textContent=tt+' ✓'}},
+        {q:'Tổng cộng: 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 = ?',inputs:[{a:45,post:'số'}],hint:'Ghép cặp: (1+9)+(2+8)+(3+7)+(4+6)+5 = 10+10+10+10+5.'}])}}
+   ar.append(h('div',{class:'center small'},'Bấm vào các số có chữ số hàng đơn vị NHỎ HƠN chữ số hàng chục. Hãy tô hết hàng 10–19, 20–29, 30–39 trước nhé!'),bd);
+   G.hintFn=()=>'Ví dụ hàng 20–29: chữ số hàng chục là 2, đơn vị phải nhỏ hơn 2 → chỉ có 20 và 21.';
+   say('Ví dụ: 31 được (1 &lt; 3), nhưng 35 không được (5 &gt; 3).');}},
+ // 45
+ {sec:6,pts:3.3,vi:'Helena bắn 3 mũi tên vào bia và được 25 điểm. Có bao nhiêu cách đạt được số điểm đó (không tính thứ tự)?',en:'Helena shot 3 arrows at the target and got 25 points. How many possible ways could she have obtained points regardless of their orders?',play:ar=>{
+   const found=[];let shots=[];
+   const svg=h('div',{class:'visual'});
+   const rings=[[6,110,'#e0f2fe'],[7,88,'#bae6fd'],[8,66,'#7dd3fc'],[9,44,'#fca5a5'],[10,22,'#facc15']];
+   svg.innerHTML=`<svg width="240" height="240" viewBox="-120 -120 240 240">${rings.map(([v,r,c])=>`<circle data-v="${v}" r="${r}" fill="${c}" stroke="#334155" stroke-width="2" style="cursor:pointer"/>`).join('')}${rings.map(([v,r])=>`<text x="${r-11}" y="5" text-anchor="middle" font-size="14" font-weight="700" pointer-events="none">${v}</text>`).join('')}<g id="arrows"></g></svg>`;
+   const cur=h('div',{class:'center',style:'font-size:1.3rem;font-weight:700;min-height:1.6em'});
+   const fl=h('div',{class:'found'});
+   const drawF=()=>{fl.innerHTML='';for(let i=0;i<Math.max(4,found.length);i++)fl.append(h('span',{class:found[i]?'':'empty'},found[i]?found[i].join(' + '):'?'))};
+   ar.append(h('div',{class:'center small'},'Bấm vào bia để bắn 3 mũi tên. Tìm tất cả các bộ 3 điểm có tổng 25 (không tính thứ tự)!'),svg,cur,h('div',{class:'center small'},'Các cách đã tìm được:'),fl);
+   drawF();
+   let qShown=false;
+   svg.querySelector('svg').addEventListener('click',ev=>{
+     const v=+ev.target.getAttribute('data-v');if(!v||shots.length>=3)return;
+     const pt=svg.querySelector('svg').createSVGPoint();pt.x=ev.clientX;pt.y=ev.clientY;const p=pt.matrixTransform(svg.querySelector('svg').getScreenCTM().inverse());
+     svg.querySelector('#arrows').insertAdjacentHTML('beforeend',`<text x="${p.x}" y="${p.y}" font-size="20" text-anchor="middle" dominant-baseline="middle" pointer-events="none">📍</text>`);
+     shots.push(v);beep(400+v*40,.08);cur.textContent=shots.join(' + ')+(shots.length===3?` = ${shots.reduce((a,b)=>a+b,0)}`:'');
+     if(shots.length===3){const sum=shots.reduce((a,b)=>a+b,0),key=[...shots].sort((a,b)=>b-a);
+       setTimeout(()=>{
+         if(sum!==25)say(`Tổng là ${sum}, chưa phải 25. Bắn lại nhé!`,'think');
+         else if(found.some(f=>f.join()===key.join()))say(`Cách ${key.join(' + ')} có rồi (đổi thứ tự vẫn là cùng một cách).`,'think');
+         else{found.push(key);drawF();sOk();praise(`Tìm được cách mới: ${key.join(' + ')} = 25!`)}
+         shots=[];svg.querySelector('#arrows').innerHTML='';cur.textContent='';
+         if(found.length>=4&&!qShown){qShown=true;quest(ar,[{q:'Vậy có tất cả bao nhiêu cách?',inputs:[{a:4,post:'cách'}],hint:'Đếm số ô đã tìm được ở trên.',ok:'10+9+6, 10+8+7, 9+9+7, 9+8+8'}])}
+       },700)}
+   });
+   const all=[[10,9,6],[10,8,7],[9,9,7],[9,8,8]];
+   G.hintFn=()=>{const miss=all.find(a=>!found.some(f=>f.join()===a.join()));if(!miss)return'Bạn đã tìm đủ rồi!';
+     return `Thử cố định mũi tên lớn nhất là ${miss[0]}: hai mũi còn lại cộng lại phải bằng ${25-miss[0]}, mỗi mũi không lớn hơn ${miss[0]}.`};
+   say('Gợi ý cách làm có hệ thống: bắt đầu với mũi tên được 10 điểm, rồi 9 điểm…');}},
+ // 46
+ {sec:6,pts:3.3,vi:'Có thể lập được bao nhiêu số có 3 chữ số từ các thẻ số: 1, 1, 3, 0, 0?',en:'How many 3-digit numbers can be made using the following number cards? 1 1 3 0 0',play:ar=>{
+   const vals=[1,1,3,0,0];let sel=[];const found=new Set();let qShown=false;
+   const all=[];{const set=new Set();for(let a=0;a<5;a++)for(let b=0;b<5;b++)for(let c=0;c<5;c++)if(a!==b&&b!==c&&a!==c&&vals[a]!==0)set.add(''+vals[a]+vals[b]+vals[c]);all.push(...[...set].sort())}
+   const slot=h('div',{class:'slot'},'_ _ _');const cards=h('div',{class:'cards'});const fl=h('div',{class:'found'});
+   const btns=vals.map((v,i)=>h('button',{class:'ncard',onclick:()=>{
+     if(sel.length===0&&v===0){bad('Số có 3 chữ số không được bắt đầu bằng chữ số 0!');return}
+     sel.push(i);btns[i].disabled=true;beep(500,.06);show();
+     if(sel.length===3){const num=sel.map(j=>vals[j]).join('');
+       setTimeout(()=>{if(found.has(num))say(`Số ${num} có rồi. Tìm số khác nhé!`,'think');else{found.add(num);sOk();praise(`Số mới: ${num}!`);drawF()}
+         sel=[];btns.forEach(b=>b.disabled=false);show();
+         if(found.size===all.length&&!qShown){qShown=true;quest(ar,[{q:'Vậy lập được bao nhiêu số có 3 chữ số?',inputs:[{a:11,post:'số'}],ok:'Hàng trăm là 1: 7 số; hàng trăm là 3: 4 số → 7 + 4 = 11.'}])}},500)}}},String(v)));
+   const show=()=>{slot.textContent=[0,1,2].map(k=>sel[k]!=null?vals[sel[k]]:'_').join(' ')};
+   const drawF=()=>{fl.innerHTML='';[...found].sort().forEach(n=>fl.append(h('span',{},n)));fl.append(h('span',{class:'empty'},`${found.size} / ?`))};
+   cards.append(...btns);
+   ar.append(h('div',{class:'center small'},'Bấm lần lượt 3 thẻ để ghép thành số. Mỗi thẻ chỉ dùng 1 lần trong một số. Tìm hết tất cả các số khác nhau!'),cards,slot,
+     h('div',{class:'center'},h('button',{class:'btn',onclick:()=>{sel=[];btns.forEach(b=>b.disabled=false);show()}},'↺ Xóa')),h('div',{class:'center small'},'Các số đã lập:'),fl);
+   drawF();
+   G.hintFn=()=>{const miss=all.filter(n=>!found.has(n));if(!miss.length)return'Đủ rồi!';
+     return `Làm có thứ tự: chọn chữ số hàng trăm trước (chỉ có thể là 1 hoặc 3). Còn thiếu một số bắt đầu bằng ${miss[0][0]}${miss.length<=3?' – thử '+miss[0]:''}.`};
+   say('Lập các số như 130, 310… Chữ số hàng trăm không thể là 0 nhé!');}},
+ // 47
+ {sec:6,pts:4.3,vi:'Hình vẽ cho thấy một quy luật tăng dần (số thứ tự là số hình). Hình số 6 có bao nhiêu chấm (•)?',en:'The picture shows an increasing pattern. How many dots would be in figure 6?',play:ar=>{
+   const v=h('div',{class:'visual',html:[1,2,3].map(n=>`<div class="center">${dotsFig(n)}<div class="small">Hình ${n}</div></div>`).join('')+'<b>…</b>'});ar.append(v);
+   const add=n=>v.insertAdjacentHTML('beforeend',`<div class="center">${dotsFig(n,16)}<div class="small">Hình ${n}</div></div>`);
+   quest(ar,[
+    {q:'Hình 1 có mấy chấm? Hình 2? Hình 3?',inputs:[{a:4,pre:'H1:'},{a:9,pre:'H2:'},{a:16,pre:'H3:'}],hint:'Đếm số hàng × số chấm mỗi hàng.'},
+    {q:'Hình 1: 2 × 2, hình 2: 3 × 3, hình 3: 4 × 4. Mỗi hàng của hình 6 có mấy chấm?',inputs:[{a:7}],hint:'Số chấm mỗi hàng = số hình + 1.'},
+    {q:'Hình 6 có: 7 × 7 = ? chấm',inputs:[{a:49,post:'chấm'}],onOk:()=>add(6)}]);}},
+ // 48
+ {sec:6,pts:4.3,vi:'Hai người làm được 7 con búp bê trong 30 phút. Hỏi năm người làm được bao nhiêu con búp bê trong 2 giờ?',en:'Two persons make 7 dolls during 30 minutes. How many dolls do five persons make in 2 hours?',play:ar=>{
+   ar.append(h('div',{class:'visual',html:'🧑‍🔧🧑‍🔧 ⏱️30 phút → 🪆×7'}));
+   quest(ar,[
+    {q:'2 giờ = ? phút',inputs:[{a:120}]},
+    {q:'120 phút gấp mấy lần 30 phút?',inputs:[{a:4,post:'lần'}]},
+    {q:'2 người làm trong 2 giờ: 7 × 4 = ?',inputs:[{a:28,post:'con'}]},
+    {q:'1 người làm trong 2 giờ: 28 : 2 = ?',inputs:[{a:14,post:'con'}]},
+    {q:'5 người làm trong 2 giờ: 14 × 5 = ?',inputs:[{a:70,post:'con'}]}]);}},
+ // 49
+ {sec:6,pts:4.3,vi:'Một khối gỗ được sơn tất cả các mặt, kể cả mặt đáy. Sau đó cắt thành các khối lập phương nhỏ như hình. Có bao nhiêu khối nhỏ được sơn đúng 3 mặt?',en:'A wooden block is painted, including the bottom. Then it is cut into pieces as shown by the picture. How many pieces have 3 painted faces?',play:ar=>{
+   const S=new Set(),key=(x,y,z)=>x+','+y+','+z;
+   for(let x=0;x<4;x++)for(let y=0;y<4;y++)for(let z=0;z<(x<3?3:2);z++)S.add(key(x,y,z));
+   const faces=(x,y,z)=>[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]].filter(d=>!S.has(key(x+d[0],y+d[1],z+d[2]))).length;
+   const ans=new Set([...S].filter(k=>faces(...k.split(',').map(Number))===3));
+   const mark=new Set();
+   const iso=h('div',{class:'visual'});
+   function drawIso(){const s=34,P=(x,y,z)=>[x*s+y*s*.55,-z*s-y*s*.5];
+     const cubes=[...S].map(k=>k.split(',').map(Number)).sort((a,b)=>b[1]-a[1]||a[2]-b[2]||a[0]-b[0]);
+     let o='';const poly=(pts,f)=>`<polygon points="${pts.map(p=>P(...p).map(v=>v.toFixed(1)).join(',')).join(' ')}" fill="${f}" stroke="#1e293b" stroke-width="1.3"/>`;
+     for(const [x,y,z] of cubes){const m=mark.has(key(x,y,z));
+       o+=poly([[x,y,z],[x+1,y,z],[x+1,y,z+1],[x,y,z+1]],m?'#facc15':'#fef3c7');
+       o+=poly([[x,y,z+1],[x+1,y,z+1],[x+1,y+1,z+1],[x,y+1,z+1]],m?'#fde047':'#fffbeb');
+       o+=poly([[x+1,y,z],[x+1,y+1,z],[x+1,y+1,z+1],[x+1,y,z+1]],m?'#eab308':'#fde68a')}
+     iso.innerHTML=`<svg width="230" height="190" viewBox="-10 -175 230 190">${o}</svg>`}
+   const names=['Tầng dưới cùng (tầng 1)','Tầng giữa (tầng 2)','Tầng trên cùng (tầng 3)'];
+   const lw=h('div',{class:'layers'});
+   for(let z=2;z>=0;z--){const g=h('div',{class:'grid',style:'grid-template-columns:repeat(4,auto)'});
+     for(let y=3;y>=0;y--)for(let x=0;x<4;x++){const k=key(x,y,z);
+       if(!S.has(k)){g.append(h('button',{class:'cell x',disabled:true}));continue}
+       const c=h('button',{class:'cell',onclick:()=>{mark.has(k)?mark.delete(k):mark.add(k);c.classList.toggle('m');c.classList.remove('bad');drawIso()}});g.append(c)}
+     lw.append(h('div',{class:'layer'},h('div',{class:'small'},names[z]),h('div',{class:'small'},'↑ phía sau'),g,h('div',{class:'small'},'↓ phía trước')))}
+   drawIso();
+   ar.append(iso,h('div',{class:'center small'},'Khối gỗ gồm phần cao 3 tầng (3 cột × 4 hàng) và phần thấp 2 tầng bên phải (1 cột × 4 hàng). Tô vàng các khối nhỏ có ĐÚNG 3 mặt được sơn trên các bản đồ tầng:'),lw);
+   const chk=h('button',{class:'btn pri',onclick:()=>{
+     let wrong=0;lw.querySelectorAll('.cell').forEach(c=>c.classList.remove('bad'));
+     const cells=[...lw.querySelectorAll('.grid')];
+     [...mark].forEach(k=>{if(!ans.has(k))wrong++});const miss=[...ans].filter(k=>!mark.has(k)).length;
+     if(wrong||miss){bad(`${wrong?`Có ${wrong} khối tô sai. `:''}${miss?`Còn thiếu ${miss} khối.`:''} Đếm lại số mặt lộ ra ngoài của từng khối nhé!`,lw)}
+     else{chk.disabled=true;sOk();say('Chính xác các vị trí! Giờ đếm lại xem có bao nhiêu khối.','happy');
+       quest(ar,[{q:'Có bao nhiêu khối nhỏ được sơn 3 mặt?',inputs:[{a:10,post:'khối'}],ok:'4 khối góc ở tầng 1 + 2 khối góc trái tầng 3 + 2 khối góc phải tầng 3 (sát bậc thang) + 2 khối góc của phần thấp ở tầng 2 = 10 khối.'}])}}},'Kiểm tra vị trí');
+   ar.append(h('div',{class:'center'},chk));
+   let hi=0;
+   G.hintFn=()=>{const tips=['Khối ở GÓC của hình hộp thường có 3 mặt sơn (ví dụ: trên/dưới + trước/sau + trái/phải).',
+     'Ở tầng dưới cùng: 4 góc (trước-trái, sau-trái, trước-phải, sau-phải) đều có 3 mặt sơn: đáy + 2 mặt bên.',
+     'Tầng 2, cột bên phải (phần thấp): khối trước và sau có mặt trên + mặt phải + mặt trước/sau → 3 mặt.',
+     'Tầng 3: góc trước-trái và sau-trái có 3 mặt. Góc trước-phải và sau-phải của tầng 3 (sát bậc) cũng có: trên + phải + trước/sau!',
+     'Khối ở cạnh (không phải góc) chỉ có 2 mặt sơn; khối ở giữa mặt chỉ có 1 mặt.'];return tips[hi++%tips.length]};
+   say('Mỗi khối nhỏ có 6 mặt. Mặt nào lộ ra ngoài thì được sơn. Hãy tìm những khối có đúng 3 mặt lộ ra!');}},
+ // 50
+ {sec:6,pts:4.3,vi:'Các số được sắp xếp theo quy luật như ví dụ. Tìm giá trị của A và B.',en:'The following set of numbers follows example. Find the values of A and B.',play:ar=>{
+   const C={A:[0,1.5,'A'],g1:[1,1,''],c126:[1,2,126],a42:[2,.5,42],g2:[2,1.5,''],a58:[2,2.5,58],b16:[3,0,16],b26:[3,1,26],b42:[3,2,42],b16b:[3,3,16],c10:[4,.5,10],B:[4,1.5,'B'],c26:[4,2.5,26],d6:[5,1,6],d10:[5,2,10],g3:[6,1.5,'']};
+   const W=58,H=34;
+   const ex=h('div',{class:'diamond',style:`width:${2*W}px;height:${3*H}px`});
+   [[0,.5,6],[1,0,2],[1,1,4],[2,.5,2]].forEach(([r,c,v])=>ex.append(h('div',{style:`left:${c*W}px;top:${r*H}px`},String(v))));
+   const dm=h('div',{class:'diamond',style:`width:${4*W}px;height:${7*H}px`});const cell={};
+   for(const [k,[r,c,v]] of Object.entries(C)){const e=h('div',{class:(k[0]==='g'?'g':'')+(typeof v==='string'&&v?' ans':''),style:`left:${c*W}px;top:${r*H}px`},String(v));cell[k]=e;dm.append(e)}
+   const hl=ks=>{Object.values(cell).forEach(e=>e.classList.remove('h'));ks.forEach(k=>cell[k].classList.add('h'))};
+   const setv=(k,v)=>{cell[k].textContent=v;cell[k].classList.add('ans')};
+   ar.append(h('div',{class:'visual'},h('div',{class:'center'},h('div',{class:'small'},'Ví dụ'),ex),h('div',{class:'center'},dm)));
+   quest(ar,[
+    {q:'Trong ví dụ: ô trên (6) có được từ hai ô ngang 2 và 4 thế nào?',choices:['Tổng: 2 + 4','Tích: 2 × 4','Hiệu: 4 − 2'],ans:0},
+    {q:'Còn ô dưới (2)?',choices:['Tổng: 2 + 4','Hiệu: 4 − 2 (số lớn trừ số bé)','Thương: 4 : 2'],ans:1,why:{2:'4 : 2 = 2 cũng ra 2! Nhưng thử với hình lớn: 26 : 16 không ra số tự nhiên, còn 26 − 16 = 10 đúng bằng ô dưới.'}},
+    {q:'Hàng dài nhất (16, 26, 42, 16) là hàng gốc. <b>Đi lên</b>: mỗi ô = <b>tổng</b> 2 ô ngay dưới nó. <b>Đi xuống</b>: mỗi ô = <b>hiệu</b> 2 ô ngay trên nó.<br>Kiểm tra ô tô vàng: 16 + 26 = ?',inputs:[{a:42}],onShow:()=>hl(['a42','b16','b26']),ok:'Đúng bằng ô 42 ở trên! Thêm nữa: 42 + 16 = 58 ✓'},
+    {q:'Ô xám ở giữa (nằm trên 26 và 42) = 26 + 42 = ?',inputs:[{a:68}],onShow:()=>hl(['g2','b26','b42']),onOk:()=>setv('g2',68),ok:'Kiểm tra: 68 + 58 = 126 ✓'},
+    {q:'Ô xám cạnh 126 (nằm trên 42 và 68) = 42 + 68 = ?',inputs:[{a:110}],onShow:()=>hl(['g1','a42','g2']),onOk:()=>setv('g1',110)},
+    {q:'A nằm trên 110 và 126. A = 110 + 126 = ?',inputs:[{a:236}],onShow:()=>hl(['A','g1','c126']),onOk:()=>setv('A',236)},
+    {q:'Bây giờ đi xuống. B nằm dưới 26 và 42. B = 42 − 26 = ?',inputs:[{a:16}],onShow:()=>hl(['B','b26','b42']),onOk:()=>setv('B',16),ok:'Kiểm tra: 26 − 16 = 10 ✓, 16 − 10 = 6 ✓, 26 − 16 = 10 ✓'},
+    {q:'Thử thách thêm: ô xám dưới cùng (dưới 6 và 10) = 10 − 6 = ?',inputs:[{a:4}],onShow:()=>hl(['g3','d6','d10']),onOk:()=>{setv('g3',4);hl([])},ok:'A = 236, B = 16 🎉'}]);}},
+];
+QS.forEach((q,i)=>q.id=i+1);
+
+/* ================= giao diện phiêu lưu ================= */
+const STICKERS=['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐤','🦆','🦉','🦄','🐝','🐞','🦋','🐢','🦖','🐙','🦀','🐠','🐬','🐳','🦈','🐊','🦓','🦒','🐘','🦛','🦘','🐫','🦔','🦩','🦚','🦜','🐿️','🦥','🦦','🐉','🦕','🐲','🌈'];
+const AVATARS=['🦁','🐼','🐰','🦊','🐸','🐯','🐨','🐧'];
+const THEME=[
+ {c1:'#ffe4f1',c2:'#ffc2e0',deco:['🍭','🍬','🧁','🍩']},
+ {c1:'#e0e7ff',c2:'#c7d2fe',deco:['🗝️','🏰','💎','🪙']},
+ {c1:'#dcfce7',c2:'#a7f3d0',deco:['⏰','⚖️','🧪','📏']},
+ {c1:'#ffedd5',c2:'#fdba74',deco:['🍕','🍰','🍉','🥧']},
+ {c1:'#e0f2fe',c2:'#93c5fd',deco:['📐','🔺','🟦','✏️']},
+ {c1:'#fef9c3',c2:'#fde047',deco:['🔍','🚌','🌽','⛽']},
+ {c1:'#f3e8ff',c2:'#d8b4fe',deco:['🧩','🎯','🃏','🧊']},
+];
+const MIMO_SVG=`<svg viewBox="0 0 120 120" aria-hidden="true">
+<ellipse cx="60" cy="114" rx="32" ry="5" fill="#00000022"/>
+<path d="M60 20 Q64 8 72 6" stroke="#6d28d9" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="73" cy="6" r="5.5" fill="#facc15"/>
+<g class="a-down"><ellipse cx="18" cy="78" rx="7" ry="12" fill="#7c3aed" transform="rotate(20 18 78)"/><ellipse cx="102" cy="78" rx="7" ry="12" fill="#7c3aed" transform="rotate(-20 102 78)"/></g>
+<g class="a-up"><ellipse cx="16" cy="46" rx="7" ry="13" fill="#7c3aed" transform="rotate(-28 16 46)"/><ellipse cx="104" cy="46" rx="7" ry="13" fill="#7c3aed" transform="rotate(28 104 46)"/></g>
+<ellipse cx="44" cy="108" rx="11" ry="6" fill="#6d28d9"/><ellipse cx="76" cy="108" rx="11" ry="6" fill="#6d28d9"/>
+<path d="M60 18 C92 18 104 44 104 70 C104 96 86 108 60 108 C34 108 16 96 16 70 C16 44 28 18 60 18Z" fill="#8b5cf6"/>
+<path d="M30 40 C36 28 48 24 56 24" stroke="#ffffff55" stroke-width="5" fill="none" stroke-linecap="round"/>
+<ellipse cx="60" cy="86" rx="26" ry="17" fill="#c4b5fd"/>
+<circle cx="32" cy="70" r="6" fill="#f9a8d4" opacity=".85"/><circle cx="88" cy="70" r="6" fill="#f9a8d4" opacity=".85"/>
+<g class="e-open"><circle cx="45" cy="54" r="12" fill="#fff"/><circle cx="75" cy="54" r="12" fill="#fff"/><g class="pupil"><circle cx="47" cy="56" r="6" fill="#1e1b4b"/><circle cx="77" cy="56" r="6" fill="#1e1b4b"/><circle cx="49" cy="53" r="2" fill="#fff"/><circle cx="79" cy="53" r="2" fill="#fff"/></g></g>
+<g class="e-happy" stroke="#1e1b4b" stroke-width="4" fill="none" stroke-linecap="round"><path d="M35 56 Q45 44 55 56"/><path d="M65 56 Q75 44 85 56"/></g>
+<g class="e-sad" stroke="#1e1b4b" stroke-width="3.5" stroke-linecap="round"><path d="M34 39 L54 44"/><path d="M86 39 L66 44"/></g>
+<path class="m-idle" d="M50 72 Q60 80 70 72" stroke="#1e1b4b" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+<path class="m-happy" d="M46 70 Q60 92 74 70 Z" fill="#be123c" stroke="#1e1b4b" stroke-width="3" stroke-linejoin="round"/>
+<path class="m-sad" d="M50 79 Q60 70 70 79" stroke="#1e1b4b" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+<ellipse class="m-think" cx="63" cy="75" rx="5" ry="6" fill="#1e1b4b"/>
+</svg>`;
+const mascot=(sz=104)=>h('div',{class:'mimo mood-idle',style:`width:${sz}px;height:${sz}px`,html:MIMO_SVG});
+function setMood(m){const el=G.owl;if(!el)return;el.className='mimo mood-idle';void el.offsetWidth;el.className='mimo mood-'+(m||'idle')}
+
+/* giọng đọc */
+let VI=null;
+function loadVoices(){try{VI=speechSynthesis.getVoices().find(v=>/^vi/i.test(v.lang))||null}catch(e){}}
+if('speechSynthesis' in window){loadVoices();speechSynthesis.onvoiceschanged=loadVoices}
+function toSpeech(html){
+  const d=document.createElement('div');d.innerHTML=T(html);
+  d.querySelectorAll('.mx').forEach(mx=>{const w=mx.querySelector('.mw');const f=mx.querySelectorAll('.fr>span');
+    mx.replaceWith(' '+(w?w.textContent+' và ':'')+(f.length===2?f[0].textContent+' phần '+f[1].textContent:'')+' ')});
+  return d.textContent.replace(/\p{Extended_Pictographic}|️|‍/gu,'')
+    .replace(/×/g,' nhân ').replace(/ : /g,' chia ').replace(/−/g,' trừ ').replace(/\+/g,' cộng ')
+    .replace(/=\s*\?/g,' bằng bao nhiêu?').replace(/=/g,' bằng ').replace(/≤/g,' bé hơn hoặc bằng ').replace(/≥/g,' lớn hơn hoặc bằng ')
+    .replace(/</g,' bé hơn ').replace(/>/g,' lớn hơn ').replace(/cm²/g,' xăng-ti-mét vuông').replace(/\bcm\b/g,' xăng-ti-mét').replace(/\s+/g,' ');
+}
+function speak(html){
+  if(P.voice===false||!('speechSynthesis' in window))return;
+  const txt=toSpeech(html);if(!txt.trim())return;
+  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt);u.lang='vi-VN';if(VI)u.voice=VI;u.rate=1;u.pitch=1.15;speechSynthesis.speak(u)}catch(e){}
+}
+
+/* bàn phím số */
+let padT=null;
+const pad=h('div',{class:'numpad'});
+(()=>{const g=h('div',{class:'grid4'});
+  const keys=['1','2','3','4','5','⌫','6','7','8','9','0',',','⬅','➡','✕','OK'];
+  keys.forEach(k=>{const cls=k==='OK'?'k-ok':k==='⌫'?'k-del':(k==='⬅'||k==='➡')?'k-nav':k==='✕'?'k-x':'';
+    const b=h('button',{class:cls,type:'button'},k==='OK'?'✔ Kiểm tra':k==='✕'?'Ẩn':k);
+    b.addEventListener('pointerdown',e=>e.preventDefault());
+    b.addEventListener('click',()=>padKey(k));g.append(b)});
+  pad.append(g);document.body.append(pad)})();
+function padKey(k){
+  const t=padT;if(!t||t.disabled){hidePad();return}
+  beep(520,.04,'sine',.05);
+  const all=[...document.querySelectorAll('.inp')].filter(e=>!e.disabled);const i=all.indexOf(t);
+  if(k==='⌫')t.value=t.value.slice(0,-1);
+  else if(k==='➡'){if(all[i+1])all[i+1].focus()}
+  else if(k==='⬅'){if(all[i-1])all[i-1].focus()}
+  else if(k==='✕'){t.blur();hidePad()}
+  else if(k==='OK')t.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));
+  else if(t.value.length<8)t.value+=k;
+}
+function hidePad(){pad.classList.remove('show');document.body.classList.remove('padon')}
+document.addEventListener('focusin',e=>{if(e.target.classList&&e.target.classList.contains('inp')){padT=e.target;pad.classList.add('show');document.body.classList.add('padon')}});
+document.addEventListener('focusout',()=>setTimeout(()=>{const a=document.activeElement;if(!(a&&a.classList&&a.classList.contains('inp')))hidePad()},120));
+
+/* mây trang trí */
+[[8,70,'0s'],[30,110,'-25s'],[18,60,'-50s']].forEach(([top,dur,del])=>document.body.append(h('div',{class:'cloud',style:`top:${top}vh;animation-duration:${dur}s;animation-delay:${del}`},'☁️')));
+
+/* ================= màn hình ================= */
+function totals(){let st=0,pt=0;QS.forEach(q=>{const s=P.stars[q.id]||0;st+=s;if(s)pt+=q.pts});return{st,pt:Math.round(pt*10)/10}}
+function hud(back){
+  const t=totals();
+  return h('div',{class:'hud'},
+    back?h('button',{class:'round',title:'Về bản đồ',onclick:()=>{location.hash=''}},'✕'):h('button',{class:'avatar',title:'Đổi tên / nhân vật',onclick:askName},P.avatar||'🙂'),
+    back?h('div',{class:'progress'},h('div',{class:'bar',id:'pbar'})):h('div',{class:'hname'},`Chào ${P.name||'bạn'}!`),
+    h('span',{class:'chipn',title:'Số sao'},`⭐ ${t.st}`),
+    h('span',{class:'chipn',title:'Xu'},`🪙 ${t.st*10}`),
+    back?null:h('span',{class:'chipn',title:'Điểm bài thi'},`🏆 ${fmt(t.pt)}`),
+    back?null:h('button',{class:'tog',title:'Bộ sưu tập nhãn dán',onclick:()=>{location.hash='album'}},'📒'),
+    h('button',{class:'tog',title:'Bật/tắt giọng đọc',onclick:e=>{P.voice=P.voice===false;save();e.currentTarget.textContent=P.voice===false?'🤐':'🗣️';if(P.voice===false)try{speechSynthesis.cancel()}catch(_){}}},P.voice===false?'🤐':'🗣️'),
+    h('button',{class:'tog',title:'Bật/tắt âm thanh',onclick:e=>{P.mute=!P.mute;save();e.currentTarget.textContent=P.mute?'🔇':'🔊'}},P.mute?'🔇':'🔊'));
+}
+function askName(){
+  let av=P.avatar||AVATARS[0];
+  const inp=h('input',{class:'nameinp',placeholder:'Tên của bạn',maxlength:'20',value:P.name||''});
+  const avs=h('div',{class:'avs'});
+  AVATARS.forEach(a=>{const b=h('button',{class:a===av?'sel':'',onclick:()=>{av=a;avs.querySelectorAll('button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');beep(600,.06)}},a);avs.append(b)});
+  const m=h('div',{class:'modal'},h('div',{class:'box'},
+    h('div',{style:'display:flex;justify-content:center'},mascot(110)),
+    h('div',{style:'font-size:1.4rem;font-weight:800'},'Chào bạn! Mình là Mimo 👋'),
+    h('div',{class:'small',style:'margin-bottom:10px'},'Bạn tên là gì? Chọn một bạn đồng hành nhé!'),
+    inp,avs,
+    h('button',{class:'btn pri big',onclick:()=>{P.name=inp.value.trim()||'bạn';P.avatar=av;save();m.remove();renderMap();speak(`Chào ${P.name}! Cùng Mimo phiêu lưu toán học nào!`)}},'Bắt đầu! 🚀')));
+  document.body.append(m);setTimeout(()=>inp.focus(),100);
+}
+function renderMap(){
+  G.bubble=null;G.owl=null;G.hintFn=null;hidePad();
+  app.innerHTML='';app.append(hud(false));
+  const doneN=Object.keys(P.stars).length;
+  const next=QS.find(q=>!P.stars[q.id]);
+  const owl=mascot(96);G.owl=owl;const bub=h('div',{class:'bubble'});G.bubble=bub;
+  app.append(h('div',{class:'scene'},owl,h('div',{class:'bwrap'},bub,h('button',{class:'spk',title:'Nghe',onclick:()=>speak(G.lastSay||'')},'🔈'))));
+  G.lastSay=doneN===0?`Chào ${P.name||'bạn'}! Mỗi câu trong đề thi là một trò chơi. Bấm vào ô số <b>1</b> để bắt đầu nhé!`
+    :doneN===50?`Wow, ${P.name||'bạn'} đã hoàn thành cả 50 câu! Chơi lại để gom đủ 3 sao nhé! 🏆`
+    :`Bạn đã xong ${doneN}/50 câu, giỏi lắm! Câu tiếp theo là câu <b>${next.id}</b> đang nhấp nháy đó.`;
+  bub.innerHTML=T(G.lastSay);
+  SECS.forEach((s,si)=>{
+    const qs=QS.filter(q=>q.sec===si),th=THEME[si],dn=qs.filter(q=>P.stars[q.id]).length;
+    const isl=h('div',{class:'island',style:`--c1:${th.c1};--c2:${th.c2}`});
+    isl.append(h('div',{class:'banner'},h('span',{class:'be'},s.e),h('div',{},h('b',{},s.t),h('div',{class:'small'},s.s)),h('span',{class:'bc'},`${dn}/${qs.length}`)));
+    const W=320,gap=104,H=qs.length*gap+20;
+    const pts=qs.map((q,i)=>[W/2+Math.sin(i*1.15+si*.7)*92,58+i*gap]);
+    let d=`M${pts[0][0]} ${pts[0][1]}`;for(let i=1;i<pts.length;i++){const [x0,y0]=pts[i-1],[x1,y1]=pts[i];d+=` C${x0} ${y0+gap/2} ${x1} ${y1-gap/2} ${x1} ${y1}`}
+    const path=h('div',{class:'path',style:`height:${H}px`,html:`<svg class="road" width="${W}" height="${H}"><path d="${d}"/><path class="d" d="${d}"/></svg>`});
+    qs.forEach((q,i)=>{const [x,y]=pts[i];const st=P.stars[q.id]||0;
+      path.append(h('span',{class:'deco',style:`left:${x<W/2?W-40:4}px;top:${y-20}px`},th.deco[i%th.deco.length]));
+      const nb=h('button',{class:'node'+(st?' done':'')+(q===next?' next':''),style:`left:${x-39}px;top:${y-39}px`,title:'Câu '+q.id,onclick:()=>{beep(700,.06);location.hash='q'+q.id}},
+        String(q.id),h('span',{class:'ns',html:'<b>'+'★'.repeat(st)+'</b>'+'★'.repeat(3-st)}));
+      path.append(nb);
+      if(q===next)path.append(h('span',{class:'here',style:`left:${x+22}px;top:${y-62}px`},P.avatar||'🙂'));
+    });
+    isl.append(path);app.append(isl);
+  });
+  app.append(h('div',{class:'center',style:'display:flex;gap:10px;justify-content:center;flex-wrap:wrap'},
+    h('button',{class:'btn y',onclick:()=>{location.hash='album'}},'📒 Bộ sưu tập nhãn dán'),
+    h('button',{class:'btn',onclick:()=>{if(confirm('Xóa toàn bộ tiến độ, sao và nhãn dán?')){P.stars={};save();renderMap()}}},'🗑️ Chơi lại từ đầu')));
+  if(!P.name)setTimeout(askName,300);
+  if(next&&doneN>0)setTimeout(()=>{const n=document.querySelector('.node.next');n&&n.scrollIntoView({behavior:'smooth',block:'center'})},200);
+  else window.scrollTo(0,0);
+}
+function renderAlbum(){
+  G.bubble=null;G.owl=null;hidePad();app.innerHTML='';
+  const hd=hud(false);hd.firstChild.replaceWith(h('button',{class:'round',onclick:()=>{location.hash=''}},'✕'));app.append(hd);
+  const n=Object.keys(P.stars).length;
+  const card=h('div',{class:'card'},h('div',{style:'font-size:1.4rem;font-weight:800'},`📒 Bộ sưu tập nhãn dán (${n}/50)`),
+    h('div',{class:'small',style:'margin-bottom:12px'},'Hoàn thành mỗi câu để nhận một nhãn dán. Bấm vào nhãn dán để nghe tiếng của nó!'));
+  const g=h('div',{class:'album'});
+  QS.forEach(q=>{const has=!!P.stars[q.id];
+    g.append(h('button',{class:'slotS'+(has?'':' no'),onclick:()=>{if(has){beep(500+q.id*12,.12);beep(800,.1)}else{location.hash='q'+q.id}}},
+      h('span',{class:'se'},STICKERS[q.id-1]),h('span',{class:'small'},has?'⭐'.repeat(P.stars[q.id]):'Câu '+q.id)))});
+  card.append(g);app.append(card);window.scrollTo(0,0);
+}
+function renderQ(id){
+  const q=QS[id-1];if(!q){renderMap();return}
+  Object.assign(G,{q,mist:0,hint:0,hintFn:null,finished:false});
+  hidePad();app.innerHTML='';
+  app.append(hud(true));
+  G.prog=(i,n)=>{const b=document.getElementById('pbar');if(b)b.style.width=Math.min(100,100*i/n)+'%'};
+  const sec=SECS[q.sec],th=THEME[q.sec];
+  const owl=mascot(100);G.owl=owl;const bub=h('div',{class:'bubble'});G.bubble=bub;
+  app.append(h('div',{class:'scene'},owl,h('div',{class:'bwrap'},bub,h('button',{class:'spk',title:'Nghe lại',onclick:()=>speak(G.lastSay||'')},'🔈'))));
+  const card=h('div',{class:'card qcard',style:`--c1:${th.c1};--c2:${th.c2}`});
+  card.append(h('div',{class:'qhead'},h('span',{class:'qnum'},String(id)),h('span',{class:'chip'},`${sec.e} ${sec.t}`),h('span',{class:'chip'},`${fmt(q.pts)} điểm`),
+    P.stars[id]?h('span',{class:'chip',html:'⭐'.repeat(P.stars[id])}):null,
+    h('button',{class:'spk',onclick:()=>speak(`Câu ${id}. ${q.vi}`)},'🔈 Nghe đề')));
+  card.append(h('div',{class:'qtext',html:T(q.vi)}));
+  card.append(h('details',{class:'en'},h('summary',{},'Đề gốc (tiếng Anh)'),h('div',{},q.en)));
+  app.append(card);
+  const area=h('div',{class:'card game-area'});app.append(area);
+  app.append(h('div',{class:'bottombar'},
+    h('div',{style:'display:flex;gap:10px;align-items:center'},
+      h('button',{class:'hintbtn',title:'Gợi ý',onclick:useHint},'💡'),
+      h('button',{class:'btn',onclick:()=>renderQ(id)},'🔄 Chơi lại')),
+    h('div',{style:'display:flex;gap:8px'},
+      id>1?h('button',{class:'btn',onclick:()=>{location.hash='q'+(id-1)}},'⬅'):null,
+      id<50?h('button',{class:'btn pri',onclick:()=>{location.hash='q'+(id+1)}},'Câu tiếp ➡'):null)));
+  say('Cùng Mimo làm từng bước nhé! Cần trợ giúp thì bấm 💡.');
+  q.play(area);
+  window.scrollTo(0,0);
+}
+function confetti(){const em=['🎉','⭐','🎊','✨','🌟','🍬','🎈'];for(let i=0;i<50;i++){const d=h('div',{class:'conf',style:`left:${Math.random()*100}vw;animation-duration:${2+Math.random()*2.5}s;animation-delay:${Math.random()*.8}s`},pick(em));document.body.append(d);setTimeout(()=>d.remove(),6000)}}
+function finish(){
+  if(G.finished)return;G.finished=true;G.hintFn=null;hidePad();
+  G.prog&&G.prog(1,1);
+  const q=G.q,pen=G.mist+G.hint,stars=pen===0?3:pen<=2?2:1;
+  const prev=P.stars[q.id]||0;const first=!prev;if(stars>prev)P.stars[q.id]=stars;save();
+  const earned=Math.max(0,stars-prev)*10;
+  setMood('happy');
+  setTimeout(()=>{
+    sWin();confetti();
+    const name=P.name||'bạn';
+    const big=mascot(130);big.classList.add('mood-happy','dance');
+    const msg=stars===3?'Hoàn hảo! Không sai, không cần gợi ý!':stars===2?'Rất tốt! Chơi lại để lấy đủ 3 sao nhé!':'Bạn đã hoàn thành! Chơi lại để được nhiều sao hơn nha!';
+    const m=h('div',{class:'celebrate'},h('div',{class:'box'},
+      h('div',{style:'display:flex;justify-content:center;margin-top:-70px'},big),
+      h('div',{style:'font-size:1.7rem;font-weight:800'},`Hoan hô, ${name}! 🎉`),
+      h('div',{class:'bigstars',html:[1,2,3].map(i=>`<span class="${i<=stars?'':'off'}" style="animation-delay:${.2+i*.35}s">⭐</span>`).join('')}),
+      h('div',{},msg),
+      earned?h('div',{class:'coins'},`+${earned} 🪙`):null,
+      first?h('div',{},h('div',{class:'sticker'},h('span',{class:'se'},STICKERS[q.id-1]),h('b',{},'Nhãn dán mới!'))):null,
+      h('div',{class:'small'},`Lần sai: ${G.mist} · Gợi ý: ${G.hint}`),
+      h('div',{style:'display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap'},
+        h('button',{class:'btn',onclick:()=>m.remove()},'👀 Xem lại'),
+        h('button',{class:'btn',onclick:()=>{m.remove();renderQ(q.id)}},'🔄'),
+        q.id<50?h('button',{class:'btn pri big',onclick:()=>{m.remove();location.hash='q'+(q.id+1)}},'Tiếp tục ➡'):h('button',{class:'btn pri big',onclick:()=>{m.remove();location.hash=''}},'🗺️ Bản đồ'))));
+    document.body.append(m);
+    [1,2,3].forEach(i=>{if(i<=stars)setTimeout(()=>beep(600+i*150,.15),200+i*350)});
+    speak(`Hoan hô ${name}! Bạn được ${stars} sao! ${first?'Bạn nhận được một nhãn dán mới!':''}`);
+  },700);
+}
+function route(){
+  document.querySelectorAll('.modal,.celebrate').forEach(e=>e.remove());
+  try{speechSynthesis.cancel()}catch(e){}
+  const m=location.hash.match(/^#q(\d+)$/);
+  if(m)renderQ(+m[1]);else if(location.hash==='#album')renderAlbum();else renderMap();
+}
+window.addEventListener('hashchange',route);
+route();
+
+</script>
+</body>
+</html>

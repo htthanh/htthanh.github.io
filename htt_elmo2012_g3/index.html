@@ -1,0 +1,1134 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mimo Toán 3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#2b2350; --muted:#6b6790; --pri:#7c3aed; --pri-d:#5b21b6; --pri-l:#ede9fe;
+  --ok:#22c55e; --ok-d:#15803d; --okbg:#dcfce7; --bad:#ef4444; --badbg:#fee2e2;
+  --yel:#fcd34d; --yel-d:#d97706; --hl:#fde68a; --blue:#2563eb; --line:#e7e3f7; --card:#fff;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{font-family:"Baloo 2",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);font-size:19px;line-height:1.4;
+  background:linear-gradient(180deg,#7dd3fc 0%,#bae6fd 35%,#e0f7ff 65%,#d9f99d 100%) fixed;min-height:100vh;overflow-x:hidden}
+body.padon{padding-bottom:250px}
+button{font-family:inherit;font-size:inherit;cursor:pointer;color:inherit}
+input{font-family:inherit}
+.cloud{position:fixed;font-size:90px;opacity:.85;z-index:0;pointer-events:none;animation:drift linear infinite;filter:drop-shadow(0 6px 0 #ffffff55)}
+@keyframes drift{from{transform:translateX(-30vw)}to{transform:translateX(130vw)}}
+.wrap{max-width:900px;margin:0 auto;padding:12px 16px 90px;position:relative;z-index:1}
+/* HUD */
+.hud{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.round,.avatar{width:52px;height:52px;border-radius:50%;border:none;background:#fff;font-size:1.5rem;font-weight:800;box-shadow:0 5px 0 #0000001f;flex:0 0 auto}
+.avatar{font-size:1.9rem;background:#fff7d6}
+.hname{flex:1;font-weight:800;font-size:1.25rem;color:#1e3a8a;text-shadow:0 2px 0 #fff;min-width:120px}
+.progress{flex:1;min-width:120px;height:22px;background:#ffffffaa;border-radius:999px;overflow:hidden;box-shadow:inset 0 3px 0 #0000001a}
+.progress .bar{height:100%;width:0;background:linear-gradient(90deg,#34d399,#22c55e);border-radius:999px;transition:width .5s cubic-bezier(.3,1.5,.6,1);box-shadow:inset 0 -5px 0 #0000001a}
+.chipn{background:#fff;border-radius:999px;padding:4px 12px;font-weight:800;box-shadow:0 4px 0 #0000001a;white-space:nowrap}
+.tog{width:44px;height:44px;border-radius:14px;border:none;background:#fff;font-size:1.2rem;box-shadow:0 4px 0 #0000001a}
+/* buttons */
+.btn{border:none;border-radius:18px;padding:10px 18px;font-weight:800;background:#fff;box-shadow:0 5px 0 #d6d3e8;transition:transform .08s}
+.btn:active:not(:disabled){transform:translateY(4px);box-shadow:0 1px 0 #d6d3e8}
+.btn.pri{background:var(--pri);color:#fff;box-shadow:0 5px 0 var(--pri-d)}
+.btn.go{background:var(--ok);color:#fff;box-shadow:0 5px 0 var(--ok-d);padding:8px 18px}
+.btn.y{background:var(--yel);box-shadow:0 5px 0 var(--yel-d)}
+.btn.big{font-size:1.25rem;padding:14px 26px;border-radius:22px}
+.btn:disabled{opacity:.5;cursor:default}
+.card{background:var(--card);border-radius:28px;padding:16px 18px;box-shadow:0 8px 0 #00000014,0 12px 30px #0000000f;margin-bottom:16px}
+.small{font-size:.9rem;color:var(--muted)}
+.center{text-align:center}
+/* mascot */
+.mimo{flex:0 0 auto;position:relative}
+.mimo svg{width:100%;height:100%;overflow:visible;animation:bob 2.6s ease-in-out infinite;transform-origin:50% 100%}
+@keyframes bob{50%{transform:translateY(-5px) scale(1.02,.98)}}
+.mimo .e-happy,.mimo .e-sad,.mimo .m-happy,.mimo .m-sad,.mimo .m-think,.mimo .a-up{display:none}
+.mimo.mood-happy .e-open,.mimo.mood-happy .m-idle,.mimo.mood-happy .a-down{display:none}
+.mimo.mood-happy .e-happy,.mimo.mood-happy .m-happy,.mimo.mood-happy .a-up{display:inline}
+.mimo.mood-happy svg{animation:hop .55s ease 2}
+.mimo.mood-sad .m-idle{display:none}.mimo.mood-sad .m-sad,.mimo.mood-sad .e-sad{display:inline}
+.mimo.mood-sad svg{animation:wob .5s}
+.mimo.mood-think .m-idle{display:none}.mimo.mood-think .m-think{display:inline}
+.mimo.mood-think .pupil{transform:translate(3px,-4px)}
+.mimo .pupil{transition:transform .3s}
+.mimo .e-open{animation:blink 4.5s infinite;transform-box:fill-box;transform-origin:center}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+@keyframes hop{30%{transform:translateY(-22px) rotate(-6deg)}60%{transform:translateY(0) scale(1.08,.92)}80%{transform:translateY(-6px) rotate(4deg)}}
+@keyframes wob{20%,60%{transform:rotate(-7deg)}40%,80%{transform:rotate(7deg)}}
+.mimo.dance svg{animation:dance .8s ease-in-out infinite}
+@keyframes dance{25%{transform:rotate(-10deg) translateY(-10px)}50%{transform:translateY(0)}75%{transform:rotate(10deg) translateY(-10px)}}
+/* scene + bubble */
+.scene{display:flex;align-items:flex-end;gap:10px;margin:4px 0 14px}
+.bwrap{flex:1;position:relative;margin-bottom:18px}
+.bubble{background:#fff;border-radius:24px;padding:12px 48px 12px 16px;position:relative;min-height:56px;font-weight:600;
+  box-shadow:0 6px 0 #00000014;border:3px solid #fff;transition:border-color .2s}
+.bubble:before{content:"";position:absolute;left:-14px;bottom:14px;border:10px solid transparent;border-right:16px solid #fff}
+.bubble.sad{border-color:#fca5a5}.bubble.happy{border-color:#86efac}.bubble.think{border-color:#fcd34d}
+.spk{border:none;background:var(--pri-l);color:var(--pri);border-radius:14px;padding:4px 10px;font-weight:800;box-shadow:0 3px 0 #c4b5fd}
+.bwrap>.spk{position:absolute;right:8px;top:8px;width:36px;height:36px;padding:0;border-radius:50%}
+/* map */
+.hero{display:flex;align-items:center;gap:8px}
+.island{border-radius:34px;padding:14px 12px 10px;margin-bottom:22px;background:linear-gradient(180deg,var(--c1),var(--c2));box-shadow:0 10px 0 #00000014;position:relative;overflow:hidden}
+.banner{display:flex;align-items:center;gap:10px;background:#fff;border-radius:22px;padding:8px 14px;box-shadow:0 5px 0 #0000001a;position:relative;z-index:2}
+.banner .be{font-size:2.2rem}
+.banner b{font-size:1.15rem}
+.banner .bc{margin-left:auto;background:var(--pri);color:#fff;border-radius:999px;padding:2px 12px;font-weight:800;white-space:nowrap}
+.path{position:relative;width:320px;margin:0 auto}
+.road{position:absolute;left:0;top:0}
+.road path{fill:none;stroke:#ffffffcc;stroke-width:16;stroke-linecap:round}
+.road path.d{stroke:#00000014;stroke-width:4;stroke-dasharray:2 14}
+.node{position:absolute;width:78px;height:78px;border-radius:50%;border:none;font-size:1.7rem;font-weight:800;background:#fff;color:var(--pri);
+  box-shadow:0 7px 0 #c9c3e6;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;transition:transform .15s}
+.node:hover{transform:scale(1.08)}
+.node:active{transform:translateY(5px);box-shadow:0 2px 0 #c9c3e6}
+.node .ns{font-size:.7rem;letter-spacing:1px;color:#d1d5db;margin-top:2px}
+.node .ns b{color:#f59e0b}
+.node.done{background:linear-gradient(#fde047,#facc15);color:#7c2d12;box-shadow:0 7px 0 #ca8a04}
+.node.next{background:var(--pri);color:#fff;box-shadow:0 7px 0 var(--pri-d);animation:pulse 1.6s infinite}
+@keyframes pulse{0%{box-shadow:0 7px 0 var(--pri-d),0 0 0 0 #a78bfa99}70%{box-shadow:0 7px 0 var(--pri-d),0 0 0 18px #a78bfa00}}
+.here{position:absolute;font-size:2.4rem;animation:hop 1.4s infinite;pointer-events:none;z-index:3}
+.deco{position:absolute;font-size:2.2rem;opacity:.9;pointer-events:none}
+/* question */
+.qcard{background:linear-gradient(180deg,#fff 60%,var(--c1))}
+.qhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.qnum{width:44px;height:44px;border-radius:14px;background:var(--pri);color:#fff;font-weight:800;font-size:1.3rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 0 var(--pri-d)}
+.chip{background:var(--pri-l);color:var(--pri);border-radius:999px;padding:2px 12px;font-weight:800;font-size:.9rem}
+.qhead .spk{margin-left:auto}
+.qtext{font-size:1.2rem;margin:10px 0 6px;font-weight:600}
+details.en{color:var(--muted);font-size:.95rem}
+details.en summary{cursor:pointer}
+.bottombar{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:center}
+.hintbtn{width:64px;height:64px;border-radius:50%;border:none;background:var(--yel);font-size:1.9rem;box-shadow:0 6px 0 var(--yel-d);animation:glow 3s infinite}
+@keyframes glow{0%,85%,100%{transform:scale(1)}90%{transform:scale(1.12) rotate(-8deg)}95%{transform:scale(1.12) rotate(8deg)}}
+/* fractions */
+.mx{display:inline-flex;align-items:center;vertical-align:middle;gap:2px;margin:0 2px}
+.mw{font-weight:800}
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.05;font-size:.92em}
+.fr>span:first-child,.fr>input:first-child{border-bottom:2.5px solid currentColor;padding:0 3px}
+.fr>span{padding:0 3px}
+/* steps */
+.steps{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+.step{display:flex;gap:10px;align-items:flex-start;border-radius:22px;padding:12px 14px;background:#f8f7ff;border:3px solid var(--line);animation:slidein .35s ease}
+@keyframes slidein{from{opacity:0;transform:translateY(16px) scale(.97)}}
+.step.cur{border-color:#a78bfa;background:#fff;box-shadow:0 6px 0 #ddd6fe}
+.step.done{border-color:#86efac;background:#f0fdf4}
+.snum{flex:0 0 36px;height:36px;border-radius:12px;background:var(--pri);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;box-shadow:0 3px 0 var(--pri-d)}
+.step.done .snum{background:var(--ok);box-shadow:0 3px 0 var(--ok-d);font-size:0}
+.step.done .snum:after{content:"✓";font-size:1.2rem}
+.sbody{flex:1;min-width:0}
+.sq{margin-bottom:8px;font-weight:600}
+.sok{color:var(--ok-d);font-size:.95rem;margin-top:6px}
+.inline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.inp{width:4.2em;font-size:1.3rem;font-weight:800;padding:4px 6px;border:3px solid #d4cff0;border-radius:14px;text-align:center;background:#fff;color:var(--ink);caret-color:var(--pri)}
+.inp:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 4px #ddd6fe}
+.fr .inp{width:3.2em;margin:2px 0;padding:2px 4px;font-size:1.1rem}
+.mx .inp.w{width:2.6em}
+.choices{display:flex;flex-wrap:wrap;gap:10px}
+.choice{border:3px solid #ddd6fe;background:#fff;border-radius:18px;padding:8px 14px;font-weight:700;box-shadow:0 5px 0 #ddd6fe;transition:transform .1s}
+.choice:hover:not(:disabled){transform:translateY(-2px);border-color:#a78bfa}
+.choice.right{border-color:var(--ok);background:var(--okbg);box-shadow:0 5px 0 #86efac;animation:popin .4s}
+.choice.wrongc{border-color:var(--bad);background:var(--badbg);box-shadow:0 5px 0 #fca5a5}
+@keyframes popin{50%{transform:scale(1.1)}}
+.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+.visual{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin:8px 0;align-items:center;font-size:1.3rem}
+/* numpad */
+.numpad{position:fixed;left:0;right:0;bottom:0;z-index:40;background:#fff;border-radius:28px 28px 0 0;box-shadow:0 -8px 30px #0000002a;padding:10px 12px 14px;transform:translateY(110%);transition:transform .25s}
+.numpad.show{transform:none}
+.numpad .grid4{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;max-width:620px;margin:0 auto}
+.numpad button{border:none;border-radius:16px;height:52px;font-size:1.45rem;font-weight:800;background:var(--pri-l);color:var(--pri);box-shadow:0 4px 0 #c4b5fd}
+.numpad button:active{transform:translateY(3px);box-shadow:0 1px 0 #c4b5fd}
+.numpad .k-ok{grid-column:span 2;background:var(--ok);color:#fff;box-shadow:0 4px 0 var(--ok-d);font-size:1.15rem}
+.numpad .k-del{background:#fee2e2;color:#b91c1c;box-shadow:0 4px 0 #fca5a5}
+.numpad .k-nav{background:#e0f2fe;color:#0369a1;box-shadow:0 4px 0 #7dd3fc;font-size:1.1rem}
+.numpad .k-x{background:#f1f5f9;color:#64748b;box-shadow:0 4px 0 #cbd5e1;font-size:1rem}
+/* long division */
+.ldwrap{display:flex;justify-content:center;margin:10px 0}
+.ldiv{display:flex;font-family:"Courier New",monospace;font-size:1.7rem;font-weight:700;background:#fffdf2;border-radius:22px;padding:14px 22px;border:3px dashed #fcd34d}
+.ldleft{display:grid;gap:0;padding-right:10px}
+.ldc{width:1.25em;height:1.5em;text-align:center}
+.ldc.hl{background:var(--hl);border-radius:8px}
+.ldc.new{color:var(--blue)}
+.ldc.qt{color:var(--pri)}
+.ldright{border-left:3px solid var(--ink);padding-left:10px;min-width:4em}
+.ldright .dv{border-bottom:3px solid var(--ink);padding-bottom:2px}
+.ldright .qt{color:var(--pri)}
+.digits{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:6px}
+.digits button{width:54px;height:54px;border-radius:18px;border:none;background:linear-gradient(#c4b5fd,#a78bfa);font-weight:800;font-size:1.4rem;color:#fff;box-shadow:0 5px 0 var(--pri-d)}
+.digits button:active{transform:translateY(4px);box-shadow:0 1px 0 var(--pri-d)}
+.trial{text-align:center;margin:8px 0;min-height:1.5em;font-weight:600}
+/* expressions */
+.locks{text-align:center;font-size:2rem;letter-spacing:4px}
+.expr{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:5px;font-size:1.8rem;font-weight:800;margin:10px 0;padding:12px;background:#f5f3ff;border-radius:22px}
+.expr .num{padding:0 4px;border-radius:10px}
+.expr .num.f,.expr .opbtn.f{background:var(--hl)}
+.expr .par{color:#a5a1c4}
+.opbtn{border:none;background:#fff;color:var(--pri);font-weight:800;font-size:1.6rem;width:48px;height:48px;border-radius:16px;box-shadow:0 5px 0 #c4b5fd}
+.opbtn:active{transform:translateY(4px);box-shadow:0 1px 0 #c4b5fd}
+.opbtn.flash{animation:flash 1s 2}
+@keyframes flash{50%{background:#facc15;transform:scale(1.15)}}
+.exhist{font-size:1.15rem;margin:6px auto;max-width:600px;background:#fffdf2}
+.exhist div{padding:2px 8px}
+/* units */
+.utable{margin:8px auto;border-collapse:collapse;font-size:1.4rem;font-weight:800;background:#fffdf2;border-radius:18px}
+.utable td{padding:4px 10px;text-align:right;min-width:3.5em}
+.utable .u{font-size:.85rem;color:var(--muted);font-weight:600}
+.utable tr.res td{border-top:3px solid var(--ink);color:var(--pri)}
+.utable td.fc{background:var(--hl);border-radius:8px}
+.utable .carry{font-size:.85rem;color:var(--bad);height:1.2em}
+.utable s{color:#a5a1c4}
+.utable .nt{color:var(--blue);font-size:.9rem;display:block}
+/* ninja */
+.bigfrac{font-size:3.2rem;font-weight:800;text-align:center;margin:10px 0;color:var(--pri)}
+.ninja{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.ninja .nb{border:none;background:#312e81;color:#fff;border-radius:16px;padding:10px 14px;font-weight:800;box-shadow:0 5px 0 #1e1b4b}
+.ninja .nb:active{transform:translateY(4px);box-shadow:0 1px 0 #1e1b4b}
+.slash{animation:slash .5s}
+@keyframes slash{0%{transform:scale(1)}40%{transform:scale(1.3) rotate(-8deg);color:#f43f5e}100%{transform:scale(1)}}
+.hist{margin:8px auto;max-width:520px;font-size:1.2rem}
+/* grids & boards */
+.grid{display:inline-grid;gap:4px;background:#a5a1c4;padding:4px;border-radius:10px}
+.grid .cell{width:44px;height:44px;background:#fff;border:none;border-radius:6px}
+.grid .cell.on{background:#6d28d9}
+.grid .cell.bad{outline:3px solid var(--bad);outline-offset:-3px}
+.flipx{transition:transform 1s;transform-style:preserve-3d}
+.board{display:grid;grid-template-columns:repeat(10,1fr) 52px;gap:4px;max-width:620px;margin:0 auto}
+.board button{border:none;border-radius:10px;background:#f1effc;padding:6px 0;font-weight:800;font-size:1rem;box-shadow:0 3px 0 #ddd6fe}
+.board button.on{background:#86efac;box-shadow:0 3px 0 #22c55e}
+.board button.no{background:#fecaca}
+.board .cnt{display:flex;align-items:center;justify-content:center;font-size:.85rem;color:var(--muted)}
+.found{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:8px 0}
+.found span{background:var(--pri-l);border-radius:14px;padding:4px 12px;font-weight:800;min-width:60px;text-align:center;animation:popin .4s}
+.found span.empty{background:#f1f5f9;color:#c4c1d9;animation:none}
+.cards{display:flex;gap:10px;justify-content:center;margin:10px 0}
+.ncard{width:58px;height:76px;border-radius:16px;border:none;background:linear-gradient(#f9a8d4,#ec4899);color:#fff;font-size:2rem;font-weight:800;box-shadow:0 6px 0 #be185d}
+.ncard:active{transform:translateY(4px)}
+.ncard:disabled{opacity:.35}
+.slot{font-size:2.3rem;font-weight:800;letter-spacing:8px;text-align:center;min-height:1.6em;color:var(--pri)}
+.machine{display:grid;grid-template-columns:auto auto auto auto auto;gap:8px 10px;align-items:center;justify-content:center;font-weight:800;font-size:1.25rem}
+.machine .sqr,.machine .hex,.machine .cir{width:54px;height:54px;display:flex;align-items:center;justify-content:center}
+.machine .sqr{background:#ffedd5;border:3px solid #fb923c;border-radius:10px}
+.machine .hex{background:#fecdd3;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)}
+.machine .cir{background:#fff1f2;border:3px solid #fda4af;border-radius:50%}
+.machine .q{background:#fff;color:var(--pri);outline:3px dashed #a78bfa}
+.arrow{color:#60a5fa}
+.diamond{position:relative;margin:10px auto}
+.diamond div{position:absolute;width:58px;height:34px;border:2px solid #3b3561;display:flex;align-items:center;justify-content:center;font-weight:800;background:#fff}
+.diamond div.g{background:#cbd5e1}
+.diamond div.h{background:var(--hl)}
+.diamond div.ans{color:var(--pri)}
+.layers{display:flex;flex-wrap:wrap;gap:16px;justify-content:center}
+.layer{text-align:center}
+.layer .grid .cell{width:38px;height:38px;font-weight:800}
+.layer .grid .cell.x{background:repeating-linear-gradient(45deg,#e5e7eb 0 4px,#f3f4f6 4px 8px);cursor:default}
+.layer .grid .cell.m{background:#facc15}
+/* overlays */
+.modal,.celebrate{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal{background:#2b235099}
+.celebrate{background:radial-gradient(circle at 50% 40%,#fef9c3ee,#c4b5fdee 70%)}
+.modal .box,.celebrate .box{background:#fff;border-radius:32px;padding:22px;max-width:440px;width:100%;text-align:center;animation:pop .35s cubic-bezier(.3,1.6,.6,1);box-shadow:0 10px 0 #00000022}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+.bigstars{display:flex;justify-content:center;gap:6px;margin:6px 0}
+.bigstars span{font-size:3.4rem;opacity:0;animation:starpop .5s cubic-bezier(.3,1.8,.6,1) forwards}
+.bigstars span.off{filter:grayscale(1);}
+.bigstars span.off{animation-name:starpopoff}
+@keyframes starpop{from{opacity:0;transform:scale(0) rotate(-90deg)}to{opacity:1;transform:scale(1)}}
+@keyframes starpopoff{from{opacity:0;transform:scale(0)}to{opacity:.25;transform:scale(.85)}}
+.coins{font-size:1.4rem;font-weight:800;color:#b45309}
+.sticker{display:inline-flex;flex-direction:column;align-items:center;background:linear-gradient(#fff,#fef3c7);border:4px dashed #f59e0b;border-radius:24px;padding:8px 18px;margin:8px 0;animation:flipin .8s .9s both}
+.sticker .se{font-size:3.6rem;line-height:1.1}
+@keyframes flipin{from{transform:rotateY(90deg) scale(.5);opacity:0}}
+.album{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:12px}
+.slotS{background:#fff;border-radius:22px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 6px 0 #0000001a;border:none}
+.slotS .se{font-size:2.6rem;line-height:1.1}
+.slotS.no .se{filter:brightness(0) opacity(.15)}
+.slotS:active .se{animation:wob .5s}
+.avs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0}
+.avs button{width:56px;height:56px;border-radius:50%;border:3px solid transparent;background:#f5f3ff;font-size:1.9rem}
+.avs button.sel{border-color:var(--pri);background:#ede9fe;transform:scale(1.1)}
+.nameinp{font-size:1.3rem;font-weight:700;padding:8px 14px;border-radius:16px;border:3px solid #ddd6fe;text-align:center;width:100%;max-width:280px;color:var(--ink)}
+.conf{position:fixed;top:-40px;font-size:1.8rem;z-index:60;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(115vh) rotate(600deg)}}
+@media (max-width:560px){
+  body{font-size:17px}
+  .expr{font-size:1.35rem}
+  .opbtn{width:40px;height:40px;font-size:1.25rem}
+  .ldiv{font-size:1.3rem;padding:10px 12px}
+  .grid .cell{width:34px;height:34px}
+  .board button{font-size:.8rem;padding:4px 0}
+  .board{grid-template-columns:repeat(10,1fr) 40px;gap:2px}
+  .numpad button{height:46px}
+  .chipn{padding:3px 8px;font-size:.9rem}
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+"use strict";
+/* ================= tiện ích ================= */
+const LS='g3_2012_minigame_v1';
+let P={};
+try{P=JSON.parse(localStorage.getItem(LS))||{}}catch(e){P={}}
+if(!P.stars)P.stars={};
+if(!P.name){try{const o=JSON.parse(localStorage.getItem('g5_2012_minigame_v1'))||{};if(o.name){P.name=o.name;P.avatar=o.avatar}}catch(e){}}
+const save=()=>{try{localStorage.setItem(LS,JSON.stringify(P))}catch(e){}};
+const app=document.getElementById('app');
+function h(tag,props,...kids){
+  const e=document.createElement(tag);
+  for(const [k,v] of Object.entries(props||{})){
+    if(v==null||v===false)continue;
+    if(k==='class')e.className=v;
+    else if(k==='html')e.innerHTML=v;
+    else if(k==='style')e.style.cssText=v;
+    else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);
+    else e.setAttribute(k,v);
+  }
+  for(const c of kids.flat()){if(c==null||c===false)continue;e.append(c.nodeType?c:document.createTextNode(c));}
+  return e;
+}
+const gcd=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a};
+const fr=(w,n,d)=>`<span class="mx">${w?`<b class="mw">${w}</b>`:''}<span class="fr"><span>${n}</span><span>${d}</span></span></span>`;
+// {4 6/7} hoặc {6/7} -> phân số đẹp
+const T=s=>String(s==null?'':s).replace(/\{(?:(\d+) )?(\d+)\/(\d+)\}/g,(m,w,n,d)=>fr(w,n,d));
+const fmt=n=>{const s=String(Math.round(n*1000)/1000).replace('.',',');const [i,d]=s.split(',');return i.replace(/\B(?=(\d{3})+(?!\d))/g,'.')+(d?','+d:'')};
+const parseNum=s=>{s=String(s).trim().replace(/\s/g,'');if(s==='')return NaN;
+  // 91,02 -> 91.02 ; 5.428 (kiểu VN hàng nghìn) -> 5428
+  if(s.includes(','))s=s.replace(/\./g,'').replace(',','.');
+  else if(/^\d{1,3}(\.\d{3})+$/.test(s))s=s.replace(/\./g,'');
+  return Number(s)};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+
+/* âm thanh */
+let AC=null;
+function beep(f=660,d=.12,type='sine',vol=.12){
+  if(P.mute)return;
+  try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;
+    g.gain.setValueAtTime(vol,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);
+    o.connect(g).connect(AC.destination);o.start();o.stop(AC.currentTime+d);}catch(e){}
+}
+const sOk=()=>{beep(660);setTimeout(()=>beep(880),90)};
+const sBad=()=>beep(180,.22,'square',.06);
+const sWin=()=>[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.18),i*130));
+
+/* ================= trạng thái 1 lượt chơi ================= */
+const G={q:null,mist:0,hint:0,hintFn:null,bubble:null,owl:null,finished:false};
+function say(html,mood=''){
+  if(!G.bubble)return;
+  G.bubble.className='bubble '+mood;G.bubble.innerHTML=T(html);G.lastSay=html;
+  setMood(mood);speak(html);
+}
+const PRAISE=['Giỏi quá! 🎉','Chính xác! 👏','Tuyệt vời! ⭐','Đúng rồi, tiếp tục nào! 🚀','Bạn làm tốt lắm! 💪','Xuất sắc! 🌟'];
+const OOPS=['Chưa đúng rồi, thử lại nhé! 🤔','Gần đúng rồi! Kiểm tra lại phép tính nha.','Ôi, sai mất rồi. Bình tĩnh tính lại nhé!','Thử lại một lần nữa nào, bạn làm được mà!'];
+function praise(extra){say((extra?extra+' ':'')+pick(PRAISE),'happy')}
+function bad(msg,node){G.mist++;sBad();say(msg||pick(OOPS),'sad');if(node){node.classList.remove('shake');void node.offsetWidth;node.classList.add('shake')}}
+function useHint(){
+  if(G.finished)return;
+  const t=G.hintFn?G.hintFn():null;
+  if(!t){say('Bạn đang làm rất tốt, cứ tiếp tục nhé!','think');return}
+  G.hint++;say('💡 '+t,'think');
+}
+
+/* ================= bước hướng dẫn (quest) ================= */
+const FORM={ 'form-simp':'Đúng giá trị rồi! Nhưng hãy <b>rút gọn</b> phân số đến tối giản nhé.',
+  'form-mixed':'Đúng giá trị rồi! Hãy viết thành <b>hỗn số</b> (phần phân số phải nhỏ hơn 1).',
+  'form-imp':'Ở bước này hãy viết dạng <b>phân số</b> (không có phần nguyên) nhé.',
+  'empty':'Bạn điền đủ các ô trước đã nhé!' };
+function parseFracStr(s){const m=String(s).match(/^(?:(\d+) )?(\d+)\/(\d+)$/);return [m[1]?+m[1]:0,+m[2],+m[3]]}
+function makeInput(inp){
+  const t=inp.t||'num';
+  if(t==='num'){
+    const e=h('input',{class:'inp',inputmode:'none',autocomplete:'off',style:`width:${Math.max(3.2,String(inp.a).length*0.75+1.6)}em`});
+    return [e,()=>{const v=parseNum(e.value);if(isNaN(v))return'empty';return Math.abs(v-inp.a)<1e-9?'ok':'wrong'}];
+  }
+  if(t==='fnum'){ // tử số cần điền, mẫu cố định
+    const e=h('input',{class:'inp',inputmode:'none',autocomplete:'off'});
+    const node=h('span',{class:'mx'},h('span',{class:'fr'},e,h('span',{},String(inp.den))));
+    return [node,()=>{const v=parseNum(e.value);if(isNaN(v))return'empty';return v===inp.a?'ok':'wrong'}];
+  }
+  // frac
+  const ew=inp.whole?h('input',{class:'inp w',inputmode:'none',autocomplete:'off'}):null;
+  const en=h('input',{class:'inp',inputmode:'none',autocomplete:'off'});
+  const ed=h('input',{class:'inp',inputmode:'none',autocomplete:'off'});
+  const node=h('span',{class:'mx'},ew,h('span',{class:'fr'},en,ed));
+  return [node,()=>{
+    const ws=ew?ew.value.trim():'';const w=ws===''?0:parseInt(ws),n=parseInt(en.value),d=parseInt(ed.value);
+    if(isNaN(n)||isNaN(d)||isNaN(w))return 'empty';
+    if(d===0)return 'wrong';
+    const [aw,an,ad]=parseFracStr(inp.a);
+    if((w*d+n)*ad!==(aw*ad+an)*d)return 'wrong';
+    if(inp.form==='final'){if(n!==0&&gcd(n,d)!==1)return'form-simp';if(n>=d)return'form-mixed'}
+    if(inp.form==='imp'&&w!==0)return'form-imp';
+    return 'ok';
+  }];
+}
+function quest(box,steps,done){
+  const wrap=h('div',{class:'steps'});box.append(wrap);
+  let i=0;
+  const run=()=>{
+    G.prog&&G.prog(i,steps.length);
+    if(i>=steps.length){G.hintFn=null;(done||finish)();return}
+    const st=steps[i];
+    st.onShow&&st.onShow();
+    G.hintFn=()=>st.hint||'Đọc thật kỹ câu hỏi, rồi tính từng bước nhé!';
+    const row=h('div',{class:'step cur'});
+    const body=h('div',{class:'sbody'});
+    row.append(h('div',{class:'snum'},String(i+1)),body);
+    body.append(h('div',{class:'sq',html:T(st.q)}));
+    const okDone=()=>{
+      row.classList.remove('cur');row.classList.add('done');
+      body.querySelectorAll('input,button').forEach(e=>e.disabled=true);
+      if(st.ok)body.append(h('div',{class:'sok',html:'✅ '+T(st.ok)}));
+      sOk();praise();st.onOk&&st.onOk();i++;setTimeout(run,300);
+    };
+    if(st.choices){
+      const cw=h('div',{class:'choices'});
+      st.choices.forEach((c,k)=>{const b=h('button',{class:'choice',html:T(c),onclick:()=>{
+        if(k===st.ans){b.classList.add('right');okDone()}
+        else{b.classList.add('wrongc');bad(st.why&&st.why[k],row)}}});cw.append(b)});
+      body.append(cw);
+    }else{
+      const line=h('div',{class:'inline'});const checks=[];
+      st.inputs.forEach(inp=>{
+        if(inp.pre)line.append(h('span',{html:T(inp.pre)}));
+        const [node,chk]=makeInput(inp);line.append(node);checks.push(chk);
+        if(inp.post)line.append(h('span',{html:T(inp.post)}));
+      });
+      const btn=h('button',{class:'btn go',onclick:()=>{
+        let res='ok';for(const c of checks){const r=c();if(r!=='ok'){res=r;break}}
+        if(res==='ok')okDone();else if(FORM[res])say(FORM[res],'think');else bad(st.wrong,row);
+      }},'Kiểm tra');
+      line.append(btn);body.append(line);
+      line.addEventListener('keydown',e=>{if(e.key==='Enter'&&!btn.disabled)btn.click()});
+      setTimeout(()=>{const f=line.querySelector('input');f&&f.focus({preventScroll:true})},50);
+    }
+    wrap.append(row);
+    setTimeout(()=>row.scrollIntoView({behavior:'smooth',block:'nearest'}),60);
+  };
+  run();
+}
+
+/* ================= các loại trò chơi ================= */
+
+/* ---- 1. Chia kiểu cột: "Đoán thương" ---- */
+function gameDiv(area,{a,b}){
+  const ds=String(a).split('').map(Number);
+  const plan=[];let idx=0,p=0;
+  do{p=p*10+ds[idx];idx++}while(p<b&&idx<ds.length);
+  for(;;){const q=Math.floor(p/b),r=p-q*b;plan.push({p,q,r,end:idx-1});if(idx>=ds.length)break;p=r*10+ds[idx];idx++}
+  const rows=[];let k=0,qstr='',phase='guess';
+  const box=h('div',{class:'ldiv'});area.append(h('div',{class:'ldwrap'},box));
+  const trial=h('div',{class:'trial'});const ctrl=h('div');area.append(trial,ctrl);
+  const N=ds.length;
+  function draw(){
+    box.innerHTML='';
+    const left=h('div',{class:'ldleft',style:`grid-template-columns:repeat(${N},1.25em)`});
+    ds.forEach((d,j)=>left.append(h('div',{class:'ldc'+(k===0&&phase!=='end'&&j<=plan[0].end?' hl':'')},String(d))));
+    rows.forEach((r,ri)=>{
+      const s=r.str;const start=r.end-s.length+1;
+      for(let j=0;j<N;j++){const ch=(j>=start&&j<=r.end)?s[j-start]:'';
+        left.append(h('div',{class:'ldc'+(r.cur&&ch?' hl':'')+(r.newIdx===j?' new':'')},ch))}
+    });
+    const right=h('div',{class:'ldright'},h('div',{class:'dv'},String(b)),h('div',{class:'qt'},qstr+(phase==='end'?'':'?')));
+    box.append(left,right);
+  }
+  function guess(){
+    phase='guess';const st=plan[k];draw();trial.innerHTML='';
+    ctrl.innerHTML='';
+    ctrl.append(h('div',{class:'center',html:`Lấy <b>${st.p}</b> chia cho <b>${b}</b> được mấy? Bấm để thử:`}));
+    const dg=h('div',{class:'digits'});
+    for(let g=0;g<=9;g++)dg.append(h('button',{onclick:()=>tryG(g)},String(g)));
+    ctrl.append(dg);
+    G.hintFn=()=>{
+      if(b<10)return `Nhớ bảng nhân ${b}: tìm số lớn nhất mà ${b} × số đó không vượt quá ${st.p}. Ví dụ ${b} × ${st.q} = ${b*st.q}, còn ${b} × ${st.q+1} = ${b*(st.q+1)}.`;
+      const pw=Math.pow(10,String(b).length-1),br=Math.round(b/pw)*pw;
+      return `Làm tròn ${b} ≈ ${br}. Ước lượng: ${st.p} : ${br} ≈ ${Math.floor(st.p/br)}. Thử số đó xem: nếu tích lớn quá thì giảm đi 1, nếu số dư vẫn lớn hơn số chia thì tăng lên 1 nhé!`;
+    };
+    say(k===0?`Bắt đầu từ trái sang: lấy <b>${st.p}</b> (số nhỏ nhất ở đầu số bị chia mà chia được cho ${b}).`:`Bây giờ chia <b>${st.p}</b> cho <b>${b}</b>.`);
+  }
+  function tryG(g){
+    const st=plan[k],pr=g*b;
+    if(pr>st.p){trial.innerHTML=`${g} × ${b} = ${pr} &gt; ${st.p} → <b style="color:var(--bad)">Lớn quá!</b> Chọn số nhỏ hơn.`;sBad();say('Lớn quá rồi, giảm xuống nhé!','think');return}
+    if(st.p-pr>=b){trial.innerHTML=`${g} × ${b} = ${pr}; còn dư ${st.p} − ${pr} = ${st.p-pr} ≥ ${b} → <b style="color:var(--warn)">Còn chia được nữa!</b> Chọn số lớn hơn.`;sBad();say('Số dư vẫn lớn hơn số chia, tăng lên nhé!','think');return}
+    trial.innerHTML=`${g} × ${b} = ${pr} ≤ ${st.p} ✓`;qstr+=String(g);sOk();praise(`Viết <b>${g}</b> vào thương.`);remStep();
+  }
+  function remStep(){
+    phase='rem';draw();const st=plan[k];ctrl.innerHTML='';
+    const e=h('input',{class:'inp',inputmode:'none'});
+    const go=()=>{const v=parseNum(e.value);if(isNaN(v)){say(FORM.empty,'think');return}
+      if(v!==st.r){bad(`Tính lại nhé: ${st.p} − ${st.q*b} = ?`,ctrl);return}
+      sOk();rows.forEach(r=>r.cur=false);G.prog&&G.prog(k+1,plan.length+1);
+      if(k<plan.length-1){bring()}else{rows.push({str:String(st.r),end:st.end,cur:false});finalStep()}};
+    e.addEventListener('keydown',ev=>{if(ev.key==='Enter')go()});
+    ctrl.append(h('div',{class:'inline',style:'justify-content:center'},
+      h('span',{html:`${st.q} nhân ${b} bằng ${st.q*b}. &nbsp;${st.p} − ${st.q*b} = `}),e,h('button',{class:'btn go',onclick:go},'Kiểm tra')));
+    G.hintFn=()=>`Lấy ${st.p} trừ đi ${st.q*b}.`;
+    setTimeout(()=>e.focus({preventScroll:true}),50);
+  }
+  function bring(){
+    phase='bring';const st=plan[k],nx=plan[k+1];
+    const digit=ds[nx.end];
+    ctrl.innerHTML='';
+    ctrl.append(h('div',{class:'center'},h('button',{class:'btn y',onclick:()=>{
+      rows.push({str:String(st.r)+String(digit),end:nx.end,cur:true,newIdx:nx.end});k++;praise(`Hạ ${digit} xuống, được ${nx.p}.`);guess()}},`⬇️ Hạ chữ số ${digit} xuống`)));
+    say(`Số dư là ${st.r}. Bây giờ hạ chữ số tiếp theo xuống nhé!`);
+    G.hintFn=()=>`Bấm nút vàng để hạ chữ số ${digit} xuống cạnh số dư ${st.r}.`;
+  }
+  function finalStep(){
+    phase='end';draw();ctrl.innerHTML='';trial.innerHTML='';
+    const q=Math.floor(a/b),r=a%b;
+    quest(ctrl,[{q:`Vậy ${fmt(a)} : ${b} = ? (dư ?)`,inputs:[{a:q},{a:r,pre:'dư'}],
+      hint:`Thương là số màu tím bên phải, số dư là số cuối cùng bên trái.`,
+      ok:`Thử lại: ${q} × ${b} + ${r} = ${fmt(a)} ✓`}]);
+  }
+  guess();
+}
+
+/* ---- 2. Biểu thức: "Mở khóa rương" ---- */
+function tokenize(s){const out=[];const re=/\d+|[-+×÷()]/g;let m;while((m=re.exec(s))){const x=m[0];
+  if(/\d/.test(x))out.push({t:'n',v:+x});else if(x==='('||x===')')out.push({t:x});else out.push({t:'op',v:x})}return out}
+function simpPar(tk){let ch=true;while(ch){ch=false;for(let j=0;j+2<tk.length;j++){if(tk[j].t==='('&&tk[j+1].t==='n'&&tk[j+2].t===')'){tk.splice(j,3,tk[j+1]);ch=true;break}}}}
+function nextOp(tk){
+  let lo=0,hi=tk.length-1;const close=tk.findIndex(x=>x.t===')');
+  if(close>=0){let open=close;while(tk[open].t!=='(')open--;lo=open+1;hi=close-1}
+  for(let j=lo;j<=hi;j++)if(tk[j].t==='op'&&(tk[j].v==='×'||tk[j].v==='÷'))return{j,lo,hi};
+  for(let j=lo;j<=hi;j++)if(tk[j].t==='op')return{j,lo,hi};
+}
+const SYM={'+':'+','-':'−','×':'×','÷':':'};
+const exprStr=tk=>tk.map(t=>t.t==='n'?fmt(t.v):t.t==='op'?SYM[t.v]:t.t).join(' ').replace(/\( /g,'(').replace(/ \)/g,')');
+function gameExpr(area,{e}){
+  const tk=tokenize(e);simpPar(tk);
+  const total=tk.filter(t=>t.t==='op').length;let opened=0;
+  const locks=h('div',{class:'locks'}),ex=h('div',{class:'expr'}),ask=h('div',{class:'center'}),hist=h('div',{class:'exhist card'});
+  area.append(h('div',{class:'center small'},'Mỗi phép tính đúng mở được 1 ổ khóa. Mở hết để lấy kho báu! Bấm vào phép tính phải làm TRƯỚC.'),locks,ex,ask,hist);
+  hist.append(h('div',{},exprStr(tk)));
+  let focus=null;
+  function draw(){
+    locks.textContent='🔓'.repeat(opened)+'🔒'.repeat(total-opened)+'  '+(opened===total?'💎':'🎁');
+    ex.innerHTML='';
+    tk.forEach((t,j)=>{
+      const f=focus!=null&&j>=focus-1&&j<=focus+1;
+      if(t.t==='op')ex.append(h('button',{class:'opbtn'+(f?' f':''),'data-j':j,onclick:()=>choose(j)},SYM[t.v]));
+      else ex.append(h('span',{class:(t.t==='n'?'num':'par')+(f?' f':'')},t.t==='n'?fmt(t.v):t.t));
+    });
+  }
+  function reason(j){const n=nextOp(tk);
+    if(tk.some(t=>t.t==='(')&&(j<n.lo||j>n.hi))return'Có dấu ngoặc! Phải làm phép tính <b>trong ngoặc</b> (ngoặc trong cùng) trước nhé.';
+    if((tk[j].v==='+'||tk[j].v==='-')&&(tk[n.j].v==='×'||tk[n.j].v==='÷'))return'Nhớ quy tắc: <b>nhân, chia trước — cộng, trừ sau</b>!';
+    return'Các phép tính cùng loại thì làm <b>từ trái sang phải</b> nhé!'}
+  function choose(j){
+    if(focus!=null)return;
+    const n=nextOp(tk);
+    if(j!==n.j){bad(reason(j),ex);return}
+    focus=j;draw();
+    const A=tk[j-1].v,B=tk[j+1].v,op=tk[j].v;
+    const res=op==='+'?A+B:op==='-'?A-B:op==='×'?A*B:A/B;
+    ask.innerHTML='';
+    const inp=h('input',{class:'inp',inputmode:'none'});
+    const go=()=>{const v=parseNum(inp.value);if(isNaN(v)){say(FORM.empty,'think');return}
+      if(v!==res){bad(`Tính lại: ${A} ${SYM[op]} ${B} = ?`,ask);return}
+      tk.splice(j-1,3,{t:'n',v:res});simpPar(tk);opened++;G.prog&&G.prog(opened,total);focus=null;ask.innerHTML='';sOk();
+      hist.append(h('div',{},'= '+exprStr(tk)));
+      draw();
+      if(tk.length===1){say(`Mở hết khóa rồi! Kết quả là <b>${fmt(res)}</b> 💎`,'happy');G.hintFn=null;setTimeout(finish,600)}
+      else {praise();G.hintFn=hintNext}};
+    inp.addEventListener('keydown',ev=>{if(ev.key==='Enter')go()});
+    ask.append(h('div',{class:'inline',style:'justify-content:center;font-size:1.3rem'},h('span',{},`${fmt(A)} ${SYM[op]} ${fmt(B)} = `),inp,h('button',{class:'btn go',onclick:go},'Kiểm tra')));
+    G.hintFn=()=>`Tính ${A} ${SYM[op]} ${B}.`;
+    setTimeout(()=>inp.focus({preventScroll:true}),50);
+    say('Đúng phép tính cần làm trước rồi! Giờ tính kết quả nào.','happy');
+  }
+  function hintNext(){const n=nextOp(tk);const b=ex.querySelector(`[data-j="${n.j}"]`);if(b){b.classList.remove('flash');void b.offsetWidth;b.classList.add('flash')}
+    return 'Thứ tự: ① trong ngoặc trước ② nhân, chia ③ cộng, trừ — cùng loại thì trái sang phải. Phép tính nhấp nháy là phép cần làm!'}
+  G.hintFn=hintNext;
+  draw();
+  say('Nhìn kỹ biểu thức: có ngoặc không? có nhân chia không? Bấm vào phép tính phải làm trước tiên!');
+}
+
+/* ---- 3. Cộng trừ số đo nhiều đơn vị: "Máy đổi đơn vị" ---- */
+function gameUnits(area,{names,base,top,bot,op,done}){
+  const n=names.length,res=Array(n).fill(null),carry=Array(n).fill(0),nt=Array(n).fill(null);let fc=n-1;
+  const tbl=h('table',{class:'utable'});area.append(tbl);
+  function draw(){
+    tbl.innerHTML='';
+    const rc=h('tr');rc.append(h('td'));for(let i=0;i<n;i++)rc.append(h('td',{class:'carry'},op==='+'&&carry[i]?`+${carry[i]} nhớ`:''));tbl.append(rc);
+    const r1=h('tr');r1.append(h('td'));for(let i=0;i<n;i++){const td=h('td',{class:i===fc?'fc':''});
+      if(nt[i]!=null)td.innerHTML=`<span class="nt">${nt[i]}</span><s>${top[i]}</s> <span class="u">${names[i]}</span>`;
+      else td.innerHTML=`${top[i]} <span class="u">${names[i]}</span>`;r1.append(td)}tbl.append(r1);
+    const r2=h('tr');r2.append(h('td',{},op==='+'?'+':'−'));for(let i=0;i<n;i++)r2.append(h('td',{class:i===fc?'fc':'',html:bot[i]==null?'':`${bot[i]} <span class="u">${names[i]}</span>`}));tbl.append(r2);
+    const r3=h('tr',{class:'res'});r3.append(h('td'));for(let i=0;i<n;i++)r3.append(h('td',{html:res[i]==null?'?':`${res[i]} <span class="u">${names[i]}</span>`}));tbl.append(r3);
+  }
+  const B=i=>bot[i]||0;
+  const steps=[];
+  if(op==='+'){let c=0;
+    for(let i=n-1;i>=0;i--){const s=top[i]+B(i)+c;const cc=c;
+      const st={q:`Cột <b>${names[i]}</b>: ${top[i]} + ${B(i)}${cc?` + ${cc} (nhớ)`:''} = ?`,inputs:[{a:s,post:names[i]}],
+        hint:`Cộng các số ở cột ${names[i]}${cc?', đừng quên số nhớ '+cc:''}.`,onShow:()=>{fc=i;draw()}};
+      steps.push(st);
+      if(i>0&&s>=base[i]){const nc=Math.floor(s/base[i]),r=s%base[i];
+        steps.push({q:`${s} ${names[i]} ≥ ${base[i]} ${names[i]} nên phải đổi! (1 ${names[i-1]} = ${fmt(base[i])} ${names[i]})<br>${fmt(s)} ${names[i]} = ? ${names[i-1]} ? ${names[i]}`,
+          inputs:[{a:nc,post:names[i-1]},{a:r,post:names[i]}],hint:`${fmt(s)} − ${fmt(base[i])} = ${fmt(s-base[i])}. Vậy ${fmt(s)} ${names[i]} = 1 ${names[i-1]} ${fmt(s-base[i])} ${names[i]}.`,
+          ok:`Viết ${r} ${names[i]}, nhớ ${nc} ${names[i-1]} sang cột bên trái.`,onOk:()=>{res[i]=r;carry[i-1]=nc;draw()}});c=nc;
+      }else{st.onOk=()=>{res[i]=s;draw()};c=0}
+    }
+  }else{let bw=0;
+    for(let i=n-1;i>=0;i--){const t=top[i]-bw;
+      if(t<B(i)&&i>0){const t2=t+base[i];
+        steps.push({q:`Cột <b>${names[i]}</b>: ${t} &lt; ${B(i)} nên không trừ được! Mượn 1 ${names[i-1]} = ${fmt(base[i])} ${names[i]}.<br>${t} + ${fmt(base[i])} = ?`,
+          inputs:[{a:t2,post:names[i]}],hint:`Cộng thêm ${fmt(base[i])} vào ${t}.`,onShow:()=>{fc=i;draw()},
+          onOk:()=>{nt[i]=t2;nt[i-1]=top[i-1]-1;draw()}});
+        steps.push({q:`${fmt(t2)} − ${B(i)} = ?`,inputs:[{a:t2-B(i),post:names[i]}],hint:`Trừ như bình thường: ${fmt(t2)} − ${B(i)}.`,onOk:()=>{res[i]=t2-B(i);draw()}});bw=1;
+      }else{
+        steps.push({q:`Cột <b>${names[i]}</b>${bw?` (đã cho mượn 1 nên còn ${t})`:''}: ${t} − ${B(i)} = ?`,inputs:[{a:t-B(i),post:names[i]}],
+          hint:bw?`Cột này đã cho mượn 1, nên lấy ${t} (không phải ${top[i]}) trừ ${B(i)}.`:`Trừ ${t} − ${B(i)}.`,onShow:()=>{fc=i;draw()},onOk:()=>{res[i]=t-B(i);draw()}});bw=0;
+      }
+    }
+  }
+  draw();
+  say('Làm từ cột <b>đơn vị nhỏ nhất</b> (bên phải) sang trái. Nhớ đổi đơn vị khi cần nhé!');
+  quest(area,steps,()=>{fc=-1;draw();const s=res.map((v,i)=>`${v} ${names[i]}`).join(' ');say(`Kết quả: <b>${s}</b> 🎉`,'happy');if(done)done(res);else setTimeout(finish,500)});
+}
+
+/* ---- 4. Rút gọn phân số: "Ninja chém phân số" ---- */
+function gameSimplify(area,{n,d}){
+  let cn=n,cd=d;
+  const big=h('div',{class:'bigfrac',html:fr(0,cn,cd)});
+  const hist=h('div',{class:'hist center'});
+  const btns=h('div',{class:'ninja'});
+  [2,3,5,7,11,13,17].forEach(p=>btns.append(h('button',{class:'nb',onclick:()=>cut(p)},`🗡️ : ${p}`)));
+  const doneB=h('button',{class:'btn pri',onclick:()=>{if(gcd(cn,cd)===1){G.hintFn=null;say(`Phân số ${fr(0,cn,cd)} đã tối giản! Vậy ${fr(0,n,d)} = ${fr(0,cn,cd)}.`,'happy');btns.querySelectorAll('button').forEach(b=>b.disabled=true);doneB.disabled=true;setTimeout(finish,500)}
+    else bad(`Chưa đâu! ${cn} và ${cd} vẫn cùng chia hết cho một số nữa.`,big)}},'✋ Tối giản rồi!');
+  area.append(h('div',{class:'center small'},'Chọn thanh kiếm để chia CẢ tử số và mẫu số cho cùng một số. Chém đến khi không chia được nữa!'),big,btns,h('div',{class:'center',style:'margin-top:10px'},doneB),hist);
+  function cut(p){
+    if(cn%p===0&&cd%p===0){hist.append(h('div',{html:`${fr(0,cn,cd)} = ${fr(0,cn+' : '+p,cd+' : '+p)} = ${fr(0,cn/p,cd/p)}`}));
+      cn/=p;cd/=p;big.innerHTML=fr(0,cn,cd);big.classList.remove('slash');void big.offsetWidth;big.classList.add('slash');sOk();praise('Xoẹt!')}
+    else bad(`${cn%p?cn:cd} không chia hết cho ${p}. Thử số khác nhé!`,big);
+  }
+  G.hintFn=()=>{for(const p of [2,3,5,7,11,13,17])if(cn%p===0&&cd%p===0)return `Cả ${cn} và ${cd} đều chia hết cho <b>${p}</b>. (Mẹo: số chẵn chia hết cho 2; tổng các chữ số chia hết cho 3 thì số đó chia hết cho 3.)`;
+    return 'Không còn số nào chia hết cả tử và mẫu (trừ 1) → bấm "Tối giản rồi!".'};
+  say(`Rút gọn ${fr(0,n,d)}. Tìm số mà cả ${n} và ${d} đều chia hết nhé!`);
+}
+
+/* ---- hình vẽ hỗ trợ ---- */
+function pie(k,d,sz=58,col='#f97316'){
+  let s=`<svg width="${sz}" height="${sz}" viewBox="-1.1 -1.1 2.2 2.2">`;
+  for(let i=0;i<d;i++){const a0=-Math.PI/2+i*2*Math.PI/d,a1=a0+2*Math.PI/d;
+    s+=`<path d="M0 0 L${Math.cos(a0).toFixed(3)} ${Math.sin(a0).toFixed(3)} A1 1 0 0 1 ${Math.cos(a1).toFixed(3)} ${Math.sin(a1).toFixed(3)} Z" fill="${i<k?col:'#fff7ed'}" stroke="#7c2d12" stroke-width="0.04"/>`}
+  return s+'</svg>';
+}
+function pies(w,n,d,col){let s='';for(let i=0;i<w;i++)s+=pie(d,d,46,col);if(n)s+=pie(n,d,46,col);return `<span style="display:inline-flex;gap:3px;flex-wrap:wrap;vertical-align:middle">${s}</span>`}
+function crossFig(qd,sz=72){const c=sz/2,L=sz*.4,sx=qd[1]==='L'?-1:1,sy=qd[0]==='U'?-1:1;
+  return `<svg viewBox="0 0 ${sz} ${sz}" width="${sz}" height="${sz}"><g stroke="#1e293b" stroke-width="3" fill="none" stroke-linecap="round"><line x1="${c-L}" y1="${c}" x2="${c+L}" y2="${c}"/><line x1="${c}" y1="${c-L}" x2="${c}" y2="${c+L}"/><line x1="${c+sx*L}" y1="${c}" x2="${c}" y2="${c+sy*L}"/></g></svg>`}
+function dotsFig(n,s=22){const m=n+1,W=n*s+12;let t=`<svg width="${W}" height="${W}" viewBox="-6 -6 ${W} ${W}">`;
+  for(let i=0;i<m;i++){t+=`<line x1="0" y1="${i*s}" x2="${n*s}" y2="${i*s}" stroke="#94a3b8" stroke-dasharray="3 3"/><line x1="${i*s}" y1="0" x2="${i*s}" y2="${n*s}" stroke="#94a3b8" stroke-dasharray="3 3"/>`}
+  for(let i=0;i<m;i++)for(let j=0;j<m;j++)t+=`<circle cx="${j*s}" cy="${i*s}" r="3.6" fill="#1e293b"/>`;return t+'</svg>'}
+
+const IMG47='data:image/png;base64,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';
+const IMG47S='data:image/png;base64,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';
+/* ---- Nhân kiểu cột: "Xưởng phép nhân" ---- */
+function mulHint(a,d){const ds=String(a).split('').reverse().map(Number);let c=0;const out=[];
+  ds.forEach((x,i)=>{const p=x*d+c;const last=i===ds.length-1;
+    out.push(`${x} × ${d}${c?` + ${c}`:''} = ${p} → ${last||p<10?`viết ${last?p:p}`:`viết ${p%10}, nhớ ${Math.floor(p/10)}`}`);c=last?0:Math.floor(p/10)});
+  return out.join('; ')}
+function gameMul(area,{a,b}){
+  const A=String(a),B=String(b),bd=B.split('').reverse().map(Number);
+  const parts=bd.map(d=>a*d),res=a*b;
+  const W=Math.max(String(res).length,A.length,B.length)+1;
+  const shown={rows:parts.map(()=>null),res:false,partial:''};let focusRow=-1;
+  const box=h('div',{class:'ldiv'});area.append(h('div',{class:'ldwrap'},box));
+  const row=(str,end,cls)=>{const cells=[];const st=end-str.length+1;for(let j=0;j<W;j++){const ch=(j>=st&&j<=end)?str[j-st]:'';cells.push(h('div',{class:'ldc'+(cls||'')},ch))}return cells};
+  const line=()=>h('div',{style:'grid-column:1/-1;border-top:3px solid var(--ink);height:4px'});
+  function draw(){
+    box.innerHTML='';const g=h('div',{class:'ldleft',style:`grid-template-columns:repeat(${W},1.25em)`});
+    g.append(...row(A,W-1));const r2=row(B,W-1);r2[0].textContent='×';g.append(...r2,line());
+    if(bd.length===1)g.append(...row(shown.partial,W-1,' qt'));
+    else{parts.forEach((p,j)=>g.append(...row(shown.rows[j]!=null?String(p):'',W-1-j,focusRow===j?' hl':'')));
+      g.append(line(),...row(shown.res?String(res):'',W-1,' qt'))}
+    box.append(g);
+  }
+  draw();
+  if(bd.length===1){
+    const ds=A.split('').reverse().map(Number);let c=0;const steps=[];
+    ds.forEach((d,i)=>{const p=d*b+c,cc=c,last=i===ds.length-1;
+      steps.push({q:`${d} × ${b}${cc?` thêm ${cc} (đã nhớ)`:''} = ?`,inputs:[{a:p}],
+        hint:cc?`${d} × ${b} = ${d*b}, rồi cộng thêm ${cc} đã nhớ.`:`Nhớ bảng nhân ${b}: ${d} × ${b} = ?`,
+        ok:last?`Viết ${p}.`:(p>=10?`Viết ${p%10}, nhớ ${Math.floor(p/10)}.`:`Viết ${p}.`),
+        onOk:()=>{shown.partial=(last?String(p):String(p%10))+shown.partial;draw()}});
+      c=Math.floor(p/10)});
+    steps.push({q:`Vậy ${fmt(a)} × ${b} = ?`,inputs:[{a:res}]});
+    say(`Nhân từ <b>phải sang trái</b>: bắt đầu với chữ số hàng đơn vị <b>${ds[0]}</b> nhé!`);
+    quest(area,steps);
+  }else{
+    const steps=parts.map((p,j)=>({q:`Tích riêng thứ ${j+1}: ${fmt(a)} × ${bd[j]} = ?`+(j?` <span class="small">(viết lùi sang trái ${j} cột)</span>`:''),
+      inputs:[{a:p}],hint:mulHint(a,bd[j]),onShow:()=>{focusRow=j;draw()},onOk:()=>{shown.rows[j]=p;draw()}}));
+    steps.push({q:'Cộng các tích riêng (thẳng cột) = ?',inputs:[{a:res}],
+      hint:'Cộng từng cột từ phải sang trái; được 10 trở lên thì viết chữ số hàng đơn vị và nhớ sang cột bên trái.',
+      onShow:()=>{focusRow=-1;draw()},onOk:()=>{shown.res=true;draw()}});
+    say(`Nhân ${fmt(a)} lần lượt với từng chữ số của ${b}, bắt đầu từ chữ số hàng đơn vị <b>${bd[0]}</b>.`);
+    quest(area,steps);
+  }
+}
+
+/* ---- Tô lưới (xoay / lật) ---- */
+function gameGrid(area,{n,orig,target,css,label,hints,intro,doneMsg}){
+  const O=new Set(orig),Tg=new Set(target),mine=new Set();
+  const mk=click=>{const g=h('div',{class:'grid flipx',style:`grid-template-columns:repeat(${n},auto)`});
+    for(let i=0;i<n*n;i++){const c=h('button',{class:'cell'+(!click&&O.has(i)?' on':''),'aria-label':'ô '+(i+1)});
+      if(click)c.onclick=()=>{mine.has(i)?mine.delete(i):mine.add(i);c.classList.toggle('on');c.classList.remove('bad');beep(500,.04)};else c.disabled=true;g.append(c)}return g};
+  const g1=mk(false),g2=mk(true);
+  area.append(h('div',{class:'visual'},g1,h('div',{class:'center',html:label}),g2));
+  let hi=0;G.hintFn=()=>hints[hi++%hints.length];
+  const chk=h('button',{class:'btn pri',onclick:()=>{
+    let wrong=0;g2.querySelectorAll('.cell').forEach((c,i)=>{if(mine.has(i)!==Tg.has(i)){wrong++;c.classList.add('bad')}});
+    if(wrong)bad(`Còn ${wrong} ô chưa đúng (viền đỏ). Thử lại nhé!`,g2);
+    else{chk.disabled=true;g2.querySelectorAll('.cell').forEach(c=>c.disabled=true);g1.style.transform=css;G.prog&&G.prog(1,1);say(doneMsg,'happy');G.hintFn=null;setTimeout(finish,1400)}}},'Kiểm tra hình');
+  area.append(h('div',{class:'center'},chk));
+  say(intro);
+}
+const miniGrid=(rows,s=22)=>{const R=rows.length,C=rows[0].length;let t=`<svg width="${C*s+4}" height="${R*s+4}" viewBox="-2 -2 ${C*s+4} ${R*s+4}">`;
+  rows.forEach((r,i)=>r.forEach((v,j)=>{t+=`<rect x="${j*s}" y="${i*s}" width="${s}" height="${s}" fill="${v?'#5b5b6b':'#fff'}" stroke="#334155" stroke-width="1.5"/>`}));return t+'</svg>'};
+function calendar(name,startDow,days,hl,upto){
+  const dn=['CN','T2','T3','T4','T5','T6','T7'];
+  let t=`<table style="border-collapse:collapse;font-weight:700;background:#fff;border-radius:12px;overflow:hidden"><caption style="font-weight:800">${name}</caption><tr>${dn.map((d,i)=>`<th style="padding:3px 7px;background:${i===5?'#fde68a':'#ede9fe'}">${d}</th>`).join('')}</tr><tr>`;
+  for(let i=0;i<startDow;i++)t+='<td></td>';
+  for(let d=1;d<=(upto||days);d++){const dow=(startDow+d-1)%7;if(dow===0&&d>1)t+='</tr><tr>';
+    t+=`<td style="padding:3px 7px;text-align:center;border:1px solid #eee;${hl.includes(d)?'background:#facc15;border-radius:50%':''};color:${dow===0?'#dc2626':dow===6?'#2563eb':'inherit'}">${d}</td>`}
+  return t+'</tr></table>'}
+function dotFrame(set,edit,onT){
+  const g=h('div',{style:'display:inline-grid;grid-template-columns:repeat(4,30px);background:#fff;padding:6px;border-radius:12px;border:3px solid #e5e7eb'});
+  for(let i=0;i<12;i++){const r=Math.floor(i/4),c=i%4;
+    const cell=h(edit?'button':'div',{style:`width:30px;height:30px;border:none;background:transparent;border-right:${c<3?'2px solid #334155':'none'};border-bottom:${r<2?'2px solid #334155':'none'};display:flex;align-items:center;justify-content:center;font-size:20px;padding:0;color:#1e293b`},set.has(i)?'●':'');
+    if(edit)cell.onclick=()=>{set.has(i)?set.delete(i):set.add(i);cell.textContent=set.has(i)?'●':'';beep(500,.04);onT&&onT()};g.append(cell)}
+  return g}
+
+/* ================= 50 câu hỏi lớp 3 ================= */
+const SECS=[
+ {e:'✖️',t:'Xưởng phép nhân',s:'Đặt tính rồi tính phép nhân'},
+ {e:'🍬',t:'Chia kẹo — Phép chia',s:'Đặt tính rồi tính, đoán từng chữ số của thương'},
+ {e:'🔐',t:'Mở khóa rương — Biểu thức',s:'Tìm phép tính phải làm trước'},
+ {e:'🍕',t:'Phân số & số thập phân',s:'Cộng, trừ phân số cùng mẫu và số thập phân'},
+ {e:'📖',t:'Thám tử toán đố',s:'Bài toán có lời văn'},
+ {e:'🧠',t:'Đấu trường tư duy',s:'Hình, lịch, quy luật, đếm hình'},
+];
+const M=(a,b)=>({sec:0,pts:1.5,vi:`Đặt tính rồi tính: <b>${fmt(a)} × ${b}</b>`,en:`Calculate. ${a} × ${b}`,play:ar=>gameMul(ar,{a,b})});
+const D=(a,b)=>({sec:1,pts:1.5,vi:`Đặt tính rồi tính: <b>${fmt(a)} : ${b}</b>`,en:`Calculate. ${b})${a}`,play:ar=>gameDiv(ar,{a,b})});
+const E=e=>({sec:2,pts:1.5,vi:`Tính giá trị biểu thức: <b>${exprStr(tokenize(e))}</b>`,en:`Calculate. ${e} =`,play:ar=>gameExpr(ar,{e})});
+const vis=(ar,html)=>ar.append(h('div',{class:'visual',html}));
+
+const QS=[
+ M(58,3),M(87,9),M(54,75),M(96,53),M(452,348),M(3815,175),
+ D(44,8),D(39,5),D(51,3),D(96,6),D(94,2),D(84,7),D(87,4),D(83,3),D(59,2),D(97,9),D(91,6),D(84,5),D(95,7),D(7212,8),D(171,26),D(345,45),D(987,52),
+ E('2×7+9÷3-2'),E('54÷(17-8)×4'),E('(4×10-4)÷6+5'),
+ // 27
+ {sec:3,pts:1.5,vi:'Tính: {4 2/7} + {3/7}',en:'4 2/7 + 3/7 =',play:ar=>{
+   vis(ar,pies(4,2,7)+' <b style="font-size:2rem">+</b> '+pies(0,3,7,'#22c55e'));
+   quest(ar,[
+    {q:'Bánh nguyên: 4 cái. Cộng phần phân số: {2/7} + {3/7} = ?',inputs:[{t:'fnum',den:7,a:5}],hint:'Cùng mẫu số 7: giữ mẫu, cộng tử: 2 + 3.',ok:'2 miếng + 3 miếng = 5 miếng (mỗi miếng là {1/7} cái bánh).'},
+    {q:'Ghép lại: 4 cái bánh và {5/7} = ?',inputs:[{t:'frac',whole:true,form:'final',a:'4 5/7'}],hint:'Viết 4 ở ô phần nguyên, {5/7} ở phần phân số.'}]);}},
+ // 28
+ {sec:3,pts:1.5,vi:'Tính: {3 7/9} − {3/9}',en:'3 7/9 − 3/9 =',play:ar=>{
+   vis(ar,pies(3,7,9));
+   quest(ar,[
+    {q:'Ăn bớt 3 miếng: {7/9} − {3/9} = ?',inputs:[{t:'fnum',den:9,a:4}],hint:'Cùng mẫu số 9: giữ mẫu, trừ tử: 7 − 3.'},
+    {q:'Phần nguyên vẫn là 3. Kết quả = ?',inputs:[{t:'frac',whole:true,form:'final',a:'3 4/9'}]}]);}},
+ // 29
+ {sec:3,pts:1.5,vi:'Tính: <b>1,54 + 0,83</b>',en:'1.54 + 0.83',play:ar=>{
+   vis(ar,'<table class="utable"><tr><td></td><td>1,54</td></tr><tr><td>+</td><td>0,83</td></tr><tr class="res"><td></td><td>?</td></tr></table>');
+   say('Viết các số sao cho <b>dấu phẩy thẳng cột</b>, rồi cộng như số tự nhiên từ phải sang trái.');
+   quest(ar,[
+    {q:'Cột ngoài cùng bên phải: 4 + 3 = ?',inputs:[{a:7}]},
+    {q:'Cột tiếp theo: 5 + 8 = ?',inputs:[{a:13}],ok:'Viết 3, nhớ 1.'},
+    {q:'Phần nguyên: 1 + 0 + 1 (nhớ) = ?',inputs:[{a:2}]},
+    {q:'Đặt dấu phẩy thẳng cột. Kết quả 1,54 + 0,83 = ?',inputs:[{a:2.37}],hint:'Phần nguyên 2, sau dấu phẩy là 3 và 7.'}]);}},
+ // 30
+ {sec:3,pts:1.5,vi:'Tính: <b>7,25 − 4,6</b>',en:'7.25 − 4.6',play:ar=>{
+   vis(ar,'<table class="utable"><tr><td></td><td>7,25</td></tr><tr><td>−</td><td>4,6<span style="color:#2563eb">0</span></td></tr><tr class="res"><td></td><td>?</td></tr></table>');
+   say('Mẹo: viết thêm chữ số 0 cho 4,6 thành 4,60 để hai số có cùng số chữ số sau dấu phẩy.');
+   quest(ar,[
+    {q:'Cột ngoài cùng bên phải: 5 − 0 = ?',inputs:[{a:5}]},
+    {q:'Cột tiếp theo: 2 không trừ được 6 → mượn 1: 12 − 6 = ?',inputs:[{a:6}],hint:'Mượn 1 ở hàng bên trái thành 12.'},
+    {q:'Phần nguyên: 7 − 4 − 1 (đã mượn) = ?',inputs:[{a:2}]},
+    {q:'Kết quả 7,25 − 4,6 = ?',inputs:[{a:2.65}]}]);}},
+ // 31
+ {sec:4,pts:2,vi:'Matthew nghiên cứu một con ốc sên. Mỗi ngày ốc sên bò được 24 cm. Hỏi trong một tuần ốc sên bò được bao nhiêu xăng-ti-mét?',en:'The snail moves 24 cm each day. In one week, how far does the snail move?',play:ar=>{
+   vis(ar,'🐌 → 24 cm / ngày');
+   quest(ar,[
+    {q:'1 tuần có mấy ngày?',inputs:[{a:7,post:'ngày'}]},
+    {q:'24 × 7 = ?',inputs:[{a:168,post:'cm'}],hint:'4 × 7 = 28, viết 8 nhớ 2; 2 × 7 = 14, thêm 2 = 16.'}]);}},
+ // 32
+ {sec:4,pts:2,vi:'Một con sư tử chạy được 524 m mỗi phút. Nếu chạy đều như vậy trong 1 giờ thì sư tử chạy được bao nhiêu mét?',en:'A lion can run 524 m per minute. If the lion runs at the same speed for one hour, how many meters will it run?',play:ar=>{
+   vis(ar,'🦁💨 524 m / phút');
+   quest(ar,[
+    {q:'1 giờ = ? phút',inputs:[{a:60,post:'phút'}]},
+    {q:'524 × 60 = ?',inputs:[{a:31440,post:'m'}],hint:'Tính 524 × 6 = 3 144, rồi viết thêm một chữ số 0 vào bên phải.'}]);}},
+ // 33
+ {sec:4,pts:2,vi:'Jessica có 32 tờ giấy màu. Nếu bạn ấy chia đều với Katie thì mỗi người được bao nhiêu tờ?',en:'Jessica has 32 sheets of colored paper. If she divides them evenly with Katie, how many sheets of colored paper does each person get?',play:ar=>{
+   vis(ar,'👧 Jessica + 👧 Katie ← 📄 × 32');
+   quest(ar,[
+    {q:'Chia cho mấy người?',choices:['1 người','2 người (Jessica và Katie)','32 người'],ans:1,why:{0:'Jessica chia với Katie mà, có cả Jessica nữa!',2:'32 là số tờ giấy.'}},
+    {q:'32 : 2 = ?',inputs:[{a:16,post:'tờ'}]}]);}},
+ // 34
+ {sec:4,pts:2,vi:'91 ngày là bao nhiêu tuần?',en:'How many weeks are there in 91 days?',play:ar=>{
+   vis(ar,'📅 91 ngày');
+   quest(ar,[
+    {q:'1 tuần có mấy ngày?',inputs:[{a:7}]},
+    {q:'91 : 7 = ?',inputs:[{a:13,post:'tuần'}],hint:'7 × 10 = 70; 91 − 70 = 21 = 7 × 3. Vậy 10 + 3.'}]);}},
+ // 35
+ {sec:4,pts:2,vi:'Hai bạn nhỏ có một sợi ruy-băng dài 82 cm. Mỗi móc treo cần 7 cm ruy-băng để trang trí. Hỏi trang trí được nhiều nhất bao nhiêu móc và còn thừa bao nhiêu xăng-ti-mét ruy-băng?',en:'Two children have a colored ribbon that is 82 cm long. Each hanger uses 7 cm of ribbon. How many hangers can they decorate, and how many cm of ribbon will be left?',play:ar=>{
+   vis(ar,'🎀 82 cm → 🪝 7 cm mỗi móc');
+   quest(ar,[
+    {q:'82 : 7 = ? dư ?',inputs:[{a:11,post:'móc,'},{a:5,pre:'thừa',post:'cm'}],hint:'7 × 11 = 77; 82 − 77 = 5.'},
+    {q:'5 cm còn lại có đủ làm thêm 1 móc không?',choices:['Không, vì 5 < 7','Có'],ans:0,ok:'Vậy trang trí được 11 móc, thừa 5 cm.'}]);}},
+ // 36
+ {sec:4,pts:2,vi:'396 học sinh đi tham quan bằng 9 xe buýt. Hỏi mỗi xe có bao nhiêu học sinh?',en:'396 students are going on a trip aboard 9 buses. How many students will be on each bus?',play:ar=>{
+   vis(ar,'🧒 × 396 → 🚌 × 9');
+   quest(ar,[{q:'396 : 9 = ?',inputs:[{a:44,post:'học sinh'}],hint:'39 : 9 = 4 dư 3; hạ 6 được 36; 36 : 9 = 4.'}]);}},
+ // 37
+ {sec:4,pts:2,vi:'Trường của Danny có 345 học sinh khối 4. Nếu xếp mỗi lớp 39 học sinh thì được bao nhiêu lớp đủ và lớp cuối cùng có bao nhiêu học sinh?',en:"There are 345 fourth grade students in Danny's school. If the students are divided into classes of 39 students each, how many classes would be formed and how many students would be in the final class?",play:ar=>{
+   vis(ar,'🏫 345 học sinh, mỗi lớp 39');
+   quest(ar,[
+    {q:'345 : 39 = ? dư ?',inputs:[{a:8},{a:33,pre:'dư'}],hint:'Làm tròn 39 ≈ 40: 345 : 40 ≈ 8. Thử 39 × 8 = 312; 345 − 312 = 33.'},
+    {q:'Lớp cuối cùng có bao nhiêu học sinh?',choices:['33 học sinh (số dư)','39 học sinh','8 học sinh'],ans:0,ok:'8 lớp đủ 39 bạn, lớp cuối có 33 bạn.'}]);}},
+ // 38
+ {sec:4,pts:2,vi:'Jake và em trai Joseph đi lấy nước. Jake mang về 3 l 500 ml, Joseph mang về 1 l 700 ml. Hỏi cả hai mang về bao nhiêu nước?',en:'Jake brought back 3 L 500 mL and Joseph brought back 1 L 700 mL. How much water did they bring back altogether?',play:ar=>{
+   say('Cộng hai lượng nước. Nhớ: 1 l = 1000 ml.');
+   gameUnits(ar,{names:['l','ml'],base:[null,1000],top:[3,500],bot:[1,700],op:'+',done:r=>{say(`Cả hai mang về <b>${r[0]} l ${r[1]} ml</b> nước 💧`,'happy');setTimeout(finish,500)}});}},
+ // 39
+ {sec:4,pts:2,vi:'Vườn hoa hình chữ nhật của Helena có chu vi 18 m. Chiều dài là 5 m. Hỏi chiều rộng là bao nhiêu mét?',en:'A rectangular flower garden has a perimeter of 18 m. If the length is 5 m, what is the width?',play:ar=>{
+   vis(ar,`<svg width="230" height="130" viewBox="-30 -20 230 130"><rect x="0" y="0" width="170" height="80" fill="#bbf7d0" stroke="#15803d" stroke-width="3" rx="6"/><text x="85" y="-5" text-anchor="middle" font-weight="700">5 m</text><text x="-6" y="45" text-anchor="end" font-weight="700">?</text><text x="85" y="48" text-anchor="middle" font-size="26">🌷🌻🌼</text></svg>`);
+   quest(ar,[
+    {q:'Chu vi hình chữ nhật là gì?',choices:['Tổng độ dài 4 cạnh: (dài + rộng) × 2','Dài × rộng','Dài + rộng'],ans:0},
+    {q:'Nửa chu vi (1 chiều dài + 1 chiều rộng) = 18 : 2 = ?',inputs:[{a:9,post:'m'}]},
+    {q:'Chiều rộng = 9 − 5 = ?',inputs:[{a:4,post:'m'}],ok:'Thử lại: (5 + 4) × 2 = 18 ✓'}]);}},
+ // 40
+ {sec:4,pts:2,vi:'Bảng sau cho biết số con vật trong sở thú. Con vật nào có số lượng là <b>bội</b> của số voi và là <b>ước</b> của số khỉ?<br>Khỉ: 48 · Sư tử: 24 · Hổ: 9 · Voi: 8 · Hươu cao cổ: 18',en:'Which animal has a population that is a multiple of the elephant population and a factor of the monkey population? Monkey 48, Lion 24, Tiger 9, Elephant 8, Giraffe 18',play:ar=>{
+   vis(ar,'🐒 48 &nbsp; 🦁 24 &nbsp; 🐯 9 &nbsp; 🐘 8 &nbsp; 🦒 18');
+   quest(ar,[
+    {q:'"Bội của 8" là số chia hết cho 8 (8, 16, 24, 32, 40, 48…). Trong 24, 9, 18 số nào là bội của 8?',choices:['24 (sư tử)','9 (hổ)','18 (hươu cao cổ)'],ans:0,why:{1:'9 : 8 không chia hết.',2:'18 : 8 = 2 dư 2, không chia hết.'}},
+    {q:'"Ước của 48" là số mà 48 chia hết cho nó. 48 có chia hết cho 24 không?',choices:['Có: 48 : 24 = 2','Không'],ans:0},
+    {q:'Vậy con vật cần tìm là:',choices:['🐒 Khỉ','🦁 Sư tử','🐯 Hổ','🦒 Hươu cao cổ'],ans:1,why:{0:'Khỉ chính là con vật dùng để so sánh rồi!',2:'9 không phải bội của 8.',3:'18 không phải bội của 8.'}}]);}},
+ // 41
+ {sec:5,pts:2.3,vi:'Tìm hình có phần tô màu bằng (rộng bằng) phần tô màu của hình mẫu.',en:'Find the figure that has the same shaded area as the shaded region in the example.',play:ar=>{
+   const ex=[[1,1,1],[0,1,0],[1,1,1]];
+   const op=[[[1,1,0,0],[0,1,1,0],[0,0,1,1],[0,0,0,1]],[[1,0,0,0],[1,1,1,0],[0,0,1,0],[1,1,1,0]],[[0,1,0,0],[0,1,1,0],[0,0,1,0],[0,1,1,0]],[[0,0,0,0],[1,1,1,1],[0,1,1,0],[0,1,1,0]]];
+   vis(ar,`<div class="center"><div class="small">Mẫu</div>${miniGrid(ex,26)}</div>`);
+   quest(ar,[
+    {q:'Hình mẫu có bao nhiêu ô được tô màu?',inputs:[{a:7,post:'ô'}],hint:'Hàng trên 3 ô, hàng giữa 1 ô, hàng dưới 3 ô.'},
+    {q:'Đếm số ô tô màu của từng hình: ① ② ③ ④',inputs:[{a:7,pre:'①'},{a:8,pre:'②'},{a:6,pre:'③'},{a:8,pre:'④'}],
+     onShow:()=>vis(ar,op.map((g,i)=>`<div class="center"><div class="small">${'①②③④'[i]}</div>${miniGrid(g,22)}</div>`).join('')),hint:'Đếm từng hàng rồi cộng lại.'},
+    {q:'Hình nào có 7 ô tô màu giống mẫu?',choices:['①','②','③','④'],ans:0}]);}},
+ // 42
+ {sec:5,pts:2.3,vi:'Vẽ hình nhận được khi xoay hình đã cho theo chiều mũi tên.',en:'Draw the figure that would be the result of rotating the given figure in the direction of the arrow.',play:ar=>{
+   gameGrid(ar,{n:3,orig:[1,3,6,8],target:[2,3,7,8],css:'rotate(-90deg)',
+     label:'<div style="font-size:2.2rem">↺</div><div class="small">xoay 1/4 vòng<br>ngược chiều<br>kim đồng hồ</div>',
+     hints:['Xoay ngược chiều kim đồng hồ 1/4 vòng: cột bên PHẢI của hình cũ trở thành hàng TRÊN CÙNG của hình mới.','Hàng trên cùng mới: chỉ có ô bên phải được tô (vì ô góc dưới-phải cũ đi lên góc trên-phải).','Hàng giữa mới: ô bên trái được tô. Hàng dưới mới: ô giữa và ô bên phải được tô.'],
+     intro:'Ký hiệu cho biết xoay <b>1/4 vòng ngược chiều kim đồng hồ</b>. Bấm các ô bên phải để tô hình sau khi xoay!',
+     doneMsg:'Chính xác! Xem hình bên trái xoay 1/4 vòng — giống hệt hình của bạn 🔄'});}},
+ // 43
+ {sec:5,pts:3.3,vi:'Nhìn tờ lịch tháng 8 dưới đây. Ngày thứ Sáu thứ hai của tháng 9 là ngày bao nhiêu?',en:'Look at the calendar below. Write the date of second Friday of September.',play:ar=>{
+   const cv=h('div',{class:'visual',html:calendar('Tháng 8',4,31,[],10)});ar.append(cv);
+   quest(ar,[
+    {q:'Các ngày thứ Sáu (T6) của tháng 8 là: 2, 9, ?, ?, ?',inputs:[{a:16},{a:23},{a:30}],hint:'Cứ 7 ngày lại đến thứ Sáu: 9 + 7 = 16…',onOk:()=>{cv.innerHTML=calendar('Tháng 8',4,31,[2,9,16,23,30])}},
+    {q:'Tháng 8 có bao nhiêu ngày?',inputs:[{a:31,post:'ngày'}],hint:'Tháng 7 và tháng 8 đều có 31 ngày (đếm trên nắm tay: tháng 7 ở đốt cuối, tháng 8 lại bắt đầu ở đốt đầu).'},
+    {q:'Thứ Sáu tiếp theo sau ngày 30/8 là ngày mấy tháng 9?',inputs:[{a:6}],hint:'Từ 30/8 đến 31/8 là 1 ngày, còn 6 ngày nữa sang tháng 9 → ngày 6/9.',onOk:()=>{cv.innerHTML=calendar('Tháng 8',4,31,[30])+calendar('Tháng 9',0,30,[6])}},
+    {q:'Thứ Sáu thứ hai của tháng 9: 6 + 7 = ?',inputs:[{a:13}],onOk:()=>{cv.innerHTML=calendar('Tháng 9',0,30,[6,13])}}]);}},
+ // 44
+ {sec:5,pts:3.3,vi:'Quan sát các hình theo quy luật và vẽ hình còn thiếu vào ô trống (ô đầu tiên).',en:'Look at the related figures and draw the one that belongs in the blank.',play:ar=>{
+   const F=[[1,3,5,6,8],[0,2,6,7,9],[1,3,4,7,10],[0,2,4,5,11]].map(a=>new Set(a));const target=new Set([0,2,4,5,11]);const mine=new Set();
+   const blank=dotFrame(mine,true);
+   const row=h('div',{class:'visual'},h('div',{class:'center'},h('div',{class:'small'},'Hình 1 ?'),blank),...F.map((s,i)=>h('div',{class:'center'},h('div',{class:'small'},'Hình '+(i+2)),dotFrame(s,false))));
+   ar.append(row);
+   quest(ar,[
+    {q:'Từ hình 2 sang hình 3, các chấm di chuyển thế nào?',choices:['Mỗi chấm sang PHẢI 1 ô (ra khỏi mép phải thì quay về ô đầu hàng)','Mỗi chấm xuống dưới 1 ô','Các chấm đổi chỗ lung tung'],ans:0,hint:'Nhìn hàng dưới cùng: chấm ở ô 1 → ô 2 → ô 3 → ô 4.'},
+    {q:'Vậy hình 1 là hình 2 dịch sang TRÁI 1 ô. Hình 1 có giống hình nào đã cho không?',choices:['Giống hình 5','Giống hình 3','Không giống hình nào'],ans:0,ok:'Đúng! Dịch tiếp hình 5 sang phải 1 ô sẽ quay về hình 2 – quy luật lặp lại. Giờ hãy bấm vào ô trống để vẽ hình 1!'}],
+    ()=>{G.hintFn=()=>'Hình 1 giống hình 5: hàng trên chấm ở ô 1 và ô 3; hàng giữa ô 1 và ô 2; hàng dưới ô 4.';
+      const chk=h('button',{class:'btn pri',onclick:()=>{const ok=[...Array(12).keys()].every(i=>mine.has(i)===target.has(i));
+        if(ok){chk.disabled=true;say('Tuyệt vời! Bạn đã vẽ đúng hình còn thiếu!','happy');setTimeout(finish,600)}else bad('Chưa đúng. So sánh từng hàng với hình 5 nhé!',blank)}},'Kiểm tra hình 1');
+      ar.append(h('div',{class:'center',style:'margin-top:10px'},chk));say('Bấm vào các ô trong khung "Hình 1 ?" để đặt chấm, rồi bấm Kiểm tra.','think')});}},
+ // 45
+ {sec:5,pts:3.3,vi:'Các hình dưới đây tăng dần theo quy luật (số là thứ tự hình). Hình số 10 có bao nhiêu ô vuông?',en:'The picture follows an increasing pattern. How many squares would there be in figure 10?',play:ar=>{
+   const fig=(n,s=16)=>{let t=`<svg width="${(2*n+1)*s+4}" height="${2*s+4}" viewBox="-2 -2 ${(2*n+1)*s+4} ${2*s+4}">`;for(let i=0;i<n;i++)t+=`<rect x="${i*s}" y="0" width="${s}" height="${s}" fill="#64748b" stroke="#1e293b"/>`;for(let i=0;i<=n;i++)t+=`<rect x="${(n+i)*s}" y="${s}" width="${s}" height="${s}" fill="#64748b" stroke="#1e293b"/>`;return t+'</svg>'};
+   const v=h('div',{class:'visual',html:[1,2,3].map(n=>`<div class="center"><div class="small">Hình ${n}</div>${fig(n)}</div>`).join('')+'…'});ar.append(v);
+   quest(ar,[
+    {q:'Hình 1, 2, 3 lần lượt có bao nhiêu ô vuông?',inputs:[{a:3,pre:'H1:'},{a:5,pre:'H2:'},{a:7,pre:'H3:'}]},
+    {q:'Hình 3: hàng trên 3 ô, hàng dưới 4 ô. Hình 10: hàng trên ? ô, hàng dưới ? ô',inputs:[{a:10,pre:'trên'},{a:11,pre:'dưới'}],hint:'Hàng trên = số thứ tự hình; hàng dưới nhiều hơn 1 ô.'},
+    {q:'Hình 10 có: 10 + 11 = ? ô vuông',inputs:[{a:21}],onOk:()=>v.insertAdjacentHTML('beforeend',`<div class="center"><div class="small">Hình 10</div>${fig(10,10)}</div>`)}]);}},
+ // 46
+ {sec:5,pts:3.3,vi:'Viết quy luật liên hệ giữa A, B và C.<br>A: 3, 5, 6, 9 · B: 2, 7, 8, 10 · C: 7, 14, 16, 21',en:'Write the pattern using A, B, and C.',play:ar=>{
+   vis(ar,'<table class="utable" style="text-align:center"><tr><td>A</td><td>B</td><td>C</td></tr><tr><td>3</td><td>2</td><td>7</td></tr><tr><td>5</td><td>7</td><td>14</td></tr><tr><td>6</td><td>8</td><td>16</td></tr><tr><td>9</td><td>10</td><td>21</td></tr></table>');
+   quest(ar,[
+    {q:'Tính A + B ở mỗi hàng:',inputs:[{a:5,pre:'3+2='},{a:12,pre:'5+7='},{a:14,pre:'6+8='},{a:19,pre:'9+10='}]},
+    {q:'So với C (7, 14, 16, 21), C lớn hơn A + B bao nhiêu?',inputs:[{a:2}],hint:'7 − 5 = ?, 14 − 12 = ?'},
+    {q:'Vậy quy luật là:',choices:['C = A + B + 2','C = A + B','C = A × B + 1','C = B + 5'],ans:0,why:{1:'3 + 2 = 5, không phải 7.',2:'3 × 2 + 1 = 7 đúng hàng đầu, nhưng 5 × 7 + 1 = 36 chứ không phải 14.',3:'2 + 5 = 7 đúng, nhưng 7 + 5 = 12 chứ không phải 14.'}}]);}},
+ // 47
+ {sec:5,pts:4.3,vi:'Cần bao nhiêu khối lập phương để xếp được hình dưới đây?',en:'How many blocks are used to make figure below?',play:ar=>{
+   const v=h('div',{class:'visual',html:`<img src="${IMG47}" alt="Hình xếp khối" style="max-width:200px">`});ar.append(v);
+   quest(ar,[
+    {q:'Nhìn các mặt trên (hình thoi) ở <b>tầng trên</b>. Tầng trên có mấy khối?',inputs:[{a:3,post:'khối'}],hint:'Ở phía trên cao có 3 mặt hình thoi xếp sát nhau.'},
+    {q:'Khối ở tầng trên không thể lơ lửng – mỗi khối phải có 1 khối đỡ ở dưới. Vậy có mấy khối đỡ (bị che khuất)?',inputs:[{a:3,post:'khối'}]},
+    {q:'Tầng dưới còn 2 khối thấp ở phía trước (nhìn thấy mặt trên hình thoi ở thấp). Tầng dưới có: 3 + 2 = ?',inputs:[{a:5,post:'khối'}]},
+    {q:'Tổng số khối: 3 + 5 = ?',inputs:[{a:8,post:'khối'}],onOk:()=>{v.innerHTML+=`<div class="center"><div class="small">Lời giải</div><img src="${IMG47S}" alt="Lời giải" style="max-width:200px"></div>`}}]);}},
+ // 48
+ {sec:5,pts:4.3,vi:'Tìm các số tự nhiên ⭐ và 🔵 biết: ⭐ + ⭐ + 🔵 = 13 và ⭐ × 🔵 = 15.',en:'Find the natural numbers represented by star and circle: star + star + circle = 13, star × circle = 15.',play:ar=>{
+   vis(ar,'<div class="card" style="margin:0">⭐ + ⭐ + 🔵 = 13<br>⭐ × 🔵 = 15</div>');
+   quest(ar,[
+    {q:'Những cặp số nào nhân với nhau bằng 15?',choices:['1 × 15, 3 × 5, 5 × 3, 15 × 1','2 × 7, 3 × 5','5 × 5'],ans:0},
+    {q:'Thử từng cặp (⭐, 🔵) vào ⭐ + ⭐ + 🔵:<br>(1, 15) → 1+1+15 = ? &nbsp; (3, 5) → 3+3+5 = ? &nbsp; (5, 3) → 5+5+3 = ? &nbsp; (15, 1) → 15+15+1 = ?',inputs:[{a:17},{a:11},{a:13},{a:31}]},
+    {q:'Cặp nào cho kết quả 13? ⭐ = ?, 🔵 = ?',inputs:[{a:5,pre:'⭐ ='},{a:3,pre:'🔵 ='}],ok:'5 + 5 + 3 = 13 và 5 × 3 = 15 ✓'}]);}},
+ // 49
+ {sec:5,pts:4.3,vi:'Trong hình dưới đây có bao nhiêu nhóm gồm 4 tam giác nhỏ (tạo thành một tam giác lớn hơn)?',en:'How many groups of 4 triangles can be found in the figure below?',play:ar=>{
+   const s=48,hh=s*0.866,Wd=4*s;const P=(r,k)=>[Wd/2+(k-r/2)*s,r*hh];
+   let base='';for(let r=0;r<4;r++)for(let k=0;k<=r;k++){const a=P(r,k),b=P(r+1,k),c=P(r+1,k+1);base+=`<polygon points="${a} ${b} ${c}" fill="#fff" stroke="#334155" stroke-width="1.5"/>`;
+     if(k<r){const d=P(r,k+1);base+=`<polygon points="${a} ${d} ${c}" fill="#fff" stroke="#334155" stroke-width="1.5"/>`}}
+   const up=(r,k)=>[P(r,k),P(r+2,k),P(r+2,k+2)],dn=(r,k)=>[P(r,k),P(r,k+2),P(r+2,k+2)];
+   const v=h('div',{class:'visual'});ar.append(v);
+   const show=tris=>{v.innerHTML=`<svg width="${Wd+10}" height="${4*hh+10}" viewBox="-5 -5 ${Wd+10} ${4*hh+10}">${base}${tris.map((t,i)=>`<polygon points="${t.join(' ')}" fill="${['#fde047','#86efac','#93c5fd','#f9a8d4','#fdba74','#c4b5fd','#fca5a5'][i%7]}" fill-opacity=".55" stroke="#7c3aed" stroke-width="3"/>`).join('')}</svg>`};
+   show([]);
+   quest(ar,[
+    {q:'4 tam giác nhỏ ghép lại tạo thành tam giác có cạnh dài gấp đôi. Tam giác tô vàng có <b>đỉnh ở trên cùng</b>. Có mấy nhóm như vậy có đỉnh ở hàng 1?',inputs:[{a:1}],onShow:()=>show([up(0,0)])},
+    {q:'Nhóm có đỉnh ở hàng thứ 2 (các hình tô màu)?',inputs:[{a:2}],onShow:()=>show([up(1,0),up(1,1)]),hint:'Đếm các tam giác tô màu.'},
+    {q:'Nhóm có đỉnh ở hàng thứ 3?',inputs:[{a:3}],onShow:()=>show([up(2,0),up(2,1),up(2,2)])},
+    {q:'Còn một nhóm <b>lộn ngược</b> (đỉnh chĩa xuống) nữa! Có mấy nhóm lộn ngược?',inputs:[{a:1}],onShow:()=>show([dn(2,0)])},
+    {q:'Tổng cộng: 1 + 2 + 3 + 1 = ?',inputs:[{a:7,post:'nhóm'}],onShow:()=>show([up(0,0),up(1,0),up(1,1),up(2,0),up(2,1),up(2,2),dn(2,0)])}]);}},
+ // 50
+ {sec:5,pts:4.3,vi:'Tích các số trên mỗi đường thẳng đều bằng 30. Biết A là số lớn nhất, tìm B và D.',en:'Each line has a product 30. If A has the biggest number, find the values of B and D.',play:ar=>{
+   const val={A:'A',B:'B',C:'C',D:'D'};const v=h('div',{class:'visual'});ar.append(v);
+   const draw=()=>{const c=(x,y,t,hl)=>`<circle cx="${x}" cy="${y}" r="20" fill="${hl?'#fde68a':'#fff'}" stroke="#334155" stroke-width="2.5"/><text x="${x}" y="${y+6}" text-anchor="middle" font-weight="800" font-size="17" fill="${/[A-D]/.test(t)?'#334155':'#7c3aed'}">${t}</text>`;
+     v.innerHTML=`<svg width="200" height="200" viewBox="0 0 200 200"><line x1="100" y1="30" x2="100" y2="170" stroke="#334155" stroke-width="2.5"/><line x1="30" y1="100" x2="170" y2="100" stroke="#334155" stroke-width="2.5"/>${c(100,30,val.A)}${c(30,100,val.B)}${c(100,100,'3',1)}${c(170,100,val.D)}${c(100,170,val.C)}</svg>`};
+   draw();
+   quest(ar,[
+    {q:'Đường dọc: A × 3 × C = 30. Vậy A × C = ?',inputs:[{a:10}],hint:'30 : 3 = ?'},
+    {q:'Hai số nhân bằng 10 có thể là 1 × 10 hoặc 2 × 5. A phải là số <b>lớn nhất</b> trong hình, nên A = ?, C = ?',inputs:[{a:10,pre:'A ='},{a:1,pre:'C ='}],onOk:()=>{val.A=10;val.C=1;draw()},hint:'Chọn cặp có số lớn nhất là 10.'},
+    {q:'Đường ngang: B × 3 × D = 30, nên B × D = 10. B và D là:',choices:['B = 2, D = 5 (hoặc B = 5, D = 2)','B = 1, D = 10','B = 10, D = 1'],ans:0,why:{1:'Nếu D = 10 thì A không còn là số lớn nhất duy nhất!',2:'Nếu B = 10 thì A không còn là số lớn nhất duy nhất!'},onOk:()=>{val.B=2;val.D=5;draw()},ok:'B = 2, D = 5 hoặc B = 5, D = 2 đều đúng.'}]);}},
+];
+QS.forEach((q,i)=>q.id=i+1);
+
+
+/* ================= giao diện phiêu lưu ================= */
+const STICKERS=['🚗','🚕','🚙','🚌','🚎','🏎️','🚓','🚑','🚒','🚐','🛻','🚚','🚜','🛵','🚲','🛴','🚂','🚀','🛸','🚁','⛵','🚤','🛳️','✈️','🎈','🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🥕','🌽','🍄','🧸','🪁','🎨','🎸','🥁','🏆'];
+const AVATARS=['🦁','🐼','🐰','🦊','🐸','🐯','🐨','🐧'];
+const THEME=[
+ {c1:'#e0f2fe',c2:'#7dd3fc',deco:['✖️','🏭','⚙️','🔢']},
+ {c1:'#ffe4f1',c2:'#ffc2e0',deco:['🍭','🍬','🧁','🍩']},
+ {c1:'#e0e7ff',c2:'#c7d2fe',deco:['🗝️','🏰','💎','🪙']},
+ {c1:'#ffedd5',c2:'#fdba74',deco:['🍕','🍰','🍉','🥧']},
+ {c1:'#fef9c3',c2:'#fde047',deco:['🐌','🦁','🚌','💧']},
+ {c1:'#f3e8ff',c2:'#d8b4fe',deco:['🧩','📅','🎲','🔺']},
+];
+const MIMO_SVG=`<svg viewBox="0 0 120 120" aria-hidden="true">
+<ellipse cx="60" cy="114" rx="32" ry="5" fill="#00000022"/>
+<path d="M60 20 Q64 8 72 6" stroke="#6d28d9" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="73" cy="6" r="5.5" fill="#facc15"/>
+<g class="a-down"><ellipse cx="18" cy="78" rx="7" ry="12" fill="#7c3aed" transform="rotate(20 18 78)"/><ellipse cx="102" cy="78" rx="7" ry="12" fill="#7c3aed" transform="rotate(-20 102 78)"/></g>
+<g class="a-up"><ellipse cx="16" cy="46" rx="7" ry="13" fill="#7c3aed" transform="rotate(-28 16 46)"/><ellipse cx="104" cy="46" rx="7" ry="13" fill="#7c3aed" transform="rotate(28 104 46)"/></g>
+<ellipse cx="44" cy="108" rx="11" ry="6" fill="#6d28d9"/><ellipse cx="76" cy="108" rx="11" ry="6" fill="#6d28d9"/>
+<path d="M60 18 C92 18 104 44 104 70 C104 96 86 108 60 108 C34 108 16 96 16 70 C16 44 28 18 60 18Z" fill="#8b5cf6"/>
+<path d="M30 40 C36 28 48 24 56 24" stroke="#ffffff55" stroke-width="5" fill="none" stroke-linecap="round"/>
+<ellipse cx="60" cy="86" rx="26" ry="17" fill="#c4b5fd"/>
+<circle cx="32" cy="70" r="6" fill="#f9a8d4" opacity=".85"/><circle cx="88" cy="70" r="6" fill="#f9a8d4" opacity=".85"/>
+<g class="e-open"><circle cx="45" cy="54" r="12" fill="#fff"/><circle cx="75" cy="54" r="12" fill="#fff"/><g class="pupil"><circle cx="47" cy="56" r="6" fill="#1e1b4b"/><circle cx="77" cy="56" r="6" fill="#1e1b4b"/><circle cx="49" cy="53" r="2" fill="#fff"/><circle cx="79" cy="53" r="2" fill="#fff"/></g></g>
+<g class="e-happy" stroke="#1e1b4b" stroke-width="4" fill="none" stroke-linecap="round"><path d="M35 56 Q45 44 55 56"/><path d="M65 56 Q75 44 85 56"/></g>
+<g class="e-sad" stroke="#1e1b4b" stroke-width="3.5" stroke-linecap="round"><path d="M34 39 L54 44"/><path d="M86 39 L66 44"/></g>
+<path class="m-idle" d="M50 72 Q60 80 70 72" stroke="#1e1b4b" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+<path class="m-happy" d="M46 70 Q60 92 74 70 Z" fill="#be123c" stroke="#1e1b4b" stroke-width="3" stroke-linejoin="round"/>
+<path class="m-sad" d="M50 79 Q60 70 70 79" stroke="#1e1b4b" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+<ellipse class="m-think" cx="63" cy="75" rx="5" ry="6" fill="#1e1b4b"/>
+</svg>`;
+const mascot=(sz=104)=>h('div',{class:'mimo mood-idle',style:`width:${sz}px;height:${sz}px`,html:MIMO_SVG});
+function setMood(m){const el=G.owl;if(!el)return;el.className='mimo mood-idle';void el.offsetWidth;el.className='mimo mood-'+(m||'idle')}
+
+/* giọng đọc */
+let VI=null;
+function loadVoices(){try{VI=speechSynthesis.getVoices().find(v=>/^vi/i.test(v.lang))||null}catch(e){}}
+if('speechSynthesis' in window){loadVoices();speechSynthesis.onvoiceschanged=loadVoices}
+function toSpeech(html){
+  const d=document.createElement('div');d.innerHTML=T(html);
+  d.querySelectorAll('.mx').forEach(mx=>{const w=mx.querySelector('.mw');const f=mx.querySelectorAll('.fr>span');
+    mx.replaceWith(' '+(w?w.textContent+' và ':'')+(f.length===2?f[0].textContent+' phần '+f[1].textContent:'')+' ')});
+  return d.textContent.replace(/\p{Extended_Pictographic}|️|‍/gu,'')
+    .replace(/×/g,' nhân ').replace(/ : /g,' chia ').replace(/−/g,' trừ ').replace(/\+/g,' cộng ')
+    .replace(/=\s*\?/g,' bằng bao nhiêu?').replace(/=/g,' bằng ').replace(/≤/g,' bé hơn hoặc bằng ').replace(/≥/g,' lớn hơn hoặc bằng ')
+    .replace(/</g,' bé hơn ').replace(/>/g,' lớn hơn ').replace(/cm²/g,' xăng-ti-mét vuông').replace(/\bcm\b/g,' xăng-ti-mét').replace(/\s+/g,' ');
+}
+function speak(html){
+  if(P.voice===false||!('speechSynthesis' in window))return;
+  const txt=toSpeech(html);if(!txt.trim())return;
+  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt);u.lang='vi-VN';if(VI)u.voice=VI;u.rate=1;u.pitch=1.15;speechSynthesis.speak(u)}catch(e){}
+}
+
+/* bàn phím số */
+let padT=null;
+const pad=h('div',{class:'numpad'});
+(()=>{const g=h('div',{class:'grid4'});
+  const keys=['1','2','3','4','5','⌫','6','7','8','9','0',',','⬅','➡','✕','OK'];
+  keys.forEach(k=>{const cls=k==='OK'?'k-ok':k==='⌫'?'k-del':(k==='⬅'||k==='➡')?'k-nav':k==='✕'?'k-x':'';
+    const b=h('button',{class:cls,type:'button'},k==='OK'?'✔ Kiểm tra':k==='✕'?'Ẩn':k);
+    b.addEventListener('pointerdown',e=>e.preventDefault());
+    b.addEventListener('click',()=>padKey(k));g.append(b)});
+  pad.append(g);document.body.append(pad)})();
+function padKey(k){
+  const t=padT;if(!t||t.disabled){hidePad();return}
+  beep(520,.04,'sine',.05);
+  const all=[...document.querySelectorAll('.inp')].filter(e=>!e.disabled);const i=all.indexOf(t);
+  if(k==='⌫')t.value=t.value.slice(0,-1);
+  else if(k==='➡'){if(all[i+1])all[i+1].focus()}
+  else if(k==='⬅'){if(all[i-1])all[i-1].focus()}
+  else if(k==='✕'){t.blur();hidePad()}
+  else if(k==='OK')t.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));
+  else if(t.value.length<8)t.value+=k;
+}
+function hidePad(){pad.classList.remove('show');document.body.classList.remove('padon')}
+document.addEventListener('focusin',e=>{if(e.target.classList&&e.target.classList.contains('inp')){padT=e.target;pad.classList.add('show');document.body.classList.add('padon')}});
+document.addEventListener('focusout',()=>setTimeout(()=>{const a=document.activeElement;if(!(a&&a.classList&&a.classList.contains('inp')))hidePad()},120));
+
+/* mây trang trí */
+[[8,70,'0s'],[30,110,'-25s'],[18,60,'-50s']].forEach(([top,dur,del])=>document.body.append(h('div',{class:'cloud',style:`top:${top}vh;animation-duration:${dur}s;animation-delay:${del}`},'☁️')));
+
+/* ================= màn hình ================= */
+function totals(){let st=0,pt=0;QS.forEach(q=>{const s=P.stars[q.id]||0;st+=s;if(s)pt+=q.pts});return{st,pt:Math.round(pt*10)/10}}
+function hud(back){
+  const t=totals();
+  return h('div',{class:'hud'},
+    back?h('button',{class:'round',title:'Về bản đồ',onclick:()=>{location.hash=''}},'✕'):h('button',{class:'avatar',title:'Đổi tên / nhân vật',onclick:askName},P.avatar||'🙂'),
+    back?h('div',{class:'progress'},h('div',{class:'bar',id:'pbar'})):h('div',{class:'hname'},`Chào ${P.name||'bạn'}!`),
+    h('span',{class:'chipn',title:'Số sao'},`⭐ ${t.st}`),
+    h('span',{class:'chipn',title:'Xu'},`🪙 ${t.st*10}`),
+    back?null:h('span',{class:'chipn',title:'Điểm bài thi'},`🏆 ${fmt(t.pt)}`),
+    back?null:h('button',{class:'tog',title:'Bộ sưu tập nhãn dán',onclick:()=>{location.hash='album'}},'📒'),
+    h('button',{class:'tog',title:'Bật/tắt giọng đọc',onclick:e=>{P.voice=P.voice===false;save();e.currentTarget.textContent=P.voice===false?'🤐':'🗣️';if(P.voice===false)try{speechSynthesis.cancel()}catch(_){}}},P.voice===false?'🤐':'🗣️'),
+    h('button',{class:'tog',title:'Bật/tắt âm thanh',onclick:e=>{P.mute=!P.mute;save();e.currentTarget.textContent=P.mute?'🔇':'🔊'}},P.mute?'🔇':'🔊'));
+}
+function askName(){
+  let av=P.avatar||AVATARS[0];
+  const inp=h('input',{class:'nameinp',placeholder:'Tên của bạn',maxlength:'20',value:P.name||''});
+  const avs=h('div',{class:'avs'});
+  AVATARS.forEach(a=>{const b=h('button',{class:a===av?'sel':'',onclick:()=>{av=a;avs.querySelectorAll('button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');beep(600,.06)}},a);avs.append(b)});
+  const m=h('div',{class:'modal'},h('div',{class:'box'},
+    h('div',{style:'display:flex;justify-content:center'},mascot(110)),
+    h('div',{style:'font-size:1.4rem;font-weight:800'},'Chào bạn! Mình là Mimo 👋'),
+    h('div',{class:'small',style:'margin-bottom:10px'},'Bạn tên là gì? Chọn một bạn đồng hành nhé!'),
+    inp,avs,
+    h('button',{class:'btn pri big',onclick:()=>{P.name=inp.value.trim()||'bạn';P.avatar=av;save();m.remove();renderMap();speak(`Chào ${P.name}! Cùng Mimo phiêu lưu toán học nào!`)}},'Bắt đầu! 🚀')));
+  document.body.append(m);setTimeout(()=>inp.focus(),100);
+}
+function renderMap(){
+  G.bubble=null;G.owl=null;G.hintFn=null;hidePad();
+  app.innerHTML='';app.append(hud(false));
+  const doneN=Object.keys(P.stars).length;
+  const next=QS.find(q=>!P.stars[q.id]);
+  const owl=mascot(96);G.owl=owl;const bub=h('div',{class:'bubble'});G.bubble=bub;
+  app.append(h('div',{class:'scene'},owl,h('div',{class:'bwrap'},bub,h('button',{class:'spk',title:'Nghe',onclick:()=>speak(G.lastSay||'')},'🔈'))));
+  G.lastSay=doneN===0?`Chào ${P.name||'bạn'}! Mỗi câu trong đề thi là một trò chơi. Bấm vào ô số <b>1</b> để bắt đầu nhé!`
+    :doneN===50?`Wow, ${P.name||'bạn'} đã hoàn thành cả 50 câu! Chơi lại để gom đủ 3 sao nhé! 🏆`
+    :`Bạn đã xong ${doneN}/50 câu, giỏi lắm! Câu tiếp theo là câu <b>${next.id}</b> đang nhấp nháy đó.`;
+  bub.innerHTML=T(G.lastSay);
+  SECS.forEach((s,si)=>{
+    const qs=QS.filter(q=>q.sec===si),th=THEME[si],dn=qs.filter(q=>P.stars[q.id]).length;
+    const isl=h('div',{class:'island',style:`--c1:${th.c1};--c2:${th.c2}`});
+    isl.append(h('div',{class:'banner'},h('span',{class:'be'},s.e),h('div',{},h('b',{},s.t),h('div',{class:'small'},s.s)),h('span',{class:'bc'},`${dn}/${qs.length}`)));
+    const W=320,gap=104,H=qs.length*gap+20;
+    const pts=qs.map((q,i)=>[W/2+Math.sin(i*1.15+si*.7)*92,58+i*gap]);
+    let d=`M${pts[0][0]} ${pts[0][1]}`;for(let i=1;i<pts.length;i++){const [x0,y0]=pts[i-1],[x1,y1]=pts[i];d+=` C${x0} ${y0+gap/2} ${x1} ${y1-gap/2} ${x1} ${y1}`}
+    const path=h('div',{class:'path',style:`height:${H}px`,html:`<svg class="road" width="${W}" height="${H}"><path d="${d}"/><path class="d" d="${d}"/></svg>`});
+    qs.forEach((q,i)=>{const [x,y]=pts[i];const st=P.stars[q.id]||0;
+      path.append(h('span',{class:'deco',style:`left:${x<W/2?W-40:4}px;top:${y-20}px`},th.deco[i%th.deco.length]));
+      const nb=h('button',{class:'node'+(st?' done':'')+(q===next?' next':''),style:`left:${x-39}px;top:${y-39}px`,title:'Câu '+q.id,onclick:()=>{beep(700,.06);location.hash='q'+q.id}},
+        String(q.id),h('span',{class:'ns',html:'<b>'+'★'.repeat(st)+'</b>'+'★'.repeat(3-st)}));
+      path.append(nb);
+      if(q===next)path.append(h('span',{class:'here',style:`left:${x+22}px;top:${y-62}px`},P.avatar||'🙂'));
+    });
+    isl.append(path);app.append(isl);
+  });
+  app.append(h('div',{class:'center',style:'display:flex;gap:10px;justify-content:center;flex-wrap:wrap'},
+    h('button',{class:'btn y',onclick:()=>{location.hash='album'}},'📒 Bộ sưu tập nhãn dán'),
+    h('button',{class:'btn',onclick:()=>{if(confirm('Xóa toàn bộ tiến độ, sao và nhãn dán?')){P.stars={};save();renderMap()}}},'🗑️ Chơi lại từ đầu')));
+  if(!P.name)setTimeout(askName,300);
+  if(next&&doneN>0)setTimeout(()=>{const n=document.querySelector('.node.next');n&&n.scrollIntoView({behavior:'smooth',block:'center'})},200);
+  else window.scrollTo(0,0);
+}
+function renderAlbum(){
+  G.bubble=null;G.owl=null;hidePad();app.innerHTML='';
+  const hd=hud(false);hd.firstChild.replaceWith(h('button',{class:'round',onclick:()=>{location.hash=''}},'✕'));app.append(hd);
+  const n=Object.keys(P.stars).length;
+  const card=h('div',{class:'card'},h('div',{style:'font-size:1.4rem;font-weight:800'},`📒 Bộ sưu tập nhãn dán (${n}/50)`),
+    h('div',{class:'small',style:'margin-bottom:12px'},'Hoàn thành mỗi câu để nhận một nhãn dán. Bấm vào nhãn dán để nghe tiếng của nó!'));
+  const g=h('div',{class:'album'});
+  QS.forEach(q=>{const has=!!P.stars[q.id];
+    g.append(h('button',{class:'slotS'+(has?'':' no'),onclick:()=>{if(has){beep(500+q.id*12,.12);beep(800,.1)}else{location.hash='q'+q.id}}},
+      h('span',{class:'se'},STICKERS[q.id-1]),h('span',{class:'small'},has?'⭐'.repeat(P.stars[q.id]):'Câu '+q.id)))});
+  card.append(g);app.append(card);window.scrollTo(0,0);
+}
+function renderQ(id){
+  const q=QS[id-1];if(!q){renderMap();return}
+  Object.assign(G,{q,mist:0,hint:0,hintFn:null,finished:false});
+  hidePad();app.innerHTML='';
+  app.append(hud(true));
+  G.prog=(i,n)=>{const b=document.getElementById('pbar');if(b)b.style.width=Math.min(100,100*i/n)+'%'};
+  const sec=SECS[q.sec],th=THEME[q.sec];
+  const owl=mascot(100);G.owl=owl;const bub=h('div',{class:'bubble'});G.bubble=bub;
+  app.append(h('div',{class:'scene'},owl,h('div',{class:'bwrap'},bub,h('button',{class:'spk',title:'Nghe lại',onclick:()=>speak(G.lastSay||'')},'🔈'))));
+  const card=h('div',{class:'card qcard',style:`--c1:${th.c1};--c2:${th.c2}`});
+  card.append(h('div',{class:'qhead'},h('span',{class:'qnum'},String(id)),h('span',{class:'chip'},`${sec.e} ${sec.t}`),h('span',{class:'chip'},`${fmt(q.pts)} điểm`),
+    P.stars[id]?h('span',{class:'chip',html:'⭐'.repeat(P.stars[id])}):null,
+    h('button',{class:'spk',onclick:()=>speak(`Câu ${id}. ${q.vi}`)},'🔈 Nghe đề')));
+  card.append(h('div',{class:'qtext',html:T(q.vi)}));
+  card.append(h('details',{class:'en'},h('summary',{},'Đề gốc (tiếng Anh)'),h('div',{},q.en)));
+  app.append(card);
+  const area=h('div',{class:'card game-area'});app.append(area);
+  app.append(h('div',{class:'bottombar'},
+    h('div',{style:'display:flex;gap:10px;align-items:center'},
+      h('button',{class:'hintbtn',title:'Gợi ý',onclick:useHint},'💡'),
+      h('button',{class:'btn',onclick:()=>renderQ(id)},'🔄 Chơi lại')),
+    h('div',{style:'display:flex;gap:8px'},
+      id>1?h('button',{class:'btn',onclick:()=>{location.hash='q'+(id-1)}},'⬅'):null,
+      id<50?h('button',{class:'btn pri',onclick:()=>{location.hash='q'+(id+1)}},'Câu tiếp ➡'):null)));
+  say('Cùng Mimo làm từng bước nhé! Cần trợ giúp thì bấm 💡.');
+  q.play(area);
+  window.scrollTo(0,0);
+}
+function confetti(){const em=['🎉','⭐','🎊','✨','🌟','🍬','🎈'];for(let i=0;i<50;i++){const d=h('div',{class:'conf',style:`left:${Math.random()*100}vw;animation-duration:${2+Math.random()*2.5}s;animation-delay:${Math.random()*.8}s`},pick(em));document.body.append(d);setTimeout(()=>d.remove(),6000)}}
+function finish(){
+  if(G.finished)return;G.finished=true;G.hintFn=null;hidePad();
+  G.prog&&G.prog(1,1);
+  const q=G.q,pen=G.mist+G.hint,stars=pen===0?3:pen<=2?2:1;
+  const prev=P.stars[q.id]||0;const first=!prev;if(stars>prev)P.stars[q.id]=stars;save();
+  const earned=Math.max(0,stars-prev)*10;
+  setMood('happy');
+  setTimeout(()=>{
+    sWin();confetti();
+    const name=P.name||'bạn';
+    const big=mascot(130);big.classList.add('mood-happy','dance');
+    const msg=stars===3?'Hoàn hảo! Không sai, không cần gợi ý!':stars===2?'Rất tốt! Chơi lại để lấy đủ 3 sao nhé!':'Bạn đã hoàn thành! Chơi lại để được nhiều sao hơn nha!';
+    const m=h('div',{class:'celebrate'},h('div',{class:'box'},
+      h('div',{style:'display:flex;justify-content:center;margin-top:-70px'},big),
+      h('div',{style:'font-size:1.7rem;font-weight:800'},`Hoan hô, ${name}! 🎉`),
+      h('div',{class:'bigstars',html:[1,2,3].map(i=>`<span class="${i<=stars?'':'off'}" style="animation-delay:${.2+i*.35}s">⭐</span>`).join('')}),
+      h('div',{},msg),
+      earned?h('div',{class:'coins'},`+${earned} 🪙`):null,
+      first?h('div',{},h('div',{class:'sticker'},h('span',{class:'se'},STICKERS[q.id-1]),h('b',{},'Nhãn dán mới!'))):null,
+      h('div',{class:'small'},`Lần sai: ${G.mist} · Gợi ý: ${G.hint}`),
+      h('div',{style:'display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap'},
+        h('button',{class:'btn',onclick:()=>m.remove()},'👀 Xem lại'),
+        h('button',{class:'btn',onclick:()=>{m.remove();renderQ(q.id)}},'🔄'),
+        q.id<50?h('button',{class:'btn pri big',onclick:()=>{m.remove();location.hash='q'+(q.id+1)}},'Tiếp tục ➡'):h('button',{class:'btn pri big',onclick:()=>{m.remove();location.hash=''}},'🗺️ Bản đồ'))));
+    document.body.append(m);
+    [1,2,3].forEach(i=>{if(i<=stars)setTimeout(()=>beep(600+i*150,.15),200+i*350)});
+    speak(`Hoan hô ${name}! Bạn được ${stars} sao! ${first?'Bạn nhận được một nhãn dán mới!':''}`);
+  },700);
+}
+function route(){
+  document.querySelectorAll('.modal,.celebrate').forEach(e=>e.remove());
+  try{speechSynthesis.cancel()}catch(e){}
+  const m=location.hash.match(/^#q(\d+)$/);
+  if(m)renderQ(+m[1]);else if(location.hash==='#album')renderAlbum();else renderMap();
+}
+window.addEventListener('hashchange',route);
+route();
+
+</script>
+</body>
+</html>
