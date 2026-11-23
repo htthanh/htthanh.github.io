@@ -1,0 +1,762 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kujala 2018 · mcpCSA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Một màu chủ đạo duy nhất: blue. Không dùng gradient. Chỉ dùng các sắc độ của blue + xám trung tính. */
+:root{
+  --bg:#ffffff; --page:#eef2f7; --line:#dbe3ef; --text:#0f172a; --muted:#5b6478;
+  --blue:#1d4ed8; --blue-d:#1e3a8a; --blue-m:#3b82f6; --blue-s:#93c5fd; --blue-l:#dbeafe; --blue-xl:#eff6ff;
+  --gray:#94a3b8; --gray-l:#e2e8f0; --gray-xl:#f1f5f9;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--page);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(15,23,42,.12);background:var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:var(--blue)}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:16px;padding-right:150px}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:var(--blue);padding:6px 16px;border-radius:999px;white-space:nowrap}
+h1{font-size:66px;line-height:1.1;font-weight:800}
+h2{font-size:30px;line-height:1.2;font-weight:800}
+h3{font-size:21px;font-weight:700;margin-bottom:6px;color:var(--blue)}
+p,li{font-size:21px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+.accent{color:var(--blue)}
+ul{list-style:none}
+ul li{position:relative;padding-left:24px;margin:5px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:9px;height:9px;border-radius:3px;background:var(--blue)}
+code.i{font-family:var(--mono);font-size:.86em;background:var(--blue-xl);border:1px solid var(--blue-l);padding:0 5px;border-radius:6px;color:var(--blue-d);white-space:nowrap}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+.cols>*{min-width:0}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.card{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px 16px;box-shadow:0 8px 24px -14px rgba(15,23,42,.25)}
+.cols3>.card,.cols4>.card{border-top:5px solid var(--blue)}
+.card p,.card li{font-size:18.5px}
+.note{margin-top:10px;padding:8px 14px;border-left:5px solid var(--blue);background:var(--blue-xl);border-radius:8px;font-size:18.5px;line-height:1.4}
+.note.blue{border-color:var(--blue-d)}
+.code{font-family:var(--mono);font-size:17px;line-height:1.5;background:#fafcff;border:1px solid var(--line);border-radius:12px;padding:8px 0;overflow:hidden;position:relative}
+.code.x4{font-size:11.4px;line-height:1.33;padding:6px 0}
+.code .ln{padding:0 12px 0 6px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c2cad8;width:22px;flex:none;text-align:right;margin-right:10px;user-select:none}
+.k{color:var(--blue-d);font-weight:700}.t{color:var(--blue);font-weight:600}.s{color:#475569}.n{color:var(--blue-m)}.c{color:var(--gray);font-style:italic}.p{color:var(--blue-d)}.fn{color:var(--blue)}
+.code.show-a .mark-a,.code.show-b .mark-b,.code.show-c .mark-c,.code.show-d .mark-d,.code.show-e .mark-e{background:var(--blue-l);box-shadow:inset 5px 0 var(--blue)}
+.code-title{font-family:var(--mono);font-size:14px;color:var(--muted);margin:0 0 4px 4px;font-weight:600}
+.hide0{opacity:0;transform:translateY(8px) scale(.96);transition:all .45s}
+.hide0.sh{opacity:1;transform:none}
+svg .hide0{transform:none}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+.dimx{opacity:.3;filter:grayscale(.8)}
+.gone{display:none!important}
+#mLegend td{padding:3px 6px;border-bottom:1px dashed var(--line)}
+.glow{box-shadow:0 0 0 4px rgba(29,78,216,.25),0 0 22px rgba(29,78,216,.3)}
+.chip{display:inline-block;font-family:var(--mono);font-size:15px;font-weight:700;padding:3px 12px;border-radius:999px;background:var(--blue-xl);color:var(--blue-d);border:1px solid var(--blue-s)}
+.chip.r{background:var(--blue);color:#fff;border-color:var(--blue)}
+.chip.g{background:#fff;color:var(--muted);border-color:var(--gray)}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:18px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.3}
+th{background:var(--blue-xl);font-weight:700;color:var(--blue-d)}
+tr:last-child td{border-bottom:none}
+table.t1 td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+table.acc td,table.acc th{text-align:center;font-size:17px;padding:8px 10px}
+table.acc td:first-child,table.acc th:first-child{text-align:left}
+table.tj td,table.tj th{font-size:15.5px;padding:6px 8px}
+table.tj td.why,table.tj th.why{text-align:left;font-size:13.5px;line-height:1.3;white-space:normal}
+table.comp td,table.comp th{text-align:center;font-size:16px;padding:6px 8px;vertical-align:middle}
+table.comp td:first-child,table.comp th:first-child,table.comp td:nth-child(2){text-align:left}
+.yes{color:var(--blue);font-weight:800}.no{color:var(--gray)}
+tr.hlr td{background:var(--blue-xl)}
+tr.hlr td:first-child{box-shadow:inset 5px 0 var(--blue)}
+tr.bdr td{background:var(--gray-xl);color:var(--muted);text-decoration:line-through;text-decoration-color:var(--gray)}
+tr.bdr td:first-child{box-shadow:inset 5px 0 var(--gray)}
+.big-ok{color:var(--blue);font-weight:800}.big-bad{color:var(--gray);font-weight:800}
+.vars{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.vc{font-family:var(--mono);font-size:17px;font-weight:700;padding:4px 12px;border-radius:10px;background:#fff;border:2px solid var(--line);transition:all .35s}
+.vc b{color:var(--blue)}
+.vc.hot{border-color:var(--blue);box-shadow:0 0 12px rgba(29,78,216,.3)}
+.vc.res{border-color:var(--blue-s);background:var(--blue-xl);color:var(--blue-d)}
+.arr{display:flex;gap:8px;justify-content:center}
+.cell{width:52px;height:56px;border-radius:12px;border:3px solid var(--line);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .45s}
+.cell small{font-size:13px;color:var(--muted);font-weight:600}
+.cell.cur{border-color:var(--blue);background:var(--blue-xl);color:var(--blue-d);transform:translateY(-6px)}
+.cell.dim{opacity:.35}
+.cell.wide{width:auto;padding:0 10px;font-size:14px}
+.flow{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap}
+.box{border-radius:12px;padding:12px 16px;text-align:center;font-family:var(--mono);font-size:17px;border:2px solid var(--blue-s);background:#fff;min-width:110px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:14px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.c{border-color:var(--blue);background:var(--blue-xl)}
+.ar{color:var(--muted);font-size:22px;text-align:center}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:var(--blue);font-size:22px;margin-bottom:18px;font-weight:600}
+.say{font-size:19px;margin-top:10px;min-height:50px;color:var(--muted);line-height:1.42}
+.say b{color:var(--text)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:14px;color:var(--muted);margin:4px 6px 2px;align-items:center}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.15)}100%{transform:none;opacity:1}}
+/* larger sizing */
+.slide.z1>*:not(.hdr):not(.jumpbtn){zoom:1.15}
+
+/* ===== agenda ===== */
+.agenda{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 14px}
+.sec{grid-column:1/-1;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.08em;margin-top:4px;text-transform:uppercase}
+.ag{background:#fff;border:1px solid var(--line);border-left:5px solid var(--blue);border-radius:10px;padding:6px 10px;cursor:pointer;transition:all .2s;font-size:15.5px;line-height:1.25;font-family:var(--mono);font-weight:600}
+.ag:hover{border-color:var(--blue);transform:translateY(-2px)}
+.ag b{color:var(--blue);margin-right:6px}
+
+/* ===== nav / jump ===== */
+#bar{position:fixed;left:0;bottom:0;height:5px;background:var(--blue);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;min-width:36px;height:32px;cursor:pointer;font-size:16px;padding:0 8px}
+#nav button:hover{border-color:var(--blue)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:var(--muted);z-index:5}
+.jumpbtn{position:absolute;top:26px;right:30px;z-index:7;font-family:"Be Vietnam Pro",sans-serif;font-size:14px;font-weight:700;color:#fff;background:var(--blue);border:none;border-radius:999px;padding:7px 14px;cursor:pointer;transition:transform .2s}
+.jumpbtn:hover{transform:translateY(-2px)}
+#jump{position:fixed;inset:0;z-index:20;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center}
+#jump.on{display:flex}
+#jbox{width:min(1100px,94vw);max-height:88vh;overflow:auto;background:#fff;border-radius:18px;padding:20px 24px;box-shadow:0 30px 70px -20px rgba(15,23,42,.6);animation:pop .3s}
+#jbox .jh{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+#jbox .jh h3{font-size:22px;margin:0}
+#jbox .jh input{margin-left:auto;font-family:var(--mono);font-size:15px;padding:6px 10px;border:2px solid var(--line);border-radius:10px;width:260px;outline:none}
+#jbox .jh input:focus{border-color:var(--blue-s)}
+#jbox .jh button{border:none;background:var(--blue-xl);color:var(--blue-d);font-weight:800;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:18px}
+#jlist{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+#jlist .ji{display:flex;gap:8px;align-items:center;padding:7px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:14.5px;transition:all .15s;background:#fff}
+#jlist .ji:hover,#jlist .ji.k{border-color:var(--blue);background:var(--blue-xl)}
+#jlist .ji.cur{background:var(--blue-l);border-color:var(--blue-s)}
+#jlist .ji b{font-family:var(--mono);color:var(--blue);min-width:26px}
+#jlist .ji span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:700px){#hint{display:none}#jlist{grid-template-columns:1fr}}
+@media print{#nav,#bar,#hint,.jumpbtn{display:none}}
+</style>
+</head>
+<body>
+
+<div id="viewport"><div id="deck">
+<!-- ===================== TITLE ===================== -->
+<section class="slide" id="title" data-title="Trang bìa">
+  <div class="title-wrap">
+    <div class="kicker in">// Kujala, Weckström, Mladenović, Saramäki · CEUS 67 (2018) 41–54</div>
+    <h1 class="in">Temporal distance profile<br><span class="accent">&amp; mcpCSA</span></h1>
+    <p class="in muted" style="font-size:24px;margin-top:20px;max-width:1080px">Travel times and transfers in public transport: comprehensive accessibility analysis based on <b>Pareto-optimal journeys</b>. Đi từng bước: Pareto-optimality → temporal distance profile → các thống kê τ và b → thuật toán <b>mcpCSA</b> (multi-criteria profile Connection Scan Algorithm) chạy tay trên ví dụ → so sánh với Huynh &amp; Barthelemy (2022).</p>
+    <p class="in" style="margin-top:30px;font-size:18px;color:var(--muted)">← → hoặc Space: chạy từng bước · Shift+→: qua slide · <b>G</b> hoặc nút <b>☰ Đi tới slide</b>: nhảy tới slide bất kỳ · A: hiện hết · F: toàn màn hình · Ký hiệu &amp; viết tắt: xem slide cuối</p>
+    <p class="in" style="margin-top:10px;font-size:15px;color:var(--muted)">doi:10.1016/j.compenvurbsys.2017.08.012 · open access CC BY · code: github.com/CxAalto/gtfspy</p>
+  </div>
+</section>
+
+<!-- ===================== AGENDA ===================== -->
+<section class="slide z1" id="agenda" data-title="Nội dung">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:17px">· bấm vào mục để đi tới</span></div>
+  <div class="agenda in">
+    <div class="sec">1 · Bài toán</div>
+    <div class="ag" data-goto="dongco"><b>01</b>Động cơ: "travel time" là gì?</div>
+    <div class="ag" data-goto="pareto"><b>02</b>Pareto-optimality</div>
+    <div class="ag" data-goto="table1"><b>03</b>Ví dụ: 9 hành trình (Table 1)</div>
+    <div class="sec">2 · Temporal distance profile &amp; thống kê</div>
+    <div class="ag" data-goto="tau"><b>04</b>Định nghĩa τ(t)</div>
+    <div class="ag" data-goto="profile"><b>05</b>Vẽ profile từng bước</div>
+    <div class="ag" data-goto="stats"><b>06</b>τ_min, τ_mean, τ_max</div>
+    <div class="ag" data-goto="boarding"><b>07</b>Số lần lên xe b</div>
+    <div class="sec">3 · Thuật toán mcpCSA &nbsp;·&nbsp; 4 · Liên hệ nghiên cứu</div>
+    <div class="ag" data-goto="csa"><b>08</b>Connection &amp; ý tưởng CSA</div>
+    <div class="ag" data-goto="mcpcsa"><b>09</b>mcpCSA chạy tay</div>
+    <div class="ag" data-goto="setup"><b>10</b>Sửa đổi &amp; pipeline</div>
+    <div class="ag" data-goto="hb"><b>11</b>So với Huynh &amp; Barthelemy</div>
+    <div class="ag" data-goto="limit"><b>12</b>Hạn chế &amp; hướng mở</div>
+    <div class="ag" data-goto="summary"><b>✓</b>Tổng kết</div>
+    <div class="ag" data-goto="gloss"><b>A</b>Phụ lục: ký hiệu &amp; viết tắt</div>
+  </div>
+</section>
+
+<!-- ===================== 01 ĐỘNG CƠ ===================== -->
+<section class="slide" id="dongco" data-title="01 · Động cơ: travel time là gì?">
+  <div class="hdr in"><span class="qn">01</span><h2>Động cơ: "thời gian đi bằng xe buýt" là gì?</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr">
+    <div class="card in"><h3>Giao thông công cộng khó đo vì 3 đặc điểm</h3>
+      <ul><li><b>Luôn có đi bộ</b>: <b>access</b> = đi bộ từ điểm xuất phát (nhà) tới trạm đầu tiên; <b>egress</b> = đi bộ từ trạm cuối tới đích</li>
+      <li><b>Theo lịch</b>: xe chỉ chạy ở <i>một số</i> thời điểm, nên phải chờ</li>
+      <li><b>Mạng lưới</b>: phải đổi tuyến (transfer), có thể đi bộ giữa hai trạm gần nhau</li></ul></div>
+    <div class="card f"><h3>Cách làm phổ biến: Dijkstra tại vài giờ lấy mẫu</h3>
+      <ul style="margin-top:2px"><li>Chỉ chạy tại vài giờ khởi hành (sampling) → không thấy chuyện gì xảy ra <b>giữa</b> các mẫu</li>
+      <li>Dijkstra <b>không</b> bị giới hạn ở một tiêu chí: khoá có thể là tuple (t<sub>arr</sub>, b) so sánh <b>lexicographic</b>. Nhưng đó vẫn là <b>một thứ tự toàn phần</b> → trả về <b>đúng một</b> hành trình, ưu tiên tuyệt đối tiêu chí đầu</li>
+      <li>Ví dụ lúc 08:00 (slide sau): lex (t<sub>arr</sub>, b) chọn B (28 ph, 3 lần lên xe), bỏ mất C (32 ph, 2 lần) và E (50 ph, 1 lần)</li>
+      <li>Muốn <b>cả tập Pareto</b> phải giữ <b>nhiều nhãn mỗi đỉnh</b> (multi-criteria label-setting): đó là việc của mcpCSA</li></ul></div>
+  </div>
+  <div class="card f" style="margin-top:12px;padding:10px 14px"><h3 style="margin-bottom:4px">Ba cách hiểu "travel time": mỗi cách gồm những phần nào?</h3>
+    <table class="comp">
+      <tr><th>Cách hiểu</th><th>Công thức</th><th>Đi bộ access</th><th>Chờ ban đầu</th><th>Ngồi trên xe</th><th>Chờ + đi bộ khi đổi tuyến</th><th>Đi bộ egress</th></tr>
+      <tr><td><b>In-vehicle time</b></td><td>tổng thời gian ngồi trên xe</td><td class="no">–</td><td class="no">–</td><td class="yes">✓</td><td class="no">–</td><td class="no">–</td></tr>
+      <tr><td><b>Journey duration</b></td><td>t<sub>arr</sub> − t<sub>dep</sub>: người dùng xem lịch, ra trạm đúng giờ</td><td class="yes">✓</td><td class="no">–</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+      <tr><td><b>Temporal distance</b></td><td>t<sub>arr</sub> − t: người dùng đi ngẫu nhiên lúc t</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+    </table>
+    <p class="muted" style="font-size:15px;margin-top:6px">Có paper chỉ dùng in-vehicle time (bỏ thời gian chờ và đi bộ đổi tuyến), nên phải kiểm tra định nghĩa trước khi so số liệu giữa các paper. Kujala dùng hai dòng dưới. Bảng phân rã này do slide tự lập.</p>
+  </div>
+  <p class="say">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== 02 PARETO ===================== -->
+<section class="slide" id="pareto" data-title="02 · Pareto-optimality">
+  <div class="hdr in"><span class="qn">02</span><h2>Pareto-optimality: khi có hai tiêu chí trở lên</h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+    <div class="card in" style="padding:8px">
+      <svg width="590" height="330" viewBox="0 0 590 330" style="display:block">
+        <line x1="60" y1="280" x2="560" y2="280" stroke="#0f172a" stroke-width="1.5"/>
+        <line x1="60" y1="280" x2="60" y2="20" stroke="#0f172a" stroke-width="1.5"/>
+        <text x="300" y="318" text-anchor="middle" font-size="14" fill="#5b6478">thời gian tới đích t<tspan font-size="10" dy="3">arr</tspan><tspan dy="-3"> − t (phút), xuất phát lúc t = 08:00</tspan></text>
+        <text x="18" y="150" font-size="14" fill="#5b6478" transform="rotate(-90 18 150)" text-anchor="middle">số lần lên xe b</text>
+        <g font-size="12" fill="#5b6478" text-anchor="middle">
+          <text x="60" y="298">0</text><text x="120" y="298">10</text><text x="180" y="298">20</text><text x="240" y="298">30</text><text x="300" y="298">40</text><text x="360" y="298">50</text><text x="420" y="298">60</text><text x="480" y="298">70</text>
+        </g>
+        <g font-size="12" fill="#5b6478" text-anchor="end">
+          <text x="52" y="254">0</text><text x="52" y="194">1</text><text x="52" y="134">2</text><text x="52" y="74">3</text>
+        </g>
+        <g class="hide0" id="pDom">
+          <circle cx="294" cy="130" r="8" fill="#cbd5e1"/><text x="294" y="117" font-size="13" text-anchor="middle" fill="#94a3b8">F (39 ph)</text>
+          <circle cx="414" cy="130" r="8" fill="#cbd5e1"/><text x="414" y="117" font-size="13" text-anchor="middle" fill="#94a3b8">D, G, H (59 ph)</text>
+          <circle cx="480" cy="190" r="8" fill="#cbd5e1"/><text x="480" y="177" font-size="13" text-anchor="middle" fill="#94a3b8">I (70 ph)</text>
+        </g>
+        <g class="hide0" id="pPts" font-size="14" font-weight="700" fill="#1d4ed8">
+          <circle cx="228" cy="70" r="9"/><text x="228" y="56" text-anchor="middle">B (28 ph, b=3)</text>
+          <circle cx="252" cy="130" r="9"/><text x="236" y="152" text-anchor="middle">C (32 ph, b=2)</text>
+          <circle cx="360" cy="190" r="9"/><text x="350" y="214" text-anchor="middle">E (50 ph, b=1)</text>
+          <rect x="411" y="241" width="18" height="18"/><text x="436" y="238">đi bộ (60 ph, b=0)</text>
+        </g>
+        <path class="hide0" id="pFront" d="M228 22 V70 H252 V130 H360 V190 H420 V250 H560" fill="none" stroke="#1d4ed8" stroke-width="3" stroke-dasharray="7 5"/>
+      </svg>
+      <p class="hide0" id="pRead" style="font-size:15px;line-height:1.4;margin:2px 8px 4px">Đọc nhãn <b>C (32 ph, b=2)</b>: xuất phát lúc 08:00 và đi hành trình C (08:08 → 08:32, Table 1) thì tới đích sau <b>32 phút</b> (8 ph chờ + 24 ph hành trình), lên xe <b>2 lần</b> (tức đổi tuyến 1 lần). A không có trên hình vì A khởi hành 07:53, trước 08:00.</p>
+    </div>
+    <div>
+      <span class="f ghost" data-act="#pPts|sh;#pDom|sh;#pRead|sh" data-say="Ví dụ của paper (Table 1), người dùng xuất phát lúc <b>08:00</b>. Mỗi hành trình là một điểm (thời gian tới đích, b). Cả hai tiêu chí đều <b>càng nhỏ càng tốt</b>."></span>
+      <div class="card f" data-act="#pDom|dimx"><h3>Dominate (trội)</h3><p>Hành trình x <b>dominate</b> y nếu x không tệ hơn y ở mọi tiêu chí và tốt hơn hẳn ở ít nhất một tiêu chí.</p><p style="margin-top:6px">Ví dụ: <b>C (32 ph, b=2)</b> dominate <b>F (39 ph, b=2)</b>: cùng số lần lên xe nhưng C tới sớm hơn 7 phút → F bị loại.</p></div>
+      <div class="card f" style="margin-top:10px" data-act="#pFront|sh"><h3>Pareto frontier</h3><p>Tập các hành trình <b>không bị ai dominate</b>: B, C, E và đi bộ. Mỗi điểm là một lựa chọn hợp lý cho một kiểu người dùng: nhanh nhưng đổi tuyến nhiều, hoặc chậm nhưng ít đổi tuyến.</p></div>
+      <div class="note f" style="margin-top:10px">Khi được <b>chọn giờ đi</b>, một hành trình là bộ ba (t<sub>dep</sub>, t<sub>arr</sub>, b): t<sub>dep</sub> <b>càng muộn càng tốt</b>, t<sub>arr</sub> càng sớm càng tốt, b càng nhỏ càng tốt (slide sau).</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 03 TABLE 1 ===================== -->
+<section class="slide" id="table1" data-title="03 · Ví dụ: 9 hành trình (Table 1)">
+  <div class="hdr in"><span class="qn">03</span><h2>Ví dụ của paper: 9 hành trình từ O tới D (Table 1)</h2></div>
+  <div class="cols" style="grid-template-columns:2.05fr 1fr;gap:16px">
+    <div class="in">
+      <table class="acc tj" id="tj">
+        <tr><th>Journey</th><th>Path</th><th>t<sub>dep</sub></th><th>t<sub>arr</sub></th><th>b</th><th>t<sub>arr</sub>−t<sub>dep</sub></th><th>Fastest</th><th>Pareto</th><th class="why" style="width:36%">Vì sao Pareto / ai dominate? (3 tiêu chí)</th></tr>
+        <tr id="rA"><td>A</td><td>OabD</td><td>07:53</td><td>08:30</td><td>1</td><td>37</td><td><span class="hide0" id="fA">·</span></td><td><span class="hide0 big-ok" id="pA">✓</span></td><td class="why"><span class="hide0" id="yA">Đến sớm nhất trong các hành trình b = 1. Ai đến sớm hơn (B, 08:28) đều lên xe nhiều hơn</span></td></tr>
+        <tr id="rB"><td>B</td><td>OcdefgD</td><td>08:08</td><td>08:28</td><td>3</td><td>20</td><td><span class="hide0 big-ok" id="fB">✓</span></td><td><span class="hide0 big-ok" id="pB">✓</span></td><td class="why"><span class="hide0" id="yB">Đến sớm nhất cả bảng (08:28): không ai đến sớm hơn</span></td></tr>
+        <tr id="rC"><td>C</td><td>OcdeD</td><td>08:08</td><td>08:32</td><td>2</td><td>24</td><td><span class="hide0" id="fC">·</span></td><td><span class="hide0 big-ok" id="pC">✓</span></td><td class="why"><span class="hide0" id="yC">Với b ≤ 2, chỉ A đến sớm hơn, nhưng A đi sớm hơn (07:53)</span></td></tr>
+        <tr id="rD"><td>D</td><td>OcdeD</td><td>08:08</td><td>08:59</td><td>2</td><td>51</td><td><span class="hide0" id="fD">·</span></td><td><span class="hide0 big-bad" id="pD">✗</span></td><td class="why"><span class="hide0" id="yD"><b>C</b> dominate: cùng giờ đi, cùng b, C đến sớm hơn (08:32). F, H cũng dominate D</span></td></tr>
+        <tr id="rE"><td>E</td><td>OabD</td><td>08:13</td><td>08:50</td><td>1</td><td>37</td><td><span class="hide0" id="fE">·</span></td><td><span class="hide0 big-ok" id="pE">✓</span></td><td class="why"><span class="hide0" id="yE">Với b = 1, chỉ A đến sớm hơn, nhưng A đi sớm hơn. F đến sớm hơn nhưng b = 2</span></td></tr>
+        <tr id="rF"><td>F</td><td>OhijkD</td><td>08:19</td><td>08:39</td><td>2</td><td>20</td><td><span class="hide0 big-ok" id="fF">✓</span></td><td><span class="hide0 big-ok" id="pF">✓</span></td><td class="why"><span class="hide0" id="yF">Ai đến ≤ 08:39 (A, B, C) đều đi sớm hơn 08:19</span></td></tr>
+        <tr id="rG"><td>G</td><td>OhideD</td><td>08:19</td><td>08:59</td><td>2</td><td>40</td><td><span class="hide0" id="fG">·</span></td><td><span class="hide0 big-bad" id="pG">✗</span></td><td class="why"><span class="hide0" id="yG"><b>F</b> dominate: cùng giờ đi 08:19, cùng b, F đến sớm hơn. H cũng dominate G (đi muộn hơn, cùng giờ đến)</span></td></tr>
+        <tr id="rH"><td>H</td><td>OcdeD</td><td>08:28</td><td>08:59</td><td>2</td><td>31</td><td><span class="hide0 big-ok" id="fH">✓</span></td><td><span class="hide0 big-ok" id="pH">✓</span></td><td class="why"><span class="hide0" id="yH">Ai đến ≤ 08:59 đều đi sớm hơn 08:28</span></td></tr>
+        <tr id="rI"><td>I</td><td>OabD</td><td>08:33</td><td>09:10</td><td>1</td><td>37</td><td><span class="hide0 big-ok" id="fI">✓</span></td><td><span class="hide0 big-ok" id="pI">✓</span></td><td class="why"><span class="hide0" id="yI">Đi muộn nhất (08:33): không ai đi muộn hơn</span></td></tr>
+      </table>
+      <p class="muted" style="font-size:13.5px;margin-top:5px">Nguồn: Kujala et al. (2018), Table 1. Cột Fastest/Pareto do paper đánh dấu; cột "Vì sao" và các bước bên phải là giải thích của slide. Chữ thường trong Path (a, b, c…) là các trạm trung gian; đơn vị thời gian: phút.</p>
+    </div>
+    <div>
+      <span class="f ghost" data-now="#rC|hlr;#rD|bdr" data-say="So <b>C</b> và <b>D</b>: cùng đi lúc 08:08, cùng b = 2, nhưng C đến lúc 08:32, D đến lúc 08:59. C dominate D → <b>D không bao giờ là lựa chọn hợp lý</b>."></span>
+      <span class="f ghost" data-now="#rB|hlr;#rA|bdr" data-say="Chỉ xét 2 tiêu chí (t<sub>dep</sub> muộn hơn, t<sub>arr</sub> sớm hơn): <b>B</b> (08:08 → 08:28) dominate <b>A</b> (07:53 → 08:30), vì B đi muộn hơn mà vẫn đến sớm hơn."></span>
+      <div class="card f" data-act="#fA|sh;#fB|sh;#fC|sh;#fD|sh;#fE|sh;#fF|sh;#fG|sh;#fH|sh;#fI|sh" data-say="Tập <b>fastest-path</b> (2 tiêu chí t<sub>dep</sub>, t<sub>arr</sub>) = {B, F, H, I}. Mỗi hành trình trong tập này, với một giờ xuất phát nào đó, là cách <b>đến đích sớm nhất</b>."><h3>Fastest-path = {B, F, H, I}</h3><p>Pareto theo 2 tiêu chí (t<sub>dep</sub> muộn, t<sub>arr</sub> sớm). B và F đều thuộc tập: B đến sớm hơn F, nhưng F đi muộn hơn B.</p></div>
+      <div class="card f" style="margin-top:10px" data-act="#pA|sh;#pB|sh;#pC|sh;#pD|sh;#pE|sh;#pF|sh;#pG|sh;#pH|sh;#pI|sh;#yA|sh;#yB|sh;#yC|sh;#yD|sh;#yE|sh;#yF|sh;#yG|sh;#yH|sh;#yI|sh" data-say="Thêm tiêu chí thứ ba <b>b</b>: các hành trình ít lần lên xe (A, C, E) quay lại tập Pareto. Cột cuối giải thích từng dòng: dòng ✓ không có ai tốt hơn hoặc bằng ở cả 3 tiêu chí; dòng ✗ ghi tên hành trình dominate nó."><h3>Pareto (3 tiêu chí) = {A, B, C, E, F, H, I}</h3><p>Thêm b (ít hơn là tốt hơn): chỉ D và G bị loại.</p><p class="muted" style="font-size:15px;margin-top:4px">Muốn dominate dòng X, phải có dòng Y: đi <b>không sớm hơn</b>, đến <b>không muộn hơn</b>, lên xe <b>không nhiều hơn</b> X.</p></div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 04 TAU ===================== -->
+<section class="slide" id="tau" data-title="04 · Định nghĩa τ(t)">
+  <div class="hdr in"><span class="qn">04</span><h2>Temporal distance τ(t): xuất phát lúc t thì mất bao lâu?</h2></div>
+  <div class="cols" style="grid-template-columns:1.05fr 1fr">
+    <div>
+      <div class="card in"><h3>Ba công thức (paper, Eq. 1–3)</h3>
+        <p style="font-family:var(--mono);font-size:18px;line-height:2">
+        j*(t) = argmin<sub>j∈S</sub> { t<sub>dep</sub><sup>j</sup> | t<sub>dep</sub><sup>j</sup> ≥ t }<br>
+        τ<sub>PT</sub>(t) = (t<sub>dep</sub><sup>j*</sup> − t) + (t<sub>arr</sub><sup>j*</sup> − t<sub>dep</sub><sup>j*</sup>) = t<sub>arr</sub><sup>j*</sup> − t<br>
+        τ(t) = min( τ<sub>PT</sub>(t), t<sub>walk</sub> )</p>
+        <p class="muted" style="font-size:16px">S = tập fastest-path. j* = hành trình fastest-path <b>khởi hành kế tiếp</b> sau t. PT = public transport (giao thông công cộng): τ<sub>PT</sub> là thời gian khi đi bằng xe. t<sub>walk</sub> = thời gian đi bộ thẳng từ O tới D. Trong τ<sub>PT</sub>, phần đầu là thời gian chờ, phần sau là journey duration.</p></div>
+      <div class="vars f" id="tvars"><span class="vc" id="tv1">t = <b>?</b></span><span class="vc" id="tv2">j* = <b>?</b></span><span class="vc" id="tv3">chờ = <b>?</b></span><span class="vc" id="tv4">duration = <b>?</b></span><span class="vc res" id="tv5">τ = <b>?</b></span></div>
+    </div>
+    <div>
+      <div class="arr in" style="margin-top:6px;gap:12px">
+        <div style="height:76px;font-size:24px;min-width:120px" class="cell wide" id="cB">B<small>08:08→08:28</small></div>
+        <div style="height:76px;font-size:24px;min-width:120px" class="cell wide" id="cF">F<small>08:19→08:39</small></div>
+        <div style="height:76px;font-size:24px;min-width:120px" class="cell wide" id="cH">H<small>08:28→08:59</small></div>
+        <div style="height:76px;font-size:24px;min-width:120px" class="cell wide" id="cI">I<small>08:33→09:10</small></div>
+      </div>
+      <span class="f ghost" data-now="#cB|cur" data-set="#tv1::t = <b>08:00</b>;#tv2::j* = <b>B</b>;#tv3::chờ = <b>8 ph</b>;#tv4::duration = <b>20 ph</b>;#tv5::τ = <b>28 ph</b>" data-say="t = 08:00: chuyến fastest-path kế tiếp là <b>B</b> (08:08). Chờ 8 ph + đi 20 ph → <b>τ = 28 ph</b>."></span>
+      <span class="f ghost" data-now="#cF|cur;#cB|dim" data-set="#tv1::t = <b>08:10</b>;#tv2::j* = <b>F</b>;#tv3::chờ = <b>9 ph</b>;#tv4::duration = <b>20 ph</b>;#tv5::τ = <b>29 ph</b>" data-say="t = 08:10: B đã chạy. Chuyến kế tiếp là <b>F</b> (08:19): chờ 9 ph + đi 20 ph → <b>τ = 29 ph</b>."></span>
+      <span class="f ghost" data-now="#cH|cur;#cB|dim;#cF|dim" data-set="#tv1::t = <b>08:20</b>;#tv2::j* = <b>H</b>;#tv3::chờ = <b>8 ph</b>;#tv4::duration = <b>31 ph</b>;#tv5::τ = <b>39 ph</b>" data-say="t = 08:20: chỉ trễ F một phút mà τ nhảy lên <b>39 ph</b> (chuyến H chậm hơn). τ(t) là hàm <b>răng cưa</b>, có bước nhảy tại mỗi giờ khởi hành (slide sau)."></span>
+      <div class="note f" style="margin-top:14px">Nếu chọn hành trình <b>đi sớm hơn</b> nhưng cùng giờ đến (ví dụ A thay cho B), journey duration chỉ dài thêm mà không đến sớm hơn. Vì vậy, với cùng t<sub>arr</sub>, paper chọn hành trình có <b>t<sub>dep</sub> muộn nhất</b> (§2.1).</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 05 PROFILE ===================== -->
+<section class="slide" id="profile" data-title="05 · Vẽ profile từng bước">
+  <div class="hdr in"><span class="qn">05</span><h2>Fastest-path temporal distance profile trên [08:00, 08:30]</h2></div>
+  <div class="cols" style="grid-template-columns:1.4fr 1fr;gap:18px">
+    <div class="card in" style="padding:8px">
+      <svg width="660" height="330" viewBox="0 0 660 330" style="display:block">
+        <polygon class="hide0" id="prArea" points="60,280 60,168 188,200 188,156 364,200 364,120 508,156 508,112 540,120 540,280" fill="#dbeafe" opacity=".8"/>
+        <line x1="60" y1="280" x2="552" y2="280" stroke="#0f172a" stroke-width="1.5"/>
+        <line x1="60" y1="280" x2="60" y2="24" stroke="#0f172a" stroke-width="1.5"/>
+        <g font-size="12" fill="#5b6478" text-anchor="middle">
+          <text x="60" y="298">08:00</text><text x="140" y="298">08:05</text><text x="220" y="298">08:10</text><text x="300" y="298">08:15</text><text x="380" y="298">08:20</text><text x="460" y="298">08:25</text><text x="540" y="298">08:30</text>
+        </g>
+        <g font-size="12" fill="#5b6478" text-anchor="end">
+          <text x="52" y="284">0</text><text x="52" y="244">10</text><text x="52" y="204">20</text><text x="52" y="164">30</text><text x="52" y="124">40</text><text x="52" y="84">50</text><text x="52" y="44">60</text>
+        </g>
+        <text x="300" y="320" font-size="13" text-anchor="middle" fill="#5b6478">giờ xuất phát t</text>
+        <text x="16" y="150" font-size="13" fill="#5b6478" transform="rotate(-90 16 150)" text-anchor="middle">τ(t) (phút)</text>
+        <g id="prWalk"><line x1="60" y1="40" x2="552" y2="40" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4 5"/><text x="556" y="44" font-size="12" fill="#5b6478">đi bộ 60 ph</text></g>
+        <!-- cột phân rã τ = chờ (nhạt) + journey duration (đậm) -->
+        <g class="hide0" id="bar0"><rect x="55" y="200" width="10" height="80" fill="#1d4ed8"/><rect x="55" y="168" width="10" height="32" fill="#bfdbfe" stroke="#1d4ed8"/><text x="60" y="160" font-size="12" font-weight="700" text-anchor="middle" fill="#1e3a8a">28</text></g>
+        <g class="hide0" id="bar4"><rect x="119" y="200" width="10" height="80" fill="#1d4ed8"/><rect x="119" y="184" width="10" height="16" fill="#bfdbfe" stroke="#1d4ed8"/><text x="124" y="176" font-size="12" font-weight="700" text-anchor="middle" fill="#1e3a8a">24</text></g>
+        <g class="hide0" id="bar8"><rect x="183" y="200" width="10" height="80" fill="#1d4ed8"/><text x="176" y="214" font-size="12" font-weight="700" text-anchor="end" fill="#1e3a8a">20</text></g>
+        <g class="hide0" id="bar9"><rect x="199" y="200" width="10" height="80" fill="#1d4ed8"/><rect x="199" y="160" width="10" height="40" fill="#bfdbfe" stroke="#1d4ed8"/><text x="214" y="156" font-size="12" font-weight="700" fill="#1e3a8a">30</text></g>
+        <g class="hide0" id="prB"><line x1="60" y1="168" x2="188" y2="200" stroke="#1d4ed8" stroke-width="4"/><text x="104" y="166" font-size="14" font-weight="700" fill="#1d4ed8">B</text><text x="96" y="236" font-size="12" fill="#1e3a8a">độ dốc −1</text></g>
+        <g class="hide0" id="prF"><line x1="188" y1="200" x2="188" y2="156" stroke="#64748b" stroke-width="2" stroke-dasharray="4 3"/><text x="192" y="146" font-size="11.5" fill="#64748b">nhảy: lỡ B</text><line x1="188" y1="156" x2="364" y2="200" stroke="#1d4ed8" stroke-width="4"/><text x="276" y="168" font-size="14" font-weight="700" fill="#1d4ed8">F</text></g>
+        <g class="hide0" id="prH"><line x1="364" y1="200" x2="364" y2="120" stroke="#64748b" stroke-width="2" stroke-dasharray="4 3"/><line x1="364" y1="120" x2="508" y2="156" stroke="#1d4ed8" stroke-width="4"/><text x="430" y="124" font-size="14" font-weight="700" fill="#1d4ed8">H</text></g>
+        <g class="hide0" id="prI"><line x1="508" y1="156" x2="508" y2="112" stroke="#64748b" stroke-width="2" stroke-dasharray="4 3"/><line x1="508" y1="112" x2="540" y2="120" stroke="#1d4ed8" stroke-width="4"/><text x="518" y="102" font-size="14" font-weight="700" fill="#1d4ed8">I</text></g>
+        <g class="hide0" id="prStat" font-size="12.5" font-weight="700" fill="#1e3a8a">
+          <line x1="60" y1="200" x2="552" y2="200" stroke="#1e3a8a" stroke-width="1.5"/><text x="556" y="204">τ_min = 20</text>
+          <line x1="60" y1="163.5" x2="552" y2="163.5" stroke="#1e3a8a" stroke-width="1.5" stroke-dasharray="8 4"/><text x="556" y="167.5">τ_mean 29,1</text>
+          <line x1="60" y1="112" x2="552" y2="112" stroke="#1e3a8a" stroke-width="1.5" stroke-dasharray="2 3"/><text x="556" y="116">τ_max = 42</text>
+        </g>
+      </svg>
+      <div class="legend"><span><i style="background:#1d4ed8"></i>journey duration t<sub>arr</sub> − t<sub>dep</sub> (từ lúc xe chạy tới khi tới đích)</span><span><i style="background:#bfdbfe;border:1px solid #1d4ed8"></i>chờ ban đầu t<sub>dep</sub> − t</span></div>
+    </div>
+    <div>
+      <div class="card in" style="padding:10px 14px"><h3 style="font-size:19px">Mỗi điểm trên đường = chờ + journey duration</h3>
+        <p style="font-family:var(--mono);font-size:15.5px;line-height:1.6">Trên khối B (t ≤ 08:08):<br>τ(t) = (08:08 − t) + 20 = <b>08:28 − t</b></p></div>
+      <table class="acc tj" style="margin-top:8px">
+        <tr><th>t</th><th>j*</th><th>chờ</th><th>duration</th><th>τ</th></tr>
+        <tr class="f" data-act="#bar0|sh" data-say="t = 08:00: chuyến kế tiếp là <b>B</b> (08:08 → 08:28). Chờ <b>8</b> ph + journey duration <b>20</b> ph = <b>28</b> ph. Trên hình: một cột, phần đậm 20, phần nhạt 8."><td>08:00</td><td>B</td><td>8</td><td>20</td><td><b>28</b></td></tr>
+        <tr class="f" data-act="#bar4|sh" data-say="Đi muộn hơn 4 phút (08:04): vẫn bắt B, vẫn tới lúc <b>08:28</b>. Phần đậm giữ nguyên 20, chỉ phần chờ co lại còn 4 → τ = <b>24</b>."><td>08:04</td><td>B</td><td>4</td><td>20</td><td><b>24</b></td></tr>
+        <tr class="f" data-act="#bar8|sh" data-say="Ra trạm đúng 08:08: không phải chờ, τ = <b>20</b> = journey duration của B. Đây là <b>đáy</b> của răng cưa."><td>08:08</td><td>B</td><td>0</td><td>20</td><td><b>20</b></td></tr>
+        <tr class="f" data-o="5" data-act="#bar9|sh" data-say="08:09: vừa <b>lỡ B</b>. Chuyến fastest-path kế tiếp là <b>F</b> (08:19 → 08:39): chờ 10 + duration 20 = <b>30</b>. Ngay sau 08:08, τ <b>nhảy dọc</b> từ 20 lên 31: bước nhảy = lỡ chuyến."><td>08:09</td><td>F</td><td>10</td><td>20</td><td><b>30</b></td></tr>
+      </table>
+      <span class="f ghost" data-o="4" data-act="#prB|sh" data-say="Nối đỉnh các cột → <b>đoạn thẳng dốc xuống</b>. Lý do: trong suốt khối B, giờ tới đích <b>cố định</b> 08:28, nên τ = 08:28 − t. Đi muộn hơn 1 phút thì chờ ít hơn 1 phút, τ giảm đúng 1 phút: <b>độ dốc = −1</b>. Phần đậm (duration) không đổi, chỉ phần nhạt (chờ) co lại."></span>
+      <span class="f ghost" data-o="6" data-act="#prF|sh" data-say="Khối F: τ = 08:39 − t, lại là đoạn dốc −1, từ <b>31</b> (t vừa qua 08:08) xuống <b>20</b> (t = 08:19, đáy = duration của F). Mỗi đoạn dốc ứng với <b>một hành trình</b> j*."></span>
+      <span class="f ghost" data-o="7" data-act="#prH|sh" data-say="t ∈ (08:19, 08:28]: j* = <b>H</b> (08:28 → 08:59). τ = 08:59 − t: nhảy lên 40 rồi giảm còn 31. Đáy răng H cao hơn (31) vì H là hành trình chậm hơn."></span>
+      <span class="f ghost" data-o="8" data-act="#prI|sh" data-say="t ∈ (08:28, 08:30]: j* = <b>I</b>. I khởi hành 08:33, <b>ngoài</b> cửa sổ, nhưng vẫn quyết định τ ở cuối cửa sổ. Vì vậy routing phải quét rộng hơn cửa sổ phân tích."></span>
+      <span class="f ghost" data-o="9" data-act="#prStat|sh" data-say="Ba đường ngang là các thống kê tóm tắt profile: tốt nhất (đáy thấp nhất), trung bình, xấu nhất (đỉnh cao nhất) (slide sau)."></span>
+      <span class="f ghost" data-o="10" data-act="#prArea|sh" data-say="τ_mean = <b>diện tích</b> dưới profile chia cho độ dài cửa sổ. Vì mỗi khối là đoạn thẳng, diện tích là tổng các <b>hình thang</b>, tính được <b>chính xác</b>, không cần rời rạc hoá thời gian (Eq. 7)."></span>
+      <p class="say" style="font-size:17px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 06 STATS ===================== -->
+<section class="slide" id="stats" data-title="06 · τ_min, τ_mean, τ_max">
+  <div class="hdr in"><span class="qn">06</span><h2>Thống kê temporal distance: tính tay cho ví dụ</h2></div>
+  <div class="cols" style="grid-template-columns:1.15fr 1fr">
+    <div>
+      <table class="acc in" id="tstat">
+        <tr><th>Khối</th><th>t<sub>start</sub> → t<sub>end</sub></th><th>τ<sub>start</sub> → τ<sub>end</sub></th><th>Diện tích hình thang</th></tr>
+        <tr id="sB"><td>B</td><td>08:00 → 08:08</td><td>28 → 20</td><td><span class="hide0" id="aB">8 × 24 = 192</span></td></tr>
+        <tr id="sF"><td>F</td><td>08:08 → 08:19</td><td>31 → 20</td><td><span class="hide0" id="aF">11 × 25,5 = 280,5</span></td></tr>
+        <tr id="sH"><td>H</td><td>08:19 → 08:28</td><td>40 → 31</td><td><span class="hide0" id="aH">9 × 35,5 = 319,5</span></td></tr>
+        <tr id="sI"><td>I</td><td>08:28 → 08:30</td><td>42 → 40</td><td><span class="hide0" id="aI">2 × 41 = 82</span></td></tr>
+        <tr><td><b>Σ</b></td><td>30 phút</td><td></td><td><b class="hide0" id="aS">874 phút²</b></td></tr>
+      </table>
+      <p class="muted" style="font-size:14px;margin-top:6px">Diện tích = (t<sub>end</sub> − t<sub>start</sub>) × (τ<sub>start</sub> + τ<sub>end</sub>)/2. Số liệu do slide tính tay từ Table 1; paper chỉ vẽ trên Fig. 3, không in các con số này.</p>
+      <div class="vars f" data-o="6"><span class="vc res">τ_min = <b>20 ph</b></span><span class="vc res">τ_mean = 874/30 ≈ <b>29,13 ph</b></span><span class="vc res">τ_max = <b>42 ph</b></span><span class="vc hot">τ_mean − τ_min ≈ <b>9,13 ph</b></span></div>
+    </div>
+    <div>
+      <span class="f ghost" data-o="1" data-act="#aB|sh" data-now="#sB|hlr" data-say="Khối B: rộng 8 phút, τ từ 28 xuống 20 → diện tích 8 × (28+20)/2 = <b>192</b>."></span>
+      <span class="f ghost" data-o="2" data-act="#aF|sh" data-now="#sF|hlr" data-say="Khối F: 11 × (31+20)/2 = <b>280,5</b>."></span>
+      <span class="f ghost" data-o="3" data-act="#aH|sh" data-now="#sH|hlr" data-say="Khối H: 9 × (40+31)/2 = <b>319,5</b>."></span>
+      <span class="f ghost" data-o="4" data-act="#aI|sh" data-now="#sI|hlr" data-say="Khối I: 2 × (42+40)/2 = <b>82</b>."></span>
+      <span class="f ghost" data-o="5" data-act="#aS|sh" data-say="Tổng diện tích <b>874</b>. Chia cho 30 phút → τ_mean ≈ <b>29,13 ph</b>."></span>
+      <table class="t1 f" data-o="7">
+        <tr><td>τ_min (Eq. 4)</td><td><b>Tốt nhất</b>: người dùng xem lịch, ra trạm đúng giờ ≈ journey duration ngắn nhất</td></tr>
+        <tr><td>τ_mean (Eq. 5)</td><td><b>Trung bình</b>: người dùng đi ngẫu nhiên, không xem lịch</td></tr>
+        <tr><td>τ_max (Eq. 6)</td><td><b>Xấu nhất</b> (được đảm bảo); lớn → có khoảng trống dịch vụ</td></tr>
+        <tr><td>τ_mean − τ_min</td><td><b>Effective waiting time</b>; với dịch vụ đều đặn thì bằng nửa headway (headway = khoảng cách giữa hai chuyến liên tiếp)</td></tr>
+      </table>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 07 BOARDING ===================== -->
+<section class="slide" id="boarding" data-title="07 · Số lần lên xe b">
+  <div class="hdr in"><span class="qn">07</span><h2>Thêm số lần lên xe b: boarding-count statistics (§2.3–2.4)</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr">
+    <div>
+      <div class="card in"><h3>Ba thống kê về b trên [t<sub>start</sub>, t<sub>end</sub>]</h3>
+        <table class="t1">
+          <tr><td>b_min</td><td>số lần lên xe ít nhất của <b>mọi</b> hành trình khởi hành sau t<sub>start</sub></td></tr>
+          <tr><td>b_mean,fp</td><td>trung bình theo thời gian, <b>nếu luôn đi fastest-path</b> (fp) (Eq. 8)</td></tr>
+          <tr><td>b_max,fp</td><td>trường hợp xấu nhất, nếu luôn đi fastest-path</td></tr>
+        </table></div>
+      <div class="card f" style="margin-top:12px"><h3>Tính b_mean,fp cho ví dụ</h3>
+        <p style="font-family:var(--mono);font-size:16px;line-height:1.8">= [ 8·b<sub>B</sub> + 11·b<sub>F</sub> + 9·b<sub>H</sub> + 2·b<sub>I</sub> ] / 30<br>= [ 8·3 + 11·2 + 9·2 + 2·1 ] / 30<br>= 66 / 30 = <b>2,2</b></p>
+        <p class="muted" style="font-size:15px">Trọng số = số phút mà hành trình đó là j*(t) (cùng các khối của slide 06).</p></div>
+    </div>
+    <div>
+      <div class="vars f"><span class="vc res">b_min = <b>1</b> (chỉ xét đi xe; tính cả phương án đi bộ thẳng thì 0)</span><span class="vc res">b_mean,fp = <b>2,2</b></span><span class="vc res">b_max,fp = <b>3</b> (B)</span></div>
+      <div class="card f" style="margin-top:12px"><h3>Trade-off thời gian và số lần đổi tuyến</h3>
+        <ul><li>b_mean,fp − b_min = 2,2 − 1 = <b>1,2</b> lần lên xe phải "trả thêm" để luôn đi nhanh nhất</li>
+        <li>Gọi τ_mean,b_min là τ_mean khi <b>chỉ</b> dùng các hành trình có b = b_min. Ở đây chỉ dùng b = 1 (E rồi I): τ_mean,b_min ≈ <b>46,3 ph</b>, nên đi fastest-path tiết kiệm ≈ <b>17,2 ph</b></li></ul>
+        <p class="muted" style="font-size:14px">Số liệu do slide tính tay, giả định "profile ít lên xe nhất" là profile của các hành trình đi xe có b = 1.</p></div>
+      <div class="note blue f" style="margin-top:10px">Bài học: <b>không có một con số duy nhất</b> cho "accessibility". Mỗi thống kê trả lời một câu hỏi khác nhau, và paper cho thấy chúng tương quan không hoàn toàn trên Helsinki (Fig. 14).</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 08 CSA ===================== -->
+<section class="slide" id="csa" data-title="08 · Connection & ý tưởng CSA">
+  <div class="hdr in"><span class="qn">08</span><h2>Làm sao tính được tập Pareto? Connection Scan Algorithm (CSA)</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.1fr;gap:18px">
+    <div>
+      <div class="card in" style="padding:10px 14px"><h3>Connection: đơn vị nhỏ nhất của lịch</h3>
+        <p style="font-family:var(--mono);font-size:16px;text-align:center;margin:2px 0 4px">c = ( s<sub>dep</sub>, s<sub>arr</sub>, t<sub>dep</sub>, t<sub>arr</sub>, T )</p>
+        <p style="font-size:16.5px">Một xe (trip T) chạy từ stop s<sub>dep</sub> tới stop <b>kế tiếp</b> s<sub>arr</sub>. Toàn bộ lịch = một <b>mảng</b> connection; không cần dựng đồ thị.</p>
+        <p style="font-size:16px;margin-top:6px"><b>Ví dụ.</b> Lịch của chuyến T1: <span style="font-family:var(--mono)">O 08:00 → a 08:10 → D 08:40</span> (3 trạm) được cắt thành <b>2</b> connection:</p>
+        <p style="font-family:var(--mono);font-size:14.5px;line-height:1.6;margin-top:2px">c1 = (O, a, 08:00, 08:10, T1)<br>c2 = (a, D, 08:10, 08:40, T1)</p>
+        <p class="muted" style="font-size:14px">Một chuyến đi qua k trạm sinh ra k − 1 connection. Cùng tuyến nhưng chuyến 08:30 là trip khác (T1′).</p></div>
+      <div class="card f" style="margin-top:10px;padding:10px 14px"><h3>Transfer = pseudo-connection đi bộ</h3>
+        <p style="font-size:16px">Đi bộ giữa hai stop gần nhau thêm vào như một connection đặc biệt. <b>Ví dụ:</b> trạm a và a′ cách 210 m, đi bộ 70 m/ph → mất <b>3 ph</b>. Tới a lúc 08:10 thì tới a′ lúc 08:13.</p>
+        <p style="font-size:16px;margin-top:4px"><b>Safety margin</b> = thời gian tối thiểu phải chừa khi đổi xe (đi lại trong trạm, xe trễ). Margin 3 ph: xuống xe lúc 08:10 thì chỉ bắt được xe chạy từ <b>08:13</b> trở đi.</p></div>
+    </div>
+    <div>
+      <div class="flow f" style="margin-top:0;gap:6px">
+        <div class="box" style="padding:6px 10px">CSA<small>quét t<sub>dep</sub> <b>tăng dần</b><br>1 gốc, 1 giờ đi</small></div>
+        <div class="ar">→</div>
+        <div class="box" style="padding:6px 10px">profile CSA<small>quét t<sub>dep</sub> <b>giảm dần</b><br>1 đích, mọi giờ đi</small></div>
+        <div class="ar">→</div>
+        <div class="box c" style="padding:6px 10px">mcpCSA<small>profile CSA<br>+ số lần lên xe b</small></div>
+      </div>
+      <div class="card f" style="margin-top:10px;padding:8px 12px"><h3 style="font-size:18px">Ví dụ: CSA quét <b>xuôi</b>, đi từ O lúc 08:00, margin 3 ph</h3>
+        <p class="muted" style="font-size:14px">Mạng đồ chơi của slide sau. arr[s] = giờ tới <b>sớm nhất</b> tại trạm s đã biết. Ban đầu arr[O] = 08:00, còn lại = ∞.</p>
+        <table class="acc tj" style="margin-top:4px">
+          <tr><th>c</th><th>chặng</th><th>giờ</th><th class="why">Dùng được không?</th><th>arr[a]</th><th>arr[D]</th></tr>
+          <tr id="fc1"><td>c1</td><td>O→a T1</td><td>08:00→08:10</td><td class="why"><span class="hide0" id="fw1">Đã ở O lúc 08:00 ≤ 08:00 → lên T1</span></td><td><span class="hide0" id="fa1">08:10</span></td><td><span class="hide0" id="fd1">∞</span></td></tr>
+          <tr id="fc2"><td>c2</td><td>a→D T1</td><td>08:10→08:40</td><td class="why"><span class="hide0" id="fw2">Đang ngồi trên T1 → đi tiếp, không cần margin</span></td><td><span class="hide0" id="fa2">08:10</span></td><td><span class="hide0" id="fd2">08:40</span></td></tr>
+          <tr id="fc3"><td>c3</td><td>a→D T2</td><td>08:15→08:25</td><td class="why"><span class="hide0" id="fw3">Tới a 08:10; 08:15 ≥ 08:10 + 3 → đổi sang T2</span></td><td><span class="hide0" id="fa3">08:10</span></td><td><span class="hide0" id="fd3"><b>08:25</b></span></td></tr>
+          <tr id="fc4"><td>c4</td><td>O→D T3</td><td>08:20→08:50</td><td class="why"><span class="hide0" id="fw4">Dùng được, nhưng 08:50 &gt; 08:25 → không cải thiện</span></td><td><span class="hide0" id="fa4">08:10</span></td><td><span class="hide0" id="fd4">08:25</span></td></tr>
+        </table></div>
+      <span class="f ghost" data-act="#fw1|sh;#fa1|sh;#fd1|sh" data-now="#fc1|hlr" data-say="Connection đã xếp theo t<sub>dep</sub> <b>tăng dần</b>, chỉ duyệt mảng một lượt. <b>c1</b>: ta đang ở O từ 08:00 nên lên được T1 → arr[a] = 08:10, và đánh dấu “đã ngồi trên T1”."></span>
+      <span class="f ghost" data-act="#fw2|sh;#fa2|sh;#fd2|sh" data-now="#fc2|hlr" data-say="<b>c2</b> thuộc T1 mà ta đang ngồi trên T1 → đi tiếp tới D lúc 08:40. Ngồi yên trên xe thì không phải trừ margin."></span>
+      <span class="f ghost" data-act="#fw3|sh;#fa3|sh;#fd3|sh" data-now="#fc3|hlr" data-say="<b>c3</b> (T2) chạy khỏi a lúc 08:15. Ta tới a lúc 08:10, cộng margin 3 ph là 08:13 ≤ 08:15 → <b>bắt kịp</b>, đổi xe. arr[D] giảm từ 08:40 xuống <b>08:25</b>. Nếu T2 chạy lúc 08:12 thì <b>không</b> bắt kịp."></span>
+      <span class="f ghost" data-act="#fw4|sh;#fa4|sh;#fd4|sh" data-now="#fc4|hlr" data-say="<b>c4</b> (T3, O→D 08:20→08:50): dùng được, nhưng tới muộn hơn 08:25 → bỏ qua. Kết quả: đi lúc 08:00 thì tới D sớm nhất <b>08:25</b> (đổi xe ở a)."></span>
+      <div class="note f" style="margin-top:8px;font-size:15.5px"><b>Vì sao cần quét ngược?</b> Lượt quét xuôi trên chỉ trả lời <b>một</b> giờ đi (08:00) và không giữ b. Muốn biết cho mọi giờ đi phải quét lại nhiều lần. Profile CSA cố định <b>đích</b> D và quét t<sub>dep</sub> giảm dần: khi xét c1, các connection đi sau (c2, c3, c4) đã xét xong, nên tại a đã biết sẵn “từ a đi tiếp tới D thế nào”. Một lượt quét cho profile của <b>mọi</b> trạm gốc (chạy tay ở slide sau). Thuật toán gốc: Dibbelt et al. (SEA 2013; ACM JEA 2018).</div>
+      <p class="say" style="font-size:16.5px;min-height:44px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 09 MCPCSA STEP-BY-STEP ===================== -->
+<section class="slide" id="mcpcsa" data-title="09 · mcpCSA chạy tay">
+  <div class="hdr in"><span class="qn">09</span><h2>mcpCSA chạy tay trên một mạng nhỏ (đích d = D, margin 3 ph)</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.12fr;gap:16px">
+    <div>
+      <svg class="in" width="520" height="168" viewBox="0 0 520 168" style="display:block">
+        <defs><marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#475569"/></marker></defs>
+        <path d="M74 50 Q 265 -6 448 50" fill="none" stroke="#1e3a8a" stroke-width="3" stroke-dasharray="8 5" marker-end="url(#ah)"/><text x="262" y="16" font-size="13" text-anchor="middle" fill="#1e3a8a" font-weight="700">T3: O→D 08:20→08:50</text>
+        <line x1="70" y1="70" x2="234" y2="126" stroke="#1d4ed8" stroke-width="3" marker-end="url(#ah)"/><text x="40" y="128" font-size="13" fill="#1d4ed8" font-weight="700">T1: 08:00→08:10</text>
+        <line x1="266" y1="126" x2="450" y2="72" stroke="#60a5fa" stroke-width="3" marker-end="url(#ah)"/><text x="352" y="90" font-size="13" fill="#2563eb" font-weight="700" text-anchor="middle" transform="rotate(-16 352 90)">T2: 08:15→08:25</text>
+        <path d="M266 140 Q 400 176 462 80" fill="none" stroke="#1d4ed8" stroke-width="3" marker-end="url(#ah)"/><text x="300" y="164" font-size="13" fill="#1d4ed8" font-weight="700">T1: 08:10→08:40</text>
+        <circle cx="58" cy="60" r="16" fill="#fff" stroke="#0f172a" stroke-width="2"/><text x="58" y="65" text-anchor="middle" font-weight="800">O</text>
+        <circle cx="250" cy="134" r="16" fill="#fff" stroke="#0f172a" stroke-width="2"/><text x="250" y="139" text-anchor="middle" font-weight="800">a</text>
+        <circle cx="464" cy="62" r="16" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2"/><text x="464" y="67" text-anchor="middle" font-weight="800">D</text>
+      </svg>
+      <table class="acc in" style="margin-top:2px;font-size:15px">
+        <tr><th>#</th><th>s<sub>dep</sub>→s<sub>arr</sub></th><th>t<sub>dep</sub>→t<sub>arr</sub></th><th>T</th></tr>
+        <tr id="c4"><td>c4</td><td>O → D</td><td>08:20 → 08:50</td><td>T3</td></tr>
+        <tr id="c3"><td>c3</td><td>a → D</td><td>08:15 → 08:25</td><td>T2</td></tr>
+        <tr id="c2"><td>c2</td><td>a → D</td><td>08:10 → 08:40</td><td>T1</td></tr>
+        <tr id="c1"><td>c1</td><td>O → a</td><td>08:00 → 08:10</td><td>T1</td></tr>
+      </table>
+      <p class="muted" style="font-size:13px;margin-top:4px">Mạng đồ chơi do slide tự dựng (không có trong paper). Connection xếp theo t<sub>dep</sub> <b>giảm dần</b>. P[s] = bag của stop s; L[T] = nhãn của trip T.</p>
+      <div class="cols" style="gap:10px;margin-top:6px">
+        <div class="card" style="padding:8px 12px"><h3 style="font-size:16px">Bag P[O]</h3><div id="bagO" style="font-family:var(--mono);font-size:14px;min-height:62px">∅</div></div>
+        <div class="card" style="padding:8px 12px"><h3 style="font-size:16px">Bag P[a]</h3><div id="bagA" style="font-family:var(--mono);font-size:14px;min-height:62px">∅</div></div>
+      </div>
+    </div>
+    <div>
+<script type="text/x-cpp" class="x4" id="kCsa" data-title="mcpCSA (giản lược, viết lại theo mô tả §2.5)" data-mark="6:a;7:b;8-9:c;10:d;11:e">
+// C: connections, t_dep giảm dần; đích d
+for (s : stops) P[s] = {};   // Pareto bag (t_dep, t_arr, b)
+for (T : trips) L[T] = {};   // nhãn khi đang ngồi trên T: (t_arr, b)
+for (c : C) {                // quét NGƯỢC thời gian
+  X = {};
+  if (c.s_arr == d) X.add(c.t_arr, 1);            // xuống xe tại đích
+  X.add(L[c.T]);                                   // ngồi tiếp trên T
+  for (j : P[c.s_arr]) if (j.t_dep >= c.t_arr + margin)
+    X.add(j.t_arr, j.b + 1);                       // đổi sang chuyến khác
+  L[c.T] = pareto(L[c.T] + X);
+  P[c.s_dep] = pareto(P[c.s_dep] + (c.t_dep, X));  // gắn t_dep của c
+}
+// + pseudo-connection đi bộ; hậu xử lý chặng đi bộ đầu
+</script>
+      <div class="cols3" style="gap:8px;margin-top:8px">
+        <div class="card" style="padding:6px 10px;border-top-width:3px"><h3 style="font-size:15px">L[T1]</h3><div id="lT1" style="font-family:var(--mono);font-size:13.5px;min-height:40px">∅</div></div>
+        <div class="card" style="padding:6px 10px;border-top-width:3px"><h3 style="font-size:15px">L[T2]</h3><div id="lT2" style="font-family:var(--mono);font-size:13.5px;min-height:40px">∅</div></div>
+        <div class="card" style="padding:6px 10px;border-top-width:3px"><h3 style="font-size:15px">L[T3]</h3><div id="lT3" style="font-family:var(--mono);font-size:13.5px;min-height:40px">∅</div></div>
+      </div>
+      <span class="f ghost" data-now="#c4|hlr;#kCsa|show-a show-d show-e" data-set="#lT3::(08:50, 1);#bagO::(08:20, 08:50, 1)" data-say="<b>c4</b> (O→D, T3): s<sub>arr</sub> là đích → X = {(08:50, 1)}. Cập nhật L[T3], và bag của O nhận nhãn <b>(08:20, 08:50, 1)</b>: đi lúc 08:20, tới lúc 08:50, lên xe 1 lần."></span>
+      <span class="f ghost" data-now="#c3|hlr;#kCsa|show-a show-d show-e" data-set="#lT2::(08:25, 1);#bagA::(08:15, 08:25, 1)" data-say="<b>c3</b> (a→D, T2): tới đích → X = {(08:25, 1)}. Bag của a nhận <b>(08:15, 08:25, 1)</b>."></span>
+      <span class="f ghost" data-now="#c2|hlr;#kCsa|show-a show-d show-e" data-set="#lT1::(08:40, 1);#bagA::(08:15, 08:25, 1)<br><s style='color:#94a3b8'>(08:10, 08:40, 1)</s> ✗" data-say="<b>c2</b> (a→D, T1): X = {(08:40, 1)}. Ứng viên (08:10, 08:40, 1) cho bag a bị <b>(08:15, 08:25, 1) dominate</b> (đi muộn hơn, đến sớm hơn, cùng b) → loại. L[T1] vẫn giữ (08:40, 1) cho người đang ngồi trên T1."></span>
+      <span class="f ghost" data-now="#c1|hlr;#kCsa|show-b show-c" data-set="#lT1::(08:40, 1)<br>(08:25, 2);#bagA::(08:15, 08:25, 1)" data-say="<b>c1</b> (O→a, T1, đến a lúc 08:10). Hai cách đi tiếp: <b>ngồi tiếp</b> T1 → (08:40, 1); hoặc <b>đổi xe</b> ở a: nhãn (08:15, 08:25, 1) có 08:15 ≥ 08:10 + 3 ph → (08:25, <b>2</b>)."></span>
+      <span class="f ghost" data-now="#c1|hlr;#kCsa|show-d show-e;#bagO|glow" data-set="#lT1::(08:40, 1)<br>(08:25, 2);#bagO::(08:20, 08:50, 1)<br>(08:00, 08:40, 1)<br>(08:00, 08:25, 2)" data-say="Gắn t<sub>dep</sub> = 08:00 vào cả hai nhãn rồi đưa vào bag của O. Không nhãn nào dominate nhãn nào → bag O có <b>3 hành trình Pareto</b>. Quét xong."></span>
+      <div class="card in" id="mLegend" style="margin-top:8px;padding:8px 12px;border-left:5px solid var(--blue)"><h3 style="font-size:16px;margin-bottom:2px">Ký hiệu trên slide này</h3>
+        <table class="t1" style="font-size:13.5px;border:none">
+          <tr><td>c1…c4</td><td><b>connection</b>: một xe chạy giữa 2 trạm liền kề (bảng bên trái); quét từ c4 về c1</td></tr>
+          <tr><td>T1, T2, T3</td><td><b>trip</b>: một chuyến xe cụ thể. T1 chạy O→a→D nên gồm c1 và c2</td></tr>
+          <tr><td>P[s]</td><td>bag của <b>trạm</b> s (P[O], P[a]): các hành trình Pareto (t<sub>dep</sub>, t<sub>arr</sub>, b) đứng ở s đi tới D</td></tr>
+          <tr><td>L[T]</td><td>nhãn của <b>chuyến</b> T (L[T1]…): nếu đang <b>ngồi trên</b> T thì tới D lúc t<sub>arr</sub>, sau tổng cộng b lần lên xe</td></tr>
+          <tr><td>X, d</td><td>X = các nhãn ứng viên sinh ra từ connection đang xét; d = đích (ở đây là D)</td></tr>
+          <tr><td>margin</td><td>thời gian tối thiểu từ lúc xuống xe tới lúc xe sau chạy. Tới a lúc 08:10, margin 3 ph → chỉ bắt được xe chạy từ 08:13</td></tr>
+        </table></div>
+      <div class="note f" data-act="#mLegend|gone" style="margin-top:8px;font-size:15.5px">Đọc kết quả bag O: đi lúc 08:00 thì có hai lựa chọn, <b>đổi xe ở a</b> (tới 08:25, b = 2) hoặc <b>ngồi lì T1</b> (tới 08:40, b = 1); đi lúc 08:20 thì có T3 (tới 08:50). Profile fastest-path của O: τ(t) = 08:25 − t khi t ≤ 08:00, và 08:50 − t khi t ∈ (08:00, 08:20].</div>
+      <p class="say" style="min-height:44px;font-size:16.5px">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 10 SETUP ===================== -->
+<section class="slide" id="setup" data-title="10 · Sửa đổi & pipeline">
+  <div class="hdr in"><span class="qn">10</span><h2>Sửa đổi so với mcpCSA gốc, pipeline và thiết lập thực nghiệm</h2></div>
+  <div class="cols3" style="margin-top:6px">
+    <div class="card f"><h3>Sửa đổi (§2.5)</h3><ul>
+      <li>Gốc: footpath <b>transitively closed</b> (nếu đi bộ được A→B và B→C thì phải có sẵn A→C), chỉ đổi xe ở transfer station</li>
+      <li>Kujala: cho đi bộ giữa <b>mọi</b> cặp stop dưới ngưỡng khoảng cách</li>
+      <li>Cấm <b>hai transfer connection liên tiếp</b> để tránh đi bộ quá dài</li>
+      <li>Chặng đi bộ đầu tiên (access) được ghép ở bước <b>hậu xử lý</b></li></ul></div>
+    <div class="card f"><h3>Pipeline 6 bước (§2.6)</h3><ul>
+      <li>1. Lịch GTFS (định dạng chuẩn của lịch chạy xe) → SQLite</li><li>2. Thêm điểm gốc / đích khác thành stop</li><li>3. Khoảng cách đi bộ từ OpenStreetMap</li>
+      <li>4. Trích connection + footpath, tạo transfer connection</li><li>5. Chạy mcpCSA → tập Pareto</li><li>6. Profile, thống kê, bản đồ</li></ul></div>
+    <div class="card f"><h3>Thiết lập Helsinki (§2.8, 3.5)</h3><ul>
+      <li>Lịch GTFS ngày thứ Hai 03/10/2016; <b>7463</b> stop</li>
+      <li>Đi bộ 70 m/phút; margin 3 ph; tối đa <b>1000 m</b></li>
+      <li>Phân tích 08:00–09:00, routing 08:00–<b>11:00</b></li>
+      <li>≈ 1 phút / đích; all-to-all trên 64 CPU, &lt; 4 giờ/CPU</li></ul></div>
+  </div>
+  <div class="note blue f" style="margin-top:16px">Điểm đáng chú ý: <b>cửa sổ phân tích</b> (giờ xuất phát, 1 giờ) tách khỏi <b>horizon routing</b> (3 giờ). Nhờ vậy những hành trình đi trong 08:00–09:00 không bị cắt cụt chỉ vì phải tới đích trước khi hết cửa sổ (so sánh với hb_runnable ở slide sau).</div>
+  <p class="say" style="text-align:center">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== 11 HB ===================== -->
+<section class="slide" id="hb" data-title="11 · So với Huynh & Barthelemy">
+  <div class="hdr in"><span class="qn">11</span><h2>Liên hệ: Kujala (2018) và Huynh &amp; Barthelemy (2022)</h2></div>
+  <table class="in" style="font-size:16px">
+    <tr><th style="width:18%">Khía cạnh</th><th style="width:34%">Kujala et al. (2018)</th><th style="width:34%">Huynh &amp; Barthelemy (2022): paper / code v3</th><th>Đánh giá</th></tr>
+    <tr class="f"><td>Loại truy vấn</td><td>Profile: mọi giờ xuất phát trong khoảng</td><td>Một hành trình mỗi cặp, mỗi cửa sổ 3 giờ</td><td><span class="chip r">mất thông tin</span></td></tr>
+    <tr class="f"><td>Tiêu chí</td><td>Pareto (t<sub>dep</sub> <b>muộn</b>, t<sub>arr</sub> sớm, b ít)</td><td>Paper: t<sub>arr</sub> tăng dần rồi t<sub>dep</sub> <b>sớm</b>; v3: t<sub>dep</sub> rồi t<sub>arr</sub> (lexicographic, chỉ 1 kết quả)</td><td><span class="chip r">đảo chiều t<sub>dep</sub></span></td></tr>
+    <tr class="f"><td>Chờ ban đầu</td><td>Có tính; tách riêng (τ_mean − τ_min)</td><td>Bỏ qua</td><td><span class="chip">cần nói rõ</span></td></tr>
+    <tr class="f"><td>Thuật toán</td><td>mcpCSA quét mảng connection một lần mỗi đích</td><td>Event graph + Dijkstra 0/1 cho từng cặp</td><td><span class="chip">"adapted" không đúng</span></td></tr>
+    <tr class="f"><td>Cửa sổ</td><td>Phân tích 1 giờ, routing 3 giờ</td><td>Cùng một cửa sổ 3 giờ cho cả giờ đi lẫn giờ đến</td><td><span class="chip r">cắt cụt</span></td></tr>
+    <tr class="f"><td>Đi bộ / margin</td><td>1000 m theo OpenStreetMap; margin 3 ph</td><td>300 m đường chim bay; margin 0; chờ tối đa 60 ph</td><td><span class="chip g">tuỳ chọn</span></td></tr>
+    <tr class="f"><td>Dữ liệu</td><td>Lịch GTFS thật theo từng stop</td><td>Lịch xấp xỉ (tốc độ hằng, dwell 6 s = dừng ở mỗi trạm 6 giây)</td><td><span class="chip">giới hạn dữ liệu</span></td></tr>
+  </table>
+  <p class="muted" style="font-size:14px;margin-top:8px">Cột Huynh &amp; Barthelemy lấy từ đọc PDF và code <code class="i">ttgAnalysisMultip_v2.py</code> (chat log 08_chat/2026-11-19_2114). Cột "Đánh giá" là nhận định của người soạn slide, không phải của hai paper.</p>
+  <p class="say" style="text-align:center">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== 12 LIMIT ===================== -->
+<section class="slide z1" id="limit" data-title="12 · Hạn chế & hướng mở">
+  <div class="hdr in"><span class="qn">12</span><h2>Hạn chế paper tự nêu và hướng mở cho nghiên cứu</h2></div>
+  <div class="cols">
+    <div>
+      <div class="card f"><h3>Paper tự thừa nhận (§4)</h3><ul>
+        <li>Tham số (1000 m, margin, tốc độ đi bộ) ảnh hưởng kết quả; cần <b>sensitivity analysis</b></li>
+        <li>Chỉ dùng <b>lịch</b>; giả định xe chạy đúng giờ hoàn toàn</li>
+        <li>Đề xuất so sánh lịch với dữ liệu vận hành thực tế (realtime)</li>
+        <li>Chỉ dùng 3 tiêu chí; có thể thêm thời gian đi bộ, thời gian chờ khi đổi xe</li></ul></div>
+    </div>
+    <div>
+      <div class="card f"><h3>Gợi ý cho hướng của Thanh</h3><ul>
+        <li>Dùng mcpCSA làm <b>oracle chính xác</b> để đo sai lệch của v1/v2/v3 trong hb_runnable</li>
+        <li>Profile cả ngày cho bus TP.HCM: τ_min / τ_mean / τ_max thay cho 3 khung giờ</li>
+        <li>So <b>lịch và dữ liệu dự đoán</b>: đúng hướng mở mà paper nêu</li>
+        <li>Tái hiện so sánh topological / temporal của Huynh &amp; Barthelemy trên nền đo lường của Kujala</li></ul></div>
+      <div class="note f" style="margin-top:10px">Cột này là <b>giả thuyết / đề xuất</b> của người soạn slide, cần kiểm chứng novelty (ví dụ so với các nghiên cứu "scheduled vs realized accessibility").</div>
+      <p class="say">Nhấn → để chạy từng bước.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="slide z1" id="summary" data-title="Tổng kết">
+  <div class="hdr in"><span class="qn">✓</span><h2>Tổng kết</h2></div>
+  <div class="cols4" style="margin-top:10px">
+    <div class="card f"><h3>Pareto</h3><p>Hành trình = (t<sub>dep</sub>, t<sub>arr</sub>, b). Giữ các hành trình không bị dominate: đi muộn, đến sớm, ít lên xe.</p></div>
+    <div class="card f"><h3>Profile</h3><p>τ(t) = t<sub>arr</sub>(j*) − t: hàm răng cưa theo giờ xuất phát, có tính thời gian chờ. Đoạn dốc −1 = chờ co lại; bước nhảy = lỡ chuyến.</p></div>
+    <div class="card f"><h3>Thống kê</h3><p>τ_min / τ_mean / τ_max và b_min / b_mean,fp / b_max,fp; tính <b>chính xác</b> bằng hình thang.</p></div>
+    <div class="card f"><h3>mcpCSA</h3><p>Quét connection theo t<sub>dep</sub> giảm dần; mỗi stop giữ một Pareto bag; một lần quét cho mọi gốc tới một đích.</p></div>
+  </div>
+  <div class="note blue f" style="margin-top:20px">Ví dụ Table 1: fastest-path = {B, F, H, I}; τ_min = 20 ph, τ_mean ≈ 29,1 ph, τ_max = 42 ph, b_mean,fp = 2,2. Kujala là <b>baseline đúng về định nghĩa</b> để đối chiếu thuật toán đường đi của Huynh &amp; Barthelemy (2022).</div>
+</section>
+
+<!-- ===================== GLOSSARY ===================== -->
+<section class="slide" id="gloss" data-title="Phụ lục · Ký hiệu & viết tắt">
+  <div class="hdr in"><span class="qn">A</span><h2>Phụ lục: ký hiệu &amp; viết tắt dùng trong slide</h2></div>
+  <div class="cols in" style="gap:16px">
+    <table class="t1" style="font-size:15.5px">
+      <tr><td>O, D</td><td>điểm đi (origin), điểm đến (destination); chữ thường a, b, c… là trạm trung gian</td></tr>
+      <tr><td>t</td><td>thời điểm người dùng bắt đầu đi (giờ xuất phát)</td></tr>
+      <tr><td>t<sub>dep</sub>, t<sub>arr</sub></td><td>giờ khởi hành / giờ tới đích của một hành trình</td></tr>
+      <tr><td>b</td><td>số lần lên xe (boardings); số lần đổi tuyến = b − 1</td></tr>
+      <tr><td>ph</td><td>phút; "C (32 ph, b=2)" = tới đích sau 32 phút, lên xe 2 lần</td></tr>
+      <tr><td>τ(t)</td><td>temporal distance: xuất phát lúc t thì mất bao lâu để tới D</td></tr>
+      <tr><td>j*(t), S</td><td>hành trình fastest-path khởi hành kế tiếp sau t; S = tập fastest-path</td></tr>
+      <tr><td>access / egress</td><td>đi bộ từ điểm xuất phát tới trạm đầu / từ trạm cuối tới đích</td></tr>
+      <tr><td>headway</td><td>khoảng cách thời gian giữa hai chuyến liên tiếp cùng tuyến</td></tr>
+    </table>
+    <table class="t1" style="font-size:15.5px">
+      <tr><td>PT</td><td>public transport, giao thông công cộng; τ<sub>PT</sub> = τ khi đi bằng xe</td></tr>
+      <tr><td>fp</td><td>fastest-path: hành trình đến sớm nhất với một giờ xuất phát nào đó</td></tr>
+      <tr><td>margin</td><td>safety margin: thời gian tối thiểu để kịp đổi xe</td></tr>
+      <tr><td>CSA</td><td>Connection Scan Algorithm (Dibbelt et al.)</td></tr>
+      <tr><td>mcpCSA</td><td>multi-criteria profile CSA: nhãn (t<sub>dep</sub>, t<sub>arr</sub>, b)</td></tr>
+      <tr><td>P[s], L[T]</td><td>Pareto bag của stop s; tập nhãn của trip T</td></tr>
+      <tr><td>GTFS</td><td>General Transit Feed Specification: định dạng chuẩn của lịch chạy xe</td></tr>
+      <tr><td>OSM</td><td>OpenStreetMap: bản đồ mở, dùng để tính khoảng cách đi bộ</td></tr>
+      <tr><td>HB</td><td>Huynh &amp; Barthelemy (2022); hb_runnable = code tái hiện của Thanh</td></tr>
+    </table>
+  </div>
+</section>
+
+</div></div>
+
+<div id="bar"></div>
+<div id="hint">← → / Space: từng bước · Shift+→: qua slide · G: đi tới slide bất kỳ · A: hiện hết · F: toàn màn hình</div>
+<div id="nav"><button id="jumpNav" title="Đi tới slide (G)">☰</button><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+<div id="jump"><div id="jbox"><div class="jh"><h3>Đi tới slide</h3><span class="muted" style="font-size:14px">gõ số hoặc tên slide rồi Enter</span><input id="jq" placeholder="vd: 5 hoặc profile" autocomplete="off"><button id="jx" aria-label="Đóng">×</button></div><div id="jlist"></div></div></div>
+
+<script>
+(function(){
+  // ---------- C++ highlighter ----------
+  const KW=new Set("class struct public private protected virtual const this new delete return if else for while do switch case break continue default friend operator static using namespace include true false nullptr sizeof".split(" "));
+  const PRIM=new Set("bool char double float int long short void unsigned auto".split(" "));
+  const STD=new Set("cout cin endl".split(" "));const LIBT=new Set("string vector".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line){
+    const re=/(\/\/.*$|\/\*.*?\*\/)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(^\s*#\w+.*$)|\b(\d+(?:\.\d+)?[fFL]?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="p">'+m[3]+'</span>';
+      else if(m[4]) out+='<span class="n">'+m[4]+'</span>';
+      else if(m[5]){
+        const w=m[5];let cls="";
+        if(PRIM.has(w)||LIBT.has(w))cls="t";else if(KW.has(w))cls="k";else if(STD.has(w))cls="fn";
+        else if(m[6])cls="fn";
+        else if(/^[A-Z][A-Z0-9_]+$/.test(w))cls="n";
+        else if(/^[A-Z]/.test(w))cls="t";
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[6]?esc(m[6]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-cpp"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");r.split(",").forEach(rr=>{const [a,b]=rr.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);});
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    if(sc.dataset.title){const t=document.createElement("div");t.className="code-title";t.textContent=sc.dataset.title;sc.before(t)}
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+  // ---------- deck engine ----------
+  //   .f = fragment, one per step.  data-act "sel|cls;…" (kept while shown) · data-now "sel|cls;…" (only on latest step)
+  //   data-set "sel::html;…" (content while shown) · data-say narration · data-o order
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")].sort((x,y)=>(+x.dataset.o||0)-(+y.dataset.o||0));
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  const pairs=(v,sep)=>(v||"").split(/;(?=\s*#)/).filter(s=>s.trim()).map(p=>{const k=p.indexOf(sep);return [p.slice(0,k).trim(),p.slice(k+sep.length)]});
+  function tog(v,on){pairs(v,"|").forEach(([sel,cls])=>{document.querySelectorAll(sel).forEach(t=>cls.split(" ").forEach(c=>c&&t.classList.toggle(c,on)))})}
+  document.querySelectorAll("[data-set]").forEach(f=>pairs(f.dataset.set,"::").forEach(([sel])=>{document.querySelectorAll(sel).forEach(t=>{if(t.dataset.orig===undefined)t.dataset.orig=t.innerHTML})}));
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach(f=>{tog(f.dataset.now,false);tog(f.dataset.act,false)});
+      s.querySelectorAll("[data-orig]").forEach(t=>t.innerHTML=t.dataset.orig);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step);f.classList.toggle("on",on);if(on){tog(f.dataset.act,true);pairs(f.dataset.set,"::").forEach(([sel,val])=>document.querySelectorAll(sel).forEach(t=>t.innerHTML=val))}});
+      if(i===cur&&step>0)tog(fs[step-1].dataset.now,true);
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.innerHTML=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length+(fs.length?" · "+step+"/"+fs.length:"");
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    try{history.replaceState(null,"","#"+slides[cur].id)}catch(e){}
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+
+  // ---------- jump-to-slide panel ----------
+  const jump=document.getElementById("jump"),jlist=document.getElementById("jlist"),jq=document.getElementById("jq");
+  const titleOf=s=>s.dataset.title||(s.querySelector("h2,h1")||{}).textContent||s.id;
+  slides.forEach((s,i)=>{
+    const d=document.createElement("div");d.className="ji";d.dataset.i=i;
+    d.innerHTML="<b>"+String(i+1).padStart(2,"0")+"</b><span>"+esc(titleOf(s).replace(/\s+/g," ").trim())+"</span>";
+    d.onclick=()=>{closeJump();go(i)};jlist.appendChild(d);
+    const b=document.createElement("button");b.className="jumpbtn";b.type="button";b.innerHTML="☰ Đi tới slide";b.title="Mở danh sách slide (phím G)";
+    b.onclick=e=>{e.stopPropagation();openJump()};s.appendChild(b);
+  });
+  function filterJump(){
+    const q=jq.value.trim().toLowerCase();let first=null;
+    [...jlist.children].forEach(d=>{const i=+d.dataset.i;const ok=!q||String(i+1)===q||d.textContent.toLowerCase().includes(q);d.style.display=ok?"":"none";d.classList.remove("k");if(ok&&!first)first=d});
+    if(first&&q)first.classList.add("k");return first;
+  }
+  function openJump(){jump.classList.add("on");jq.value="";filterJump();[...jlist.children].forEach(d=>d.classList.toggle("cur",+d.dataset.i===cur));setTimeout(()=>jq.focus(),30)}
+  function closeJump(){jump.classList.remove("on");jq.blur()}
+  jq.addEventListener("input",filterJump);
+  jq.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Escape")closeJump();else if(e.key==="Enter"){const q=jq.value.trim();const n=parseInt(q,10);if(String(n)===q&&n>=1&&n<=slides.length){closeJump();go(n-1)}else{const f=filterJump();if(f){closeJump();go(+f.dataset.i)}}}});
+  jump.addEventListener("click",e=>{if(e.target===jump)closeJump()});
+  document.getElementById("jx").onclick=closeJump;
+  document.getElementById("jumpNav").onclick=openJump;
+
+  addEventListener("keydown",e=>{
+    if(jump.classList.contains("on")){if(e.key==="Escape")closeJump();return}
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="g"||e.key==="G"){e.preventDefault();openJump()}
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null||jump.classList.contains("on"))return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+</script>
+</body>
+</html>

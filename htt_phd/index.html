@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>HTT PhD · Tài liệu</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <h1>HTT · PhD research</h1>
+  <p class="sub">Tài liệu nghiên cứu: Temporal Graph. Cần code truy cập.</p>
+
+  <form id="gate" class="card" autocomplete="off">
+    <label for="code">Nhập code truy cập (6 chữ số)</label>
+    <div class="row">
+      <input id="code" type="text" inputmode="numeric" maxlength="6" placeholder="••••••">
+      <button type="submit">Mở</button>
+    </div>
+    <p id="err" class="err"></p>
+  </form>
+
+  <section id="list" class="hidden">
+    <div class="head"><strong>Danh sách tài liệu</strong><button class="ghost" id="lock" type="button">Khoá lại</button></div>
+    <div id="docs"></div>
+  </section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
