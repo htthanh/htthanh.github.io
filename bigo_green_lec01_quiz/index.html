@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz Lecture 01 – Introduction</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2315803d'/%3E%3Ctext x='32' y='42' font-family='Arial,sans-serif' font-size='24' font-weight='700' fill='%23fff' text-anchor='middle'%3EHTT%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g:#15803d; --g-dark:#14532d; --g-mid:#16a34a; --g-soft:#dcfce7; --g-50:#f0fdf4; --g-line:#bbf7d0;
+  --text:#1c2b22; --muted:#5b6b61; --line:#e3ebe5; --bg:#f7faf8; --card:#ffffff; --code:#f6fbf7;
+  --mono:"JetBrains Mono",Consolas,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;line-height:1.55}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px 80px}
+header.top{background:var(--g);color:#fff;padding:28px 16px 24px}
+header.top .wrap{padding-bottom:0}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
+h1{font-size:30px;font-weight:800;margin:4px 0 6px}
+.sub{font-size:15px;opacity:.92}
+.bar{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:14px;padding:10px 16px;flex-wrap:wrap}
+.prog{flex:1;min-width:160px;height:10px;background:var(--g-soft);border-radius:99px;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:var(--g);transition:width .3s}
+.stat{font-size:14px;font-weight:600;color:var(--muted);white-space:nowrap}
+.stat b{color:var(--g-dark)}
+.btn{font:inherit;font-weight:700;font-size:14px;border-radius:10px;padding:9px 16px;cursor:pointer;border:1.5px solid var(--g);background:var(--g);color:#fff;transition:background .15s}
+.btn:hover{background:var(--g-dark);border-color:var(--g-dark)}
+.btn.ghost{background:#fff;color:var(--g)}
+.btn.ghost:hover{background:var(--g-50)}
+.btn:disabled{opacity:.45;cursor:default}
+.intro{margin:22px 0 8px;padding:14px 16px;background:var(--g-50);border:1px solid var(--g-line);border-radius:12px;font-size:14.5px}
+.q{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 20px 18px;margin-top:18px}
+.q.ok{border-color:var(--g);box-shadow:0 0 0 2px var(--g-soft)}
+.qh{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.qn{background:var(--g);color:#fff;font-weight:800;font-size:13px;padding:3px 11px;border-radius:99px}
+.tag{font-size:12px;font-weight:700;color:var(--g-dark);background:var(--g-soft);padding:3px 9px;border-radius:6px}
+.res{margin-left:auto;font-size:13px;font-weight:700}
+.res.good{color:var(--g)} .res.bad{color:var(--text)}
+.qt{font-size:16px;font-weight:600}
+.qt code,.opt code,.exp code{font-family:var(--mono);font-size:.9em;background:var(--g-50);border:1px solid var(--g-line);padding:0 5px;border-radius:5px}
+pre{font-family:var(--mono);font-size:13.5px;line-height:1.6;background:var(--code);border:1px solid var(--g-line);border-left:4px solid var(--g);border-radius:10px;padding:12px 14px;margin:12px 0 4px;overflow-x:auto;white-space:pre}
+pre .lbl{display:block;font-family:"Be Vietnam Pro",sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.k{color:var(--g-dark);font-weight:600}.s{color:var(--g-mid)}.n{color:var(--g)}.c{color:#8a9a90;font-style:italic}
+.hint{font-size:13px;color:var(--muted);margin:10px 0 8px}
+.opts{display:grid;gap:8px}
+.opt{display:flex;gap:12px;align-items:flex-start;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;background:#fff;transition:border-color .15s,background .15s}
+.opt:hover{border-color:var(--g-line);background:var(--g-50)}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.box{flex:none;width:22px;height:22px;border:2px solid #b7c6bc;border-radius:6px;display:grid;place-items:center;font-size:12px;font-weight:800;color:var(--muted);margin-top:1px}
+.opt.sel{border-color:var(--g);background:var(--g-50)}
+.opt.sel .box{background:var(--g);border-color:var(--g);color:#fff}
+.otext{flex:1;min-width:0;font-size:15px}
+.otext pre{margin:6px 0 0;font-size:13px;padding:8px 10px;border-left-width:3px}
+.mark{flex:none;font-weight:800;font-size:13px;white-space:nowrap;margin-top:2px}
+.q.done .opt{cursor:default}
+.q.done .opt:hover{background:#fff;border-color:var(--line)}
+.q.done .opt.right{border-color:var(--g);background:var(--g-50)}
+.q.done .opt.right .mark{color:var(--g)}
+.q.done .opt.wrong{border-color:#6b7280;border-style:dashed;background:#fafafa}
+.q.done .opt.wrong .mark{color:#4b5563}
+.q.done .opt.miss{border-color:var(--g);border-style:dashed}
+.q.done .opt.miss .mark{color:var(--g)}
+.acts{display:flex;gap:10px;margin-top:14px}
+.exp{display:none;margin-top:14px;padding:12px 14px;border-radius:10px;background:var(--g-50);border:1px solid var(--g-line);font-size:14.5px}
+.exp b{color:var(--g-dark)}
+.q.done .exp{display:block}
+.summary{display:none;margin-top:26px;padding:24px;text-align:center;background:#fff;border:2px solid var(--g);border-radius:14px}
+.summary.show{display:block}
+.summary .big{font-size:46px;font-weight:800;color:var(--g)}
+.summary p{color:var(--muted);margin:4px 0 14px}
+@media (max-width:560px){h1{font-size:24px}.q{padding:16px 14px}pre{font-size:12.5px}}
+/* gate */
+body.locked .top,body.locked .bar,body.locked main{display:none}
+body:not(.locked) .gate{display:none}
+.gate{min-height:100vh;display:grid;place-items:center;padding:16px}
+.gcard{background:#fff;border:1px solid var(--line);border-top:6px solid var(--g);border-radius:16px;padding:30px 24px 26px;max-width:440px;width:100%;text-align:center}
+.gcard .eyebrow{color:var(--g)}
+.gcard h2{font-size:22px;font-weight:800;margin:6px 0 4px}
+.gcard p{color:var(--muted);font-size:14.5px}
+.digits{display:flex;gap:8px;justify-content:center;margin:20px 0 10px}
+.digits input{width:46px;height:56px;font:700 24px var(--mono);text-align:center;color:var(--g-dark);border:2px solid var(--line);border-radius:10px;background:var(--g-50);outline:none}
+.digits input:focus{border-color:var(--g);background:#fff}
+.gerr{min-height:22px;font-size:14px;font-weight:600;color:#374151;margin-bottom:8px}
+.gcard .btn{width:100%;padding:12px}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-8px)}50%{transform:translateX(8px)}75%{transform:translateX(-4px)}}
+@media (max-width:400px){.digits{gap:6px}.digits input{width:40px;height:50px;font-size:21px}}
+/* scoring */
+.tries{font-size:12.5px;font-weight:600;color:var(--muted)}
+.res.pts{font-size:12.5px;font-weight:800;color:#fff;background:var(--g);padding:3px 10px;border-radius:6px}
+.res.pts.zero{background:#6b7280}
+.msg{display:none;margin-top:12px;padding:10px 12px;border-radius:10px;font-size:14px;background:#f5f6f5;border:1px dashed #9ca3af}
+.msg.show{display:block}
+.msg.good{background:var(--g-50);border:1px solid var(--g-line);color:var(--g-dark)}
+.rules{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.rules span{background:#fff;border:1px solid var(--g-line);border-radius:8px;padding:4px 10px;font-size:13px}
+.rules b{color:var(--g)}
+.brk{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:0 0 16px}
+.brk span{background:var(--g-50);border:1px solid var(--g-line);border-radius:8px;padding:4px 10px;font-size:13.5px}
+/* logo (không phải link: bấm vào không điều hướng) */
+.logo{flex:none;display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:12px;font-weight:800;font-size:17px;letter-spacing:.03em;line-height:1;user-select:none;-webkit-user-select:none;cursor:default}
+.logo.on-green{background:#fff;color:var(--g);border:2px solid #fff}
+.logo.on-white{background:var(--g);color:#fff;margin:0 auto 12px}
+.brand{display:flex;align-items:center;gap:16px}
+.brand > div{min-width:0}
+@media (max-width:560px){.logo{width:44px;height:44px;font-size:15px}}
+</style>
+</head>
+<body class="locked">
+<div class="gate">
+  <div class="gcard">
+    <div class="logo on-white" role="img" aria-label="HTT">HTT</div>
+    <div class="eyebrow">Big-O Coding · Green · Lecture 01</div>
+    <h2>Nhập mã để vào bài</h2>
+    <p>Mã gồm 6 chữ số do giảng viên cung cấp.</p>
+    <div class="digits">
+      <input inputmode="numeric" maxlength="1" aria-label="Chữ số 1"><input inputmode="numeric" maxlength="1" aria-label="Chữ số 2"><input inputmode="numeric" maxlength="1" aria-label="Chữ số 3"><input inputmode="numeric" maxlength="1" aria-label="Chữ số 4"><input inputmode="numeric" maxlength="1" aria-label="Chữ số 5"><input inputmode="numeric" maxlength="1" aria-label="Chữ số 6">
+    </div>
+    <div class="gerr" id="gErr"></div>
+    <button class="btn" id="gGo">Vào làm bài</button>
+  </div>
+</div>
+
+<header class="top"><div class="wrap brand">
+  <div class="logo on-green" role="img" aria-label="HTT">HTT</div>
+  <div>
+  <div class="eyebrow">Big-O Coding · Green · Lecture 01</div>
+  <h1>Ôn tập: Introduction to Programming</h1>
+  <div class="sub">Chương trình, giải thuật, C++ / Java / Python, kiểu dữ liệu, biến, toán tử, nhập xuất</div>
+  </div>
+</div></header>
+
+<div class="bar"><div class="wrap">
+  <div class="prog"><i id="progFill"></i></div>
+  <div class="stat">Hoàn thành <b id="sDone">0</b>/<span class="sTotal"></span> · Điểm <b id="sScore">0</b>/<span class="sMax"></span></div>
+  <button class="btn ghost" id="resetAll">Làm lại</button>
+</div></div>
+
+<main class="wrap">
+  <div class="intro">Mỗi câu có <b>từ 1 đến 4 đáp án đúng</b>. Chọn <b>tất cả</b> đáp án đúng rồi bấm <b>Kiểm tra</b> (chọn đủ, không thừa). Làm sai thì có thể thử lại, nhưng điểm giảm dần theo số lần thử:
+    <div class="rules"><span>Đúng lần 1: <b>10đ</b></span><span>Lần 2: <b>6đ</b></span><span>Lần 3: <b>3đ</b></span><span>Từ lần 4: <b>1đ</b></span><span>Xem đáp án: <b>0đ</b></span></div>
+    <div style="margin-top:8px;font-size:13px;color:var(--muted)">Tiến độ và điểm được lưu trên trình duyệt này.</div>
+  </div>
+  <div id="quiz"></div>
+  <div class="summary" id="summary">
+    <div class="big" id="sumScore"></div>
+    <p id="sumMsg"></p>
+    <div class="brk" id="sumBreak"></div>
+    <button class="btn" id="resetAll2">Làm lại từ đầu</button>
+  </div>
+</main>
+
+<script>
+const Q = [
+{
+  tag:"Khái niệm",
+  q:"Trong <b>Bước 1 – Đọc hiểu đề bài</b>, học viên cần xác định những thông tin nào?",
+  opts:["Input","Giới hạn thời gian và giới hạn bộ nhớ","Đặt breakpoint, step over để tìm lỗi","Output"],
+  ans:[0,1,3],
+  exp:"Bước 1 gồm: đề bài, <b>Input</b>, <b>Output</b>, giới hạn thời gian, giới hạn bộ nhớ. Breakpoint / step over thuộc <b>Bước 4 – Kiểm tra mã nguồn</b> (debug)."
+},
+{
+  tag:"Khái niệm",
+  q:"Ở <b>Bước 2 – Xây dựng giải thuật</b>, giải thuật có thể được biểu diễn bằng cách nào?",
+  opts:["Ngôn ngữ tự nhiên","Sơ đồ khối (flow chart)","Mã giả (pseudo-code)","Gói thành file executable rồi deploy"],
+  ans:[0,1,2],
+  exp:"Giải thuật được mô tả bằng <b>ngôn ngữ tự nhiên, sơ đồ khối, mã giả</b>. Đóng gói và triển khai (desktop / web / mobile) là <b>Bước 5</b>."
+},
+{
+  tag:"Khái niệm",
+  q:"IDE (Integrated Development Environment) như Visual Studio Code hỗ trợ những việc gì?",
+  opts:["EDIT – soạn thảo source code","COMPILE – biên dịch source code","RUN – chạy thử, xem kết quả","DEBUG – hỗ trợ tìm lỗi"],
+  ans:[0,1,2,3],
+  exp:"Cả 4 đều đúng: IDE tích hợp <b>Edit, Compile, Run, Debug</b> trong một môi trường. (Source code chỉ là text file nên vẫn có thể soạn bằng text editor bất kì.)"
+},
+{
+  tag:"C++",
+  q:"Chọn các nhận xét <b>đúng</b> về chương trình C++ sau:",
+  code:{lang:"cpp",src:`// L01P01.cpp
+#include <iostream>
+using namespace std;
+int main()
+{
+    cout << "Hello, World!!!";
+    return 0;
+}`},
+  opts:["<code>#include &lt;iostream&gt;</code> khai báo thư viện nhập xuất","Mỗi câu lệnh kết thúc bằng dấu <code>;</code>","Chương trình bắt đầu thực thi từ hàm <code>main()</code>","Có thể bỏ dòng <code>#include</code> vì <code>cout</code> là lệnh có sẵn của ngôn ngữ"],
+  ans:[0,1,2],
+  exp:"<code>cout</code> nằm trong thư viện <code>iostream</code>, bỏ <code>#include</code> sẽ lỗi biên dịch. Ba nhận xét còn lại đúng như slide."
+},
+{
+  tag:"Java",
+  q:"File sau được lưu với tên <code>L01P01.java</code>. Nhận xét nào <b>đúng</b>?",
+  code:{lang:"java",src:`public class Hello {
+    public static void main(String[] args) {
+        System.out.print("Hello, World!!!");
+    }
+}`},
+  opts:["Biên dịch bị lỗi vì tên class public (<code>Hello</code>) khác tên file","Java giống Python: không cần hàm <code>main</code>","Câu lệnh trong Java kết thúc bằng dấu <code>;</code> (như C++)","Nếu đổi tên file thành <code>Hello.java</code> thì chương trình in ra <code>Hello, World!!!</code>"],
+  ans:[0,2,3],
+  exp:"Trong Java, <b>tên class public và tên file phải giống nhau</b>. Java vẫn cần <code>main()</code> làm điểm bắt đầu; chỉ Python mới không cần."
+},
+{
+  tag:"Python",
+  q:"Về chương trình Python một dòng dưới đây, nhận xét nào <b>đúng</b>?",
+  code:{lang:"py",src:`# L01P01.py
+print("Hello, World!!!")`},
+  opts:["Không cần include / import thư viện để in ra màn hình","Không cần hàm <code>main</code>","Không cần dấu <code>;</code> cuối câu lệnh","<code>\"Hello, World!!!\"</code> có kiểu dữ liệu chuỗi (string)"],
+  ans:[0,1,2,3],
+  exp:"Python không cần include/import để nhập xuất cơ bản, không cần <code>main</code>, không cần <code>;</code>. Văn bản đặt trong cặp nháy đôi là một <b>string</b>."
+},
+{
+  tag:"Python",
+  q:"Đoạn code sau in ra gì (mỗi lệnh <code>print</code> in trên một dòng)?",
+  code:{lang:"py",src:`print(9 / 2)
+print(9 // 2)
+print(9 % 2)`},
+  opts:["<code>4</code>, <code>4</code>, <code>1</code>","<code>4.5</code>, <code>4</code>, <code>1</code>","<code>4.5</code>, <code>4.5</code>, <code>1</code>","<code>4.5</code>, <code>4.0</code>, <code>1</code>"],
+  ans:[1],
+  exp:"Python: <code>/</code> là <b>classic division</b> → luôn ra số thực <code>4.5</code>; <code>//</code> là <b>floor division</b> → <code>4</code> (hai số nguyên nên kết quả là số nguyên); <code>%</code> lấy phần dư → <code>1</code>."
+},
+{
+  tag:"Python",
+  q:"Lệnh nào in ra <b>đúng</b> kết quả được ghi bên cạnh?",
+  opts:["<code>print(9.0 // 2.0)</code> → <code>4.0</code>","<code>print(9 ** 2)</code> → <code>81</code>","<code>print(4E3)</code> → <code>4000.0</code>","<code>print(9.0 % 2.0)</code> → <code>1.0</code>"],
+  ans:[0,1,2,3],
+  exp:"Cả 4 đều đúng. <code>**</code> là lũy thừa: <code>9 ** 2 = 81</code>. Floor division trên số thực vẫn trả về số thực (<code>4.0</code>). <code>4E3</code> là số thực 4000 nên in <code>4000.0</code>."
+},
+{
+  tag:"C++",
+  q:"Trong C++, biểu thức nào khi <code>cout</code> sẽ in ra <code>4.5</code>?",
+  opts:["<code>cout &lt;&lt; 9.0 / 2;</code>","<code>cout &lt;&lt; 9 / 2.0;</code>","<code>cout &lt;&lt; 1.0 * 9 / 2;</code>","<code>cout &lt;&lt; 9 / 2 * 1.0;</code>"],
+  ans:[0,1,2],
+  exp:"Trong C++/Java, dấu <code>/</code> cho kết quả số thực khi <b>có ít nhất một toán hạng là số thực</b>. Với <code>9 / 2 * 1.0</code>, phép <code>9 / 2</code> được tính trước (chia nguyên) → <code>4</code>, rồi <code>4 * 1.0 = 4</code>."
+},
+{
+  tag:"Java",
+  q:"Lệnh Java nào in ra <b>đúng</b> kết quả được ghi bên cạnh?",
+  opts:["<code>System.out.print(10 * (2 + 3) - 3);</code> → <code>47</code>","<code>System.out.print(9 / 2);</code> → <code>4.5</code>","<code>System.out.print(9.0 % 2.0);</code> → <code>1.0</code>","<code>System.out.print(9 % 2);</code> → <code>1.0</code>"],
+  ans:[0,2],
+  exp:"<code>9 / 2</code> với hai số nguyên là <b>floor division</b> → <code>4</code>. Java cho phép <code>%</code> trên số thực: <code>9.0 % 2.0 = 1.0</code>. Ngoặc được tính trước: <code>10*5-3 = 47</code>. <code>9 % 2</code> với hai số nguyên in <code>1</code>, không phải <code>1.0</code>."
+},
+{
+  tag:"Tổng hợp",
+  q:"Tên biến nào <b>hợp lệ</b> (theo qui tắc đặt tên biến trong C++, Java, Python)?",
+  opts:["<code>myAge</code>","<code>1styear</code>","<code>my_age</code>","<code>this-year</code>"],
+  ans:[0,2],
+  exp:"Tên biến chỉ gồm chữ cái, chữ số và dấu <code>_</code>, <b>không bắt đầu bằng số</b>, không có khoảng trắng hay kí tự đặc biệt (<code>-</code> bị hiểu là phép trừ). <code>myAge</code> là camelCase, <code>my_age</code> là lower_case."
+},
+{
+  tag:"C++",
+  q:"Chuyện gì xảy ra với đoạn code sau?",
+  code:{lang:"cpp",src:`int thisYear;
+thisYear = 2018;
+cout << ThisYear;`},
+  opts:["In ra <code>2018</code>","Lỗi biên dịch vì <code>ThisYear</code> chưa được khai báo","Nguyên nhân là C++ phân biệt chữ hoa chữ thường (case sensitive)","In ra <code>0</code> vì <code>ThisYear</code> là biến mới chưa gán giá trị"],
+  ans:[1,2],
+  exp:"C++, Java và Python đều <b>case sensitive</b>: <code>thisYear</code> và <code>ThisYear</code> là hai tên khác nhau. Trong C++, dùng biến chưa khai báo là lỗi biên dịch."
+},
+{
+  tag:"C++",
+  q:"Kiểu dữ liệu C++ nào <b>lưu được</b> giá trị <code>10000000000</code> (10<sup>10</sup>) theo bảng trong slide?",
+  opts:["<code>short</code>","<code>int</code>","<code>long long</code>","<code>double</code>"],
+  ans:[2,3],
+  exp:"<code>int</code> (4 bytes) tối đa khoảng 2.147.483.647 ≈ 2·10<sup>9</sup>; <code>short</code> chỉ tới 32.767. <code>long long</code> (8 bytes) tới ≈ 9,2·10<sup>18</sup>. <code>double</code> có miền giá trị tới ≈ 1,8·10<sup>308</sup> nên cũng biểu diễn được."
+},
+{
+  tag:"Java · Python",
+  q:"Nhận xét nào <b>đúng</b> về kiểu dữ liệu số?",
+  opts:["Java <code>byte</code> có miền giá trị -128 … 127","Java <code>long</code> chiếm 8 bytes","<code>double</code> chiếm 4 bytes, <code>float</code> chiếm 8 bytes","Python bắt buộc khai báo kiểu dữ liệu trước khi gán giá trị cho biến"],
+  ans:[0,1],
+  exp:"<code>float</code> 4 bytes, <code>double</code> 8 bytes (ngược lại với phương án C). Python <b>không khai báo biến</b>: kiểu dữ liệu được xác định khi gán giá trị."
+},
+{
+  tag:"C++",
+  q:"BT2 – Tính tổng: Input là <code>2000000000 2000000000</code>. Với code dưới đây, nhận xét nào <b>đúng</b>?",
+  code:{lang:"cpp",src:`int a, b;
+cin >> a >> b;
+int c = a + b;
+cout << c;`},
+  opts:["Kết quả in ra sai do <code>a + b</code> vượt quá miền giá trị của <code>int</code> (tràn số)","Nên đổi sang kiểu <code>long long</code>","Nếu viết bằng Java, nên dùng kiểu <code>long</code>","Nếu viết bằng Python, <code>a + b</code> cũng bị tràn số tương tự"],
+  ans:[0,1,2],
+  exp:"4·10<sup>9</sup> lớn hơn 2.147.483.647 nên <code>int</code> bị tràn. Gợi ý BT2: C++ dùng <code>long long</code>, Java dùng <code>long</code>. Số nguyên Python không giới hạn nên không bị tràn."
+},
+{
+  tag:"Python",
+  q:"Theo dõi giá trị của <code>a</code>. Nhận xét nào <b>đúng</b>?",
+  code:{lang:"py",src:`a = 10
+a += 2
+a -= 2
+a *= 2
+a /= 2
+print(a)   # (1)
+a **= 2
+print(a)   # (2)
+a //= 2
+print(a)   # (3)
+a %= 2
+print(a)   # (4)`},
+  opts:["Dòng (1) in <code>10.0</code>","Dòng (2) in <code>100</code>","Dòng (3) in <code>50.0</code>","Dòng (4) in <code>0.0</code>"],
+  ans:[0,2,3],
+  exp:"12 → 10 → 20 → <code>a /= 2</code> là classic division nên <code>a = 10.0</code> (số thực). Từ đó trở đi <code>a</code> là số thực: <code>10.0 ** 2 = 100.0</code>, <code>100.0 // 2 = 50.0</code>, <code>50.0 % 2 = 0.0</code>."
+},
+{
+  tag:"C++",
+  q:"Chương trình sau in ra màn hình chuỗi nào?",
+  code:{lang:"cpp",src:`int a;
+a = 10;
+a += 2;  cout << a;
+a -= 2;  cout << a;
+a *= 2;  cout << a;
+a /= 2;  cout << a;
+a %= 2;  cout << a;`},
+  opts:["<code>12 10 20 10 0</code>","<code>1210201000</code>","<code>121020100</code>","<code>12102010.00</code>"],
+  ans:[2],
+  exp:"Các giá trị lần lượt: 12, 10, 20, 10, 0. <code>a</code> là <code>int</code> nên <code>a /= 2</code> là chia nguyên → <code>10</code>. <code>cout</code> không tự thêm khoảng trắng, nên các số dính liền: <code>121020100</code>."
+},
+{
+  tag:"Tổng hợp",
+  q:"Cho <code>a = 5</code>, <code>b = 7</code>, <code>c = a + b</code> (kiểu số nguyên). Lệnh nào in ra đúng <code>5 + 7 = 12</code>?",
+  opts:[
+    "C++:<pre>cout &lt;&lt; a &lt;&lt; \" + \" &lt;&lt; b &lt;&lt; \" = \" &lt;&lt; c;</pre>",
+    "Python:<pre>print(f\"{a} + {b} = {c}\")</pre>",
+    "Python:<pre>print(\"{0} + {1} = {2}\".format(a, b, c))</pre>",
+    "Java:<pre>System.out.printf(\"%f + %f = %f\", a, b, c);</pre>"],
+  ans:[0,1,2],
+  exp:"Trong <code>printf</code> của Java, <code>%d</code> dành cho số nguyên, <code>%f</code> dành cho số thực. Dùng <code>%f</code> với biến <code>int</code> sẽ gây lỗi khi chạy; phải viết <code>\"%d + %d = %d\"</code>."
+},
+{
+  tag:"Tổng hợp",
+  q:"Cho <code>x = 3.141592653589793</code>. Lệnh nào in ra đúng <code>3.14</code>?",
+  opts:[
+    "C++ (đã <code>#include &lt;iomanip&gt;</code>):<pre>cout &lt;&lt; fixed &lt;&lt; setprecision(2) &lt;&lt; x;</pre>",
+    "Java:<pre>System.out.printf(\"%.2f\", x);</pre>",
+    "Python:<pre>print(f\"{x:.2f}\")</pre>",
+    "Python:<pre>print(\"{0:2f}\".format(x))</pre>"],
+  ans:[0,1,2],
+  exp:"Định dạng làm tròn 2 chữ số thập phân là <code>.2f</code> — có dấu chấm. <code>{0:2f}</code> (thiếu dấu chấm) nghĩa là độ rộng tối thiểu 2, với 6 chữ số thập phân mặc định → in <code>3.141593</code>."
+},
+{
+  tag:"Tổng hợp",
+  q:"Input gồm <b>2 số nguyên trên cùng 1 dòng</b>: <code>7 8</code>. Cách đọc nào <b>đúng</b>?",
+  opts:[
+    "Python:<pre>a, b = map(int, input().split())</pre>",
+    "Python:<pre>a = int(input())\nb = int(input())</pre>",
+    "C++:<pre>int a, b;\ncin &gt;&gt; a &gt;&gt; b;</pre>",
+    "Java:<pre>Scanner sc = new Scanner(System.in);\na = sc.nextInt();\nb = sc.nextInt();</pre>"],
+  ans:[0,2,3],
+  exp:"<code>input()</code> trong Python đọc <b>cả một dòng</b>, nên <code>int(\"7 8\")</code> gây lỗi. Phải <code>split()</code> rồi <code>map(int, ...)</code>. <code>cin</code> và <code>Scanner</code> tự bỏ qua khoảng trắng / xuống dòng nên dùng được cho cả hai trường hợp."
+},
+{
+  tag:"Tổng hợp",
+  q:"Input gồm <b>2 số thực trên 2 dòng</b>:<br><code>7.1</code><br><code>8.2</code><br>Cách đọc nào <b>đúng</b>?",
+  opts:[
+    "Python:<pre>a = float(input())\nb = float(input())</pre>",
+    "Python:<pre>a = int(input())\nb = int(input())</pre>",
+    "Java:<pre>a = sc.nextDouble();\nb = sc.nextDouble();</pre>",
+    "C++:<pre>double a, b;\ncin &gt;&gt; a &gt;&gt; b;</pre>"],
+  ans:[0,2,3],
+  exp:"Số thực phải đọc bằng kiểu số thực: <code>float(...)</code> trong Python, <code>nextDouble()</code> trong Java, biến <code>double</code> trong C++. <code>int(\"7.1\")</code> gây lỗi."
+},
+{
+  tag:"Python",
+  q:"BT5 – Đếm nút. Với input <code>98765</code>, nhận xét nào <b>đúng</b>?",
+  code:{lang:"py",src:`n = int(input())
+d1 = n % 10; n = n // 10
+d2 = n % 10; n = n // 10
+d3 = n % 10; n = n // 10
+d4 = n % 10; n = n // 10
+d5 = n % 10
+print((d1 + d2 + d3 + d4 + d5) % 10)`},
+  opts:["Chương trình in ra <code>5</code>","Chương trình in ra <code>35</code>","Nếu thay <code>//</code> bằng <code>/</code> thì kết quả sẽ sai","Trong C++/Java, với <code>int n</code>, viết <code>n = n / 10</code> là đúng"],
+  ans:[0,2,3],
+  exp:"Tổng các chữ số 5+6+7+8+9 = 35, lấy <code>% 10</code> → số nút là <code>5</code>. Trong Python, <code>/</code> ra số thực (9876.5, …) nên các chữ số tách ra bị sai. C++/Java chia hai số nguyên là floor division nên <code>n / 10</code> đúng."
+},
+{
+  tag:"Command line",
+  q:"Nhận xét nào <b>đúng</b> về việc chạy chương trình từ command line?",
+  code:{lang:"sh",src:`g++ -o L01P01.exe L01P01.cpp
+javac L01P01.java
+python L01P01.py`},
+  opts:["<code>g++ -o L01P01.exe L01P01.cpp</code> biên dịch file .cpp thành file thực thi <code>L01P01.exe</code>","<code>javac L01P01.java</code> tạo ra file <code>L01P01.class</code>, cần máy ảo Java (JVM) để chạy","Để chạy chương trình Java sau khi biên dịch, gõ <code>java L01P01.class</code>","Python chạy trực tiếp từ source code bằng <code>python L01P01.py</code>"],
+  ans:[0,1,3],
+  exp:"Lệnh chạy Java là <code>java L01P01</code> — truyền <b>tên class</b>, không kèm đuôi <code>.class</code>."
+}
+];
+
+const KW = {
+  cpp:/\b(int|double|float|long|short|bool|return|using|namespace|include|cout|cin|fixed|setprecision)\b/,
+  java:/\b(public|class|static|void|int|double|long|new|String)\b/,
+  py:/\b(print|input|int|float|map|import|True|False)\b/,
+  sh:/\b(g\+\+|javac|java|python)\b/
+};
+const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+function hl(src, lang){
+  const kw = KW[lang];
+  const cm = lang==="py"||lang==="sh" ? "#[^\\n]*" : "//[^\\n]*";
+  const re = new RegExp(`(${cm})|("(?:[^"\\\\]|\\\\.)*")|(#include|${kw.source})|(\\b\\d+(?:\\.\\d+)?(?:[eE]\\d+)?\\b)`,"g");
+  let out="", last=0, m;
+  while((m=re.exec(src))){
+    out += esc(src.slice(last,m.index));
+    const cls = m[1]?"c":m[2]?"s":m[3]?"k":"n";
+    out += `<span class="${cls}">${esc(m[0])}</span>`;
+    last = re.lastIndex;
+  }
+  return out + esc(src.slice(last));
+}
+const LNAME = {cpp:"C++",java:"Java",py:"Python",sh:"Terminal"};
+const L = "ABCD";
+
+/* ===== Cấu hình ===== */
+const ACCESS_CODE = "583027";              // mã vào bài (6 chữ số)
+const POINTS = [10, 6, 3, 1];              // điểm khi đúng ở lần 1, 2, 3, từ lần 4 trở đi
+const MAX = Q.length * POINTS[0];
+const KEY = "bigo_green_lec01_quiz_v1";
+const ptsFor = tries => POINTS[Math.min(tries, POINTS.length) - 1];
+
+/* ===== Lưu trữ ===== */
+const blank = () => ({sel:[], tries:0, tried:[], solved:false, gaveUp:false, pts:0});
+let store = {unlocked:false, qs:Q.map(blank)};
+try{
+  const s = JSON.parse(localStorage.getItem(KEY));
+  if(s && Array.isArray(s.qs) && s.qs.length===Q.length) store = s;
+  else if(s && s.unlocked) store.unlocked = true;
+}catch(e){}
+const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(store)); }catch(e){} };
+const st = i => store.qs[i];
+const isDone = s => s.solved || s.gaveUp;
+
+/* ===== Màn hình nhập mã ===== */
+function initGate(){
+  const boxes = [...document.querySelectorAll(".digits input")];
+  const err = document.getElementById("gErr");
+  const card = document.querySelector(".gcard");
+  const submit = () => {
+    const code = boxes.map(b=>b.value).join("");
+    if(code.length<6){ err.textContent="Vui lòng nhập đủ 6 chữ số."; return; }
+    if(code===ACCESS_CODE){
+      store.unlocked = true; save();
+      document.body.classList.remove("locked");
+      window.scrollTo(0,0);
+    }else{
+      err.textContent="Mã không đúng. Vui lòng thử lại.";
+      card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake");
+      boxes.forEach(b=>b.value=""); boxes[0].focus();
+    }
+  };
+  boxes.forEach((b,k)=>{
+    b.addEventListener("input",()=>{
+      b.value = b.value.replace(/\D/g,"").slice(-1);
+      err.textContent="";
+      if(b.value && k<5) boxes[k+1].focus();
+      if(boxes.every(x=>x.value)) submit();
+    });
+    b.addEventListener("keydown",e=>{
+      if(e.key==="Backspace" && !b.value && k>0) boxes[k-1].focus();
+      if(e.key==="Enter") submit();
+    });
+    b.addEventListener("paste",e=>{
+      e.preventDefault();
+      const d=(e.clipboardData.getData("text")||"").replace(/\D/g,"").slice(0,6);
+      d.split("").forEach((c,j)=>boxes[j].value=c);
+      if(d.length===6) submit(); else boxes[Math.min(d.length,5)].focus();
+    });
+  });
+  document.getElementById("gGo").onclick = submit;
+  if(store.unlocked) document.body.classList.remove("locked");
+  else boxes[0].focus();
+}
+
+/* ===== Quiz ===== */
+function render(){
+  document.getElementById("quiz").innerHTML = Q.map((q,i)=>`
+  <section class="q" id="q${i}">
+    <div class="qh"><span class="qn">Câu ${i+1}</span><span class="tag">${q.tag}</span><span class="tries"></span><span class="res"></span></div>
+    <div class="qt">${q.q}</div>
+    ${q.code?`<pre><span class="lbl">${LNAME[q.code.lang]}</span>${hl(q.code.src,q.code.lang)}</pre>`:""}
+    <div class="hint">Chọn tất cả đáp án đúng</div>
+    <div class="opts">${q.opts.map((o,j)=>`
+      <label class="opt" data-j="${j}"><span class="box">${L[j]}</span><span class="otext">${o}</span><span class="mark"></span></label>`).join("")}
+    </div>
+    <div class="msg"></div>
+    <div class="acts"><button class="btn chk">Kiểm tra</button><button class="btn ghost give" hidden>Xem đáp án (0 điểm)</button></div>
+    <div class="exp"></div>
+  </section>`).join("");
+  document.querySelectorAll(".sTotal").forEach(e=>e.textContent=Q.length);
+  document.querySelectorAll(".sMax").forEach(e=>e.textContent=MAX);
+
+  Q.forEach((q,i)=>{
+    const el = document.getElementById("q"+i);
+    el.querySelectorAll(".opt").forEach(op=>{
+      op.addEventListener("click",e=>{
+        e.preventDefault();
+        const s = st(i); if(isDone(s)) return;
+        const j = +op.dataset.j;
+        s.sel = s.sel.includes(j) ? s.sel.filter(x=>x!==j) : [...s.sel, j].sort();
+        save(); paint(i);
+      });
+    });
+    el.querySelector(".chk").addEventListener("click",()=>check(i));
+    el.querySelector(".give").addEventListener("click",()=>giveUp(i));
+    paint(i);
+  });
+  update();
+}
+
+function paint(i){
+  const q=Q[i], s=st(i), el=document.getElementById("q"+i), ans=new Set(q.ans), done=isDone(s);
+  el.classList.toggle("done",done);
+  el.classList.toggle("ok",s.solved);
+  el.querySelectorAll(".opt").forEach(op=>{
+    const j=+op.dataset.j, sel=s.sel.includes(j), mk=op.querySelector(".mark");
+    op.className="opt"+(sel?" sel":""); mk.textContent="";
+    if(done){
+      if(s.solved && ans.has(j)){op.classList.add("right");mk.textContent="✓ Đúng";}
+      else if(s.gaveUp && ans.has(j)){op.classList.add("miss");mk.textContent="✓ Đáp án";}
+    }
+  });
+  el.querySelector(".tries").textContent = s.tries ? `Lần thử: ${s.tries}` : "";
+  const r=el.querySelector(".res");
+  if(s.solved){ r.className="res pts"; r.textContent=`+${s.pts} điểm`; }
+  else if(s.gaveUp){ r.className="res pts zero"; r.textContent="0 điểm"; }
+  else { r.className="res"; r.textContent=""; }
+
+  const chk=el.querySelector(".chk"), give=el.querySelector(".give"), msg=el.querySelector(".msg");
+  chk.hidden=done; chk.disabled=s.sel.length===0;
+  give.hidden=done || s.tries===0;
+  if(!done && s.tries>0){
+    msg.className="msg show";
+    msg.innerHTML=`✗ Chưa chính xác (đã thử ${s.tries} lần). Nếu đúng ở lần tiếp theo, bạn được <b>${ptsFor(s.tries+1)} điểm</b>.`;
+  }else if(s.solved){
+    msg.className="msg show good";
+    msg.innerHTML=`✓ Chính xác ở lần thử thứ ${s.tries} → <b>+${s.pts} điểm</b>.`;
+  }else msg.className="msg";
+  el.querySelector(".exp").innerHTML = done ? `<b>Đáp án: ${q.ans.map(j=>L[j]).join(", ")}.</b> ${q.exp}` : "";
+}
+
+function check(i){
+  const q=Q[i], s=st(i), el=document.getElementById("q"+i);
+  if(isDone(s) || !s.sel.length) return;
+  const combo = s.sel.join(",");
+  if(s.tried.includes(combo)){
+    const msg=el.querySelector(".msg");
+    msg.className="msg show";
+    msg.innerHTML="Bạn đã thử đúng tổ hợp này rồi (không tính thêm lần thử). Hãy chọn tổ hợp khác.";
+    return;
+  }
+  s.tries++; s.tried.push(combo);
+  const ans=new Set(q.ans);
+  if(s.sel.length===ans.size && s.sel.every(j=>ans.has(j))){ s.solved=true; s.pts=ptsFor(s.tries); }
+  save(); paint(i); update();
+}
+
+function giveUp(i){
+  const s=st(i);
+  if(!confirm("Xem đáp án câu này? Câu này sẽ được 0 điểm và không thể làm lại.")) return;
+  s.gaveUp=true; s.pts=0; save(); paint(i); update();
+}
+
+function update(){
+  const qs=store.qs, done=qs.filter(isDone).length, score=qs.reduce((a,s)=>a+s.pts,0);
+  document.getElementById("sDone").textContent=done;
+  document.getElementById("sScore").textContent=score;
+  document.getElementById("progFill").style.width=(done/Q.length*100)+"%";
+  const sum=document.getElementById("summary");
+  if(done===Q.length){
+    sum.classList.add("show");
+    document.getElementById("sumScore").textContent=`${score}/${MAX}`;
+    const c=t=>qs.filter(s=>s.solved && Math.min(s.tries,4)===t).length;
+    document.getElementById("sumBreak").innerHTML=
+      `<span>Đúng lần 1: <b>${c(1)}</b></span><span>Đúng lần 2: <b>${c(2)}</b></span><span>Đúng lần 3: <b>${c(3)}</b></span><span>Đúng từ lần 4: <b>${c(4)}</b></span><span>Xem đáp án: <b>${qs.filter(s=>s.gaveUp).length}</b></span>`;
+    const p=score/MAX;
+    document.getElementById("sumMsg").textContent =
+      p>=.9?"Xuất sắc! Bạn đã nắm vững Lecture 01.":
+      p>=.7?"Rất tốt! Xem lại phần giải thích các câu phải làm nhiều lần nhé.":
+      p>=.5?"Khá ổn. Hãy đọc lại slide phần toán tử, kiểu dữ liệu và nhập xuất.":
+      "Cần ôn lại Lecture 01 và làm lại quiz nhé.";
+  } else sum.classList.remove("show");
+}
+
+function resetAll(){
+  if(!confirm("Xóa toàn bộ tiến độ và điểm số đã lưu để làm lại từ đầu?")) return;
+  store.qs = Q.map(blank); save();
+  Q.forEach((_,i)=>paint(i)); update();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.getElementById("resetAll").onclick=resetAll;
+document.getElementById("resetAll2").onclick=resetAll;
+initGate();
+render();
+</script>
+</body>
+</html>
