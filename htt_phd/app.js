@@ -9,6 +9,12 @@ const DOCS = [
     desc: "Pareto-optimal journeys, temporal distance profile, CSA/mcpCSA chạy tay, so sánh với Huynh & Barthelemy (2022).",
     url: "docs/kujala2018-mcpcsa.html",
   },
+  {
+    title: "GTFS file format: định dạng dữ liệu lịch chạy giao thông công cộng",
+    meta: "Slides · 2026-11-24",
+    desc: "GTFS là gì, nguồn gốc & lịch sử, các file và quan hệ, feed mẫu, stop_times → connection (temporal graph), code Python, nguồn download dataset.",
+    url: "docs/gtfs-file-format.html",
+  },
 ];
 
 const $ = (id) => document.getElementById(id);

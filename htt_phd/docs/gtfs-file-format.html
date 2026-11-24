@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GTFS file format</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Một màu chủ đạo duy nhất: blue. Không dùng gradient. Chỉ dùng các sắc độ của blue + xám trung tính. */
+:root{
+  --bg:#ffffff; --page:#eef2f7; --line:#dbe3ef; --text:#0f172a; --muted:#5b6478;
+  --blue:#1d4ed8; --blue-d:#1e3a8a; --blue-m:#3b82f6; --blue-s:#93c5fd; --blue-l:#dbeafe; --blue-xl:#eff6ff;
+  --gray:#94a3b8; --gray-l:#e2e8f0; --gray-xl:#f1f5f9;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--page);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(15,23,42,.12);background:var(--bg);
+  opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.past{transform:translateX(-60px) scale(.98)}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.active .in{animation:rise .6s both}
+.slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:var(--blue)}
+.hdr{display:flex;align-items:center;gap:16px;margin-bottom:16px;padding-right:150px}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:var(--blue);padding:6px 16px;border-radius:999px;white-space:nowrap}
+h1{font-size:66px;line-height:1.1;font-weight:800}
+h2{font-size:30px;line-height:1.2;font-weight:800}
+h3{font-size:21px;font-weight:700;margin-bottom:6px;color:var(--blue)}
+p,li{font-size:21px;line-height:1.45;color:var(--text)}
+.muted{color:var(--muted)}
+.accent{color:var(--blue)}
+ul{list-style:none}
+ul li{position:relative;padding-left:24px;margin:5px 0}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:9px;height:9px;border-radius:3px;background:var(--blue)}
+code.i{font-family:var(--mono);font-size:.86em;background:var(--blue-xl);border:1px solid var(--blue-l);padding:0 5px;border-radius:6px;color:var(--blue-d);white-space:nowrap}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+.cols>*{min-width:0}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.card{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px 16px;box-shadow:0 8px 24px -14px rgba(15,23,42,.25)}
+.cols3>.card,.cols4>.card{border-top:5px solid var(--blue)}
+.card p,.card li{font-size:18.5px}
+.note{margin-top:10px;padding:8px 14px;border-left:5px solid var(--blue);background:var(--blue-xl);border-radius:8px;font-size:18.5px;line-height:1.4}
+.note.blue{border-color:var(--blue-d)}
+.code{font-family:var(--mono);font-size:17px;line-height:1.5;background:#fafcff;border:1px solid var(--line);border-radius:12px;padding:8px 0;overflow:hidden;position:relative}
+.code.x4{font-size:11.4px;line-height:1.33;padding:6px 0}
+.code .ln{padding:0 12px 0 6px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
+.code .no{color:#c2cad8;width:22px;flex:none;text-align:right;margin-right:10px;user-select:none}
+.k{color:var(--blue-d);font-weight:700}.t{color:var(--blue);font-weight:600}.s{color:#475569}.n{color:var(--blue-m)}.c{color:var(--gray);font-style:italic}.p{color:var(--blue-d)}.fn{color:var(--blue)}
+.code.show-a .mark-a,.code.show-b .mark-b,.code.show-c .mark-c,.code.show-d .mark-d,.code.show-e .mark-e{background:var(--blue-l);box-shadow:inset 5px 0 var(--blue)}
+.code-title{font-family:var(--mono);font-size:14px;color:var(--muted);margin:0 0 4px 4px;font-weight:600}
+.hide0{opacity:0;transform:translateY(8px) scale(.96);transition:all .45s}
+.hide0.sh{opacity:1;transform:none}
+svg .hide0{transform:none}
+.f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.f.on{opacity:1;transform:none}
+.f.ghost{display:none}
+.dimx{opacity:.3;filter:grayscale(.8)}
+.gone{display:none!important}
+#mLegend td{padding:3px 6px;border-bottom:1px dashed var(--line)}
+.glow{box-shadow:0 0 0 4px rgba(29,78,216,.25),0 0 22px rgba(29,78,216,.3)}
+.chip{display:inline-block;font-family:var(--mono);font-size:15px;font-weight:700;padding:3px 12px;border-radius:999px;background:var(--blue-xl);color:var(--blue-d);border:1px solid var(--blue-s)}
+.chip.r{background:var(--blue);color:#fff;border-color:var(--blue)}
+.chip.g{background:#fff;color:var(--muted);border-color:var(--gray)}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:18px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.3}
+th{background:var(--blue-xl);font-weight:700;color:var(--blue-d)}
+tr:last-child td{border-bottom:none}
+table.t1 td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
+table.acc td,table.acc th{text-align:center;font-size:17px;padding:8px 10px}
+table.acc td:first-child,table.acc th:first-child{text-align:left}
+table.tj td,table.tj th{font-size:15.5px;padding:6px 8px}
+table.tj td.why,table.tj th.why{text-align:left;font-size:13.5px;line-height:1.3;white-space:normal}
+table.comp td,table.comp th{text-align:center;font-size:16px;padding:6px 8px;vertical-align:middle}
+table.comp td:first-child,table.comp th:first-child,table.comp td:nth-child(2){text-align:left}
+.yes{color:var(--blue);font-weight:800}.no{color:var(--gray)}
+tr.hlr td{background:var(--blue-xl)}
+tr.hlr td:first-child{box-shadow:inset 5px 0 var(--blue)}
+tr.bdr td{background:var(--gray-xl);color:var(--muted);text-decoration:line-through;text-decoration-color:var(--gray)}
+tr.bdr td:first-child{box-shadow:inset 5px 0 var(--gray)}
+.big-ok{color:var(--blue);font-weight:800}.big-bad{color:var(--gray);font-weight:800}
+.vars{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.vc{font-family:var(--mono);font-size:17px;font-weight:700;padding:4px 12px;border-radius:10px;background:#fff;border:2px solid var(--line);transition:all .35s}
+.vc b{color:var(--blue)}
+.vc.hot{border-color:var(--blue);box-shadow:0 0 12px rgba(29,78,216,.3)}
+.vc.res{border-color:var(--blue-s);background:var(--blue-xl);color:var(--blue-d)}
+.arr{display:flex;gap:8px;justify-content:center}
+.cell{width:52px;height:56px;border-radius:12px;border:3px solid var(--line);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .45s}
+.cell small{font-size:13px;color:var(--muted);font-weight:600}
+.cell.cur{border-color:var(--blue);background:var(--blue-xl);color:var(--blue-d);transform:translateY(-6px)}
+.cell.dim{opacity:.35}
+.cell.wide{width:auto;padding:0 10px;font-size:14px}
+.flow{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap}
+.box{border-radius:12px;padding:12px 16px;text-align:center;font-family:var(--mono);font-size:17px;border:2px solid var(--blue-s);background:#fff;min-width:110px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:14px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.c{border-color:var(--blue);background:var(--blue-xl)}
+.ar{color:var(--muted);font-size:22px;text-align:center}
+.title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
+.kicker{font-family:var(--mono);color:var(--blue);font-size:22px;margin-bottom:18px;font-weight:600}
+.say{font-size:19px;margin-top:10px;min-height:50px;color:var(--muted);line-height:1.42}
+.say b{color:var(--text)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:14px;color:var(--muted);margin:4px 6px 2px;align-items:center}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.15)}100%{transform:none;opacity:1}}
+/* larger sizing */
+.slide.z1>*:not(.hdr):not(.jumpbtn){zoom:1.15}
+
+/* ===== agenda ===== */
+.agenda{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 14px}
+.sec{grid-column:1/-1;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.08em;margin-top:4px;text-transform:uppercase}
+.ag{background:#fff;border:1px solid var(--line);border-left:5px solid var(--blue);border-radius:10px;padding:6px 10px;cursor:pointer;transition:all .2s;font-size:15.5px;line-height:1.25;font-family:var(--mono);font-weight:600}
+.ag:hover{border-color:var(--blue);transform:translateY(-2px)}
+.ag b{color:var(--blue);margin-right:6px}
+
+/* ===== nav / jump ===== */
+#bar{position:fixed;left:0;bottom:0;height:5px;background:var(--blue);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;min-width:36px;height:32px;cursor:pointer;font-size:16px;padding:0 8px}
+#nav button:hover{border-color:var(--blue)}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:var(--muted);z-index:5}
+.jumpbtn{position:absolute;top:26px;right:30px;z-index:7;font-family:"Be Vietnam Pro",sans-serif;font-size:14px;font-weight:700;color:#fff;background:var(--blue);border:none;border-radius:999px;padding:7px 14px;cursor:pointer;transition:transform .2s}
+.jumpbtn:hover{transform:translateY(-2px)}
+#jump{position:fixed;inset:0;z-index:20;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center}
+#jump.on{display:flex}
+#jbox{width:min(1100px,94vw);max-height:88vh;overflow:auto;background:#fff;border-radius:18px;padding:20px 24px;box-shadow:0 30px 70px -20px rgba(15,23,42,.6);animation:pop .3s}
+#jbox .jh{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+#jbox .jh h3{font-size:22px;margin:0}
+#jbox .jh input{margin-left:auto;font-family:var(--mono);font-size:15px;padding:6px 10px;border:2px solid var(--line);border-radius:10px;width:260px;outline:none}
+#jbox .jh input:focus{border-color:var(--blue-s)}
+#jbox .jh button{border:none;background:var(--blue-xl);color:var(--blue-d);font-weight:800;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:18px}
+#jlist{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+#jlist .ji{display:flex;gap:8px;align-items:center;padding:7px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:14.5px;transition:all .15s;background:#fff}
+#jlist .ji:hover,#jlist .ji.k{border-color:var(--blue);background:var(--blue-xl)}
+#jlist .ji.cur{background:var(--blue-l);border-color:var(--blue-s)}
+#jlist .ji b{font-family:var(--mono);color:var(--blue);min-width:26px}
+#jlist .ji span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:700px){#hint{display:none}#jlist{grid-template-columns:1fr}}
+@media print{#nav,#bar,#hint,.jumpbtn{display:none}}
+/* ===== GTFS deck extras ===== */
+.tl{position:relative;margin:18px 10px 0;padding-left:34px}
+.tl::before{content:"";position:absolute;left:12px;top:6px;bottom:6px;width:4px;border-radius:2px;background:var(--blue-l)}
+.tl .ev{position:relative;margin:0 0 12px;padding:8px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;transition:all .35s}
+.tl .ev::before{content:"";position:absolute;left:-29px;top:14px;width:14px;height:14px;border-radius:50%;background:#fff;border:4px solid var(--blue)}
+.tl .ev .y{font-family:var(--mono);font-weight:800;color:var(--blue);margin-right:10px}
+.tl .ev p{font-size:17.5px;line-height:1.38}
+.tl .ev.hot{border-color:var(--blue);background:var(--blue-xl);box-shadow:0 0 0 3px rgba(29,78,216,.15)}
+.zip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.fl{font-family:var(--mono);font-size:14.5px;font-weight:600;padding:7px 9px;border-radius:9px;border:2px solid var(--line);background:#fff;transition:all .35s;display:flex;align-items:center;gap:6px}
+.fl::before{content:"";width:10px;height:12px;border:2px solid currentColor;border-radius:2px;flex:none;opacity:.6}
+.fl.req{border-color:var(--blue);color:var(--blue-d);background:var(--blue-xl)}
+.fl.cond{border-color:var(--blue-s);color:var(--blue-d);border-style:dashed}
+.fl.opt{color:var(--muted)}
+.fl.hot{box-shadow:0 0 0 4px rgba(29,78,216,.22);transform:translateY(-3px)}
+.er .nd rect{fill:#fff;stroke:#93c5fd;stroke-width:2;transition:all .35s}
+.er .nd text{font-family:var(--mono);font-size:14px;font-weight:700;fill:#1e3a8a}
+.er .nd text.k{font-weight:400;font-size:11.5px;fill:#5b6478}
+.er .nd.hot rect{fill:#dbeafe;stroke:#1d4ed8;stroke-width:3}
+.er .ed{stroke:#cbd5e1;stroke-width:2.5;fill:none;transition:all .35s}
+.er .ed.hot{stroke:#1d4ed8;stroke-width:4}
+.er .el{font-family:var(--mono);font-size:11.5px;fill:#94a3b8;transition:fill .35s}
+.er .el.hot{fill:#1d4ed8;font-weight:700}
+table.csv td,table.csv th{font-family:var(--mono);font-size:13.5px;padding:4px 8px;white-space:nowrap;transition:background .35s}
+table.csv th{font-size:12.5px}
+.fname{font-family:var(--mono);font-size:13.5px;font-weight:700;color:var(--blue);margin:6px 0 3px 2px}
+td.hc{background:var(--blue-l)!important;color:var(--blue-d);font-weight:700}
+.big{font-size:44px;font-weight:800;color:var(--blue);font-family:var(--mono);line-height:1}
+.src td,.src th{font-size:15px;padding:7px 10px}
+.src td:first-child{font-weight:700;white-space:nowrap}
+.src a,.ref a{color:var(--blue);text-decoration:none;font-family:var(--mono);font-size:.92em}
+.ref li{font-size:15.5px;line-height:1.38;margin:4px 0}
+.tag{display:inline-block;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;border:1px solid var(--blue-s);color:var(--blue-d);background:var(--blue-xl);vertical-align:2px}
+.tag.g{border-color:var(--gray);color:var(--muted);background:#fff}
+</style>
+</head>
+<body>
+
+<div id="viewport"><div id="deck">
+<!-- ===================== TITLE ===================== -->
+<section class="slide" id="title" data-title="Trang bìa">
+  <div class="title-wrap">
+    <div class="kicker in">// Dữ liệu đầu vào của mọi thuật toán routing trên mạng giao thông công cộng</div>
+    <h1 class="in">GTFS<br><span class="accent">General Transit Feed Specification</span></h1>
+    <p class="in muted" style="font-size:24px;margin-top:20px;max-width:1080px">GTFS là gì, ra đời thế nào, gồm những file gì, các file nối với nhau ra sao, đọc một feed mẫu, biến <code class="i">stop_times.txt</code> thành <b>temporal graph</b> (connection) cho CSA, và tải dataset ở đâu.</p>
+    <p class="in" style="margin-top:30px;font-size:18px;color:var(--muted)">← → hoặc Space: chạy từng bước · Shift+→: qua slide · <b>G</b> hoặc nút <b>☰ Đi tới slide</b>: nhảy tới slide bất kỳ · A: hiện hết · F: toàn màn hình · Nguồn tham khảo: slide cuối</p>
+    <p class="in" style="margin-top:10px;font-size:15px;color:var(--muted)">Spec chính thức: gtfs.org (MobilityData) · github.com/google/transit · số liệu kiểm tra ngày 2026-11-24</p>
+  </div>
+</section>
+
+<!-- ===================== AGENDA ===================== -->
+<section class="slide z1" id="agenda" data-title="Nội dung">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:17px">· bấm vào mục để đi tới</span></div>
+  <div class="agenda in">
+    <div class="sec">1 · Giới thiệu</div>
+    <div class="ag" data-goto="what"><b>01</b>GTFS là gì?</div>
+    <div class="ag" data-goto="origin"><b>02</b>Nguồn gốc: TriMet + Google</div>
+    <div class="ag" data-goto="history"><b>03</b>Lịch sử phát triển</div>
+    <div class="sec">2 · Định dạng &amp; cấu trúc</div>
+    <div class="ag" data-goto="format"><b>04</b>Định dạng: zip + CSV</div>
+    <div class="ag" data-goto="files"><b>05</b>Các file trong feed</div>
+    <div class="ag" data-goto="er"><b>06</b>Quan hệ giữa các file</div>
+    <div class="sec">3 · Ví dụ &amp; sử dụng</div>
+    <div class="ag" data-goto="ex1"><b>07</b>Feed mẫu: lịch &amp; tuyến</div>
+    <div class="ag" data-goto="ex2"><b>08</b>stop_times → connection</div>
+    <div class="ag" data-goto="code"><b>09</b>Đọc GTFS bằng Python</div>
+    <div class="ag" data-goto="pitfall"><b>10</b>Cạm bẫy khi dùng GTFS</div>
+    <div class="ag" data-goto="download"><b>11</b>Nguồn download dataset</div>
+    <div class="ag" data-goto="summary"><b>✓</b>Tổng kết</div>
+    <div class="ag" data-goto="refs"><b>R</b>Tài liệu tham khảo</div>
+  </div>
+</section>
+
+<!-- ===================== 01 WHAT ===================== -->
+<section class="slide" id="what" data-title="01 · GTFS là gì?">
+  <div class="hdr in"><span class="qn">01</span><h2>GTFS là gì?</h2></div>
+  <div class="cols" style="grid-template-columns:1.1fr 1fr">
+    <div>
+      <div class="card in"><h3>Định nghĩa</h3>
+        <p><b>GTFS</b> (General Transit Feed Specification) là <b>định dạng dữ liệu mở</b> để các đơn vị vận tải công cộng (agency) công bố <b>lịch chạy</b> và <b>thông tin địa lý</b> của mạng lưới: tuyến, trạm, chuyến, giờ đến/đi từng trạm.</p></div>
+      <div class="card f" style="margin-top:12px"><h3>Hai thành phần</h3>
+        <ul><li><b>GTFS Schedule</b> (tĩnh): một file <code class="i">.zip</code> chứa các file văn bản CSV. Đây là phần slide này tập trung.</li>
+        <li><b>GTFS Realtime</b>: cập nhật thời gian thực (trễ chuyến, vị trí xe, cảnh báo), mã hoá bằng <b>Protocol Buffers</b>, tham chiếu id của feed Schedule.</li></ul></div>
+    </div>
+    <div>
+      <div class="card f"><h3>Ai dùng?</h3>
+        <ul><li>App chỉ đường: Google Maps, Apple Maps, Transit, Moovit…</li>
+        <li>Phần mềm mã nguồn mở: OpenTripPlanner, R5, MOTIS…</li>
+        <li><b>Nghiên cứu</b>: accessibility, temporal network, centrality của mạng giao thông, chính là input của Kujala (2018) và Huynh &amp; Barthelemy (2022)</li></ul></div>
+      <div class="note f" style="margin-top:12px">Với nhóm temporal graph: một feed GTFS = một <b>temporal graph thực tế</b>. Mỗi cặp trạm liên tiếp của một chuyến là một <b>cạnh có thời gian</b> (u, v, t<sub>dep</sub>, t<sub>arr</sub>).</div>
+    </div>
+  </div>
+  <p class="say">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== 02 ORIGIN ===================== -->
+<section class="slide" id="origin" data-title="02 · Nguồn gốc: TriMet + Google">
+  <div class="hdr in"><span class="qn">02</span><h2>Nguồn gốc: Portland (TriMet) gặp Google, 2005</h2></div>
+  <div class="flow in" style="margin:16px 0 18px">
+    <div class="box" id="oA">TriMet<small>agency ở Portland, Oregon</small></div><div class="ar">→</div>
+    <div class="box" id="oB">CSV export<small>lịch chạy của TriMet</small></div><div class="ar">→</div>
+    <div class="box" id="oC">Google Transit<small>Trip Planner, 12/2005</small></div><div class="ar">→</div>
+    <div class="box" id="oD">Spec công khai<small>agency khác làm theo</small></div>
+  </div>
+  <div class="cols3">
+    <div class="card f" data-now="#oA|c glow"><h3>Vấn đề</h3><p>Khoảng 2005, bản đồ trực tuyến chỉ đường được cho ô tô. Bibiana &amp; Tim McHugh (bộ phận IT của TriMet) muốn có chỉ đường bằng xe buýt/tàu, nhưng mỗi agency lưu lịch theo định dạng riêng.</p></div>
+    <div class="card f" data-now="#oB|c glow;#oC|c glow"><h3>Hợp tác</h3><p>Chris Harrelson (Google) đang thử đưa dữ liệu transit vào Google Maps. TriMet xuất lịch chạy thành các file CSV đơn giản; Google xây Trip Planner trên đó, ra mắt <b>12/2005</b> với Portland là thành phố đầu tiên.</p></div>
+    <div class="card f" data-now="#oD|c glow"><h3>Thành chuẩn</h3><p>Định dạng CSV được công bố để agency khác tự xuất dữ liệu. Thiết kế cố ý <b>đơn giản</b> (đọc được bằng Excel) nên lan nhanh và trở thành chuẩn <i>de facto</i>.</p></div>
+  </div>
+  <div class="note f" style="margin-top:14px">Câu chuyện được chính Bibiana McHugh kể lại trong chương "Pioneering Open Data Standards: The GTFS Story", sách <i>Beyond Transparency</i> (2013), xem slide Tài liệu tham khảo.</div>
+  <p class="say">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== 03 HISTORY ===================== -->
+<section class="slide" id="history" data-title="03 · Lịch sử phát triển">
+  <div class="hdr in"><span class="qn">03</span><h2>Lịch sử: từ "Google Transit Feed" đến chuẩn mở toàn cầu</h2></div>
+  <div class="cols" style="grid-template-columns:1.35fr 1fr">
+    <div class="tl">
+      <div class="ev f" id="e1" data-now="#e1|hot"><span class="y">2005</span><p style="display:inline">Google Transit Trip Planner ra mắt với dữ liệu TriMet (Portland). Tên ban đầu: <b>Google Transit Feed Specification</b>.</p></div>
+      <div class="ev f" id="e2" data-now="#e2|hot"><span class="y">2009–10</span><p style="display:inline">Đổi tên thành <b>General Transit Feed Specification</b> để agency và hãng khác dễ chấp nhận. <span class="muted">(Nguồn ghi 2009 là lúc đề xuất, 2010 là đổi chính thức.)</span></p></div>
+      <div class="ev f" id="e3" data-now="#e3|hot"><span class="y">2011</span><p style="display:inline">Google công bố <b>GTFS Realtime</b> (08/2011): Trip Updates, Vehicle Positions, Service Alerts; giấy phép CC BY 3.0 như GTFS.</p></div>
+      <div class="ev f" id="e4" data-now="#e4|hot"><span class="y">2016</span><p style="display:inline">Kho lưu trữ cộng đồng <b>GTFS Data Exchange</b> (2008–2016) đóng cửa; TransitFeeds / OpenMobilityData thay thế.</p></div>
+      <div class="ev f" id="e5" data-now="#e5|hot"><span class="y">nay</span><p style="display:inline">Tổ chức phi lợi nhuận <b>MobilityData</b> điều phối spec tại <b>gtfs.org</b>; mở rộng: Fares v2, GTFS-Flex, pathways… Thay đổi qua pull request + bỏ phiếu ở github.com/google/transit.</p></div>
+      <div class="ev f" id="e6" data-now="#e6|hot"><span class="y">12/2025</span><p style="display:inline">Dữ liệu lịch sử của TransitFeeds được chuyển vào <b>Mobility Database</b> (theo FAQ của mobilitydatabase.org).</p></div>
+    </div>
+    <div>
+      <div class="card f"><h3>Bài học thiết kế</h3>
+        <ul><li><b>Đơn giản thắng</b>: CSV + zip, không cần XML schema như các chuẩn châu Âu (TransXChange, NeTEx)</li>
+        <li><b>Có người dùng ngay</b>: Google Maps là động lực để agency công bố dữ liệu</li>
+        <li><b>Tiến hoá có quản trị</b>: thêm trường mới nhưng giữ tương thích ngược</li></ul></div>
+      <div class="note f" style="margin-top:12px">Năm đổi tên các nguồn ghi khác nhau (2009 hoặc 2010); slide ghi cả hai. Năm MobilityData nhận điều phối: <b>(chưa xác minh)</b>, nên không ghi.</div>
+    </div>
+  </div>
+  <p class="say">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== 04 FORMAT ===================== -->
+<section class="slide" id="format" data-title="04 · Định dạng: zip + CSV">
+  <div class="hdr in"><span class="qn">04</span><h2>Định dạng: một file zip, bên trong là các bảng CSV</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1.05fr">
+    <div>
+      <div class="card in"><h3>Quy tắc chung</h3>
+        <ul><li>Feed = <code class="i">gtfs.zip</code>; các file <code class="i">.txt</code> nằm ở <b>gốc</b> zip (không có thư mục con)</li>
+        <li>Mỗi file là CSV, <b>UTF-8</b>, dòng đầu là tên cột; cột không bắt buộc có thể bỏ</li>
+        <li>Quan hệ giữa các file qua <b>id</b> (khoá ngoại): <code class="i">route_id</code>, <code class="i">trip_id</code>, <code class="i">stop_id</code>, <code class="i">service_id</code>…</li></ul></div>
+      <div class="card f" style="margin-top:12px"><h3>Kiểu dữ liệu hay gặp</h3>
+        <table class="t1" style="font-size:16px">
+          <tr><td>Time</td><td><code class="i">HH:MM:SS</code>, tính từ "ngày phục vụ"; <b>có thể ≥ 24:00:00</b>, vd <code class="i">25:35:00</code> = 1:35 sáng hôm sau</td></tr>
+          <tr><td>Date</td><td><code class="i">YYYYMMDD</code>, vd <code class="i">20260902</code></td></tr>
+          <tr><td>Timezone</td><td>tên IANA, vd <code class="i">Asia/Ho_Chi_Minh</code></td></tr>
+          <tr><td>Toạ độ</td><td>WGS84: <code class="i">stop_lat</code>, <code class="i">stop_lon</code></td></tr>
+        </table></div>
+    </div>
+    <div>
+      <div class="card f"><h3><code class="i">route_type</code>: loại phương tiện</h3>
+        <table class="acc" style="font-size:16px">
+          <tr><th>Mã</th><th>Phương tiện</th><th>Mã</th><th>Phương tiện</th></tr>
+          <tr><td>0</td><td style="text-align:left">Tram / light rail</td><td>5</td><td style="text-align:left">Cable tram</td></tr>
+          <tr><td>1</td><td style="text-align:left">Subway / metro</td><td>6</td><td style="text-align:left">Aerial lift (cáp treo)</td></tr>
+          <tr><td>2</td><td style="text-align:left">Rail (tàu liên tỉnh)</td><td>7</td><td style="text-align:left">Funicular</td></tr>
+          <tr class="hlr"><td>3</td><td style="text-align:left"><b>Bus</b></td><td>11</td><td style="text-align:left">Trolleybus</td></tr>
+          <tr><td>4</td><td style="text-align:left">Ferry</td><td>12</td><td style="text-align:left">Monorail</td></tr>
+        </table></div>
+      <div class="note f" style="margin-top:12px">Giờ ≥ 24:00:00 giúp một chuyến chạy qua nửa đêm vẫn thuộc <b>một ngày phục vụ</b>. Khi dựng temporal graph phải đổi về <b>giây tuyệt đối</b> (ngày × 86400 + giây) thay vì đọc như giờ đồng hồ.</div>
+    </div>
+  </div>
+  <p class="say">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== 05 FILES ===================== -->
+<section class="slide" id="files" data-title="05 · Các file trong feed">
+  <div class="hdr in"><span class="qn">05</span><h2>Các file trong một feed GTFS Schedule</h2></div>
+  <div class="legend in"><span><i style="background:var(--blue-xl);border:2px solid var(--blue)"></i>bắt buộc</span><span><i style="border:2px dashed var(--blue-s)"></i>bắt buộc có điều kiện</span><span><i style="border:2px solid var(--line)"></i>tuỳ chọn</span></div>
+  <div class="zip in" style="margin-top:8px">
+    <div class="fl req" id="fAg">agency.txt</div><div class="fl req" id="fRo">routes.txt</div><div class="fl req" id="fTr">trips.txt</div><div class="fl req" id="fSt">stop_times.txt</div>
+    <div class="fl cond" id="fSp">stops.txt</div><div class="fl cond" id="fCa">calendar.txt</div><div class="fl cond" id="fCd">calendar_dates.txt</div><div class="fl cond" id="fFi">feed_info.txt</div>
+    <div class="fl opt" id="fSh">shapes.txt</div><div class="fl opt" id="fFr">frequencies.txt</div><div class="fl opt" id="fTf">transfers.txt</div><div class="fl opt" id="fPa">pathways.txt · levels.txt</div>
+    <div class="fl opt" id="fFa">fare_attributes · fare_rules</div><div class="fl opt" id="fF2">fare_products · fare_leg_rules…</div><div class="fl opt" id="fTl">translations · attributions</div><div class="fl opt" id="fFx">locations.geojson · booking_rules…</div>
+  </div>
+  <div class="cols3" style="margin-top:14px">
+    <div class="card f" data-now="#fAg,#fRo,#fTr,#fSt,#fSp|hot"><h3>Mạng lưới &amp; giờ chạy</h3><p><b>agency</b>: đơn vị vận hành · <b>routes</b>: tuyến · <b>trips</b>: chuyến (một lần chạy của tuyến) · <b>stop_times</b>: giờ đến/đi tại từng trạm của mỗi chuyến · <b>stops</b>: trạm + toạ độ.</p></div>
+    <div class="card f" data-now="#fCa,#fCd,#fFr|hot"><h3>Khi nào chạy</h3><p><b>calendar</b>: chạy các thứ nào trong khoảng ngày · <b>calendar_dates</b>: ngoại lệ (thêm/bỏ ngày lễ). Cần ít nhất một trong hai. <b>frequencies</b>: chuyến theo tần suất ("10 phút/chuyến").</p></div>
+    <div class="card f" data-now="#fSh,#fTf,#fPa,#fFa,#fF2,#fTl,#fFx,#fFi|hot"><h3>Bổ sung</h3><p><b>shapes</b>: hình học đường đi · <b>transfers</b>: quy tắc đổi tuyến (thời gian tối thiểu) · <b>pathways/levels</b>: lối đi trong nhà ga · <b>fare_*</b>: giá vé · <b>feed_info</b>: phiên bản feed · Flex: dịch vụ theo yêu cầu.</p></div>
+  </div>
+  <div class="note f" style="margin-top:12px">"Bắt buộc có điều kiện": vd <code class="i">stops.txt</code> chỉ được bỏ khi feed dùng vùng GTFS-Flex; <code class="i">feed_info.txt</code> bắt buộc nếu có <code class="i">translations.txt</code>. Danh sách đầy đủ: <b>gtfs.org/documentation/schedule/reference</b>.</div>
+  <p class="say">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== 06 ER ===================== -->
+<section class="slide" id="er" data-title="06 · Quan hệ giữa các file">
+  <div class="hdr in"><span class="qn">06</span><h2>Quan hệ giữa các file: một CSDL quan hệ thu nhỏ</h2></div>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr">
+    <div class="card in" style="padding:8px">
+      <svg class="er" width="100%" viewBox="0 0 660 370" style="display:block">
+        <line class="ed" id="eAR" x1="160" y1="46" x2="255" y2="46"/><text class="el" id="lAR" x="207" y="38" text-anchor="middle">agency_id</text>
+        <line class="ed" id="eRT" x1="330" y1="72" x2="330" y2="150"/><text class="el" id="lRT" x="337" y="126">route_id</text>
+        <line class="ed" id="eTC" x1="255" y1="176" x2="160" y2="176"/><text class="el" id="lTC" x="207" y="168" text-anchor="middle">service_id</text>
+        <path class="ed" id="eTD" d="M255 192 H222 V266 H160"/><text class="el" id="lTD" x="228" y="240">service_id</text>
+        <line class="ed" id="eTS" x1="405" y1="176" x2="500" y2="176"/><text class="el" id="lTS" x="452" y="168" text-anchor="middle">shape_id</text>
+        <line class="ed" id="eTT" x1="330" y1="202" x2="330" y2="300"/><text class="el" id="lTT" x="337" y="256">trip_id</text>
+        <line class="ed" id="eSS" x1="405" y1="326" x2="500" y2="326"/><text class="el" id="lSS" x="452" y="318" text-anchor="middle">stop_id</text>
+        <path class="ed" id="eTF" d="M575 72 V112 H405"/><text class="el" id="lTF" x="480" y="106" text-anchor="middle">trip_id</text>
+        <g class="nd" id="nAg"><rect x="10" y="20" width="150" height="52" rx="10"/><text x="85" y="42" text-anchor="middle">agency</text><text class="k" x="85" y="60" text-anchor="middle">agency_id, timezone</text></g>
+        <g class="nd" id="nRo"><rect x="255" y="20" width="150" height="52" rx="10"/><text x="330" y="42" text-anchor="middle">routes</text><text class="k" x="330" y="60" text-anchor="middle">route_id, route_type</text></g>
+        <g class="nd" id="nFr"><rect x="500" y="20" width="150" height="52" rx="10"/><text x="575" y="42" text-anchor="middle">frequencies</text><text class="k" x="575" y="60" text-anchor="middle">headway_secs</text></g>
+        <g class="nd" id="nTr"><rect x="255" y="150" width="150" height="52" rx="10"/><text x="330" y="172" text-anchor="middle">trips</text><text class="k" x="330" y="190" text-anchor="middle">trip_id</text></g>
+        <g class="nd" id="nCa"><rect x="10" y="150" width="150" height="52" rx="10"/><text x="85" y="172" text-anchor="middle">calendar</text><text class="k" x="85" y="190" text-anchor="middle">monday…sunday</text></g>
+        <g class="nd" id="nCd"><rect x="10" y="240" width="150" height="52" rx="10"/><text x="85" y="262" text-anchor="middle">calendar_dates</text><text class="k" x="85" y="280" text-anchor="middle">date, exception_type</text></g>
+        <g class="nd" id="nSh"><rect x="500" y="150" width="150" height="52" rx="10"/><text x="575" y="172" text-anchor="middle">shapes</text><text class="k" x="575" y="190" text-anchor="middle">lat, lon, sequence</text></g>
+        <g class="nd" id="nSt"><rect x="255" y="300" width="150" height="52" rx="10"/><text x="330" y="322" text-anchor="middle">stop_times</text><text class="k" x="330" y="340" text-anchor="middle">arrival, departure</text></g>
+        <g class="nd" id="nSp"><rect x="500" y="300" width="150" height="52" rx="10"/><text x="575" y="322" text-anchor="middle">stops</text><text class="k" x="575" y="340" text-anchor="middle">stop_lat, stop_lon</text></g>
+      </svg>
+    </div>
+    <div>
+      <div class="card f" data-now="#nAg,#nRo,#eAR,#lAR,#nTr,#eRT,#lRT|hot"><h3>① Ai chạy tuyến nào, chuyến nào</h3><p>agency 1–n routes 1–n trips. Một <b>trip</b> là một lần xe chạy hết tuyến theo một chiều.</p></div>
+      <div class="card f" style="margin-top:8px" data-now="#nTr,#nCa,#nCd,#eTC,#lTC,#eTD,#lTD|hot"><h3>② Chuyến chạy ngày nào</h3><p><code class="i">service_id</code> trỏ tới lịch tuần (calendar) và các ngày ngoại lệ (calendar_dates).</p></div>
+      <div class="card f" style="margin-top:8px" data-now="#nTr,#nSt,#nSp,#eTT,#lTT,#eSS,#lSS|hot"><h3>③ Chuyến ghé trạm nào, lúc mấy giờ</h3><p><b>stop_times</b> là bảng nối n–n giữa trips và stops, sắp theo <code class="i">stop_sequence</code>. Đây là bảng <b>lớn nhất</b> và là nơi chứa cạnh thời gian.</p></div>
+      <div class="card f" style="margin-top:8px" data-now="#nTr,#nSh,#eTS,#lTS,#nFr,#eTF,#lTF|hot"><h3>④ Hình học &amp; tần suất</h3><p>shapes vẽ đường đi trên bản đồ; frequencies nhân một trip mẫu thành nhiều chuyến theo headway.</p></div>
+    </div>
+  </div>
+  <p class="say">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== 07 EXAMPLE 1 ===================== -->
+<section class="slide" id="ex1" data-title="07 · Feed mẫu: lịch & tuyến">
+  <div class="hdr in"><span class="qn">07</span><h2>Ví dụ: feed mẫu "Demo Bus" (tự tạo để minh hoạ)</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:18px">
+    <div class="in">
+      <div class="fname">agency.txt</div>
+      <table class="csv"><tr><th>agency_id</th><th>agency_name</th><th>agency_url</th><th>agency_timezone</th></tr>
+        <tr><td id="a1">DEMO</td><td>Demo Bus</td><td>https://example.org</td><td>Asia/Ho_Chi_Minh</td></tr></table>
+      <div class="fname">routes.txt</div>
+      <table class="csv"><tr><th>route_id</th><th>agency_id</th><th>route_short_name</th><th>route_long_name</th><th>route_type</th></tr>
+        <tr><td id="r1">R1</td><td id="a2">DEMO</td><td>01</td><td>A – C</td><td>3</td></tr>
+        <tr><td id="r2">R2</td><td id="a3">DEMO</td><td>02</td><td>B – D</td><td>3</td></tr></table>
+      <div class="fname">trips.txt</div>
+      <table class="csv"><tr><th>route_id</th><th>service_id</th><th>trip_id</th><th>direction_id</th></tr>
+        <tr><td id="t1r">R1</td><td id="t1s">WK</td><td id="t1">T1</td><td>0</td></tr>
+        <tr><td id="t2r">R1</td><td id="t2s">WK</td><td id="t2">T2</td><td>0</td></tr>
+        <tr><td id="t3r">R2</td><td id="t3s">WE</td><td id="t3">T3</td><td>0</td></tr></table>
+    </div>
+    <div class="in">
+      <div class="fname">stops.txt</div>
+      <table class="csv"><tr><th>stop_id</th><th>stop_name</th><th>stop_lat</th><th>stop_lon</th></tr>
+        <tr><td>S1</td><td>Trạm A</td><td>10.7700</td><td>106.6900</td></tr>
+        <tr><td>S2</td><td>Trạm B</td><td>10.7750</td><td>106.7000</td></tr>
+        <tr><td>S3</td><td>Trạm C</td><td>10.7800</td><td>106.7100</td></tr>
+        <tr><td>S4</td><td>Trạm D</td><td>10.7900</td><td>106.7000</td></tr></table>
+      <div class="fname">calendar.txt <span class="muted" style="font-weight:400">(7 cột monday…sunday gộp lại cho gọn)</span></div>
+      <table class="csv"><tr><th>service_id</th><th>monday … sunday</th><th>start_date</th><th>end_date</th></tr>
+        <tr><td id="cWK">WK</td><td>1 1 1 1 1 0 0</td><td>20260101</td><td>20261231</td></tr>
+        <tr><td id="cWE">WE</td><td>0 0 0 0 0 1 1</td><td>20260101</td><td>20261231</td></tr></table>
+      <div class="fname">calendar_dates.txt</div>
+      <table class="csv"><tr><th>service_id</th><th>date</th><th>exception_type</th></tr>
+        <tr><td id="dWK">WK</td><td id="dD">20260902</td><td id="dE">2</td></tr></table>
+      <span class="f ghost" data-now="#a1,#a2,#a3|hc" data-say="<b>agency_id = DEMO</b>: cả hai tuyến R1, R2 do Demo Bus vận hành; giờ trong feed hiểu theo múi <b>Asia/Ho_Chi_Minh</b>."></span>
+      <span class="f ghost" data-now="#r1,#t1r,#t2r|hc" data-say="<b>route_id = R1</b> có hai chuyến <b>T1, T2</b> (cùng chiều, direction_id = 0). Tuyến R2 có một chuyến T3. route_type = 3 là bus."></span>
+      <span class="f ghost" data-now="#t1s,#t2s,#cWK|hc" data-say="T1, T2 có <b>service_id = WK</b>: chạy thứ Hai → thứ Sáu, từ 01/01 đến 31/12/2026. T3 thuộc WE: chỉ cuối tuần."></span>
+      <span class="f ghost" data-now="#dWK,#dD,#dE|hc" data-say="Ngoại lệ: <b>exception_type = 2</b> (bỏ dịch vụ) ngày <b>2026-09-02</b> (Quốc khánh, thứ Tư). Hôm đó T1, T2 <b>không chạy</b>. exception_type = 1 là thêm ngày."></span>
+    </div>
+  </div>
+  <p class="say" style="margin-top:6px">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== 08 EXAMPLE 2: stop_times -> connections ===================== -->
+<section class="slide" id="ex2" data-title="08 · stop_times → connection">
+  <div class="hdr in"><span class="qn">08</span><h2>stop_times.txt → danh sách connection (temporal graph)</h2></div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:20px">
+    <div class="in">
+      <div class="fname">stop_times.txt</div>
+      <table class="csv"><tr><th>trip_id</th><th>arrival_time</th><th>departure_time</th><th>stop_id</th><th>stop_sequence</th></tr>
+        <tr id="s1"><td>T1</td><td>08:00:00</td><td>08:00:00</td><td>S1</td><td>1</td></tr>
+        <tr id="s2"><td>T1</td><td>08:10:00</td><td>08:11:00</td><td>S2</td><td>2</td></tr>
+        <tr id="s3"><td>T1</td><td>08:25:00</td><td>08:25:00</td><td>S3</td><td>3</td></tr>
+        <tr id="s4"><td>T2</td><td>08:30:00</td><td>08:30:00</td><td>S1</td><td>1</td></tr>
+        <tr id="s5"><td>T2</td><td>08:40:00</td><td>08:41:00</td><td>S2</td><td>2</td></tr>
+        <tr id="s6"><td>T2</td><td>08:55:00</td><td>08:55:00</td><td>S3</td><td>3</td></tr>
+        <tr id="s7"><td>T3</td><td>23:50:00</td><td>23:50:00</td><td>S2</td><td>1</td></tr>
+        <tr id="s8"><td>T3</td><td><b>24:05:00</b></td><td><b>24:05:00</b></td><td>S4</td><td>2</td></tr>
+      </table>
+      <p class="muted" style="font-size:15px;margin-top:6px">T1 dừng ở S2 từ 08:10 đến 08:11 (dwell time 1 phút): arrival ≠ departure.</p>
+    </div>
+    <div>
+      <div class="fname">connection = (u, v, t<sub>dep</sub>, t<sub>arr</sub>, trip)</div>
+      <table class="csv"><tr><th>u</th><th>v</th><th>t_dep</th><th>t_arr</th><th>trip</th></tr>
+        <tr class="f" data-now="#s1,#s2|hlr"><td>S1</td><td>S2</td><td>08:00</td><td>08:10</td><td>T1</td></tr>
+        <tr class="f" data-now="#s2,#s3|hlr"><td>S2</td><td>S3</td><td>08:11</td><td>08:25</td><td>T1</td></tr>
+        <tr class="f" data-now="#s4,#s5|hlr"><td>S1</td><td>S2</td><td>08:30</td><td>08:40</td><td>T2</td></tr>
+        <tr class="f" data-now="#s5,#s6|hlr"><td>S2</td><td>S3</td><td>08:41</td><td>08:55</td><td>T2</td></tr>
+        <tr class="f" data-now="#s7,#s8|hlr"><td>S2</td><td>S4</td><td>23:50</td><td>24:05</td><td>T3</td></tr>
+      </table>
+      <div class="note f" style="margin-top:12px">Quy tắc: với mỗi trip, sắp theo <code class="i">stop_sequence</code>; hai dòng liên tiếp i, i+1 cho một connection: <b>t<sub>dep</sub> = departure_time[i]</b>, <b>t<sub>arr</sub> = arrival_time[i+1]</b>. Một trip k trạm → k−1 connection.</div>
+      <div class="note blue f" style="margin-top:8px">Sắp toàn bộ connection theo t<sub>dep</sub> ta được đúng <b>mảng connection</b> mà CSA / mcpCSA quét. Lọc theo ngày: chỉ giữ trip có service chạy ngày đó (vd 2026-09-02 thì bỏ T1, T2).</div>
+    </div>
+  </div>
+  <p class="say">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== 09 CODE ===================== -->
+<section class="slide" id="code" data-title="09 · Đọc GTFS bằng Python">
+  <div class="hdr in"><span class="qn">09</span><h2>Đọc GTFS bằng Python: từ zip tới mảng connection</h2></div>
+  <div class="cols" style="grid-template-columns:1.6fr 1fr">
+    <div class="in">
+<script type="text/x-py" id="pyC" data-title="gtfs_to_connections.py (pandas, minh hoạ; chưa lọc theo ngày)" data-mark="7-8:a;10-11:b;12-16:c;17:d">
+import zipfile, pandas as pd
+
+def sec(hms):                    # cho phép giờ >= 24
+    h, m, s = map(int, hms.split(":"))
+    return 3600*h + 60*m + s
+
+z = zipfile.ZipFile("gtfs.zip")
+st = pd.read_csv(z.open("stop_times.txt"), dtype=str)
+
+st["stop_sequence"] = st["stop_sequence"].astype(int)
+st = st.sort_values(["trip_id", "stop_sequence"])
+nxt = st.groupby("trip_id").shift(-1)   # dòng i+1
+c = pd.DataFrame({"trip": st.trip_id,
+    "u": st.stop_id, "v": nxt.stop_id,
+    "dep": st.departure_time, "arr": nxt.arrival_time}).dropna()
+c["t_dep"], c["t_arr"] = c.dep.map(sec), c.arr.map(sec)
+c = c.sort_values("t_dep")              # mảng connection
+</script>
+    </div>
+    <div>
+      <div class="card f" data-now="#pyC|show-a"><h3>① Đọc file trong zip</h3><p>Đọc thẳng từ zip; <code class="i">dtype=str</code> để id như <code class="i">"007"</code> không bị đổi thành số.</p></div>
+      <div class="card f" style="margin-top:8px" data-now="#pyC|show-b"><h3>② Sắp theo trip + sequence</h3><p>stop_sequence chỉ cần <b>tăng dần</b>, không nhất thiết liên tiếp 1, 2, 3.</p></div>
+      <div class="card f" style="margin-top:8px" data-now="#pyC|show-c"><h3>③ Ghép dòng i với i+1</h3><p><code class="i">shift(-1)</code> trong từng trip; dòng cuối không có "kế tiếp" nên bị <code class="i">dropna</code>. Trạm không có giờ (non-timepoint) cũng bị bỏ: cần nội suy nếu muốn giữ.</p></div>
+      <div class="card f" style="margin-top:8px" data-now="#pyC|show-d"><h3>④ Thư viện có sẵn</h3><p><b>gtfspy</b> (Aalto, nhóm Kujala), <b>gtfs_kit</b>, <b>partridge</b>; kiểm tra chất lượng feed bằng <b>gtfs-validator</b> của MobilityData.</p></div>
+    </div>
+  </div>
+  <p class="say">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== 10 PITFALLS ===================== -->
+<section class="slide z1" id="pitfall" data-title="10 · Cạm bẫy khi dùng GTFS">
+  <div class="hdr in"><span class="qn">10</span><h2>Cạm bẫy khi dùng GTFS cho nghiên cứu</h2></div>
+  <div class="cols">
+    <div class="card f"><h3>Thời gian &amp; ngày</h3>
+      <ul><li>Giờ ≥ 24:00:00; chuyến qua đêm thuộc ngày phục vụ trước</li>
+      <li>Phải hợp nhất <b>calendar + calendar_dates</b> để biết chuyến nào chạy ngày nào; chọn một "ngày điển hình" và ghi rõ trong paper</li>
+      <li><b>frequencies.txt</b>: phải nhân trip mẫu ra nhiều chuyến, nếu không sẽ thiếu cạnh</li></ul></div>
+    <div class="card f"><h3>Không gian &amp; đổi tuyến</h3>
+      <ul><li>GTFS <b>thường không có</b> cạnh đi bộ giữa các trạm: phải tự thêm (vd khoảng cách OSM như Kujala 2018)</li>
+      <li><b>transfers.txt</b> có min_transfer_time nhưng nhiều feed bỏ trống; giả định transfer margin ảnh hưởng kết quả</li>
+      <li>Trạm cha/con (<code class="i">parent_station</code>): gộp hay tách thay đổi kích thước đồ thị</li></ul></div>
+  </div>
+  <div class="cols" style="margin-top:12px">
+    <div class="card f"><h3>Chất lượng dữ liệu</h3>
+      <ul><li>Feed có lỗi: giờ giảm dần, trạm trùng toạ độ, tốc độ phi lý → chạy validator trước</li>
+      <li>Feed thay đổi theo thời gian: ghi <b>phiên bản / ngày tải</b> để tái lập</li></ul></div>
+    <div class="card f"><h3>Giấy phép</h3>
+      <ul><li>Mỗi agency có licence riêng; một số cấm dùng thương mại hoặc phân phối lại</li>
+      <li>Kujala et al. 2018 (Sci. Data) đã loại một số thành phố vì licence không cho phép</li></ul></div>
+  </div>
+  <p class="say">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== 11 DOWNLOAD ===================== -->
+<section class="slide" id="download" data-title="11 · Nguồn download dataset">
+  <div class="hdr in"><span class="qn">11</span><h2>Tải GTFS dataset ở đâu?</h2></div>
+  <table class="src in">
+    <tr><th style="width:230px">Nguồn</th><th>Nội dung</th><th style="width:300px">Link</th></tr>
+    <tr class="f"><td>Mobility Database <span class="tag">khuyên dùng</span></td><td>Catalog của MobilityData: nhiều nghìn feed GTFS / GTFS-RT / GBFS toàn cầu, có bản lưu lịch sử, kết quả validator, API; đã nhận dữ liệu cũ của TransitFeeds</td><td><a href="https://mobilitydatabase.org" target="_blank">mobilitydatabase.org</a></td></tr>
+    <tr class="f"><td>Transitland</td><td>Catalog mở của Interline, lưu lịch sử phiên bản feed, có REST API và bản đồ tra cứu</td><td><a href="https://www.transit.land" target="_blank">transit.land</a></td></tr>
+    <tr class="f"><td>Kujala et al. 2018 <span class="tag">nghiên cứu</span></td><td>25 thành phố đã làm sạch, lọc không gian/thời gian, thêm cạnh đi bộ OSM; xuất sẵn edge list, <b>temporal event list</b>, SQLite, GeoJSON, GTFS. Phù hợp làm benchmark temporal graph</td><td><a href="https://doi.org/10.1038/sdata.2018.89" target="_blank">doi:10.1038/sdata.2018.89</a><br><a href="https://transportnetworks.cs.aalto.fi" target="_blank">transportnetworks.cs.aalto.fi</a></td></tr>
+    <tr class="f"><td>Cổng open data của agency</td><td>Tải trực tiếp từ đơn vị vận hành: vd HSL (Helsinki), MTA (New York), VBB (Berlin), Île-de-France Mobilités (Paris)… Luôn đọc licence</td><td><span class="muted">trang "developers / open data" của từng agency</span></td></tr>
+    <tr class="f"><td>TransitFeeds / OpenMobilityData <span class="tag g">cũ</span></td><td>Không còn được duy trì; dữ liệu lịch sử đã chuyển sang Mobility Database (12/2025). Vẫn gặp trong paper cũ</td><td><span class="muted">transitfeeds.com</span></td></tr>
+    <tr class="f"><td>GTFS Data Exchange <span class="tag g">cũ</span></td><td>Đóng năm 2016; bản lưu 2008–2016 (~93 GB) có thể xin qua MobilityData</td><td><span class="muted">gtfs-data-exchange.com</span></td></tr>
+  </table>
+  <div class="note f" style="margin-top:10px">Việt Nam: chưa tìm thấy feed GTFS chính thức công khai của TP.HCM / Hà Nội trong các catalog trên <b>(chưa xác minh đầy đủ, cần tra lại Mobility Database trước khi dùng)</b>.</div>
+  <p class="say">Nhấn → để chạy từng bước.</p>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="slide z1" id="summary" data-title="Tổng kết">
+  <div class="hdr in"><span class="qn">✓</span><h2>Tổng kết</h2></div>
+  <div class="cols4" style="margin-top:10px">
+    <div class="card f"><h3>Là gì</h3><p>Chuẩn mở mô tả lịch chạy giao thông công cộng: zip chứa các bảng CSV nối nhau bằng id. Có thêm GTFS Realtime (protobuf).</p></div>
+    <div class="card f"><h3>Từ đâu</h3><p>TriMet (Portland) + Google, 2005; đổi tên "General" năm 2009–10; nay do MobilityData điều phối tại gtfs.org.</p></div>
+    <div class="card f"><h3>Cốt lõi</h3><p>agency → routes → trips → stop_times ← stops; calendar / calendar_dates cho biết ngày chạy.</p></div>
+    <div class="card f"><h3>Cho nghiên cứu</h3><p>stop_times → connection (u, v, t<sub>dep</sub>, t<sub>arr</sub>) = temporal graph thực; tải từ Mobility Database, Transitland, Kujala 25 cities.</p></div>
+  </div>
+  <div class="note blue f" style="margin-top:20px">Khi viết paper: ghi rõ <b>nguồn feed, ngày tải, ngày phục vụ được chọn, cách thêm cạnh đi bộ và transfer margin</b>. Đây là những chỗ reviewer hay hỏi và là nguồn sai khác chính khi so với baseline.</div>
+</section>
+
+<!-- ===================== REFS ===================== -->
+<section class="slide" id="refs" data-title="Tài liệu tham khảo">
+  <div class="hdr in"><span class="qn">R</span><h2>Tài liệu tham khảo (đã kiểm tra 2026-11-24)</h2></div>
+  <div class="cols in" style="gap:18px">
+    <ul class="ref">
+      <li><b>GTFS Schedule Reference</b>, MobilityData. <a href="https://gtfs.org/documentation/schedule/reference/" target="_blank">gtfs.org/documentation/schedule/reference</a> <span class="tag g">spec</span></li>
+      <li><b>google/transit</b>: repo quản lý thay đổi spec. <a href="https://github.com/google/transit" target="_blank">github.com/google/transit</a></li>
+      <li>B. McHugh (2013). "Pioneering Open Data Standards: The GTFS Story". In <i>Beyond Transparency</i>, Code for America. <a href="https://beyondtransparency.org/part-2/pioneering-open-data-standards-the-gtfs-story/" target="_blank">beyondtransparency.org</a> <span class="tag g">chương sách</span></li>
+      <li>Google (08/2011). "Introducing GTFS-realtime to exchange realtime transit updates". <a href="https://developers.googleblog.com/2011/08/introducing-gtfs-realtime-to-exchange.html" target="_blank">developers.googleblog.com</a> <span class="tag g">blog</span></li>
+      <li>Streetsblog (01/2010). "How Google and Portland's TriMet set the standard for open transit data". <a href="https://sf.streetsblog.org/2010/01/05/how-google-and-portlands-trimet-set-the-standard-for-open-transit-data" target="_blank">sf.streetsblog.org</a></li>
+    </ul>
+    <ul class="ref">
+      <li>R. Kujala, C. Weckström, R. K. Darst, M. N. Mladenović, J. Saramäki (2018). "A collection of public transport network data sets for 25 cities". <i>Scientific Data</i> 5, 180089. <a href="https://doi.org/10.1038/sdata.2018.89" target="_blank">doi:10.1038/sdata.2018.89</a> <span class="tag">peer-reviewed</span></li>
+      <li>R. Kujala et al. (2018). "Travel times and transfers in public transport…". <i>CEUS</i> 67, 41–54. <a href="https://doi.org/10.1016/j.compenvurbsys.2017.08.012" target="_blank">doi:10.1016/j.compenvurbsys.2017.08.012</a> <span class="tag">peer-reviewed</span></li>
+      <li>Mobility Database &amp; FAQ (TransitFeeds migration). <a href="https://mobilitydatabase.org/faq" target="_blank">mobilitydatabase.org/faq</a></li>
+      <li>Transitland. <a href="https://www.transit.land" target="_blank">transit.land</a></li>
+      <li>GTFS (Wikipedia), mục lịch sử. <a href="https://en.wikipedia.org/wiki/GTFS" target="_blank">en.wikipedia.org/wiki/GTFS</a> <span class="tag g">tham khảo phụ</span></li>
+    </ul>
+  </div>
+</section>
+
+</div></div>
+
+<div id="bar"></div>
+<div id="hint">← → / Space: từng bước · Shift+→: qua slide · G: đi tới slide bất kỳ · A: hiện hết · F: toàn màn hình</div>
+<div id="nav"><button id="jumpNav" title="Đi tới slide (G)">☰</button><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
+<div id="jump"><div id="jbox"><div class="jh"><h3>Đi tới slide</h3><span class="muted" style="font-size:14px">gõ số hoặc tên slide rồi Enter</span><input id="jq" placeholder="vd: 5 hoặc profile" autocomplete="off"><button id="jx" aria-label="Đóng">×</button></div><div id="jlist"></div></div></div>
+
+<script>
+(function(){
+  // ---------- Python highlighter ----------
+  const KW=new Set("def return if else elif for while in not and or import from as with lambda class try except pass break continue yield None True False".split(" "));
+  const PRIM=new Set("int str float dict list set tuple".split(" "));
+  const STD=new Set("print len map zip sorted".split(" "));const LIBT=new Set("pd DataFrame".split(" "));
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function hlLine(line){
+    const re=/(#.*$)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(\b\B)|\b(\d+(?:\.\d+)?[fFL]?)\b|\b([A-Za-z_]\w*)\b(\s*\()?/g;
+    let out="",last=0,m;
+    while((m=re.exec(line))){
+      out+=esc(line.slice(last,m.index));
+      if(m[1]) out+='<span class="c">'+esc(m[1])+'</span>';
+      else if(m[2]) out+='<span class="s">'+esc(m[2])+'</span>';
+      else if(m[3]) out+='<span class="p">'+m[3]+'</span>';
+      else if(m[4]) out+='<span class="n">'+m[4]+'</span>';
+      else if(m[5]){
+        const w=m[5];let cls="";
+        if(PRIM.has(w)||LIBT.has(w))cls="t";else if(KW.has(w))cls="k";else if(STD.has(w))cls="fn";
+        else if(m[6])cls="fn";
+        else if(/^[A-Z][A-Z0-9_]+$/.test(w))cls="n";
+        else if(/^[A-Z]/.test(w))cls="t";
+        out+=(cls?'<span class="'+cls+'">'+w+'</span>':w)+(m[6]?esc(m[6]):"");
+      }
+      last=re.lastIndex;
+    }
+    return out+esc(line.slice(last));
+  }
+  document.querySelectorAll('script[type="text/x-py"]').forEach(sc=>{
+    let lines=sc.textContent.replace(/^\n/,"").replace(/\s+$/,"").split("\n");
+    const marks={};
+    (sc.dataset.mark||"").split(";").filter(Boolean).forEach(g=>{
+      const [r,c]=g.split(":");r.split(",").forEach(rr=>{const [a,b]=rr.split("-").map(Number);
+      for(let i=a;i<=(b||a);i++)(marks[i]=marks[i]||[]).push("mark-"+c);});
+    });
+    const div=document.createElement("div");
+    div.className="code "+(sc.className||"");
+    if(sc.id) div.id=sc.id;
+    if(sc.dataset.title){const t=document.createElement("div");t.className="code-title";t.textContent=sc.dataset.title;sc.before(t)}
+    div.innerHTML=lines.map((l,i)=>'<div class="ln '+(marks[i+1]||[]).join(" ")+'"><span class="no">'+(i+1)+'</span><span>'+(hlLine(l)||" ")+'</span></div>').join("");
+    sc.replaceWith(div);
+  });
+
+  // ---------- deck engine ----------
+  //   .f = fragment, one per step.  data-act "sel|cls;…" (kept while shown) · data-now "sel|cls;…" (only on latest step)
+  //   data-set "sel::html;…" (content while shown) · data-say narration · data-o order
+  const deck=document.getElementById("deck");
+  const slides=[...document.querySelectorAll(".slide")];
+  let cur=0,step=0;
+  const frags=i=>[...slides[i].querySelectorAll(".f")].sort((x,y)=>(+x.dataset.o||0)-(+y.dataset.o||0));
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.97;deck.style.transform=`scale(${s})`}
+  addEventListener("resize",fit);fit();
+  const pairs=(v,sep)=>(v||"").split(/;(?=\s*#)/).filter(s=>s.trim()).map(p=>{const k=p.indexOf(sep);return [p.slice(0,k).trim(),p.slice(k+sep.length)]});
+  function tog(v,on){pairs(v,"|").forEach(([sel,cls])=>{document.querySelectorAll(sel).forEach(t=>cls.split(" ").forEach(c=>c&&t.classList.toggle(c,on)))})}
+  document.querySelectorAll("[data-set]").forEach(f=>pairs(f.dataset.set,"::").forEach(([sel])=>{document.querySelectorAll(sel).forEach(t=>{if(t.dataset.orig===undefined)t.dataset.orig=t.innerHTML})}));
+  function render(){
+    slides.forEach((s,i)=>{s.classList.toggle("active",i===cur);s.classList.toggle("past",i<cur)});
+    slides.forEach((s,i)=>{
+      const fs=frags(i);
+      fs.forEach(f=>{tog(f.dataset.now,false);tog(f.dataset.act,false)});
+      s.querySelectorAll("[data-orig]").forEach(t=>t.innerHTML=t.dataset.orig);
+      fs.forEach((f,k)=>{const on=(i===cur&&k<step);f.classList.toggle("on",on);if(on){tog(f.dataset.act,true);pairs(f.dataset.set,"::").forEach(([sel,val])=>document.querySelectorAll(sel).forEach(t=>t.innerHTML=val))}});
+      if(i===cur&&step>0)tog(fs[step-1].dataset.now,true);
+    });
+    const fs=frags(cur);let say=null;fs.slice(0,step).forEach(f=>{if(f.dataset.say)say=f.dataset.say});
+    const mt=slides[cur].querySelector(".say");if(mt)mt.innerHTML=say||"Nhấn → để chạy từng bước.";
+    document.getElementById("count").textContent=(cur+1)+"/"+slides.length+(fs.length?" · "+step+"/"+fs.length:"");
+    document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+    try{history.replaceState(null,"","#"+slides[cur].id)}catch(e){}
+  }
+  function next(){const n=frags(cur).length;if(step<n)step++;else if(cur<slides.length-1){cur++;step=0}render()}
+  function prev(){if(step>0)step--;else if(cur>0){cur--;step=frags(cur).length}render()}
+  function go(i,s=0){cur=Math.max(0,Math.min(slides.length-1,i));step=s;render()}
+
+  // ---------- jump-to-slide panel ----------
+  const jump=document.getElementById("jump"),jlist=document.getElementById("jlist"),jq=document.getElementById("jq");
+  const titleOf=s=>s.dataset.title||(s.querySelector("h2,h1")||{}).textContent||s.id;
+  slides.forEach((s,i)=>{
+    const d=document.createElement("div");d.className="ji";d.dataset.i=i;
+    d.innerHTML="<b>"+String(i+1).padStart(2,"0")+"</b><span>"+esc(titleOf(s).replace(/\s+/g," ").trim())+"</span>";
+    d.onclick=()=>{closeJump();go(i)};jlist.appendChild(d);
+    const b=document.createElement("button");b.className="jumpbtn";b.type="button";b.innerHTML="☰ Đi tới slide";b.title="Mở danh sách slide (phím G)";
+    b.onclick=e=>{e.stopPropagation();openJump()};s.appendChild(b);
+  });
+  function filterJump(){
+    const q=jq.value.trim().toLowerCase();let first=null;
+    [...jlist.children].forEach(d=>{const i=+d.dataset.i;const ok=!q||String(i+1)===q||d.textContent.toLowerCase().includes(q);d.style.display=ok?"":"none";d.classList.remove("k");if(ok&&!first)first=d});
+    if(first&&q)first.classList.add("k");return first;
+  }
+  function openJump(){jump.classList.add("on");jq.value="";filterJump();[...jlist.children].forEach(d=>d.classList.toggle("cur",+d.dataset.i===cur));setTimeout(()=>jq.focus(),30)}
+  function closeJump(){jump.classList.remove("on");jq.blur()}
+  jq.addEventListener("input",filterJump);
+  jq.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Escape")closeJump();else if(e.key==="Enter"){const q=jq.value.trim();const n=parseInt(q,10);if(String(n)===q&&n>=1&&n<=slides.length){closeJump();go(n-1)}else{const f=filterJump();if(f){closeJump();go(+f.dataset.i)}}}});
+  jump.addEventListener("click",e=>{if(e.target===jump)closeJump()});
+  document.getElementById("jx").onclick=closeJump;
+  document.getElementById("jumpNav").onclick=openJump;
+
+  addEventListener("keydown",e=>{
+    if(jump.classList.contains("on")){if(e.key==="Escape")closeJump();return}
+    if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur+1):next()}
+    else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();e.shiftKey?go(cur-1):prev()}
+    else if(e.key==="Home")go(0);else if(e.key==="End")go(slides.length-1);
+    else if(e.key==="g"||e.key==="G"){e.preventDefault();openJump()}
+    else if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+    else if(e.key==="a"||e.key==="A"){step=frags(cur).length;render()}
+  });
+  document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+  document.querySelectorAll("[data-goto]").forEach(el=>el.onclick=()=>go(slides.findIndex(s=>s.id===el.dataset.goto)));
+  let tx=null;addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+  addEventListener("touchend",e=>{if(tx==null||jump.classList.contains("on"))return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null});
+  const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
+  go(idx>=0?idx:0);
+  addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+</script>
+</body>
+</html>
