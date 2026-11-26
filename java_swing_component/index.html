@@ -8,18 +8,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#ffffff; --panel:#ffffff; --line:#e8eef7; --text:#17263e; --muted:#3d63a0;
-  --accent:#3a7fed; --accent2:#0949b1; --warn:#1d68e1; --gold:#0b58d4; --code:#fcfbff;
-  --k:#3371d6; --t:#3a7fed; --s:#083d93; --n:#0c61ea; --c:#84a1d0; --p:#276cdb; --fn:#0a4fbf;
-  --sa1:#3a7fed; --sa2:#4887ec;
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
   --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:#eff5fe;color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
 #viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
 #deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
-.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(58,127,237,.14);
-  background:none,none,none,var(--bg);
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
   opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
 .slide.past{transform:translateX(-60px) scale(.98)}
 .slide.active{opacity:1;transform:none;pointer-events:auto}
@@ -27,272 +27,250 @@ html,body{height:100%;background:#eff5fe;color:var(--text);font-family:"Be Vietn
 .slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
 @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 .hdr{display:flex;align-items:center;gap:16px;margin-bottom:16px;padding-right:150px}
-.slide:nth-of-type(4n+1){--sa1:#3a7fed;--sa2:#4887ec}.slide:nth-of-type(4n+2){--sa1:#0949b1;--sa2:#3a7fed}.slide:nth-of-type(4n+3){--sa1:#4887ec;--sa2:#1c6ef3}.slide:nth-of-type(4n){--sa1:#083d93;--sa2:#0e62e9}
-.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:var(--sa1)}
-.qn{font-weight:800;font-size:max(17px,var(--htt-min,24px));letter-spacing:.06em;color:#fff;background:var(--sa1);box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
-.lvl{font-size:max(14px,var(--htt-min,24px));font-weight:700;color:var(--muted);white-space:nowrap;margin-left:auto}
-.lvl b{color:#0e65f2;letter-spacing:2px}.lvl s{color:#d1dced;text-decoration:none;letter-spacing:2px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+.lvl{font-size:14px;font-weight:700;color:var(--muted);white-space:nowrap;margin-left:auto}
+.lvl b{color:#f59e0b;letter-spacing:2px}.lvl s{color:#d9d6e8;text-decoration:none;letter-spacing:2px}
 h1{font-size:66px;line-height:1.1;font-weight:800}
 h2{font-size:30px;line-height:1.2;font-weight:800}
-h3{font-size:max(21px,var(--htt-min,24px));font-weight:700;margin-bottom:6px;color:var(--sa1)}
-p,li{font-size:max(20px,var(--htt-min,24px));line-height:1.45;color:var(--text)}
+h3{font-size:21px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:20px;line-height:1.45;color:var(--text)}
 .muted{color:var(--muted)}
 ul{list-style:none}
 ul li{position:relative;padding-left:24px;margin:5px 0}
-ul li::before{content:"";position:absolute;left:4px;top:.6em;width:9px;height:9px;border-radius:3px;background:var(--sa1)}
-.grad{background:#3a7fed;-webkit-background-clip:text;background-clip:text;color:transparent}
-code.i{font-family:var(--mono);font-size:.86em;background:#f0f5fd;border:1px solid #d3e2f9;padding:0 5px;border-radius:6px;color:#1858be;white-space:nowrap}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:9px;height:9px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.86em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 5px;border-radius:6px;color:#be185d;white-space:nowrap}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
 .cols>*{min-width:0}
 .cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px;box-shadow:0 8px 24px -12px rgba(58,127,237,.25)}
-.card p,.card li{font-size:max(17px,var(--htt-min,24px))}
-.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #3a7fed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0949b1}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #4887ec}.cols4>.card:nth-child(4n){border-top:5px solid #0e65f2}
-.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0949b1}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#276cdb}.cols4>.card:nth-child(4n) h3{color:#0b58d4}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#3a7fed}
-.note{margin-top:10px;padding:8px 14px;border-left:5px solid #0e65f2;background:#e2ecfd;border-radius:8px;font-size:max(17px,var(--htt-min,24px));line-height:1.4}
-.note.blue{border-color:#5c97f6;background:#eef4fe}
-.note.red{border-color:#1d68e1;background:#f2f7fe}
-.code{font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));line-height:1.45;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:8px 0;overflow:hidden;position:relative}
-.code.sm{font-size:max(14px,var(--htt-min,24px));line-height:1.42}.code.xs{font-size:max(13px,var(--htt-min,24px));line-height:1.4}.code.xxs{font-size:max(12px,var(--htt-min,24px));line-height:1.36;padding:6px 0}
-.code.x4{font-size:max(11.4px,var(--htt-min,24px));line-height:1.33;padding:6px 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.card p,.card li{font-size:17px}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.note{margin-top:10px;padding:8px 14px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:17px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.note.red{border-color:#e11d48;background:linear-gradient(90deg,#fff1f3,#fffafa)}
+.code{font-family:var(--mono);font-size:15px;line-height:1.45;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:8px 0;overflow:hidden;position:relative}
+.code.sm{font-size:14px;line-height:1.42}.code.xs{font-size:13px;line-height:1.4}.code.xxs{font-size:12px;line-height:1.36;padding:6px 0}
+.code.x4{font-size:11.4px;line-height:1.33;padding:6px 0}
 .code .ln{padding:0 12px 0 6px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
-.code .no{color:#bdcde6;width:22px;flex:none;text-align:right;margin-right:10px;user-select:none}
+.code .no{color:#c9c3e0;width:22px;flex:none;text-align:right;margin-right:10px;user-select:none}
 .k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
-.code.show-a .mark-a{background:rgba(58,127,237,.13);box-shadow:inset 5px 0 #3a7fed}
-.code.show-b .mark-b{background:rgba(11,86,207,.15);box-shadow:inset 5px 0 #0b56cf}
-.code.show-c .mark-c{background:rgba(14,101,242,.18);box-shadow:inset 5px 0 #0e65f2}
-.code.show-d .mark-d{background:rgba(72,135,236,.14);box-shadow:inset 5px 0 #4887ec}
-.code.show-e .mark-e{background:rgba(16,81,185,.15);box-shadow:inset 5px 0 #1051b9}
-.code.show-f .mark-f{background:rgba(58,127,237,.13);box-shadow:inset 5px 0 #3a7fed}
-.code.show-g .mark-g{background:rgba(11,86,207,.15);box-shadow:inset 5px 0 #0b56cf}
-.code.show-h .mark-h{background:rgba(14,101,242,.18);box-shadow:inset 5px 0 #0e65f2}
-.code.show-i .mark-i{background:rgba(72,135,236,.14);box-shadow:inset 5px 0 #4887ec}
-.code.show-j .mark-j{background:rgba(16,81,185,.15);box-shadow:inset 5px 0 #1051b9}
+.code.show-a .mark-a{background:rgba(124,58,237,.13);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.15);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.18);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.14);box-shadow:inset 5px 0 #ec4899}
+.code.show-e .mark-e{background:rgba(16,185,129,.15);box-shadow:inset 5px 0 #10b981}
+.code.show-f .mark-f{background:rgba(124,58,237,.13);box-shadow:inset 5px 0 #7c3aed}
+.code.show-g .mark-g{background:rgba(6,182,212,.15);box-shadow:inset 5px 0 #06b6d4}
+.code.show-h .mark-h{background:rgba(245,158,11,.18);box-shadow:inset 5px 0 #f59e0b}
+.code.show-i .mark-i{background:rgba(236,72,153,.14);box-shadow:inset 5px 0 #ec4899}
+.code.show-j .mark-j{background:rgba(16,185,129,.15);box-shadow:inset 5px 0 #10b981}
 .hide0{opacity:0;transform:translateY(8px) scale(.96);transition:all .45s}
 .hide0.sh{opacity:1;transform:none}
 .win.pre.sh:not(.vis){opacity:.35;filter:grayscale(1)}
 .gone.sh{display:none}
 .stage{position:relative;display:flex;align-items:center;justify-content:center}
-.chip{display:inline-block;font-family:var(--mono);font-size:max(12.5px,var(--htt-min,24px));font-weight:700;padding:2px 9px;border-radius:999px;background:#c9ddfc;color:#094bb4;border:1px solid #5391f6}
-.chip.v{background:#e9f1fe;color:#286cd9;border-color:#b7d1fb}.chip.g{background:#d1e1fa;color:#063176;border-color:#6e9ce7}.chip.r{background:#e5effe;color:#1254be;border-color:#a7c7fa}
-.hlo{outline:3px solid #0e65f2;outline-offset:3px;border-radius:6px}
-.jb.dis.en{color:#111;border-color:#7f9dce;background:#fff}.jb.dis.en .ico{filter:none;opacity:1}
-.jb.dis.en.dis2{color:#a0a4ad;border-color:#becde6;background:#eef2f8}
+.chip{display:inline-block;font-family:var(--mono);font-size:12.5px;font-weight:700;padding:2px 9px;border-radius:999px;background:#fef3c7;color:#b45309;border:1px solid #fcd34d}
+.chip.v{background:#ede9fe;color:#6d28d9;border-color:#c4b5fd}.chip.g{background:#d1fae5;color:#047857;border-color:#6ee7b7}.chip.r{background:#ffe4e6;color:#be123c;border-color:#fda4af}
+.hlo{outline:3px solid #f59e0b;outline-offset:3px;border-radius:6px}
+.jb.dis.en{color:#111;border-color:#9aa1b3;background:linear-gradient(180deg,#fff,#e6e8ee)}.jb.dis.en .ico{filter:none;opacity:1}
+.jb.dis.en.dis2{color:#a0a4ad;border-color:#ccd0d8;background:#f1f2f5}
 .rad.on.off::before,.chk.on.off::before{background:#fff;content:""}
-.code-title{font-family:var(--mono);font-size:max(13px,var(--htt-min,24px));color:var(--muted);margin:0 0 4px 4px;font-weight:600}
+.code-title{font-family:var(--mono);font-size:13px;color:var(--muted);margin:0 0 4px 4px;font-weight:600}
 .f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
 .f.on{opacity:1;transform:none}
 .f.ghost{display:none}
-table{border-collapse:separate;border-spacing:0;width:100%;font-size:max(16px,var(--htt-min,24px));border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:16px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
 th,td{padding:6px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.3}
-th{background:#ebf2fe;font-weight:700}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
 tr:last-child td{border-bottom:none}
 table.t1 td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
-.console{font-family:var(--mono);font-size:max(13.5px,var(--htt-min,24px));line-height:1.45;background:#17263e;border-radius:12px;padding:8px 14px;color:#e7f0fe;white-space:pre;min-height:40px;overflow:hidden}
-.console .in{color:#2b78f4;font-weight:600}
-.console::before{content:"● ● ●";display:block;color:#72a4f4;font-size:max(10px,var(--htt-min,24px));letter-spacing:3px;margin-bottom:3px}
+.console{font-family:var(--mono);font-size:13.5px;line-height:1.45;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:8px 14px;color:#e6f0ff;white-space:pre;min-height:40px;overflow:hidden}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:10px;letter-spacing:3px;margin-bottom:3px}
 .cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
 .flow{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap}
-.box{border-radius:12px;padding:8px 12px;text-align:center;font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));border:2px solid var(--line);background:#fff;min-width:110px;font-weight:600}
-.box small{display:block;font-family:"Be Vietnam Pro";font-size:max(12.5px,var(--htt-min,24px));color:var(--muted);margin-top:2px;font-weight:400}
-.box.a{border-color:#3a7fed}.box.b{border-color:#0949b1}.box.c{border-color:#4887ec;background:#f2f6fd}.box.d{border-color:#0e65f2;background:#ecf3fe}.box.e{border-color:#1051b9;background:#ecf3fd}
-.ar{color:var(--muted);font-size:max(22px,var(--htt-min,24px));text-align:center}
+.box{border-radius:12px;padding:8px 12px;text-align:center;font-family:var(--mono);font-size:15px;border:2px solid var(--line);background:#fff;min-width:110px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:12.5px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.a{border-color:#7c3aed}.box.b{border-color:#0891b2}.box.c{border-color:#ec4899;background:#fdf2f8}.box.d{border-color:#f59e0b;background:#fffbeb}.box.e{border-color:#10b981;background:#ecfdf5}
+.ar{color:var(--muted);font-size:22px;text-align:center}
 .title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
-.kicker{font-family:var(--mono);color:#276cdb;font-size:max(22px,var(--htt-min,24px));margin-bottom:18px;font-weight:600}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
 .orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
 @keyframes float{50%{transform:translate(30px,-25px)}}
-.say{font-size:max(17px,var(--htt-min,24px));margin-top:10px;min-height:50px;color:var(--muted);line-height:1.42}
+.say{font-size:17px;margin-top:10px;min-height:50px;color:var(--muted);line-height:1.42}
 .say b{color:var(--text)}
 .vars{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
-.vc{font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));font-weight:700;padding:4px 12px;border-radius:10px;background:#fff;border:2px solid #dce8fb;transition:all .35s}
+.vc{font-family:var(--mono);font-size:15px;font-weight:700;padding:4px 12px;border-radius:10px;background:#fff;border:2px solid #e4dcfb;transition:all .35s}
 .vc b{color:var(--t)}
-.vc.hot{border-color:#0e65f2;background:#ecf3fe;box-shadow:0 0 14px rgba(14,101,242,.45)}
-.vc.res{border-color:#1051b9;background:#ecf3fd;color:#063176}
+.vc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.45)}
+.vc.res{border-color:#10b981;background:#ecfdf5;color:#047857}
 .arr{display:flex;gap:8px;justify-content:center}
-.cell{width:52px;height:56px;border-radius:12px;border:3px solid #dce8fb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:max(20px,var(--htt-min,24px));font-weight:800;transition:all .45s}
-.cell small{font-size:max(11px,var(--htt-min,24px));color:var(--muted);font-weight:600}
-.cell.cur{border-color:#0e65f2;background:#ecf3fe;color:#094bb4;transform:translateY(-6px)}
-.cell.ok{border-color:#1051b9;background:#ecf3fd;color:#063176}
-.cell.bad{border-color:#1d68e1;background:#f2f7fe;color:#1254be}
+.cell{width:52px;height:56px;border-radius:12px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .45s}
+.cell small{font-size:11px;color:var(--muted);font-weight:600}
+.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-6px)}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c}
 .cell.dim{opacity:.35}
-.cell.wide{width:auto;padding:0 10px;font-size:max(14px,var(--htt-min,24px))}
+.cell.wide{width:auto;padding:0 10px;font-size:14px}
 @keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.15)}100%{transform:none;opacity:1}}
 .pop{animation:pop .45s}
 
 /* ===== agenda ===== */
 .agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 10px}
-.sec{grid-column:1/-1;font-family:var(--mono);font-size:max(13px,var(--htt-min,24px));font-weight:700;color:var(--muted);letter-spacing:.08em;margin-top:4px;text-transform:uppercase}
-.ag{background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 10px;cursor:pointer;transition:all .2s;font-size:max(15.5px,var(--htt-min,24px));line-height:1.25;box-shadow:0 2px 6px rgba(40,67,110,.05);font-family:var(--mono);font-weight:600}
-.ag:hover{border-color:#4887ec;transform:translateY(-2px);box-shadow:0 10px 24px -10px rgba(72,135,236,.45)}
-.ag b{color:#276cdb;margin-right:6px}
-.ag.g1{border-left:5px solid #3a7fed}.ag.g2{border-left:5px solid #0949b1}.ag.g3{border-left:5px solid #4887ec}.ag.g4{border-left:5px solid #0e65f2}
-.ag.g5{border-left:5px solid #1051b9}.ag.g6{border-left:5px solid #6399f1}.ag.g7{border-left:5px solid #1c6ef3}.ag.g8{border-left:5px solid #0e62e9}
+.sec{grid-column:1/-1;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.08em;margin-top:4px;text-transform:uppercase}
+.ag{background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 10px;cursor:pointer;transition:all .2s;font-size:15.5px;line-height:1.25;box-shadow:0 2px 6px rgba(40,50,110,.05);font-family:var(--mono);font-weight:600}
+.ag:hover{border-color:#ec4899;transform:translateY(-2px);box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag b{color:#db2777;margin-right:6px}
+.ag.g1{border-left:5px solid #7c3aed}.ag.g2{border-left:5px solid #0891b2}.ag.g3{border-left:5px solid #ec4899}.ag.g4{border-left:5px solid #f59e0b}
+.ag.g5{border-left:5px solid #10b981}.ag.g6{border-left:5px solid #6366f1}.ag.g7{border-left:5px solid #f97316}.ag.g8{border-left:5px solid #0ea5e9}
 
 /* ===== mock Swing windows ===== */
-.win{border:1px solid #c5d3e9;border-radius:10px;background:#ebf0f7;box-shadow:0 18px 40px -18px rgba(23,38,62,.45);font-family:"Segoe UI",system-ui,sans-serif;font-size:max(14px,var(--htt-min,24px));color:#222;transition:all .5s;overflow:hidden;position:relative}
-.wt{height:28px;background:#f6f8fb;border-bottom:1px solid #c1d0e8;display:flex;align-items:center;gap:6px;padding:0 10px;font-weight:600;font-size:max(13px,var(--htt-min,24px));color:#333}
-.wt i{width:11px;height:11px;border-radius:50%;background:#5f99f7;display:inline-block}.wt i:nth-child(2){background:#3880f5}.wt i:nth-child(3){background:#2865c8}
+.win{border:1px solid #cfc8e6;border-radius:10px;background:#eef0f4;box-shadow:0 18px 40px -18px rgba(30,27,58,.45);font-family:"Segoe UI",system-ui,sans-serif;font-size:14px;color:#222;transition:all .5s;overflow:hidden;position:relative}
+.wt{height:28px;background:linear-gradient(180deg,#f7f7fa,#e2e4ea);border-bottom:1px solid #cfd2da;display:flex;align-items:center;gap:6px;padding:0 10px;font-weight:600;font-size:13px;color:#333}
+.wt i{width:11px;height:11px;border-radius:50%;background:#ff5f57;display:inline-block}.wt i:nth-child(2){background:#febc2e}.wt i:nth-child(3){background:#28c840}
 .wt span{margin-left:8px}
 .wb{padding:12px;position:relative}
 .win.ghost{opacity:.25;filter:grayscale(1)}
 .win.undec .wt{display:none}
-.jb{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid #7f9dce;border-radius:5px;background:#fff;font-size:max(13.5px,var(--htt-min,24px));color:#111;transition:all .3s;white-space:nowrap;cursor:default}
-.jb.dis{color:#a0a4ad;border-color:#becde6;background:#eef2f8}
+.jb{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid #9aa1b3;border-radius:5px;background:linear-gradient(180deg,#fff,#e6e8ee);font-size:13.5px;color:#111;transition:all .3s;white-space:nowrap;cursor:default}
+.jb.dis{color:#a0a4ad;border-color:#ccd0d8;background:#f1f2f5}
 .jb.dis .ico{filter:grayscale(1);opacity:.5}
-.jb.press{background:#cdd9ec;border-color:#527cbe;transform:scale(.96)}
-.jb.def{box-shadow:0 0 0 2px #7aaaf7}
+.jb.press{background:linear-gradient(180deg,#cfd8ea,#b9c6e2);border-color:#5b74b5;transform:scale(.96)}
+.jb.def{box-shadow:0 0 0 2px #7aa2f7}
 .jb.vert{flex-direction:column}
 .jb u{text-decoration:underline}
-.ico{display:inline-block;width:18px;height:18px;border-radius:50%;background:#a7c4f3;flex:none}
-.ico.l{border-radius:4px;background:#639cf7;clip-path:polygon(100% 0,0 50%,100% 100%)}
-.ico.r{border-radius:4px;background:#72a4f4;clip-path:polygon(0 0,100% 50%,0 100%)}
-.splat{display:inline-block;width:34px;height:30px;background:none,none,none,none,none}
-.chk,.rad{display:block;padding:3px 0;font-size:max(14px,var(--htt-min,24px));transition:all .3s;white-space:nowrap}
+.ico{display:inline-block;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#a7f3d0,#059669);flex:none}
+.ico.l{border-radius:4px;background:linear-gradient(135deg,#60a5fa,#2563eb);clip-path:polygon(100% 0,0 50%,100% 100%)}
+.ico.r{border-radius:4px;background:linear-gradient(135deg,#f472b6,#db2777);clip-path:polygon(0 0,100% 50%,0 100%)}
+.splat{display:inline-block;width:34px;height:30px;background:radial-gradient(circle at 50% 50%,#f59e0b 0 30%,transparent 31%),radial-gradient(circle at 25% 30%,#ec4899 0 18%,transparent 19%),radial-gradient(circle at 75% 35%,#7c3aed 0 18%,transparent 19%),radial-gradient(circle at 40% 78%,#0891b2 0 17%,transparent 18%),radial-gradient(circle at 78% 75%,#10b981 0 15%,transparent 16%)}
+.chk,.rad{display:block;padding:3px 0;font-size:14px;transition:all .3s;white-space:nowrap}
 .chk::before,.rad::before{display:inline-block;vertical-align:-2px;margin-right:7px}
-.chk::before{content:"";width:14px;height:14px;border:1px solid #7b8394;border-radius:3px;background:#fff;flex:none;font-size:max(12px,var(--htt-min,24px));line-height:14px;text-align:center;font-weight:900;color:#1d65d8}
-.chk.on::before{content:"✓";background:#dde9fd}
+.chk::before{content:"";width:14px;height:14px;border:1px solid #7b8394;border-radius:3px;background:#fff;flex:none;font-size:12px;line-height:14px;text-align:center;font-weight:900;color:#1d4ed8}
+.chk.on::before{content:"✓";background:#dbe7ff}
 .rad::before{content:"";width:14px;height:14px;border:1px solid #7b8394;border-radius:50%;background:#fff;flex:none;box-sizing:border-box}
-.rad.on::before{background:#1d65d8}
-.chk.hl,.rad.hl{background:#c7dbfc;border-radius:4px}
-.tf{display:inline-block;min-width:120px;min-height:26px;border:1px solid #8c93a3;background:#fff;padding:3px 7px;font-family:var(--mono);font-size:max(13.5px,var(--htt-min,24px));border-radius:3px;transition:all .3s;white-space:pre;vertical-align:middle}
-.tf.err{background:#d3e3fd}
-.tf.ro{background:#f0f3f9}
+.rad.on::before{background:radial-gradient(circle,#1d4ed8 0 35%,#fff 40%)}
+.chk.hl,.rad.hl{background:#fff3c4;border-radius:4px}
+.tf{display:inline-block;min-width:120px;min-height:26px;border:1px solid #8c93a3;background:#fff;padding:3px 7px;font-family:var(--mono);font-size:13.5px;border-radius:3px;transition:all .3s;white-space:pre;vertical-align:middle}
+.tf.err{background:#ffd1dc}
+.tf.ro{background:#f3f4f6}
 .tf .cur{display:inline-block;width:1px;height:15px;background:#111;vertical-align:middle;animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
-.ta{border:1px solid #8c93a3;background:#fff;padding:6px 8px;font-family:var(--mono);font-size:max(12.5px,var(--htt-min,24px));line-height:1.5;border-radius:3px;white-space:pre-wrap;overflow:hidden}
+.ta{border:1px solid #8c93a3;background:#fff;padding:6px 8px;font-family:var(--mono);font-size:12.5px;line-height:1.5;border-radius:3px;white-space:pre-wrap;overflow:hidden}
 /* text area that stays scrolled to bottom */
 .ta.bottom{display:flex;flex-direction:column;justify-content:flex-end}
-mark{background:#c4d2e8;color:inherit;border-radius:2px;padding:0 1px}
-mark.sel{background:#c1d8fc}
-.combo{display:inline-flex;align-items:center;justify-content:space-between;min-width:170px;border:1px solid #8c93a3;border-radius:4px;background:#fff;padding:4px 8px;font-size:max(14px,var(--htt-min,24px));gap:10px;position:relative}
+mark{background:#d1d5db;color:inherit;border-radius:2px;padding:0 1px}
+mark.sel{background:#bfdbfe}
+.combo{display:inline-flex;align-items:center;justify-content:space-between;min-width:170px;border:1px solid #8c93a3;border-radius:4px;background:linear-gradient(180deg,#fff,#eceef3);padding:4px 8px;font-size:14px;gap:10px;position:relative}
 .combo::after{content:"▾";color:#555}
 .combo.ed{background:#fff}
 .dd{position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid #8c93a3;box-shadow:0 8px 18px -8px rgba(0,0,0,.35);z-index:3;display:none;text-align:left}
-.dd div{padding:3px 8px;font-size:max(13.5px,var(--htt-min,24px))}
-.dd div.s{background:#3b77d8;color:#fff}
+.dd div{padding:3px 8px;font-size:13.5px}
+.dd div.s{background:#3b6fd8;color:#fff}
 .open .dd{display:block}
-.lst{border:1px solid #8c93a3;background:#fff;font-size:max(14px,var(--htt-min,24px));min-height:90px}
+.lst{border:1px solid #8c93a3;background:#fff;font-size:14px;min-height:90px}
 .lst div{padding:3px 8px;transition:all .3s}
-.lst div.s{background:#3b77d8;color:#fff}
+.lst div.s{background:#3b6fd8;color:#fff}
 .lst div.nw{animation:pop .5s}
-.jt{border-collapse:collapse;width:100%;font-size:max(13px,var(--htt-min,24px));border:1px solid #7f9dce;border-radius:0;background:#fff;font-family:"Segoe UI",system-ui,sans-serif}
-.jt th{background:#fafafa;border:1px solid #a5badd;padding:3px 6px;font-weight:600;font-size:max(12.5px,var(--htt-min,24px));white-space:nowrap;text-align:left}
-.jt td{border:1px solid #d9e2f0;padding:3px 6px;color:#111;font-weight:400;white-space:nowrap;vertical-align:middle}
+.jt{border-collapse:collapse;width:100%;font-size:13px;border:1px solid #9aa1b3;border-radius:0;background:#fff;font-family:"Segoe UI",system-ui,sans-serif}
+.jt th{background:linear-gradient(180deg,#fafafa,#e3e5ea);border:1px solid #b9bec9;padding:3px 6px;font-weight:600;font-size:12.5px;white-space:nowrap;text-align:left}
+.jt td{border:1px solid #e1e3e8;padding:3px 6px;color:#111;font-weight:400;white-space:nowrap;vertical-align:middle}
 .jt td.num{text-align:right}
 .jt td.ck{text-align:center}
-.jt tr.s td{background:#3b77d8;color:#fff}
-.jt td.s{background:#3b77d8;color:#fff}
-.jt td.edit{outline:2px solid #0e65f2;background:#ecf3fe}
-.jt th.sorted::after{content:" ▲";color:#3b77d8}
+.jt tr.s td{background:#3b6fd8;color:#fff}
+.jt td.s{background:#3b6fd8;color:#fff}
+.jt td.edit{outline:2px solid #f59e0b;background:#fffbeb}
+.jt th.sorted::after{content:" ▲";color:#3b6fd8}
 .jt th.sorted.desc::after{content:" ▼"}
 .jt tr.hide{display:none}
-.jt .cb{display:inline-block;width:13px;height:13px;border:1px solid #7b8394;border-radius:2px;background:#fff;vertical-align:middle;font-size:max(11px,var(--htt-min,24px));line-height:12px;text-align:center;font-weight:900;color:#1d65d8}
+.jt .cb{display:inline-block;width:13px;height:13px;border:1px solid #7b8394;border-radius:2px;background:#fff;vertical-align:middle;font-size:11px;line-height:12px;text-align:center;font-weight:900;color:#1d4ed8}
 .jt .cb.on::before{content:"✓"}
-.pb{height:20px;border:1px solid #8c93a3;border-radius:4px;background:#dee6f2;position:relative;overflow:hidden;min-width:180px}
-.pb .fill{position:absolute;left:0;top:0;bottom:0;background:#7aaaf7;transition:width .6s}
-.pb .txt{position:absolute;inset:0;text-align:center;font-size:max(12px,var(--htt-min,24px));line-height:18px;font-weight:600;color:#111}
+.pb{height:20px;border:1px solid #8c93a3;border-radius:4px;background:#e5e7eb;position:relative;overflow:hidden;min-width:180px}
+.pb .fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(180deg,#7aa2f7,#3b6fd8);transition:width .6s}
+.pb .txt{position:absolute;inset:0;text-align:center;font-size:12px;line-height:18px;font-weight:600;color:#111}
 .pb.ind .fill{width:30%!important;animation:ind 1.2s linear infinite alternate}
 .pb.ind .txt{opacity:0}
 @keyframes ind{from{left:0}to{left:70%}}
-.mbar{display:flex;gap:2px;background:#fbfbfc;border-bottom:1px solid #c1d0e8;padding:2px 6px;font-size:max(13.5px,var(--htt-min,24px));position:relative}
+.mbar{display:flex;gap:2px;background:linear-gradient(180deg,#fbfbfc,#e9ebf0);border-bottom:1px solid #cfd2da;padding:2px 6px;font-size:13.5px;position:relative}
 .mbar>span{padding:2px 8px;border-radius:3px}
-.mbar>span.s{background:#3b77d8;color:#fff}
-.menu{position:absolute;top:26px;left:6px;background:#fff;border:1px solid #7f9dce;box-shadow:0 10px 24px -8px rgba(0,0,0,.4);min-width:250px;z-index:4;display:none;font-size:max(13px,var(--htt-min,24px))}
+.mbar>span.s{background:#3b6fd8;color:#fff}
+.menu{position:absolute;top:26px;left:6px;background:#fff;border:1px solid #9aa1b3;box-shadow:0 10px 24px -8px rgba(0,0,0,.4);min-width:250px;z-index:4;display:none;font-size:13px}
 .menu.open{display:block;animation:pop .3s}
 .mi{display:flex;align-items:center;gap:6px;padding:3px 10px;white-space:nowrap}
-.mi .acc{margin-left:auto;color:#666;font-size:max(12px,var(--htt-min,24px));padding-left:16px}
-.mi.s{background:#3b77d8;color:#fff}.mi.s .acc{color:#e2ecfd}
-.msep{height:1px;background:#cfdbed;margin:3px 0}
+.mi .acc{margin-left:auto;color:#666;font-size:12px;padding-left:16px}
+.mi.s{background:#3b6fd8;color:#fff}.mi.s .acc{color:#e0e7ff}
+.msep{height:1px;background:#d9dce3;margin:3px 0}
 .mi .mk{width:14px;text-align:center;font-weight:900;flex:none}
-.dlgwrap{position:absolute;inset:0;background:rgba(23,38,62,.18);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;z-index:6}
+.dlgwrap{position:absolute;inset:0;background:rgba(30,27,58,.18);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;z-index:6}
 .dlgwrap.on{opacity:1}
 .dlgwrap.on .win{animation:pop .4s}
 .dlgwrap.nomodal{background:none}
-.dlgico{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:max(20px,var(--htt-min,24px));flex:none;background:#3c83f5}
-.dlgico.q{background:#1051b9}.dlgico.e{background:#1d68e1}.dlgico.w{background:#0e65f2;border-radius:6px}
-.tabs{display:flex;gap:2px;border-bottom:1px solid #7f9dce;margin-bottom:8px}
-.tabs span{padding:3px 10px;border:1px solid #a5badd;border-bottom:none;border-radius:5px 5px 0 0;background:#e1e8f3;font-size:max(12.5px,var(--htt-min,24px))}
+.dlgico{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:20px;flex:none;background:#3b82f6}
+.dlgico.q{background:#10b981}.dlgico.e{background:#e11d48}.dlgico.w{background:#f59e0b;border-radius:6px}
+.tabs{display:flex;gap:2px;border-bottom:1px solid #9aa1b3;margin-bottom:8px}
+.tabs span{padding:3px 10px;border:1px solid #b9bec9;border-bottom:none;border-radius:5px 5px 0 0;background:#e6e8ee;font-size:12.5px}
 .tabs span.s{background:#fff;font-weight:600}
-.tip{position:absolute;background:#e2edfe;border:1px solid #777;font-size:max(12px,var(--htt-min,24px));padding:2px 6px;box-shadow:2px 2px 4px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;white-space:nowrap;z-index:5}
+.tip{position:absolute;background:#ffffe1;border:1px solid #777;font-size:12px;padding:2px 6px;box-shadow:2px 2px 4px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;white-space:nowrap;z-index:5}
 .tip.on{opacity:1}
 .pic{display:flex;align-items:center;justify-content:center;font-size:64px;min-height:110px;transition:all .4s}
 .thumb{width:34px;height:34px;border-radius:5px;border:1px solid #888;display:inline-block;transition:all .4s}
-.lane{display:grid;grid-template-columns:110px 1fr;gap:6px;align-items:center;font-size:max(13px,var(--htt-min,24px))}
-.lane .ln2{height:30px;border-radius:8px;background:#f8f9fc;border:1px dashed #c4d2e8;display:flex;align-items:center;gap:6px;padding:0 8px;overflow:hidden}
-.ev{font-family:var(--mono);font-size:max(11.5px,var(--htt-min,24px));font-weight:700;padding:2px 7px;border-radius:6px;background:#e9f1fe;color:#286cd9;white-space:nowrap}
-.ev.b{background:#d0e1fd;color:#0e4090}.ev.c{background:#e7effc;color:#1858be}.ev.d{background:#c9ddfc;color:#094bb4}
-.kv{font-family:var(--mono);font-size:max(13px,var(--htt-min,24px))}
+.lane{display:grid;grid-template-columns:110px 1fr;gap:6px;align-items:center;font-size:13px}
+.lane .ln2{height:30px;border-radius:8px;background:#f8fafc;border:1px dashed #cbd5e1;display:flex;align-items:center;gap:6px;padding:0 8px;overflow:hidden}
+.ev{font-family:var(--mono);font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:6px;background:#ede9fe;color:#6d28d9;white-space:nowrap}
+.ev.b{background:#cffafe;color:#0e7490}.ev.c{background:#fce7f3;color:#be185d}.ev.d{background:#fef3c7;color:#b45309}
+.kv{font-family:var(--mono);font-size:13px}
 .swatch{display:inline-block;width:100%;height:100%;border-radius:4px}
 
 /* ===== nav / jump ===== */
-#bar{position:fixed;left:0;bottom:0;height:5px;background:#3a7fed;transition:width .4s;z-index:5}
-#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:max(14px,var(--htt-min,24px));color:var(--muted)}
-#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;min-width:36px;height:32px;cursor:pointer;font-size:max(16px,var(--htt-min,24px));padding:0 8px}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;min-width:36px;height:32px;cursor:pointer;font-size:16px;padding:0 8px}
 #nav button:hover{border-color:var(--accent)}
-#hint{position:fixed;left:16px;bottom:12px;font-size:max(13px,var(--htt-min,24px));color:#7495ca;z-index:5}
-.jumpbtn{position:absolute;top:26px;right:30px;z-index:7;font-family:"Be Vietnam Pro",sans-serif;font-size:max(14px,var(--htt-min,24px));font-weight:700;color:#fff;background:var(--sa1);border:none;border-radius:999px;padding:7px 14px;cursor:pointer;box-shadow:0 6px 16px -6px var(--sa1);transition:transform .2s}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+.jumpbtn{position:absolute;top:26px;right:30px;z-index:7;font-family:"Be Vietnam Pro",sans-serif;font-size:14px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));border:none;border-radius:999px;padding:7px 14px;cursor:pointer;box-shadow:0 6px 16px -6px var(--sa1);transition:transform .2s}
 .jumpbtn:hover{transform:translateY(-2px) scale(1.04)}
-#jump{position:fixed;inset:0;z-index:20;background:rgba(23,38,62,.45);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
+#jump{position:fixed;inset:0;z-index:20;background:rgba(30,27,58,.45);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
 #jump.on{display:flex}
-#jbox{width:min(1100px,94vw);max-height:88vh;overflow:auto;background:#fff;border-radius:18px;padding:20px 24px;box-shadow:0 30px 70px -20px rgba(23,38,62,.6);animation:pop .3s}
+#jbox{width:min(1100px,94vw);max-height:88vh;overflow:auto;background:#fff;border-radius:18px;padding:20px 24px;box-shadow:0 30px 70px -20px rgba(30,27,58,.6);animation:pop .3s}
 #jbox .jh{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-#jbox .jh h3{font-size:max(22px,var(--htt-min,24px));color:#3a7fed;margin:0}
-#jbox .jh input{margin-left:auto;font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));padding:6px 10px;border:2px solid var(--line);border-radius:10px;width:260px;outline:none}
-#jbox .jh input:focus{border-color:#8cb6f9}
-#jbox .jh button{border:none;background:#ebf2fe;color:#286cd9;font-weight:800;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:max(18px,var(--htt-min,24px))}
+#jbox .jh h3{font-size:22px;color:#7c3aed;margin:0}
+#jbox .jh input{margin-left:auto;font-family:var(--mono);font-size:15px;padding:6px 10px;border:2px solid var(--line);border-radius:10px;width:260px;outline:none}
+#jbox .jh input:focus{border-color:#a78bfa}
+#jbox .jh button{border:none;background:#f1eaff;color:#6d28d9;font-weight:800;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:18px}
 #jlist{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-#jlist .ji{display:flex;gap:8px;align-items:center;padding:7px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:max(14.5px,var(--htt-min,24px));transition:all .15s;background:#fff}
-#jlist .ji:hover,#jlist .ji.k{border-color:#4887ec;background:#f2f6fd}
-#jlist .ji.cur{background:#eef4fe;border-color:#8cb6f9}
-#jlist .ji b{font-family:var(--mono);color:#276cdb;min-width:26px}
+#jlist .ji{display:flex;gap:8px;align-items:center;padding:7px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:14.5px;transition:all .15s;background:#fff}
+#jlist .ji:hover,#jlist .ji.k{border-color:#ec4899;background:#fdf2f8}
+#jlist .ji.cur{background:#f3edff;border-color:#a78bfa}
+#jlist .ji b{font-family:var(--mono);color:#db2777;min-width:26px}
 #jlist .ji span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:700px){#hint{display:none}#jlist{grid-template-columns:1fr}}
 @media print{#nav,#bar,#hint,.jumpbtn{display:none}}
 </style>
-<style id="htt-theme">
-/* HTT theme: logo + layout helpers (font-size >= 24px, single blue) */
-#deck>.htt-logo{position:absolute;top:12px;right:14px;z-index:60;height:40px;padding:0 10px;border-radius:8px;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;font:800 24px/1 "Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.04em;pointer-events:none;user-select:none}
-#deck>.htt-logo span{font-size:24px;color:#fff}
-.htt-stack{grid-template-columns:minmax(0,1fr)!important;grid-template-areas:none!important;flex-direction:column!important;flex-wrap:nowrap!important}
-.htt-stack>*{grid-column:auto!important;grid-row:auto!important;max-width:100%}
-.htt-wrap,.htt-wrap *{white-space:pre-wrap!important;overflow-wrap:anywhere}
-.htt-wrap .ln{flex-wrap:nowrap}
-.htt-flexwrap{flex-wrap:wrap!important}
-#nav,#nav *{font-size:16px!important}
-#hint{font-size:14px!important}
-.orb{display:none!important}
-:root{--htt-min:24px}
-.slide.htt-fs22{--htt-min:22px}.slide.htt-fs20{--htt-min:20px}.slide.htt-fs0{--htt-min:0px}
-.jumpbtn{right:100px!important}
-.slide.htt-fs18{--htt-min:18px}.slide.htt-fs16{--htt-min:16px}
-.slide .hdr{padding-right:84px}
-.sjump{right:100px!important}
-
-</style>
-<script>window.HTT_MIN=function(el){var s=el&&el.closest?el.closest(".slide"):null;var v=parseFloat(getComputedStyle(s||document.documentElement).getPropertyValue("--htt-min"));return isNaN(v)?24:v};</script>
 </head>
 <body>
 
 <div id="viewport"><div id="deck">
-<div class="htt-logo" aria-label="HTT" title="HTT"><span>HTT</span></div>
 
 <!-- ===================== TITLE ===================== -->
 <section class="slide" id="title" data-title="Trang bìa">
-  <div class="orb" style="width:380px;height:380px;background:#a8c7f9;right:-60px;top:-80px"></div>
-  <div class="orb" style="width:300px;height:300px;background:#81aff8;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
   <div class="title-wrap">
     <div class="kicker in">// Java · Swing Components</div>
     <h1 class="in">Lập trình giao diện<br><span class="grad">Java Swing qua 26 demo</span></h1>
     <p class="in muted" style="font-size:24px;margin-top:20px;max-width:980px">Đọc hiểu code các demo trong <b>The Java Tutorials (Oracle)</b>, sắp xếp theo chủ đề và từ dễ đến khó: cửa sổ → nhãn &amp; ảnh → nút → nhập văn bản → combo &amp; list → menu &amp; hộp thoại → tác vụ nền → bảng JTable.</p>
-    <p class="in" style="margin-top:34px;font-size:max(18px,var(--htt-min,24px));color:#7495ca">← → hoặc Space: chạy từng bước · Shift+→: qua slide · <b>G</b> hoặc nút <b>☰ Đi tới slide</b>: nhảy tới slide bất kỳ · A: hiện hết · F: toàn màn hình</p>
+    <p class="in" style="margin-top:34px;font-size:18px;color:#8a91b4">← → hoặc Space: chạy từng bước · Shift+→: qua slide · <b>G</b> hoặc nút <b>☰ Đi tới slide</b>: nhảy tới slide bất kỳ · A: hiện hết · F: toàn màn hình</p>
   </div>
 </section>
 
 <!-- ===================== AGENDA ===================== -->
 <section class="slide" id="agenda" data-title="Nội dung">
-  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:max(17px,var(--htt-min,24px))">· bấm vào demo để đi tới · ★ = độ khó</span></div>
-  <div class="agenda in htt-stack">
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:17px">· bấm vào demo để đi tới · ★ = độ khó</span></div>
+  <div class="agenda in">
     <div class="sec">0 · Khung chương trình &nbsp;·&nbsp; 1 · Cửa sổ JFrame &nbsp;·&nbsp; 2 · Nhãn &amp; hình ảnh</div>
     <div class="ag g1" data-goto="skeleton"><b>00</b>Khung chung</div>
     <div class="ag g1" data-goto="FrameDemo"><b>01</b>FrameDemo ★</div>
@@ -305,12 +283,7 @@ mark.sel{background:#c1d8fc}
     <div class="ag g3" data-goto="RadioButtonDemo"><b>07</b>RadioButtonDemo ★★</div><div></div>
     <div class="sec">4 · Nhập văn bản</div>
     <div class="ag g4" data-goto="PasswordDemo"><b>08</b>PasswordDemo ★★</div>
-    </div>
-</section>
-
-<section id="agenda-p2" class="slide htt-cont" data-title="Nội dung">
-<div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:max(17px,var(--htt-min,24px))">· bấm vào demo để đi tới · ★ = độ khó</span></div>
-<div class="agenda in htt-stack htt-cont-part"><div class="ag g4" data-goto="TextFieldDemo"><b>09</b>TextFieldDemo ★★</div>
+    <div class="ag g4" data-goto="TextFieldDemo"><b>09</b>TextFieldDemo ★★</div>
     <div class="ag g4" data-goto="FormattedTextFieldDemo"><b>10</b>FormattedTextField ★★★</div>
     <div class="ag g4" data-goto="TextAreaDemo"><b>11</b>TextAreaDemo ★★★</div>
     <div class="sec">5 · Chọn từ danh sách</div>
@@ -322,12 +295,7 @@ mark.sel{background:#c1d8fc}
     <div class="ag g6" data-goto="MenuDemo"><b>16</b>MenuDemo ★★</div>
     <div class="ag g6" data-goto="DialogDemo"><b>17</b>DialogDemo ★★★</div>
     <div class="ag g7" data-goto="ProgressBarDemo"><b>18</b>ProgressBarDemo ★★★</div>
-    </div>
-</section>
-
-<section id="agenda-p2-p2" class="slide htt-cont htt-cont" data-title="Nội dung">
-<div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:max(17px,var(--htt-min,24px))">· bấm vào demo để đi tới · ★ = độ khó</span></div>
-<div class="agenda in htt-stack htt-cont-part htt-cont-part"><div class="ag g7" data-goto="ProgressBarDemo2"><b>19</b>ProgressBarDemo2 ★★★</div>
+    <div class="ag g7" data-goto="ProgressBarDemo2"><b>19</b>ProgressBarDemo2 ★★★</div>
     <div class="sec">8 · Bảng JTable</div>
     <div class="ag g8" data-goto="SimpleTableDemo"><b>20</b>SimpleTableDemo ★</div>
     <div class="ag g8" data-goto="SimpleTableSelectionDemo"><b>21</b>SimpleTableSelection ★★</div>
@@ -341,7 +309,7 @@ mark.sel{background:#c1d8fc}
 </section>
 
 <!-- ===================== SKELETON ===================== -->
-<section class="slide htt-fs18" id="skeleton" data-title="00 · Khung chung của mọi demo">
+<section class="slide" id="skeleton" data-title="00 · Khung chung của mọi demo">
   <div class="hdr in"><span class="qn">00</span><h2>Khung chung của mọi demo Swing</h2></div>
   <div class="cols" style="grid-template-columns:1.12fr 1fr">
     <div>
@@ -388,15 +356,15 @@ public class ButtonDemo extends JPanel implements ActionListener {
       <span class="f ghost" data-now="#kSk|show-f" data-say="<b>setContentPane</b>: dùng panel đó làm vùng nội dung của cửa sổ. <b>setOpaque(true)</b> để panel tự tô nền (content pane phải đục)."></span>
       <span class="f ghost" data-now="#kSk|show-g" data-act="#skE5|sh" data-say="<b>pack()</b> tính kích thước vừa khít với kích thước ưa thích (preferred size) của các component. <b>setVisible(true)</b> hiện cửa sổ. Từ đây EDT ngồi chờ sự kiện (click, gõ phím…) và gọi listener tương ứng."></span>
       <p class="say">Nhấn → để chạy từng bước.</p>
-      <div class="note blue f" style="font-size:max(15.5px,var(--htt-min,24px))">Hầu hết 26 demo đều theo khung này. Ở các slide sau chỉ trích phần <b>khác biệt</b>: constructor, listener và các lớp phụ.</div>
+      <div class="note blue f" style="font-size:15.5px">Hầu hết 26 demo đều theo khung này. Ở các slide sau chỉ trích phần <b>khác biệt</b>: constructor, listener và các lớp phụ.</div>
     </div>
   </div>
 </section>
 
 <!-- ===================== 01 FrameDemo ===================== -->
-<section class="slide htt-fs18" id="FrameDemo" data-title="01 · FrameDemo: tạo cửa sổ JFrame">
-  <style>#fw{width:330px}#fw.packed{width:auto}#fwb{height:150px;display:flex;align-items:center;justify-content:center}#fw.packed #fwb{height:auto}#flab{width:175px;height:100px;border:2px dashed #8cb6f9;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:max(12px,var(--htt-min,24px));color:#3a7fed}
-  .bl{display:grid;grid-template-columns:70px 120px 70px;grid-template-rows:26px 52px 26px;gap:3px;font-family:var(--mono);font-size:max(10.5px,var(--htt-min,24px));font-weight:700}.bl div{background:#f1f4f9;border:1px solid #c4d2e8;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#426bad}.bl .t,.bl .b{grid-column:1/-1}.bl .c{background:#e9f1fe;border-color:#8cb6f9;color:#286cd9}</style>
+<section class="slide" id="FrameDemo" data-title="01 · FrameDemo: tạo cửa sổ JFrame">
+  <style>#fw{width:330px}#fw.packed{width:auto}#fwb{height:150px;display:flex;align-items:center;justify-content:center}#fw.packed #fwb{height:auto}#flab{width:175px;height:100px;border:2px dashed #a78bfa;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;color:#7c3aed}
+  .bl{display:grid;grid-template-columns:70px 120px 70px;grid-template-rows:26px 52px 26px;gap:3px;font-family:var(--mono);font-size:10.5px;font-weight:700}.bl div{background:#f1f5f9;border:1px solid #cbd5e1;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#64748b}.bl .t,.bl .b{grid-column:1/-1}.bl .c{background:#ede9fe;border-color:#a78bfa;color:#6d28d9}</style>
   <div class="hdr in"><span class="qn">DEMO 01</span><h2>FrameDemo: cửa sổ JFrame đầu tiên</h2><span class="lvl">Độ khó <b>★</b><s>★★</s></span></div>
   <div class="cols" style="grid-template-columns:1.05fr 1fr">
     <div>
@@ -418,7 +386,7 @@ public class FrameDemo {
     // main(): invokeLater(... createAndShowGUI() ...)
 }
 </script>
-      <table class="t1 f" style="margin-top:10px;font-size:max(14.5px,var(--htt-min,24px))"><tr><th>setDefaultCloseOperation(…)</th><th>Khi bấm ×</th></tr>
+      <table class="t1 f" style="margin-top:10px;font-size:14.5px"><tr><th>setDefaultCloseOperation(…)</th><th>Khi bấm ×</th></tr>
         <tr><td>HIDE_ON_CLOSE</td><td>(mặc định) chỉ ẩn cửa sổ</td></tr>
         <tr><td>DISPOSE_ON_CLOSE</td><td>ẩn &amp; giải phóng cửa sổ này</td></tr>
         <tr><td>EXIT_ON_CLOSE</td><td>thoát toàn bộ ứng dụng</td></tr>
@@ -431,7 +399,7 @@ public class FrameDemo {
       </div>
       <div style="display:flex;gap:14px;align-items:center;justify-content:center">
         <div class="bl hide0" id="fbl"><div class="t">PAGE_START</div><div>LINE_START</div><div class="c">CENTER</div><div>LINE_END</div><div class="b">PAGE_END</div></div>
-        <p class="hide0" id="fbt" style="font-size:max(14px,var(--htt-min,24px));max-width:230px;color:var(--muted)">Content pane của JFrame mặc định dùng <b>BorderLayout</b>: 5 vùng, CENTER chiếm phần còn lại.</p>
+        <p class="hide0" id="fbt" style="font-size:14px;max-width:230px;color:var(--muted)">Content pane của JFrame mặc định dùng <b>BorderLayout</b>: 5 vùng, CENTER chiếm phần còn lại.</p>
       </div>
       <span class="f ghost" data-now="#kFr|show-a" data-act="#fw|sh" data-say="<b>new JFrame(&quot;FrameDemo&quot;)</b> tạo đối tượng cửa sổ, nhưng cửa sổ <b>chưa hiện</b> trên màn hình (vẽ mờ)."></span>
       <span class="f ghost" data-now="#kFr|show-b" data-act="#fwx|sh" data-say="Gắn hành vi cho nút ×: <b>EXIT_ON_CLOSE</b> gọi System.exit khi đóng. Xem bảng các lựa chọn bên trái."></span>
@@ -445,9 +413,9 @@ public class FrameDemo {
 </section>
 
 <!-- ===================== 02 FrameDemo2 ===================== -->
-<section class="slide htt-fs18" id="FrameDemo2" data-title="02 · FrameDemo2: trang trí cửa sổ, vị trí, icon">
+<section class="slide" id="FrameDemo2" data-title="02 · FrameDemo2: trang trí cửa sổ, vị trí, icon">
   <style>#f2s .win{position:absolute}#f2m{left:0;top:0;width:290px}#f2a,#f2b,#f2c{width:150px;height:84px}#f2a{left:300px;top:20px}#f2b{left:340px;top:60px}#f2c{left:380px;top:100px}
-  #f2s .wb{font-size:max(12px,var(--htt-min,24px))}#f2s .rad{font-size:max(12px,var(--htt-min,24px));padding:1px 0}.fdi{display:inline-block;width:14px;height:14px;background:#4486ef;border-radius:2px;vertical-align:middle;margin-right:4px}.fdj{display:inline-block;width:14px;height:14px;background:#0e65f2;border-radius:2px;vertical-align:middle;margin-right:4px}</style>
+  #f2s .wb{font-size:12px}#f2s .rad{font-size:12px;padding:1px 0}.fdi{display:inline-block;width:14px;height:14px;background:radial-gradient(circle at 50% 40%,#ef4444 0 28%,#000 32%);border-radius:2px;vertical-align:middle;margin-right:4px}.fdj{display:inline-block;width:14px;height:14px;background:linear-gradient(135deg,#f59e0b,#7c3aed);border-radius:2px;vertical-align:middle;margin-right:4px}</style>
   <div class="hdr in"><span class="qn">DEMO 02</span><h2>FrameDemo2: trang trí, vị trí &amp; icon cửa sổ</h2><span class="lvl">Độ khó <b>★★</b><s>★</s></span></div>
   <div class="cols" style="grid-template-columns:1.1fr 1fr">
     <div>
@@ -489,9 +457,9 @@ public void showNewWindow() {
           <div style="font-weight:600;margin-top:6px">Icon options:</div>
           <div class="rad" id="f2r4">Default icon</div><div class="rad">Icon from a JPEG file</div><div class="rad" id="f2r6">Painted icon</div>
           <div style="text-align:center;margin-top:6px"><span class="jb def" id="f2btn">New window</span></div></div></div>
-        <div class="win hide0" id="f2a"><div class="wt"><i></i><i></i><i></i><span>A window</span></div><div class="wb" style="text-align:center;padding-top:18px"><span class="jb" style="font-size:max(11px,var(--htt-min,24px));padding:2px 6px">Close window</span></div></div>
-        <div class="win undec hide0" id="f2b"><div class="wt"><span>A window</span></div><div class="wb" style="text-align:center;padding-top:44px"><span class="jb" style="font-size:max(11px,var(--htt-min,24px));padding:2px 6px">Close window</span></div></div>
-        <div class="win hide0" id="f2c"><div class="wt"><span class="fdi"></span><span style="margin-left:0">A window</span></div><div class="wb" style="text-align:center;padding-top:18px"><span class="jb" style="font-size:max(11px,var(--htt-min,24px));padding:2px 6px">Close window</span></div></div>
+        <div class="win hide0" id="f2a"><div class="wt"><i></i><i></i><i></i><span>A window</span></div><div class="wb" style="text-align:center;padding-top:18px"><span class="jb" style="font-size:11px;padding:2px 6px">Close window</span></div></div>
+        <div class="win undec hide0" id="f2b"><div class="wt"><span>A window</span></div><div class="wb" style="text-align:center;padding-top:44px"><span class="jb" style="font-size:11px;padding:2px 6px">Close window</span></div></div>
+        <div class="win hide0" id="f2c"><div class="wt"><span class="fdi"></span><span style="margin-left:0">A window</span></div><div class="wb" style="text-align:center;padding-top:18px"><span class="jb" style="font-size:11px;padding:2px 6px">Close window</span></div></div>
       </div>
       <div class="vars"><span class="vc" id="f2v1"><b>noDecorations</b> = false</span><span class="vc" id="f2v2"><b>specifyIcon</b> = false</span><span class="vc" id="f2v3"><b>createIcon</b> = false</span></div>
       <span class="f ghost" data-act="#f2r1|on;#f2r4|on" data-say="Cửa sổ chính có 2 nhóm <b>JRadioButton</b> (mỗi nhóm một <b>ButtonGroup</b>) và nút <b>New window</b> được đặt làm <b>default button</b> (nhấn Enter = bấm nút). Mọi nút dùng chung một <b>ActionListener</b> là this."></span>
@@ -506,8 +474,8 @@ public void showNewWindow() {
 </section>
 
 <!-- ===================== 03 LabelDemo ===================== -->
-<section class="slide htt-fs18" id="LabelDemo" data-title="03 · LabelDemo: JLabel chữ, ảnh, chữ+ảnh">
-  <style>#lbw .wb{display:grid;grid-template-rows:repeat(3,70px);padding:0}#lbw .row{display:flex;align-items:center;justify-content:flex-start;border-bottom:1px dashed #c4d2e8;padding:0 12px;position:relative;transition:background .3s}#lbw .row.hl{background:#d8e6fd}#lbw .row:last-child{border:none}#lbw .row1{flex-direction:column;justify-content:center;gap:2px}</style>
+<section class="slide" id="LabelDemo" data-title="03 · LabelDemo: JLabel chữ, ảnh, chữ+ảnh">
+  <style>#lbw .wb{display:grid;grid-template-rows:repeat(3,70px);padding:0}#lbw .row{display:flex;align-items:center;justify-content:flex-start;border-bottom:1px dashed #cbd5e1;padding:0 12px;position:relative;transition:background .3s}#lbw .row.hl{background:#fff7d6}#lbw .row:last-child{border:none}#lbw .row1{flex-direction:column;justify-content:center;gap:2px}</style>
   <div class="hdr in"><span class="qn">DEMO 03</span><h2>LabelDemo: JLabel hiển thị chữ và ảnh</h2><span class="lvl">Độ khó <b>★</b><s>★★</s></span></div>
   <div class="cols" style="grid-template-columns:1.1fr 1fr">
     <div>
@@ -560,10 +528,10 @@ public class LabelDemo extends JPanel {
 </section>
 
 <!-- ===================== 04 IconDemo ===================== -->
-<section class="slide htt-fs18" id="IconDemo" data-title="04 · IconDemo: nạp ảnh nền bằng SwingWorker">
-  <style>#icw .ph{height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:max(12px,var(--htt-min,24px));color:#444}#icw .big{width:180px;height:120px;border-radius:6px;transition:all .4s}
-  #icw .bar{display:flex;gap:6px;justify-content:center;border-top:1px solid #c1d0e8;padding:6px;background:#f6f8fb;min-height:48px}
-  .p1{background:#3a7fed}.p2{background:#0e62e9}.p3{background:#0e65f2}.p4{background:#1051b9}.p5{background:#3f84f4}</style>
+<section class="slide" id="IconDemo" data-title="04 · IconDemo: nạp ảnh nền bằng SwingWorker">
+  <style>#icw .ph{height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:12px;color:#444}#icw .big{width:180px;height:120px;border-radius:6px;transition:all .4s}
+  #icw .bar{display:flex;gap:6px;justify-content:center;border-top:1px solid #cfd2da;padding:6px;background:linear-gradient(180deg,#f7f7fa,#e9ebf0);min-height:48px}
+  .p1{background:linear-gradient(135deg,#7c3aed,#ec4899)}.p2{background:linear-gradient(160deg,#0ea5e9,#1e3a8a)}.p3{background:linear-gradient(200deg,#f59e0b,#b45309)}.p4{background:linear-gradient(120deg,#10b981,#065f46)}.p5{background:linear-gradient(90deg,#f43f5e,#7c2d12)}</style>
   <div class="hdr in"><span class="qn">DEMO 04</span><h2>IconDemo: ảnh thumbnail &amp; SwingWorker</h2><span class="lvl">Độ khó <b>★★★</b></span></div>
   <div class="cols" style="grid-template-columns:1.12fr 1fr">
     <div>
@@ -605,7 +573,7 @@ private class ThumbnailAction extends AbstractAction {
     <div>
       <div class="stage"><div class="win" id="icw" style="width:380px"><div class="wt"><i></i><i></i><i></i><span id="ict">Icon Demo: Please Select an Image</span></div>
         <div class="ph" id="icph"><span class="muted">photographLabel (CENTER)</span></div>
-        <div class="bar"><span class="muted" style="font-size:max(11px,var(--htt-min,24px))">glue</span><span class="thumb p1 hide0" id="ith1"></span><span class="thumb p2 hide0" id="ith2"></span><span class="thumb p3 hide0" id="ith3"></span><span class="thumb p4 hide0" id="ith4"></span><span class="thumb p5 hide0" id="ith5"></span><span class="muted" style="font-size:max(11px,var(--htt-min,24px))">glue</span></div></div></div>
+        <div class="bar"><span class="muted" style="font-size:11px">glue</span><span class="thumb p1 hide0" id="ith1"></span><span class="thumb p2 hide0" id="ith2"></span><span class="thumb p3 hide0" id="ith3"></span><span class="thumb p4 hide0" id="ith4"></span><span class="thumb p5 hide0" id="ith5"></span><span class="muted" style="font-size:11px">glue</span></div></div></div>
       <div class="lane" style="margin-top:10px"><b>worker thread</b><div class="ln2" id="icL1"><span class="ev hide0" id="icw1">load+scale 1</span><span class="ev hide0" id="icw2">publish 1</span><span class="ev hide0" id="icw3">load 2…5</span></div></div>
       <div class="lane" style="margin-top:4px"><b>EDT</b><div class="ln2"><span class="ev b hide0" id="ice1">execute()</span><span class="ev c hide0" id="ice2">process: add nút</span><span class="ev d hide0" id="ice3">click → action</span></div></div>
       <span class="f ghost" data-act="#ice1|sh" data-say="Constructor dựng khung: <b>photographLabel</b> ở CENTER, <b>JToolBar</b> ở SOUTH có sẵn 2 <b>glue</b> (khoảng trống co giãn) để căn giữa các nút. Cuối constructor gọi <b>loadimages.execute()</b>."></span>
@@ -621,7 +589,7 @@ private class ThumbnailAction extends AbstractAction {
 </section>
 
 <!-- ===================== 05 ButtonDemo ===================== -->
-<section class="slide htt-fs18" id="ButtonDemo" data-title="05 · ButtonDemo: JButton, icon, mnemonic, enable/disable">
+<section class="slide" id="ButtonDemo" data-title="05 · ButtonDemo: JButton, icon, mnemonic, enable/disable">
   <div class="hdr in"><span class="qn">DEMO 05</span><h2>ButtonDemo: JButton &amp; ActionListener</h2><span class="lvl">Độ khó <b>★</b><s>★★</s></span></div>
   <div class="cols" style="grid-template-columns:1.08fr 1fr">
     <div>
@@ -680,7 +648,7 @@ public void actionPerformed(ActionEvent e) {
 </section>
 
 <!-- ===================== 06 CheckBoxDemo ===================== -->
-<section class="slide htt-fs18" id="CheckBoxDemo" data-title="06 · CheckBoxDemo: JCheckBox & ItemListener">
+<section class="slide" id="CheckBoxDemo" data-title="06 · CheckBoxDemo: JCheckBox & ItemListener">
   <div class="hdr in"><span class="qn">DEMO 06</span><h2>CheckBoxDemo: JCheckBox &amp; ItemListener</h2><span class="lvl">Độ khó <b>★★</b><s>★</s></span></div>
   <div class="cols" style="grid-template-columns:1.08fr 1fr">
     <div>
@@ -731,13 +699,13 @@ protected void updatePicture() {
       <span class="f ghost" data-now="#kCb|show-h;#kCb|show-i" data-act="#cb2|off;#cc1|bad" data-set="#cv1::-;#cbfile::geek-<b>c-ht</b>.gif;#cbpic::<span class='pop'>😀</span>" data-say="<b>updatePicture()</b> ghép tên file &quot;images/geek/geek-c-ht.gif&quot;, nạp icon và <b>setIcon</b> cho nhãn ảnh: nhân vật mất kính."></span>
       <span class="f ghost" data-act="#cb2|off;#cb4|off;#cc1|bad;#cc3|bad" data-set="#cv1::-;#cv3::-;#cbfile::geek-<b>c-h-</b>.gif;#cbpic::<span class='pop'>😶</span>;#cbIdx::<b>index</b> = 3;#cbC::<b>c</b> = '-';#cbSt::<b>stateChange</b> = DESELECTED" data-say="Bỏ chọn tiếp <b>Teeth</b> (Alt+T): index = 3 → &quot;c-h-&quot;. Mỗi lần thay đổi chỉ sửa đúng 1 ký tự, không cần kiểm tra lại cả 4 checkbox."></span>
       <p class="say">Nhấn → để chạy từng bước.</p>
-      <div class="note blue f" data-o="99" style="font-size:max(15px,var(--htt-min,24px))"><b>ItemListener</b> báo khi trạng thái chọn thay đổi (kể cả do code gọi setSelected). <b>ActionListener</b> chỉ báo khi người dùng thao tác.</div>
+      <div class="note blue f" data-o="99" style="font-size:15px"><b>ItemListener</b> báo khi trạng thái chọn thay đổi (kể cả do code gọi setSelected). <b>ActionListener</b> chỉ báo khi người dùng thao tác.</div>
     </div>
   </div>
 </section>
 
 <!-- ===================== 07 RadioButtonDemo ===================== -->
-<section class="slide htt-fs18" id="RadioButtonDemo" data-title="07 · RadioButtonDemo: JRadioButton & ButtonGroup">
+<section class="slide" id="RadioButtonDemo" data-title="07 · RadioButtonDemo: JRadioButton & ButtonGroup">
   <div class="hdr in"><span class="qn">DEMO 07</span><h2>RadioButtonDemo: JRadioButton &amp; ButtonGroup</h2><span class="lvl">Độ khó <b>★★</b><s>★</s></span></div>
   <div class="cols" style="grid-template-columns:1.05fr 1fr">
     <div>
@@ -767,7 +735,7 @@ public void actionPerformed(ActionEvent e) {
                                     + e.getActionCommand() + ".gif"));
 }
 </script>
-      <table class="t1 f" data-o="99" style="margin-top:10px;font-size:max(14px,var(--htt-min,24px))"><tr><th></th><th>JCheckBox</th><th>JRadioButton + ButtonGroup</th></tr>
+      <table class="t1 f" data-o="99" style="margin-top:10px;font-size:14px"><tr><th></th><th>JCheckBox</th><th>JRadioButton + ButtonGroup</th></tr>
         <tr><td>Chọn</td><td>nhiều ô cùng lúc</td><td>đúng 1 ô trong nhóm</td></tr>
         <tr><td>Listener hay dùng</td><td>ItemListener</td><td>ActionListener</td></tr></table>
     </div>
@@ -775,7 +743,7 @@ public void actionPerformed(ActionEvent e) {
       <div class="stage"><div class="win" style="width:400px"><div class="wt"><i></i><i></i><i></i><span>RadioButtonDemo</span></div>
         <div class="wb" style="display:flex;gap:20px;align-items:center;padding:14px 20px">
           <div><div class="rad on" id="rb1"><u>B</u>ird</div><div class="rad" id="rb2"><u>C</u>at</div><div class="rad" id="rb3"><u>D</u>og</div><div class="rad" id="rb4"><u>R</u>abbit</div><div class="rad" id="rb5"><u>P</u>ig</div></div>
-          <div style="flex:1;text-align:center"><div class="pic" id="rbpic" style="width:177px;height:122px;border:1px dashed #c4d2e8;margin:auto">🐦</div><div class="kv" id="rbfile">images/Bird.gif</div></div>
+          <div style="flex:1;text-align:center"><div class="pic" id="rbpic" style="width:177px;height:122px;border:1px dashed #cbd5e1;margin:auto">🐦</div><div class="kv" id="rbfile">images/Bird.gif</div></div>
         </div></div></div>
       <div class="vars" style="justify-content:center"><span class="vc" id="rbCmd"><b>e.getActionCommand()</b> = –</span></div>
       <span class="f ghost" data-now="#kRb|show-a;#rb1|hlo" data-say="Mỗi nút có <b>mnemonic</b> (Alt+B, Alt+C…) và <b>action command</b> = tên con vật. Bird được chọn sẵn bằng setSelected(true)."></span>
@@ -790,7 +758,7 @@ public void actionPerformed(ActionEvent e) {
 </section>
 
 <!-- ===================== 08 PasswordDemo ===================== -->
-<section class="slide htt-fs18" id="PasswordDemo" data-title="08 · PasswordDemo: JPasswordField">
+<section class="slide" id="PasswordDemo" data-title="08 · PasswordDemo: JPasswordField">
   <div class="hdr in"><span class="qn">DEMO 08</span><h2>PasswordDemo: JPasswordField &amp; char[]</h2><span class="lvl">Độ khó <b>★★</b><s>★</s></span></div>
   <div class="cols" style="grid-template-columns:1.08fr 1fr">
     <div>
@@ -852,7 +820,7 @@ private static boolean isPasswordCorrect(char[] input) {
 </section>
 
 <!-- ===================== 09 TextFieldDemo ===================== -->
-<section class="slide htt-fs18" id="TextFieldDemo" data-title="09 · TextFieldDemo: tìm kiếm khi gõ, DocumentListener, Highlighter">
+<section class="slide" id="TextFieldDemo" data-title="09 · TextFieldDemo: tìm kiếm khi gõ, DocumentListener, Highlighter">
   <div class="hdr in"><span class="qn">DEMO 09</span><h2>TextFieldDemo: tìm ngay khi gõ</h2><span class="lvl">Độ khó <b>★★</b><s>★</s></span></div>
   <div class="cols" style="grid-template-columns:1.12fr 1fr">
     <div>
@@ -898,11 +866,11 @@ class CancelAction extends AbstractAction {
       <div class="stage"><div class="win" style="width:470px"><div class="wt"><i></i><i></i><i></i><span>TextFieldDemo</span></div>
         <div class="wb">
           <div style="display:flex;gap:8px;align-items:center"><span>Enter text to search:</span><span class="tf" id="tfe" style="flex:1"><span class="cur"></span></span></div>
-          <div class="ta" id="tfa" style="margin-top:8px;height:118px;white-space:pre;font-size:max(11.5px,var(--htt-min,24px))">The Java Swing toolkit draws its own widgets. Every Swing
+          <div class="ta" id="tfa" style="margin-top:8px;height:118px;white-space:pre;font-size:11.5px">The Java Swing toolkit draws its own widgets. Every Swing
 component is a JComponent, and Swing components are not
 thread safe, so they must be used only on the event
 dispatch thread. JTextArea shows many lines of text.</div>
-          <div id="tfs" style="margin-top:6px;font-size:max(13px,var(--htt-min,24px));min-height:18px;color:#333"> </div>
+          <div id="tfs" style="margin-top:6px;font-size:13px;min-height:18px;color:#333"> </div>
         </div></div></div>
       <div class="vars" style="justify-content:center"><span class="vc" id="tfv1"><b>s</b> = &quot;&quot;</span><span class="vc" id="tfv2"><b>index</b> = –</span><span class="vc" id="tfv3"><b>end</b> = –</span></div>
       <span class="f ghost" data-now="#kTf|show-a" data-say="Giao diện: một <b>JTextField</b> để gõ, một <b>JTextArea</b> (chỉ đọc, nằm trong JScrollPane) chứa nội dung file content.txt, và một JLabel trạng thái. <b>Highlighter</b> là đối tượng tô nền cho một đoạn văn bản."></span>
@@ -919,7 +887,7 @@ dispatch thread. JTextArea shows many lines of text.</div>
 </section>
 
 <!-- ===================== 10 FormattedTextFieldDemo ===================== -->
-<section class="slide htt-fs18" id="FormattedTextFieldDemo" data-title="10 · FormattedTextFieldDemo: JFormattedTextField">
+<section class="slide" id="FormattedTextFieldDemo" data-title="10 · FormattedTextFieldDemo: JFormattedTextField">
   <div class="hdr in"><span class="qn">DEMO 10</span><h2>FormattedTextFieldDemo: tính tiền trả góp</h2><span class="lvl">Độ khó <b>★★★</b></span></div>
   <div class="cols" style="grid-template-columns:1.12fr 1fr">
     <div>
@@ -965,7 +933,7 @@ double computePayment(double loanAmt, double rate, int numPeriods) {
           <span>Loan Amount:</span><span class="tf" id="ftA" style="min-width:130px">100,000</span>
           <span>APR (%):</span><span class="tf" id="ftR" style="min-width:130px">7.500</span>
           <span>Years:</span><span class="tf" id="ftY" style="min-width:130px">30</span>
-          <span>Monthly Payment:</span><span class="tf ro" id="ftP" style="min-width:130px;color:#266cdc">($699.21)</span>
+          <span>Monthly Payment:</span><span class="tf ro" id="ftP" style="min-width:130px;color:#dc2626">($699.21)</span>
         </div></div></div>
       <div class="vars" style="justify-content:center"><span class="vc" id="ftv1"><b>amount</b> = 100000.0</span><span class="vc" id="ftv2"><b>rate</b> = 7.5</span><span class="vc" id="ftv3"><b>numPeriods</b> = 30</span></div>
       <div class="vars" style="justify-content:center" id="ftcalc"><span class="vc">n = 360 tháng</span><span class="vc">I = 0.00625</span><span class="vc">partial1 = 0.10615</span><span class="vc">denominator = 143.02</span></div>
@@ -984,7 +952,7 @@ double computePayment(double loanAmt, double rate, int numPeriods) {
 </section>
 
 <!-- ===================== 11 TextAreaDemo ===================== -->
-<section class="slide htt-fs18" id="TextAreaDemo" data-title="11 · TextAreaDemo: tự hoàn thành từ (autocomplete)">
+<section class="slide" id="TextAreaDemo" data-title="11 · TextAreaDemo: tự hoàn thành từ (autocomplete)">
   <div class="hdr in"><span class="qn">DEMO 11</span><h2>TextAreaDemo: tự hoàn thành từ khi gõ</h2><span class="lvl">Độ khó <b>★★★</b></span></div>
   <div class="cols" style="grid-template-columns:1.12fr 1fr">
     <div>
@@ -1025,8 +993,8 @@ mode = Mode.COMPLETION;
     </div>
     <div>
       <div class="stage"><div class="win" style="width:440px"><div class="wt"><i></i><i></i><i></i><span>TextAreaDemo</span></div>
-        <div class="wb"><div style="font-size:max(13px,var(--htt-min,24px));margin-bottom:6px">Try typing 'spectacular' or 'Swing'...</div>
-          <div class="ta" id="taT" style="height:64px;font-size:max(16px,var(--htt-min,24px))"><span class="cur"></span></div></div></div></div>
+        <div class="wb"><div style="font-size:13px;margin-bottom:6px">Try typing 'spectacular' or 'Swing'...</div>
+          <div class="ta" id="taT" style="height:64px;font-size:16px"><span class="cur"></span></div></div></div></div>
       <div class="code-title" style="margin-top:10px">words (ArrayList đã sắp xếp)</div>
       <div class="arr"><div class="cell wide" id="tw0">spark<small>[0]</small></div><div class="cell wide" id="tw1">special<small>[1]</small></div><div class="cell wide" id="tw2">spectacles<small>[2]</small></div><div class="cell wide" id="tw3">spectacular<small>[3]</small></div><div class="cell wide" id="tw4">swing<small>[4]</small></div></div>
       <div class="vars" style="justify-content:center"><span class="vc" id="tav1"><b>pos</b>=–, <b>w</b>=–</span><span class="vc" id="tav2"><b>prefix</b> = –</span><span class="vc" id="tav3"><b>n</b> = –</span><span class="vc" id="tav4"><b>completion</b> = –</span></div>
@@ -1044,7 +1012,7 @@ mode = Mode.COMPLETION;
 </section>
 
 <!-- ===================== 12 ComboBoxDemo ===================== -->
-<section class="slide htt-fs16" id="ComboBoxDemo" data-title="12 · ComboBoxDemo: JComboBox không sửa được">
+<section class="slide" id="ComboBoxDemo" data-title="12 · ComboBoxDemo: JComboBox không sửa được">
   <div class="hdr in"><span class="qn">DEMO 12</span><h2>ComboBoxDemo: chọn một mục trong JComboBox</h2><span class="lvl">Độ khó <b>★</b><s>★★</s></span></div>
   <div class="cols" style="grid-template-columns:1.08fr 1fr">
     <div>
@@ -1093,13 +1061,13 @@ protected void updateLabel(String name) {
       <span class="f ghost" data-now="#kCo|show-g;#coC|open;#coI1|s" data-set="#coV::Cat;#coV1::<b>selectedIndex</b> = 1;#coV2::<b>selectedItem</b> = &quot;Cat&quot;" data-say="Chọn <b>Cat</b> → combo phát <b>ActionEvent</b>. Listener lấy combo bằng <b>e.getSource()</b> (ép kiểu), rồi <b>getSelectedItem()</b> trả về Object → ép sang String &quot;Cat&quot;."></span>
       <span class="f ghost" data-now="#kCo|show-h;#coT|on" data-set="#coV::Cat;#coV1::<b>selectedIndex</b> = 1;#coV2::<b>selectedItem</b> = &quot;Cat&quot;;#coP::<span class='pop'>🐱</span>;#coT::A drawing of a cat" data-say="<b>updateLabel(&quot;Cat&quot;)</b> nạp &quot;images/Cat.gif&quot;, đặt icon và tooltip. Nếu thiếu file thì icon = null → hiện chữ nghiêng &quot;Image not found&quot; (lý do đặt font ITALIC từ đầu)."></span>
       <p class="say">Nhấn → để chạy từng bước.</p>
-      <div class="note blue f" data-o="99" style="font-size:max(15px,var(--htt-min,24px))">Từ Java 7 nên viết kiểu tổng quát: <code class="i">JComboBox&lt;String&gt; petList = new JComboBox&lt;&gt;(petStrings);</code> để khỏi ép kiểu.</div>
+      <div class="note blue f" data-o="99" style="font-size:15px">Từ Java 7 nên viết kiểu tổng quát: <code class="i">JComboBox&lt;String&gt; petList = new JComboBox&lt;&gt;(petStrings);</code> để khỏi ép kiểu.</div>
     </div>
   </div>
 </section>
 
 <!-- ===================== 13 ComboBoxDemo2 ===================== -->
-<section class="slide htt-fs18" id="ComboBoxDemo2" data-title="13 · ComboBoxDemo2: JComboBox sửa được (editable)">
+<section class="slide" id="ComboBoxDemo2" data-title="13 · ComboBoxDemo2: JComboBox sửa được (editable)">
   <div class="hdr in"><span class="qn">DEMO 13</span><h2>ComboBoxDemo2: combo sửa được &amp; định dạng ngày</h2><span class="lvl">Độ khó <b>★★</b><s>★</s></span></div>
   <div class="cols" style="grid-template-columns:1.1fr 1fr">
     <div>
@@ -1142,12 +1110,12 @@ public void reformat() {
     <div>
       <div class="stage"><div class="win" style="width:380px"><div class="wt"><i></i><i></i><i></i><span>ComboBoxDemo2</span></div>
         <div class="wb" style="padding:12px 14px;height:200px">
-          <div style="font-size:max(13px,var(--htt-min,24px))">Enter the pattern string or<br>select one from the list:</div>
-          <div class="combo ed" id="c2C" style="width:100%;margin-top:4px"><span id="c2V" style="font-family:var(--mono);font-size:max(13px,var(--htt-min,24px))">dd MMMMM yyyy</span><div class="dd" style="font-family:var(--mono)"><div>dd MMMMM yyyy</div><div>dd.MM.yy</div><div id="c2I2">MM/dd/yy</div><div>yyyy.MM.dd G 'at' hh:mm:ss z</div><div>EEE, MMM d, ''yy</div><div>h:mm a</div></div></div>
-          <div style="font-size:max(13px,var(--htt-min,24px));margin-top:14px">Current Date/Time</div>
-          <div id="c2R" style="border:1px solid #000;padding:5px;margin-top:4px;font-size:max(14px,var(--htt-min,24px));background:#fff">03 November 2026</div>
+          <div style="font-size:13px">Enter the pattern string or<br>select one from the list:</div>
+          <div class="combo ed" id="c2C" style="width:100%;margin-top:4px"><span id="c2V" style="font-family:var(--mono);font-size:13px">dd MMMMM yyyy</span><div class="dd" style="font-family:var(--mono)"><div>dd MMMMM yyyy</div><div>dd.MM.yy</div><div id="c2I2">MM/dd/yy</div><div>yyyy.MM.dd G 'at' hh:mm:ss z</div><div>EEE, MMM d, ''yy</div><div>h:mm a</div></div></div>
+          <div style="font-size:13px;margin-top:14px">Current Date/Time</div>
+          <div id="c2R" style="border:1px solid #000;padding:5px;margin-top:4px;font-size:14px;background:#fff">03 November 2026</div>
         </div></div></div>
-      <table class="t1 f" data-o="99" style="margin-top:10px;font-size:max(13.5px,var(--htt-min,24px))"><tr><th>Ký tự</th><th>Ý nghĩa</th><th>Ký tự</th><th>Ý nghĩa</th></tr>
+      <table class="t1 f" data-o="99" style="margin-top:10px;font-size:13.5px"><tr><th>Ký tự</th><th>Ý nghĩa</th><th>Ký tự</th><th>Ý nghĩa</th></tr>
         <tr><td>dd / MM / yy(yy)</td><td>ngày / tháng / năm</td><td>MMMMM</td><td>tên tháng đầy đủ</td></tr>
         <tr><td>H / h, mm, ss</td><td>giờ 0–23 / 1–12, phút, giây</td><td>EEE, a</td><td>thứ, AM/PM</td></tr></table>
       <span class="f ghost" data-now="#kC2|show-a;#kC2|show-b;#kC2|show-c" data-say="<b>BoxLayout.PAGE_AXIS</b>: xếp các phần tử theo chiều dọc. Mảng chứa các <b>mẫu định dạng ngày</b> của SimpleDateFormat; mẫu đầu tiên được dùng lúc khởi động."></span>
@@ -1156,15 +1124,15 @@ public void reformat() {
       <span class="f ghost" data-now="#kC2|show-g;#kC2|show-h;#c2C|open;#c2I2|s" data-set="#c2V::MM/dd/yy;#c2R::11/03/26" data-say="Chọn <b>&quot;MM/dd/yy&quot;</b> → actionPerformed → lưu currentPattern → reformat() → <b>11/03/26</b>."></span>
       <span class="f ghost" data-now="#kC2|show-g;#kC2|show-h" data-set="#c2V::EEE, MMM d, ''yy;#c2R::Tue, Nov 3, '26" data-say="&quot;EEE, MMM d, ''yy&quot; → <b>Tue, Nov 3, '26</b>. Hai dấu nháy đơn liền nhau '' nghĩa là in ra một dấu nháy."></span>
       <span class="f ghost" data-now="#kC2|show-g;#c2C|hlo" data-set="#c2V::dd/MM/yyyy HH:mm<span class='cur'></span>;#c2R::03/11/2026 09:41" data-say="Gõ mẫu kiểu Việt Nam <b>dd/MM/yyyy HH:mm</b> rồi Enter: combo editable phát ActionEvent khi nhấn Enter trong ô nhập → <b>03/11/2026 09:41</b>."></span>
-      <span class="f ghost" data-now="#kC2|show-h;#c2R|hlo" data-set="#c2V::dd bb<span class='cur'></span>;#c2R::<span style='color:#266cdc'>Error: Illegal pattern character 'b'</span>" data-say="Gõ mẫu sai &quot;dd bb&quot;: constructor <b>SimpleDateFormat</b> ném <b>IllegalArgumentException</b> → khối catch hiển thị thông báo lỗi màu đỏ thay vì làm chương trình dừng."></span>
+      <span class="f ghost" data-now="#kC2|show-h;#c2R|hlo" data-set="#c2V::dd bb<span class='cur'></span>;#c2R::<span style='color:#dc2626'>Error: Illegal pattern character 'b'</span>" data-say="Gõ mẫu sai &quot;dd bb&quot;: constructor <b>SimpleDateFormat</b> ném <b>IllegalArgumentException</b> → khối catch hiển thị thông báo lỗi màu đỏ thay vì làm chương trình dừng."></span>
       <p class="say">Nhấn → để chạy từng bước.</p>
     </div>
   </div>
 </section>
 
 <!-- ===================== 14 CustomComboBoxDemo ===================== -->
-<section class="slide htt-fs18" id="CustomComboBoxDemo" data-title="14 · CustomComboBoxDemo: ListCellRenderer tùy biến">
-  <style>.ccr{display:flex;flex-direction:column;align-items:center;justify-content:center;height:62px;font-size:max(13px,var(--htt-min,24px));gap:2px;transition:all .3s}.ccr .e{font-size:30px;line-height:1}.ccr.s{background:#3b77d8;color:#fff}.ccdd{position:absolute;left:0;right:14px;top:100%;background:#fff;border:1px solid #8c93a3;box-shadow:0 8px 18px -8px rgba(0,0,0,.35);z-index:3;display:none}.open>.ccdd{display:block}.ccsb{position:absolute;right:-14px;top:0;bottom:0;width:13px;background:#ebf0f7;border-left:1px solid #ccc}.ccsb::after{content:"";position:absolute;left:2px;right:2px;top:2px;height:55%;background:#a5badd;border-radius:4px}</style>
+<section class="slide" id="CustomComboBoxDemo" data-title="14 · CustomComboBoxDemo: ListCellRenderer tùy biến">
+  <style>.ccr{display:flex;flex-direction:column;align-items:center;justify-content:center;height:62px;font-size:13px;gap:2px;transition:all .3s}.ccr .e{font-size:30px;line-height:1}.ccr.s{background:#3b6fd8;color:#fff}.ccdd{position:absolute;left:0;right:14px;top:100%;background:#fff;border:1px solid #8c93a3;box-shadow:0 8px 18px -8px rgba(0,0,0,.35);z-index:3;display:none}.open>.ccdd{display:block}.ccsb{position:absolute;right:-14px;top:0;bottom:0;width:13px;background:#eef0f4;border-left:1px solid #ccc}.ccsb::after{content:"";position:absolute;left:2px;right:2px;top:2px;height:55%;background:#b9bec9;border-radius:4px}</style>
   <div class="hdr in"><span class="qn">DEMO 14</span><h2>CustomComboBoxDemo: renderer tự vẽ</h2><span class="lvl">Độ khó <b>★★★</b></span></div>
   <div class="cols" style="grid-template-columns:1.15fr 1fr">
     <div>
@@ -1225,7 +1193,7 @@ class ComboBoxRenderer extends JLabel implements ListCellRenderer {
 </section>
 
 <!-- ===================== 15 ListDemo ===================== -->
-<section class="slide htt-fs18" id="ListDemo" data-title="15 · ListDemo: JList + DefaultListModel (Hire/Fire)">
+<section class="slide" id="ListDemo" data-title="15 · ListDemo: JList + DefaultListModel (Hire/Fire)">
   <div class="hdr in"><span class="qn">DEMO 15</span><h2>ListDemo: JList &amp; DefaultListModel</h2><span class="lvl">Độ khó <b>★★★</b></span></div>
   <div class="cols" style="grid-template-columns:1.12fr 1fr">
     <div>
@@ -1285,7 +1253,7 @@ if (size == 0) {   //Nobody's left, disable firing.
 </section>
 
 <!-- ===================== 16 MenuDemo ===================== -->
-<section class="slide htt-fs18" id="MenuDemo" data-title="16 · MenuDemo: JMenuBar, JMenu, các loại JMenuItem">
+<section class="slide" id="MenuDemo" data-title="16 · MenuDemo: JMenuBar, JMenu, các loại JMenuItem">
   <div class="hdr in"><span class="qn">DEMO 16</span><h2>MenuDemo: thanh menu &amp; các loại mục menu</h2><span class="lvl">Độ khó <b>★★</b><s>★</s></span></div>
   <div class="cols" style="grid-template-columns:1.1fr 1fr">
     <div>
@@ -1334,7 +1302,7 @@ public void actionPerformed(ActionEvent e) {
             <div class="mi" id="mi8"><span class="mk"></span>A submenu<span class="acc">▸</span></div></div>
           <div class="menu" id="mnS" style="left:262px;top:198px;min-width:220px"><div class="mi">An item in the submenu<span class="acc">Alt-2</span></div><div class="mi">Another item</div></div>
         </div>
-        <div class="wb" style="padding:6px"><div class="ta bottom" id="mnO" style="height:205px;font-size:max(11.5px,var(--htt-min,24px))"></div></div></div></div>
+        <div class="wb" style="padding:6px"><div class="ta bottom" id="mnO" style="height:205px;font-size:11.5px"></div></div></div></div>
       <span class="f ghost" data-now="#kMn|show-a;#kMn|show-g" data-say="Cây menu: <b>JMenuBar</b> ⊃ <b>JMenu</b> ⊃ các <b>JMenuItem</b>. Thanh menu gắn vào JFrame bằng <b>setJMenuBar</b>, nằm ngoài content pane (phía trên)."></span>
       <span class="f ghost" data-now="#kMn|show-a;#mnA|s;#mnM|open" data-say="<b>setMnemonic(VK_A)</b> trên JMenu: nhấn <b>Alt+A</b> để mở menu &quot;A Menu&quot;."></span>
       <span class="f ghost" data-now="#kMn|show-b;#mnA|s;#mnM|open;#mi1|hlo" data-say="JMenuItem có 2 loại phím tắt: <b>mnemonic</b> (chữ T gạch chân, dùng khi menu đang mở) và <b>accelerator</b> Alt+1 (hiển thị bên phải, dùng được cả khi menu đóng)."></span>
@@ -1348,7 +1316,7 @@ public void actionPerformed(ActionEvent e) {
 </section>
 
 <!-- ===================== 17a DialogDemo ===================== -->
-<section class="slide htt-fs18" id="DialogDemo" data-title="17a · DialogDemo: hộp thoại modal đơn giản (JOptionPane)">
+<section class="slide" id="DialogDemo" data-title="17a · DialogDemo: hộp thoại modal đơn giản (JOptionPane)">
   <div class="hdr in"><span class="qn">DEMO 17 · 1/2</span><h2>DialogDemo: JOptionPane cơ bản</h2><span class="lvl">Độ khó <b>★★★</b></span></div>
   <div class="cols" style="grid-template-columns:1.05fr 1fr">
     <div>
@@ -1387,16 +1355,16 @@ if (n == JOptionPane.YES_OPTION) setLabel("You're kidding!");
       <div class="stage"><div class="win" style="width:470px;height:290px"><div class="wt"><i></i><i></i><i></i><span>DialogDemo</span></div>
         <div class="wb" style="padding:8px 12px">
           <div class="tabs"><span class="s">Simple Modal Dialogs</span><span>More Dialogs</span><span>Dialog Icons</span></div>
-          <div style="font-size:max(12.5px,var(--htt-min,24px));margin-bottom:2px">Some simple message dialogs:</div>
-          <div class="rad on" id="dgr1" style="font-size:max(12.5px,var(--htt-min,24px))">OK (in the L&amp;F's words)</div><div class="rad" id="dgr2" style="font-size:max(12.5px,var(--htt-min,24px))">Yes/No (in the L&amp;F's words)</div><div class="rad" id="dgr3" style="font-size:max(12.5px,var(--htt-min,24px))">Yes/No (in the programmer's words)</div><div class="rad" style="font-size:max(12.5px,var(--htt-min,24px))">Yes/No/Cancel (in the programmer's words)</div>
+          <div style="font-size:12.5px;margin-bottom:2px">Some simple message dialogs:</div>
+          <div class="rad on" id="dgr1" style="font-size:12.5px">OK (in the L&amp;F's words)</div><div class="rad" id="dgr2" style="font-size:12.5px">Yes/No (in the L&amp;F's words)</div><div class="rad" id="dgr3" style="font-size:12.5px">Yes/No (in the programmer's words)</div><div class="rad" style="font-size:12.5px">Yes/No/Cancel (in the programmer's words)</div>
           <div style="margin-top:6px"><span class="jb" id="dgShow">Show it!</span></div>
-          <div id="dgL" style="text-align:center;margin-top:12px;font-size:max(13px,var(--htt-min,24px))">Click the "Show it!" button to bring up the selected dialog.</div>
+          <div id="dgL" style="text-align:center;margin-top:12px;font-size:13px">Click the "Show it!" button to bring up the selected dialog.</div>
         </div>
         <div class="dlgwrap" id="dgD1"><div class="win" style="width:300px"><div class="wt"><span>Message</span></div><div class="wb" style="display:flex;gap:10px;align-items:center"><span class="dlgico">i</span><span>Eggs aren't supposed to be green.</span></div><div style="text-align:right;padding:0 10px 8px"><span class="jb def">OK</span></div></div></div>
         <div class="dlgwrap" id="dgD2"><div class="win" style="width:320px"><div class="wt"><span>An Inane Question</span></div><div class="wb" style="display:flex;gap:10px;align-items:center"><span class="dlgico q">?</span><span>Would you like green eggs and ham?</span></div><div style="text-align:right;padding:0 10px 8px;display:flex;gap:6px;justify-content:flex-end"><span class="jb def">Yes</span><span class="jb" id="dgNo">No</span></div></div></div>
         <div class="dlgwrap" id="dgD3"><div class="win" style="width:330px"><div class="wt"><span>A Silly Question</span></div><div class="wb" style="display:flex;gap:10px;align-items:center"><span class="dlgico q">?</span><span>Would you like green eggs and ham?</span></div><div style="text-align:right;padding:0 10px 8px;display:flex;gap:6px;justify-content:flex-end"><span class="jb def" id="dgYP">Yes, please</span><span class="jb">No way!</span></div></div></div>
       </div></div>
-      <table class="t1 f" data-o="99" style="margin-top:8px;font-size:max(13px,var(--htt-min,24px))"><tr><th>Giá trị trả về</th><th>Ý nghĩa</th></tr><tr><td>YES_OPTION = 0 · NO_OPTION = 1</td><td>nút thứ 1 / thứ 2 (cũng là chỉ số trong mảng options)</td></tr><tr><td>CANCEL_OPTION = 2 · CLOSED_OPTION = -1</td><td>nút thứ 3 / đóng bằng × hoặc ESC</td></tr></table>
+      <table class="t1 f" data-o="99" style="margin-top:8px;font-size:13px"><tr><th>Giá trị trả về</th><th>Ý nghĩa</th></tr><tr><td>YES_OPTION = 0 · NO_OPTION = 1</td><td>nút thứ 1 / thứ 2 (cũng là chỉ số trong mảng options)</td></tr><tr><td>CANCEL_OPTION = 2 · CLOSED_OPTION = -1</td><td>nút thứ 3 / đóng bằng × hoặc ESC</td></tr></table>
       <span class="f ghost" data-now="#kDg|show-a;#dgShow|hlo" data-say="Cửa sổ gồm <b>JTabbedPane</b> 3 tab. Mỗi tab là một nhóm radio + nút <b>Show it!</b>. Khi bấm nút, đọc lựa chọn bằng <b>group.getSelection().getActionCommand()</b> rồi rẽ nhánh."></span>
       <span class="f ghost" data-now="#kDg|show-b;#dgD1|on" data-say="<b>showMessageDialog(frame, msg)</b>: hộp thoại chỉ có nút OK, icon thông tin. Tham số frame là cửa sổ cha: hộp thoại hiện giữa cửa sổ cha và là <b>modal</b> (khóa cửa sổ cha tới khi đóng)."></span>
       <span class="f ghost" data-now="#kDg|show-c;#dgD2|on;#dgNo|hlo" data-act="#dgr1|off;#dgr2|on" data-say="<b>showConfirmDialog</b> với YES_NO_OPTION: nút Yes/No theo ngôn ngữ của Look &amp; Feel. Hàm <b>chặn</b> tại đây cho tới khi người dùng bấm, rồi trả về số nguyên n."></span>
@@ -1410,7 +1378,7 @@ if (n == JOptionPane.YES_OPTION) setLabel("You're kidding!");
 </section>
 
 <!-- ===================== 17b DialogDemo ===================== -->
-<section class="slide htt-fs18" id="DialogDemo2" data-title="17b · DialogDemo: input, non-auto-closing, non-modal">
+<section class="slide" id="DialogDemo2" data-title="17b · DialogDemo: input, non-auto-closing, non-modal">
   <div class="hdr in"><span class="qn">DEMO 17 · 2/2</span><h2>DialogDemo: nhập liệu, JDialog, non-modal</h2><span class="lvl">Độ khó <b>★★★</b></span></div>
   <div class="cols" style="grid-template-columns:1.1fr 1fr">
     <div>
@@ -1451,15 +1419,15 @@ dialog.setVisible(true);   // KHÔNG chặn luồng, cửa sổ chính vẫn dù
       <div class="stage"><div class="win" style="width:470px;height:260px"><div class="wt"><i></i><i></i><i></i><span>DialogDemo</span></div>
         <div class="wb" style="padding:8px 12px">
           <div class="tabs"><span>Simple Modal Dialogs</span><span class="s">More Dialogs</span><span>Dialog Icons</span></div>
-          <div class="rad on" id="dhr1" style="font-size:max(12.5px,var(--htt-min,24px))">Pick one of several choices</div><div class="rad" style="font-size:max(12.5px,var(--htt-min,24px))">Enter some text</div><div class="rad" id="dhr3" style="font-size:max(12.5px,var(--htt-min,24px))">Non-auto-closing dialog</div><div class="rad" style="font-size:max(12.5px,var(--htt-min,24px))">Input-validating dialog (with custom message area)</div><div class="rad" id="dhr5" style="font-size:max(12.5px,var(--htt-min,24px))">Non-modal dialog</div>
+          <div class="rad on" id="dhr1" style="font-size:12.5px">Pick one of several choices</div><div class="rad" style="font-size:12.5px">Enter some text</div><div class="rad" id="dhr3" style="font-size:12.5px">Non-auto-closing dialog</div><div class="rad" style="font-size:12.5px">Input-validating dialog (with custom message area)</div><div class="rad" id="dhr5" style="font-size:12.5px">Non-modal dialog</div>
           <div style="margin-top:6px"><span class="jb" id="dhShow">Show it!</span></div>
-          <div id="dhL" style="text-align:center;margin-top:8px;font-size:max(13px,var(--htt-min,24px))">Click the "Show it!" button to bring up the selected dialog.</div>
+          <div id="dhL" style="text-align:center;margin-top:8px;font-size:13px">Click the "Show it!" button to bring up the selected dialog.</div>
         </div>
-        <div class="dlgwrap" id="dhD1"><div class="win" style="width:300px"><div class="wt"><span>Customized Dialog</span></div><div class="wb" style="display:flex;gap:10px;align-items:flex-start"><span class="splat"></span><div style="font-size:max(13px,var(--htt-min,24px))">Complete the sentence:<br>"Green eggs and..."<div class="combo" id="dhC" style="margin-top:6px;min-width:150px;position:relative"><span id="dhCV">ham</span><div class="dd"><div>ham</div><div class="s">spam</div><div>yam</div></div></div></div></div><div style="text-align:right;padding:0 10px 8px;display:flex;gap:6px;justify-content:flex-end"><span class="jb def">OK</span><span class="jb">Cancel</span></div></div></div>
-        <div class="dlgwrap" id="dhD2"><div class="win" style="width:330px"><div class="wt"><span>Click a button</span><span class="chip r" style="margin-left:auto">× bị vô hiệu</span></div><div class="wb" style="display:flex;gap:10px;align-items:center;font-size:max(12.5px,var(--htt-min,24px))"><span class="dlgico q">?</span><span>The only way to close this dialog is by<br>pressing one of the following buttons.<br>Do you understand?</span></div><div style="text-align:right;padding:0 10px 8px;display:flex;gap:6px;justify-content:flex-end"><span class="jb def">Yes</span><span class="jb">No</span></div></div></div>
-        <div class="dlgwrap nomodal" id="dhD3" style="align-items:flex-end;justify-content:flex-end;padding:0 10px 10px 0"><div class="win" style="width:250px;box-shadow:0 18px 40px -10px rgba(23,38,62,.6)"><div class="wt"><span>A Non-Modal Dialog</span></div><div class="wb" style="font-size:max(12px,var(--htt-min,24px));text-align:center">This is a non-modal dialog.<br>You can have one or more of these up<br>and still use the main window.</div><div style="text-align:right;padding:0 10px 8px"><span class="jb">Close</span></div></div></div>
+        <div class="dlgwrap" id="dhD1"><div class="win" style="width:300px"><div class="wt"><span>Customized Dialog</span></div><div class="wb" style="display:flex;gap:10px;align-items:flex-start"><span class="splat"></span><div style="font-size:13px">Complete the sentence:<br>"Green eggs and..."<div class="combo" id="dhC" style="margin-top:6px;min-width:150px;position:relative"><span id="dhCV">ham</span><div class="dd"><div>ham</div><div class="s">spam</div><div>yam</div></div></div></div></div><div style="text-align:right;padding:0 10px 8px;display:flex;gap:6px;justify-content:flex-end"><span class="jb def">OK</span><span class="jb">Cancel</span></div></div></div>
+        <div class="dlgwrap" id="dhD2"><div class="win" style="width:330px"><div class="wt"><span>Click a button</span><span class="chip r" style="margin-left:auto">× bị vô hiệu</span></div><div class="wb" style="display:flex;gap:10px;align-items:center;font-size:12.5px"><span class="dlgico q">?</span><span>The only way to close this dialog is by<br>pressing one of the following buttons.<br>Do you understand?</span></div><div style="text-align:right;padding:0 10px 8px;display:flex;gap:6px;justify-content:flex-end"><span class="jb def">Yes</span><span class="jb">No</span></div></div></div>
+        <div class="dlgwrap nomodal" id="dhD3" style="align-items:flex-end;justify-content:flex-end;padding:0 10px 10px 0"><div class="win" style="width:250px;box-shadow:0 18px 40px -10px rgba(30,27,58,.6)"><div class="wt"><span>A Non-Modal Dialog</span></div><div class="wb" style="font-size:12px;text-align:center">This is a non-modal dialog.<br>You can have one or more of these up<br>and still use the main window.</div><div style="text-align:right;padding:0 10px 8px"><span class="jb">Close</span></div></div></div>
       </div></div>
-      <div class="flow f" data-o="99" style="margin-top:8px;gap:6px"><span class="ev">PLAIN</span><span class="dlgico" style="width:24px;height:24px;font-size:max(14px,var(--htt-min,24px))">i</span><span class="ev b">INFORMATION</span><span class="dlgico q" style="width:24px;height:24px;font-size:max(14px,var(--htt-min,24px))">?</span><span class="ev b">QUESTION</span><span class="dlgico w" style="width:24px;height:24px;font-size:max(14px,var(--htt-min,24px))">!</span><span class="ev d">WARNING</span><span class="dlgico e" style="width:24px;height:24px;font-size:max(14px,var(--htt-min,24px))">×</span><span class="ev c">ERROR</span></div>
+      <div class="flow f" data-o="99" style="margin-top:8px;gap:6px"><span class="ev">PLAIN</span><span class="dlgico" style="width:24px;height:24px;font-size:14px">i</span><span class="ev b">INFORMATION</span><span class="dlgico q" style="width:24px;height:24px;font-size:14px">?</span><span class="ev b">QUESTION</span><span class="dlgico w" style="width:24px;height:24px;font-size:14px">!</span><span class="ev d">WARNING</span><span class="dlgico e" style="width:24px;height:24px;font-size:14px">×</span><span class="ev c">ERROR</span></div>
       <span class="f ghost" data-now="#kDh|show-a;#dhD1|on" data-say="<b>showInputDialog</b> có mảng <b>possibilities</b> → hộp thoại hiện một combo để chọn (nếu truyền null thì hiện ô nhập chữ tự do). PLAIN_MESSAGE + icon riêng; &quot;ham&quot; là giá trị chọn sẵn."></span>
       <span class="f ghost" data-now="#kDh|show-a;#dhD1|on;#dhC|open" data-set="#dhCV::spam" data-say="Người dùng chọn <b>spam</b> rồi bấm OK. Hàm trả về <b>Object</b> được chọn (ép sang String); bấm Cancel hoặc × thì trả về <b>null</b>."></span>
       <span class="f ghost" data-now="#kDh|show-b" data-set="#dhL::Green eggs and... spam!" data-say="Kiểm tra <b>s != null</b> và không rỗng trước khi dùng: hiển thị &quot;Green eggs and... spam!&quot;. Ngược lại nhắc &quot;Come on, finish the sentence!&quot;."></span>
@@ -1472,7 +1440,7 @@ dialog.setVisible(true);   // KHÔNG chặn luồng, cửa sổ chính vẫn dù
 </section>
 
 <!-- ===================== 18 ProgressBarDemo ===================== -->
-<section class="slide htt-fs18" id="ProgressBarDemo" data-title="18 · ProgressBarDemo: JProgressBar + SwingWorker">
+<section class="slide" id="ProgressBarDemo" data-title="18 · ProgressBarDemo: JProgressBar + SwingWorker">
   <div class="hdr in"><span class="qn">DEMO 18</span><h2>ProgressBarDemo: tác vụ dài &amp; thanh tiến trình</h2><span class="lvl">Độ khó <b>★★★</b></span></div>
   <div class="cols" style="grid-template-columns:1.08fr 1fr">
     <div>
@@ -1520,7 +1488,7 @@ public void propertyChange(PropertyChangeEvent evt) {
       <div class="stage"><div class="win" style="width:440px"><div class="wt"><i></i><i></i><i></i><span>ProgressBarDemo</span><span class="chip hide0" id="pbCur" style="margin-left:auto">⏳ WAIT_CURSOR</span></div>
         <div class="wb" style="padding:12px 16px">
           <div style="display:flex;gap:10px;align-items:center;justify-content:center"><span class="jb" id="pbS">Start</span><div class="pb" id="pbB"><div class="fill" id="pbF" style="width:0%"></div><div class="txt" id="pbT">0%</div></div></div>
-          <div class="ta bottom" id="pbO" style="margin-top:10px;height:118px;font-size:max(11.5px,var(--htt-min,24px))"></div>
+          <div class="ta bottom" id="pbO" style="margin-top:10px;height:118px;font-size:11.5px"></div>
         </div></div></div>
       <div class="lane" style="margin-top:10px"><b>worker</b><div class="ln2"><span class="ev hide0" id="pw1">sleep…</span><span class="ev hide0" id="pw2">setProgress(7)</span><span class="ev hide0" id="pw3">… setProgress(100)</span><span class="ev c hide0" id="pw4">return</span></div></div>
       <div class="lane" style="margin-top:4px"><b>EDT</b><div class="ln2"><span class="ev b hide0" id="pe1">actionPerformed</span><span class="ev d hide0" id="pe2">propertyChange</span><span class="ev d hide0" id="pe3">…</span><span class="ev c hide0" id="pe4">done()</span></div></div>
@@ -1537,7 +1505,7 @@ public void propertyChange(PropertyChangeEvent evt) {
 </section>
 
 <!-- ===================== 19 ProgressBarDemo2 ===================== -->
-<section class="slide htt-fs18" id="ProgressBarDemo2" data-title="19 · ProgressBarDemo2: chế độ indeterminate">
+<section class="slide" id="ProgressBarDemo2" data-title="19 · ProgressBarDemo2: chế độ indeterminate">
   <div class="hdr in"><span class="qn">DEMO 19</span><h2>ProgressBarDemo2: khi chưa biết còn bao lâu</h2><span class="lvl">Độ khó <b>★★★</b></span></div>
   <div class="cols" style="grid-template-columns:1.08fr 1fr">
     <div>
@@ -1575,9 +1543,9 @@ public void propertyChange(PropertyChangeEvent evt) {
       <div class="stage"><div class="win" style="width:440px"><div class="wt"><i></i><i></i><i></i><span>ProgressBarDemo2</span></div>
         <div class="wb" style="padding:12px 16px">
           <div style="display:flex;gap:10px;align-items:center;justify-content:center"><span class="jb" id="p2S">Start</span><div class="pb" id="p2B"><div class="fill" id="p2F" style="width:0%"></div><div class="txt" id="p2T">0%</div></div></div>
-          <div class="ta bottom" id="p2O" style="margin-top:10px;height:96px;font-size:max(11.5px,var(--htt-min,24px))"></div>
+          <div class="ta bottom" id="p2O" style="margin-top:10px;height:96px;font-size:11.5px"></div>
         </div></div></div>
-      <table class="t1 f" data-o="99" style="margin-top:12px;font-size:max(13.5px,var(--htt-min,24px))"><tr><th></th><th>ProgressBarDemo</th><th>ProgressBarDemo2</th></tr>
+      <table class="t1 f" data-o="99" style="margin-top:12px;font-size:13.5px"><tr><th></th><th>ProgressBarDemo</th><th>ProgressBarDemo2</th></tr>
         <tr><td>Lúc đầu</td><td>0% đứng yên</td><td>indeterminate (vạch chạy qua lại)</td></tr>
         <tr><td>Con trỏ chuột</td><td>WAIT_CURSOR</td><td>giữ nguyên</td></tr>
         <tr><td>Giá trị ghi log</td><td>task.getProgress()</td><td>evt.getNewValue()</td></tr></table>
@@ -1592,7 +1560,7 @@ public void propertyChange(PropertyChangeEvent evt) {
 </section>
 
 <!-- ===================== 20 SimpleTableDemo ===================== -->
-<section class="slide htt-fs18" id="SimpleTableDemo" data-title="20 · SimpleTableDemo: JTable từ mảng">
+<section class="slide" id="SimpleTableDemo" data-title="20 · SimpleTableDemo: JTable từ mảng">
   <div class="hdr in"><span class="qn">DEMO 20</span><h2>SimpleTableDemo: JTable tạo từ mảng</h2><span class="lvl">Độ khó <b>★</b><s>★★</s></span></div>
   <div class="cols" style="grid-template-columns:1.1fr 1fr">
     <div>
@@ -1618,16 +1586,16 @@ JScrollPane scrollPane = new JScrollPane(table);
 add(scrollPane);
 </script>
       <div class="cols3 f" data-o="99" style="margin-top:10px;gap:8px">
-        <div class="card"><h3>Mọi ô sửa được</h3><p style="font-size:max(14px,var(--htt-min,24px))">Kể cả tên, không chặn được.</p></div>
-        <div class="card"><h3>Mọi ô là chuỗi</h3><p style="font-size:max(14px,var(--htt-min,24px))">Số căn trái, Boolean hiện chữ "false".</p></div>
-        <div class="card"><h3>Dữ liệu cố định</h3><p style="font-size:max(14px,var(--htt-min,24px))">Muốn linh hoạt → tự viết TableModel (demo 22).</p></div>
+        <div class="card"><h3>Mọi ô sửa được</h3><p style="font-size:14px">Kể cả tên, không chặn được.</p></div>
+        <div class="card"><h3>Mọi ô là chuỗi</h3><p style="font-size:14px">Số căn trái, Boolean hiện chữ "false".</p></div>
+        <div class="card"><h3>Dữ liệu cố định</h3><p style="font-size:14px">Muốn linh hoạt → tự viết TableModel (demo 22).</p></div>
       </div>
     </div>
     <div>
       <div class="stage"><div class="win" style="width:520px"><div class="wt"><i></i><i></i><i></i><span>SimpleTableDemo</span></div>
-        <div class="wb" style="padding:8px"><div style="position:relative;border:1px solid #7f9dce;height:118px;overflow:hidden;background:#fff" id="stSP">
+        <div class="wb" style="padding:8px"><div style="position:relative;border:1px solid #9aa1b3;height:118px;overflow:hidden;background:#fff" id="stSP">
           <table class="jt" id="st"><thead id="sth" class="hide0"><tr><th>First Name</th><th>Last Name</th><th>Sport</th><th># of Years</th><th>Vegetarian</th></tr></thead><tbody id="stb" class="hide0"><tr><td>Kathy</td><td>Smith</td><td>Snowboarding</td><td>5</td><td>false</td></tr><tr><td>John</td><td>Doe</td><td>Rowing</td><td>3</td><td>true</td></tr><tr><td>Sue</td><td>Black</td><td>Knitting</td><td>2</td><td>false</td></tr><tr><td>Jane</td><td>White</td><td>Speed reading</td><td>20</td><td>true</td></tr><tr><td>Joe</td><td>Brown</td><td>Pool</td><td>10</td><td>false</td></tr></tbody></table>
-          <div style="position:absolute;right:0;top:0;bottom:0;width:12px;background:#ebf0f7;border-left:1px solid #ccc" class="hide0" id="stSB"></div></div></div></div></div>
+          <div style="position:absolute;right:0;top:0;bottom:0;width:12px;background:#eef0f4;border-left:1px solid #ccc" class="hide0" id="stSB"></div></div></div></div></div>
       <span class="f ghost" data-now="#kSt|show-a" data-act="#sth|sh" data-say="Tên cột là một mảng <b>String[]</b>. Panel dùng <b>GridLayout(1,0)</b> (1 dòng, số cột tùy ý) để bảng giãn đầy cửa sổ."></span>
       <span class="f ghost" data-now="#kSt|show-b" data-act="#sth|sh" data-say="Dữ liệu là mảng 2 chiều <b>Object[][]</b>: mỗi dòng một người; các giá trị có kiểu khác nhau (String, Integer, Boolean) nên phải dùng Object."></span>
       <span class="f ghost" data-now="#kSt|show-c" data-act="#sth|sh;#stb|sh" data-say="<b>new JTable(data, columnNames)</b>: JTable tự bọc mảng thành một DefaultTableModel. Nhưng constructor này coi mọi ô là <b>String</b>: cột số căn trái, cột Vegetarian hiện chữ <b>false/true</b> thay vì checkbox."></span>
@@ -1641,7 +1609,7 @@ add(scrollPane);
 </section>
 
 <!-- ===================== 21 SimpleTableSelectionDemo ===================== -->
-<section class="slide htt-fs18" id="SimpleTableSelectionDemo" data-title="21 · SimpleTableSelectionDemo: lắng nghe việc chọn dòng">
+<section class="slide" id="SimpleTableSelectionDemo" data-title="21 · SimpleTableSelectionDemo: lắng nghe việc chọn dòng">
   <div class="hdr in"><span class="qn">DEMO 21</span><h2>SimpleTableSelectionDemo: phát hiện dòng được chọn</h2><span class="lvl">Độ khó <b>★★</b><s>★</s></span></div>
   <div class="cols" style="grid-template-columns:1.1fr 1fr">
     <div>
@@ -1692,7 +1660,7 @@ if (ALLOW_COLUMN_SELECTION) { // false by default
 </section>
 
 <!-- ===================== 22 TableDemo ===================== -->
-<section class="slide htt-fs18" id="TableDemo" data-title="22 · TableDemo: tự viết TableModel (AbstractTableModel)">
+<section class="slide" id="TableDemo" data-title="22 · TableDemo: tự viết TableModel (AbstractTableModel)">
   <div class="hdr in"><span class="qn">DEMO 22</span><h2>TableDemo: tự viết TableModel</h2><span class="lvl">Độ khó <b>★★</b><s>★</s></span></div>
   <div class="cols" style="grid-template-columns:1.1fr 1fr">
     <div>
@@ -1728,7 +1696,7 @@ class MyTableModel extends AbstractTableModel {
       <div class="stage"><div class="win" style="width:520px"><div class="wt"><i></i><i></i><i></i><span>TableDemo</span></div>
         <div class="wb" style="padding:8px"><table class="jt" id="td"><thead id="tdh"><tr><th>First Name</th><th>Last Name</th><th>Sport</th><th># of Years</th><th>Vegetarian</th></tr></thead><tbody id="tdb"><tr><td>Kathy</td><td>Smith</td><td>Snowboarding</td><td>5</td><td>false</td></tr><tr><td>John</td><td>Doe</td><td>Rowing</td><td>3</td><td>true</td></tr><tr><td>Sue</td><td>Black</td><td>Knitting</td><td>2</td><td>false</td></tr><tr><td>Jane</td><td>White</td><td>Speed reading</td><td>20</td><td>true</td></tr><tr><td>Joe</td><td>Brown</td><td>Pool</td><td>10</td><td>false</td></tr></tbody></table></div></div></div>
       <div class="flow" style="margin-top:12px;flex-wrap:nowrap"><div class="box a">JTable<small>view</small></div>
-        <div style="display:flex;flex-direction:column;gap:4px;font-family:var(--mono);font-size:max(12px,var(--htt-min,24px));font-weight:700"><span class="ev">getValueAt(r, c) →</span><span class="ev b hide0" id="tdA2">setValueAt(v, r, c) →</span><span class="ev c hide0" id="tdA3">← fireTableCellUpdated</span></div>
+        <div style="display:flex;flex-direction:column;gap:4px;font-family:var(--mono);font-size:12px;font-weight:700"><span class="ev">getValueAt(r, c) →</span><span class="ev b hide0" id="tdA2">setValueAt(v, r, c) →</span><span class="ev c hide0" id="tdA3">← fireTableCellUpdated</span></div>
         <div class="box b">MyTableModel<small>extends AbstractTableModel</small></div></div>
       <span class="f ghost" data-now="#kTd|show-a;#kTd|show-b" data-say="Thay vì đưa mảng cho JTable, ta đưa một <b>TableModel</b> tự viết. Kế thừa <b>AbstractTableModel</b> để khỏi tự quản lý danh sách listener."></span>
       <span class="f ghost" data-now="#kTd|show-c" data-say="3 hàm <b>bắt buộc</b>: getRowCount, getColumnCount, getValueAt. JTable chỉ <b>hỏi</b> model khi cần vẽ ô nào, nên dữ liệu có thể nằm ở bất cứ đâu (mảng, List, cơ sở dữ liệu...). getColumnName để có tiêu đề (không có thì hiện A, B, C...)."></span>
@@ -1742,7 +1710,7 @@ class MyTableModel extends AbstractTableModel {
 </section>
 
 <!-- ===================== 23 TableSortDemo ===================== -->
-<section class="slide htt-fs18" id="TableSortDemo" data-title="23 · TableSortDemo: sắp xếp bằng 1 dòng lệnh">
+<section class="slide" id="TableSortDemo" data-title="23 · TableSortDemo: sắp xếp bằng 1 dòng lệnh">
   <div class="hdr in"><span class="qn">DEMO 23</span><h2>TableSortDemo: sắp xếp khi bấm tiêu đề</h2><span class="lvl">Độ khó <b>★★</b><s>★</s></span></div>
   <div class="cols" style="grid-template-columns:1fr 1.05fr">
     <div>
@@ -1759,7 +1727,7 @@ add(scrollPane);
 int modelRow = table.convertRowIndexToModel(viewRow);
 int viewRow  = table.convertRowIndexToView(modelRow);
 </script>
-      <div class="note blue f" data-o="99" style="font-size:max(15px,var(--htt-min,24px))">Cột <b># of Years</b> sắp theo <b>số</b> (2 &lt; 3 &lt; 5 &lt; 10 &lt; 20) vì getColumnClass trả về Integer. Nếu coi là chuỗi thì sẽ sai: "10" &lt; "2".</div>
+      <div class="note blue f" data-o="99" style="font-size:15px">Cột <b># of Years</b> sắp theo <b>số</b> (2 &lt; 3 &lt; 5 &lt; 10 &lt; 20) vì getColumnClass trả về Integer. Nếu coi là chuỗi thì sẽ sai: "10" &lt; "2".</div>
     </div>
     <div>
       <div class="stage"><div class="win" style="width:540px"><div class="wt"><i></i><i></i><i></i><span>TableSortDemo</span></div>
@@ -1776,8 +1744,8 @@ int viewRow  = table.convertRowIndexToView(modelRow);
 </section>
 
 <!-- ===================== 24 TableRenderDemo ===================== -->
-<section class="slide htt-fs18" id="TableRenderDemo" data-title="24 · TableRenderDemo: renderer, editor & độ rộng cột">
-  <style>#trw .jt td:nth-child(3){position:relative}#trDD{position:absolute;left:196px;top:100px;width:150px;background:#fff;border:1px solid #8c93a3;box-shadow:0 8px 18px -8px rgba(0,0,0,.35);z-index:3;font-size:max(12.5px,var(--htt-min,24px))}#trDD div{padding:2px 6px}#trDD div.s{background:#3b77d8;color:#fff}</style>
+<section class="slide" id="TableRenderDemo" data-title="24 · TableRenderDemo: renderer, editor & độ rộng cột">
+  <style>#trw .jt td:nth-child(3){position:relative}#trDD{position:absolute;left:196px;top:100px;width:150px;background:#fff;border:1px solid #8c93a3;box-shadow:0 8px 18px -8px rgba(0,0,0,.35);z-index:3;font-size:12.5px}#trDD div{padding:2px 6px}#trDD div.s{background:#3b6fd8;color:#fff}</style>
   <div class="hdr in"><span class="qn">DEMO 24</span><h2>TableRenderDemo: renderer, editor &amp; độ rộng cột</h2><span class="lvl">Độ khó <b>★★★</b></span></div>
   <div class="cols" style="grid-template-columns:1.12fr 1fr">
     <div>
@@ -1835,7 +1803,7 @@ private void initColumnSizes(JTable table) {
 </section>
 
 <!-- ===================== 25 TableFilterDemo ===================== -->
-<section class="slide htt-fs18" id="TableFilterDemo" data-title="25 · TableFilterDemo: lọc dòng bằng RowFilter (regex)">
+<section class="slide" id="TableFilterDemo" data-title="25 · TableFilterDemo: lọc dòng bằng RowFilter (regex)">
   <div class="hdr in"><span class="qn">DEMO 25</span><h2>TableFilterDemo: lọc dòng theo biểu thức chính quy</h2><span class="lvl">Độ khó <b>★★★</b></span></div>
   <div class="cols" style="grid-template-columns:1.12fr 1fr">
     <div>
@@ -1878,8 +1846,8 @@ private void newFilter() {
     </div>
     <div>
       <div class="stage"><div class="win" style="width:540px"><div class="wt"><i></i><i></i><i></i><span>TableFilterDemo</span></div>
-        <div class="wb" style="padding:8px"><div style="height:126px;border:1px solid #7f9dce;background:#fff;overflow:hidden"><table class="jt" id="tf2"><thead id="tf2h"><tr><th>First Name</th><th>Last Name</th><th>Sport</th><th># of Years</th><th>Vegetarian</th></tr></thead><tbody id="tf2b"><tr><td>Kathy</td><td>Smith</td><td>Snowboarding</td><td class='num'>5</td><td class='ck'><span class='cb'></span></td></tr><tr><td>John</td><td>Doe</td><td>Rowing</td><td class='num'>3</td><td class='ck'><span class='cb on'></span></td></tr><tr><td>Sue</td><td>Black</td><td>Knitting</td><td class='num'>2</td><td class='ck'><span class='cb'></span></td></tr><tr><td>Jane</td><td>White</td><td>Speed reading</td><td class='num'>20</td><td class='ck'><span class='cb on'></span></td></tr><tr><td>Joe</td><td>Brown</td><td>Pool</td><td class='num'>10</td><td class='ck'><span class='cb'></span></td></tr></tbody></table></div>
-          <div style="display:grid;grid-template-columns:auto 1fr;gap:6px;align-items:center;margin-top:8px;font-size:max(13px,var(--htt-min,24px))"><span style="text-align:right">Filter Text:</span><span class="tf" id="tflT"><span class="cur"></span></span><span style="text-align:right">Status:</span><span class="tf" id="tflS" style="font-family:inherit;font-size:max(12.5px,var(--htt-min,24px))"> </span></div></div></div></div>
+        <div class="wb" style="padding:8px"><div style="height:126px;border:1px solid #9aa1b3;background:#fff;overflow:hidden"><table class="jt" id="tf2"><thead id="tf2h"><tr><th>First Name</th><th>Last Name</th><th>Sport</th><th># of Years</th><th>Vegetarian</th></tr></thead><tbody id="tf2b"><tr><td>Kathy</td><td>Smith</td><td>Snowboarding</td><td class='num'>5</td><td class='ck'><span class='cb'></span></td></tr><tr><td>John</td><td>Doe</td><td>Rowing</td><td class='num'>3</td><td class='ck'><span class='cb on'></span></td></tr><tr><td>Sue</td><td>Black</td><td>Knitting</td><td class='num'>2</td><td class='ck'><span class='cb'></span></td></tr><tr><td>Jane</td><td>White</td><td>Speed reading</td><td class='num'>20</td><td class='ck'><span class='cb on'></span></td></tr><tr><td>Joe</td><td>Brown</td><td>Pool</td><td class='num'>10</td><td class='ck'><span class='cb'></span></td></tr></tbody></table></div>
+          <div style="display:grid;grid-template-columns:auto 1fr;gap:6px;align-items:center;margin-top:8px;font-size:13px"><span style="text-align:right">Filter Text:</span><span class="tf" id="tflT"><span class="cur"></span></span><span style="text-align:right">Status:</span><span class="tf" id="tflS" style="font-family:inherit;font-size:12.5px"> </span></div></div></div></div>
       <span class="f ghost" data-now="#kTfl|show-a" data-say="Tự tạo <b>TableRowSorter</b> (thay vì setAutoCreateRowSorter) để giữ tham chiếu <b>sorter</b>: vừa sắp xếp, vừa có thể gắn bộ lọc."></span>
       <span class="f ghost" data-now="#kTfl|show-b;#kTfl|show-c" data-set="#tf2b::<tr><td>Kathy</td><td>Smith</td><td>Snowboarding</td><td class='num'>5</td><td class='ck'><span class='cb'></span></td></tr><tr><td>John</td><td>Doe</td><td>Rowing</td><td class='num'>3</td><td class='ck'><span class='cb on'></span></td></tr><tr><td>Sue</td><td>Black</td><td>Knitting</td><td class='num'>2</td><td class='ck'><span class='cb'></span></td></tr><tr class='s'><td>Jane</td><td>White</td><td>Speed reading</td><td class='num'>20</td><td class='ck'><span class='cb on'></span></td></tr><tr><td>Joe</td><td>Brown</td><td>Pool</td><td class='num'>10</td><td class='ck'><span class='cb'></span></td></tr>;#tflS::Selected Row in view: 3. Selected Row in model: 3." data-say="Chọn Jane: listener in ra chỉ số dòng ở <b>view</b> và ở <b>model</b>. Chưa lọc nên hai số bằng nhau."></span>
       <span class="f ghost" data-now="#kTfl|show-d;#kTfl|show-e;#kTfl|show-f;#kTfl|show-h" data-set="#tflT::J<span class='cur'></span>;#tf2b::<tr class='hide'><td>Kathy</td><td>Smith</td><td>Snowboarding</td><td class='num'>5</td><td class='ck'><span class='cb'></span></td></tr><tr><td>John</td><td>Doe</td><td>Rowing</td><td class='num'>3</td><td class='ck'><span class='cb on'></span></td></tr><tr class='hide'><td>Sue</td><td>Black</td><td>Knitting</td><td class='num'>2</td><td class='ck'><span class='cb'></span></td></tr><tr class='s'><td>Jane</td><td>White</td><td>Speed reading</td><td class='num'>20</td><td class='ck'><span class='cb on'></span></td></tr><tr><td>Joe</td><td>Brown</td><td>Pool</td><td class='num'>10</td><td class='ck'><span class='cb'></span></td></tr>;#tflS::Selected Row in view: 1. Selected Row in model: 3." data-say="Gõ &quot;J&quot;: DocumentListener → <b>newFilter()</b> → <b>RowFilter.regexFilter(&quot;J&quot;, 0)</b>: giữ dòng mà cột 0 (First Name) <b>chứa</b> khớp với regex. Còn John, Jane, Joe. Jane giờ là view 1 nhưng vẫn là model 3."></span>
@@ -1892,7 +1860,7 @@ private void newFilter() {
 </section>
 
 <!-- ===================== 26 TableSelectionDemo ===================== -->
-<section class="slide htt-fs18" id="TableSelectionDemo" data-title="26 · TableSelectionDemo: chế độ chọn dòng/cột/ô">
+<section class="slide" id="TableSelectionDemo" data-title="26 · TableSelectionDemo: chế độ chọn dòng/cột/ô">
   <div class="hdr in"><span class="qn">DEMO 26</span><h2>TableSelectionDemo: các chế độ chọn</h2><span class="lvl">Độ khó <b>★★★</b></span></div>
   <div class="cols" style="grid-template-columns:1.08fr 1fr">
     <div>
@@ -1939,12 +1907,12 @@ private void outputSelection() {
     </div>
     <div>
       <div class="win" style="width:100%"><div class="wt"><i></i><i></i><i></i><span>TableSelectionDemo</span></div>
-        <div class="wb" style="padding:8px"><table class="jt" id="sel" style="font-size:max(12px,var(--htt-min,24px))"><thead><tr><th>First Name</th><th>Last Name</th><th>Sport</th><th># of Years</th><th>Vegetarian</th></tr></thead><tbody id="selb"><tr><td>Kathy</td><td>Smith</td><td>Snowboarding</td><td class='num'>5</td><td class='ck'><span class='cb'></span></td></tr><tr><td>John</td><td>Doe</td><td>Rowing</td><td class='num'>3</td><td class='ck'><span class='cb on'></span></td></tr><tr><td>Sue</td><td>Black</td><td>Knitting</td><td class='num'>2</td><td class='ck'><span class='cb'></span></td></tr><tr><td>Jane</td><td>White</td><td>Speed reading</td><td class='num'>20</td><td class='ck'><span class='cb on'></span></td></tr><tr><td>Joe</td><td>Brown</td><td>Pool</td><td class='num'>10</td><td class='ck'><span class='cb'></span></td></tr></tbody></table>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;margin-top:8px;font-size:max(12.5px,var(--htt-min,24px))">
-            <div><b style="font-size:max(12px,var(--htt-min,24px))">Selection Mode</b><div class="rad on" id="sm1" style="font-size:max(12.5px,var(--htt-min,24px))">Multiple Interval Selection</div><div class="rad" id="sm2" style="font-size:max(12.5px,var(--htt-min,24px))">Single Selection</div><div class="rad" id="sm3" style="font-size:max(12.5px,var(--htt-min,24px))">Single Interval Selection</div></div>
-            <div><b style="font-size:max(12px,var(--htt-min,24px))">Selection Options</b><div class="chk on" id="so1" style="font-size:max(12.5px,var(--htt-min,24px))">Row Selection</div><div class="chk" id="so2" style="font-size:max(12.5px,var(--htt-min,24px))">Column Selection</div><div class="chk" id="so3" style="font-size:max(12.5px,var(--htt-min,24px));color:#a0a4ad">Cell Selection</div></div>
+        <div class="wb" style="padding:8px"><table class="jt" id="sel" style="font-size:12px"><thead><tr><th>First Name</th><th>Last Name</th><th>Sport</th><th># of Years</th><th>Vegetarian</th></tr></thead><tbody id="selb"><tr><td>Kathy</td><td>Smith</td><td>Snowboarding</td><td class='num'>5</td><td class='ck'><span class='cb'></span></td></tr><tr><td>John</td><td>Doe</td><td>Rowing</td><td class='num'>3</td><td class='ck'><span class='cb on'></span></td></tr><tr><td>Sue</td><td>Black</td><td>Knitting</td><td class='num'>2</td><td class='ck'><span class='cb'></span></td></tr><tr><td>Jane</td><td>White</td><td>Speed reading</td><td class='num'>20</td><td class='ck'><span class='cb on'></span></td></tr><tr><td>Joe</td><td>Brown</td><td>Pool</td><td class='num'>10</td><td class='ck'><span class='cb'></span></td></tr></tbody></table>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;margin-top:8px;font-size:12.5px">
+            <div><b style="font-size:12px">Selection Mode</b><div class="rad on" id="sm1" style="font-size:12.5px">Multiple Interval Selection</div><div class="rad" id="sm2" style="font-size:12.5px">Single Selection</div><div class="rad" id="sm3" style="font-size:12.5px">Single Interval Selection</div></div>
+            <div><b style="font-size:12px">Selection Options</b><div class="chk on" id="so1" style="font-size:12.5px">Row Selection</div><div class="chk" id="so2" style="font-size:12.5px">Column Selection</div><div class="chk" id="so3" style="font-size:12.5px;color:#a0a4ad">Cell Selection</div></div>
           </div>
-          <div class="ta bottom" id="selO" style="height:60px;margin-top:6px;font-size:max(11px,var(--htt-min,24px))"></div></div></div>
+          <div class="ta bottom" id="selO" style="height:60px;margin-top:6px;font-size:11px"></div></div></div>
       <span class="f ghost" data-now="#kTsel|show-a" data-say="Chọn trong JTable thực chất do <b>2 ListSelectionModel</b> quản lý: một cho dòng (table.getSelectionModel), một cho cột (trong TableColumnModel). Demo lắng nghe cả hai và in trạng thái ra JTextArea."></span>
       <span class="f ghost" data-set="#selb::<tr><td>Kathy</td><td>Smith</td><td>Snowboarding</td><td class='num'>5</td><td class='ck'><span class='cb'></span></td></tr><tr class='s'><td>John</td><td>Doe</td><td>Rowing</td><td class='num'>3</td><td class='ck'><span class='cb on'></span></td></tr><tr><td>Sue</td><td>Black</td><td>Knitting</td><td class='num'>2</td><td class='ck'><span class='cb'></span></td></tr><tr class='s'><td>Jane</td><td>White</td><td>Speed reading</td><td class='num'>20</td><td class='ck'><span class='cb on'></span></td></tr><tr><td>Joe</td><td>Brown</td><td>Pool</td><td class='num'>10</td><td class='ck'><span class='cb'></span></td></tr>;#selO::ROW SELECTION EVENT. Lead: 3, 2. Rows: 1 3. Columns: 2." data-say="Mặc định: <b>MULTIPLE_INTERVAL_SELECTION</b> + Row Selection. Bấm dòng 1, Ctrl+click dòng 3 → chọn 2 dòng rời nhau. Lead = ô thao tác gần nhất (dòng 3, cột 2)."></span>
       <span class="f ghost" data-now="#kTsel|show-c;#so1|off;#so2|on" data-set="#selb::<tr><td class='s'>Kathy</td><td>Smith</td><td class='s'>Snowboarding</td><td class='num'>5</td><td class='ck'><span class='cb'></span></td></tr><tr><td class='s'>John</td><td>Doe</td><td class='s'>Rowing</td><td class='num'>3</td><td class='ck'><span class='cb on'></span></td></tr><tr><td class='s'>Sue</td><td>Black</td><td class='s'>Knitting</td><td class='num'>2</td><td class='ck'><span class='cb'></span></td></tr><tr><td class='s'>Jane</td><td>White</td><td class='s'>Speed reading</td><td class='num'>20</td><td class='ck'><span class='cb on'></span></td></tr><tr><td class='s'>Joe</td><td>Brown</td><td class='s'>Pool</td><td class='num'>10</td><td class='ck'><span class='cb'></span></td></tr>;#selO::COLUMN SELECTION EVENT. Lead: 4, 2. Rows: 4. Columns: 0 2." data-say="Tick <b>Column Selection</b>: ở chế độ MIS, chọn cột và chọn dòng <b>loại trừ nhau</b> → Row Selection tự bỏ tick. Click cột 0, Ctrl+click cột 2 → chọn 2 cột."></span>
@@ -1957,10 +1925,10 @@ private void outputSelection() {
 </section>
 
 <!-- ===================== SUMMARY ===================== -->
-<section class="slide htt-fs18" id="summary" data-title="Tổng kết">
+<section class="slide" id="summary" data-title="Tổng kết">
   <div class="hdr in"><span class="qn">TỔNG KẾT</span><h2>Component → sự kiện → cách xử lý</h2></div>
-  <table class="t1 in" style="font-size:max(13.5px,var(--htt-min,24px))">
-    <tr class="htt-stack"><th>Component</th><th>Listener / sự kiện chính</th><th>Hàm hay dùng</th><th>Demo</th></tr>
+  <table class="t1 in" style="font-size:13.5px">
+    <tr><th>Component</th><th>Listener / sự kiện chính</th><th>Hàm hay dùng</th><th>Demo</th></tr>
     <tr><td>JFrame, JDialog</td><td>WindowListener</td><td>setDefaultCloseOperation, pack, setVisible, setUndecorated</td><td>01 02 17</td></tr>
     <tr><td>JLabel, ImageIcon</td><td>(không phát sự kiện)</td><td>setIcon, setText, setVertical/HorizontalTextPosition</td><td>03 04</td></tr>
     <tr><td>JButton</td><td>ActionListener</td><td>setActionCommand, setMnemonic, setEnabled</td><td>05</td></tr>
@@ -1974,17 +1942,17 @@ private void outputSelection() {
     <tr><td>JTable</td><td>ListSelectionListener, TableModelListener</td><td>AbstractTableModel, getColumnClass, renderer/editor, TableRowSorter, RowFilter</td><td>20 – 26</td></tr>
   </table>
   <div class="cols3" style="margin-top:10px">
-    <div class="card in"><h3>Quy tắc EDT</h3><p style="font-size:max(15px,var(--htt-min,24px))">Tạo &amp; sửa component chỉ trên EDT (invokeLater). Việc chậm → SwingWorker.</p></div>
-    <div class="card in"><h3>Model ↔ View</h3><p style="font-size:max(15px,var(--htt-min,24px))">JList, JComboBox, JTable chỉ hiển thị; dữ liệu nằm trong model. Sửa model → view tự cập nhật.</p></div>
-    <div class="card in"><h3>View index ≠ model index</h3><p style="font-size:max(15px,var(--htt-min,24px))">Khi bảng sắp xếp/lọc, luôn đổi chỉ số bằng convertRowIndexToModel.</p></div>
+    <div class="card in"><h3>Quy tắc EDT</h3><p style="font-size:15px">Tạo &amp; sửa component chỉ trên EDT (invokeLater). Việc chậm → SwingWorker.</p></div>
+    <div class="card in"><h3>Model ↔ View</h3><p style="font-size:15px">JList, JComboBox, JTable chỉ hiển thị; dữ liệu nằm trong model. Sửa model → view tự cập nhật.</p></div>
+    <div class="card in"><h3>View index ≠ model index</h3><p style="font-size:15px">Khi bảng sắp xếp/lọc, luôn đổi chỉ số bằng convertRowIndexToModel.</p></div>
   </div>
-  <p class="muted in" style="font-size:max(13px,var(--htt-min,24px));margin-top:8px">Nguồn code: Oracle, The Java™ Tutorials · docs.oracle.com/javase/tutorial/uiswing/examples/components</p>
+  <p class="muted in" style="font-size:13px;margin-top:8px">Nguồn code: Oracle, The Java™ Tutorials · docs.oracle.com/javase/tutorial/uiswing/examples/components</p>
 </section></div></div>
 
 <div id="bar"></div>
 <div id="hint">← → / Space: từng bước · Shift+→: qua slide · G: đi tới slide bất kỳ · A: hiện hết · F: toàn màn hình</div>
 <div id="nav"><button id="jumpNav" title="Đi tới slide (G)">☰</button><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
-<div id="jump"><div id="jbox"><div class="jh"><h3>Đi tới slide</h3><span class="muted" style="font-size:max(14px,var(--htt-min,24px))">gõ số hoặc tên demo rồi Enter</span><input id="jq" placeholder="vd: 12 hoặc Table" autocomplete="off"><button id="jx" aria-label="Đóng">×</button></div><div id="jlist"></div></div></div>
+<div id="jump"><div id="jbox"><div class="jh"><h3>Đi tới slide</h3><span class="muted" style="font-size:14px">gõ số hoặc tên demo rồi Enter</span><input id="jq" placeholder="vd: 12 hoặc Table" autocomplete="off"><button id="jx" aria-label="Đóng">×</button></div><div id="jlist"></div></div></div>
 
 <script>
 (function(){
@@ -2099,53 +2067,6 @@ private void outputSelection() {
   go(idx>=0?idx:0);
   addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
 })();
-</script>
-<script id="htt-theme-js">
-(function(){
-  // HTT theme runtime: renumber split code blocks, enforce the slide's minimum font size (--htt-min, default 24px)
-  function minOf(el){var s=el&&el.closest?el.closest('.slide'):null;var v=parseFloat(getComputedStyle(s||document.documentElement).getPropertyValue('--htt-min'));return isNaN(v)?24:v}
-  window.HTT_MIN=function(el){return minOf(el)};
-  function renumber(){
-    document.querySelectorAll('.code[class*="htt-start-"]').forEach(function(c){
-      if(c.dataset.httNum)return;var m=c.className.match(/htt-start-(\d+)/);if(!m)return;var off=+m[1];
-      c.querySelectorAll('.ln>.no').forEach(function(n){var v=parseInt(n.textContent,10);if(!isNaN(v))n.textContent=String(v+off)});
-      c.dataset.httNum='1';
-    });
-  }
-  function hasText(el){for(var n=el.firstChild;n;n=n.nextSibling){if(n.nodeType===3&&/\S/.test(n.nodeValue))return true}return /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(el.tagName)}
-  function svgScale(t){var svg=t.ownerSVGElement;if(!svg)return 1;var s=1;
-    while(svg){var vb=svg.viewBox&&svg.viewBox.baseVal;if(vb&&vb.width&&vb.height){var w=svg.clientWidth||svg.getBoundingClientRect().width,h=svg.clientHeight||svg.getBoundingClientRect().height;if(!w||!h)return 0;s*=Math.min(w/vb.width,h/vb.height)}svg=svg.ownerSVGElement}
-    return s}
-  function set(el,v){if(!el.hasAttribute('data-htt-prev'))el.setAttribute('data-htt-prev',el.style.getPropertyValue('font-size')+'|'+el.style.getPropertyPriority('font-size'));el.style.setProperty('font-size',v,'important')}
-  function unfix(sel){document.querySelectorAll((sel||'#deck .slide *')).forEach(function(el){var p=el.getAttribute('data-htt-prev');if(p===null)return;var a=p.split('|');if(a[0])el.style.setProperty('font-size',a[0],a[1]||'');else el.style.removeProperty('font-size');el.removeAttribute('data-htt-prev')})}
-  function fix(sel){
-    renumber();
-    var slides=document.querySelectorAll(typeof sel==='string'?sel:'#deck .slide');
-    for(var j=0;j<slides.length;j++){var sl=slides[j];var MIN=minOf(sl);if(MIN<=0)continue;
-      var els=sl.querySelectorAll('*');
-      for(var i=0;i<els.length;i++){var el=els[i];
-        if(el instanceof SVGElement){
-          if(!/^(text|tspan|textPath)$/.test(el.tagName))continue;
-          if(el.tagName!=='text'&&!hasText(el))continue;
-          var sc=svgScale(el);if(!sc)continue;
-          var fs=parseFloat(getComputedStyle(el).fontSize);if(!fs)continue;
-          if(fs*sc<MIN-0.3)set(el,(MIN/sc).toFixed(2)+'px');
-          continue;
-        }
-        if(!hasText(el))continue;
-        var f=parseFloat(getComputedStyle(el).fontSize);
-        if(f>0&&f<MIN-0.3)set(el,MIN+'px');
-      }
-    }
-  }
-  window.HTT_fix=fix;window.HTT_unfix=unfix;
-  fix();
-  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){fix()});
-  var t=null;var mo=new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(ms[i].type==='childList'&&ms[i].addedNodes.length){clearTimeout(t);t=setTimeout(function(){fix()},30);return}}});
-  var d=document.getElementById('deck');if(d)mo.observe(d,{childList:true,subtree:true});
-  function act(){setTimeout(function(){fix('#deck .slide.active')},0)}addEventListener('keydown',act);addEventListener('click',act);addEventListener('touchend',act);
-})();
-
 </script>
 </body>
 </html>

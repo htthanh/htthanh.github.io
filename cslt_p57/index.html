@@ -8,18 +8,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#ffffff; --panel:#ffffff; --line:#e8eef7; --text:#17263e; --muted:#3d63a0;
-  --accent:#3a7fed; --accent2:#0949b1; --warn:#1d68e1; --gold:#0b58d4; --code:#fcfbff;
-  --k:#3371d6; --t:#3a7fed; --s:#083d93; --n:#0c61ea; --c:#84a1d0; --p:#276cdb; --fn:#0a4fbf;
-  --sa1:#3a7fed; --sa2:#4887ec;
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
   --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:#eff5fe;color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
 #viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
 #deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
-.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(58,127,237,.14);
-  background:none,none,none,var(--bg);
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
   opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
 .slide.past{transform:translateX(-60px) scale(.98)}
 .slide.active{opacity:1;transform:none;pointer-events:auto}
@@ -27,247 +27,247 @@ html,body{height:100%;background:#eff5fe;color:var(--text);font-family:"Be Vietn
 .slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
 @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 .hdr{display:flex;align-items:center;gap:16px;margin-bottom:16px;padding-right:150px}
-.slide:nth-of-type(4n+1){--sa1:#3a7fed;--sa2:#4887ec}.slide:nth-of-type(4n+2){--sa1:#0949b1;--sa2:#3a7fed}.slide:nth-of-type(4n+3){--sa1:#4887ec;--sa2:#1c6ef3}.slide:nth-of-type(4n){--sa1:#083d93;--sa2:#0e62e9}
-.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:var(--sa1)}
-.qn{font-weight:800;font-size:max(17px,var(--htt-min,24px));letter-spacing:.06em;color:#fff;background:var(--sa1);box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
-.lvl{font-size:max(14px,var(--htt-min,24px));font-weight:700;color:var(--muted);white-space:nowrap;margin-left:auto}
-.lvl b{color:#0e65f2;letter-spacing:2px}.lvl s{color:#d1dced;text-decoration:none;letter-spacing:2px}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+.lvl{font-size:14px;font-weight:700;color:var(--muted);white-space:nowrap;margin-left:auto}
+.lvl b{color:#f59e0b;letter-spacing:2px}.lvl s{color:#d9d6e8;text-decoration:none;letter-spacing:2px}
 h1{font-size:66px;line-height:1.1;font-weight:800}
 h2{font-size:30px;line-height:1.2;font-weight:800}
-h3{font-size:max(21px,var(--htt-min,24px));font-weight:700;margin-bottom:6px;color:var(--sa1)}
-p,li{font-size:max(20px,var(--htt-min,24px));line-height:1.45;color:var(--text)}
+h3{font-size:21px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:20px;line-height:1.45;color:var(--text)}
 .muted{color:var(--muted)}
 ul{list-style:none}
 ul li{position:relative;padding-left:24px;margin:5px 0}
-ul li::before{content:"";position:absolute;left:4px;top:.6em;width:9px;height:9px;border-radius:3px;background:var(--sa1)}
-.grad{background:#3a7fed;-webkit-background-clip:text;background-clip:text;color:transparent}
-code.i{font-family:var(--mono);font-size:.86em;background:#f0f5fd;border:1px solid #d3e2f9;padding:0 5px;border-radius:6px;color:#1858be;white-space:nowrap}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:9px;height:9px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.86em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 5px;border-radius:6px;color:#be185d;white-space:nowrap}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
 .cols>*{min-width:0}
 .cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px;box-shadow:0 8px 24px -12px rgba(58,127,237,.25)}
-.card p,.card li{font-size:max(17px,var(--htt-min,24px))}
-.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #3a7fed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0949b1}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #4887ec}.cols4>.card:nth-child(4n){border-top:5px solid #0e65f2}
-.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0949b1}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#276cdb}.cols4>.card:nth-child(4n) h3{color:#0b58d4}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#3a7fed}
-.note{margin-top:10px;padding:8px 14px;border-left:5px solid #0e65f2;background:#e2ecfd;border-radius:8px;font-size:max(17px,var(--htt-min,24px));line-height:1.4}
-.note.blue{border-color:#5c97f6;background:#eef4fe}
-.note.red{border-color:#1d68e1;background:#f2f7fe}
-.code{font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));line-height:1.45;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:8px 0;overflow:hidden;position:relative}
-.code.sm{font-size:max(14px,var(--htt-min,24px));line-height:1.42}.code.xs{font-size:max(13px,var(--htt-min,24px));line-height:1.4}.code.xxs{font-size:max(12px,var(--htt-min,24px));line-height:1.36;padding:6px 0}
-.code.x4{font-size:max(11.4px,var(--htt-min,24px));line-height:1.33;padding:6px 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.card p,.card li{font-size:17px}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.note{margin-top:10px;padding:8px 14px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:17px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.note.red{border-color:#e11d48;background:linear-gradient(90deg,#fff1f3,#fffafa)}
+.code{font-family:var(--mono);font-size:15px;line-height:1.45;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:8px 0;overflow:hidden;position:relative}
+.code.sm{font-size:14px;line-height:1.42}.code.xs{font-size:13px;line-height:1.4}.code.xxs{font-size:12px;line-height:1.36;padding:6px 0}
+.code.x4{font-size:11.4px;line-height:1.33;padding:6px 0}
 .code .ln{padding:0 12px 0 6px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
-.code .no{color:#bdcde6;width:22px;flex:none;text-align:right;margin-right:10px;user-select:none}
+.code .no{color:#c9c3e0;width:22px;flex:none;text-align:right;margin-right:10px;user-select:none}
 .k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
-.code.show-a .mark-a{background:rgba(58,127,237,.13);box-shadow:inset 5px 0 #3a7fed}
-.code.show-b .mark-b{background:rgba(11,86,207,.15);box-shadow:inset 5px 0 #0b56cf}
-.code.show-c .mark-c{background:rgba(14,101,242,.18);box-shadow:inset 5px 0 #0e65f2}
-.code.show-d .mark-d{background:rgba(72,135,236,.14);box-shadow:inset 5px 0 #4887ec}
-.code.show-e .mark-e{background:rgba(16,81,185,.15);box-shadow:inset 5px 0 #1051b9}
-.code.show-f .mark-f{background:rgba(58,127,237,.13);box-shadow:inset 5px 0 #3a7fed}
-.code.show-g .mark-g{background:rgba(11,86,207,.15);box-shadow:inset 5px 0 #0b56cf}
-.code.show-h .mark-h{background:rgba(14,101,242,.18);box-shadow:inset 5px 0 #0e65f2}
-.code.show-i .mark-i{background:rgba(72,135,236,.14);box-shadow:inset 5px 0 #4887ec}
-.code.show-j .mark-j{background:rgba(16,81,185,.15);box-shadow:inset 5px 0 #1051b9}
+.code.show-a .mark-a{background:rgba(124,58,237,.13);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.15);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.18);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.14);box-shadow:inset 5px 0 #ec4899}
+.code.show-e .mark-e{background:rgba(16,185,129,.15);box-shadow:inset 5px 0 #10b981}
+.code.show-f .mark-f{background:rgba(124,58,237,.13);box-shadow:inset 5px 0 #7c3aed}
+.code.show-g .mark-g{background:rgba(6,182,212,.15);box-shadow:inset 5px 0 #06b6d4}
+.code.show-h .mark-h{background:rgba(245,158,11,.18);box-shadow:inset 5px 0 #f59e0b}
+.code.show-i .mark-i{background:rgba(236,72,153,.14);box-shadow:inset 5px 0 #ec4899}
+.code.show-j .mark-j{background:rgba(16,185,129,.15);box-shadow:inset 5px 0 #10b981}
 .hide0{opacity:0;transform:translateY(8px) scale(.96);transition:all .45s}
 .hide0.sh{opacity:1;transform:none}
 .win.pre.sh:not(.vis){opacity:.35;filter:grayscale(1)}
 .gone.sh{display:none}
 .stage{position:relative;display:flex;align-items:center;justify-content:center}
-.chip{display:inline-block;font-family:var(--mono);font-size:max(12.5px,var(--htt-min,24px));font-weight:700;padding:2px 9px;border-radius:999px;background:#c9ddfc;color:#094bb4;border:1px solid #5391f6}
-.chip.v{background:#e9f1fe;color:#286cd9;border-color:#b7d1fb}.chip.g{background:#d1e1fa;color:#063176;border-color:#6e9ce7}.chip.r{background:#e5effe;color:#1254be;border-color:#a7c7fa}
-.hlo{outline:3px solid #0e65f2;outline-offset:3px;border-radius:6px}
-.jb.dis.en{color:#111;border-color:#7f9dce;background:#fff}.jb.dis.en .ico{filter:none;opacity:1}
-.jb.dis.en.dis2{color:#a0a4ad;border-color:#becde6;background:#eef2f8}
+.chip{display:inline-block;font-family:var(--mono);font-size:12.5px;font-weight:700;padding:2px 9px;border-radius:999px;background:#fef3c7;color:#b45309;border:1px solid #fcd34d}
+.chip.v{background:#ede9fe;color:#6d28d9;border-color:#c4b5fd}.chip.g{background:#d1fae5;color:#047857;border-color:#6ee7b7}.chip.r{background:#ffe4e6;color:#be123c;border-color:#fda4af}
+.hlo{outline:3px solid #f59e0b;outline-offset:3px;border-radius:6px}
+.jb.dis.en{color:#111;border-color:#9aa1b3;background:linear-gradient(180deg,#fff,#e6e8ee)}.jb.dis.en .ico{filter:none;opacity:1}
+.jb.dis.en.dis2{color:#a0a4ad;border-color:#ccd0d8;background:#f1f2f5}
 .rad.on.off::before,.chk.on.off::before{background:#fff;content:""}
-.code-title{font-family:var(--mono);font-size:max(13px,var(--htt-min,24px));color:var(--muted);margin:0 0 4px 4px;font-weight:600}
+.code-title{font-family:var(--mono);font-size:13px;color:var(--muted);margin:0 0 4px 4px;font-weight:600}
 .f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
 .f.on{opacity:1;transform:none}
 .f.ghost{display:none}
-table{border-collapse:separate;border-spacing:0;width:100%;font-size:max(16px,var(--htt-min,24px));border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:16px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
 th,td{padding:6px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.3}
-th{background:#ebf2fe;font-weight:700}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
 tr:last-child td{border-bottom:none}
 table.t1 td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
-.console{font-family:var(--mono);font-size:max(13.5px,var(--htt-min,24px));line-height:1.45;background:#17263e;border-radius:12px;padding:8px 14px;color:#e7f0fe;white-space:pre;min-height:40px;overflow:hidden}
-.console .in{color:#2b78f4;font-weight:600}
-.console::before{content:"● ● ●";display:block;color:#72a4f4;font-size:max(10px,var(--htt-min,24px));letter-spacing:3px;margin-bottom:3px}
+.console{font-family:var(--mono);font-size:13.5px;line-height:1.45;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:8px 14px;color:#e6f0ff;white-space:pre;min-height:40px;overflow:hidden}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:10px;letter-spacing:3px;margin-bottom:3px}
 .cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
 .flow{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap}
-.box{border-radius:12px;padding:8px 12px;text-align:center;font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));border:2px solid var(--line);background:#fff;min-width:110px;font-weight:600}
-.box small{display:block;font-family:"Be Vietnam Pro";font-size:max(12.5px,var(--htt-min,24px));color:var(--muted);margin-top:2px;font-weight:400}
-.box.a{border-color:#3a7fed}.box.b{border-color:#0949b1}.box.c{border-color:#4887ec;background:#f2f6fd}.box.d{border-color:#0e65f2;background:#ecf3fe}.box.e{border-color:#1051b9;background:#ecf3fd}
-.ar{color:var(--muted);font-size:max(22px,var(--htt-min,24px));text-align:center}
+.box{border-radius:12px;padding:8px 12px;text-align:center;font-family:var(--mono);font-size:15px;border:2px solid var(--line);background:#fff;min-width:110px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:12.5px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.a{border-color:#7c3aed}.box.b{border-color:#0891b2}.box.c{border-color:#ec4899;background:#fdf2f8}.box.d{border-color:#f59e0b;background:#fffbeb}.box.e{border-color:#10b981;background:#ecfdf5}
+.ar{color:var(--muted);font-size:22px;text-align:center}
 .title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
-.kicker{font-family:var(--mono);color:#276cdb;font-size:max(22px,var(--htt-min,24px));margin-bottom:18px;font-weight:600}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
 .orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
 @keyframes float{50%{transform:translate(30px,-25px)}}
-.say{font-size:max(17px,var(--htt-min,24px));margin-top:10px;min-height:50px;color:var(--muted);line-height:1.42}
+.say{font-size:17px;margin-top:10px;min-height:50px;color:var(--muted);line-height:1.42}
 .say b{color:var(--text)}
 .vars{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
-.vc{font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));font-weight:700;padding:4px 12px;border-radius:10px;background:#fff;border:2px solid #dce8fb;transition:all .35s}
+.vc{font-family:var(--mono);font-size:15px;font-weight:700;padding:4px 12px;border-radius:10px;background:#fff;border:2px solid #e4dcfb;transition:all .35s}
 .vc b{color:var(--t)}
-.vc.hot{border-color:#0e65f2;background:#ecf3fe;box-shadow:0 0 14px rgba(14,101,242,.45)}
-.vc.res{border-color:#1051b9;background:#ecf3fd;color:#063176}
+.vc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.45)}
+.vc.res{border-color:#10b981;background:#ecfdf5;color:#047857}
 .arr{display:flex;gap:8px;justify-content:center}
-.cell{width:52px;height:56px;border-radius:12px;border:3px solid #dce8fb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:max(20px,var(--htt-min,24px));font-weight:800;transition:all .45s}
-.cell small{font-size:max(11px,var(--htt-min,24px));color:var(--muted);font-weight:600}
-.cell.cur{border-color:#0e65f2;background:#ecf3fe;color:#094bb4;transform:translateY(-6px)}
-.cell.ok{border-color:#1051b9;background:#ecf3fd;color:#063176}
-.cell.bad{border-color:#1d68e1;background:#f2f7fe;color:#1254be}
+.cell{width:52px;height:56px;border-radius:12px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .45s}
+.cell small{font-size:11px;color:var(--muted);font-weight:600}
+.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-6px)}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c}
 .cell.dim{opacity:.35}
-.cell.wide{width:auto;padding:0 10px;font-size:max(14px,var(--htt-min,24px))}
+.cell.wide{width:auto;padding:0 10px;font-size:14px}
 @keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.15)}100%{transform:none;opacity:1}}
 .pop{animation:pop .45s}
 
 /* ===== agenda ===== */
 .agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 10px}
-.sec{grid-column:1/-1;font-family:var(--mono);font-size:max(13px,var(--htt-min,24px));font-weight:700;color:var(--muted);letter-spacing:.08em;margin-top:4px;text-transform:uppercase}
-.ag{background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 10px;cursor:pointer;transition:all .2s;font-size:max(15.5px,var(--htt-min,24px));line-height:1.25;box-shadow:0 2px 6px rgba(40,67,110,.05);font-family:var(--mono);font-weight:600}
-.ag:hover{border-color:#4887ec;transform:translateY(-2px);box-shadow:0 10px 24px -10px rgba(72,135,236,.45)}
-.ag b{color:#276cdb;margin-right:6px}
-.ag.g1{border-left:5px solid #3a7fed}.ag.g2{border-left:5px solid #0949b1}.ag.g3{border-left:5px solid #4887ec}.ag.g4{border-left:5px solid #0e65f2}
-.ag.g5{border-left:5px solid #1051b9}.ag.g6{border-left:5px solid #6399f1}.ag.g7{border-left:5px solid #1c6ef3}.ag.g8{border-left:5px solid #0e62e9}
+.sec{grid-column:1/-1;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.08em;margin-top:4px;text-transform:uppercase}
+.ag{background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 10px;cursor:pointer;transition:all .2s;font-size:15.5px;line-height:1.25;box-shadow:0 2px 6px rgba(40,50,110,.05);font-family:var(--mono);font-weight:600}
+.ag:hover{border-color:#ec4899;transform:translateY(-2px);box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag b{color:#db2777;margin-right:6px}
+.ag.g1{border-left:5px solid #7c3aed}.ag.g2{border-left:5px solid #0891b2}.ag.g3{border-left:5px solid #ec4899}.ag.g4{border-left:5px solid #f59e0b}
+.ag.g5{border-left:5px solid #10b981}.ag.g6{border-left:5px solid #6366f1}.ag.g7{border-left:5px solid #f97316}.ag.g8{border-left:5px solid #0ea5e9}
 
 /* ===== mock Swing windows ===== */
-.win{border:1px solid #c5d3e9;border-radius:10px;background:#ebf0f7;box-shadow:0 18px 40px -18px rgba(23,38,62,.45);font-family:"Segoe UI",system-ui,sans-serif;font-size:max(14px,var(--htt-min,24px));color:#222;transition:all .5s;overflow:hidden;position:relative}
-.wt{height:28px;background:#f6f8fb;border-bottom:1px solid #c1d0e8;display:flex;align-items:center;gap:6px;padding:0 10px;font-weight:600;font-size:max(13px,var(--htt-min,24px));color:#333}
-.wt i{width:11px;height:11px;border-radius:50%;background:#5f99f7;display:inline-block}.wt i:nth-child(2){background:#3880f5}.wt i:nth-child(3){background:#2865c8}
+.win{border:1px solid #cfc8e6;border-radius:10px;background:#eef0f4;box-shadow:0 18px 40px -18px rgba(30,27,58,.45);font-family:"Segoe UI",system-ui,sans-serif;font-size:14px;color:#222;transition:all .5s;overflow:hidden;position:relative}
+.wt{height:28px;background:linear-gradient(180deg,#f7f7fa,#e2e4ea);border-bottom:1px solid #cfd2da;display:flex;align-items:center;gap:6px;padding:0 10px;font-weight:600;font-size:13px;color:#333}
+.wt i{width:11px;height:11px;border-radius:50%;background:#ff5f57;display:inline-block}.wt i:nth-child(2){background:#febc2e}.wt i:nth-child(3){background:#28c840}
 .wt span{margin-left:8px}
 .wb{padding:12px;position:relative}
 .win.ghost{opacity:.25;filter:grayscale(1)}
 .win.undec .wt{display:none}
-.jb{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid #7f9dce;border-radius:5px;background:#fff;font-size:max(13.5px,var(--htt-min,24px));color:#111;transition:all .3s;white-space:nowrap;cursor:default}
-.jb.dis{color:#a0a4ad;border-color:#becde6;background:#eef2f8}
+.jb{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid #9aa1b3;border-radius:5px;background:linear-gradient(180deg,#fff,#e6e8ee);font-size:13.5px;color:#111;transition:all .3s;white-space:nowrap;cursor:default}
+.jb.dis{color:#a0a4ad;border-color:#ccd0d8;background:#f1f2f5}
 .jb.dis .ico{filter:grayscale(1);opacity:.5}
-.jb.press{background:#cdd9ec;border-color:#527cbe;transform:scale(.96)}
-.jb.def{box-shadow:0 0 0 2px #7aaaf7}
+.jb.press{background:linear-gradient(180deg,#cfd8ea,#b9c6e2);border-color:#5b74b5;transform:scale(.96)}
+.jb.def{box-shadow:0 0 0 2px #7aa2f7}
 .jb.vert{flex-direction:column}
 .jb u{text-decoration:underline}
-.ico{display:inline-block;width:18px;height:18px;border-radius:50%;background:#a7c4f3;flex:none}
-.ico.l{border-radius:4px;background:#639cf7;clip-path:polygon(100% 0,0 50%,100% 100%)}
-.ico.r{border-radius:4px;background:#72a4f4;clip-path:polygon(0 0,100% 50%,0 100%)}
-.splat{display:inline-block;width:34px;height:30px;background:none,none,none,none,none}
-.chk,.rad{display:block;padding:3px 0;font-size:max(14px,var(--htt-min,24px));transition:all .3s;white-space:nowrap}
+.ico{display:inline-block;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#a7f3d0,#059669);flex:none}
+.ico.l{border-radius:4px;background:linear-gradient(135deg,#60a5fa,#2563eb);clip-path:polygon(100% 0,0 50%,100% 100%)}
+.ico.r{border-radius:4px;background:linear-gradient(135deg,#f472b6,#db2777);clip-path:polygon(0 0,100% 50%,0 100%)}
+.splat{display:inline-block;width:34px;height:30px;background:radial-gradient(circle at 50% 50%,#f59e0b 0 30%,transparent 31%),radial-gradient(circle at 25% 30%,#ec4899 0 18%,transparent 19%),radial-gradient(circle at 75% 35%,#7c3aed 0 18%,transparent 19%),radial-gradient(circle at 40% 78%,#0891b2 0 17%,transparent 18%),radial-gradient(circle at 78% 75%,#10b981 0 15%,transparent 16%)}
+.chk,.rad{display:block;padding:3px 0;font-size:14px;transition:all .3s;white-space:nowrap}
 .chk::before,.rad::before{display:inline-block;vertical-align:-2px;margin-right:7px}
-.chk::before{content:"";width:14px;height:14px;border:1px solid #7b8394;border-radius:3px;background:#fff;flex:none;font-size:max(12px,var(--htt-min,24px));line-height:14px;text-align:center;font-weight:900;color:#1d65d8}
-.chk.on::before{content:"✓";background:#dde9fd}
+.chk::before{content:"";width:14px;height:14px;border:1px solid #7b8394;border-radius:3px;background:#fff;flex:none;font-size:12px;line-height:14px;text-align:center;font-weight:900;color:#1d4ed8}
+.chk.on::before{content:"✓";background:#dbe7ff}
 .rad::before{content:"";width:14px;height:14px;border:1px solid #7b8394;border-radius:50%;background:#fff;flex:none;box-sizing:border-box}
-.rad.on::before{background:#1d65d8}
-.chk.hl,.rad.hl{background:#c7dbfc;border-radius:4px}
-.tf{display:inline-block;min-width:120px;min-height:26px;border:1px solid #8c93a3;background:#fff;padding:3px 7px;font-family:var(--mono);font-size:max(13.5px,var(--htt-min,24px));border-radius:3px;transition:all .3s;white-space:pre;vertical-align:middle}
-.tf.err{background:#d3e3fd}
-.tf.ro{background:#f0f3f9}
+.rad.on::before{background:radial-gradient(circle,#1d4ed8 0 35%,#fff 40%)}
+.chk.hl,.rad.hl{background:#fff3c4;border-radius:4px}
+.tf{display:inline-block;min-width:120px;min-height:26px;border:1px solid #8c93a3;background:#fff;padding:3px 7px;font-family:var(--mono);font-size:13.5px;border-radius:3px;transition:all .3s;white-space:pre;vertical-align:middle}
+.tf.err{background:#ffd1dc}
+.tf.ro{background:#f3f4f6}
 .tf .cur{display:inline-block;width:1px;height:15px;background:#111;vertical-align:middle;animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
-.ta{border:1px solid #8c93a3;background:#fff;padding:6px 8px;font-family:var(--mono);font-size:max(12.5px,var(--htt-min,24px));line-height:1.5;border-radius:3px;white-space:pre-wrap;overflow:hidden}
+.ta{border:1px solid #8c93a3;background:#fff;padding:6px 8px;font-family:var(--mono);font-size:12.5px;line-height:1.5;border-radius:3px;white-space:pre-wrap;overflow:hidden}
 /* text area that stays scrolled to bottom */
 .ta.bottom{display:flex;flex-direction:column;justify-content:flex-end}
-mark{background:#c4d2e8;color:inherit;border-radius:2px;padding:0 1px}
-mark.sel{background:#c1d8fc}
-.combo{display:inline-flex;align-items:center;justify-content:space-between;min-width:170px;border:1px solid #8c93a3;border-radius:4px;background:#fff;padding:4px 8px;font-size:max(14px,var(--htt-min,24px));gap:10px;position:relative}
+mark{background:#d1d5db;color:inherit;border-radius:2px;padding:0 1px}
+mark.sel{background:#bfdbfe}
+.combo{display:inline-flex;align-items:center;justify-content:space-between;min-width:170px;border:1px solid #8c93a3;border-radius:4px;background:linear-gradient(180deg,#fff,#eceef3);padding:4px 8px;font-size:14px;gap:10px;position:relative}
 .combo::after{content:"▾";color:#555}
 .combo.ed{background:#fff}
 .dd{position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid #8c93a3;box-shadow:0 8px 18px -8px rgba(0,0,0,.35);z-index:3;display:none;text-align:left}
-.dd div{padding:3px 8px;font-size:max(13.5px,var(--htt-min,24px))}
-.dd div.s{background:#3b77d8;color:#fff}
+.dd div{padding:3px 8px;font-size:13.5px}
+.dd div.s{background:#3b6fd8;color:#fff}
 .open .dd{display:block}
-.lst{border:1px solid #8c93a3;background:#fff;font-size:max(14px,var(--htt-min,24px));min-height:90px}
+.lst{border:1px solid #8c93a3;background:#fff;font-size:14px;min-height:90px}
 .lst div{padding:3px 8px;transition:all .3s}
-.lst div.s{background:#3b77d8;color:#fff}
+.lst div.s{background:#3b6fd8;color:#fff}
 .lst div.nw{animation:pop .5s}
-.jt{border-collapse:collapse;width:100%;font-size:max(13px,var(--htt-min,24px));border:1px solid #7f9dce;border-radius:0;background:#fff;font-family:"Segoe UI",system-ui,sans-serif}
-.jt th{background:#fafafa;border:1px solid #a5badd;padding:3px 6px;font-weight:600;font-size:max(12.5px,var(--htt-min,24px));white-space:nowrap;text-align:left}
-.jt td{border:1px solid #d9e2f0;padding:3px 6px;color:#111;font-weight:400;white-space:nowrap;vertical-align:middle}
+.jt{border-collapse:collapse;width:100%;font-size:13px;border:1px solid #9aa1b3;border-radius:0;background:#fff;font-family:"Segoe UI",system-ui,sans-serif}
+.jt th{background:linear-gradient(180deg,#fafafa,#e3e5ea);border:1px solid #b9bec9;padding:3px 6px;font-weight:600;font-size:12.5px;white-space:nowrap;text-align:left}
+.jt td{border:1px solid #e1e3e8;padding:3px 6px;color:#111;font-weight:400;white-space:nowrap;vertical-align:middle}
 .jt td.num{text-align:right}
 .jt td.ck{text-align:center}
-.jt tr.s td{background:#3b77d8;color:#fff}
-.jt td.s{background:#3b77d8;color:#fff}
-.jt td.edit{outline:2px solid #0e65f2;background:#ecf3fe}
-.jt th.sorted::after{content:" ▲";color:#3b77d8}
+.jt tr.s td{background:#3b6fd8;color:#fff}
+.jt td.s{background:#3b6fd8;color:#fff}
+.jt td.edit{outline:2px solid #f59e0b;background:#fffbeb}
+.jt th.sorted::after{content:" ▲";color:#3b6fd8}
 .jt th.sorted.desc::after{content:" ▼"}
 .jt tr.hide{display:none}
-.jt .cb{display:inline-block;width:13px;height:13px;border:1px solid #7b8394;border-radius:2px;background:#fff;vertical-align:middle;font-size:max(11px,var(--htt-min,24px));line-height:12px;text-align:center;font-weight:900;color:#1d65d8}
+.jt .cb{display:inline-block;width:13px;height:13px;border:1px solid #7b8394;border-radius:2px;background:#fff;vertical-align:middle;font-size:11px;line-height:12px;text-align:center;font-weight:900;color:#1d4ed8}
 .jt .cb.on::before{content:"✓"}
-.pb{height:20px;border:1px solid #8c93a3;border-radius:4px;background:#dee6f2;position:relative;overflow:hidden;min-width:180px}
-.pb .fill{position:absolute;left:0;top:0;bottom:0;background:#7aaaf7;transition:width .6s}
-.pb .txt{position:absolute;inset:0;text-align:center;font-size:max(12px,var(--htt-min,24px));line-height:18px;font-weight:600;color:#111}
+.pb{height:20px;border:1px solid #8c93a3;border-radius:4px;background:#e5e7eb;position:relative;overflow:hidden;min-width:180px}
+.pb .fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(180deg,#7aa2f7,#3b6fd8);transition:width .6s}
+.pb .txt{position:absolute;inset:0;text-align:center;font-size:12px;line-height:18px;font-weight:600;color:#111}
 .pb.ind .fill{width:30%!important;animation:ind 1.2s linear infinite alternate}
 .pb.ind .txt{opacity:0}
 @keyframes ind{from{left:0}to{left:70%}}
-.mbar{display:flex;gap:2px;background:#fbfbfc;border-bottom:1px solid #c1d0e8;padding:2px 6px;font-size:max(13.5px,var(--htt-min,24px));position:relative}
+.mbar{display:flex;gap:2px;background:linear-gradient(180deg,#fbfbfc,#e9ebf0);border-bottom:1px solid #cfd2da;padding:2px 6px;font-size:13.5px;position:relative}
 .mbar>span{padding:2px 8px;border-radius:3px}
-.mbar>span.s{background:#3b77d8;color:#fff}
-.menu{position:absolute;top:26px;left:6px;background:#fff;border:1px solid #7f9dce;box-shadow:0 10px 24px -8px rgba(0,0,0,.4);min-width:250px;z-index:4;display:none;font-size:max(13px,var(--htt-min,24px))}
+.mbar>span.s{background:#3b6fd8;color:#fff}
+.menu{position:absolute;top:26px;left:6px;background:#fff;border:1px solid #9aa1b3;box-shadow:0 10px 24px -8px rgba(0,0,0,.4);min-width:250px;z-index:4;display:none;font-size:13px}
 .menu.open{display:block;animation:pop .3s}
 .mi{display:flex;align-items:center;gap:6px;padding:3px 10px;white-space:nowrap}
-.mi .acc{margin-left:auto;color:#666;font-size:max(12px,var(--htt-min,24px));padding-left:16px}
-.mi.s{background:#3b77d8;color:#fff}.mi.s .acc{color:#e2ecfd}
-.msep{height:1px;background:#cfdbed;margin:3px 0}
+.mi .acc{margin-left:auto;color:#666;font-size:12px;padding-left:16px}
+.mi.s{background:#3b6fd8;color:#fff}.mi.s .acc{color:#e0e7ff}
+.msep{height:1px;background:#d9dce3;margin:3px 0}
 .mi .mk{width:14px;text-align:center;font-weight:900;flex:none}
-.dlgwrap{position:absolute;inset:0;background:rgba(23,38,62,.18);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;z-index:6}
+.dlgwrap{position:absolute;inset:0;background:rgba(30,27,58,.18);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;z-index:6}
 .dlgwrap.on{opacity:1}
 .dlgwrap.on .win{animation:pop .4s}
 .dlgwrap.nomodal{background:none}
-.dlgico{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:max(20px,var(--htt-min,24px));flex:none;background:#3c83f5}
-.dlgico.q{background:#1051b9}.dlgico.e{background:#1d68e1}.dlgico.w{background:#0e65f2;border-radius:6px}
-.tabs{display:flex;gap:2px;border-bottom:1px solid #7f9dce;margin-bottom:8px}
-.tabs span{padding:3px 10px;border:1px solid #a5badd;border-bottom:none;border-radius:5px 5px 0 0;background:#e1e8f3;font-size:max(12.5px,var(--htt-min,24px))}
+.dlgico{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:20px;flex:none;background:#3b82f6}
+.dlgico.q{background:#10b981}.dlgico.e{background:#e11d48}.dlgico.w{background:#f59e0b;border-radius:6px}
+.tabs{display:flex;gap:2px;border-bottom:1px solid #9aa1b3;margin-bottom:8px}
+.tabs span{padding:3px 10px;border:1px solid #b9bec9;border-bottom:none;border-radius:5px 5px 0 0;background:#e6e8ee;font-size:12.5px}
 .tabs span.s{background:#fff;font-weight:600}
-.tip{position:absolute;background:#e2edfe;border:1px solid #777;font-size:max(12px,var(--htt-min,24px));padding:2px 6px;box-shadow:2px 2px 4px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;white-space:nowrap;z-index:5}
+.tip{position:absolute;background:#ffffe1;border:1px solid #777;font-size:12px;padding:2px 6px;box-shadow:2px 2px 4px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;white-space:nowrap;z-index:5}
 .tip.on{opacity:1}
 .pic{display:flex;align-items:center;justify-content:center;font-size:64px;min-height:110px;transition:all .4s}
 .thumb{width:34px;height:34px;border-radius:5px;border:1px solid #888;display:inline-block;transition:all .4s}
-.lane{display:grid;grid-template-columns:110px 1fr;gap:6px;align-items:center;font-size:max(13px,var(--htt-min,24px))}
-.lane .ln2{height:30px;border-radius:8px;background:#f8f9fc;border:1px dashed #c4d2e8;display:flex;align-items:center;gap:6px;padding:0 8px;overflow:hidden}
-.ev{font-family:var(--mono);font-size:max(11.5px,var(--htt-min,24px));font-weight:700;padding:2px 7px;border-radius:6px;background:#e9f1fe;color:#286cd9;white-space:nowrap}
-.ev.b{background:#d0e1fd;color:#0e4090}.ev.c{background:#e7effc;color:#1858be}.ev.d{background:#c9ddfc;color:#094bb4}
-.kv{font-family:var(--mono);font-size:max(13px,var(--htt-min,24px))}
+.lane{display:grid;grid-template-columns:110px 1fr;gap:6px;align-items:center;font-size:13px}
+.lane .ln2{height:30px;border-radius:8px;background:#f8fafc;border:1px dashed #cbd5e1;display:flex;align-items:center;gap:6px;padding:0 8px;overflow:hidden}
+.ev{font-family:var(--mono);font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:6px;background:#ede9fe;color:#6d28d9;white-space:nowrap}
+.ev.b{background:#cffafe;color:#0e7490}.ev.c{background:#fce7f3;color:#be185d}.ev.d{background:#fef3c7;color:#b45309}
+.kv{font-family:var(--mono);font-size:13px}
 .swatch{display:inline-block;width:100%;height:100%;border-radius:4px}
 
 /* ===== nav / jump ===== */
-#bar{position:fixed;left:0;bottom:0;height:5px;background:#3a7fed;transition:width .4s;z-index:5}
-#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:max(14px,var(--htt-min,24px));color:var(--muted)}
-#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;min-width:36px;height:32px;cursor:pointer;font-size:max(16px,var(--htt-min,24px));padding:0 8px}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;min-width:36px;height:32px;cursor:pointer;font-size:16px;padding:0 8px}
 #nav button:hover{border-color:var(--accent)}
-#hint{position:fixed;left:16px;bottom:12px;font-size:max(13px,var(--htt-min,24px));color:#7495ca;z-index:5}
-.jumpbtn{position:absolute;top:26px;right:30px;z-index:7;font-family:"Be Vietnam Pro",sans-serif;font-size:max(14px,var(--htt-min,24px));font-weight:700;color:#fff;background:var(--sa1);border:none;border-radius:999px;padding:7px 14px;cursor:pointer;box-shadow:0 6px 16px -6px var(--sa1);transition:transform .2s}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+.jumpbtn{position:absolute;top:26px;right:30px;z-index:7;font-family:"Be Vietnam Pro",sans-serif;font-size:14px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));border:none;border-radius:999px;padding:7px 14px;cursor:pointer;box-shadow:0 6px 16px -6px var(--sa1);transition:transform .2s}
 .jumpbtn:hover{transform:translateY(-2px) scale(1.04)}
-#jump{position:fixed;inset:0;z-index:20;background:rgba(23,38,62,.45);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
+#jump{position:fixed;inset:0;z-index:20;background:rgba(30,27,58,.45);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
 #jump.on{display:flex}
-#jbox{width:min(1100px,94vw);max-height:88vh;overflow:auto;background:#fff;border-radius:18px;padding:20px 24px;box-shadow:0 30px 70px -20px rgba(23,38,62,.6);animation:pop .3s}
+#jbox{width:min(1100px,94vw);max-height:88vh;overflow:auto;background:#fff;border-radius:18px;padding:20px 24px;box-shadow:0 30px 70px -20px rgba(30,27,58,.6);animation:pop .3s}
 #jbox .jh{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-#jbox .jh h3{font-size:max(22px,var(--htt-min,24px));color:#3a7fed;margin:0}
-#jbox .jh input{margin-left:auto;font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));padding:6px 10px;border:2px solid var(--line);border-radius:10px;width:260px;outline:none}
-#jbox .jh input:focus{border-color:#8cb6f9}
-#jbox .jh button{border:none;background:#ebf2fe;color:#286cd9;font-weight:800;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:max(18px,var(--htt-min,24px))}
+#jbox .jh h3{font-size:22px;color:#7c3aed;margin:0}
+#jbox .jh input{margin-left:auto;font-family:var(--mono);font-size:15px;padding:6px 10px;border:2px solid var(--line);border-radius:10px;width:260px;outline:none}
+#jbox .jh input:focus{border-color:#a78bfa}
+#jbox .jh button{border:none;background:#f1eaff;color:#6d28d9;font-weight:800;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:18px}
 #jlist{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-#jlist .ji{display:flex;gap:8px;align-items:center;padding:7px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:max(14.5px,var(--htt-min,24px));transition:all .15s;background:#fff}
-#jlist .ji:hover,#jlist .ji.k{border-color:#4887ec;background:#f2f6fd}
-#jlist .ji.cur{background:#eef4fe;border-color:#8cb6f9}
-#jlist .ji b{font-family:var(--mono);color:#276cdb;min-width:26px}
+#jlist .ji{display:flex;gap:8px;align-items:center;padding:7px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:14.5px;transition:all .15s;background:#fff}
+#jlist .ji:hover,#jlist .ji.k{border-color:#ec4899;background:#fdf2f8}
+#jlist .ji.cur{background:#f3edff;border-color:#a78bfa}
+#jlist .ji b{font-family:var(--mono);color:#db2777;min-width:26px}
 #jlist .ji span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:700px){#hint{display:none}#jlist{grid-template-columns:1fr}}
 @media print{#nav,#bar,#hint,.jumpbtn{display:none}}
 
 /* ===== matrix visuals ===== */
 .mwrap{display:flex;flex-direction:column;align-items:center;gap:6px}
-.mlabel{font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));font-weight:700;color:var(--muted)}
+.mlabel{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted)}
 .mlabel b{color:var(--sa1)}
 .mat{display:inline-grid;gap:6px;position:relative}
 .mat .cell{width:54px;height:54px}
-.mat.sm .cell{width:44px;height:44px;font-size:max(17px,var(--htt-min,24px));border-radius:10px}
-.mat.xs .cell{width:38px;height:38px;font-size:max(15px,var(--htt-min,24px));border-radius:9px;border-width:2px}
-.cell.empty{background:#faf9ff;border-style:dashed;color:#bdcde6}
-.cell.k0{border-color:#3a7fed;background:#eef4fe;color:#286cd9}
-.cell.k1{border-color:#0949b1;background:#e7f0fe;color:#0e4090}
-.cell.k2{border-color:#4887ec;background:#f2f6fd;color:#1858be}
-.cell.k3{border-color:#0e65f2;background:#ecf3fe;color:#094bb4}
-.cell.ok{border-color:#1051b9;background:#ecf3fd;color:#063176;border-style:solid}
-.cell.bad{border-color:#1d68e1;background:#f2f7fe;color:#1254be;border-style:solid}
-.cell.cur{border-color:#0e65f2;background:#ecf3fe;color:#094bb4;border-style:solid}
+.mat.sm .cell{width:44px;height:44px;font-size:17px;border-radius:10px}
+.mat.xs .cell{width:38px;height:38px;font-size:15px;border-radius:9px;border-width:2px}
+.cell.empty{background:#faf9ff;border-style:dashed;color:#c9c3e0}
+.cell.k0{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.cell.k1{border-color:#0891b2;background:#e6fbff;color:#0e7490}
+.cell.k2{border-color:#ec4899;background:#fdf2f8;color:#be185d}
+.cell.k3{border-color:#f59e0b;background:#fffbeb;color:#b45309}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857;border-style:solid}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;border-style:solid}
+.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;border-style:solid}
 .cell.k0,.cell.k1,.cell.k2,.cell.k3{border-style:solid}
-.cell.star{box-shadow:0 0 0 4px #8eb7f9}
+.cell.star{box-shadow:0 0 0 4px #fde68a}
 .rotbox{transition:transform 1.1s cubic-bezier(.5,0,.3,1)}
 .rotbox .cell span{display:inline-block;transition:transform 1.1s cubic-bezier(.5,0,.3,1)}
 .rotbox.rot{transform:rotate(-90deg)}
@@ -275,92 +275,55 @@ mark.sel{background:#c1d8fc}
 .rotbox.rotR{transform:rotate(90deg)}
 .rotbox.rotR .cell span{transform:rotate(-90deg)}
 .bigar{font-size:40px;color:var(--sa1);font-weight:800;text-align:center}
-.formula{font-family:var(--mono);font-size:24px;font-weight:800;text-align:center;padding:12px 18px;border-radius:14px;background:#eef4fe;border:2px solid #b7d1fb;color:#1d4b95}
-.formula .hi{color:#276cdb}
-.ex{font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));white-space:pre;line-height:1.4;background:#fcfbff;border:1px solid var(--line);border-radius:10px;padding:6px 10px;margin-top:4px}
-.ex b{color:#276cdb}
-.file{border:2px solid var(--line);border-radius:12px;background:#fff;padding:8px 12px;font-family:var(--mono);font-size:max(14px,var(--htt-min,24px));min-width:200px;transition:all .4s}
-.file h4{font-size:max(16px,var(--htt-min,24px));margin-bottom:4px}
+.formula{font-family:var(--mono);font-size:24px;font-weight:800;text-align:center;padding:12px 18px;border-radius:14px;background:linear-gradient(90deg,#f3edff,#fdf2f8);border:2px solid #c4b5fd;color:#4c1d95}
+.formula .hi{color:#db2777}
+.ex{font-family:var(--mono);font-size:15px;white-space:pre;line-height:1.4;background:#fcfbff;border:1px solid var(--line);border-radius:10px;padding:6px 10px;margin-top:4px}
+.ex b{color:#db2777}
+.file{border:2px solid var(--line);border-radius:12px;background:#fff;padding:8px 12px;font-family:var(--mono);font-size:14px;min-width:200px;transition:all .4s}
+.file h4{font-size:16px;margin-bottom:4px}
 .box.c{font-style:normal;color:var(--text)}
-.mat.sm .cell small,.mat.xs .cell small{font-size:max(8.5px,var(--htt-min,24px));white-space:nowrap;letter-spacing:-.3px}
-.pflow .box{min-width:0;font-size:max(13px,var(--htt-min,24px));padding:6px 8px}
-.file.fa{border-color:#3a7fed}.file.fa h4{color:#3a7fed}
-.file.fb{border-color:#0949b1}.file.fb h4{color:#0949b1}
-.file.fc{border-color:#4887ec}.file.fc h4{color:#276cdb}
-.file.glow{box-shadow:0 0 0 4px #8eb7f9,0 10px 30px -10px rgba(14,101,242,.6)}
-.file small{display:block;font-family:"Be Vietnam Pro";color:var(--muted);font-size:max(13px,var(--htt-min,24px))}
-.bad-code{font-family:var(--mono);font-size:max(13px,var(--htt-min,24px));background:#f2f7fe;border:1px solid #a7c7fa;border-radius:8px;padding:4px 8px;margin:4px 0;white-space:pre;color:#12489f;overflow:hidden}
-.good-code{font-family:var(--mono);font-size:max(13px,var(--htt-min,24px));background:#ecf3fd;border:1px solid #6e9ce7;border-radius:8px;padding:4px 8px;margin:4px 0;white-space:pre;color:#06285f;overflow:hidden}
-.card.err p{font-size:max(14.5px,var(--htt-min,24px));line-height:1.35}
-.card.err h3{font-size:max(17px,var(--htt-min,24px))}
+.mat.sm .cell small,.mat.xs .cell small{font-size:8.5px;white-space:nowrap;letter-spacing:-.3px}
+.pflow .box{min-width:0;font-size:13px;padding:6px 8px}
+.file.fa{border-color:#7c3aed}.file.fa h4{color:#7c3aed}
+.file.fb{border-color:#0891b2}.file.fb h4{color:#0891b2}
+.file.fc{border-color:#ec4899}.file.fc h4{color:#db2777}
+.file.glow{box-shadow:0 0 0 4px #fde68a,0 10px 30px -10px rgba(245,158,11,.6)}
+.file small{display:block;font-family:"Be Vietnam Pro";color:var(--muted);font-size:13px}
+.bad-code{font-family:var(--mono);font-size:13px;background:#fff1f3;border:1px solid #fda4af;border-radius:8px;padding:4px 8px;margin:4px 0;white-space:pre;color:#9f1239;overflow:hidden}
+.good-code{font-family:var(--mono);font-size:13px;background:#ecfdf5;border:1px solid #6ee7b7;border-radius:8px;padding:4px 8px;margin:4px 0;white-space:pre;color:#065f46;overflow:hidden}
+.card.err p{font-size:14.5px;line-height:1.35}
+.card.err h3{font-size:17px}
 </style>
-<style id="htt-theme">
-/* HTT theme: logo + layout helpers (font-size >= 24px, single blue) */
-#deck>.htt-logo{position:absolute;top:12px;right:14px;z-index:60;height:40px;padding:0 10px;border-radius:8px;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;font:800 24px/1 "Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.04em;pointer-events:none;user-select:none}
-#deck>.htt-logo span{font-size:24px;color:#fff}
-.htt-stack{grid-template-columns:minmax(0,1fr)!important;grid-template-areas:none!important;flex-direction:column!important;flex-wrap:nowrap!important}
-.htt-stack>*{grid-column:auto!important;grid-row:auto!important;max-width:100%}
-.htt-wrap,.htt-wrap *{white-space:pre-wrap!important;overflow-wrap:anywhere}
-.htt-wrap .ln{flex-wrap:nowrap}
-.htt-flexwrap{flex-wrap:wrap!important}
-#nav,#nav *{font-size:16px!important}
-#hint{font-size:14px!important}
-.orb{display:none!important}
-:root{--htt-min:24px}
-.slide.htt-fs22{--htt-min:22px}.slide.htt-fs20{--htt-min:20px}.slide.htt-fs0{--htt-min:0px}
-.jumpbtn{right:100px!important}
-.slide.htt-fs18{--htt-min:18px}.slide.htt-fs16{--htt-min:16px}
-.slide .hdr{padding-right:84px}
-.sjump{right:100px!important}
-
-</style>
-<script>window.HTT_MIN=function(el){var s=el&&el.closest?el.closest(".slide"):null;var v=parseFloat(getComputedStyle(s||document.documentElement).getPropertyValue("--htt-min"));return isNaN(v)?24:v};</script>
 </head>
 <body>
 
 <div id="viewport"><div id="deck">
-<div class="htt-logo" aria-label="HTT" title="HTT"><span>HTT</span></div>
 <section class="slide" id="title" data-title="Trang bìa">
 
-  <div class="orb" style="width:380px;height:380px;background:#a8c7f9;right:-60px;top:-80px"></div>
-  <div class="orb" style="width:300px;height:300px;background:#81aff8;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
   <div class="title-wrap">
     <div class="kicker in">// C++ · Practice 5.7 · Mảng 2 chiều</div>
     <h1 class="in">Xoay trái ma trận<br><span class="grad">90° bằng mảng int a[100][100]</span></h1>
     <p class="in muted" style="font-size:24px;margin-top:20px;max-width:1000px">Nhập ma trận số nguyên M × N, xoay trái 90° (ngược chiều kim đồng hồ) rồi in kết quả. Tổ chức bằng <b>hàm</b> và <b>project nhiều file</b>: <code class="i">matrix.h</code>, <code class="i">matrix.cpp</code>, <code class="i">main.cpp</code>.</p>
-    <p class="in" style="margin-top:34px;font-size:max(18px,var(--htt-min,24px));color:#7495ca">← → hoặc Space: chạy từng bước · Shift+→: qua slide · <b>G</b> hoặc nút <b>☰ Đi tới slide</b>: nhảy tới slide bất kỳ · A: hiện hết · F: toàn màn hình</p>
+    <p class="in" style="margin-top:34px;font-size:18px;color:#8a91b4">← → hoặc Space: chạy từng bước · Shift+→: qua slide · <b>G</b> hoặc nút <b>☰ Đi tới slide</b>: nhảy tới slide bất kỳ · A: hiện hết · F: toàn màn hình</p>
   </div>
 </section>
 
 <section class="slide" id="agenda" data-title="Nội dung">
-<div class="hdr in"><span class="qn">MỤC LỤC</span><h2>Nội dung</h2><span class="muted" style="font-size:max(17px,var(--htt-min,24px))">· bấm để đi tới</span></div><div class="agenda in htt-stack" style="grid-template-columns:repeat(4,1fr);gap:12px"><div class="sec">Phân tích đề bài</div><div class="ag g1" data-goto="problem" style="font-size:max(17px,var(--htt-min,24px));padding:10px 12px"><b>01</b>Đề bài &amp; ví dụ</div><div class="ag g1" data-goto="rotate" style="font-size:max(17px,var(--htt-min,24px));padding:10px 12px"><b>02</b>Xoay trái là gì?</div><div class="sec">Ý tưởng</div><div class="ag g2" data-goto="index" style="font-size:max(17px,var(--htt-min,24px));padding:10px 12px"><b>03</b>Ô nào đi về đâu?</div><div class="ag g2" data-goto="idea" style="font-size:max(17px,var(--htt-min,24px));padding:10px 12px"><b>04</b>Ý tưởng: cột → hàng</div><div class="sec">Giải thuật &amp; chạy tay</div><div class="ag g3" data-goto="algo" style="font-size:max(17px,var(--htt-min,24px));padding:10px 12px"><b>05</b>Giải thuật</div><div class="ag g3" data-goto="trace1" style="font-size:max(17px,var(--htt-min,24px));padding:10px 12px"><b>06</b>Chạy tay: 2 × 3</div><div class="ag g3" data-goto="trace2" style="font-size:max(17px,var(--htt-min,24px));padding:10px 12px"><b>07</b>Chạy tay: 3 × 3 và 1 × 4</div></div>
-</section>
-
-<section id="agenda-p2" class="slide htt-cont" data-title="Nội dung">
-<div class="hdr in"><span class="qn">MỤC LỤC</span><h2>Nội dung</h2><span class="muted" style="font-size:max(17px,var(--htt-min,24px))">· bấm để đi tới</span></div>
-<div class="agenda in htt-stack htt-cont-part" style="grid-template-columns:repeat(4,1fr);gap:12px"><div class="sec">Code C++ (project nhiều file)</div><div class="ag g4" data-goto="project" style="font-size:max(17px,var(--htt-min,24px));padding:10px 12px"><b>08</b>Project nhiều file</div><div class="ag g4" data-goto="codeH" style="font-size:max(17px,var(--htt-min,24px));padding:10px 12px"><b>09</b>matrix.h</div><div class="ag g4" data-goto="codeIO" style="font-size:max(17px,var(--htt-min,24px));padding:10px 12px"><b>10</b>Nhập &amp; in ma trận</div><div class="ag g5" data-goto="codeRot" style="font-size:max(17px,var(--htt-min,24px));padding:10px 12px"><b>11</b>Hàm rotateLeft</div><div class="ag g5" data-goto="codeMain" style="font-size:max(17px,var(--htt-min,24px));padding:10px 12px"><b>12</b>main.cpp &amp; chạy thử</div><div class="sec">Lỗi sai &amp; mở rộng</div><div class="ag g6" data-goto="errors" style="font-size:max(17px,var(--htt-min,24px));padding:10px 12px"><b>13</b>Lỗi hay gặp</div><div class="ag g6" data-goto="inplace" style="font-size:max(17px,var(--htt-min,24px));padding:10px 12px"><b>14</b>Lỗi: xoay tại chỗ</div><div class="ag g7" data-goto="vector" style="font-size:max(17px,var(--htt-min,24px));padding:10px 12px"><b>15</b>Làm bằng vector</div></div>
-</section>
-
-<section id="agenda-p2-p2" class="slide htt-cont htt-cont" data-title="Nội dung">
-<div class="hdr in"><span class="qn">MỤC LỤC</span><h2>Nội dung</h2><span class="muted" style="font-size:max(17px,var(--htt-min,24px))">· bấm để đi tới</span></div>
-<div class="agenda in htt-stack htt-cont-part htt-cont-part" style="grid-template-columns:repeat(4,1fr);gap:12px"><div class="ag g8" data-goto="more" style="font-size:max(17px,var(--htt-min,24px));padding:10px 12px"><b>16</b>Mở rộng</div><div class="ag g1" data-goto="summary" style="font-size:max(17px,var(--htt-min,24px));padding:10px 12px"><b>✓</b>Tổng kết</div></div>
+<div class="hdr in"><span class="qn">MỤC LỤC</span><h2>Nội dung</h2><span class="muted" style="font-size:17px">· bấm để đi tới</span></div><div class="agenda in" style="grid-template-columns:repeat(4,1fr);gap:12px"><div class="sec">Phân tích đề bài</div><div class="ag g1" data-goto="problem" style="font-size:17px;padding:10px 12px"><b>01</b>Đề bài &amp; ví dụ</div><div class="ag g1" data-goto="rotate" style="font-size:17px;padding:10px 12px"><b>02</b>Xoay trái là gì?</div><div class="sec">Ý tưởng</div><div class="ag g2" data-goto="index" style="font-size:17px;padding:10px 12px"><b>03</b>Ô nào đi về đâu?</div><div class="ag g2" data-goto="idea" style="font-size:17px;padding:10px 12px"><b>04</b>Ý tưởng: cột → hàng</div><div class="sec">Giải thuật &amp; chạy tay</div><div class="ag g3" data-goto="algo" style="font-size:17px;padding:10px 12px"><b>05</b>Giải thuật</div><div class="ag g3" data-goto="trace1" style="font-size:17px;padding:10px 12px"><b>06</b>Chạy tay: 2 × 3</div><div class="ag g3" data-goto="trace2" style="font-size:17px;padding:10px 12px"><b>07</b>Chạy tay: 3 × 3 và 1 × 4</div><div class="sec">Code C++ (project nhiều file)</div><div class="ag g4" data-goto="project" style="font-size:17px;padding:10px 12px"><b>08</b>Project nhiều file</div><div class="ag g4" data-goto="codeH" style="font-size:17px;padding:10px 12px"><b>09</b>matrix.h</div><div class="ag g4" data-goto="codeIO" style="font-size:17px;padding:10px 12px"><b>10</b>Nhập &amp; in ma trận</div><div class="ag g5" data-goto="codeRot" style="font-size:17px;padding:10px 12px"><b>11</b>Hàm rotateLeft</div><div class="ag g5" data-goto="codeMain" style="font-size:17px;padding:10px 12px"><b>12</b>main.cpp &amp; chạy thử</div><div class="sec">Lỗi sai &amp; mở rộng</div><div class="ag g6" data-goto="errors" style="font-size:17px;padding:10px 12px"><b>13</b>Lỗi hay gặp</div><div class="ag g6" data-goto="inplace" style="font-size:17px;padding:10px 12px"><b>14</b>Lỗi: xoay tại chỗ</div><div class="ag g7" data-goto="vector" style="font-size:17px;padding:10px 12px"><b>15</b>Làm bằng vector</div><div class="ag g8" data-goto="more" style="font-size:17px;padding:10px 12px"><b>16</b>Mở rộng</div><div class="ag g1" data-goto="summary" style="font-size:17px;padding:10px 12px"><b>✓</b>Tổng kết</div></div>
 </section>
 
 <section class="slide" id="problem" data-title="01 · Phân tích đề bài">
-<div class="hdr in"><span class="qn">01 · PHÂN TÍCH</span><h2>Đề bài nói gì?</h2></div><div class="cols htt-stack" style="grid-template-columns:1fr 1.15fr">
+<div class="hdr in"><span class="qn">01 · PHÂN TÍCH</span><h2>Đề bài nói gì?</h2></div><div class="cols" style="grid-template-columns:1fr 1.15fr">
  <div>
   <div class="card in"><h3>Đầu vào (Input)</h3><ul><li>Hai số nguyên <b>M</b> (số dòng), <b>N</b> (số cột).</li><li>M × N số nguyên của ma trận, nhập theo từng dòng.</li><li>Dùng mảng <code class="i">int a[100][100]</code> ⇒ <b>1 ≤ M, N ≤ 100</b>.</li></ul></div>
   <div class="card in" style="margin-top:12px"><h3>Đầu ra (Output)</h3><ul><li>Ma trận sau khi <b>xoay trái 90°</b> (ngược chiều kim đồng hồ).</li><li>Kết quả có <b>N dòng, M cột</b> (đổi chỗ kích thước!).</li></ul></div>
   <div class="card in" style="margin-top:12px"><h3>Yêu cầu tổ chức</h3><ul><li>Chia thành các <b>hàm</b>: nhập, in, xoay.</li><li><b>Project nhiều file</b>: .h (khai báo) + .cpp (định nghĩa) + main.cpp.</li></ul></div>
  </div>
- </div>
-</section>
-
-<section id="problem-p2" class="slide htt-cont" data-title="01 · Phân tích đề bài">
-<div class="hdr in"><span class="qn">01 · PHÂN TÍCH</span><h2>Đề bài nói gì?</h2></div>
-<div class="cols htt-stack htt-cont-part" style="grid-template-columns:1fr 1.15fr"><div>
+ <div>
   <h3 class="in">Ví dụ input / output</h3>
-  <table class="in" style="font-size:max(15px,var(--htt-min,24px))"><tr><th>#</th><th>Input</th><th>Output</th><th>Ghi chú</th></tr>
+  <table class="in" style="font-size:15px"><tr><th>#</th><th>Input</th><th>Output</th><th>Ghi chú</th></tr>
    <tr><td>1</td><td><div class="ex">2 3
 1 2 3
 4 5 6</div></td><td><div class="ex">3 6
@@ -378,22 +341,16 @@ mark.sel{background:#c1d8fc}
 8
 7</div></td><td>1 dòng → 1 cột<br>(trường hợp biên)</td></tr>
   </table>
-  </div></div>
-</section>
-
-<section id="problem-p2-p2" class="slide htt-cont htt-cont" data-title="01 · Phân tích đề bài">
-<div class="hdr in"><span class="qn">01 · PHÂN TÍCH</span><h2>Đề bài nói gì?</h2></div>
-<div class="cols htt-stack htt-cont-part htt-cont-part" style="grid-template-columns:1fr 1.15fr"><div class="htt-cont-part">
-<h3 class="in">Ví dụ input / output</h3><div class="note blue f">Hai câu hỏi cần trả lời trước khi code: <b>(1)</b> “xoay trái” làm ma trận trông thế nào? <b>(2)</b> phần tử ở vị trí <b>[i][j]</b> của kết quả lấy từ ô nào của ma trận cũ?</div>
+  <div class="note blue f">Hai câu hỏi cần trả lời trước khi code: <b>(1)</b> “xoay trái” làm ma trận trông thế nào? <b>(2)</b> phần tử ở vị trí <b>[i][j]</b> của kết quả lấy từ ô nào của ma trận cũ?</div>
  </div></div>
 </section>
 
-<section class="slide htt-fs20" id="rotate" data-title="02 · Xoay trái 90° trông thế nào">
+<section class="slide" id="rotate" data-title="02 · Xoay trái 90° trông thế nào">
 <div class="hdr in"><span class="qn">02 · HIỂU ĐỀ</span><h2>Xoay trái 90° trông như thế nào?</h2></div><div class="cols" style="grid-template-columns:1.25fr 1fr"><div><div class="stage" style="height:330px;gap:60px"><div class="mwrap"><div class="mlabel">a: <b>2 × 3</b></div><div class="rotbox" id="rb"><div class="mat  " id="ra" style="grid-template-columns:repeat(3,auto)"><div class="cell" id="ra_0_0"><span>1</span></div><div class="cell" id="ra_0_1"><span>2</span></div><div class="cell star" id="ra_0_2"><span>3</span></div><div class="cell" id="ra_1_0"><span>4</span></div><div class="cell" id="ra_1_1"><span>5</span></div><div class="cell" id="ra_1_2"><span>6</span></div></div></div></div><div class="bigar hide0" id="rar">⟲</div><div class="mwrap hide0" id="rbw"><div class="mlabel">b: <b>3 × 2</b></div><div class="mat  " id="rbm" style="grid-template-columns:repeat(2,auto)"><div class="cell star" id="rbm_0_0"><span>3</span></div><div class="cell" id="rbm_0_1"><span>6</span></div><div class="cell" id="rbm_1_0"><span>2</span></div><div class="cell" id="rbm_1_1"><span>5</span></div><div class="cell" id="rbm_2_0"><span>1</span></div><div class="cell" id="rbm_2_1"><span>4</span></div></div></div></div><div class="flow hide0" id="rcmp" style="gap:26px"><div class="mwrap"><div class="mlabel">xoay <b>TRÁI</b> ⟲ (đề yêu cầu)</div><div class="mat xs " id="cl" style="grid-template-columns:repeat(2,auto)"><div class="cell ok" id="cl_0_0"><span>3</span></div><div class="cell ok" id="cl_0_1"><span>6</span></div><div class="cell ok" id="cl_1_0"><span>2</span></div><div class="cell ok" id="cl_1_1"><span>5</span></div><div class="cell ok" id="cl_2_0"><span>1</span></div><div class="cell ok" id="cl_2_1"><span>4</span></div></div></div><div class="mwrap"><div class="mlabel">xoay <b>PHẢI</b> ⟳ (không phải!)</div><div class="mat xs " id="cr" style="grid-template-columns:repeat(2,auto)"><div class="cell bad" id="cr_0_0"><span>4</span></div><div class="cell bad" id="cr_0_1"><span>1</span></div><div class="cell bad" id="cr_1_0"><span>5</span></div><div class="cell bad" id="cr_1_1"><span>2</span></div><div class="cell bad" id="cr_2_0"><span>6</span></div><div class="cell bad" id="cr_2_1"><span>3</span></div></div></div></div></div><div><span class="f ghost" data-act="#rar|sh" data-say="Ma trận <b>a</b> có 2 dòng, 3 cột. Đánh dấu ô góc <b>trên-phải</b> (số 3) để theo dõi. “Xoay trái 90°” = xoay <b>ngược chiều kim đồng hồ</b> một góc vuông."></span><span class="f ghost" data-act="#rb|rot" data-say="Hãy tưởng tượng cầm tờ giấy chứa ma trận và xoay ngược chiều kim đồng hồ. Ô góc trên-phải (3) chạy lên góc <b>trên-trái</b>. Các số vẫn đứng thẳng để dễ đọc."></span><span class="f ghost" data-act="#rbw|sh" data-say="Viết lại cho ngay ngắn ta được <b>b</b>. Ma trận 2×3 nằm ngang thành 3×2 nằm dọc: <b>số dòng mới = N = 3</b>, <b>số cột mới = M = 2</b>."></span><span class="f ghost" data-now="#rbm_0_0|cur;#rbm_0_1|cur" data-say="Đọc dòng đầu của b: <b>3 6</b>. Đó chính là <b>cột cuối</b> của a (3 ở trên, 6 ở dưới), đọc từ trên xuống. Đây là manh mối cho ý tưởng!"></span><span class="f ghost" data-act="#rcmp|sh" data-say="Cẩn thận đừng nhầm với <b>xoay phải</b> (theo chiều kim đồng hồ): dòng đầu khi đó là <b>4 1</b>, tức cột đầu đọc từ dưới lên. Nhiều bạn làm nhầm chiều xoay."></span><p class="say">Nhấn → để chạy từng bước.</p><div class="note f">Mẹo nhớ: xoay <b>trái</b> ⟲ thì cạnh <b>phải</b> của ma trận cũ (cột cuối) trở thành cạnh <b>trên</b> (dòng đầu).</div></div></div>
 </section>
 
-<section class="slide htt-fs18" id="index" data-title="03 · Công thức chỉ số">
-<div class="hdr in"><span class="qn">03 · HIỂU ĐỀ</span><h2>Ô b[i][j] lấy giá trị từ ô nào của a?</h2></div><div class="cols" style="grid-template-columns:1fr 1.1fr"><div><div class="flow" style="gap:30px;margin-top:6px"><div class="mwrap"><div class="mlabel">a (M=2, N=3)</div><div class="mat  " id="ia" style="grid-template-columns:repeat(3,auto)"><div class="cell" id="ia_0_0"><span>1</span><small>[0][0]</small></div><div class="cell" id="ia_0_1"><span>2</span><small>[0][1]</small></div><div class="cell" id="ia_0_2"><span>3</span><small>[0][2]</small></div><div class="cell" id="ia_1_0"><span>4</span><small>[1][0]</small></div><div class="cell" id="ia_1_1"><span>5</span><small>[1][1]</small></div><div class="cell" id="ia_1_2"><span>6</span><small>[1][2]</small></div></div></div><div class="mwrap"><div class="mlabel">b (3 × 2)</div><div class="mat  " id="ib" style="grid-template-columns:repeat(2,auto)"><div class="cell empty" id="ib_0_0"><span></span><small>[0][0]</small></div><div class="cell empty" id="ib_0_1"><span></span><small>[0][1]</small></div><div class="cell empty" id="ib_1_0"><span></span><small>[1][0]</small></div><div class="cell empty" id="ib_1_1"><span></span><small>[1][1]</small></div><div class="cell empty" id="ib_2_0"><span></span><small>[2][0]</small></div><div class="cell empty" id="ib_2_1"><span></span><small>[2][1]</small></div></div></div></div><div class="formula hide0" id="ifm" style="margin-top:18px">b[i][j] = a[<span class="hi">j</span>][<span class="hi">N − 1 − i</span>]</div></div><div><table class="t1" style="font-size:max(15.5px,var(--htt-min,24px))"><tr><th>ô của b</th><th>lấy từ</th><th>giá trị</th><th>dòng của a</th><th>cột của a</th></tr><tr class="hide0" id="ir0"><td>b[0][0]</td><td>a[0][2]</td><td>3</td><td>j = 0</td><td>2 = 3−1−0</td></tr><tr class="hide0" id="ir1"><td>b[0][1]</td><td>a[1][2]</td><td>6</td><td>j = 1</td><td>2 = 3−1−0</td></tr><tr class="hide0" id="ir2"><td>b[1][0]</td><td>a[0][1]</td><td>2</td><td>j = 0</td><td>1 = 3−1−1</td></tr><tr class="hide0" id="ir3"><td>b[1][1]</td><td>a[1][1]</td><td>5</td><td>j = 1</td><td>1 = 3−1−1</td></tr><tr class="hide0" id="ir4"><td>b[2][0]</td><td>a[0][0]</td><td>1</td><td>j = 0</td><td>0 = 3−1−2</td></tr><tr class="hide0" id="ir5"><td>b[2][1]</td><td>a[1][0]</td><td>4</td><td>j = 1</td><td>0 = 3−1−2</td></tr></table><span class="f ghost" data-now="#ia_0_2|cur;#ib_0_0|cur" data-act="#ir0|sh;#ib_0_0|ok;#ia_0_2|dim" data-set='#ib_0_0::<span>3</span><small>[0][0]</small>' data-say="b[0][0] (góc trên-trái của b) = ô góc trên-phải của a: <b>a[0][2] = 3</b>."></span><span class="f ghost" data-now="#ia_1_2|cur;#ib_0_1|cur" data-act="#ir1|sh;#ib_0_1|ok;#ia_1_2|dim" data-set='#ib_0_1::<span>6</span><small>[0][1]</small>' data-say="Đi sang phải trên dòng 0 của b (j tăng) ⇔ đi <b>xuống</b> trên cột 2 của a: <b>a[1][2] = 6</b>."></span><span class="f ghost" data-now="#ia_0_1|cur;#ib_1_0|cur" data-act="#ir2|sh;#ib_1_0|ok;#ia_0_1|dim" data-set='#ib_1_0::<span>2</span><small>[1][0]</small>' data-say="Xuống dòng 1 của b ⇔ lùi sang cột 1 của a: b[1][0] = <b>a[0][1] = 2</b>."></span><span class="f ghost" data-now="#ia_1_1|cur;#ib_1_1|cur" data-act="#ir3|sh;#ib_1_1|ok;#ia_1_1|dim" data-set='#ib_1_1::<span>5</span><small>[1][1]</small>' data-say="b[1][1] = <b>a[1][1] = 5</b>. Nhận thấy: <b>dòng của a luôn bằng j</b> (cột của b)."></span><span class="f ghost" data-now="#ia_0_0|cur;#ib_2_0|cur" data-act="#ir4|sh;#ib_2_0|ok;#ia_0_0|dim" data-set='#ib_2_0::<span>1</span><small>[2][0]</small>' data-say="b[2][0] = <b>a[0][0] = 1</b>. Cột của a giảm dần 2, 1, 0 khi i tăng 0, 1, 2 ⇒ <b>cột của a = N − 1 − i</b>."></span><span class="f ghost" data-now="#ia_1_0|cur;#ib_2_1|cur" data-act="#ir5|sh;#ib_2_1|ok;#ia_1_0|dim" data-set='#ib_2_1::<span>4</span><small>[2][1]</small>' data-say="b[2][1] = <b>a[1][0] = 4</b>. Mọi ô đều khớp quy luật."></span><span class="f ghost" data-act="#ifm|sh" data-say="Tổng quát: <b>b[i][j] = a[j][N − 1 − i]</b>, với i chạy 0..N−1 (dòng của b), j chạy 0..M−1 (cột của b). Đây là “trái tim” của bài."></span><p class="say">Nhấn → để chạy từng bước.</p></div></div>
+<section class="slide" id="index" data-title="03 · Công thức chỉ số">
+<div class="hdr in"><span class="qn">03 · HIỂU ĐỀ</span><h2>Ô b[i][j] lấy giá trị từ ô nào của a?</h2></div><div class="cols" style="grid-template-columns:1fr 1.1fr"><div><div class="flow" style="gap:30px;margin-top:6px"><div class="mwrap"><div class="mlabel">a (M=2, N=3)</div><div class="mat  " id="ia" style="grid-template-columns:repeat(3,auto)"><div class="cell" id="ia_0_0"><span>1</span><small>[0][0]</small></div><div class="cell" id="ia_0_1"><span>2</span><small>[0][1]</small></div><div class="cell" id="ia_0_2"><span>3</span><small>[0][2]</small></div><div class="cell" id="ia_1_0"><span>4</span><small>[1][0]</small></div><div class="cell" id="ia_1_1"><span>5</span><small>[1][1]</small></div><div class="cell" id="ia_1_2"><span>6</span><small>[1][2]</small></div></div></div><div class="mwrap"><div class="mlabel">b (3 × 2)</div><div class="mat  " id="ib" style="grid-template-columns:repeat(2,auto)"><div class="cell empty" id="ib_0_0"><span></span><small>[0][0]</small></div><div class="cell empty" id="ib_0_1"><span></span><small>[0][1]</small></div><div class="cell empty" id="ib_1_0"><span></span><small>[1][0]</small></div><div class="cell empty" id="ib_1_1"><span></span><small>[1][1]</small></div><div class="cell empty" id="ib_2_0"><span></span><small>[2][0]</small></div><div class="cell empty" id="ib_2_1"><span></span><small>[2][1]</small></div></div></div></div><div class="formula hide0" id="ifm" style="margin-top:18px">b[i][j] = a[<span class="hi">j</span>][<span class="hi">N − 1 − i</span>]</div></div><div><table class="t1" style="font-size:15.5px"><tr><th>ô của b</th><th>lấy từ</th><th>giá trị</th><th>dòng của a</th><th>cột của a</th></tr><tr class="hide0" id="ir0"><td>b[0][0]</td><td>a[0][2]</td><td>3</td><td>j = 0</td><td>2 = 3−1−0</td></tr><tr class="hide0" id="ir1"><td>b[0][1]</td><td>a[1][2]</td><td>6</td><td>j = 1</td><td>2 = 3−1−0</td></tr><tr class="hide0" id="ir2"><td>b[1][0]</td><td>a[0][1]</td><td>2</td><td>j = 0</td><td>1 = 3−1−1</td></tr><tr class="hide0" id="ir3"><td>b[1][1]</td><td>a[1][1]</td><td>5</td><td>j = 1</td><td>1 = 3−1−1</td></tr><tr class="hide0" id="ir4"><td>b[2][0]</td><td>a[0][0]</td><td>1</td><td>j = 0</td><td>0 = 3−1−2</td></tr><tr class="hide0" id="ir5"><td>b[2][1]</td><td>a[1][0]</td><td>4</td><td>j = 1</td><td>0 = 3−1−2</td></tr></table><span class="f ghost" data-now="#ia_0_2|cur;#ib_0_0|cur" data-act="#ir0|sh;#ib_0_0|ok;#ia_0_2|dim" data-set='#ib_0_0::<span>3</span><small>[0][0]</small>' data-say="b[0][0] (góc trên-trái của b) = ô góc trên-phải của a: <b>a[0][2] = 3</b>."></span><span class="f ghost" data-now="#ia_1_2|cur;#ib_0_1|cur" data-act="#ir1|sh;#ib_0_1|ok;#ia_1_2|dim" data-set='#ib_0_1::<span>6</span><small>[0][1]</small>' data-say="Đi sang phải trên dòng 0 của b (j tăng) ⇔ đi <b>xuống</b> trên cột 2 của a: <b>a[1][2] = 6</b>."></span><span class="f ghost" data-now="#ia_0_1|cur;#ib_1_0|cur" data-act="#ir2|sh;#ib_1_0|ok;#ia_0_1|dim" data-set='#ib_1_0::<span>2</span><small>[1][0]</small>' data-say="Xuống dòng 1 của b ⇔ lùi sang cột 1 của a: b[1][0] = <b>a[0][1] = 2</b>."></span><span class="f ghost" data-now="#ia_1_1|cur;#ib_1_1|cur" data-act="#ir3|sh;#ib_1_1|ok;#ia_1_1|dim" data-set='#ib_1_1::<span>5</span><small>[1][1]</small>' data-say="b[1][1] = <b>a[1][1] = 5</b>. Nhận thấy: <b>dòng của a luôn bằng j</b> (cột của b)."></span><span class="f ghost" data-now="#ia_0_0|cur;#ib_2_0|cur" data-act="#ir4|sh;#ib_2_0|ok;#ia_0_0|dim" data-set='#ib_2_0::<span>1</span><small>[2][0]</small>' data-say="b[2][0] = <b>a[0][0] = 1</b>. Cột của a giảm dần 2, 1, 0 khi i tăng 0, 1, 2 ⇒ <b>cột của a = N − 1 − i</b>."></span><span class="f ghost" data-now="#ia_1_0|cur;#ib_2_1|cur" data-act="#ir5|sh;#ib_2_1|ok;#ia_1_0|dim" data-set='#ib_2_1::<span>4</span><small>[2][1]</small>' data-say="b[2][1] = <b>a[1][0] = 4</b>. Mọi ô đều khớp quy luật."></span><span class="f ghost" data-act="#ifm|sh" data-say="Tổng quát: <b>b[i][j] = a[j][N − 1 − i]</b>, với i chạy 0..N−1 (dòng của b), j chạy 0..M−1 (cột của b). Đây là “trái tim” của bài."></span><p class="say">Nhấn → để chạy từng bước.</p></div></div>
 </section>
 
 <section class="slide" id="idea" data-title="04 · Ý tưởng: cột thành dòng">
@@ -401,7 +358,7 @@ mark.sel{background:#c1d8fc}
 <div class="note blue f">Cách nhìn tương đương: duyệt a, đặt mỗi a[i][j] vào <code class="i">b[N-1-j][i]</code>. Hai cách cho cùng kết quả, chọn cách bạn thấy dễ nhớ.</div></div></div>
 </section>
 
-<section class="slide htt-fs20" id="algo" data-title="05 · Giải thuật">
+<section class="slide" id="algo" data-title="05 · Giải thuật">
 <div class="hdr in"><span class="qn">05 · GIẢI THUẬT</span><h2>Giải thuật từng bước (mã giả)</h2></div><div class="cols" style="grid-template-columns:1.15fr 1fr"><div><script type="text/x-cpp" class="" id="kAlg" data-title="Mã giả" data-mark="1-2:a;3-4:b;5:c;6-8:d;9:e">
 Bước 1: Nhập M, N
         Nếu M, N không thuộc [1, 100] -> nhập lại
@@ -420,19 +377,19 @@ Bước 5: In ma trận b (N dòng, M cột)
  <div class="box e hide0" id="ab5">In b<small>printMatrix(b, N, M)</small></div></div><span class="f ghost" data-now="#kAlg|show-a" data-act="#ab1|sh" data-say="Đọc M, N trước. Vì mảng khai báo cố định <b>100 × 100</b> nên phải chặn M, N trong khoảng 1..100, nếu không sẽ ghi ra ngoài mảng."></span><span class="f ghost" data-now="#kAlg|show-b" data-act="#aa1|sh;#ab2|sh" data-say="Hai vòng lặp lồng nhau: vòng ngoài theo dòng i, vòng trong theo cột j. Tổng cộng M × N lần nhập."></span><span class="f ghost" data-now="#kAlg|show-c" data-act="#aa2|sh;#ab3|sh" data-say="In lại ma trận vừa nhập để kiểm tra nhập đúng chưa (không bắt buộc nhưng rất nên làm)."></span><span class="f ghost" data-now="#kAlg|show-d" data-act="#aa3|sh;#ab4|sh" data-say="Bước chính. Lưu ý vòng ngoài chạy <b>i &lt; N</b>, vòng trong <b>j &lt; M</b>, vì ta đang duyệt trên <b>b</b> (N dòng, M cột), không phải trên a."></span><span class="f ghost" data-now="#kAlg|show-e" data-act="#aa4|sh;#ab5|sh" data-say="In b với <b>N dòng, M cột</b>. Độ phức tạp: O(M × N), mỗi ô được chép đúng 1 lần."></span><p class="say">Nhấn → để chạy từng bước.</p></div></div>
 </section>
 
-<section class="slide htt-fs18" id="trace1" data-title="06 · Chạy tay case 2×3">
+<section class="slide" id="trace1" data-title="06 · Chạy tay case 2×3">
 <div class="hdr in"><span class="qn">06 · CHẠY TAY</span><h2>Chạy tay giải thuật với case 1: M = 2, N = 3</h2></div><div class="cols" style="grid-template-columns:1fr 1fr"><div><script type="text/x-cpp" class="" id="kT1" data-title="Bước 4: vòng lặp xoay" data-mark="1:a;2:b;3:c">
 for (int i = 0; i < n; i++)       // n = 3
     for (int j = 0; j < m; j++)   // m = 2
         b[i][j] = a[j][n - 1 - i];
-</script><div class="vars"><span class="vc" id="tvi">i = ?</span><span class="vc" id="tvj">j = ?</span><span class="vc" id="tvc">n−1−i = ?</span></div><div class="formula" id="tf" style="font-size:max(20px,var(--htt-min,24px));margin-top:10px">b[i][j] = a[j][n−1−i]</div></div><div><div class="flow" style="gap:36px;margin-top:4px"><div class="mwrap"><div class="mlabel">a</div><div class="mat  " id="ta" style="grid-template-columns:repeat(3,auto)"><div class="cell" id="ta_0_0"><span>1</span><small>[0][0]</small></div><div class="cell" id="ta_0_1"><span>2</span><small>[0][1]</small></div><div class="cell" id="ta_0_2"><span>3</span><small>[0][2]</small></div><div class="cell" id="ta_1_0"><span>4</span><small>[1][0]</small></div><div class="cell" id="ta_1_1"><span>5</span><small>[1][1]</small></div><div class="cell" id="ta_1_2"><span>6</span><small>[1][2]</small></div></div></div><div class="mwrap"><div class="mlabel">b</div><div class="mat  " id="tb" style="grid-template-columns:repeat(2,auto)"><div class="cell empty" id="tb_0_0"><span></span><small>[0][0]</small></div><div class="cell empty" id="tb_0_1"><span></span><small>[0][1]</small></div><div class="cell empty" id="tb_1_0"><span></span><small>[1][0]</small></div><div class="cell empty" id="tb_1_1"><span></span><small>[1][1]</small></div><div class="cell empty" id="tb_2_0"><span></span><small>[2][0]</small></div><div class="cell empty" id="tb_2_1"><span></span><small>[2][1]</small></div></div></div></div><span class="f ghost" data-now="#kT1|show-c;#ta_0_2|cur;#tb_0_0|cur;#tvi|hot;#tvj|hot" data-act="#tb_0_0|ok" data-set='#tvi::i = <b>0</b>;#tvj::j = <b>0</b>;#tvc::n−1−i = <b>2</b>;#tf::b[0][0] = a[0][2] = <span class="hi">3</span>;#tb_0_0::<span>3</span><small>[0][0]</small>' data-say="i = 0, j = 0: lấy a[0][2] = <b>3</b> đặt vào b[0][0]."></span><span class="f ghost" data-now="#kT1|show-c;#ta_1_2|cur;#tb_0_1|cur;#tvi|hot;#tvj|hot" data-act="#tb_0_1|ok" data-set='#tvi::i = <b>0</b>;#tvj::j = <b>1</b>;#tvc::n−1−i = <b>2</b>;#tf::b[0][1] = a[1][2] = <span class="hi">6</span>;#tb_0_1::<span>6</span><small>[0][1]</small>' data-say="i = 0, j = 1: lấy a[1][2] = <b>6</b> đặt vào b[0][1]."></span><span class="f ghost" data-now="#kT1|show-c;#ta_0_1|cur;#tb_1_0|cur;#tvi|hot;#tvj|hot" data-act="#tb_1_0|ok" data-set='#tvi::i = <b>1</b>;#tvj::j = <b>0</b>;#tvc::n−1−i = <b>1</b>;#tf::b[1][0] = a[0][1] = <span class="hi">2</span>;#tb_1_0::<span>2</span><small>[1][0]</small>' data-say="Hết vòng j ⇒ i tăng lên 1, j quay về 0. i = 1, j = 0: lấy a[0][1] = <b>2</b> đặt vào b[1][0]."></span><span class="f ghost" data-now="#kT1|show-c;#ta_1_1|cur;#tb_1_1|cur;#tvi|hot;#tvj|hot" data-act="#tb_1_1|ok" data-set='#tvi::i = <b>1</b>;#tvj::j = <b>1</b>;#tvc::n−1−i = <b>1</b>;#tf::b[1][1] = a[1][1] = <span class="hi">5</span>;#tb_1_1::<span>5</span><small>[1][1]</small>' data-say="i = 1, j = 1: lấy a[1][1] = <b>5</b> đặt vào b[1][1]."></span><span class="f ghost" data-now="#kT1|show-c;#ta_0_0|cur;#tb_2_0|cur;#tvi|hot;#tvj|hot" data-act="#tb_2_0|ok" data-set='#tvi::i = <b>2</b>;#tvj::j = <b>0</b>;#tvc::n−1−i = <b>0</b>;#tf::b[2][0] = a[0][0] = <span class="hi">1</span>;#tb_2_0::<span>1</span><small>[2][0]</small>' data-say="Hết vòng j ⇒ i tăng lên 2, j quay về 0. i = 2, j = 0: lấy a[0][0] = <b>1</b> đặt vào b[2][0]."></span><span class="f ghost" data-now="#kT1|show-c;#ta_1_0|cur;#tb_2_1|cur;#tvi|hot;#tvj|hot" data-act="#tb_2_1|ok" data-set='#tvi::i = <b>2</b>;#tvj::j = <b>1</b>;#tvc::n−1−i = <b>0</b>;#tf::b[2][1] = a[1][0] = <span class="hi">4</span>;#tb_2_1::<span>4</span><small>[2][1]</small>' data-say="i = 2, j = 1: lấy a[1][0] = <b>4</b> đặt vào b[2][1]. j = 2 không còn &lt; m ⇒ thoát; i = 3 không còn &lt; n ⇒ xong!"></span><p class="say">Nhấn → để chạy từng bước.</p><div class="note f">Kết quả b = <b>{3 6}, {2 5}, {1 4}</b> khớp với output mong đợi của ví dụ 1. Vòng trong chạy m = 2 lần, vòng ngoài n = 3 lần ⇒ 6 phép gán.</div></div></div>
+</script><div class="vars"><span class="vc" id="tvi">i = ?</span><span class="vc" id="tvj">j = ?</span><span class="vc" id="tvc">n−1−i = ?</span></div><div class="formula" id="tf" style="font-size:20px;margin-top:10px">b[i][j] = a[j][n−1−i]</div></div><div><div class="flow" style="gap:36px;margin-top:4px"><div class="mwrap"><div class="mlabel">a</div><div class="mat  " id="ta" style="grid-template-columns:repeat(3,auto)"><div class="cell" id="ta_0_0"><span>1</span><small>[0][0]</small></div><div class="cell" id="ta_0_1"><span>2</span><small>[0][1]</small></div><div class="cell" id="ta_0_2"><span>3</span><small>[0][2]</small></div><div class="cell" id="ta_1_0"><span>4</span><small>[1][0]</small></div><div class="cell" id="ta_1_1"><span>5</span><small>[1][1]</small></div><div class="cell" id="ta_1_2"><span>6</span><small>[1][2]</small></div></div></div><div class="mwrap"><div class="mlabel">b</div><div class="mat  " id="tb" style="grid-template-columns:repeat(2,auto)"><div class="cell empty" id="tb_0_0"><span></span><small>[0][0]</small></div><div class="cell empty" id="tb_0_1"><span></span><small>[0][1]</small></div><div class="cell empty" id="tb_1_0"><span></span><small>[1][0]</small></div><div class="cell empty" id="tb_1_1"><span></span><small>[1][1]</small></div><div class="cell empty" id="tb_2_0"><span></span><small>[2][0]</small></div><div class="cell empty" id="tb_2_1"><span></span><small>[2][1]</small></div></div></div></div><span class="f ghost" data-now="#kT1|show-c;#ta_0_2|cur;#tb_0_0|cur;#tvi|hot;#tvj|hot" data-act="#tb_0_0|ok" data-set='#tvi::i = <b>0</b>;#tvj::j = <b>0</b>;#tvc::n−1−i = <b>2</b>;#tf::b[0][0] = a[0][2] = <span class="hi">3</span>;#tb_0_0::<span>3</span><small>[0][0]</small>' data-say="i = 0, j = 0: lấy a[0][2] = <b>3</b> đặt vào b[0][0]."></span><span class="f ghost" data-now="#kT1|show-c;#ta_1_2|cur;#tb_0_1|cur;#tvi|hot;#tvj|hot" data-act="#tb_0_1|ok" data-set='#tvi::i = <b>0</b>;#tvj::j = <b>1</b>;#tvc::n−1−i = <b>2</b>;#tf::b[0][1] = a[1][2] = <span class="hi">6</span>;#tb_0_1::<span>6</span><small>[0][1]</small>' data-say="i = 0, j = 1: lấy a[1][2] = <b>6</b> đặt vào b[0][1]."></span><span class="f ghost" data-now="#kT1|show-c;#ta_0_1|cur;#tb_1_0|cur;#tvi|hot;#tvj|hot" data-act="#tb_1_0|ok" data-set='#tvi::i = <b>1</b>;#tvj::j = <b>0</b>;#tvc::n−1−i = <b>1</b>;#tf::b[1][0] = a[0][1] = <span class="hi">2</span>;#tb_1_0::<span>2</span><small>[1][0]</small>' data-say="Hết vòng j ⇒ i tăng lên 1, j quay về 0. i = 1, j = 0: lấy a[0][1] = <b>2</b> đặt vào b[1][0]."></span><span class="f ghost" data-now="#kT1|show-c;#ta_1_1|cur;#tb_1_1|cur;#tvi|hot;#tvj|hot" data-act="#tb_1_1|ok" data-set='#tvi::i = <b>1</b>;#tvj::j = <b>1</b>;#tvc::n−1−i = <b>1</b>;#tf::b[1][1] = a[1][1] = <span class="hi">5</span>;#tb_1_1::<span>5</span><small>[1][1]</small>' data-say="i = 1, j = 1: lấy a[1][1] = <b>5</b> đặt vào b[1][1]."></span><span class="f ghost" data-now="#kT1|show-c;#ta_0_0|cur;#tb_2_0|cur;#tvi|hot;#tvj|hot" data-act="#tb_2_0|ok" data-set='#tvi::i = <b>2</b>;#tvj::j = <b>0</b>;#tvc::n−1−i = <b>0</b>;#tf::b[2][0] = a[0][0] = <span class="hi">1</span>;#tb_2_0::<span>1</span><small>[2][0]</small>' data-say="Hết vòng j ⇒ i tăng lên 2, j quay về 0. i = 2, j = 0: lấy a[0][0] = <b>1</b> đặt vào b[2][0]."></span><span class="f ghost" data-now="#kT1|show-c;#ta_1_0|cur;#tb_2_1|cur;#tvi|hot;#tvj|hot" data-act="#tb_2_1|ok" data-set='#tvi::i = <b>2</b>;#tvj::j = <b>1</b>;#tvc::n−1−i = <b>0</b>;#tf::b[2][1] = a[1][0] = <span class="hi">4</span>;#tb_2_1::<span>4</span><small>[2][1]</small>' data-say="i = 2, j = 1: lấy a[1][0] = <b>4</b> đặt vào b[2][1]. j = 2 không còn &lt; m ⇒ thoát; i = 3 không còn &lt; n ⇒ xong!"></span><p class="say">Nhấn → để chạy từng bước.</p><div class="note f">Kết quả b = <b>{3 6}, {2 5}, {1 4}</b> khớp với output mong đợi của ví dụ 1. Vòng trong chạy m = 2 lần, vòng ngoài n = 3 lần ⇒ 6 phép gán.</div></div></div>
 </section>
 
-<section class="slide htt-fs18" id="trace2" data-title="07 · Chạy tay case 3×3 và 1×4">
+<section class="slide" id="trace2" data-title="07 · Chạy tay case 3×3 và 1×4">
 <div class="hdr in"><span class="qn">07 · CHẠY TAY</span><h2>Thêm 2 case: ma trận vuông 3 × 3 và ma trận 1 dòng 1 × 4</h2></div><div class="cols" style="grid-template-columns:1.1fr 1fr"><div><h3>Case 2: M = 3, N = 3 (điền mỗi bước một dòng của b)</h3><div class="flow" style="gap:30px"><div class="mwrap"><div class="mlabel">a</div><div class="mat sm " id="ua" style="grid-template-columns:repeat(3,auto)"><div class="cell" id="ua_0_0"><span>1</span><small>[0][0]</small></div><div class="cell" id="ua_0_1"><span>2</span><small>[0][1]</small></div><div class="cell" id="ua_0_2"><span>3</span><small>[0][2]</small></div><div class="cell" id="ua_1_0"><span>4</span><small>[1][0]</small></div><div class="cell" id="ua_1_1"><span>5</span><small>[1][1]</small></div><div class="cell" id="ua_1_2"><span>6</span><small>[1][2]</small></div><div class="cell" id="ua_2_0"><span>7</span><small>[2][0]</small></div><div class="cell" id="ua_2_1"><span>8</span><small>[2][1]</small></div><div class="cell" id="ua_2_2"><span>9</span><small>[2][2]</small></div></div></div><div class="bigar">⟲</div><div class="mwrap"><div class="mlabel">b</div><div class="mat sm " id="ub" style="grid-template-columns:repeat(3,auto)"><div class="cell empty" id="ub_0_0"><span></span><small>[0][0]</small></div><div class="cell empty" id="ub_0_1"><span></span><small>[0][1]</small></div><div class="cell empty" id="ub_0_2"><span></span><small>[0][2]</small></div><div class="cell empty" id="ub_1_0"><span></span><small>[1][0]</small></div><div class="cell empty" id="ub_1_1"><span></span><small>[1][1]</small></div><div class="cell empty" id="ub_1_2"><span></span><small>[1][2]</small></div><div class="cell empty" id="ub_2_0"><span></span><small>[2][0]</small></div><div class="cell empty" id="ub_2_1"><span></span><small>[2][1]</small></div><div class="cell empty" id="ub_2_2"><span></span><small>[2][2]</small></div></div></div></div><h3 style="margin-top:14px">Case 3: M = 1, N = 4 (trường hợp biên)</h3><div class="flow" style="gap:30px"><div class="mwrap"><div class="mlabel">a: 1 × 4</div><div class="mat sm " id="wa" style="grid-template-columns:repeat(4,auto)"><div class="cell" id="wa_0_0"><span>7</span><small>[0][0]</small></div><div class="cell" id="wa_0_1"><span>8</span><small>[0][1]</small></div><div class="cell" id="wa_0_2"><span>9</span><small>[0][2]</small></div><div class="cell" id="wa_0_3"><span>10</span><small>[0][3]</small></div></div></div><div class="bigar">⟲</div><div class="mwrap"><div class="mlabel">b: 4 × 1</div><div class="mat sm " id="wb" style="grid-template-columns:repeat(1,auto)"><div class="cell empty" id="wb_0_0"><span></span><small>[0][0]</small></div><div class="cell empty" id="wb_1_0"><span></span><small>[1][0]</small></div><div class="cell empty" id="wb_2_0"><span></span><small>[2][0]</small></div><div class="cell empty" id="wb_3_0"><span></span><small>[3][0]</small></div></div></div></div></div><div><span class="f ghost" data-now="#ua_0_2|cur;#ua_1_2|cur;#ua_2_2|cur" data-act="#ub_0_0|k0;#ua_0_2|k0;#ub_0_1|k0;#ua_1_2|k0;#ub_0_2|k0;#ua_2_2|k0" data-set='#ub_0_0::<span>3</span><small>[0][0]</small>;#ub_0_1::<span>6</span><small>[0][1]</small>;#ub_0_2::<span>9</span><small>[0][2]</small>' data-say="i = 0: j chạy 0, 1, 2 lấy a[0][2], a[1][2], a[2][2] = <b>3 6 9</b> ⇒ dòng 0 của b."></span><span class="f ghost" data-now="#ua_0_1|cur;#ua_1_1|cur;#ua_2_1|cur" data-act="#ub_1_0|k1;#ua_0_1|k1;#ub_1_1|k1;#ua_1_1|k1;#ub_1_2|k1;#ua_2_1|k1" data-set='#ub_1_0::<span>2</span><small>[1][0]</small>;#ub_1_1::<span>5</span><small>[1][1]</small>;#ub_1_2::<span>8</span><small>[1][2]</small>' data-say="i = 1: j chạy 0, 1, 2 lấy a[0][1], a[1][1], a[2][1] = <b>2 5 8</b> ⇒ dòng 1 của b."></span><span class="f ghost" data-now="#ua_0_0|cur;#ua_1_0|cur;#ua_2_0|cur" data-act="#ub_2_0|k2;#ua_0_0|k2;#ub_2_1|k2;#ua_1_0|k2;#ub_2_2|k2;#ua_2_0|k2" data-set='#ub_2_0::<span>1</span><small>[2][0]</small>;#ub_2_1::<span>4</span><small>[2][1]</small>;#ub_2_2::<span>7</span><small>[2][2]</small>' data-say="i = 2: j chạy 0, 1, 2 lấy a[0][0], a[1][0], a[2][0] = <b>1 4 7</b> ⇒ dòng 2 của b."></span><span class="f ghost" data-now="#wa_0_3|cur" data-act="#wb_0_0|ok" data-set='#wb_0_0::<span>10</span><small>[0][0]</small>' data-say="i = 0: m = 1 nên j chỉ có giá trị 0: b[0][0] = a[0][3] = <b>10</b>."></span><span class="f ghost" data-now="#wa_0_2|cur" data-act="#wb_1_0|ok" data-set='#wb_1_0::<span>9</span><small>[1][0]</small>' data-say="i = 1: m = 1 nên j chỉ có giá trị 0: b[1][0] = a[0][2] = <b>9</b>."></span><span class="f ghost" data-now="#wa_0_1|cur" data-act="#wb_2_0|ok" data-set='#wb_2_0::<span>8</span><small>[2][0]</small>' data-say="i = 2: m = 1 nên j chỉ có giá trị 0: b[2][0] = a[0][1] = <b>8</b>."></span><span class="f ghost" data-now="#wa_0_0|cur" data-act="#wb_3_0|ok" data-set='#wb_3_0::<span>7</span><small>[3][0]</small>' data-say="i = 3: m = 1 nên j chỉ có giá trị 0: b[3][0] = a[0][0] = <b>7</b>. Ma trận 1 dòng thành 1 cột, số cuối lên đầu."></span><p class="say">Nhấn → để chạy từng bước.</p><div class="note blue f">Ma trận vuông vẫn dùng công thức chung. Với 1 × 4, vòng j chỉ chạy 1 lần; code không cần trường hợp đặc biệt nào. Hãy tự thử thêm case <b>1 × 1</b> và <b>4 × 1</b>.</div></div></div>
 </section>
 
-<section class="slide htt-fs18" id="project" data-title="08 · Project nhiều file">
+<section class="slide" id="project" data-title="08 · Project nhiều file">
 <div class="hdr in"><span class="qn">08 · CODE</span><h2>Tổ chức project nhiều file</h2></div><div class="cols" style="grid-template-columns:1.1fr 1fr"><div><div class="flow" style="gap:18px;flex-wrap:nowrap;align-items:stretch;margin-top:6px">
  <div class="file fb hide0" id="pf2"><h4>matrix.cpp</h4><small>ĐỊNH NGHĨA (thân hàm)</small>#include "matrix.h"<br>inputMatrix {…}<br>printMatrix {…}<br>rotateLeft {…}</div>
  <div class="file fa hide0" id="pf1"><h4>matrix.h</h4><small>KHAI BÁO (prototype)</small>const int MAX = 100;<br>void inputMatrix(…);<br>void printMatrix(…);<br>void rotateLeft(…);</div>
@@ -445,7 +402,7 @@ for (int i = 0; i < n; i++)       // n = 3
 $ <span class="in">./rotate</span></div></div><div><span class="f ghost" data-now="#pf1|glow" data-act="#pf1|sh" data-say="<b>matrix.h</b> (header) chỉ chứa <b>khai báo</b>: hằng MAX và nguyên mẫu (prototype) các hàm. Nó giống “mục lục”: cho biết có hàm gì, nhận tham số gì."></span><span class="f ghost" data-now="#pf2|glow" data-act="#pf2|sh" data-say="<b>matrix.cpp</b> chứa <b>thân hàm</b>. Dòng <code class=&quot;i&quot;>#include &quot;matrix.h&quot;</code> giúp compiler kiểm tra định nghĩa khớp với khai báo."></span><span class="f ghost" data-now="#pf3|glow" data-act="#pf3|sh" data-say="<b>main.cpp</b> cũng <code class=&quot;i&quot;>#include &quot;matrix.h&quot;</code> để biết các hàm tồn tại, rồi gọi chúng. main không cần biết bên trong hàm làm gì."></span><span class="f ghost" data-act="#pfl|sh" data-say="Mỗi file .cpp được biên dịch riêng thành file .o, rồi <b>linker</b> nối lại thành 1 file chạy. Vì vậy phải đưa <b>cả hai</b> file .cpp vào lệnh biên dịch (hoặc vào cùng một Project)."></span><span class="f ghost" data-act="#pcon|sh" data-say="Dòng lệnh: <b>g++ main.cpp matrix.cpp -o rotate</b>. Với Dev-C++ / Code::Blocks: File → New → Project → Console Application, rồi thêm matrix.h, matrix.cpp vào project và bấm Build."></span><p class="say">Nhấn → để chạy từng bước.</p><div class="note f">Dùng <code class="i">#include "..."</code> (dấu nháy) cho file của mình; <code class="i">#include &lt;...&gt;</code> cho thư viện chuẩn. <b>Không bao giờ</b> #include một file .cpp.</div></div></div>
 </section>
 
-<section class="slide htt-fs18" id="codeH" data-title="09 · matrix.h">
+<section class="slide" id="codeH" data-title="09 · matrix.h">
 <div class="hdr in"><span class="qn">09 · CODE</span><h2>File matrix.h: khai báo</h2></div><div class="cols" style="grid-template-columns:1.15fr 1fr"><div><script type="text/x-cpp" class="" id="kH" data-title="matrix.h" data-mark="1-2:a;4:b;6:c;7:d;8:e;10:a">
 #ifndef MATRIX_H
 #define MATRIX_H
@@ -457,10 +414,10 @@ void printMatrix(int a[][MAX], int m, int n);
 void rotateLeft(int a[][MAX], int m, int n, int b[][MAX]);
 
 #endif
-</script><table class="t1 f" style="margin-top:12px;font-size:max(15px,var(--htt-min,24px))"><tr><th>Tham số</th><th>Ý nghĩa</th></tr><tr><td>int a[][MAX]</td><td>mảng 2 chiều: được bỏ trống số dòng, <b>bắt buộc</b> ghi số cột</td></tr><tr><td>int &amp;m</td><td>tham chiếu: hàm sửa được biến m của main</td></tr><tr><td>int m</td><td>tham trị: hàm chỉ đọc, nhận bản sao</td></tr></table></div><div><span class="f ghost" data-now="#kH|show-a" data-say="<b>Include guard</b>: #ifndef / #define / #endif. Nếu file .h bị include 2 lần trong cùng một file .cpp, lần thứ hai bị bỏ qua, tránh lỗi “redefinition”."></span><span class="f ghost" data-now="#kH|show-b" data-say="<b>const int MAX = 100</b>: đặt tên cho kích thước tối đa. Muốn đổi thành 200 chỉ sửa một chỗ. Hằng const ở phạm vi file được phép đặt trong header."></span><span class="f ghost" data-now="#kH|show-c" data-say="<b>inputMatrix(int a[][MAX], int &amp;m, int &amp;n)</b>: nhập cả kích thước và phần tử. m, n dùng <b>&amp;</b> vì hàm phải <b>trả về</b> số dòng, số cột cho main. Mảng thì luôn được truyền “theo địa chỉ” nên không cần &amp;."></span><span class="f ghost" data-now="#kH|show-d" data-say="<b>printMatrix(a, m, n)</b>: chỉ đọc nên m, n truyền tham trị. Dùng chung cho cả a (M × N) và b (N × M)."></span><span class="f ghost" data-now="#kH|show-e" data-say="<b>rotateLeft(a, m, n, b)</b>: đọc a có m dòng, n cột; ghi kết quả vào b. Kích thước b là n × m nên main tự biết, không cần trả thêm."></span><p class="say">Nhấn → để chạy từng bước.</p><div class="note red f">Viết <code class="i">int a[][]</code> là <b>lỗi biên dịch</b>: compiler cần số cột để tính vị trí ô a[i][j] = (i × MAX + j) trong bộ nhớ.</div></div></div>
+</script><table class="t1 f" style="margin-top:12px;font-size:15px"><tr><th>Tham số</th><th>Ý nghĩa</th></tr><tr><td>int a[][MAX]</td><td>mảng 2 chiều: được bỏ trống số dòng, <b>bắt buộc</b> ghi số cột</td></tr><tr><td>int &amp;m</td><td>tham chiếu: hàm sửa được biến m của main</td></tr><tr><td>int m</td><td>tham trị: hàm chỉ đọc, nhận bản sao</td></tr></table></div><div><span class="f ghost" data-now="#kH|show-a" data-say="<b>Include guard</b>: #ifndef / #define / #endif. Nếu file .h bị include 2 lần trong cùng một file .cpp, lần thứ hai bị bỏ qua, tránh lỗi “redefinition”."></span><span class="f ghost" data-now="#kH|show-b" data-say="<b>const int MAX = 100</b>: đặt tên cho kích thước tối đa. Muốn đổi thành 200 chỉ sửa một chỗ. Hằng const ở phạm vi file được phép đặt trong header."></span><span class="f ghost" data-now="#kH|show-c" data-say="<b>inputMatrix(int a[][MAX], int &amp;m, int &amp;n)</b>: nhập cả kích thước và phần tử. m, n dùng <b>&amp;</b> vì hàm phải <b>trả về</b> số dòng, số cột cho main. Mảng thì luôn được truyền “theo địa chỉ” nên không cần &amp;."></span><span class="f ghost" data-now="#kH|show-d" data-say="<b>printMatrix(a, m, n)</b>: chỉ đọc nên m, n truyền tham trị. Dùng chung cho cả a (M × N) và b (N × M)."></span><span class="f ghost" data-now="#kH|show-e" data-say="<b>rotateLeft(a, m, n, b)</b>: đọc a có m dòng, n cột; ghi kết quả vào b. Kích thước b là n × m nên main tự biết, không cần trả thêm."></span><p class="say">Nhấn → để chạy từng bước.</p><div class="note red f">Viết <code class="i">int a[][]</code> là <b>lỗi biên dịch</b>: compiler cần số cột để tính vị trí ô a[i][j] = (i × MAX + j) trong bộ nhớ.</div></div></div>
 </section>
 
-<section class="slide htt-fs18" id="codeIO" data-title="10 · Nhập và in ma trận">
+<section class="slide" id="codeIO" data-title="10 · Nhập và in ma trận">
 <div class="hdr in"><span class="qn">10 · CODE</span><h2>matrix.cpp (1): nhập và in ma trận</h2></div><div class="cols" style="grid-template-columns:1.2fr 1fr"><div><script type="text/x-cpp" class="sm" id="kIO" data-title="matrix.cpp (phần 1)" data-mark="1-3:a;5:b;6-9:c;10-14:d;17:e;18-22:f">
 #include <iostream>
 #include "matrix.h"
@@ -492,7 +449,7 @@ a[1][2] = <span class="in">6</span></span><span class="cl" id="io4">1	2	3
 4	5	6</span></div><span class="f ghost" data-now="#kIO|show-a" data-say="Include thư viện <b>iostream</b> (cin, cout) và header của mình. <b>using namespace std</b> để viết cout thay vì std::cout."></span><span class="f ghost" data-now="#kIO|show-b" data-say="Định nghĩa hàm: phần đầu phải <b>giống hệt</b> prototype trong matrix.h (cùng tên, cùng kiểu tham số)."></span><span class="f ghost" data-now="#kIO|show-c" data-act="#ioc|sh;#io1|show;#io2|show" data-say="Vòng <b>do…while</b> bắt nhập lại khi M hoặc N ngoài [1, 100]. Ví dụ nhập “0 5” sai ⇒ hỏi lại, nhập “2 3” thì qua."></span><span class="f ghost" data-now="#kIO|show-d" data-act="#io3|show" data-say="Hai vòng for lồng nhau nhập từng phần tử. In ra chỉ số a[i][j] để người dùng biết đang nhập ô nào."></span><span class="f ghost" data-now="#kIO|show-e" data-say="printMatrix nhận số dòng, số cột qua tham số, nên in được ma trận kích thước bất kỳ."></span><span class="f ghost" data-now="#kIO|show-f" data-act="#io4|show" data-say="Mỗi phần tử in kèm <b>&quot;\t&quot;</b> (tab) cho thẳng cột. Hết một dòng i thì <b>endl</b> xuống dòng: chú ý endl nằm <b>ngoài</b> vòng j, <b>trong</b> vòng i."></span><p class="say">Nhấn → để chạy từng bước.</p></div></div>
 </section>
 
-<section class="slide htt-fs18" id="codeRot" data-title="11 · Hàm rotateLeft">
+<section class="slide" id="codeRot" data-title="11 · Hàm rotateLeft">
 <div class="hdr in"><span class="qn">11 · CODE</span><h2>matrix.cpp (2): hàm rotateLeft</h2></div><div class="cols" style="grid-template-columns:1.25fr 1fr"><div><script type="text/x-cpp" class="" id="kR" data-title="matrix.cpp (phần 2)" data-mark="1:a;2:b;3:c;4:d;5:e">
 // Ma tran a co m dong, n cot -> b co n dong, m cot
 void rotateLeft(int a[][MAX], int m, int n, int b[][MAX]) {
@@ -503,7 +460,7 @@ void rotateLeft(int a[][MAX], int m, int n, int b[][MAX]) {
 </script><div class="flow" style="gap:28px;margin-top:14px"><div class="mwrap"><div class="mlabel">a (m=2, n=3)</div><div class="mat sm " id="ra2" style="grid-template-columns:repeat(3,auto)"><div class="cell" id="ra2_0_0"><span>1</span><small>[0][0]</small></div><div class="cell" id="ra2_0_1"><span>2</span><small>[0][1]</small></div><div class="cell" id="ra2_0_2"><span>3</span><small>[0][2]</small></div><div class="cell" id="ra2_1_0"><span>4</span><small>[1][0]</small></div><div class="cell" id="ra2_1_1"><span>5</span><small>[1][1]</small></div><div class="cell" id="ra2_1_2"><span>6</span><small>[1][2]</small></div></div></div><div class="bigar">→</div><div class="mwrap"><div class="mlabel">b (n=3, m=2)</div><div class="mat sm " id="rb2" style="grid-template-columns:repeat(2,auto)"><div class="cell" id="rb2_0_0"><span>3</span><small>[0][0]</small></div><div class="cell" id="rb2_0_1"><span>6</span><small>[0][1]</small></div><div class="cell" id="rb2_1_0"><span>2</span><small>[1][0]</small></div><div class="cell" id="rb2_1_1"><span>5</span><small>[1][1]</small></div><div class="cell" id="rb2_2_0"><span>1</span><small>[2][0]</small></div><div class="cell" id="rb2_2_1"><span>4</span><small>[2][1]</small></div></div></div></div></div><div><span class="f ghost" data-now="#kR|show-a" data-say="Chú thích nhắc lại quy ước: a có <b>m dòng, n cột</b>, b sẽ có <b>n dòng, m cột</b>."></span><span class="f ghost" data-now="#kR|show-b" data-say="Hàm nhận a (để đọc) và b (để ghi). Mảng truyền vào hàm là truyền địa chỉ, nên ghi vào b trong hàm thì b ở main thay đổi theo."></span><span class="f ghost" data-now="#kR|show-c" data-act="#rb2_0_0|k0;#rb2_0_1|k0;#rb2_1_0|k1;#rb2_1_1|k1;#rb2_2_0|k2;#rb2_2_1|k2" data-say="Vòng ngoài: <b>i</b> là chỉ số dòng của b, chạy từ 0 đến <b>n − 1</b> (3 dòng, mỗi màu một dòng)."></span><span class="f ghost" data-now="#kR|show-d" data-say="Vòng trong: <b>j</b> là chỉ số cột của b, chạy từ 0 đến <b>m − 1</b>."></span><span class="f ghost" data-now="#kR|show-e;#ra2_1_1|cur;#rb2_1_1|cur" data-say="Công thức chép: <b>b[i][j] = a[j][n − 1 − i]</b>. Ví dụ i = 1, j = 1: a[1][3−1−1] = a[1][1] = 5. Chỉ 3 dòng code nhưng là phần quan trọng nhất!"></span><p class="say">Nhấn → để chạy từng bước.</p><div class="note blue f">Cách viết tương đương (duyệt theo a):<br><code class="i">for i&lt;m: for j&lt;n: b[n-1-j][i] = a[i][j];</code></div></div></div>
 </section>
 
-<section class="slide htt-fs18" id="codeMain" data-title="12 · main.cpp và chạy thử">
+<section class="slide" id="codeMain" data-title="12 · main.cpp và chạy thử">
 <div class="hdr in"><span class="qn">12 · CODE</span><h2>main.cpp: ghép các hàm lại và chạy thử</h2></div><div class="cols" style="grid-template-columns:1.15fr 1fr"><div><script type="text/x-cpp" class="sm" id="kM" data-title="main.cpp" data-mark="1-3:a;5:b;8:c;9:d;11-12:e;14:f;16-17:g;18:h">
 #include <iostream>
 #include "matrix.h"
@@ -537,20 +494,10 @@ a[1][2] = <span class="in">6</span></span><span class="cl" id="mc3">Ma tran ban 
 </section>
 
 <section class="slide" id="errors" data-title="13 · Những lỗi sai hay gặp">
-<div class="hdr in"><span class="qn">13 · LỖI SAI</span><h2>Những lỗi sai hay gặp</h2></div><div class="cols3 htt-stack" style="gap:12px"><div class="card err f"><h3>1. In b sai kích thước</h3><p>Dùng lại m, n của a khi in b ⇒ thiếu/thừa ô, in ra số rác hoặc số 0.</p><div class="bad-code">✗ printMatrix(b, m, n);</div><div class="good-code">✓ printMatrix(b, n, m);</div></div><div class="card err f"><h3>2. Nhầm chiều xoay</h3><p>Dùng công thức của xoay phải ⇒ ra 4 1 / 5 2 / 6 3.</p><div class="bad-code">✗ b[i][j] = a[m-1-j][i];</div><div class="good-code">✓ b[i][j] = a[j][n-1-i];</div></div><div class="card err f"><h3>3. Sai giới hạn vòng lặp</h3><p>Duyệt b mà để i &lt; m, j &lt; n (giới hạn của a) ⇒ chỉ đúng khi ma trận vuông.</p><div class="bad-code">✗ for(i&lt;m) for(j&lt;n) b[i][j]=…</div><div class="good-code">✓ for(i&lt;n) for(j&lt;m) b[i][j]=…</div></div></div></section>
-
-<section id="errors-p2" class="slide htt-cont" data-title="13 · Những lỗi sai hay gặp">
-<div class="hdr in"><span class="qn">13 · LỖI SAI</span><h2>Những lỗi sai hay gặp</h2></div>
-<div class="cols3 htt-stack htt-cont-part" style="gap:12px"><div class="card err f"><h3>4. Quên kiểm tra M, N</h3><p>Nhập M = 150 ⇒ ghi ra ngoài mảng 100 × 100, chương trình chạy sai hoặc crash.</p><div class="bad-code">✗ cin &gt;&gt; m &gt;&gt; n;</div><div class="good-code">✓ do {cin&gt;&gt;m&gt;&gt;n;} while(m&lt;1||m&gt;MAX||…);</div></div><div class="card err f"><h3>5. Lỗi khai báo tham số</h3><p>Thiếu số cột ⇒ lỗi biên dịch. Thiếu &amp; ⇒ main không nhận được m, n.</p><div class="bad-code">✗ void inputMatrix(int a[][], int m, int n)</div><div class="good-code">✓ void inputMatrix(int a[][MAX], int &amp;m, int &amp;n)</div></div></div></section>
-
-<section id="errors-p2-p2" class="slide htt-cont htt-cont" data-title="13 · Những lỗi sai hay gặp">
-<div class="hdr in"><span class="qn">13 · LỖI SAI</span><h2>Những lỗi sai hay gặp</h2></div>
-<div class="cols3 htt-stack htt-cont-part htt-cont-part" style="gap:12px"><div class="card err f"><h3>6. Lỗi project nhiều file</h3><p>Chỉ biên dịch main.cpp ⇒ “undefined reference to rotateLeft”. #include "matrix.cpp" ⇒ “multiple definition”.</p><div class="bad-code">✗ g++ main.cpp -o rotate</div><div class="good-code">✓ g++ main.cpp matrix.cpp -o rotate</div></div></div><div class="note red f" style="font-size:max(15.5px,var(--htt-min,24px))">Thêm: dùng chỉ số từ 1 (<code class="i">i &lt;= n</code>) ⇒ truy cập a[i][n] ngoài vùng có dữ liệu · ghi đè trực tiếp lên a (xem slide sau) · quên <code class="i">endl</code> ⇒ cả ma trận in trên một dòng.</div>
-
-
+<div class="hdr in"><span class="qn">13 · LỖI SAI</span><h2>Những lỗi sai hay gặp</h2></div><div class="cols3" style="gap:12px"><div class="card err f"><h3>1. In b sai kích thước</h3><p>Dùng lại m, n của a khi in b ⇒ thiếu/thừa ô, in ra số rác hoặc số 0.</p><div class="bad-code">✗ printMatrix(b, m, n);</div><div class="good-code">✓ printMatrix(b, n, m);</div></div><div class="card err f"><h3>2. Nhầm chiều xoay</h3><p>Dùng công thức của xoay phải ⇒ ra 4 1 / 5 2 / 6 3.</p><div class="bad-code">✗ b[i][j] = a[m-1-j][i];</div><div class="good-code">✓ b[i][j] = a[j][n-1-i];</div></div><div class="card err f"><h3>3. Sai giới hạn vòng lặp</h3><p>Duyệt b mà để i &lt; m, j &lt; n (giới hạn của a) ⇒ chỉ đúng khi ma trận vuông.</p><div class="bad-code">✗ for(i&lt;m) for(j&lt;n) b[i][j]=…</div><div class="good-code">✓ for(i&lt;n) for(j&lt;m) b[i][j]=…</div></div><div class="card err f"><h3>4. Quên kiểm tra M, N</h3><p>Nhập M = 150 ⇒ ghi ra ngoài mảng 100 × 100, chương trình chạy sai hoặc crash.</p><div class="bad-code">✗ cin &gt;&gt; m &gt;&gt; n;</div><div class="good-code">✓ do {cin&gt;&gt;m&gt;&gt;n;} while(m&lt;1||m&gt;MAX||…);</div></div><div class="card err f"><h3>5. Lỗi khai báo tham số</h3><p>Thiếu số cột ⇒ lỗi biên dịch. Thiếu &amp; ⇒ main không nhận được m, n.</p><div class="bad-code">✗ void inputMatrix(int a[][], int m, int n)</div><div class="good-code">✓ void inputMatrix(int a[][MAX], int &amp;m, int &amp;n)</div></div><div class="card err f"><h3>6. Lỗi project nhiều file</h3><p>Chỉ biên dịch main.cpp ⇒ “undefined reference to rotateLeft”. #include "matrix.cpp" ⇒ “multiple definition”.</p><div class="bad-code">✗ g++ main.cpp -o rotate</div><div class="good-code">✓ g++ main.cpp matrix.cpp -o rotate</div></div></div><div class="note red f" style="font-size:15.5px">Thêm: dùng chỉ số từ 1 (<code class="i">i &lt;= n</code>) ⇒ truy cập a[i][n] ngoài vùng có dữ liệu · ghi đè trực tiếp lên a (xem slide sau) · quên <code class="i">endl</code> ⇒ cả ma trận in trên một dòng.</div>
 </section>
 
-<section class="slide htt-fs18" id="inplace" data-title="14 · Lỗi xoay tại chỗ">
+<section class="slide" id="inplace" data-title="14 · Lỗi xoay tại chỗ">
 <div class="hdr in"><span class="qn">14 · LỖI SAI</span><h2>Lỗi kinh điển: xoay “tại chỗ” trên chính mảng a</h2></div><div class="cols" style="grid-template-columns:1fr 1.05fr"><div><script type="text/x-cpp" class="" id="kIP" data-title="Code sai (với ma trận vuông 3 × 3)" data-mark="4:a">
 // SAI: khong dung mang b
 for (int i = 0; i < n; i++)
@@ -559,7 +506,7 @@ for (int i = 0; i < n; i++)
 </script><div class="flow" style="gap:30px;margin-top:14px"><div class="mwrap"><div class="mlabel">a đang bị ghi đè</div><div class="mat  " id="pa" style="grid-template-columns:repeat(3,auto)"><div class="cell" id="pa_0_0"><span>1</span><small>[0][0]</small></div><div class="cell" id="pa_0_1"><span>2</span><small>[0][1]</small></div><div class="cell" id="pa_0_2"><span>3</span><small>[0][2]</small></div><div class="cell" id="pa_1_0"><span>4</span><small>[1][0]</small></div><div class="cell" id="pa_1_1"><span>5</span><small>[1][1]</small></div><div class="cell" id="pa_1_2"><span>6</span><small>[1][2]</small></div><div class="cell" id="pa_2_0"><span>7</span><small>[2][0]</small></div><div class="cell" id="pa_2_1"><span>8</span><small>[2][1]</small></div><div class="cell" id="pa_2_2"><span>9</span><small>[2][2]</small></div></div></div><div class="mwrap"><div class="mlabel">kết quả đúng</div><div class="mat sm " id="pc" style="grid-template-columns:repeat(3,auto)"><div class="cell" id="pc_0_0"><span>3</span></div><div class="cell" id="pc_0_1"><span>6</span></div><div class="cell" id="pc_0_2"><span>9</span></div><div class="cell" id="pc_1_0"><span>2</span></div><div class="cell" id="pc_1_1"><span>5</span></div><div class="cell" id="pc_1_2"><span>8</span></div><div class="cell" id="pc_2_0"><span>1</span></div><div class="cell" id="pc_2_1"><span>4</span></div><div class="cell" id="pc_2_2"><span>7</span></div></div></div></div></div><div><span class="f ghost" data-now="#kIP|show-a;#pa_0_2|cur" data-act="#pa_0_0|ok" data-set='#pa_0_0::<span>3</span><small>[0][0]</small>;#pa_0_1::<span>2</span><small>[0][1]</small>;#pa_0_2::<span>3</span><small>[0][2]</small>;#pa_1_0::<span>4</span><small>[1][0]</small>;#pa_1_1::<span>5</span><small>[1][1]</small>;#pa_1_2::<span>6</span><small>[1][2]</small>;#pa_2_0::<span>7</span><small>[2][0]</small>;#pa_2_1::<span>8</span><small>[2][1]</small>;#pa_2_2::<span>9</span><small>[2][2]</small>' data-say="a[0][0] = a[0][2] = <b>3</b>. Đúng (bằng kết quả mong đợi)."></span><span class="f ghost" data-now="#kIP|show-a;#pa_1_2|cur" data-act="#pa_0_1|ok" data-set='#pa_0_0::<span>3</span><small>[0][0]</small>;#pa_0_1::<span>6</span><small>[0][1]</small>;#pa_0_2::<span>3</span><small>[0][2]</small>;#pa_1_0::<span>4</span><small>[1][0]</small>;#pa_1_1::<span>5</span><small>[1][1]</small>;#pa_1_2::<span>6</span><small>[1][2]</small>;#pa_2_0::<span>7</span><small>[2][0]</small>;#pa_2_1::<span>8</span><small>[2][1]</small>;#pa_2_2::<span>9</span><small>[2][2]</small>' data-say="a[0][1] = a[1][2] = <b>6</b>. Đúng (bằng kết quả mong đợi)."></span><span class="f ghost" data-now="#kIP|show-a;#pa_2_2|cur" data-act="#pa_0_2|ok" data-set='#pa_0_0::<span>3</span><small>[0][0]</small>;#pa_0_1::<span>6</span><small>[0][1]</small>;#pa_0_2::<span>9</span><small>[0][2]</small>;#pa_1_0::<span>4</span><small>[1][0]</small>;#pa_1_1::<span>5</span><small>[1][1]</small>;#pa_1_2::<span>6</span><small>[1][2]</small>;#pa_2_0::<span>7</span><small>[2][0]</small>;#pa_2_1::<span>8</span><small>[2][1]</small>;#pa_2_2::<span>9</span><small>[2][2]</small>' data-say="a[0][2] = a[2][2] = <b>9</b>. Đúng (bằng kết quả mong đợi)."></span><span class="f ghost" data-now="#kIP|show-a;#pa_0_1|cur" data-act="#pa_1_0|bad" data-set='#pa_0_0::<span>3</span><small>[0][0]</small>;#pa_0_1::<span>6</span><small>[0][1]</small>;#pa_0_2::<span>9</span><small>[0][2]</small>;#pa_1_0::<span>6</span><small>[1][0]</small>;#pa_1_1::<span>5</span><small>[1][1]</small>;#pa_1_2::<span>6</span><small>[1][2]</small>;#pa_2_0::<span>7</span><small>[2][0]</small>;#pa_2_1::<span>8</span><small>[2][1]</small>;#pa_2_2::<span>9</span><small>[2][2]</small>' data-say="a[1][0] = a[0][1] = <b>6</b>. <b>SAI!</b> Mong đợi 2. Ô a[0][1] vốn là 2 đã bị ghi đè bằng 6 ở bước 2, giá trị 2 <b>mất vĩnh viễn</b>."></span><p class="say">Nhấn → để chạy từng bước.</p><div class="card f"><h3>Vì sao sai?</h3><ul style="margin:0"><li>Ô bị ghi trước có thể là ô <b>nguồn</b> cần đọc sau ⇒ đọc phải giá trị mới.</li><li>Với M ≠ N, kích thước cũng đổi ⇒ không thể giữ trong cùng hình chữ nhật.</li><li><b>Cách đúng:</b> chép sang mảng b. (Ma trận vuông có cách tại chỗ riêng, xem slide Mở rộng.)</li></ul></div></div></div>
 </section>
 
-<section class="slide htt-fs18" id="vector" data-title="15 · Giải bằng vector">
+<section class="slide" id="vector" data-title="15 · Giải bằng vector">
 <div class="hdr in"><span class="qn">15 · LƯU Ý</span><h2>Nếu giải bằng vector thì thế nào?</h2></div><div class="cols" style="grid-template-columns:1.15fr 1fr"><div><script type="text/x-cpp" class="xs" id="kV" data-title="rotate_vector.cpp (C++11 trở lên)" data-mark="1-2:a;5:b;6:c;7:d;8-10:e;11:f;17:g;20:g;18-19:h;21-24:i">
 #include <iostream>
 #include <vector>
@@ -586,15 +533,15 @@ int main() {
         cout << endl;
     }
 }
-</script></div><div><span class="f ghost" data-now="#kV|show-a" data-say="Thêm <b>#include &lt;vector&gt;</b>. Ma trận = <b>vector&lt;vector&lt;int&gt;&gt;</b>: một vector mà mỗi phần tử là một dòng (vector&lt;int&gt;)."></span><span class="f ghost" data-now="#kV|show-b" data-say="Hàm nhận <b>const &amp;</b> (không chép, không sửa a) và <b>trả về</b> ma trận mới. Không cần truyền m, n hay mảng b nữa."></span><span class="f ghost" data-now="#kV|show-c" data-say="Kích thước lấy từ chính vector: <b>m = a.size()</b> (số dòng), <b>n = a[0].size()</b> (số cột)."></span><span class="f ghost" data-now="#kV|show-d" data-say="Tạo b có <b>n dòng</b>, mỗi dòng là vector&lt;int&gt;(m): cấp phát vừa đủ, không phí 100 × 100."></span><span class="f ghost" data-now="#kV|show-e" data-say="Vòng lặp và công thức <b>giữ nguyên</b> như bản mảng: b[i][j] = a[j][n − 1 − i]."></span><span class="f ghost" data-now="#kV|show-f;#kV|show-g" data-say="<b>return b;</b> trả ma trận mới. Ở main: a được tạo đúng <b>m × n</b> sau khi nhập m, n (dòng 17); kết quả nhận bằng phép gán <b>b = rotateLeft(a)</b> (dòng 20)."></span><span class="f ghost" data-now="#kV|show-h;#kV|show-i" data-say="Duyệt bằng <b>range-for</b>: <code class=&quot;i&quot;>for (auto &amp;row : a)</code>. Dùng &amp; khi nhập để ghi thẳng vào phần tử, không phải vào bản sao. In b cũng bằng range-for, không cần biết n, m."></span><p class="say">Nhấn → để chạy từng bước.</p><table class="t1 f" style="font-size:max(14px,var(--htt-min,24px));margin-top:6px"><tr><th></th><th>int a[100][100]</th><th>vector</th></tr>
+</script></div><div><span class="f ghost" data-now="#kV|show-a" data-say="Thêm <b>#include &lt;vector&gt;</b>. Ma trận = <b>vector&lt;vector&lt;int&gt;&gt;</b>: một vector mà mỗi phần tử là một dòng (vector&lt;int&gt;)."></span><span class="f ghost" data-now="#kV|show-b" data-say="Hàm nhận <b>const &amp;</b> (không chép, không sửa a) và <b>trả về</b> ma trận mới. Không cần truyền m, n hay mảng b nữa."></span><span class="f ghost" data-now="#kV|show-c" data-say="Kích thước lấy từ chính vector: <b>m = a.size()</b> (số dòng), <b>n = a[0].size()</b> (số cột)."></span><span class="f ghost" data-now="#kV|show-d" data-say="Tạo b có <b>n dòng</b>, mỗi dòng là vector&lt;int&gt;(m): cấp phát vừa đủ, không phí 100 × 100."></span><span class="f ghost" data-now="#kV|show-e" data-say="Vòng lặp và công thức <b>giữ nguyên</b> như bản mảng: b[i][j] = a[j][n − 1 − i]."></span><span class="f ghost" data-now="#kV|show-f;#kV|show-g" data-say="<b>return b;</b> trả ma trận mới. Ở main: a được tạo đúng <b>m × n</b> sau khi nhập m, n (dòng 17); kết quả nhận bằng phép gán <b>b = rotateLeft(a)</b> (dòng 20)."></span><span class="f ghost" data-now="#kV|show-h;#kV|show-i" data-say="Duyệt bằng <b>range-for</b>: <code class=&quot;i&quot;>for (auto &amp;row : a)</code>. Dùng &amp; khi nhập để ghi thẳng vào phần tử, không phải vào bản sao. In b cũng bằng range-for, không cần biết n, m."></span><p class="say">Nhấn → để chạy từng bước.</p><table class="t1 f" style="font-size:14px;margin-top:6px"><tr><th></th><th>int a[100][100]</th><th>vector</th></tr>
 <tr><td>Kích thước</td><td>cố định, phải kiểm tra ≤ 100</td><td>đúng M × N, không giới hạn 100</td></tr>
 <tr><td>Truyền vào hàm</td><td>phải ghi số cột, kèm m, n</td><td>tự biết .size()</td></tr>
 <tr><td>Trả kết quả</td><td>qua tham số b</td><td>return trực tiếp</td></tr>
 <tr><td>Truy cập</td><td colspan="2" style="text-align:center">giống nhau: <code class="i">b[i][j]</code>; vector có thêm <code class="i">.at(i)</code> báo lỗi khi vượt chỉ số</td></tr></table></div></div>
 </section>
 
-<section class="slide htt-fs20" id="more" data-title="16 · Mở rộng">
-<div class="hdr in"><span class="qn">16 · MỞ RỘNG</span><h2>Mở rộng: các phép xoay khác</h2></div><div class="cols3"><div class="card in"><h3>Xoay phải 90° ⟳</h3><p>Kích thước N × M.</p><div class="good-code">b[i][j] = a[m-1-j][i];</div><p class="muted" style="font-size:max(14px,var(--htt-min,24px))">Cột đầu (đọc từ dưới lên) → dòng đầu.</p></div><div class="card in"><h3>Xoay 180°</h3><p>Kích thước giữ nguyên M × N.</p><div class="good-code">b[i][j] = a[m-1-i][n-1-j];</div><p class="muted" style="font-size:max(14px,var(--htt-min,24px))">= xoay trái 2 lần.</p></div><div class="card in"><h3>Xoay trái k lần</h3><p>Xoay 4 lần quay về như cũ ⇒ chỉ cần xoay <b>k % 4</b> lần.</p><div class="good-code">k = k % 4;  // 0..3</div><p class="muted" style="font-size:max(14px,var(--htt-min,24px))">Sau mỗi lần nhớ đổi chỗ m ↔ n.</p></div></div><div class="cols" style="margin-top:14px;grid-template-columns:1.1fr 1fr"><div><h3>Ma trận vuông: xoay trái tại chỗ (không cần b)</h3><div class="flow" style="gap:18px;flex-wrap:nowrap"><div class="mwrap"><div class="mlabel">a</div><div class="mat xs " id="xa" style="grid-template-columns:repeat(3,auto)"><div class="cell" id="xa_0_0"><span>1</span></div><div class="cell" id="xa_0_1"><span>2</span></div><div class="cell" id="xa_0_2"><span>3</span></div><div class="cell" id="xa_1_0"><span>4</span></div><div class="cell" id="xa_1_1"><span>5</span></div><div class="cell" id="xa_1_2"><span>6</span></div><div class="cell" id="xa_2_0"><span>7</span></div><div class="cell" id="xa_2_1"><span>8</span></div><div class="cell" id="xa_2_2"><span>9</span></div></div></div><div class="ar hide0" id="xr1">→ chuyển vị →</div><div class="mwrap hide0" id="xtw"><div class="mlabel">aᵀ</div><div class="mat xs " id="xt" style="grid-template-columns:repeat(3,auto)"><div class="cell" id="xt_0_0"><span>1</span></div><div class="cell" id="xt_0_1"><span>4</span></div><div class="cell" id="xt_0_2"><span>7</span></div><div class="cell" id="xt_1_0"><span>2</span></div><div class="cell" id="xt_1_1"><span>5</span></div><div class="cell" id="xt_1_2"><span>8</span></div><div class="cell" id="xt_2_0"><span>3</span></div><div class="cell" id="xt_2_1"><span>6</span></div><div class="cell" id="xt_2_2"><span>9</span></div></div></div><div class="ar hide0" id="xr2">→ đảo thứ tự dòng →</div><div class="mwrap hide0" id="xbw"><div class="mlabel">kết quả</div><div class="mat xs " id="xb" style="grid-template-columns:repeat(3,auto)"><div class="cell ok" id="xb_0_0"><span>3</span></div><div class="cell ok" id="xb_0_1"><span>6</span></div><div class="cell ok" id="xb_0_2"><span>9</span></div><div class="cell ok" id="xb_1_0"><span>2</span></div><div class="cell ok" id="xb_1_1"><span>5</span></div><div class="cell ok" id="xb_1_2"><span>8</span></div><div class="cell ok" id="xb_2_0"><span>1</span></div><div class="cell ok" id="xb_2_1"><span>4</span></div><div class="cell ok" id="xb_2_2"><span>7</span></div></div></div></div></div><div><script type="text/x-cpp" class="xs" id="kX" data-title="xoay trái tại chỗ (n × n)" data-mark="1-4:a;5-8:b">
+<section class="slide" id="more" data-title="16 · Mở rộng">
+<div class="hdr in"><span class="qn">16 · MỞ RỘNG</span><h2>Mở rộng: các phép xoay khác</h2></div><div class="cols3"><div class="card in"><h3>Xoay phải 90° ⟳</h3><p>Kích thước N × M.</p><div class="good-code">b[i][j] = a[m-1-j][i];</div><p class="muted" style="font-size:14px">Cột đầu (đọc từ dưới lên) → dòng đầu.</p></div><div class="card in"><h3>Xoay 180°</h3><p>Kích thước giữ nguyên M × N.</p><div class="good-code">b[i][j] = a[m-1-i][n-1-j];</div><p class="muted" style="font-size:14px">= xoay trái 2 lần.</p></div><div class="card in"><h3>Xoay trái k lần</h3><p>Xoay 4 lần quay về như cũ ⇒ chỉ cần xoay <b>k % 4</b> lần.</p><div class="good-code">k = k % 4;  // 0..3</div><p class="muted" style="font-size:14px">Sau mỗi lần nhớ đổi chỗ m ↔ n.</p></div></div><div class="cols" style="margin-top:14px;grid-template-columns:1.1fr 1fr"><div><h3>Ma trận vuông: xoay trái tại chỗ (không cần b)</h3><div class="flow" style="gap:18px;flex-wrap:nowrap"><div class="mwrap"><div class="mlabel">a</div><div class="mat xs " id="xa" style="grid-template-columns:repeat(3,auto)"><div class="cell" id="xa_0_0"><span>1</span></div><div class="cell" id="xa_0_1"><span>2</span></div><div class="cell" id="xa_0_2"><span>3</span></div><div class="cell" id="xa_1_0"><span>4</span></div><div class="cell" id="xa_1_1"><span>5</span></div><div class="cell" id="xa_1_2"><span>6</span></div><div class="cell" id="xa_2_0"><span>7</span></div><div class="cell" id="xa_2_1"><span>8</span></div><div class="cell" id="xa_2_2"><span>9</span></div></div></div><div class="ar hide0" id="xr1">→ chuyển vị →</div><div class="mwrap hide0" id="xtw"><div class="mlabel">aᵀ</div><div class="mat xs " id="xt" style="grid-template-columns:repeat(3,auto)"><div class="cell" id="xt_0_0"><span>1</span></div><div class="cell" id="xt_0_1"><span>4</span></div><div class="cell" id="xt_0_2"><span>7</span></div><div class="cell" id="xt_1_0"><span>2</span></div><div class="cell" id="xt_1_1"><span>5</span></div><div class="cell" id="xt_1_2"><span>8</span></div><div class="cell" id="xt_2_0"><span>3</span></div><div class="cell" id="xt_2_1"><span>6</span></div><div class="cell" id="xt_2_2"><span>9</span></div></div></div><div class="ar hide0" id="xr2">→ đảo thứ tự dòng →</div><div class="mwrap hide0" id="xbw"><div class="mlabel">kết quả</div><div class="mat xs " id="xb" style="grid-template-columns:repeat(3,auto)"><div class="cell ok" id="xb_0_0"><span>3</span></div><div class="cell ok" id="xb_0_1"><span>6</span></div><div class="cell ok" id="xb_0_2"><span>9</span></div><div class="cell ok" id="xb_1_0"><span>2</span></div><div class="cell ok" id="xb_1_1"><span>5</span></div><div class="cell ok" id="xb_1_2"><span>8</span></div><div class="cell ok" id="xb_2_0"><span>1</span></div><div class="cell ok" id="xb_2_1"><span>4</span></div><div class="cell ok" id="xb_2_2"><span>7</span></div></div></div></div></div><div><script type="text/x-cpp" class="xs" id="kX" data-title="xoay trái tại chỗ (n × n)" data-mark="1-4:a;5-8:b">
 // 1) chuyen vi: doi a[i][j] <-> a[j][i]
 for (int i = 0; i < n; i++)
     for (int j = i + 1; j < n; j++)
@@ -613,7 +560,7 @@ for (int i = 0; i < n / 2; i++)
 <div id="bar"></div>
 <div id="hint">← → / Space: từng bước · Shift+→: qua slide · G: đi tới slide bất kỳ · A: hiện hết · F: toàn màn hình</div>
 <div id="nav"><button id="jumpNav" title="Đi tới slide (G)">☰</button><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
-<div id="jump"><div id="jbox"><div class="jh"><h3>Đi tới slide</h3><span class="muted" style="font-size:max(14px,var(--htt-min,24px))">gõ số hoặc tên rồi Enter</span><input id="jq" placeholder="vd: 6 hoặc vector" autocomplete="off"><button id="jx" aria-label="Đóng">×</button></div><div id="jlist"></div></div></div>
+<div id="jump"><div id="jbox"><div class="jh"><h3>Đi tới slide</h3><span class="muted" style="font-size:14px">gõ số hoặc tên rồi Enter</span><input id="jq" placeholder="vd: 6 hoặc vector" autocomplete="off"><button id="jx" aria-label="Đóng">×</button></div><div id="jlist"></div></div></div>
 <script>
 (function(){
   // ---------- C++ highlighter ----------
@@ -729,53 +676,6 @@ for (int i = 0; i < n / 2; i++)
   go(idx>=0?idx:0);
   addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
 })();
-</script>
-<script id="htt-theme-js">
-(function(){
-  // HTT theme runtime: renumber split code blocks, enforce the slide's minimum font size (--htt-min, default 24px)
-  function minOf(el){var s=el&&el.closest?el.closest('.slide'):null;var v=parseFloat(getComputedStyle(s||document.documentElement).getPropertyValue('--htt-min'));return isNaN(v)?24:v}
-  window.HTT_MIN=function(el){return minOf(el)};
-  function renumber(){
-    document.querySelectorAll('.code[class*="htt-start-"]').forEach(function(c){
-      if(c.dataset.httNum)return;var m=c.className.match(/htt-start-(\d+)/);if(!m)return;var off=+m[1];
-      c.querySelectorAll('.ln>.no').forEach(function(n){var v=parseInt(n.textContent,10);if(!isNaN(v))n.textContent=String(v+off)});
-      c.dataset.httNum='1';
-    });
-  }
-  function hasText(el){for(var n=el.firstChild;n;n=n.nextSibling){if(n.nodeType===3&&/\S/.test(n.nodeValue))return true}return /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(el.tagName)}
-  function svgScale(t){var svg=t.ownerSVGElement;if(!svg)return 1;var s=1;
-    while(svg){var vb=svg.viewBox&&svg.viewBox.baseVal;if(vb&&vb.width&&vb.height){var w=svg.clientWidth||svg.getBoundingClientRect().width,h=svg.clientHeight||svg.getBoundingClientRect().height;if(!w||!h)return 0;s*=Math.min(w/vb.width,h/vb.height)}svg=svg.ownerSVGElement}
-    return s}
-  function set(el,v){if(!el.hasAttribute('data-htt-prev'))el.setAttribute('data-htt-prev',el.style.getPropertyValue('font-size')+'|'+el.style.getPropertyPriority('font-size'));el.style.setProperty('font-size',v,'important')}
-  function unfix(sel){document.querySelectorAll((sel||'#deck .slide *')).forEach(function(el){var p=el.getAttribute('data-htt-prev');if(p===null)return;var a=p.split('|');if(a[0])el.style.setProperty('font-size',a[0],a[1]||'');else el.style.removeProperty('font-size');el.removeAttribute('data-htt-prev')})}
-  function fix(sel){
-    renumber();
-    var slides=document.querySelectorAll(typeof sel==='string'?sel:'#deck .slide');
-    for(var j=0;j<slides.length;j++){var sl=slides[j];var MIN=minOf(sl);if(MIN<=0)continue;
-      var els=sl.querySelectorAll('*');
-      for(var i=0;i<els.length;i++){var el=els[i];
-        if(el instanceof SVGElement){
-          if(!/^(text|tspan|textPath)$/.test(el.tagName))continue;
-          if(el.tagName!=='text'&&!hasText(el))continue;
-          var sc=svgScale(el);if(!sc)continue;
-          var fs=parseFloat(getComputedStyle(el).fontSize);if(!fs)continue;
-          if(fs*sc<MIN-0.3)set(el,(MIN/sc).toFixed(2)+'px');
-          continue;
-        }
-        if(!hasText(el))continue;
-        var f=parseFloat(getComputedStyle(el).fontSize);
-        if(f>0&&f<MIN-0.3)set(el,MIN+'px');
-      }
-    }
-  }
-  window.HTT_fix=fix;window.HTT_unfix=unfix;
-  fix();
-  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){fix()});
-  var t=null;var mo=new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(ms[i].type==='childList'&&ms[i].addedNodes.length){clearTimeout(t);t=setTimeout(function(){fix()},30);return}}});
-  var d=document.getElementById('deck');if(d)mo.observe(d,{childList:true,subtree:true});
-  function act(){setTimeout(function(){fix('#deck .slide.active')},0)}addEventListener('keydown',act);addEventListener('click',act);addEventListener('touchend',act);
-})();
-
 </script>
 </body>
 </html>

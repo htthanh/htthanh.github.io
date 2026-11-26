@@ -8,18 +8,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#ffffff; --panel:#ffffff; --line:#e8eef7; --text:#17263e; --muted:#3d63a0;
-  --accent:#3a7fed; --accent2:#0949b1; --warn:#1d68e1; --gold:#0b58d4; --code:#fcfbff;
-  --k:#3371d6; --t:#3a7fed; --s:#083d93; --n:#0c61ea; --c:#84a1d0; --p:#276cdb; --fn:#0a4fbf;
-  --sa1:#3a7fed; --sa2:#4887ec;
+  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
+  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
+  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
+  --sa1:#7c3aed; --sa2:#ec4899;
   --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:#eff5fe;color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
 #viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
 #deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
-.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(58,127,237,.14);
-  background:none,none,none,var(--bg);
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
+  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
   opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
 .slide.past{transform:translateX(-60px) scale(.98)}
 .slide.active{opacity:1;transform:none;pointer-events:auto}
@@ -27,81 +27,81 @@ html,body{height:100%;background:#eff5fe;color:var(--text);font-family:"Be Vietn
 .slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
 @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 .hdr{display:flex;align-items:center;gap:16px;margin-bottom:18px}
-.slide:nth-of-type(4n+1){--sa1:#3a7fed;--sa2:#4887ec}.slide:nth-of-type(4n+2){--sa1:#0949b1;--sa2:#3a7fed}.slide:nth-of-type(4n+3){--sa1:#4887ec;--sa2:#1c6ef3}.slide:nth-of-type(4n){--sa1:#083d93;--sa2:#0e62e9}
-.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:var(--sa1)}
-.qn{font-weight:800;font-size:max(17px,var(--htt-min,24px));letter-spacing:.06em;color:#fff;background:var(--sa1);box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
 h1{font-size:70px;line-height:1.1;font-weight:800}
 h2{font-size:38px;line-height:1.2;font-weight:800}
-h3{font-size:max(23px,var(--htt-min,24px));font-weight:700;margin-bottom:6px;color:var(--sa1)}
-p,li{font-size:max(22px,var(--htt-min,24px));line-height:1.45;color:var(--text)}
+h3{font-size:23px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:22px;line-height:1.45;color:var(--text)}
 .muted{color:var(--muted)}
 ul{list-style:none}
 ul li{position:relative;padding-left:26px;margin:6px 0}
-ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:var(--sa1)}
-.grad{background:#3a7fed;-webkit-background-clip:text;background-clip:text;color:transparent}
-code.i{font-family:var(--mono);font-size:.88em;background:#f0f5fd;border:1px solid #d3e2f9;padding:0 6px;border-radius:6px;color:#1858be}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
+.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.88em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 6px;border-radius:6px;color:#be185d}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
 .cols.c64{grid-template-columns:1.25fr 1fr}.cols.c46{grid-template-columns:1fr 1.2fr}
 .cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(58,127,237,.25)}
-.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #3a7fed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0949b1}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #4887ec}.cols4>.card:nth-child(4n){border-top:5px solid #0e65f2}
-.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0949b1}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#276cdb}.cols4>.card:nth-child(4n) h3{color:#0b58d4}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#3a7fed}
-.card.bad{border-color:#cfe0fc;background:#f2f7fe}
-.card.good{border-color:#a7c4f3;background:#ecf3fd}
-.lbl{display:inline-block;font-size:max(15px,var(--htt-min,24px));font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
-.lbl.bad{background:#e5effe;color:#1254be}.lbl.good{background:#d1e1fa;color:#063176}.lbl.info{background:#e3ecfb;color:#3363b0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
+.card.bad{border-color:#fecdd3;background:linear-gradient(180deg,#fff1f3,#fff)}
+.card.good{border-color:#a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff)}
+.lbl{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
 .icon{font-size:34px;margin-bottom:4px}
-.note{margin-top:12px;padding:10px 16px;border-left:5px solid #0e65f2;background:#e2ecfd;border-radius:8px;font-size:max(20px,var(--htt-min,24px));line-height:1.4}
-.note.blue{border-color:#5c97f6;background:#eef4fe}
-.code{font-family:var(--mono);font-size:max(18px,var(--htt-min,24px));line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
-.code.sm{font-size:max(16.5px,var(--htt-min,24px))}.code.xs{font-size:max(15px,var(--htt-min,24px));line-height:1.45}.code.xxs{font-size:max(13.6px,var(--htt-min,24px));line-height:1.38;padding:8px 0}
+.note{margin-top:12px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:20px;line-height:1.4}
+.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
+.code{font-family:var(--mono);font-size:18px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
+.code.sm{font-size:16.5px}.code.xs{font-size:15px;line-height:1.45}.code.xxs{font-size:13.6px;line-height:1.38;padding:8px 0}
 .code .ln{padding:0 14px 0 8px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
-.code .no{color:#bdcde6;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
 .k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
-.code.show-a .mark-a{background:rgba(58,127,237,.11);box-shadow:inset 5px 0 #3a7fed}
-.code.show-b .mark-b{background:rgba(11,86,207,.13);box-shadow:inset 5px 0 #0b56cf}
-.code.show-c .mark-c{background:rgba(14,101,242,.16);box-shadow:inset 5px 0 #0e65f2}
-.code.show-d .mark-d{background:rgba(72,135,236,.12);box-shadow:inset 5px 0 #4887ec}
-.code-title{font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.code.show-a .mark-a{background:rgba(124,58,237,.11);box-shadow:inset 5px 0 #7c3aed}
+.code.show-b .mark-b{background:rgba(6,182,212,.13);box-shadow:inset 5px 0 #06b6d4}
+.code.show-c .mark-c{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
+.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
+.code-title{font-family:var(--mono);font-size:15px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
 .f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
 .f.on{opacity:1;transform:none}
 .f.ghost{display:none}
 .f.zoom{transform:scale(.85)}.f.zoom.on{transform:none}
-table{border-collapse:separate;border-spacing:0;width:100%;font-size:max(19px,var(--htt-min,24px));border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:19px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
 th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
-th{background:#ebf2fe;font-weight:700}
+th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
 tr:last-child td{border-bottom:none}
 td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
 .legend{display:flex;flex-direction:column;gap:10px}
 .leg{border-radius:12px;padding:10px 16px;background:#fff;border:1px solid var(--line)}
-.leg b{display:block;font-size:max(21px,var(--htt-min,24px));margin-bottom:2px}
-.leg p{font-size:max(19px,var(--htt-min,24px))}
-.leg.a{border-left:6px solid #3a7fed}.leg.b{border-left:6px solid #0b56cf}.leg.c{border-left:6px solid #0e65f2}
-.console{font-family:var(--mono);font-size:max(17px,var(--htt-min,24px));line-height:1.5;background:#17263e;border-radius:12px;padding:10px 16px;color:#e7f0fe;white-space:pre}
-.console .in{color:#2b78f4;font-weight:600}
-.console::before{content:"● ● ●";display:block;color:#72a4f4;font-size:max(11px,var(--htt-min,24px));letter-spacing:3px;margin-bottom:4px}
+.leg b{display:block;font-size:21px;margin-bottom:2px}
+.leg p{font-size:19px}
+.leg.a{border-left:6px solid #7c3aed}.leg.b{border-left:6px solid #06b6d4}.leg.c{border-left:6px solid #f59e0b}
+.console{font-family:var(--mono);font-size:17px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre}
+.console .in{color:#fbbf24;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
 .mem{display:flex;align-items:center;gap:16px;min-height:130px}
-.frame{border:2px solid #dce8fb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
-.frame .fname{font-family:var(--mono);font-size:max(16px,var(--htt-min,24px));color:var(--muted);margin-bottom:6px}
+.frame{border:2px solid #e4dcfb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
+.frame .fname{font-family:var(--mono);font-size:16px;color:var(--muted);margin-bottom:6px}
 .var{display:flex;align-items:center;gap:10px}
-.vn{font-family:var(--mono);font-size:max(21px,var(--htt-min,24px));color:var(--t);font-weight:600}
-.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #b7d1fb;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
+.vn{font-family:var(--mono);font-size:21px;color:var(--t);font-weight:600}
+.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #c4b5fd;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
 .vb .new{display:none}
 .callee,.arw{opacity:0;transform:translateX(-14px);transition:all .5s}
 .mem.s1 .callee,.mem.s1 .arw{opacity:1;transform:none}
 .mem.s2 .chg .old{display:none}.mem.s2 .chg .new{display:inline;animation:pop .5s}
-.mem.s2 .chg{border-color:#0e65f2;box-shadow:0 0 18px rgba(14,101,242,.5)}
+.mem.s2 .chg{border-color:#f59e0b;box-shadow:0 0 18px rgba(245,158,11,.5)}
 .mem.s3 .callee,.mem.s3 .arw{opacity:.15;transform:translateY(10px)}
-.mem.s3 .result{border-color:#1051b9;box-shadow:0 0 18px rgba(16,81,185,.5)}
-.arw{font-family:var(--mono);font-size:max(16px,var(--htt-min,24px));color:var(--#0d65f2);text-align:center;line-height:1.2;font-weight:600}
+.mem.s3 .result{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.5)}
+.arw{font-family:var(--mono);font-size:16px;color:var(--gold);text-align:center;line-height:1.2;font-weight:600}
 .arw .bar{display:block;font-size:30px}
-.alias{font-size:max(18px,var(--htt-min,24px));color:var(--accent2);font-weight:600}
+.alias{font-size:18px;color:var(--accent2);font-weight:600}
 @keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.25)}100%{transform:none;opacity:1}}
 .flow{display:flex;align-items:center;gap:12px;justify-content:center}
-.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:max(18px,var(--htt-min,24px));border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
-.box small{display:block;font-family:"Be Vietnam Pro";font-size:max(14px,var(--htt-min,24px));color:var(--muted);margin-top:2px;font-weight:400}
-.box.h{border-color:var(--#0d65f2)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#b7d1fb}.box.exe{border-color:#4887ec;background:#f2f6fd}
+.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:18px;border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:14px;color:var(--muted);margin-top:2px;font-weight:400}
+.box.h{border-color:var(--gold)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#c4b5fd}.box.exe{border-color:#ec4899;background:#fdf2f8}
 .ar{color:var(--muted);font-size:26px;text-align:center}
 .stack{display:flex;flex-direction:column;gap:8px}
 svg text{font-family:var(--mono);font-weight:600}
@@ -110,87 +110,65 @@ svg.d1 .dr1,svg.d2 .dr2,svg.d3 .dr3{stroke-dashoffset:0}
 .fadein{opacity:0;transition:opacity .6s}
 svg.d1 .fd1,svg.d2 .fd2,svg.d3 .fd3{opacity:1}
 .title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
-.kicker{font-family:var(--mono);color:#276cdb;font-size:max(22px,var(--htt-min,24px));margin-bottom:18px;font-weight:600}
+.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
 .orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
 @keyframes float{50%{transform:translate(30px,-25px)}}
 .agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:max(19px,var(--htt-min,24px));line-height:1.3;box-shadow:0 2px 6px rgba(40,67,110,.05)}
-.ag:hover{border-color:#4887ec;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(72,135,236,.45)}
-.ag:nth-child(4n+1){border-left:5px solid #3a7fed}.ag:nth-child(4n+2){border-left:5px solid #0949b1}.ag:nth-child(4n+3){border-left:5px solid #4887ec}.ag:nth-child(4n){border-left:5px solid #0e65f2}
-.ag b{color:#276cdb;margin-right:6px;font-family:var(--mono)}
-.formula{font-family:var(--mono);font-size:max(23px,var(--htt-min,24px));text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
-#bar{position:fixed;left:0;bottom:0;height:5px;background:#3a7fed;transition:width .4s;z-index:5}
-#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:max(14px,var(--htt-min,24px));color:var(--muted)}
-#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:max(16px,var(--htt-min,24px))}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:19px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05)}
+.ag:hover{border-color:#ec4899;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
+.ag b{color:#db2777;margin-right:6px;font-family:var(--mono)}
+.formula{font-family:var(--mono);font-size:23px;text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:16px}
 #nav button:hover{border-color:var(--accent)}
-#hint{position:fixed;left:16px;bottom:12px;font-size:max(13px,var(--htt-min,24px));color:#7495ca;z-index:5}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
 @media (max-width:700px){#hint{display:none}}
 @media print{#nav,#bar,#hint{display:none}}
 
 /* lec03 additions */
 .chain{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.pv{display:inline-flex;align-items:center;font-family:var(--mono);font-size:max(18px,var(--htt-min,24px));font-weight:700;padding:5px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;white-space:nowrap}
-.pv.yes{background:#d1e1fa;border-color:#3471d3;color:#063176}
-.pv.no{background:#e5effe;border-color:#74a7f8;color:#1254be}
-.pv.skip{background:#f1f4f9;border-color:#c4d2e8;color:#7e9dce;text-decoration:line-through;border-style:dashed}
+.pv{display:inline-flex;align-items:center;font-family:var(--mono);font-size:18px;font-weight:700;padding:5px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;white-space:nowrap}
+.pv.yes{background:#d1fae5;border-color:#34d399;color:#047857}
+.pv.no{background:#ffe4e6;border-color:#fb7185;color:#be123c}
+.pv.skip{background:#f1f5f9;border-color:#cbd5e1;color:#94a3b8;text-decoration:line-through;border-style:dashed}
 .op{font-family:var(--mono);font-size:26px;font-weight:800;color:var(--sa1)}
 .tt th,.tt td{text-align:center}.tt td:first-child{color:var(--text);font-weight:400}
-.tt tr.hit td{background:#f2f6fd;color:#1858be}
+.tt tr.hit td{background:#fdf2f8;color:#be185d}
 tr.f{transform:none}
 .cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
 .code.show-s .mark-s{opacity:.3;text-decoration:line-through}
 .arr{display:flex;gap:12px;justify-content:center;margin-top:6px}
-.cell{width:84px;height:84px;border-radius:16px;border:3px solid #dce8fb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:800;transition:all .45s;box-shadow:0 6px 16px -10px rgba(58,127,237,.4)}
-.cell small{font-size:max(13px,var(--htt-min,24px));color:var(--muted);font-weight:600}
-.cell.ok{border-color:#1051b9;background:#ecf3fd;color:#063176;transform:translateY(-6px)}
-.cell.bad{border-color:#1d68e1;background:#f2f7fe;color:#1254be;transform:translateY(-10px) scale(1.06);box-shadow:0 10px 24px -8px rgba(29,104,225,.5)}
+.cell{width:84px;height:84px;border-radius:16px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:800;transition:all .45s;box-shadow:0 6px 16px -10px rgba(124,58,237,.4)}
+.cell small{font-size:13px;color:var(--muted);font-weight:600}
+.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857;transform:translateY(-6px)}
+.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;transform:translateY(-10px) scale(1.06);box-shadow:0 10px 24px -8px rgba(225,29,72,.5)}
 .cell.skip{opacity:.3;transform:scale(.92)}
 .syn{display:flex;gap:12px;align-items:center;justify-content:center;font-family:var(--mono);font-size:24px;font-weight:700}
 .sy{padding:8px 16px;border-radius:12px;color:#fff}
-.sy.c1{background:#3a7fed}.sy.c2{background:#083d93}.sy.c3{background:#1d68e1}
+.sy.c1{background:linear-gradient(135deg,#7c3aed,#a855f7)}.sy.c2{background:linear-gradient(135deg,#059669,#10b981)}.sy.c3{background:linear-gradient(135deg,#e11d48,#f97316)}
 .spin{display:inline-block;animation:spin 2.4s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
-<style id="htt-theme">
-/* HTT theme: logo + layout helpers (font-size >= 24px, single blue) */
-#deck>.htt-logo{position:absolute;top:12px;right:14px;z-index:60;height:40px;padding:0 10px;border-radius:8px;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;font:800 24px/1 "Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.04em;pointer-events:none;user-select:none}
-#deck>.htt-logo span{font-size:24px;color:#fff}
-.htt-stack{grid-template-columns:minmax(0,1fr)!important;grid-template-areas:none!important;flex-direction:column!important;flex-wrap:nowrap!important}
-.htt-stack>*{grid-column:auto!important;grid-row:auto!important;max-width:100%}
-.htt-wrap,.htt-wrap *{white-space:pre-wrap!important;overflow-wrap:anywhere}
-.htt-wrap .ln{flex-wrap:nowrap}
-.htt-flexwrap{flex-wrap:wrap!important}
-#nav,#nav *{font-size:16px!important}
-#hint{font-size:14px!important}
-.orb{display:none!important}
-:root{--htt-min:24px}
-.slide.htt-fs22{--htt-min:22px}.slide.htt-fs20{--htt-min:20px}.slide.htt-fs0{--htt-min:0px}
-.jumpbtn{right:100px!important}
-.slide.htt-fs18{--htt-min:18px}.slide.htt-fs16{--htt-min:16px}
-.slide .hdr{padding-right:84px}
-.sjump{right:100px!important}
-
-</style>
-<script>window.HTT_MIN=function(el){var s=el&&el.closest?el.closest(".slide"):null;var v=parseFloat(getComputedStyle(s||document.documentElement).getPropertyValue("--htt-min"));return isNaN(v)?24:v};</script>
 </head>
 <body>
 <div id="viewport"><div id="deck">
-<div class="htt-logo" aria-label="HTT" title="HTT"><span>HTT</span></div>
 <!-- ===================== TITLE ===================== -->
 <section class="slide" id="title">
-  <div class="orb" style="width:380px;height:380px;background:#a8c7f9;right:-60px;top:-80px"></div>
-  <div class="orb" style="width:300px;height:300px;background:#81aff8;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
   <div class="title-wrap">
     <div class="kicker in">// C++ · Control Structures</div>
     <h1 class="in">Cấu trúc điều khiển<br><span class="grad">trong C++</span></h1>
     <p class="in muted" style="font-size:26px;margin-top:20px;max-width:860px">15 ví dụ có ý nghĩa: toán tử logic <code class="i">&amp;&amp; || !</code>, rẽ nhánh <code class="i">if</code> / <code class="i">switch</code>, vòng lặp <code class="i">for</code> / <code class="i">while</code> / <code class="i">do…while</code>, <code class="i">break</code>, <code class="i">continue</code> và short-circuit.</p>
-    <p class="in" style="margin-top:36px;font-size:max(19px,var(--htt-min,24px));color:#7495ca">Dùng phím ← → hoặc Space để chuyển · F: toàn màn hình</p>
+    <p class="in" style="margin-top:36px;font-size:19px;color:#8a91b4">Dùng phím ← → hoặc Space để chuyển · F: toàn màn hình</p>
   </div>
 </section>
 
 <!-- ===================== AGENDA ===================== -->
 <section class="slide" id="agenda">
-  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:max(18px,var(--htt-min,24px))">· bấm vào câu hỏi để đi tới</span></div>
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:18px">· bấm vào câu hỏi để đi tới</span></div>
   <div class="agenda in">
     <div class="ag" data-goto="q1"><b>01</b>Toán tử &amp;&amp;</div>
     <div class="ag" data-goto="q2"><b>02</b>Toán tử ||</div>
@@ -283,7 +261,7 @@ else
 </section>
 
 <!-- ===================== Q3 ! ===================== -->
-<section class="slide htt-fs22" id="q3">
+<section class="slide" id="q3">
   <div class="hdr in"><span class="qn">CÂU 3</span><h2>Toán tử <code class="i" style="font-size:33px">!</code> (NOT) – kiểm tra dữ liệu</h2></div>
   <div class="cols" style="grid-template-columns:1.2fr 1fr">
     <div>
@@ -316,7 +294,7 @@ Vui long dang nhap</div>
 </section>
 
 <!-- ===================== Q4 if else ===================== -->
-<section class="slide htt-fs22" id="q4">
+<section class="slide" id="q4">
   <div class="hdr in"><span class="qn">CÂU 4</span><h2><code class="i" style="font-size:33px">if … else</code> – đậu hay thi lại?</h2></div>
   <div class="cols" style="grid-template-columns:1.1fr 1fr">
     <div>
@@ -332,29 +310,29 @@ else
 Chuc mung, ban da DAU!</div>
       <div class="console f" style="margin-top:10px" data-act="#c4|show-d;#sv4|d2"><span class="in">3</span>
 Rat tiec, ban phai thi lai.</div>
-      <p class="f" style="margin-top:12px;font-size:max(20px,var(--htt-min,24px))">Đúng <b>một trong hai</b> nhánh được chạy: điều kiện đúng thì chạy khối <code class="i">if</code>, sai thì chạy khối <code class="i">else</code>.</p>
+      <p class="f" style="margin-top:12px;font-size:20px">Đúng <b>một trong hai</b> nhánh được chạy: điều kiện đúng thì chạy khối <code class="i">if</code>, sai thì chạy khối <code class="i">else</code>.</p>
     </div>
     <svg viewBox="0 0 440 390" width="100%" id="sv4">
-      <defs><marker id="ah4" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#7495ca"/></marker></defs>
-      <rect x="150" y="10" width="140" height="44" rx="22" fill="#eef4fe" stroke="#3a7fed" stroke-width="2"/>
-      <text x="220" y="38" text-anchor="middle" font-size="17" fill="#17263e">Nhập score</text>
-      <line x1="220" y1="54" x2="220" y2="92" stroke="#7495ca" stroke-width="2" marker-end="url(#ah4)"/>
-      <polygon points="220,95 340,150 220,205 100,150" fill="#fff" stroke="#4887ec" stroke-width="2.5"/>
-      <text x="220" y="156" text-anchor="middle" font-size="17" fill="#17263e">score &gt;= 5.0 ?</text>
-      <path d="M100,150 H50 V250" fill="none" stroke="#c4d2e8" stroke-width="2" marker-end="url(#ah4)"/>
-      <path d="M340,150 H368 V250" fill="none" stroke="#c4d2e8" stroke-width="2" marker-end="url(#ah4)"/>
-      <path class="draw dr1" d="M100,150 H50 V250" fill="none" stroke="#1051b9" stroke-width="5"/>
-      <path class="draw dr2" d="M340,150 H368 V250" fill="none" stroke="#1d68e1" stroke-width="5"/>
-      <text x="60" y="140" font-size="16" fill="#083d93">true</text>
-      <text x="345" y="140" font-size="16" fill="#1d68e1">false</text>
-      <rect x="0" y="255" width="120" height="50" rx="10" fill="#ecf3fd" stroke="#1051b9" stroke-width="2"/>
-      <text x="60" y="286" text-anchor="middle" font-size="17" fill="#063176">In "ĐẬU"</text>
-      <rect x="296" y="255" width="144" height="50" rx="10" fill="#f2f7fe" stroke="#1d68e1" stroke-width="2"/>
-      <text x="368" y="286" text-anchor="middle" font-size="16" fill="#1254be">In "Thi lại"</text>
-      <path d="M60,305 V345 H200" fill="none" stroke="#7495ca" stroke-width="2" marker-end="url(#ah4)"/>
-      <path d="M368,305 V345 H240" fill="none" stroke="#7495ca" stroke-width="2" marker-end="url(#ah4)"/>
-      <rect x="160" y="325" width="120" height="40" rx="20" fill="#eef4fe" stroke="#3a7fed" stroke-width="2"/>
-      <text x="220" y="351" text-anchor="middle" font-size="16" fill="#17263e">Kết thúc</text>
+      <defs><marker id="ah4" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a91b4"/></marker></defs>
+      <rect x="150" y="10" width="140" height="44" rx="22" fill="#f3edff" stroke="#7c3aed" stroke-width="2"/>
+      <text x="220" y="38" text-anchor="middle" font-size="17" fill="#1e1b3a">Nhập score</text>
+      <line x1="220" y1="54" x2="220" y2="92" stroke="#8a91b4" stroke-width="2" marker-end="url(#ah4)"/>
+      <polygon points="220,95 340,150 220,205 100,150" fill="#fff" stroke="#ec4899" stroke-width="2.5"/>
+      <text x="220" y="156" text-anchor="middle" font-size="17" fill="#1e1b3a">score &gt;= 5.0 ?</text>
+      <path d="M100,150 H50 V250" fill="none" stroke="#cbd5e1" stroke-width="2" marker-end="url(#ah4)"/>
+      <path d="M340,150 H368 V250" fill="none" stroke="#cbd5e1" stroke-width="2" marker-end="url(#ah4)"/>
+      <path class="draw dr1" d="M100,150 H50 V250" fill="none" stroke="#10b981" stroke-width="5"/>
+      <path class="draw dr2" d="M340,150 H368 V250" fill="none" stroke="#e11d48" stroke-width="5"/>
+      <text x="60" y="140" font-size="16" fill="#059669">true</text>
+      <text x="345" y="140" font-size="16" fill="#e11d48">false</text>
+      <rect x="0" y="255" width="120" height="50" rx="10" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+      <text x="60" y="286" text-anchor="middle" font-size="17" fill="#047857">In "ĐẬU"</text>
+      <rect x="296" y="255" width="144" height="50" rx="10" fill="#fff1f3" stroke="#e11d48" stroke-width="2"/>
+      <text x="368" y="286" text-anchor="middle" font-size="16" fill="#be123c">In "Thi lại"</text>
+      <path d="M60,305 V345 H200" fill="none" stroke="#8a91b4" stroke-width="2" marker-end="url(#ah4)"/>
+      <path d="M368,305 V345 H240" fill="none" stroke="#8a91b4" stroke-width="2" marker-end="url(#ah4)"/>
+      <rect x="160" y="325" width="120" height="40" rx="20" fill="#f3edff" stroke="#7c3aed" stroke-width="2"/>
+      <text x="220" y="351" text-anchor="middle" font-size="16" fill="#1e1b3a">Kết thúc</text>
     </svg>
   </div>
 </section>
@@ -376,16 +354,16 @@ else                 cout << "Loai F\n";
       <div class="note f">Thứ tự quan trọng: xét từ <b>cao xuống thấp</b>. Nếu viết <code class="i">s &gt;= 4.0</code> trước thì mọi điểm từ 4 trở lên đều thành "Loai D".</div>
     </div>
     <div>
-      <div class="card f" data-act="#c5|show-d"><div class="chain"><span class="pv no">7.2 &gt;= 8.5 → false</span><span class="muted" style="font-size:max(19px,var(--htt-min,24px))">xét tiếp…</span></div></div>
-      <div class="card f" style="margin-top:12px" data-act="#c5|show-b"><div class="chain"><span class="pv yes">7.2 &gt;= 7.0 → true</span><span style="font-size:max(19px,var(--htt-min,24px))">in <b>Loai B</b></span></div></div>
-      <div class="card f" style="margin-top:12px" data-act="#c5|show-s"><div class="chain"><span class="pv skip">các nhánh còn lại</span><span class="muted" style="font-size:max(19px,var(--htt-min,24px))">bị bỏ qua</span></div></div>
-      <p class="f" style="margin-top:14px;font-size:max(20px,var(--htt-min,24px))">Các điều kiện được kiểm tra <b>lần lượt</b>. Gặp điều kiện đúng <b>đầu tiên</b> thì chạy nhánh đó rồi thoát khỏi cả chuỗi. Chỉ <b>một</b> nhánh được chạy; <code class="i">else</code> cuối cùng bắt mọi trường hợp còn lại.</p>
+      <div class="card f" data-act="#c5|show-d"><div class="chain"><span class="pv no">7.2 &gt;= 8.5 → false</span><span class="muted" style="font-size:19px">xét tiếp…</span></div></div>
+      <div class="card f" style="margin-top:12px" data-act="#c5|show-b"><div class="chain"><span class="pv yes">7.2 &gt;= 7.0 → true</span><span style="font-size:19px">in <b>Loai B</b></span></div></div>
+      <div class="card f" style="margin-top:12px" data-act="#c5|show-s"><div class="chain"><span class="pv skip">các nhánh còn lại</span><span class="muted" style="font-size:19px">bị bỏ qua</span></div></div>
+      <p class="f" style="margin-top:14px;font-size:20px">Các điều kiện được kiểm tra <b>lần lượt</b>. Gặp điều kiện đúng <b>đầu tiên</b> thì chạy nhánh đó rồi thoát khỏi cả chuỗi. Chỉ <b>một</b> nhánh được chạy; <code class="i">else</code> cuối cùng bắt mọi trường hợp còn lại.</p>
     </div>
   </div>
 </section>
 
 <!-- ===================== Q6 for ===================== -->
-<section class="slide htt-fs18" id="q6">
+<section class="slide" id="q6">
   <div class="hdr in"><span class="qn">CÂU 6</span><h2>Vòng lặp <code class="i" style="font-size:33px">for</code> – tiền gửi tiết kiệm</h2></div>
   <div class="cols" style="grid-template-columns:1.1fr 1fr">
     <div>
@@ -408,13 +386,13 @@ for (int year = 1; year <= 5; year++) {
         <tr class="f" data-act="#c6l5|show"><td>5</td><td>true</td><td>133.82255776</td></tr>
         <tr class="f hit"><td>6</td><td><b>false</b></td><td>→ dừng vòng lặp</td></tr>
       </table>
-      <div class="note blue f" style="font-size:max(18px,var(--htt-min,24px))"><b>Giải thích:</b> biết trước số lần lặp (5 năm) nên dùng <code class="i">for</code>. Mỗi vòng, tiền được nhân 1.06 (lãi kép). <code class="i">cout</code> mặc định in 6 chữ số có nghĩa nên 119.1016 hiện thành <code class="i">119.102</code>.</div>
+      <div class="note blue f" style="font-size:18px"><b>Giải thích:</b> biết trước số lần lặp (5 năm) nên dùng <code class="i">for</code>. Mỗi vòng, tiền được nhân 1.06 (lãi kép). <code class="i">cout</code> mặc định in 6 chữ số có nghĩa nên 119.1016 hiện thành <code class="i">119.102</code>.</div>
     </div>
   </div>
 </section>
 
 <!-- ===================== Q7 while ===================== -->
-<section class="slide htt-fs20" id="q7">
+<section class="slide" id="q7">
   <div class="hdr in"><span class="qn">CÂU 7</span><h2>Vòng lặp <code class="i" style="font-size:33px">while</code> – tổng các chữ số</h2></div>
   <div class="cols" style="grid-template-columns:1.1fr 1fr">
     <div>
@@ -439,13 +417,13 @@ cout << "Tong chu so = " << sum << '\n';
         <tr class="f" data-act="#c7l4|show"><td>2</td><td>true</td><td>2</td><td>10</td><td>0</td></tr>
         <tr class="f hit" data-act="#c7l5|show;#c7|show-c"><td>0</td><td><b>false</b></td><td colspan="3">→ thoát, in tổng</td></tr>
       </table>
-      <div class="note blue f" style="font-size:max(18px,var(--htt-min,24px))"><b>Giải thích:</b> không biết trước số có bao nhiêu chữ số nên dùng <code class="i">while</code>: lặp <b>khi</b> điều kiện còn đúng. Mỗi vòng tách một chữ số cuối bằng <code class="i">% 10</code> và bỏ nó đi bằng <code class="i">/ 10</code>. Sau 4 vòng, n = 0 nên vòng lặp dừng và in 2 + 0 + 2 + 6 = 10.</div>
+      <div class="note blue f" style="font-size:18px"><b>Giải thích:</b> không biết trước số có bao nhiêu chữ số nên dùng <code class="i">while</code>: lặp <b>khi</b> điều kiện còn đúng. Mỗi vòng tách một chữ số cuối bằng <code class="i">% 10</code> và bỏ nó đi bằng <code class="i">/ 10</code>. Sau 4 vòng, n = 0 nên vòng lặp dừng và in 2 + 0 + 2 + 6 = 10.</div>
     </div>
   </div>
 </section>
 
 <!-- ===================== Q8 do while ===================== -->
-<section class="slide htt-fs20" id="q8">
+<section class="slide" id="q8">
   <div class="hdr in"><span class="qn">CÂU 8</span><h2>Vòng lặp <code class="i" style="font-size:33px">do … while</code> – nhập đến khi hợp lệ</h2></div>
   <div class="cols" style="grid-template-columns:1.15fr 1fr">
     <div>
@@ -464,16 +442,16 @@ cout << "Diem hop le: " << score << '\n';
 Diem hop le: 8</span></div>
     </div>
     <div>
-      <div class="card f" data-act="#c8l1|show;#c8|show-a"><h3>Lần 1: nhập −3</h3><p style="font-size:max(19px,var(--htt-min,24px))">Thân vòng lặp chạy <b>trước</b>, rồi mới kiểm tra: −3 &lt; 0 → true → lặp lại.</p></div>
-      <div class="card f" style="margin-top:10px" data-act="#c8l2|show;#c8|show-b"><h3>Lần 2: nhập 12</h3><p style="font-size:max(19px,var(--htt-min,24px))">12 &gt; 10 → true → lặp lại.</p></div>
-      <div class="card f" style="margin-top:10px" data-act="#c8l3|show;#c8|show-c"><h3>Lần 3: nhập 8</h3><p style="font-size:max(19px,var(--htt-min,24px))">Điều kiện false → thoát vòng lặp và in điểm.</p></div>
-      <div class="note f" style="font-size:max(18px,var(--htt-min,24px))"><b>do…while</b> luôn chạy thân <b>ít nhất 1 lần</b>. Phù hợp khi phải <i>làm trước rồi mới biết có cần lặp không</i>, như hỏi người dùng nhập liệu hay hiện menu.</div>
+      <div class="card f" data-act="#c8l1|show;#c8|show-a"><h3>Lần 1: nhập −3</h3><p style="font-size:19px">Thân vòng lặp chạy <b>trước</b>, rồi mới kiểm tra: −3 &lt; 0 → true → lặp lại.</p></div>
+      <div class="card f" style="margin-top:10px" data-act="#c8l2|show;#c8|show-b"><h3>Lần 2: nhập 12</h3><p style="font-size:19px">12 &gt; 10 → true → lặp lại.</p></div>
+      <div class="card f" style="margin-top:10px" data-act="#c8l3|show;#c8|show-c"><h3>Lần 3: nhập 8</h3><p style="font-size:19px">Điều kiện false → thoát vòng lặp và in điểm.</p></div>
+      <div class="note f" style="font-size:18px"><b>do…while</b> luôn chạy thân <b>ít nhất 1 lần</b>. Phù hợp khi phải <i>làm trước rồi mới biết có cần lặp không</i>, như hỏi người dùng nhập liệu hay hiện menu.</div>
     </div>
   </div>
 </section>
 
 <!-- ===================== Q9 break ===================== -->
-<section class="slide htt-fs18" id="q9">
+<section class="slide" id="q9">
   <div class="hdr in"><span class="qn">CÂU 9</span><h2><code class="i" style="font-size:33px">break</code> – tìm sinh viên đầu tiên bị rớt</h2></div>
   <div class="cols" style="grid-template-columns:1.2fr 1fr">
     <div>
@@ -498,14 +476,14 @@ for (int i = 0; i < 5; i++) {
       <span class="f ghost" data-act="#b9_1|ok;#c9l1|show" data-say="i = 1: 9 ≥ 5, đậu → xét tiếp."></span>
       <span class="f ghost" data-act="#b9_2|bad;#c9l2|show;#c9|show-d" data-say="i = 2: 4 < 5 → in vị trí rồi break: thoát vòng for ngay."></span>
       <span class="f ghost" data-act="#b9_3|skip;#b9_4|skip" data-say="a[3], a[4] không bao giờ được xét, kể cả a[4] = 3 cũng < 5."></span>
-      <p class="say muted" style="font-size:max(20px,var(--htt-min,24px));margin-top:16px;min-height:60px">Nhấn → để chạy từng bước.</p>
-      <div class="note blue f" style="font-size:max(18px,var(--htt-min,24px))"><b>Giải thích:</b> chỉ cần tìm SV <b>đầu tiên</b> nên khi tìm thấy thì <code class="i">break</code> thoát vòng lặp, không duyệt phần còn lại. Mảng càng lớn thì càng tiết kiệm thời gian.</div>
+      <p class="say muted" style="font-size:20px;margin-top:16px;min-height:60px">Nhấn → để chạy từng bước.</p>
+      <div class="note blue f" style="font-size:18px"><b>Giải thích:</b> chỉ cần tìm SV <b>đầu tiên</b> nên khi tìm thấy thì <code class="i">break</code> thoát vòng lặp, không duyệt phần còn lại. Mảng càng lớn thì càng tiết kiệm thời gian.</div>
     </div>
   </div>
 </section>
 
 <!-- ===================== Q10 continue ===================== -->
-<section class="slide htt-fs18" id="q10">
+<section class="slide" id="q10">
   <div class="hdr in"><span class="qn">CÂU 10</span><h2><code class="i" style="font-size:33px">continue</code> – bỏ qua dữ liệu lỗi</h2></div>
   <div class="cols" style="grid-template-columns:1.2fr 1fr">
     <div>
@@ -533,14 +511,14 @@ cout << "Trung binh = " << total / count << " do C\n";
       <span class="f ghost" data-act="#b10_2|ok" data-say="i = 2: 15 → total = 27, count = 2"></span>
       <span class="f ghost" data-act="#b10_3|bad;#c10l3|show" data-say="i = 3: −1 → continue, không cộng."></span>
       <span class="f ghost" data-act="#b10_4|ok;#c10l5|show;#c10|show-c" data-say="i = 4: 9 → total = 36, count = 3. Trung bình = 36 / 3 = 12."></span>
-      <p class="say muted" style="font-size:max(20px,var(--htt-min,24px));margin-top:16px;min-height:60px">Nhấn → để chạy từng bước.</p>
-      <div class="note blue f" style="font-size:max(18px,var(--htt-min,24px))"><b>continue</b> khác <b>break</b>: nó chỉ bỏ qua <b>phần còn lại của lần lặp hiện tại</b> rồi sang lần kế tiếp, vòng lặp vẫn chạy đủ 5 lần. Nhờ vậy giá trị lỗi −1 không làm sai kết quả trung bình.</div>
+      <p class="say muted" style="font-size:20px;margin-top:16px;min-height:60px">Nhấn → để chạy từng bước.</p>
+      <div class="note blue f" style="font-size:18px"><b>continue</b> khác <b>break</b>: nó chỉ bỏ qua <b>phần còn lại của lần lặp hiện tại</b> rồi sang lần kế tiếp, vòng lặp vẫn chạy đủ 5 lần. Nhờ vậy giá trị lỗi −1 không làm sai kết quả trung bình.</div>
     </div>
   </div>
 </section>
 
 <!-- ===================== Q11 short-circuit && ===================== -->
-<section class="slide htt-fs18" id="q11">
+<section class="slide" id="q11">
   <div class="hdr in"><span class="qn">CÂU 11</span><h2>Short-circuit với <code class="i" style="font-size:33px">&amp;&amp;</code> – tránh chia cho 0</h2></div>
   <div class="cols" style="grid-template-columns:1.15fr 1fr">
     <div>
@@ -562,19 +540,19 @@ else
       <div class="console f" style="margin-top:14px">Chua co du lieu</div>
     </div>
     <div>
-      <div class="card f"><h3>Quy tắc</h3><p style="font-size:max(20px,var(--htt-min,24px))">Với <code class="i">A &amp;&amp; B</code>: nếu <b>A false</b> thì kết quả chắc chắn false, nên C++ <b>không tính B</b>.</p></div>
-      <div class="card bad f" style="margin-top:12px"><h3 style="color:#1254be">Đảo thứ tự sẽ lỗi</h3>
+      <div class="card f"><h3>Quy tắc</h3><p style="font-size:20px">Với <code class="i">A &amp;&amp; B</code>: nếu <b>A false</b> thì kết quả chắc chắn false, nên C++ <b>không tính B</b>.</p></div>
+      <div class="card bad f" style="margin-top:12px"><h3 style="color:#be123c">Đảo thứ tự sẽ lỗi</h3>
 <script type="text/x-cpp" class="xs">
 if (total / students >= 5 && students > 0)
 // chia cho 0 → chương trình crash!
 </script></div>
-      <div class="note f" style="font-size:max(18px,var(--htt-min,24px))">Điều kiện "bảo vệ" (khác 0, trong phạm vi mảng, con trỏ khác null…) phải đặt <b>bên trái</b> <code class="i">&amp;&amp;</code>.</div>
+      <div class="note f" style="font-size:18px">Điều kiện "bảo vệ" (khác 0, trong phạm vi mảng, con trỏ khác null…) phải đặt <b>bên trái</b> <code class="i">&amp;&amp;</code>.</div>
     </div>
   </div>
 </section>
 
 <!-- ===================== Q12 short-circuit || ===================== -->
-<section class="slide htt-fs20" id="q12">
+<section class="slide" id="q12">
   <div class="hdr in"><span class="qn">CÂU 12</span><h2>Short-circuit với <code class="i" style="font-size:33px">||</code> – không tải lại file</h2></div>
   <div class="cols" style="grid-template-columns:1.25fr 1fr">
     <div>
@@ -602,14 +580,14 @@ if (hasLocalCopy(f) || downloadFromServer(f))
       </div>
       <div class="console f" style="margin-top:14px">  kiem tra tren may...
 Mo file baigiang.pdf</div>
-      <div class="card f" style="margin-top:12px"><h3>Giải thích</h3><p style="font-size:max(19px,var(--htt-min,24px))">Với <code class="i">A || B</code>: nếu <b>A true</b> thì kết quả chắc chắn true, nên <b>B không được gọi</b>. Màn hình không hề có dòng "tai tu server", tức là không tốn thời gian tải lại.</p></div>
-      <div class="note f" style="font-size:max(18px,var(--htt-min,24px))">Mẹo: đặt điều kiện <b>rẻ, nhanh</b> hoặc hay đúng nhất ở bên trái <code class="i">||</code>.</div>
+      <div class="card f" style="margin-top:12px"><h3>Giải thích</h3><p style="font-size:19px">Với <code class="i">A || B</code>: nếu <b>A true</b> thì kết quả chắc chắn true, nên <b>B không được gọi</b>. Màn hình không hề có dòng "tai tu server", tức là không tốn thời gian tải lại.</p></div>
+      <div class="note f" style="font-size:18px">Mẹo: đặt điều kiện <b>rẻ, nhanh</b> hoặc hay đúng nhất ở bên trái <code class="i">||</code>.</div>
     </div>
   </div>
 </section>
 
 <!-- ===================== Q13 switch ===================== -->
-<section class="slide htt-fs18" id="q13">
+<section class="slide" id="q13">
   <div class="hdr in"><span class="qn">CÂU 13</span><h2><code class="i" style="font-size:33px">switch … case … break … default</code> – số ngày trong tháng</h2></div>
   <div class="cols" style="grid-template-columns:1.3fr 1fr">
     <div>
@@ -633,16 +611,16 @@ cout << "Thang " << month << " co " << days << " ngay\n";
       <div class="console f" style="margin-top:12px" data-act="#c13|show-c">Thang 2 co 29 ngay</div>
     </div>
     <div>
-      <div class="card f" data-act="#c13|show-a"><h3>① So khớp giá trị</h3><p style="font-size:max(19px,var(--htt-min,24px))"><code class="i">switch (month)</code> nhảy thẳng tới <code class="i">case</code> có giá trị bằng month (= 2).</p></div>
-      <div class="card f" style="margin-top:10px" data-act="#c13|show-b"><h3>② Chạy &amp; break</h3><p style="font-size:max(19px,var(--htt-min,24px))">2024 là năm nhuận nên days = 29. <code class="i">break</code> thoát khỏi switch. Thiếu break thì chương trình chạy <b>tràn</b> (fall-through) xuống case bên dưới.</p></div>
-      <div class="card f" style="margin-top:10px" data-act="#c13|show-d"><h3>③ default</h3><p style="font-size:max(19px,var(--htt-min,24px))">Bắt các giá trị không khớp case nào, ví dụ month = 13 → days = −1.</p></div>
-      <div class="note blue f" style="font-size:max(17px,var(--htt-min,24px))">Nhiều <code class="i">case</code> liền nhau dùng chung một khối lệnh: đây là fall-through có chủ đích.</div>
+      <div class="card f" data-act="#c13|show-a"><h3>① So khớp giá trị</h3><p style="font-size:19px"><code class="i">switch (month)</code> nhảy thẳng tới <code class="i">case</code> có giá trị bằng month (= 2).</p></div>
+      <div class="card f" style="margin-top:10px" data-act="#c13|show-b"><h3>② Chạy &amp; break</h3><p style="font-size:19px">2024 là năm nhuận nên days = 29. <code class="i">break</code> thoát khỏi switch. Thiếu break thì chương trình chạy <b>tràn</b> (fall-through) xuống case bên dưới.</p></div>
+      <div class="card f" style="margin-top:10px" data-act="#c13|show-d"><h3>③ default</h3><p style="font-size:19px">Bắt các giá trị không khớp case nào, ví dụ month = 13 → days = −1.</p></div>
+      <div class="note blue f" style="font-size:17px">Nhiều <code class="i">case</code> liền nhau dùng chung một khối lệnh: đây là fall-through có chủ đích.</div>
     </div>
   </div>
 </section>
 
 <!-- ===================== Q14 ternary ===================== -->
-<section class="slide htt-fs22" id="q14">
+<section class="slide" id="q14">
   <div class="hdr in"><span class="qn">CÂU 14</span><h2>Toán tử 3 ngôi <code class="i" style="font-size:33px">? :</code></h2></div>
   <div class="syn in">
     <span class="sy c1">điều_kiện</span><span class="op">?</span><span class="sy c2">giá_trị_nếu_đúng</span><span class="op">:</span><span class="sy c3">giá_trị_nếu_sai</span>
@@ -664,13 +642,13 @@ Max = 12</div>
     <div>
       <div class="card f" data-act="#c14|show-a"><h3>Dòng 2</h3><div class="chain"><span class="pv yes">6.5 &gt;= 5.0 → true</span><span class="op">⇒</span><span class="pv yes">"Dau"</span></div></div>
       <div class="card f" style="margin-top:10px" data-act="#c14|show-b"><h3>Dòng 6</h3><div class="chain"><span class="pv yes">12 &gt; 7 → true</span><span class="op">⇒</span><span class="pv yes">a = 12</span></div></div>
-      <div class="note f" style="font-size:max(18px,var(--htt-min,24px))">Đây là cách viết gọn của <code class="i">if…else</code> khi cả hai nhánh chỉ để <b>chọn một giá trị</b>. Khác với if, nó là một <b>biểu thức</b> nên gán hoặc in trực tiếp được. Không nên lồng nhiều tầng vì khó đọc.</div>
+      <div class="note f" style="font-size:18px">Đây là cách viết gọn của <code class="i">if…else</code> khi cả hai nhánh chỉ để <b>chọn một giá trị</b>. Khác với if, nó là một <b>biểu thức</b> nên gán hoặc in trực tiếp được. Không nên lồng nhiều tầng vì khó đọc.</div>
     </div>
   </div>
 </section>
 
 <!-- ===================== Q15 infinite loop ===================== -->
-<section class="slide htt-fs18" id="q15">
+<section class="slide" id="q15">
   <div class="hdr in"><span class="qn">CÂU 15</span><h2>Vòng lặp vô tận <span class="spin">🔄</span></h2></div>
   <div class="cols" style="grid-template-columns:1.25fr 1fr">
     <div>
@@ -686,7 +664,7 @@ while (true) {                       // lặp vô tận có chủ đích
 }
 cout << "Tam biet!\n";
 </script>
-      <div class="console" style="margin-top:10px;font-size:max(15px,var(--htt-min,24px));line-height:1.4"><span class="cl" id="c15l1">1. Xem so du  2. Rut tien  0. Thoat
+      <div class="console" style="margin-top:10px;font-size:15px;line-height:1.4"><span class="cl" id="c15l1">1. Xem so du  2. Rut tien  0. Thoat
 Chon: <span class="in">1</span>
 So du: 5000000</span><span class="cl" id="c15l2">1. Xem so du  2. Rut tien  0. Thoat
 Chon: <span class="in">2</span>
@@ -698,15 +676,15 @@ Tam biet!</span></div>
       <span class="f ghost" data-act="#c15l3|show;#c15|show-d"></span>
     </div>
     <div>
-      <div class="card f"><h3>Giải thích</h3><p style="font-size:max(19px,var(--htt-min,24px))"><code class="i">while (true)</code> không bao giờ tự dừng. Menu hiện lặp lại sau mỗi thao tác cho tới khi người dùng chọn 0, lúc đó <code class="i">break</code> thoát ra và in "Tam biet!". Server, game loop và menu đều dùng mẫu này.</p></div>
-      <div class="card bad f" style="margin-top:12px"><h3 style="color:#1254be">❌ Vô tình: quên cập nhật biến</h3>
+      <div class="card f"><h3>Giải thích</h3><p style="font-size:19px"><code class="i">while (true)</code> không bao giờ tự dừng. Menu hiện lặp lại sau mỗi thao tác cho tới khi người dùng chọn 0, lúc đó <code class="i">break</code> thoát ra và in "Tam biet!". Server, game loop và menu đều dùng mẫu này.</p></div>
+      <div class="card bad f" style="margin-top:12px"><h3 style="color:#be123c">❌ Vô tình: quên cập nhật biến</h3>
 <script type="text/x-cpp" class="xs">
 int i = 0;
 while (i < 5)
     cout << i << " ";   // quên i++
 </script>
-      <div class="console" style="margin-top:8px;font-size:max(15px,var(--htt-min,24px))">0 0 0 0 0 0 0 0 0 0 0 0 … <span class="spin" style="display:inline-block">⏳</span></div>
-      <p style="font-size:max(17px,var(--htt-min,24px));margin-top:6px">i luôn bằng 0 nên <code class="i">i &lt; 5</code> mãi đúng và màn hình in 0 không ngừng. Nhấn <b>Ctrl + C</b> để dừng chương trình.</p></div>
+      <div class="console" style="margin-top:8px;font-size:15px">0 0 0 0 0 0 0 0 0 0 0 0 … <span class="spin" style="display:inline-block">⏳</span></div>
+      <p style="font-size:17px;margin-top:6px">i luôn bằng 0 nên <code class="i">i &lt; 5</code> mãi đúng và màn hình in 0 không ngừng. Nhấn <b>Ctrl + C</b> để dừng chương trình.</p></div>
     </div>
   </div>
 </section>
@@ -714,13 +692,13 @@ while (i < 5)
 <!-- ===================== SUMMARY ===================== -->
 <section class="slide" id="end">
   <div class="title-wrap" style="align-items:center;text-align:center">
-    <div class="orb" style="width:360px;height:360px;background:#a8c7f9;left:10%;top:10%"></div>
+    <div class="orb" style="width:360px;height:360px;background:#f9a8d4;left:10%;top:10%"></div>
     <h1 class="in">Tóm tắt <span class="grad">nhanh</span></h1>
     <div class="cols4 in" style="margin-top:32px;text-align:left;max-width:1150px">
-      <div class="card"><h3>Logic</h3><p style="font-size:max(18px,var(--htt-min,24px))"><code class="i">&amp;&amp;</code> đúng khi tất cả đúng, <code class="i">||</code> đúng khi có một cái đúng, <code class="i">!</code> đảo giá trị. Có short-circuit nên thứ tự điều kiện quan trọng.</p></div>
-      <div class="card"><h3>Rẽ nhánh</h3><p style="font-size:max(18px,var(--htt-min,24px))"><code class="i">if/else</code> cho điều kiện bất kỳ. <code class="i">switch</code> khi so khớp nhiều giá trị rời rạc. <code class="i">? :</code> để chọn nhanh một giá trị.</p></div>
-      <div class="card"><h3>Vòng lặp</h3><p style="font-size:max(18px,var(--htt-min,24px))"><code class="i">for</code> khi biết số lần lặp, <code class="i">while</code> khi chưa biết, <code class="i">do…while</code> khi phải chạy ít nhất 1 lần.</p></div>
-      <div class="card"><h3>Điều khiển</h3><p style="font-size:max(18px,var(--htt-min,24px))"><code class="i">break</code> thoát hẳn vòng lặp, <code class="i">continue</code> bỏ qua lần lặp hiện tại. Vòng lặp vô tận cần có lối thoát.</p></div>
+      <div class="card"><h3>Logic</h3><p style="font-size:18px"><code class="i">&amp;&amp;</code> đúng khi tất cả đúng, <code class="i">||</code> đúng khi có một cái đúng, <code class="i">!</code> đảo giá trị. Có short-circuit nên thứ tự điều kiện quan trọng.</p></div>
+      <div class="card"><h3>Rẽ nhánh</h3><p style="font-size:18px"><code class="i">if/else</code> cho điều kiện bất kỳ. <code class="i">switch</code> khi so khớp nhiều giá trị rời rạc. <code class="i">? :</code> để chọn nhanh một giá trị.</p></div>
+      <div class="card"><h3>Vòng lặp</h3><p style="font-size:18px"><code class="i">for</code> khi biết số lần lặp, <code class="i">while</code> khi chưa biết, <code class="i">do…while</code> khi phải chạy ít nhất 1 lần.</p></div>
+      <div class="card"><h3>Điều khiển</h3><p style="font-size:18px"><code class="i">break</code> thoát hẳn vòng lặp, <code class="i">continue</code> bỏ qua lần lặp hiện tại. Vòng lặp vô tận cần có lối thoát.</p></div>
     </div>
   </div>
 </section>
@@ -808,53 +786,6 @@ while (i < 5)
   go(idx>=0?idx:0);
   addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
 })();
-</script>
-<script id="htt-theme-js">
-(function(){
-  // HTT theme runtime: renumber split code blocks, enforce the slide's minimum font size (--htt-min, default 24px)
-  function minOf(el){var s=el&&el.closest?el.closest('.slide'):null;var v=parseFloat(getComputedStyle(s||document.documentElement).getPropertyValue('--htt-min'));return isNaN(v)?24:v}
-  window.HTT_MIN=function(el){return minOf(el)};
-  function renumber(){
-    document.querySelectorAll('.code[class*="htt-start-"]').forEach(function(c){
-      if(c.dataset.httNum)return;var m=c.className.match(/htt-start-(\d+)/);if(!m)return;var off=+m[1];
-      c.querySelectorAll('.ln>.no').forEach(function(n){var v=parseInt(n.textContent,10);if(!isNaN(v))n.textContent=String(v+off)});
-      c.dataset.httNum='1';
-    });
-  }
-  function hasText(el){for(var n=el.firstChild;n;n=n.nextSibling){if(n.nodeType===3&&/\S/.test(n.nodeValue))return true}return /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(el.tagName)}
-  function svgScale(t){var svg=t.ownerSVGElement;if(!svg)return 1;var s=1;
-    while(svg){var vb=svg.viewBox&&svg.viewBox.baseVal;if(vb&&vb.width&&vb.height){var w=svg.clientWidth||svg.getBoundingClientRect().width,h=svg.clientHeight||svg.getBoundingClientRect().height;if(!w||!h)return 0;s*=Math.min(w/vb.width,h/vb.height)}svg=svg.ownerSVGElement}
-    return s}
-  function set(el,v){if(!el.hasAttribute('data-htt-prev'))el.setAttribute('data-htt-prev',el.style.getPropertyValue('font-size')+'|'+el.style.getPropertyPriority('font-size'));el.style.setProperty('font-size',v,'important')}
-  function unfix(sel){document.querySelectorAll((sel||'#deck .slide *')).forEach(function(el){var p=el.getAttribute('data-htt-prev');if(p===null)return;var a=p.split('|');if(a[0])el.style.setProperty('font-size',a[0],a[1]||'');else el.style.removeProperty('font-size');el.removeAttribute('data-htt-prev')})}
-  function fix(sel){
-    renumber();
-    var slides=document.querySelectorAll(typeof sel==='string'?sel:'#deck .slide');
-    for(var j=0;j<slides.length;j++){var sl=slides[j];var MIN=minOf(sl);if(MIN<=0)continue;
-      var els=sl.querySelectorAll('*');
-      for(var i=0;i<els.length;i++){var el=els[i];
-        if(el instanceof SVGElement){
-          if(!/^(text|tspan|textPath)$/.test(el.tagName))continue;
-          if(el.tagName!=='text'&&!hasText(el))continue;
-          var sc=svgScale(el);if(!sc)continue;
-          var fs=parseFloat(getComputedStyle(el).fontSize);if(!fs)continue;
-          if(fs*sc<MIN-0.3)set(el,(MIN/sc).toFixed(2)+'px');
-          continue;
-        }
-        if(!hasText(el))continue;
-        var f=parseFloat(getComputedStyle(el).fontSize);
-        if(f>0&&f<MIN-0.3)set(el,MIN+'px');
-      }
-    }
-  }
-  window.HTT_fix=fix;window.HTT_unfix=unfix;
-  fix();
-  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){fix()});
-  var t=null;var mo=new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(ms[i].type==='childList'&&ms[i].addedNodes.length){clearTimeout(t);t=setTimeout(function(){fix()},30);return}}});
-  var d=document.getElementById('deck');if(d)mo.observe(d,{childList:true,subtree:true});
-  function act(){setTimeout(function(){fix('#deck .slide.active')},0)}addEventListener('keydown',act);addEventListener('click',act);addEventListener('touchend',act);
-})();
-
 </script>
 </body>
 </html>
