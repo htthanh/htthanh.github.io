@@ -8,18 +8,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
-  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
-  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
-  --sa1:#7c3aed; --sa2:#ec4899;
+  --bg:#ffffff; --panel:#ffffff; --line:#e8eef7; --text:#17263e; --muted:#3d63a0;
+  --accent:#3a7fed; --accent2:#0949b1; --warn:#1d68e1; --gold:#0b58d4; --code:#fcfbff;
+  --k:#3371d6; --t:#3a7fed; --s:#083d93; --n:#0c61ea; --c:#84a1d0; --p:#276cdb; --fn:#0a4fbf;
+  --sa1:#3a7fed; --sa2:#4887ec;
   --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+html,body{height:100%;background:#eff5fe;color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
 #viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
 #deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
-.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
-  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(58,127,237,.14);
+  background:none,none,none,var(--bg);
   opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
 .slide.past{transform:translateX(-60px) scale(.98)}
 .slide.active{opacity:1;transform:none;pointer-events:auto}
@@ -27,81 +27,81 @@ html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff
 .slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
 @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 .hdr{display:flex;align-items:center;gap:16px;margin-bottom:18px}
-.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
-.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
-.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+.slide:nth-of-type(4n+1){--sa1:#3a7fed;--sa2:#4887ec}.slide:nth-of-type(4n+2){--sa1:#0949b1;--sa2:#3a7fed}.slide:nth-of-type(4n+3){--sa1:#4887ec;--sa2:#1c6ef3}.slide:nth-of-type(4n){--sa1:#083d93;--sa2:#0e62e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:var(--sa1)}
+.qn{font-weight:800;font-size:max(17px,var(--htt-min,24px));letter-spacing:.06em;color:#fff;background:var(--sa1);box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
 h1{font-size:70px;line-height:1.1;font-weight:800}
 h2{font-size:38px;line-height:1.2;font-weight:800}
-h3{font-size:23px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
-p,li{font-size:22px;line-height:1.45;color:var(--text)}
+h3{font-size:max(23px,var(--htt-min,24px));font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:max(22px,var(--htt-min,24px));line-height:1.45;color:var(--text)}
 .muted{color:var(--muted)}
 ul{list-style:none}
 ul li{position:relative;padding-left:26px;margin:6px 0}
-ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
-.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
-code.i{font-family:var(--mono);font-size:.88em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 6px;border-radius:6px;color:#be185d}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:var(--sa1)}
+.grad{background:#3a7fed;-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.88em;background:#f0f5fd;border:1px solid #d3e2f9;padding:0 6px;border-radius:6px;color:#1858be}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
 .cols.c64{grid-template-columns:1.25fr 1fr}.cols.c46{grid-template-columns:1fr 1.2fr}
 .cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
-.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
-.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
-.card.bad{border-color:#fecdd3;background:linear-gradient(180deg,#fff1f3,#fff)}
-.card.good{border-color:#a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff)}
-.lbl{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
-.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(58,127,237,.25)}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #3a7fed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0949b1}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #4887ec}.cols4>.card:nth-child(4n){border-top:5px solid #0e65f2}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0949b1}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#276cdb}.cols4>.card:nth-child(4n) h3{color:#0b58d4}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#3a7fed}
+.card.bad{border-color:#cfe0fc;background:#f2f7fe}
+.card.good{border-color:#a7c4f3;background:#ecf3fd}
+.lbl{display:inline-block;font-size:max(15px,var(--htt-min,24px));font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#e5effe;color:#1254be}.lbl.good{background:#d1e1fa;color:#063176}.lbl.info{background:#e3ecfb;color:#3363b0}
 .icon{font-size:34px;margin-bottom:4px}
-.note{margin-top:12px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:20px;line-height:1.4}
-.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
-.code{font-family:var(--mono);font-size:18px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
-.code.sm{font-size:16.5px}.code.xs{font-size:15px;line-height:1.45}.code.xxs{font-size:13.6px;line-height:1.38;padding:8px 0}
+.note{margin-top:12px;padding:10px 16px;border-left:5px solid #0e65f2;background:#e2ecfd;border-radius:8px;font-size:max(20px,var(--htt-min,24px));line-height:1.4}
+.note.blue{border-color:#5c97f6;background:#eef4fe}
+.code{font-family:var(--mono);font-size:max(18px,var(--htt-min,24px));line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
+.code.sm{font-size:max(16.5px,var(--htt-min,24px))}.code.xs{font-size:max(15px,var(--htt-min,24px));line-height:1.45}.code.xxs{font-size:max(13.6px,var(--htt-min,24px));line-height:1.38;padding:8px 0}
 .code .ln{padding:0 14px 0 8px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
-.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.code .no{color:#bdcde6;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
 .k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
-.code.show-a .mark-a{background:rgba(124,58,237,.11);box-shadow:inset 5px 0 #7c3aed}
-.code.show-b .mark-b{background:rgba(6,182,212,.13);box-shadow:inset 5px 0 #06b6d4}
-.code.show-c .mark-c{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
-.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
-.code-title{font-family:var(--mono);font-size:15px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.code.show-a .mark-a{background:rgba(58,127,237,.11);box-shadow:inset 5px 0 #3a7fed}
+.code.show-b .mark-b{background:rgba(11,86,207,.13);box-shadow:inset 5px 0 #0b56cf}
+.code.show-c .mark-c{background:rgba(14,101,242,.16);box-shadow:inset 5px 0 #0e65f2}
+.code.show-d .mark-d{background:rgba(72,135,236,.12);box-shadow:inset 5px 0 #4887ec}
+.code-title{font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));color:var(--muted);margin:0 0 5px 4px;font-weight:600}
 .f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
 .f.on{opacity:1;transform:none}
 .f.ghost{display:none}
 .f.zoom{transform:scale(.85)}.f.zoom.on{transform:none}
-table{border-collapse:separate;border-spacing:0;width:100%;font-size:19px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:max(19px,var(--htt-min,24px));border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
 th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
-th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+th{background:#ebf2fe;font-weight:700}
 tr:last-child td{border-bottom:none}
 td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
 .legend{display:flex;flex-direction:column;gap:10px}
 .leg{border-radius:12px;padding:10px 16px;background:#fff;border:1px solid var(--line)}
-.leg b{display:block;font-size:21px;margin-bottom:2px}
-.leg p{font-size:19px}
-.leg.a{border-left:6px solid #7c3aed}.leg.b{border-left:6px solid #06b6d4}.leg.c{border-left:6px solid #f59e0b}
-.console{font-family:var(--mono);font-size:17px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre}
-.console .in{color:#fbbf24;font-weight:600}
-.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.leg b{display:block;font-size:max(21px,var(--htt-min,24px));margin-bottom:2px}
+.leg p{font-size:max(19px,var(--htt-min,24px))}
+.leg.a{border-left:6px solid #3a7fed}.leg.b{border-left:6px solid #0b56cf}.leg.c{border-left:6px solid #0e65f2}
+.console{font-family:var(--mono);font-size:max(17px,var(--htt-min,24px));line-height:1.5;background:#17263e;border-radius:12px;padding:10px 16px;color:#e7f0fe;white-space:pre}
+.console .in{color:#2b78f4;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#72a4f4;font-size:max(11px,var(--htt-min,24px));letter-spacing:3px;margin-bottom:4px}
 .mem{display:flex;align-items:center;gap:16px;min-height:130px}
-.frame{border:2px solid #e4dcfb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
-.frame .fname{font-family:var(--mono);font-size:16px;color:var(--muted);margin-bottom:6px}
+.frame{border:2px solid #dce8fb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
+.frame .fname{font-family:var(--mono);font-size:max(16px,var(--htt-min,24px));color:var(--muted);margin-bottom:6px}
 .var{display:flex;align-items:center;gap:10px}
-.vn{font-family:var(--mono);font-size:21px;color:var(--t);font-weight:600}
-.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #c4b5fd;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
+.vn{font-family:var(--mono);font-size:max(21px,var(--htt-min,24px));color:var(--t);font-weight:600}
+.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #b7d1fb;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
 .vb .new{display:none}
 .callee,.arw{opacity:0;transform:translateX(-14px);transition:all .5s}
 .mem.s1 .callee,.mem.s1 .arw{opacity:1;transform:none}
 .mem.s2 .chg .old{display:none}.mem.s2 .chg .new{display:inline;animation:pop .5s}
-.mem.s2 .chg{border-color:#f59e0b;box-shadow:0 0 18px rgba(245,158,11,.5)}
+.mem.s2 .chg{border-color:#0e65f2;box-shadow:0 0 18px rgba(14,101,242,.5)}
 .mem.s3 .callee,.mem.s3 .arw{opacity:.15;transform:translateY(10px)}
-.mem.s3 .result{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.5)}
-.arw{font-family:var(--mono);font-size:16px;color:var(--gold);text-align:center;line-height:1.2;font-weight:600}
+.mem.s3 .result{border-color:#1051b9;box-shadow:0 0 18px rgba(16,81,185,.5)}
+.arw{font-family:var(--mono);font-size:max(16px,var(--htt-min,24px));color:var(--#0d65f2);text-align:center;line-height:1.2;font-weight:600}
 .arw .bar{display:block;font-size:30px}
-.alias{font-size:18px;color:var(--accent2);font-weight:600}
+.alias{font-size:max(18px,var(--htt-min,24px));color:var(--accent2);font-weight:600}
 @keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.25)}100%{transform:none;opacity:1}}
 .flow{display:flex;align-items:center;gap:12px;justify-content:center}
-.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:18px;border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
-.box small{display:block;font-family:"Be Vietnam Pro";font-size:14px;color:var(--muted);margin-top:2px;font-weight:400}
-.box.h{border-color:var(--gold)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#c4b5fd}.box.exe{border-color:#ec4899;background:#fdf2f8}
+.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:max(18px,var(--htt-min,24px));border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:max(14px,var(--htt-min,24px));color:var(--muted);margin-top:2px;font-weight:400}
+.box.h{border-color:var(--#0d65f2)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#b7d1fb}.box.exe{border-color:#4887ec;background:#f2f6fd}
 .ar{color:var(--muted);font-size:26px;text-align:center}
 .stack{display:flex;flex-direction:column;gap:8px}
 svg text{font-family:var(--mono);font-weight:600}
@@ -110,271 +110,271 @@ svg.d1 .dr1,svg.d2 .dr2,svg.d3 .dr3{stroke-dashoffset:0}
 .fadein{opacity:0;transition:opacity .6s}
 svg.d1 .fd1,svg.d2 .fd2,svg.d3 .fd3{opacity:1}
 .title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
-.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.kicker{font-family:var(--mono);color:#276cdb;font-size:max(22px,var(--htt-min,24px));margin-bottom:18px;font-weight:600}
 .orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
 @keyframes float{50%{transform:translate(30px,-25px)}}
 .agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:19px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05)}
-.ag:hover{border-color:#ec4899;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
-.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
-.ag b{color:#db2777;margin-right:6px;font-family:var(--mono)}
-.formula{font-family:var(--mono);font-size:23px;text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
-#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
-#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
-#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:16px}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:max(19px,var(--htt-min,24px));line-height:1.3;box-shadow:0 2px 6px rgba(40,67,110,.05)}
+.ag:hover{border-color:#4887ec;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(72,135,236,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #3a7fed}.ag:nth-child(4n+2){border-left:5px solid #0949b1}.ag:nth-child(4n+3){border-left:5px solid #4887ec}.ag:nth-child(4n){border-left:5px solid #0e65f2}
+.ag b{color:#276cdb;margin-right:6px;font-family:var(--mono)}
+.formula{font-family:var(--mono);font-size:max(23px,var(--htt-min,24px));text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:#3a7fed;transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:max(14px,var(--htt-min,24px));color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:max(16px,var(--htt-min,24px))}
 #nav button:hover{border-color:var(--accent)}
-#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+#hint{position:fixed;left:16px;bottom:12px;font-size:max(13px,var(--htt-min,24px));color:#7495ca;z-index:5}
 @media (max-width:700px){#hint{display:none}}
 @media print{#nav,#bar,#hint{display:none}}
 
 /* lec03 additions */
 .chain{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.pv{display:inline-flex;align-items:center;font-family:var(--mono);font-size:18px;font-weight:700;padding:5px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;white-space:nowrap}
-.pv.yes{background:#d1fae5;border-color:#34d399;color:#047857}
-.pv.no{background:#ffe4e6;border-color:#fb7185;color:#be123c}
-.pv.skip{background:#f1f5f9;border-color:#cbd5e1;color:#94a3b8;text-decoration:line-through;border-style:dashed}
+.pv{display:inline-flex;align-items:center;font-family:var(--mono);font-size:max(18px,var(--htt-min,24px));font-weight:700;padding:5px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;white-space:nowrap}
+.pv.yes{background:#d1e1fa;border-color:#3471d3;color:#063176}
+.pv.no{background:#e5effe;border-color:#74a7f8;color:#1254be}
+.pv.skip{background:#f1f4f9;border-color:#c4d2e8;color:#7e9dce;text-decoration:line-through;border-style:dashed}
 .op{font-family:var(--mono);font-size:26px;font-weight:800;color:var(--sa1)}
 .tt th,.tt td{text-align:center}.tt td:first-child{color:var(--text);font-weight:400}
-.tt tr.hit td{background:#fdf2f8;color:#be185d}
+.tt tr.hit td{background:#f2f6fd;color:#1858be}
 tr.f{transform:none}
 .cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
 .code.show-s .mark-s{opacity:.3;text-decoration:line-through}
 .arr{display:flex;gap:12px;justify-content:center;margin-top:6px}
-.cell{width:84px;height:84px;border-radius:16px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:800;transition:all .45s;box-shadow:0 6px 16px -10px rgba(124,58,237,.4)}
-.cell small{font-size:13px;color:var(--muted);font-weight:600}
-.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857;transform:translateY(-6px)}
-.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;transform:translateY(-10px) scale(1.06);box-shadow:0 10px 24px -8px rgba(225,29,72,.5)}
+.cell{width:84px;height:84px;border-radius:16px;border:3px solid #dce8fb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:800;transition:all .45s;box-shadow:0 6px 16px -10px rgba(58,127,237,.4)}
+.cell small{font-size:max(13px,var(--htt-min,24px));color:var(--muted);font-weight:600}
+.cell.ok{border-color:#1051b9;background:#ecf3fd;color:#063176;transform:translateY(-6px)}
+.cell.bad{border-color:#1d68e1;background:#f2f7fe;color:#1254be;transform:translateY(-10px) scale(1.06);box-shadow:0 10px 24px -8px rgba(29,104,225,.5)}
 .cell.skip{opacity:.3;transform:scale(.92)}
 .syn{display:flex;gap:12px;align-items:center;justify-content:center;font-family:var(--mono);font-size:24px;font-weight:700}
 .sy{padding:8px 16px;border-radius:12px;color:#fff}
-.sy.c1{background:linear-gradient(135deg,#7c3aed,#a855f7)}.sy.c2{background:linear-gradient(135deg,#059669,#10b981)}.sy.c3{background:linear-gradient(135deg,#e11d48,#f97316)}
+.sy.c1{background:#3a7fed}.sy.c2{background:#083d93}.sy.c3{background:#1d68e1}
 .spin{display:inline-block;animation:spin 2.4s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* lec04 arrays additions */
 .cell .v{display:block;line-height:1}
-.cell.max{border-color:#db2777;background:#fdf2f8;color:#be185d}
-.cell.empty{border-style:dashed;background:#f8fafc;color:#cbd5e1;box-shadow:none}
-.cell.done{border-color:#10b981;background:#ecfdf5;color:#047857}
-.cell.new{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.cell.max{border-color:#276cdb;background:#f2f6fd;color:#1858be}
+.cell.empty{border-style:dashed;background:#f8f9fc;color:#c4d2e8;box-shadow:none}
+.cell.done{border-color:#1051b9;background:#ecf3fd;color:#063176}
+.cell.new{border-color:#3a7fed;background:#eef4fe;color:#286cd9}
 .cell.out{opacity:.4;border-style:dashed}
-.cell.gone{border-color:#e11d48;background:#fff1f3;color:#be123c;text-decoration:line-through}
-.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(245,158,11,.55)}
-.cell.cmp{border-color:#0891b2;background:#ecfeff;color:#0e7490;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(8,145,178,.5)}
+.cell.gone{border-color:#1d68e1;background:#f2f7fe;color:#1254be;text-decoration:line-through}
+.cell.cur{border-color:#0e65f2;background:#ecf3fe;color:#094bb4;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(14,101,242,.55)}
+.cell.cmp{border-color:#0949b1;background:#edf4fe;color:#0e4090;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(9,73,177,.5)}
 .cell.dots{border:none;box-shadow:none;background:none;width:40px;color:var(--muted)}
 .arr.sm .cell{width:70px;height:74px;font-size:24px;border-radius:14px}
-.arr.xs .cell{width:56px;height:62px;font-size:19px;border-radius:12px}
-.arr.xs .cell small{font-size:11.5px}
+.arr.xs .cell{width:56px;height:62px;font-size:max(19px,var(--htt-min,24px));border-radius:12px}
+.arr.xs .cell small{font-size:max(11.5px,var(--htt-min,24px))}
 .arr.left{justify-content:flex-start}
-.addr{display:flex;gap:12px;justify-content:center;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.addr{display:flex;gap:12px;justify-content:center;font-family:var(--mono);font-size:max(13px,var(--htt-min,24px));color:var(--muted)}
 .addr span{width:84px;text-align:center}
 .vars{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
-.vc{font-family:var(--mono);font-size:19px;font-weight:700;padding:5px 14px;border-radius:12px;background:#fff;border:2px solid #e4dcfb;transition:all .35s}
+.vc{font-family:var(--mono);font-size:max(19px,var(--htt-min,24px));font-weight:700;padding:5px 14px;border-radius:12px;background:#fff;border:2px solid #dce8fb;transition:all .35s}
 .vc b{color:var(--t)}
-.vc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.45)}
-.vc.res{border-color:#10b981;background:#ecfdf5;color:#047857}
+.vc.hot{border-color:#0e65f2;background:#ecf3fe;box-shadow:0 0 14px rgba(14,101,242,.45)}
+.vc.res{border-color:#1051b9;background:#ecf3fd;color:#063176}
 .ci{opacity:0;transition:opacity .4s}.ci.show{opacity:1}
-.say{font-size:20px;margin-top:12px;min-height:56px;color:var(--muted)}
+.say{font-size:max(20px,var(--htt-min,24px));margin-top:12px;min-height:56px;color:var(--muted)}
 .say b{color:var(--text)}
-.rowlbl{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted);margin:10px 0 4px}
-.zone{display:flex;gap:6px;justify-content:center;margin-top:8px;font-size:15px;font-weight:700}
+.rowlbl{font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));font-weight:700;color:var(--muted);margin:10px 0 4px}
+.zone{display:flex;gap:6px;justify-content:center;margin-top:8px;font-size:max(15px,var(--htt-min,24px));font-weight:700}
 .zone span{padding:3px 10px;border-radius:999px}
-.z1{background:#d1fae5;color:#047857}.z2{background:#f1f5f9;color:#64748b}.z3{background:#ffe4e6;color:#be123c}
+.z1{background:#d1e1fa;color:#063176}.z2{background:#f1f4f9;color:#426bad}.z3{background:#e5effe;color:#1254be}
 .brace{display:flex;gap:12px;justify-content:center;margin-top:4px}
-.brace div{border-top:3px solid currentColor;padding-top:4px;text-align:center;font-family:var(--mono);font-size:15px;font-weight:700}
+.brace div{border-top:3px solid currentColor;padding-top:4px;text-align:center;font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));font-weight:700}
 .mx{display:grid;gap:6px;justify-content:center}
-.mc{width:62px;height:52px;border-radius:10px;border:2px solid #e4dcfb;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .4s}
-.mx.sm .mc{width:44px;height:36px;font-size:14px;border-radius:8px}
-.mc.ix{border:none;background:none;color:var(--muted);font-size:14px;font-weight:600;box-shadow:none}
-.mc.unused{border-style:dashed;background:#f8fafc;color:#cbd5e1}
-.mc.used{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
-.mc.hl{background:#fffbeb;border-color:#fcd34d}
-.mc.cur{border-color:#f59e0b;background:#fde68a;color:#92400e;transform:scale(1.12);box-shadow:0 8px 20px -6px rgba(245,158,11,.6)}
-.mc.bd{border-color:#ec4899;border-width:3px}
+.mc{width:62px;height:52px;border-radius:10px;border:2px solid #dce8fb;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:max(20px,var(--htt-min,24px));font-weight:800;transition:all .4s}
+.mx.sm .mc{width:44px;height:36px;font-size:max(14px,var(--htt-min,24px));border-radius:8px}
+.mc.ix{border:none;background:none;color:var(--muted);font-size:max(14px,var(--htt-min,24px));font-weight:600;box-shadow:none}
+.mc.unused{border-style:dashed;background:#f8f9fc;color:#c4d2e8}
+.mc.used{border-color:#3a7fed;background:#eef4fe;color:#286cd9}
+.mc.hl{background:#ecf3fe;border-color:#5391f6}
+.mc.cur{border-color:#0e65f2;background:#8eb7f9;color:#0e4192;transform:scale(1.12);box-shadow:0 8px 20px -6px rgba(14,101,242,.6)}
+.mc.bd{border-color:#4887ec;border-width:3px}
 .mc.inr{opacity:.3}
-.mc.pos{border-color:#10b981;background:#d1fae5;color:#047857}
-.mc.neg{background:#fff1f3;color:#be123c}
-.mc.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;border-style:dashed}
-.strip{display:flex;gap:3px;font-family:var(--mono);font-size:12px;flex-wrap:nowrap;overflow:hidden}
-.strip span{padding:6px 5px;border-radius:5px;background:#f3edff;color:#6d28d9;white-space:nowrap}
-.strip span.r1{background:#e0f2fe;color:#0369a1}
+.mc.pos{border-color:#1051b9;background:#d1e1fa;color:#063176}
+.mc.neg{background:#f2f7fe;color:#1254be}
+.mc.bad{border-color:#1d68e1;background:#f2f7fe;color:#1254be;border-style:dashed}
+.strip{display:flex;gap:3px;font-family:var(--mono);font-size:max(12px,var(--htt-min,24px));flex-wrap:nowrap;overflow:hidden}
+.strip span{padding:6px 5px;border-radius:5px;background:#eef4fe;color:#286cd9;white-space:nowrap}
+.strip span.r1{background:#e1ecfd;color:#08419c}
 .strip span.gap{background:none;color:var(--muted)}
-.trace td,.trace th{font-size:17px;padding:5px 10px}
+.trace td,.trace th{font-size:max(17px,var(--htt-min,24px));padding:5px 10px}
 .trace td:first-child{color:var(--text)}
-.trace tr.now td{background:#fffbeb}
-.sig{font-family:var(--mono);font-size:17px;background:#fff;border:1px dashed #c4b5fd;border-radius:10px;padding:6px 12px;color:#6d28d9;display:inline-block}
+.trace tr.now td{background:#ecf3fe}
+.sig{font-family:var(--mono);font-size:max(17px,var(--htt-min,24px));background:#fff;border:1px dashed #b7d1fb;border-radius:10px;padding:6px 12px;color:#286cd9;display:inline-block}
 
 .cols>*{min-width:0}
 
 /* ===== DDIA ch1 additions ===== */
 .sv{width:100%;height:auto;overflow:visible}
-.sv text{font-family:"Be Vietnam Pro",system-ui,sans-serif;font-weight:700;font-size:15px;fill:#1e1b3a}
-.sv text.sm{font-size:12.5px;fill:#64607d;font-weight:500}
-.sv text.lb{font-size:12.5px;fill:#7c3aed;font-weight:700}
-.sv .nd{fill:#fff;stroke:#c4b5fd;stroke-width:2}
-.sv .nd.c2{stroke:#0891b2}.sv .nd.c3{stroke:#ec4899}.sv .nd.c4{stroke:#f59e0b}.sv .nd.c5{stroke:#10b981}
-.sv .ln{stroke:#a78bfa;stroke-width:2.2;fill:none}
+.sv text{font-family:"Be Vietnam Pro",system-ui,sans-serif;font-weight:700;font-size:max(15px,var(--htt-min,24px));fill:#17263e}
+.sv text.sm{font-size:max(12.5px,var(--htt-min,24px));fill:#3d63a0;font-weight:500}
+.sv text.lb{font-size:max(12.5px,var(--htt-min,24px));fill:#3a7fed;font-weight:700}
+.sv .nd{fill:#fff;stroke:#b7d1fb;stroke-width:2}
+.sv .nd.c2{stroke:#0949b1}.sv .nd.c3{stroke:#4887ec}.sv .nd.c4{stroke:#0e65f2}.sv .nd.c5{stroke:#1051b9}
+.sv .ln{stroke:#8cb6f9;stroke-width:2.2;fill:none}
 .sv .g{opacity:0;transition:opacity .55s}
-.sv .g.hot .ln{stroke:#ec4899;stroke-dasharray:7 6;animation:dash .7s linear infinite}
-.sv .g.hot .nd{filter:drop-shadow(0 6px 10px rgba(236,72,153,.35))}
+.sv .g.hot .ln{stroke:#4887ec;stroke-dasharray:7 6;animation:dash .7s linear infinite}
+.sv .g.hot .nd{filter:drop-shadow(0 6px 10px rgba(72,135,236,.35))}
 @keyframes dash{to{stroke-dashoffset:-13}}
-.sv .box6{fill:none;stroke:#ec4899;stroke-width:2.5;stroke-dasharray:9 7}
-.chip{display:inline-flex;align-items:center;gap:8px;font-size:18px;font-weight:600;padding:6px 14px;border-radius:999px;background:#fff;border:2px solid #e4dcfb;white-space:nowrap}
-.chip.p{border-color:#c4b5fd;background:#f5f0ff;color:#6d28d9}.chip.c{border-color:#a5f3fc;background:#ecfeff;color:#0e7490}.chip.k{border-color:#fbcfe8;background:#fdf2f8;color:#be185d}.chip.y{border-color:#fde68a;background:#fffbeb;color:#b45309}.chip.g{border-color:#a7f3d0;background:#ecfdf5;color:#047857}
+.sv .box6{fill:none;stroke:#4887ec;stroke-width:2.5;stroke-dasharray:9 7}
+.chip{display:inline-flex;align-items:center;gap:8px;font-size:max(18px,var(--htt-min,24px));font-weight:600;padding:6px 14px;border-radius:999px;background:#fff;border:2px solid #dce8fb;white-space:nowrap}
+.chip.p{border-color:#b7d1fb;background:#f1f6fe;color:#286cd9}.chip.c{border-color:#a7c7fa;background:#edf4fe;color:#0e4090}.chip.k{border-color:#cfe0fb;background:#f2f6fd;color:#1858be}.chip.y{border-color:#8eb7f9;background:#ecf3fe;color:#094bb4}.chip.g{border-color:#a7c4f3;background:#ecf3fd;color:#063176}
 .chips{display:flex;flex-wrap:wrap;gap:10px}
-.cell.t{font-size:15px;font-weight:700;text-align:center;line-height:1.15;padding:4px}
-.cell.t .v{font-size:15px}
+.cell.t{font-size:max(15px,var(--htt-min,24px));font-weight:700;text-align:center;line-height:1.15;padding:4px}
+.cell.t .v{font-size:max(15px,var(--htt-min,24px))}
 .cell.big{font-size:30px}
-.stat{font-family:var(--mono);font-size:44px;font-weight:800;line-height:1;background:linear-gradient(90deg,var(--sa1),var(--sa2));-webkit-background-clip:text;background-clip:text;color:transparent}
-.stat small{font-size:18px}
-.sysbox{border-radius:14px;padding:12px 16px;text-align:center;font-weight:700;font-size:20px;border:2px solid #e4dcfb;background:#fff;transition:all .45s}
-.sysbox.fail{border-color:#e11d48;background:#fff1f3;color:#be123c;box-shadow:0 0 22px rgba(225,29,72,.35)}
-.sysbox.ok{border-color:#10b981;background:#ecfdf5;color:#047857;box-shadow:0 0 22px rgba(16,185,129,.3)}
-.shield{opacity:0;transform:scale(.7);transition:all .45s;font-size:15px;font-weight:700;color:#7c3aed;text-align:center;border:2px dashed #a78bfa;border-radius:12px;padding:6px 10px;background:#f5f0ff}
+.stat{font-family:var(--mono);font-size:44px;font-weight:800;line-height:1;background:var(--sa1);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat small{font-size:max(18px,var(--htt-min,24px))}
+.sysbox{border-radius:14px;padding:12px 16px;text-align:center;font-weight:700;font-size:max(20px,var(--htt-min,24px));border:2px solid #dce8fb;background:#fff;transition:all .45s}
+.sysbox.fail{border-color:#1d68e1;background:#f2f7fe;color:#1254be;box-shadow:0 0 22px rgba(29,104,225,.35)}
+.sysbox.ok{border-color:#1051b9;background:#ecf3fd;color:#063176;box-shadow:0 0 22px rgba(16,81,185,.3)}
+.shield{opacity:0;transform:scale(.7);transition:all .45s;font-size:max(15px,var(--htt-min,24px));font-weight:700;color:#3a7fed;text-align:center;border:2px dashed #8cb6f9;border-radius:12px;padding:6px 10px;background:#f1f6fe}
 .shield.on{opacity:1;transform:none}
 .dots{display:grid;grid-template-columns:repeat(25,1fr);gap:5px;padding:12px;background:#fff;border:1px solid var(--line);border-radius:14px}
-.dots i{display:block;aspect-ratio:1;border-radius:4px;background:#e9e3fb;transition:all .4s}
-.dots i.x{background:#e11d48;transform:scale(1.35);box-shadow:0 0 10px rgba(225,29,72,.6)}
-.dots i.r{background:#10b981}
-.node{width:110px;border-radius:14px;border:2.5px solid #c4b5fd;background:#fff;text-align:center;padding:8px 4px;font-weight:700;transition:all .45s}
-.node .ver{display:block;font-family:var(--mono);font-size:22px;color:#6d28d9}
-.node small{display:block;font-size:13px;color:var(--muted);font-weight:600}
-.node.down{border-color:#f59e0b;background:#fffbeb;opacity:.55;transform:translateY(8px)}
-.node.v2{border-color:#10b981;background:#ecfdf5}.node.v2 .ver{color:#047857}
-.node.bad{border-color:#e11d48;background:#fff1f3;color:#be123c}.node.bad .ver{color:#be123c}
+.dots i{display:block;aspect-ratio:1;border-radius:4px;background:#e3ecfb;transition:all .4s}
+.dots i.x{background:#1d68e1;transform:scale(1.35);box-shadow:0 0 10px rgba(29,104,225,.6)}
+.dots i.r{background:#1051b9}
+.node{width:110px;border-radius:14px;border:2.5px solid #b7d1fb;background:#fff;text-align:center;padding:8px 4px;font-weight:700;transition:all .45s}
+.node .ver{display:block;font-family:var(--mono);font-size:max(22px,var(--htt-min,24px));color:#286cd9}
+.node small{display:block;font-size:max(13px,var(--htt-min,24px));color:var(--muted);font-weight:600}
+.node.down{border-color:#0e65f2;background:#ecf3fe;opacity:.55;transform:translateY(8px)}
+.node.v2{border-color:#1051b9;background:#ecf3fd}.node.v2 .ver{color:#063176}
+.node.bad{border-color:#1d68e1;background:#f2f7fe;color:#1254be}.node.bad .ver{color:#1254be}
 .nodes{display:flex;gap:14px;justify-content:center}
 .casc{display:flex;align-items:center;gap:6px;justify-content:center}
-.casc .ar{font-size:22px}
-.tw{display:inline-block;font-size:13px;font-weight:700;padding:2px 8px;border-radius:6px;background:#fdf2f8;color:#be185d;border:1px solid #fbcfe8;margin:2px;opacity:0;transform:translateY(-10px) scale(.6);transition:all .45s}
+.casc .ar{font-size:max(22px,var(--htt-min,24px))}
+.tw{display:inline-block;font-size:max(13px,var(--htt-min,24px));font-weight:700;padding:2px 8px;border-radius:6px;background:#f2f6fd;color:#1858be;border:1px solid #cfe0fb;margin:2px;opacity:0;transform:translateY(-10px) scale(.6);transition:all .45s}
 .tw.show{opacity:1;transform:none}
-.tw.b{background:#ecfeff;color:#0e7490;border-color:#a5f3fc}
-.tw.y{background:#fffbeb;color:#b45309;border-color:#fde68a}
-.mbox{border:2px solid #e4dcfb;border-radius:12px;background:#fff;padding:6px 8px;min-height:84px;transition:all .4s}
-.mbox h4{font-size:14px;color:var(--muted);margin-bottom:4px}
-.mbox.hot{border-color:#0891b2;box-shadow:0 0 16px rgba(8,145,178,.35)}
+.tw.b{background:#edf4fe;color:#0e4090;border-color:#a7c7fa}
+.tw.y{background:#ecf3fe;color:#094bb4;border-color:#8eb7f9}
+.mbox{border:2px solid #dce8fb;border-radius:12px;background:#fff;padding:6px 8px;min-height:84px;transition:all .4s}
+.mbox h4{font-size:max(14px,var(--htt-min,24px));color:var(--muted);margin-bottom:4px}
+.mbox.hot{border-color:#0949b1;box-shadow:0 0 16px rgba(9,73,177,.35)}
 .mboxes{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.who{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:18px;padding:8px 14px;border-radius:12px;background:#fff;border:2px solid #fbcfe8}
+.who{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:max(18px,var(--htt-min,24px));padding:8px 14px;border-radius:12px;background:#fff;border:2px solid #cfe0fb}
 .big-ar{font-size:30px;color:var(--muted);text-align:center;line-height:1}
-.rt{display:flex;height:58px;border-radius:12px;overflow:hidden;border:2px solid #e4dcfb;background:#fff}
-.rt>div{display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;opacity:0;transition:opacity .45s;white-space:nowrap}
+.rt{display:flex;height:58px;border-radius:12px;overflow:hidden;border:2px solid #dce8fb;background:#fff}
+.rt>div{display:flex;align-items:center;justify-content:center;font-size:max(15px,var(--htt-min,24px));font-weight:700;color:#fff;opacity:0;transition:opacity .45s;white-space:nowrap}
 .rt>div.show{opacity:1}
-.rt .n1,.rt .n2{background:#94a3b8}.rt .q{background:#f59e0b}.rt .sv2{background:#7c3aed}
+.rt .n1,.rt .n2{background:#7e9dce}.rt .q{background:#0e65f2}.rt .sv2{background:#3a7fed}
 .brk{position:relative;height:44px;margin-top:6px}
-.brk>div{position:absolute;top:0;border-top:3px solid;text-align:center;font-size:15px;font-weight:700;padding-top:4px;opacity:0;transition:opacity .45s}
+.brk>div{position:absolute;top:0;border-top:3px solid;text-align:center;font-size:max(15px,var(--htt-min,24px));font-weight:700;padding-top:4px;opacity:0;transition:opacity .45s}
 .brk>div.show{opacity:1}
-.pc rect.b{fill:#c4b5fd;transform:translateX(var(--x0));transition:transform 1.3s cubic-bezier(.6,0,.2,1) calc(var(--d)*7ms),fill .4s}
+.pc rect.b{fill:#b7d1fb;transform:translateX(var(--x0));transition:transform 1.3s cubic-bezier(.6,0,.2,1) calc(var(--d)*7ms),fill .4s}
 .pc.sorted rect.b{transform:translateX(var(--x1))}
-.pc.p95 rect.t95{fill:#f472b6}.pc.p99 rect.t99{fill:#e11d48}
+.pc.p95 rect.t95{fill:#72a4f4}.pc.p99 rect.t99{fill:#1d68e1}
 .pc .mk{opacity:0;transition:opacity .5s}
 .pc.mean .mkm,.pc.p50 .mk50,.pc.p95 .mk95,.pc.p99 .mk99{opacity:1}
-.pc text{font-family:var(--mono);font-size:12px;font-weight:700}
+.pc text{font-family:var(--mono);font-size:max(12px,var(--htt-min,24px));font-weight:700}
 .q-row{display:flex;gap:8px;align-items:center}
-.rq{height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;font-weight:700;color:#fff;transition:all .5s}
-.rq.slow{width:190px;background:linear-gradient(135deg,#e11d48,#f97316)}
-.rq.fast{width:54px;background:linear-gradient(135deg,#0891b2,#7c3aed)}
-.rq.wait{box-shadow:0 0 0 3px #fde68a;animation:shake .5s infinite}
+.rq{height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));font-weight:700;color:#fff;transition:all .5s}
+.rq.slow{width:190px;background:#1d68e1}
+.rq.fast{width:54px;background:#0949b1}
+.rq.wait{box-shadow:0 0 0 3px #8eb7f9;animation:shake .5s infinite}
 .rq.done{opacity:.25}
 @keyframes shake{50%{transform:translateY(-3px)}}
-.srv{border:2.5px solid #7c3aed;border-radius:14px;padding:10px 14px;text-align:center;font-weight:800;background:#f5f0ff;min-width:120px}
+.srv{border:2.5px solid #3a7fed;border-radius:14px;padding:10px 14px;text-align:center;font-weight:800;background:#f1f6fe;min-width:120px}
 .be{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;margin:6px 0}
-.be .nm{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted)}
-.be .trk{height:26px;border-radius:8px;background:#f5f3ff;position:relative;overflow:hidden}
-.be .bb{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:8px;background:linear-gradient(90deg,#0891b2,#7c3aed);transition:width 1s ease}
-.be .bb.slow{background:linear-gradient(90deg,#f97316,#e11d48)}
+.be .nm{font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));font-weight:700;color:var(--muted)}
+.be .trk{height:26px;border-radius:8px;background:#f4f8fe;position:relative;overflow:hidden}
+.be .bb{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:8px;background:#0949b1;transition:width 1s ease}
+.be .bb.slow{background:#1c6ef3}
 .run .be .bb{width:var(--w)}
-.mach{border:3px solid #7c3aed;border-radius:14px;background:#f5f0ff;display:flex;align-items:center;justify-content:center;font-weight:800;color:#6d28d9;transition:all .7s cubic-bezier(.2,.8,.2,1);width:90px;height:70px;font-size:15px;text-align:center}
-.mach.big{width:220px;height:170px;font-size:22px;border-width:5px;box-shadow:0 14px 30px -12px rgba(124,58,237,.6)}
-.mach.sm2{width:70px;height:56px;font-size:13px;border-color:#0891b2;background:#ecfeff;color:#0e7490;opacity:0;transform:scale(.5)}
+.mach{border:3px solid #3a7fed;border-radius:14px;background:#f1f6fe;display:flex;align-items:center;justify-content:center;font-weight:800;color:#286cd9;transition:all .7s cubic-bezier(.2,.8,.2,1);width:90px;height:70px;font-size:max(15px,var(--htt-min,24px));text-align:center}
+.mach.big{width:220px;height:170px;font-size:max(22px,var(--htt-min,24px));border-width:5px;box-shadow:0 14px 30px -12px rgba(58,127,237,.6)}
+.mach.sm2{width:70px;height:56px;font-size:max(13px,var(--htt-min,24px));border-color:#0949b1;background:#edf4fe;color:#0e4090;opacity:0;transform:scale(.5)}
 .mach.sm2.show{opacity:1;transform:none}
 .farm{display:grid;grid-template-columns:repeat(4,70px);gap:10px;justify-content:center}
-.layer{border-radius:12px;padding:10px 14px;font-weight:700;font-size:17px;text-align:center;transition:all .6s}
-.layer.top{background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;font-size:20px}
-.layer.hid{background:#f8fafc;border:2px dashed #cbd5e1;color:#64748b;font-weight:600;font-size:16px}
+.layer{border-radius:12px;padding:10px 14px;font-weight:700;font-size:max(17px,var(--htt-min,24px));text-align:center;transition:all .6s}
+.layer.top{background:#3a7fed;color:#fff;font-size:max(20px,var(--htt-min,24px))}
+.layer.hid{background:#f8f9fc;border:2px dashed #c4d2e8;color:#426bad;font-weight:600;font-size:max(16px,var(--htt-min,24px))}
 .abs.cover .layer.hid{opacity:.25;filter:blur(1.5px)}
 .toggle{display:flex;gap:10px;align-items:center;justify-content:center}
-.pill{padding:8px 16px;border-radius:999px;font-weight:800;font-size:17px;border:2px solid #e4dcfb;background:#fff;transition:all .4s;color:var(--muted)}
-.pill.on{background:linear-gradient(135deg,var(--sa1),var(--sa2));color:#fff;border-color:transparent;transform:scale(1.06)}
-.quote{font-size:21px;line-height:1.45;font-style:italic;color:#4c4672;border-left:5px solid #ec4899;padding:8px 18px;background:rgba(255,255,255,.7);border-radius:8px}
+.pill{padding:8px 16px;border-radius:999px;font-weight:800;font-size:max(17px,var(--htt-min,24px));border:2px solid #dce8fb;background:#fff;transition:all .4s;color:var(--muted)}
+.pill.on{background:var(--sa1);color:#fff;border-color:transparent;transform:scale(1.06)}
+.quote{font-size:max(21px,var(--htt-min,24px));line-height:1.45;font-style:italic;color:#335285;border-left:5px solid #4887ec;padding:8px 18px;background:rgba(255,255,255,.7);border-radius:8px}
 .quote b{font-style:normal}
-.mini li{font-size:18px;margin:3px 0;line-height:1.35}
-.card p.ps,p.ps{font-size:17px;line-height:1.4}
-.vs{font-weight:800;font-size:22px;color:var(--muted);align-self:center;text-align:center}
-.here{display:inline-block;font-size:13px;font-weight:800;color:#fff;background:#e11d48;border-radius:6px;padding:2px 8px;margin-left:6px;opacity:0;transition:opacity .4s}
+.mini li{font-size:max(18px,var(--htt-min,24px));margin:3px 0;line-height:1.35}
+.card p.ps,p.ps{font-size:max(17px,var(--htt-min,24px));line-height:1.4}
+.vs{font-weight:800;font-size:max(22px,var(--htt-min,24px));color:var(--muted);align-self:center;text-align:center}
+.here{display:inline-block;font-size:max(13px,var(--htt-min,24px));font-weight:800;color:#fff;background:#1d68e1;border-radius:6px;padding:2px 8px;margin-left:6px;opacity:0;transition:opacity .4s}
 .here.show{opacity:1}
-.cols4>.card.lit{box-shadow:0 0 0 3px #ec4899,0 12px 26px -10px rgba(236,72,153,.5);transform:translateY(-4px)}
+.cols4>.card.lit{box-shadow:0 0 0 3px #4887ec,0 12px 26px -10px rgba(72,135,236,.5);transform:translateY(-4px)}
 .card{transition:all .4s}
 
 .chip.c,.leg.c{font-style:normal}.leg.c{color:var(--text)}.leg.c b{color:var(--text)}
 .leg p b{display:inline;font-size:inherit;margin:0}
-.toggle .pill{font-size:15px;white-space:nowrap}
+.toggle .pill{font-size:max(15px,var(--htt-min,24px));white-space:nowrap}
 .abs.cover .layer.hid{opacity:.4;filter:blur(1px)}
-.mach.big{width:260px;font-size:21px}
+.mach.big{width:260px;font-size:max(21px,var(--htt-min,24px))}
 .sv text.lb,.pc text{paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
-.sv.s1 .g1{opacity:1}.sv.s2 .g2{opacity:1}.sv.s3 .g3{opacity:1}.sv.s4 .g4{opacity:1}.sv.s5 .g5{opacity:1}.sv.s6 .g6{opacity:1}.sv.s7 .g7{opacity:1}.sv.s8 .g8{opacity:1}.who.hot{border-color:#ec4899;box-shadow:0 0 18px rgba(236,72,153,.45)}.toggle.flip #ev1{background:#fff;color:var(--muted);border-color:#e4dcfb;transform:none}.toggle.flip #ev2{background:linear-gradient(135deg,var(--sa1),var(--sa2));color:#fff;border-color:transparent;transform:scale(1.06)}.dots{grid-template-columns:repeat(50,1fr);gap:3px}.dots i{border-radius:2px}
+.sv.s1 .g1{opacity:1}.sv.s2 .g2{opacity:1}.sv.s3 .g3{opacity:1}.sv.s4 .g4{opacity:1}.sv.s5 .g5{opacity:1}.sv.s6 .g6{opacity:1}.sv.s7 .g7{opacity:1}.sv.s8 .g8{opacity:1}.who.hot{border-color:#4887ec;box-shadow:0 0 18px rgba(72,135,236,.45)}.toggle.flip #ev1{background:#fff;color:var(--muted);border-color:#dce8fb;transform:none}.toggle.flip #ev2{background:var(--sa1);color:#fff;border-color:transparent;transform:scale(1.06)}.dots{grid-template-columns:repeat(50,1fr);gap:3px}.dots i{border-radius:2px}
 /* ===== DDIA ch7 additions ===== */
-.tl{display:flex;flex-direction:column;gap:4px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px 12px;box-shadow:0 8px 24px -14px rgba(124,58,237,.3)}
+.tl{display:flex;flex-direction:column;gap:4px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px 12px;box-shadow:0 8px 24px -14px rgba(58,127,237,.3)}
 .tlr{display:grid;grid-template-columns:92px repeat(var(--n,6),minmax(0,1fr));gap:6px;align-items:center;position:relative;min-height:46px}
-.tlr::before{content:"";position:absolute;left:96px;right:0;top:50%;border-top:2px dashed #e4dcfb;z-index:0}
-.tlr .who2{font-weight:800;font-size:15px;color:#6d28d9;grid-column:1;line-height:1.15}
-.tlr.u2 .who2{color:#0e7490}
-.tlr.db{background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:10px}
-.tlr.db .who2{color:#b45309}
-.tlr.db::before{border-top-color:#fde68a}
+.tlr::before{content:"";position:absolute;left:96px;right:0;top:50%;border-top:2px dashed #dce8fb;z-index:0}
+.tlr .who2{font-weight:800;font-size:max(15px,var(--htt-min,24px));color:#286cd9;grid-column:1;line-height:1.15}
+.tlr.u2 .who2{color:#0e4090}
+.tlr.db{background:#e2ecfd;border-radius:10px}
+.tlr.db .who2{color:#094bb4}
+.tlr.db::before{border-top-color:#8eb7f9}
 .tlr.tk{min-height:22px}.tlr.tk::before{display:none}
-.tlr.tk span{font-family:var(--mono);font-size:12px;color:#a8a3c4;text-align:center;font-weight:700}
-.ev{position:relative;z-index:1;font-family:var(--mono);font-size:13px;font-weight:700;padding:6px 4px;border-radius:10px;border:2px solid #c4b5fd;background:#f5f0ff;color:#6d28d9;text-align:center;opacity:0;transform:translateY(8px) scale(.9);transition:all .4s;line-height:1.25}
-.ev.u2{border-color:#67e8f9;background:#ecfeff;color:#0e7490}
-.ev.d{border-color:#fcd34d;background:#fffbeb;color:#b45309}
-.ev.bad{border-color:#fb7185;background:#fff1f3;color:#be123c}
-.ev.ok{border-color:#34d399;background:#ecfdf5;color:#047857}
+.tlr.tk span{font-family:var(--mono);font-size:max(12px,var(--htt-min,24px));color:#92acd5;text-align:center;font-weight:700}
+.ev{position:relative;z-index:1;font-family:var(--mono);font-size:max(13px,var(--htt-min,24px));font-weight:700;padding:6px 4px;border-radius:10px;border:2px solid #b7d1fb;background:#f1f6fe;color:#286cd9;text-align:center;opacity:0;transform:translateY(8px) scale(.9);transition:all .4s;line-height:1.25}
+.ev.u2{border-color:#699ff7;background:#edf4fe;color:#0e4090}
+.ev.d{border-color:#5391f6;background:#ecf3fe;color:#094bb4}
+.ev.bad{border-color:#74a7f8;background:#f2f7fe;color:#1254be}
+.ev.ok{border-color:#3471d3;background:#ecf3fd;color:#063176}
 .ev.cm{border-style:dashed}
 .ev.wide{grid-column-end:span 2}
 .tl.s1 .e1,.tl.s2 .e2,.tl.s3 .e3,.tl.s4 .e4,.tl.s5 .e5,.tl.s6 .e6,.tl.s7 .e7,.tl.s8 .e8,.tl.s9 .e9,.tl.s10 .e10,.tl.s11 .e11,.tl.s12 .e12,.tl.s13 .e13,.tl.s14 .e14{opacity:1;transform:none}
 .acid{display:flex;gap:18px;justify-content:center}
-.lt{width:132px;height:132px;border-radius:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-size:64px;font-weight:800;line-height:1;transition:all .55s cubic-bezier(.2,.8,.2,1);box-shadow:0 12px 26px -12px rgba(124,58,237,.6)}
-.lt small{font-size:15px;font-weight:700;letter-spacing:.03em;margin-top:8px}
-.lt.a{background:linear-gradient(135deg,#7c3aed,#a855f7)}.lt.c{background:linear-gradient(135deg,#0891b2,#22d3ee)}.lt.i{background:linear-gradient(135deg,#db2777,#f472b6)}.lt.d{background:linear-gradient(135deg,#d97706,#fb923c)}
+.lt{width:132px;height:132px;border-radius:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-size:64px;font-weight:800;line-height:1;transition:all .55s cubic-bezier(.2,.8,.2,1);box-shadow:0 12px 26px -12px rgba(58,127,237,.6)}
+.lt small{font-size:max(15px,var(--htt-min,24px));font-weight:700;letter-spacing:.03em;margin-top:8px}
+.lt.a{background:#3a7fed}.lt.c{background:#0949b1}.lt.i{background:#276cdb}.lt.d{background:#0b58d4}
 .lt.dim{filter:grayscale(1);opacity:.35;transform:scale(.86) rotate(-8deg)}
-.lt.lit{transform:translateY(-10px) scale(1.07);box-shadow:0 18px 30px -10px rgba(236,72,153,.6)}
-.acid.sm .lt{width:86px;height:86px;font-size:40px;border-radius:18px}.acid.sm .lt small{font-size:11px;margin-top:4px}
-.mv{font-size:16px}
+.lt.lit{transform:translateY(-10px) scale(1.07);box-shadow:0 18px 30px -10px rgba(72,135,236,.6)}
+.acid.sm .lt{width:86px;height:86px;font-size:40px;border-radius:18px}.acid.sm .lt small{font-size:max(11px,var(--htt-min,24px));margin-top:4px}
+.mv{font-size:max(16px,var(--htt-min,24px))}
 .mv th,.mv td{padding:6px 10px;font-family:var(--mono);text-align:center}
 .mv td:first-child{color:var(--text)}
 .mv tr{transition:all .45s}
 .mv tr.pend{opacity:0}
 .mv tr.pend.show{opacity:1}
-.mv tr.del td{text-decoration:line-through;color:#be123c;background:#fff1f3}
-.mv tr.vis td{background:#ecfdf5;color:#047857}
+.mv tr.del td{text-decoration:line-through;color:#1254be;background:#f2f7fe}
+.mv tr.vis td{background:#ecf3fd;color:#063176}
 .mv tr.inv td{opacity:.35}
-.mv td.hl{background:#fffbeb;color:#b45309;font-weight:800}
+.mv td.hl{background:#ecf3fe;color:#094bb4;font-weight:800}
 .big-n{font-family:var(--mono);font-size:58px;font-weight:800;line-height:1;transition:all .4s}
-.lk{display:inline-flex;align-items:center;gap:6px;font-size:15px;font-weight:800;padding:4px 10px;border-radius:8px}
-.lk.sh{background:#ecfeff;color:#0e7490;border:2px solid #67e8f9}.lk.ex{background:#fff1f3;color:#be123c;border:2px solid #fb7185}
-.mtx td,.mtx th{text-align:center;font-size:17px;padding:7px 10px}
+.lk{display:inline-flex;align-items:center;gap:6px;font-size:max(15px,var(--htt-min,24px));font-weight:800;padding:4px 10px;border-radius:8px}
+.lk.sh{background:#edf4fe;color:#0e4090;border:2px solid #699ff7}.lk.ex{background:#f2f7fe;color:#1254be;border:2px solid #74a7f8}
+.mtx td,.mtx th{text-align:center;font-size:max(17px,var(--htt-min,24px));padding:7px 10px}
 .mtx td:first-child{text-align:left;color:var(--text);font-weight:700}
 .ck{display:inline-block;opacity:0;transform:scale(.4);transition:all .4s;font-weight:800}
-.ck.y{color:#047857}.ck.n{color:#be123c}.ck.m{color:#b45309}
+.ck.y{color:#063176}.ck.n{color:#1254be}.ck.m{color:#094bb4}
 .mtx.r1 .k1,.mtx.r2 .k2,.mtx.r3 .k3,.mtx.r4 .k4,.mtx.r5 .k5,.mtx.r6 .k6{opacity:1;transform:none}
 .thr{display:flex;align-items:center;gap:10px;justify-content:center}
-.cpu{border:3px solid #7c3aed;border-radius:14px;background:#f5f0ff;padding:10px 16px;font-weight:800;color:#6d28d9;text-align:center;font-size:17px;min-width:120px}
-.cpu small{display:block;font-size:12.5px;color:var(--muted);font-weight:600}
-.rtt{font-family:var(--mono);font-size:13px;font-weight:700}
-.stamp{display:inline-block;font-weight:800;font-size:16px;padding:4px 12px;border-radius:8px;border:3px solid;transform:rotate(-6deg)}
-.stamp.bad{color:#be123c;border-color:#e11d48;background:#fff1f3}.stamp.ok{color:#047857;border-color:#10b981;background:#ecfdf5}
+.cpu{border:3px solid #3a7fed;border-radius:14px;background:#f1f6fe;padding:10px 16px;font-weight:800;color:#286cd9;text-align:center;font-size:max(17px,var(--htt-min,24px));min-width:120px}
+.cpu small{display:block;font-size:max(12.5px,var(--htt-min,24px));color:var(--muted);font-weight:600}
+.rtt{font-family:var(--mono);font-size:max(13px,var(--htt-min,24px));font-weight:700}
+.stamp{display:inline-block;font-weight:800;font-size:max(16px,var(--htt-min,24px));padding:4px 12px;border-radius:8px;border:3px solid;transform:rotate(-6deg)}
+.stamp.bad{color:#1254be;border-color:#1d68e1;background:#f2f7fe}.stamp.ok{color:#063176;border-color:#1051b9;background:#ecf3fd}
 .vs2{display:grid;grid-template-columns:1fr 44px 1fr;gap:10px;align-items:stretch}
-.tree text{font-family:var(--mono);font-size:13px;font-weight:700;fill:#1e1b3a}
+.tree text{font-family:var(--mono);font-size:max(13px,var(--htt-min,24px));font-weight:700;fill:#17263e}
 .code .ln .cm2{color:var(--c);font-style:italic}
 .sql .k{color:var(--k);font-weight:700}
-.ctr-box{border:2px solid #e4dcfb;border-radius:14px;padding:10px 14px;background:#fff;text-align:center;transition:all .4s}
-.ctr-box.hot{border-color:#e11d48;box-shadow:0 0 18px rgba(225,29,72,.35)}
-.ctr-box.okk{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.35)}
-.ctr-box h4{font-size:14px;color:var(--muted);margin-bottom:4px;font-family:var(--mono)}
-.mini2 li{font-size:16.5px;margin:2px 0;line-height:1.35}
-.tag{display:inline-block;font-family:var(--mono);font-size:13px;font-weight:700;padding:2px 8px;border-radius:6px;background:#f3edff;color:#6d28d9;margin:2px}
-.tag.b{background:#ecfeff;color:#0e7490}.tag.r{background:#fff1f3;color:#be123c}.tag.g{background:#ecfdf5;color:#047857}.tag.y{background:#fffbeb;color:#b45309}
+.ctr-box{border:2px solid #dce8fb;border-radius:14px;padding:10px 14px;background:#fff;text-align:center;transition:all .4s}
+.ctr-box.hot{border-color:#1d68e1;box-shadow:0 0 18px rgba(29,104,225,.35)}
+.ctr-box.okk{border-color:#1051b9;box-shadow:0 0 18px rgba(16,81,185,.35)}
+.ctr-box h4{font-size:max(14px,var(--htt-min,24px));color:var(--muted);margin-bottom:4px;font-family:var(--mono)}
+.mini2 li{font-size:max(16.5px,var(--htt-min,24px));margin:2px 0;line-height:1.35}
+.tag{display:inline-block;font-family:var(--mono);font-size:max(13px,var(--htt-min,24px));font-weight:700;padding:2px 8px;border-radius:6px;background:#eef4fe;color:#286cd9;margin:2px}
+.tag.b{background:#edf4fe;color:#0e4090}.tag.r{background:#f2f7fe;color:#1254be}.tag.g{background:#ecf3fd;color:#063176}.tag.y{background:#ecf3fe;color:#094bb4}
 .sv.s9 .g9{opacity:1}.sv.s10 .g10{opacity:1}.sv.s11 .g11{opacity:1}.sv.s12 .g12{opacity:1}
 .ph{display:flex;gap:6px;align-items:center}
-.ph .bar2{height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;transition:all .6s;opacity:.15}
+.ph .bar2{height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:max(14px,var(--htt-min,24px));transition:all .6s;opacity:.15}
 .ph .bar2.on2{opacity:1}
 
 .lt.c{font-style:normal;color:#fff}
@@ -382,26 +382,48 @@ tr.f{transform:none}
 .code .ln{white-space:pre-wrap}
 .code .ln>span:last-child{min-width:0;overflow-wrap:anywhere}
 </style>
+<style id="htt-theme">
+/* HTT theme: logo + layout helpers (font-size >= 24px, single blue) */
+#deck>.htt-logo{position:absolute;top:12px;right:14px;z-index:60;height:40px;padding:0 10px;border-radius:8px;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;font:800 24px/1 "Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.04em;pointer-events:none;user-select:none}
+#deck>.htt-logo span{font-size:24px;color:#fff}
+.htt-stack{grid-template-columns:minmax(0,1fr)!important;grid-template-areas:none!important;flex-direction:column!important;flex-wrap:nowrap!important}
+.htt-stack>*{grid-column:auto!important;grid-row:auto!important;max-width:100%}
+.htt-wrap,.htt-wrap *{white-space:pre-wrap!important;overflow-wrap:anywhere}
+.htt-wrap .ln{flex-wrap:nowrap}
+.htt-flexwrap{flex-wrap:wrap!important}
+#nav,#nav *{font-size:16px!important}
+#hint{font-size:14px!important}
+.orb{display:none!important}
+:root{--htt-min:24px}
+.slide.htt-fs22{--htt-min:22px}.slide.htt-fs20{--htt-min:20px}.slide.htt-fs0{--htt-min:0px}
+.jumpbtn{right:100px!important}
+.slide.htt-fs18{--htt-min:18px}.slide.htt-fs16{--htt-min:16px}
+.slide .hdr{padding-right:84px}
+.sjump{right:100px!important}
+
+</style>
+<script>window.HTT_MIN=function(el){var s=el&&el.closest?el.closest(".slide"):null;var v=parseFloat(getComputedStyle(s||document.documentElement).getPropertyValue("--htt-min"));return isNaN(v)?24:v};</script>
 </head>
 <body>
 <div id="viewport"><div id="deck">
+<div class="htt-logo" aria-label="HTT" title="HTT"><span>HTT</span></div>
 
 <!-- ===================== TITLE ===================== -->
 <section class="slide" id="title">
-  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
-  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="orb" style="width:380px;height:380px;background:#a8c7f9;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#81aff8;left:40%;bottom:-120px;animation-delay:-4s"></div>
   <div class="title-wrap">
     <div class="kicker in">// DDIA · Part II: Distributed Data · Chapter 7</div>
     <h1 class="in" style="font-size:84px"><span class="grad">Transactions</span></h1>
     <p class="in muted" style="font-size:24px;margin-top:18px;max-width:1000px"><i>Designing Data-Intensive Applications</i> — Martin Kleppmann. Transaction là gì, <b>ACID</b> thật sự hứa hẹn điều gì, các <b>race condition</b> nào có thể xảy ra, và database hiện thực <b>read committed</b>, <b>snapshot isolation</b>, <b>serializability</b> ra sao.</p>
-    <div class="quote in" style="margin-top:26px;max-width:1000px;font-size:19px">Nhóm thiết kế Spanner của Google cho rằng thà để developer xử lý vấn đề performance khi lạm dụng transaction, còn hơn lúc nào cũng phải “code vòng” quanh việc <i>không có</i> transaction. <b>— James Corbett et al., Spanner (2012)</b></div>
-    <p class="in" style="margin-top:26px;font-size:18px;color:#8a91b4">Phím ← → hoặc Space: chạy từng bước · Shift+→: qua slide · A: hiện hết · F: toàn màn hình</p>
+    <div class="quote in" style="margin-top:26px;max-width:1000px;font-size:max(19px,var(--htt-min,24px))">Nhóm thiết kế Spanner của Google cho rằng thà để developer xử lý vấn đề performance khi lạm dụng transaction, còn hơn lúc nào cũng phải “code vòng” quanh việc <i>không có</i> transaction. <b>— James Corbett et al., Spanner (2012)</b></div>
+    <p class="in" style="margin-top:26px;font-size:max(18px,var(--htt-min,24px));color:#7495ca">Phím ← → hoặc Space: chạy từng bước · Shift+→: qua slide · A: hiện hết · F: toàn màn hình</p>
   </div>
 </section>
 
 <!-- ===================== AGENDA ===================== -->
 <section class="slide" id="agenda">
-  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:18px">· bấm vào mục để đi tới</span></div>
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:max(18px,var(--htt-min,24px))">· bấm vào mục để đi tới</span></div>
   <div class="agenda in" style="gap:10px">
     <div class="ag" data-goto="why"><b>01</b>Vì sao cần transactions?</div>
     <div class="ag" data-goto="slip"><b>02</b>The Slippery Concept of a Transaction</div>
@@ -448,7 +470,7 @@ tr.f{transform:none}
       </div>
       <span class="f ghost" data-act="#txw|s1;#txw|s2;#txw|s3;#txw|s4" data-say="<b>Commit</b>: toàn bộ transaction thành công — mọi write có hiệu lực cùng lúc."></span>
       <span class="f ghost" data-act="#txw|s5;#txw|s6;#txw|s7;#txw|s8" data-say="<b>Abort / rollback</b>: lỗi giữa chừng → mọi write bị bỏ, application có thể <b>retry an toàn</b>. Không phải lo <b>partial failure</b>."></span>
-      <div class="note blue f" style="font-size:18px">Transactions không phải định luật tự nhiên — chúng được tạo ra để <b>đơn giản hoá programming model</b>. Database lo một số lỗi và concurrency issue thay app: gọi là <b>safety guarantees</b>.</div>
+      <div class="note blue f" style="font-size:max(18px,var(--htt-min,24px))">Transactions không phải định luật tự nhiên — chúng được tạo ra để <b>đơn giản hoá programming model</b>. Database lo một số lỗi và concurrency issue thay app: gọi là <b>safety guarantees</b>.</div>
       <p class="say">Nhấn → để chạy từng bước.</p>
     </div>
   </div>
@@ -463,16 +485,21 @@ tr.f{transform:none}
     <div class="card f zoom"><div class="icon">⚖️</div><h3>Hai luồng hype</h3><p class="ps">“Transactions là kẻ thù của <b>scalability</b>” vs “transaction là bắt buộc cho <i>serious applications</i> với <i>valuable data</i>”. Cả hai đều là <b>pure hyperbole</b>.</p></div>
   </div>
   <div class="note f" style="margin-top:18px">Sự thật: như mọi lựa chọn thiết kế kỹ thuật, transactions có <b>advantages</b> và <b>limitations</b>. Để hiểu trade-off, phải xem chính xác chúng đảm bảo điều gì — cả lúc bình thường lẫn trong các tình huống cực đoan (nhưng thực tế).</div>
-  <div class="cols f" style="margin-top:14px;gap:16px">
+  </section>
+
+<section id="slip-p2" class="slide htt-cont">
+<div class="hdr in"><span class="qn">02</span><h2>The Slippery Concept of a Transaction</h2></div>
+<div class="cols f" style="margin-top:14px;gap:16px">
     <div class="card"><p class="ps">❓ <b>Có cần transaction không?</b> Không phải app nào cũng cần; đôi khi nới lỏng guarantee để đạt <b>higher performance / availability</b>. Một số safety property đạt được mà không cần transaction.</p></div>
     <div class="card"><p class="ps">📍 Chương này áp dụng cho cả <b>single-node</b> lẫn <b>distributed</b> databases; đào sâu <b>concurrency control</b>. Chapter 8 mới bàn riêng về thách thức của distributed systems.</p></div>
   </div>
+
 </section>
 
 <!-- ===================== ACID ===================== -->
 <section class="slide" id="acid">
   <div class="hdr in"><span class="qn">03</span><h2>The Meaning of ACID</h2></div>
-  <p class="in muted" style="font-size:20px;max-width:1150px">Thuật ngữ do <b>Theo Härder &amp; Andreas Reuter</b> đặt năm 1983 để mô tả chính xác các fault-tolerance mechanism trong database.</p>
+  <p class="in muted" style="font-size:max(20px,var(--htt-min,24px));max-width:1150px">Thuật ngữ do <b>Theo Härder &amp; Andreas Reuter</b> đặt năm 1983 để mô tả chính xác các fault-tolerance mechanism trong database.</p>
   <div class="acid" id="acidL" style="margin:26px 0 22px">
     <div class="lt a f zoom">A<small>Atomicity</small></div>
     <div class="lt c f zoom" id="ltC">C<small>Consistency</small></div>
@@ -486,7 +513,7 @@ tr.f{transform:none}
 </section>
 
 <!-- ===================== ATOMICITY + CONSISTENCY ===================== -->
-<section class="slide" id="atom">
+<section class="slide htt-fs20" id="atom">
   <div class="hdr in"><span class="qn">04</span><h2>Atomicity <span class="muted" style="font-weight:600">&amp;</span> Consistency</h2></div>
   <div class="cols" style="grid-template-columns:1.1fr 1fr;gap:26px">
     <div>
@@ -505,7 +532,7 @@ tr.f{transform:none}
       <p class="say">Nhấn → để chạy từng bước.</p>
     </div>
     <div>
-      <h3 style="color:#0891b2">Consistency — từ bị “quá tải” nghĩa</h3>
+      <h3 style="color:#0949b1">Consistency — từ bị “quá tải” nghĩa</h3>
       <div class="chips f" style="margin:6px 0 10px"><span class="chip p">replica consistency / eventual consistency (Ch.5)</span><span class="chip c">consistent hashing (Ch.6)</span><span class="chip k">CAP: consistency = linearizability (Ch.9)</span><span class="chip y">ACID: database ở “good state”</span></div>
       <div class="card f"><p class="ps">ACID consistency = các <b>invariants</b> luôn đúng. Ví dụ hệ thống kế toán: credits và debits trên mọi account luôn <b>balanced</b>.</p></div>
       <div class="card bad f" style="margin-top:10px" data-act="#acidS .c|dim"><p class="ps">Nhưng invariant do <b>application</b> định nghĩa; database chỉ check được vài loại (foreign key, uniqueness constraint). A, I, D là thuộc tính của <b>database</b>; C là thuộc tính của <b>application</b> → chữ C <b>“không thật sự thuộc về ACID”</b>.</p>
@@ -515,7 +542,7 @@ tr.f{transform:none}
 </section>
 
 <!-- ===================== ISOLATION + DURABILITY ===================== -->
-<section class="slide" id="iso">
+<section class="slide htt-fs18" id="iso">
   <div class="hdr in"><span class="qn">05</span><h2>Isolation <span class="muted" style="font-weight:600">&amp;</span> Durability</h2></div>
   <div class="cols" style="grid-template-columns:1.25fr 1fr;gap:24px">
     <div>
@@ -530,14 +557,14 @@ tr.f{transform:none}
       <span class="f ghost" data-act="#tl71|s2" data-say="User 2 cũng đọc 42 — trước khi User 1 kịp ghi."></span>
       <span class="f ghost" data-act="#tl71|s3" data-say="User 1 ghi 43."></span>
       <span class="f ghost" data-act="#tl71|s4" data-say="User 2 cũng ghi 43. Hai lần increment nhưng counter chỉ từ <b>42 → 43</b> (đáng lẽ 44): một <b>race condition</b>."></span>
-      <div class="note blue f" style="font-size:17.5px">ACID <b>isolation</b>: các transaction chạy đồng thời không “giẫm chân” nhau. Sách giáo khoa formalize thành <b>serializability</b>: kết quả như thể chạy <b>serially</b> (lần lượt từng cái). Thực tế ít dùng vì performance penalty — Oracle 11g gọi là “serializable” nhưng thật ra là <b>snapshot isolation</b>.</div>
+      <div class="note blue f" style="font-size:max(17.5px,var(--htt-min,24px))">ACID <b>isolation</b>: các transaction chạy đồng thời không “giẫm chân” nhau. Sách giáo khoa formalize thành <b>serializability</b>: kết quả như thể chạy <b>serially</b> (lần lượt từng cái). Thực tế ít dùng vì performance penalty — Oracle 11g gọi là “serializable” nhưng thật ra là <b>snapshot isolation</b>.</div>
       <p class="say">Nhấn → để chạy từng bước.</p>
     </div>
     <div>
-      <h3 style="color:#d97706">Durability</h3>
+      <h3 style="color:#0b58d4">Durability</h3>
       <p class="ps">Lời hứa: transaction đã <b>commit</b> thì data không bị mất, kể cả khi hardware fault hay database crash.</p>
       <div class="chips" style="margin:8px 0"><span class="chip y">single-node: nonvolatile storage + write-ahead log</span><span class="chip c">replicated: copy tới N nodes</span></div>
-      <div class="card f" style="margin-top:6px"><h3 style="font-size:19px">Replication and Durability — không gì hoàn hảo</h3>
+      <div class="card f" style="margin-top:6px"><h3 style="font-size:max(19px,var(--htt-min,24px))">Replication and Durability — không gì hoàn hảo</h3>
         <ul class="mini2">
           <li>Ghi disk mà máy chết → data không mất nhưng <b>inaccessible</b></li>
           <li><b>Correlated fault</b> (mất điện, bug) hạ mọi replica cùng lúc</li>
@@ -554,18 +581,18 @@ tr.f{transform:none}
 </section>
 
 <!-- ===================== MULTI-OBJECT ===================== -->
-<section class="slide" id="multi">
+<section class="slide htt-fs20" id="multi">
   <div class="hdr in"><span class="qn">06</span><h2>Single-Object and Multi-Object Operations</h2></div>
   <div class="cols" style="grid-template-columns:1fr 1.15fr;gap:24px">
     <div>
       <p class="ps">Email app lưu <b>unread counter</b> riêng (denormalization) thay vì <code class="i">SELECT COUNT(*)</code> mỗi lần. Mỗi email mới → <b>2 writes</b>: insert email + increment counter.</p>
       <div class="cols" style="gap:12px;margin-top:12px">
-        <div class="ctr-box" id="mbx"><h4>emails (user 2)</h4><div id="mbxv" style="font-size:20px;font-weight:700;min-height:62px">📭 (trống)</div></div>
+        <div class="ctr-box" id="mbx"><h4>emails (user 2)</h4><div id="mbxv" style="font-size:max(20px,var(--htt-min,24px));font-weight:700;min-height:62px">📭 (trống)</div></div>
         <div class="ctr-box" id="cnt"><h4>mailboxes.unread</h4><div class="big-n" id="cntv">0</div></div>
       </div>
-      <div class="ctr-box" id="u2v" style="margin-top:12px;text-align:left"><h4>User 2 đang xem</h4><div id="u2t" style="font-size:18px">—</div></div>
-      <span class="f ghost" data-act="#mbx|okk" data-set="#mbxv::📩 Hello <small style='color:#be123c'>(unread)</small>" data-say="Transaction của User 1: <b>insert</b> email mới vào mailbox của User 2 (chưa commit)."></span>
-      <span class="f ghost" data-act="#u2v|hot" data-set="#u2t::Thấy <b>1 email unread</b> nhưng counter = <b style='color:#be123c'>0</b> ⁉" data-say="Figure 7-2: User 2 đọc giữa chừng → thấy email mới nhưng counter vẫn 0. Đây là <b>dirty read</b> — vi phạm isolation."></span>
+      <div class="ctr-box" id="u2v" style="margin-top:12px;text-align:left"><h4>User 2 đang xem</h4><div id="u2t" style="font-size:max(18px,var(--htt-min,24px))">—</div></div>
+      <span class="f ghost" data-act="#mbx|okk" data-set="#mbxv::📩 Hello <small style='color:#1254be'>(unread)</small>" data-say="Transaction của User 1: <b>insert</b> email mới vào mailbox của User 2 (chưa commit)."></span>
+      <span class="f ghost" data-act="#u2v|hot" data-set="#u2t::Thấy <b>1 email unread</b> nhưng counter = <b style='color:#1254be'>0</b> ⁉" data-say="Figure 7-2: User 2 đọc giữa chừng → thấy email mới nhưng counter vẫn 0. Đây là <b>dirty read</b> — vi phạm isolation."></span>
       <span class="f ghost" data-act="#cnt|hot" data-set="#cntv::💥" data-say="Figure 7-3: giả sử update counter <b>bị lỗi</b>…"></span>
       <span class="f ghost" data-act="#mbx|hot" data-set="#mbxv::<s>📩 Hello</s> ↺ rolled back" data-say="Với <b>atomicity</b>: transaction abort → email đã insert cũng bị <b>rollback</b>. Mailbox và counter không bao giờ lệch nhau."></span>
       <p class="say">Nhấn → để chạy từng bước.</p>
@@ -582,20 +609,25 @@ tr.f{transform:none}
 <!-- ===================== ABORTS ===================== -->
 <section class="slide" id="abort">
   <div class="hdr in"><span class="qn">07</span><h2>Handling errors and aborts</h2></div>
-  <div class="cols" style="grid-template-columns:1fr 1.25fr;gap:24px">
+  <div class="cols htt-stack" style="grid-template-columns:1fr 1.25fr;gap:24px">
     <div>
       <div class="card good"><span class="lbl good">ACID PHILOSOPHY</span><p class="ps">Nếu sắp vi phạm atomicity, isolation hay durability, database thà <b>bỏ hẳn transaction</b> còn hơn để nó dở dang.</p></div>
       <div class="card bad" style="margin-top:12px"><span class="lbl bad">BEST EFFORT</span><p class="ps"><b>Leaderless replication</b>: “database làm được bao nhiêu thì làm, gặp lỗi cũng không undo” → app tự recover.</p></div>
-      <div class="note f" style="font-size:18px">ORM như <b>Rails ActiveRecord</b>, <b>Django</b> không retry aborted transaction — exception nổi lên, input của user bị vứt. Đáng tiếc: <b>mục đích của abort là cho phép retry an toàn</b>.</div>
+      <div class="note f" style="font-size:max(18px,var(--htt-min,24px))">ORM như <b>Rails ActiveRecord</b>, <b>Django</b> không retry aborted transaction — exception nổi lên, input của user bị vứt. Đáng tiếc: <b>mục đích của abort là cho phép retry an toàn</b>.</div>
     </div>
-    <div>
+    </div>
+</section>
+
+<section id="abort-p2" class="slide htt-cont">
+<div class="hdr in"><span class="qn">07</span><h2>Handling errors and aborts</h2></div>
+<div class="cols htt-stack htt-cont-part" style="grid-template-columns:1fr 1.25fr;gap:24px"><div>
       <h3>Retry đơn giản &amp; hiệu quả, nhưng không hoàn hảo</h3>
       <div class="stack">
         <div class="leg a f"><b>✅❓ Commit thành công nhưng ack bị mất</b><p>Client tưởng fail → retry → thực hiện <b>2 lần</b>, trừ khi có deduplication ở application level.</p></div>
         <div class="leg b f"><b>🔥 Lỗi do overload</b><p>Retry làm tệ hơn → giới hạn số lần, <b>exponential backoff</b>.</p></div>
         <div class="leg c f"><b>⏳ Chỉ retry transient errors</b><p>deadlock, isolation violation, network tạm đứt, failover. <b>Permanent error</b> (constraint violation) thì retry vô ích.</p></div>
-        <div class="leg a f" style="border-left-color:#ec4899"><b>📧 Side effects ngoài database</b><p>Gửi email không nên lặp mỗi lần retry. Cần nhiều hệ thống cùng commit/abort → <b>two-phase commit</b> (Ch.9).</p></div>
-        <div class="leg b f" style="border-left-color:#10b981"><b>💀 Client chết khi đang retry</b><p>Data đang định ghi bị mất.</p></div>
+        <div class="leg a f" style="border-left-color:#4887ec"><b>📧 Side effects ngoài database</b><p>Gửi email không nên lặp mỗi lần retry. Cần nhiều hệ thống cùng commit/abort → <b>two-phase commit</b> (Ch.9).</p></div>
+        <div class="leg b f" style="border-left-color:#1051b9"><b>💀 Client chết khi đang retry</b><p>Data đang định ghi bị mất.</p></div>
       </div>
     </div>
   </div>
@@ -604,19 +636,24 @@ tr.f{transform:none}
 <!-- ===================== WEAK ISOLATION ===================== -->
 <section class="slide" id="weak">
   <div class="hdr in"><span class="qn">08</span><h2>Weak Isolation Levels</h2></div>
-  <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:26px">
+  <div class="cols htt-stack" style="grid-template-columns:1fr 1.05fr;gap:26px">
     <div>
       <p class="ps">Hai transaction không đụng cùng data → chạy song song an toàn. <b>Race condition</b> chỉ xuất hiện khi một transaction đọc data mà transaction khác đang sửa, hoặc cả hai cùng sửa một data.</p>
       <div class="card bad f" style="margin-top:12px"><span class="lbl bad">CONCURRENCY BUGS</span><p class="ps">Khó tìm bằng testing (chỉ xảy ra khi “xui” về timing), khó reproduce, khó suy luận trong app lớn. Đã gây <b>mất tiền thật</b>, bị financial auditor điều tra, làm hỏng customer data.</p></div>
-      <div class="note f" style="font-size:18px">“Dùng ACID database nếu xử lý financial data!” — trật trọng tâm: nhiều relational DB “ACID” nổi tiếng vẫn dùng <b>weak isolation</b> mặc định.</div>
-      <div class="note blue f" style="font-size:18px">Thay vì tin mù quáng vào tool, cần hiểu <b>các loại concurrency problem</b> và cách phòng tránh chúng.</div>
+      <div class="note f" style="font-size:max(18px,var(--htt-min,24px))">“Dùng ACID database nếu xử lý financial data!” — trật trọng tâm: nhiều relational DB “ACID” nổi tiếng vẫn dùng <b>weak isolation</b> mặc định.</div>
+      <div class="note blue f" style="font-size:max(18px,var(--htt-min,24px))">Thay vì tin mù quáng vào tool, cần hiểu <b>các loại concurrency problem</b> và cách phòng tránh chúng.</div>
     </div>
-    <div>
+    </div>
+</section>
+
+<section id="weak-p2" class="slide htt-cont">
+<div class="hdr in"><span class="qn">08</span><h2>Weak Isolation Levels</h2></div>
+<div class="cols htt-stack htt-cont-part" style="grid-template-columns:1fr 1.05fr;gap:26px"><div>
       <h3>Thang isolation level (yếu → mạnh)</h3>
       <div class="stack" style="margin-top:8px">
         <div class="layer hid f" style="text-align:left">read uncommitted <span class="tag r">dirty reads ✗</span></div>
-        <div class="layer f" style="background:#f5f0ff;border:2px solid #c4b5fd;color:#6d28d9;text-align:left">read committed <span class="tag">no dirty reads</span><span class="tag">no dirty writes</span></div>
-        <div class="layer f" style="background:#ecfeff;border:2px solid #67e8f9;color:#0e7490;text-align:left">snapshot isolation <small>(“repeatable read”)</small> <span class="tag b">+ no read skew</span></div>
+        <div class="layer f" style="background:#f1f6fe;border:2px solid #b7d1fb;color:#286cd9;text-align:left">read committed <span class="tag">no dirty reads</span><span class="tag">no dirty writes</span></div>
+        <div class="layer f" style="background:#edf4fe;border:2px solid #699ff7;color:#0e4090;text-align:left">snapshot isolation <small>(“repeatable read”)</small> <span class="tag b">+ no read skew</span></div>
         <div class="layer top f" style="text-align:left">serializable <span class="tag" style="background:rgba(255,255,255,.25);color:#fff">chặn mọi race condition</span></div>
       </div>
       <p class="ps muted f" style="margin-top:12px">Serializable có <b>performance cost</b> mà nhiều database không muốn trả → hệ thống thường dùng level yếu hơn: chặn được <b>một số</b> concurrency issue, không phải tất cả.</p>
@@ -625,11 +662,11 @@ tr.f{transform:none}
 </section>
 
 <!-- ===================== READ COMMITTED ===================== -->
-<section class="slide" id="rc">
+<section class="slide htt-fs20" id="rc">
   <div class="hdr in"><span class="qn">09</span><h2>Read Committed</h2><span class="chip p">level cơ bản nhất</span></div>
   <div class="cols" style="grid-template-columns:1fr 1fr;gap:22px">
     <div>
-      <h3>① No dirty reads <span class="muted" style="font-size:15px">· Figure 7-4</span></h3>
+      <h3>① No dirty reads <span class="muted" style="font-size:max(15px,var(--htt-min,24px))">· Figure 7-4</span></h3>
       <div class="tl" id="tl74">
         <div class="tlr" style="--n:4"><span class="who2">User 1</span><div class="ev e1" style="grid-column:2">set x = 3</div><div class="ev ok e3" style="grid-column:4">commit</div></div>
         <div class="tlr db" style="--n:4"><span class="who2">DB · x</span><div class="ev d e1" style="grid-column:2">2 → 3 <small>(uncommitted)</small></div><div class="ev d e2" style="grid-column:3">→ 2</div><div class="ev ok e3" style="grid-column:4">x = 3 ✓</div><div class="ev d e4" style="grid-column:5">→ 3</div></div>
@@ -642,7 +679,7 @@ tr.f{transform:none}
       <p class="say">Nhấn → để chạy từng bước.</p>
     </div>
     <div>
-      <h3>② No dirty writes <span class="muted" style="font-size:15px">· Figure 7-5</span></h3>
+      <h3>② No dirty writes <span class="muted" style="font-size:max(15px,var(--htt-min,24px))">· Figure 7-5</span></h3>
       <p class="ps">Alice &amp; Bob cùng mua một chiếc xe cũ. Mua = 2 writes: <code class="i">listings.buyer</code> + <code class="i">invoices.recipient</code>.</p>
       <div class="cols" style="gap:10px;margin:10px 0">
         <div class="ctr-box" id="lst"><h4>listings · buyer</h4><div id="lstv" style="font-size:24px;font-weight:800">—</div></div>
@@ -652,7 +689,7 @@ tr.f{transform:none}
       <span class="f ghost" data-act="#lst|hot" data-set="#lstv::Bob" data-say="Bob ghi đè lên giá trị <b>uncommitted</b> của Alice → <b>dirty write</b>."></span>
       <span class="f ghost" data-set="#invv::Bob" data-say="Bob update invoice → recipient = Bob."></span>
       <span class="f ghost" data-act="#inv|hot" data-set="#invv::Alice" data-say="Alice ghi đè invoice. Kết quả: <b>xe bán cho Bob, hoá đơn gửi Alice</b> 🙃"></span>
-      <div class="note f" style="font-size:17px">Read committed chặn dirty writes bằng cách <b>delay write thứ hai</b> tới khi transaction đầu commit/abort. Nhưng <b>không</b> chặn race của Figure 7-1 (counter): write thứ hai xảy ra <i>sau</i> commit nên không phải dirty write.</div>
+      <div class="note f" style="font-size:max(17px,var(--htt-min,24px))">Read committed chặn dirty writes bằng cách <b>delay write thứ hai</b> tới khi transaction đầu commit/abort. Nhưng <b>không</b> chặn race của Figure 7-1 (counter): write thứ hai xảy ra <i>sau</i> commit nên không phải dirty write.</div>
       <p class="say">Nhấn → để chạy từng bước.</p>
     </div>
   </div>
@@ -661,7 +698,7 @@ tr.f{transform:none}
 <!-- ===================== IMPLEMENTING RC ===================== -->
 <section class="slide" id="rcimpl">
   <div class="hdr in"><span class="qn">09b</span><h2>Implementing read committed</h2></div>
-  <p class="in muted" style="font-size:19px">Level rất phổ biến — default của <b>Oracle 11g, PostgreSQL, SQL Server 2012, MemSQL</b> và nhiều DB khác.</p>
+  <p class="in muted" style="font-size:max(19px,var(--htt-min,24px))">Level rất phổ biến — default của <b>Oracle 11g, PostgreSQL, SQL Server 2012, MemSQL</b> và nhiều DB khác.</p>
   <div class="cols3" style="margin-top:14px">
     <div class="card f"><div class="icon">🔒</div><h3>Dirty writes → row-level locks</h3><p class="ps">Muốn sửa object (row/document) phải lấy <b>lock</b> và giữ đến khi commit/abort. Transaction khác muốn ghi cùng object phải <b>chờ</b>. DB làm tự động.</p></div>
     <div class="card bad f"><div class="icon">🐢</div><h3>Dirty reads bằng read lock?</h3><p class="ps">Bắt reader lấy lock ngắn hạn… Không ổn: một <b>long-running write</b> làm mọi read-only transaction phải chờ → response time tệ, ảnh hưởng dây chuyền (bad operability).</p></div>
@@ -669,7 +706,7 @@ tr.f{transform:none}
   </div>
   <div class="cols f" style="margin-top:18px;gap:18px;align-items:center;grid-template-columns:1fr 1fr">
     <div class="flow"><div class="box o">x = 2<small>committed</small></div><span class="ar">+</span><div class="box exe">x = 3<small>uncommitted · txn holds write lock</small></div></div>
-    <div class="note blue" style="margin:0;font-size:17.5px">Readers → <b>2</b> · Sau commit → mọi read chuyển sang <b>3</b>. (Chỉ DB2 và SQL Server với <code class="i">read_committed_snapshot=off</code> dùng lock cho read.)</div>
+    <div class="note blue" style="margin:0;font-size:max(17.5px,var(--htt-min,24px))">Readers → <b>2</b> · Sau commit → mọi read chuyển sang <b>3</b>. (Chỉ DB2 và SQL Server với <code class="i">read_committed_snapshot=off</code> dùng lock cho read.)</div>
   </div>
 </section>
 
@@ -686,7 +723,7 @@ tr.f{transform:none}
       <span class="f ghost" data-act="#tl76|s1" data-say="Alice đọc account 1 khi tiền chưa tới: <b>$500</b>."></span>
       <span class="f ghost" data-act="#tl76|s2" data-say="Transfer transaction chạy xong và commit."></span>
       <span class="f ghost" data-act="#tl76|s3;#rsk|show" data-say="Alice đọc account 2 sau khi tiền đã đi: <b>$400</b>. Tổng = <b>$900</b> — $100 “bốc hơi”!"></span>
-      <div style="display:flex;gap:14px;align-items:center;margin-top:14px"><div class="formula" style="flex:1">500 + 400 = <span style="color:#e11d48">900</span> ≠ 1,000</div><span class="here" id="rsk" style="font-size:16px;padding:6px 12px">READ SKEW</span></div>
+      <div style="display:flex;gap:14px;align-items:center;margin-top:14px"><div class="formula" style="flex:1">500 + 400 = <span style="color:#1d68e1">900</span> ≠ 1,000</div><span class="here" id="rsk" style="font-size:max(16px,var(--htt-min,24px));padding:6px 12px">READ SKEW</span></div>
       <p class="ps muted" style="margin-top:10px">Read committed <b>chấp nhận</b> điều này: mọi giá trị Alice thấy đều đã committed lúc đọc. Reload vài giây sau sẽ thấy đúng.</p>
       <p class="say">Nhấn → để chạy từng bước.</p>
     </div>
@@ -694,7 +731,7 @@ tr.f{transform:none}
       <h3>Nhưng có tình huống không chịu được</h3>
       <div class="leg a f"><b>💾 Backups</b><p>Copy cả database mất hàng giờ trong khi write vẫn diễn ra → backup chứa phần cũ phần mới. Restore xong, tiền “biến mất” <b>vĩnh viễn</b>.</p></div>
       <div class="leg b f" style="margin-top:10px"><b>📊 Analytic queries &amp; integrity checks</b><p>Query quét phần lớn database, thấy các phần ở <b>thời điểm khác nhau</b> → kết quả vô nghĩa.</p></div>
-      <div class="note blue f" style="font-size:18px">Giải pháp phổ biến nhất: <b>snapshot isolation</b>.</div>
+      <div class="note blue f" style="font-size:max(18px,var(--htt-min,24px))">Giải pháp phổ biến nhất: <b>snapshot isolation</b>.</div>
     </div>
   </div>
 </section>
@@ -707,23 +744,23 @@ tr.f{transform:none}
       <p class="ps">Mỗi transaction đọc từ một <b>consistent snapshot</b>: thấy mọi data đã committed <b>tại thời điểm bắt đầu</b> transaction. Data sau đó có bị sửa, transaction vẫn chỉ thấy data cũ “đóng băng”.</p>
       <div class="chips f" style="margin-top:12px"><span class="chip p">PostgreSQL</span><span class="chip c">MySQL / InnoDB</span><span class="chip k">Oracle</span><span class="chip y">SQL Server</span></div>
       <div class="card good f" style="margin-top:14px"><span class="lbl good">BOON</span><p class="ps">Cho các <b>long-running, read-only queries</b> như backup, analytics: dễ suy luận hơn hẳn khi data không thay đổi dưới chân query.</p></div>
-      <div class="quote f" style="margin-top:14px;font-style:normal;font-size:22px">Key principle: <b>readers never block writers</b>, and <b>writers never block readers</b>.</div>
+      <div class="quote f" style="margin-top:14px;font-style:normal;font-size:max(22px,var(--htt-min,24px))">Key principle: <b>readers never block writers</b>, and <b>writers never block readers</b>.</div>
     </div>
     <div>
       <h3>Hiện thực: MVCC</h3>
       <p class="ps">Write vẫn dùng <b>write lock</b> (chặn dirty write), nhưng read <b>không cần lock</b>. DB giữ <b>nhiều committed versions</b> của một object vì nhiều transaction cần thấy DB ở các thời điểm khác nhau → <b>multi-version concurrency control (MVCC)</b>.</p>
       <div class="cols f" style="gap:10px;margin-top:12px">
-        <div class="card"><h3 style="font-size:18px">Read committed</h3><p class="ps">snapshot riêng cho <b>mỗi query</b></p></div>
-        <div class="card"><h3 style="font-size:18px">Snapshot isolation</h3><p class="ps">một snapshot cho <b>cả transaction</b></p></div>
+        <div class="card"><h3 style="font-size:max(18px,var(--htt-min,24px))">Read committed</h3><p class="ps">snapshot riêng cho <b>mỗi query</b></p></div>
+        <div class="card"><h3 style="font-size:max(18px,var(--htt-min,24px))">Snapshot isolation</h3><p class="ps">một snapshot cho <b>cả transaction</b></p></div>
       </div>
-      <div class="note f" style="font-size:17px">Mỗi transaction nhận một <b>txid</b> tăng dần. Mọi data nó ghi được gắn txid của writer. (txid là số 32-bit → overflow sau ~4 tỉ; PostgreSQL <b>vacuum</b> xử lý.)</div>
+      <div class="note f" style="font-size:max(17px,var(--htt-min,24px))">Mỗi transaction nhận một <b>txid</b> tăng dần. Mọi data nó ghi được gắn txid của writer. (txid là số 32-bit → overflow sau ~4 tỉ; PostgreSQL <b>vacuum</b> xử lý.)</div>
     </div>
   </div>
 </section>
 
 <!-- ===================== MVCC ===================== -->
 <section class="slide" id="mvcc">
-  <div class="hdr in"><span class="qn">11b</span><h2>MVCC trong PostgreSQL <span class="muted" style="font-size:20px;font-weight:600">· Figure 7-7</span></h2></div>
+  <div class="hdr in"><span class="qn">11b</span><h2>MVCC trong PostgreSQL <span class="muted" style="font-size:max(20px,var(--htt-min,24px));font-weight:600">· Figure 7-7</span></h2></div>
   <div class="cols" style="grid-template-columns:1.15fr 1fr;gap:24px">
     <div>
       <table class="mv" id="mvt">
@@ -738,22 +775,22 @@ tr.f{transform:none}
       <span class="f ghost" data-act="#r1|del;#r3|show" data-set="#r1d::txid 13" data-say="Và cộng $100 vào account 1. Rồi transaction 13 commit."></span>
       <span class="f ghost" data-act="#r1|vis;#r2|vis;#r3|inv;#r4|inv" data-say="Transaction 12 đọc account 2: vẫn thấy <b>$500</b>! Deletion và creation do txid 13 (bắt đầu <b>sau</b> 12) đều bị bỏ qua → snapshot nhất quán: 500 + 500."></span>
       <p class="say">Nhấn → để chạy từng bước.</p>
-      <div class="note blue f" style="font-size:16.5px">Row không bị xoá thật: <b>garbage collection</b> dọn sau khi chắc chắn không transaction nào còn cần.</div>
+      <div class="note blue f" style="font-size:max(16.5px,var(--htt-min,24px))">Row không bị xoá thật: <b>garbage collection</b> dọn sau khi chắc chắn không transaction nào còn cần.</div>
     </div>
     <div>
       <h3>Visibility rules</h3>
       <ol style="padding-left:0;list-style:none">
-        <li class="leg a f" style="margin-bottom:8px;font-size:17px"><b style="font-size:18px">1 · In-progress</b>Bỏ qua write của các transaction đang chạy lúc mình bắt đầu (kể cả khi sau đó chúng commit).</li>
-        <li class="leg b f" style="margin-bottom:8px;font-size:17px"><b style="font-size:18px">2 · Aborted</b>Bỏ qua mọi write của transaction đã abort.</li>
-        <li class="leg c f" style="margin-bottom:8px;font-size:17px"><b style="font-size:18px">3 · Later txid</b>Bỏ qua write của transaction có txid lớn hơn (bắt đầu sau), dù đã commit.</li>
-        <li class="leg a f" style="font-size:17px;border-left-color:#10b981"><b style="font-size:18px">4 · Còn lại</b>Mọi write khác đều visible.</li>
+        <li class="leg a f" style="margin-bottom:8px;font-size:max(17px,var(--htt-min,24px))"><b style="font-size:max(18px,var(--htt-min,24px))">1 · In-progress</b>Bỏ qua write của các transaction đang chạy lúc mình bắt đầu (kể cả khi sau đó chúng commit).</li>
+        <li class="leg b f" style="margin-bottom:8px;font-size:max(17px,var(--htt-min,24px))"><b style="font-size:max(18px,var(--htt-min,24px))">2 · Aborted</b>Bỏ qua mọi write của transaction đã abort.</li>
+        <li class="leg c f" style="margin-bottom:8px;font-size:max(17px,var(--htt-min,24px))"><b style="font-size:max(18px,var(--htt-min,24px))">3 · Later txid</b>Bỏ qua write của transaction có txid lớn hơn (bắt đầu sau), dù đã commit.</li>
+        <li class="leg a f" style="font-size:max(17px,var(--htt-min,24px));border-left-color:#1051b9"><b style="font-size:max(18px,var(--htt-min,24px))">4 · Còn lại</b>Mọi write khác đều visible.</li>
       </ol>
     </div>
   </div>
 </section>
 
 <!-- ===================== INDEXES + REPEATABLE READ ===================== -->
-<section class="slide" id="rr">
+<section class="slide htt-fs22" id="rr">
   <div class="hdr in"><span class="qn">12</span><h2>Indexes &amp; Repeatable read naming confusion</h2></div>
   <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:24px">
     <div>
@@ -773,9 +810,9 @@ tr.f{transform:none}
         </g>
         <g class="g g2"><rect class="nd c3" x="410" y="190" width="70" height="36" rx="8"/><text x="445" y="213" text-anchor="middle">L4′</text><text x="445" y="244" text-anchor="middle" class="sm">copy</text></g>
         <g class="g g3"><rect class="nd c3" x="400" y="100" width="90" height="40" rx="10"/><text x="445" y="126" text-anchor="middle">P2′</text>
-          <line class="ln" x1="445" y1="140" x2="445" y2="190" style="stroke:#ec4899"/><line class="ln" x1="420" y1="140" x2="250" y2="190" style="stroke:#ec4899;stroke-dasharray:5 5"/></g>
+          <line class="ln" x1="445" y1="140" x2="445" y2="190" style="stroke:#4887ec"/><line class="ln" x1="420" y1="140" x2="250" y2="190" style="stroke:#4887ec;stroke-dasharray:5 5"/></g>
         <g class="g g4"><rect class="nd c3" x="400" y="10" width="90" height="40" rx="10"/><text x="445" y="36" text-anchor="middle">root v2</text>
-          <line class="ln" x1="445" y1="50" x2="445" y2="100" style="stroke:#ec4899"/><line class="ln" x1="410" y1="40" x2="130" y2="110" style="stroke:#ec4899;stroke-dasharray:5 5"/></g>
+          <line class="ln" x1="445" y1="50" x2="445" y2="100" style="stroke:#4887ec"/><line class="ln" x1="410" y1="40" x2="130" y2="110" style="stroke:#4887ec;stroke-dasharray:5 5"/></g>
       </svg>
       <span class="f ghost" data-act="#cow|s2" data-say="Write sửa leaf L4 → tạo bản copy <b>L4′</b>."></span>
       <span class="f ghost" data-act="#cow|s3" data-say="Parent P2 cũng được copy thành <b>P2′</b>, trỏ tới L4′ và L3 (không đổi)."></span>
@@ -784,20 +821,20 @@ tr.f{transform:none}
     </div>
     <div>
       <h3>Cùng một thứ, nhiều cái tên</h3>
-      <table class="f" style="font-size:17px">
+      <table class="f" style="font-size:max(17px,var(--htt-min,24px))">
         <tr><th>Database</th><th>Gọi là</th><th>Thực chất</th></tr>
         <tr><td>Oracle</td><td><code class="i">serializable</code></td><td>snapshot isolation</td></tr>
         <tr><td>PostgreSQL, MySQL</td><td><code class="i">repeatable read</code></td><td>snapshot isolation</td></tr>
         <tr><td>IBM DB2</td><td><code class="i">repeatable read</code></td><td>serializability</td></tr>
       </table>
       <p class="ps f" style="margin-top:12px">SQL standard dựa trên định nghĩa isolation level của System R (1975) — lúc đó <b>chưa có snapshot isolation</b>. Standard chỉ có <i>repeatable read</i>, trông giống bề ngoài, và bản thân định nghĩa lại <b>ambiguous, imprecise</b>.</p>
-      <div class="quote f" style="margin-top:14px;font-size:22px">→ <b>Nobody really knows what repeatable read means.</b></div>
+      <div class="quote f" style="margin-top:14px;font-size:max(22px,var(--htt-min,24px))">→ <b>Nobody really knows what repeatable read means.</b></div>
     </div>
   </div>
 </section>
 
 <!-- ===================== LOST UPDATES ===================== -->
-<section class="slide" id="lost">
+<section class="slide htt-fs20" id="lost">
   <div class="hdr in"><span class="qn">13</span><h2>Preventing Lost Updates</h2></div>
   <div class="cols" style="grid-template-columns:1fr 1.1fr;gap:24px">
     <div>
@@ -808,7 +845,7 @@ tr.f{transform:none}
         <p class="ps muted" style="margin-top:6px">MongoDB: atomic update một phần JSON · Redis: atomic ops trên priority queue… Hiện thực bằng <b>exclusive lock</b> khi đọc (<i>cursor stability</i>) hoặc chạy mọi atomic op trên <b>single thread</b>. ⚠️ ORM dễ vô tình sinh read-modify-write không an toàn.</p></div>
     </div>
     <div>
-      <div class="card f"><h3>② Explicit locking <span class="muted" style="font-size:15px">· Example 7-1</span></h3><p class="ps">Multiplayer game: nước đi phải đúng luật — logic không viết được thành query → app tự lock rows:</p>
+      <div class="card f"><h3>② Explicit locking <span class="muted" style="font-size:max(15px,var(--htt-min,24px))">· Example 7-1</span></h3><p class="ps">Multiplayer game: nước đi phải đúng luật — logic không viết được thành query → app tự lock rows:</p>
         <div class="code xs" id="ex71"><div class="ln "><span class="no">1</span><span><span class="k">BEGIN</span> <span class="k">TRANSACTION</span>;</span></div><div class="ln mark-d"><span class="no">2</span><span><span class="k">SELECT</span> * <span class="k">FROM</span> figures</span></div><div class="ln mark-d"><span class="no">3</span><span>  <span class="k">WHERE</span> name = <span class="s">'robot'</span> <span class="k">AND</span> game_id = <span class="n">222</span></span></div><div class="ln mark-d"><span class="no">4</span><span>  <span class="k">FOR</span> <span class="k">UPDATE</span>;</span></div><div class="ln "><span class="no">5</span><span><span class="c">-- Check whether move is valid, then update the position</span></span></div><div class="ln "><span class="no">6</span><span><span class="c">-- of the piece that was returned by the previous SELECT.</span></span></div><div class="ln "><span class="no">7</span><span><span class="k">UPDATE</span> figures <span class="k">SET</span> position = <span class="s">'c4'</span> <span class="k">WHERE</span> id = <span class="n">1234</span>;</span></div><div class="ln "><span class="no">8</span><span><span class="k">COMMIT</span>;</span></div></div>
         <span class="f ghost" data-act=".code#ex71|show-d" data-say="<code class='i'>FOR UPDATE</code>: DB lock mọi row query trả về. Transaction khác muốn đọc cùng row phải chờ read-modify-write này xong."></span>
         <p class="ps muted" style="margin-top:6px">Chạy được — nhưng dễ <b>quên</b> thêm lock ở đâu đó → race condition.</p></div>
@@ -820,12 +857,17 @@ tr.f{transform:none}
 <!-- ===================== LOST UPDATES 2 ===================== -->
 <section class="slide" id="lost2">
   <div class="hdr in"><span class="qn">13b</span><h2>Lost updates: detect, CAS &amp; replication</h2></div>
-  <div class="cols3">
+  <div class="cols3 htt-stack">
     <div class="card f"><h3>③ Automatically detecting</h3><p class="ps">Cho chạy song song; transaction manager phát hiện lost update → <b>abort</b> và bắt retry. Làm hiệu quả cùng snapshot isolation.</p>
       <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px">
         <span class="pv yes">PostgreSQL repeatable read ✓</span><span class="pv yes">Oracle serializable ✓</span><span class="pv yes">SQL Server snapshot ✓</span><span class="pv no">MySQL/InnoDB repeatable read ✗</span></div>
       <p class="ps muted" style="margin-top:8px">Ưu điểm lớn: không cần app code làm gì đặc biệt → <b>ít lỗi</b> hơn.</p></div>
-    <div class="card f"><h3>④ Compare-and-set</h3><p class="ps">Ở DB không có transaction: chỉ update nếu giá trị <b>chưa đổi</b> từ lần đọc trước; không khớp → retry.</p>
+    </div>
+</section>
+
+<section id="lost2-p2" class="slide htt-cont">
+<div class="hdr in"><span class="qn">13b</span><h2>Lost updates: detect, CAS &amp; replication</h2></div>
+<div class="cols3 htt-stack htt-cont-part"><div class="card f"><h3>④ Compare-and-set</h3><p class="ps">Ở DB không có transaction: chỉ update nếu giá trị <b>chưa đổi</b> từ lần đọc trước; không khớp → retry.</p>
       <div class="code xxs"><div class="ln "><span class="no">1</span><span><span class="c">-- This may or may not be safe, depending on the database implementation</span></span></div><div class="ln "><span class="no">2</span><span><span class="k">UPDATE</span> wiki_pages <span class="k">SET</span> content = <span class="s">'new content'</span></span></div><div class="ln "><span class="no">3</span><span>  <span class="k">WHERE</span> id = <span class="n">1234</span> <span class="k">AND</span> content = <span class="s">'old content'</span>;</span></div></div>
       <p class="ps muted" style="margin-top:6px">⚠️ Nếu <code class="i">WHERE</code> đọc từ <b>old snapshot</b> thì vẫn có thể lost update. Kiểm tra trước khi tin.</p></div>
     <div class="card f"><h3>⑤ Conflict resolution &amp; replication</h3><p class="ps">Multi-leader / leaderless: không có “single up-to-date copy” → lock &amp; CAS <b>không áp dụng được</b>.</p>
@@ -834,8 +876,8 @@ tr.f{transform:none}
 </section>
 
 <!-- ===================== WRITE SKEW ===================== -->
-<section class="slide" id="ws">
-  <div class="hdr in"><span class="qn">14</span><h2>Write Skew <span class="muted" style="font-size:20px;font-weight:600">· Figure 7-8</span></h2></div>
+<section class="slide htt-fs18" id="ws">
+  <div class="hdr in"><span class="qn">14</span><h2>Write Skew <span class="muted" style="font-size:max(20px,var(--htt-min,24px));font-weight:600">· Figure 7-8</span></h2></div>
   <div class="cols" style="grid-template-columns:1.35fr 1fr;gap:22px">
     <div>
       <p class="ps">Bệnh viện yêu cầu <b>luôn có ít nhất 1 doctor on call</b>. Alice và Bob cùng trực ca 1234, cùng thấy mệt và bấm “go off call” gần như đồng thời. DB dùng <b>snapshot isolation</b>.</p>
@@ -846,7 +888,7 @@ tr.f{transform:none}
       <div style="display:flex;gap:12px;align-items:center;margin-top:14px">
         <div class="node" id="dA"><span class="ver">👩‍⚕️</span>Alice<small id="dAs">on call</small></div>
         <div class="node" id="dB"><span class="ver">👨‍⚕️</span>Bob<small id="dBs">on call</small></div>
-        <span class="here" id="wsk" style="font-size:16px;padding:6px 12px">0 DOCTOR ON CALL!</span>
+        <span class="here" id="wsk" style="font-size:max(16px,var(--htt-min,24px));padding:6px 12px">0 DOCTOR ON CALL!</span>
       </div>
       <span class="f ghost" data-act="#tl78|s1" data-say="Alice kiểm tra: có 2 doctor on call ≥ 2 → an toàn để rời."></span>
       <span class="f ghost" data-act="#tl78|s2" data-say="Bob kiểm tra trên snapshot của mình: cũng thấy 2."></span>
@@ -857,8 +899,8 @@ tr.f{transform:none}
     <div>
       <h3>Characterizing write skew</h3>
       <p class="ps">Không phải dirty write, không phải lost update (update 2 object khác nhau) — nhưng rõ ràng là race condition: chạy lần lượt thì người thứ hai đã bị chặn.</p>
-      <div class="note blue f" style="font-size:17px">Write skew = <b>generalization của lost update</b>: hai transaction <b>đọc cùng objects</b>, rồi update <b>một số</b> trong đó (có thể khác nhau). Update cùng object → dirty write / lost update.</div>
-      <h3 class="f" style="margin-top:10px;font-size:19px">Lựa chọn bị thu hẹp</h3>
+      <div class="note blue f" style="font-size:max(17px,var(--htt-min,24px))">Write skew = <b>generalization của lost update</b>: hai transaction <b>đọc cùng objects</b>, rồi update <b>một số</b> trong đó (có thể khác nhau). Update cùng object → dirty write / lost update.</div>
+      <h3 class="f" style="margin-top:10px;font-size:max(19px,var(--htt-min,24px))">Lựa chọn bị thu hẹp</h3>
       <ul class="mini2 f">
         <li>❌ Atomic single-object ops: vô dụng — nhiều object</li>
         <li>❌ Auto lost-update detection: PG repeatable read, MySQL, Oracle serializable, SQL Server snapshot đều <b>không</b> phát hiện</li>
@@ -870,15 +912,15 @@ tr.f{transform:none}
 </section>
 
 <!-- ===================== MORE EXAMPLES / PHANTOM ===================== -->
-<section class="slide" id="phantom">
+<section class="slide htt-fs18" id="phantom">
   <div class="hdr in"><span class="qn">15</span><h2>More write skew &amp; Phantoms</h2></div>
   <div class="cols" style="grid-template-columns:1fr 1.05fr;gap:22px">
     <div>
       <div class="cols" style="gap:10px">
-        <div class="card f" style="padding:10px 14px"><h3 style="font-size:18px">📅 Meeting room booking</h3><p class="ps">Check không có booking trùng giờ rồi insert → hai người cùng book được.</p></div>
-        <div class="card f" style="padding:10px 14px"><h3 style="font-size:18px">🎮 Multiplayer game</h3><p class="ps">Lock 1 figure không chặn 2 figure khác di chuyển vào <b>cùng ô</b>.</p></div>
-        <div class="card f" style="padding:10px 14px"><h3 style="font-size:18px">🪪 Claiming a username</h3><p class="ps">Check tên chưa ai dùng rồi tạo account. Fix đơn giản: <b>unique constraint</b>.</p></div>
-        <div class="card f" style="padding:10px 14px"><h3 style="font-size:18px">💸 Double-spending</h3><p class="ps">Hai khoản chi insert đồng thời, cộng lại làm balance <b>âm</b>.</p></div>
+        <div class="card f" style="padding:10px 14px"><h3 style="font-size:max(18px,var(--htt-min,24px))">📅 Meeting room booking</h3><p class="ps">Check không có booking trùng giờ rồi insert → hai người cùng book được.</p></div>
+        <div class="card f" style="padding:10px 14px"><h3 style="font-size:max(18px,var(--htt-min,24px))">🎮 Multiplayer game</h3><p class="ps">Lock 1 figure không chặn 2 figure khác di chuyển vào <b>cùng ô</b>.</p></div>
+        <div class="card f" style="padding:10px 14px"><h3 style="font-size:max(18px,var(--htt-min,24px))">🪪 Claiming a username</h3><p class="ps">Check tên chưa ai dùng rồi tạo account. Fix đơn giản: <b>unique constraint</b>.</p></div>
+        <div class="card f" style="padding:10px 14px"><h3 style="font-size:max(18px,var(--htt-min,24px))">💸 Double-spending</h3><p class="ps">Hai khoản chi insert đồng thời, cộng lại làm balance <b>âm</b>.</p></div>
       </div>
       <p class="code-title" style="margin-top:10px">Example 7-2 · not safe under snapshot isolation</p>
       <div class="code xxs" id="ex72"><div class="ln "><span class="no">1</span><span><span class="k">BEGIN</span> <span class="k">TRANSACTION</span>;</span></div><div class="ln mark-b"><span class="no">2</span><span><span class="c">-- Check for any existing bookings that overlap with the period of noon-1pm</span></span></div><div class="ln mark-b"><span class="no">3</span><span><span class="k">SELECT</span> <span class="k">COUNT</span>(*) <span class="k">FROM</span> bookings</span></div><div class="ln mark-b"><span class="no">4</span><span>  <span class="k">WHERE</span> room_id = <span class="n">123</span> <span class="k">AND</span> end_time &gt; <span class="s">'2015-01-01 12:00'</span> <span class="k">AND</span> start_time &lt; <span class="s">'2015-01-01 13:00'</span>;</span></div><div class="ln "><span class="no">5</span><span><span class="c">-- If the previous query returned zero:</span></span></div><div class="ln mark-d"><span class="no">6</span><span><span class="k">INSERT</span> <span class="k">INTO</span> bookings</span></div><div class="ln mark-d"><span class="no">7</span><span>  (room_id, start_time, end_time, user_id)</span></div><div class="ln mark-d"><span class="no">8</span><span>  <span class="k">VALUES</span> (<span class="n">123</span>, <span class="s">'2015-01-01 12:00'</span>, <span class="s">'2015-01-01 13:00'</span>, <span class="n">666</span>);</span></div><div class="ln "><span class="no">9</span><span><span class="k">COMMIT</span>;</span></div></div>
@@ -897,7 +939,7 @@ tr.f{transform:none}
 </section>
 
 <!-- ===================== MATERIALIZING CONFLICTS ===================== -->
-<section class="slide" id="mat">
+<section class="slide htt-fs22" id="mat">
   <div class="hdr in"><span class="qn">15b</span><h2>Materializing conflicts</h2></div>
   <div class="cols" style="grid-template-columns:1fr 1.1fr;gap:26px">
     <div>
@@ -921,7 +963,7 @@ tr.f{transform:none}
       <span class="f ghost" data-act="#mat .ma|used" data-set="#mat .ma::🔒" data-say="Txn A muốn book R123 12:00–13:00 → lock 4 row slot tương ứng."></span>
       <span class="f ghost" data-act="#mat .mb|cur;#mat .mb2|bad" data-say="Txn B muốn book R123 12:30–13:30 → đụng lock ở 12:30, 12:45 → phải <b>chờ</b>. Phantom đã biến thành <b>lock conflict</b> trên các row cụ thể."></span>
       <span class="f ghost" data-act="#matok|show" data-say="Booking ở phòng khác, hoặc cùng phòng nhưng giờ khác, vẫn chạy song song bình thường."></span>
-      <p style="margin-top:10px"><span class="here" id="matok" style="background:#10b981;font-size:15px;padding:5px 12px">R122 / R124 vẫn tự do ✓</span></p>
+      <p style="margin-top:10px"><span class="here" id="matok" style="background:#1051b9;font-size:max(15px,var(--htt-min,24px));padding:5px 12px">R122 / R124 vẫn tự do ✓</span></p>
     </div>
   </div>
 </section>
@@ -943,9 +985,9 @@ tr.f{transform:none}
     <div>
       <h3>Vậy sao không ai cũng dùng? Ba cách hiện thực:</h3>
       <div class="stack" style="margin-top:6px">
-        <div class="card f" style="border-left:6px solid #7c3aed"><div style="display:flex;gap:14px;align-items:center"><div class="icon">🧵</div><div><h3 style="margin:0">Actual Serial Execution</h3><p class="ps">Thực sự chạy từng transaction một, trên một thread.</p></div></div></div>
-        <div class="card f" style="border-left:6px solid #0891b2"><div style="display:flex;gap:14px;align-items:center"><div class="icon">🔐</div><div><h3 style="margin:0;color:#0891b2">Two-Phase Locking (2PL)</h3><p class="ps">Hàng chục năm là lựa chọn khả thi duy nhất. <b>Pessimistic</b>.</p></div></div></div>
-        <div class="card f" style="border-left:6px solid #ec4899"><div style="display:flex;gap:14px;align-items:center"><div class="icon">🔮</div><div><h3 style="margin:0;color:#db2777">Serializable Snapshot Isolation (SSI)</h3><p class="ps">Optimistic concurrency control — mới (2008), đầy hứa hẹn.</p></div></div></div>
+        <div class="card f" style="border-left:6px solid #3a7fed"><div style="display:flex;gap:14px;align-items:center"><div class="icon">🧵</div><div><h3 style="margin:0">Actual Serial Execution</h3><p class="ps">Thực sự chạy từng transaction một, trên một thread.</p></div></div></div>
+        <div class="card f" style="border-left:6px solid #0949b1"><div style="display:flex;gap:14px;align-items:center"><div class="icon">🔐</div><div><h3 style="margin:0;color:#0949b1">Two-Phase Locking (2PL)</h3><p class="ps">Hàng chục năm là lựa chọn khả thi duy nhất. <b>Pessimistic</b>.</p></div></div></div>
+        <div class="card f" style="border-left:6px solid #4887ec"><div style="display:flex;gap:14px;align-items:center"><div class="icon">🔮</div><div><h3 style="margin:0;color:#276cdb">Serializable Snapshot Isolation (SSI)</h3><p class="ps">Optimistic concurrency control — mới (2008), đầy hứa hẹn.</p></div></div></div>
       </div>
     </div>
   </div>
@@ -958,8 +1000,8 @@ tr.f{transform:none}
     <div>
       <p class="ps">Cách đơn giản nhất để tránh concurrency problem: <b>bỏ concurrency</b>. Isolation khi đó serializable <i>by definition</i>. Mãi tới ~<b>2007</b> mới được coi là khả thi. Vì sao?</p>
       <div class="cols" style="gap:10px;margin-top:10px">
-        <div class="card f"><div class="icon">🧠</div><h3 style="font-size:19px">RAM rẻ</h3><p class="ps">Giữ toàn bộ <b>active dataset in memory</b> → không chờ disk.</p></div>
-        <div class="card f"><div class="icon">⚡</div><h3 style="font-size:19px">OLTP ngắn</h3><p class="ps">Ít read/write. Analytic query dài thì chạy trên snapshot, ngoài vòng serial.</p></div>
+        <div class="card f"><div class="icon">🧠</div><h3 style="font-size:max(19px,var(--htt-min,24px))">RAM rẻ</h3><p class="ps">Giữ toàn bộ <b>active dataset in memory</b> → không chờ disk.</p></div>
+        <div class="card f"><div class="icon">⚡</div><h3 style="font-size:max(19px,var(--htt-min,24px))">OLTP ngắn</h3><p class="ps">Ít read/write. Analytic query dài thì chạy trên snapshot, ngoài vòng serial.</p></div>
       </div>
       <div class="chips f" style="margin-top:12px"><span class="chip p">VoltDB / H-Store</span><span class="chip k">Redis</span><span class="chip c">Datomic</span></div>
       <p class="ps muted f" style="margin-top:10px">Có thể nhanh hơn hệ thống concurrent vì không tốn <b>locking overhead</b>, nhưng throughput bị giới hạn ở <b>một CPU core</b>.</p>
@@ -977,34 +1019,34 @@ tr.f{transform:none}
       <span class="f ghost" data-act="#q1|done;#q2|cur" data-set="#cpu1s::running T2" data-say="Xong T1 thì tới T2… mỗi transaction phải <b>nhỏ và nhanh</b>."></span>
       <span class="f ghost" data-act="#q2|done;#q3|bad" data-set="#cpu1s::T3 chờ disk… 🐢;#q3::<span class='v'>T3</span><small>slow</small>" data-say="Chỉ cần <b>một</b> transaction chậm (ví dụ cần data không có trong memory) là <b>mọi</b> transaction phía sau bị stall."></span>
       <p class="say">Nhấn → để chạy từng bước.</p>
-      <div class="note f" style="font-size:16.5px">Giải pháp cho data ngoài memory: abort transaction, fetch data <b>asynchronously</b> rồi restart — gọi là <b>anti-caching</b>.</div>
+      <div class="note f" style="font-size:max(16.5px,var(--htt-min,24px))">Giải pháp cho data ngoài memory: abort transaction, fetch data <b>asynchronously</b> rồi restart — gọi là <b>anti-caching</b>.</div>
     </div>
   </div>
 </section>
 
 <!-- ===================== STORED PROCEDURES ===================== -->
-<section class="slide" id="sp">
+<section class="slide htt-fs18" id="sp">
   <div class="hdr in"><span class="qn">17b</span><h2>Encapsulating transactions in stored procedures</h2></div>
   <div class="cols" style="grid-template-columns:1.1fr 1fr;gap:24px">
     <div>
       <p class="ps">Con người phản hồi rất chậm → OLTP giữ transaction trong <b>một HTTP request</b>. Nhưng transaction vẫn chạy kiểu <b>interactive</b>: từng statement, qua lại giữa app và DB.</p>
       <p class="code-title" style="margin-top:8px">Figure 7-9 · interactive transaction vs stored procedure</p>
       <svg class="sv" id="sp79" viewBox="0 0 600 270">
-        <defs><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#a78bfa"/></marker>
-        <marker id="ah3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#ec4899"/></marker></defs>
-        <text x="20" y="22" class="lb">Interactive</text><text x="330" y="22" class="lb" style="fill:#db2777">Stored procedure</text>
+        <defs><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#8cb6f9"/></marker>
+        <marker id="ah3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#4887ec"/></marker></defs>
+        <text x="20" y="22" class="lb">Interactive</text><text x="330" y="22" class="lb" style="fill:#276cdb">Stored procedure</text>
         <rect class="nd" x="10" y="34" width="80" height="34" rx="8"/><text x="50" y="56" text-anchor="middle">App</text>
         <rect class="nd c4" x="200" y="34" width="80" height="34" rx="8"/><text x="240" y="56" text-anchor="middle">DB</text>
-        <line x1="50" y1="68" x2="50" y2="262" stroke="#e4dcfb" stroke-width="2"/><line x1="240" y1="68" x2="240" y2="262" stroke="#e4dcfb" stroke-width="2"/>
+        <line x1="50" y1="68" x2="50" y2="262" stroke="#dce8fb" stroke-width="2"/><line x1="240" y1="68" x2="240" y2="262" stroke="#dce8fb" stroke-width="2"/>
         <g class="g g1"><line class="ln" x1="50" y1="84" x2="236" y2="104" marker-end="url(#ah2)"/><text x="140" y="86" text-anchor="middle" class="sm">SELECT count</text><line class="ln" x1="240" y1="110" x2="54" y2="130" marker-end="url(#ah2)"/><text x="130" y="134" text-anchor="middle" class="sm">2</text></g>
         <g class="g g2"><line class="ln" x1="50" y1="146" x2="236" y2="166" marker-end="url(#ah2)"/><text x="140" y="150" text-anchor="middle" class="sm">UPDATE on_call</text><line class="ln" x1="240" y1="172" x2="54" y2="192" marker-end="url(#ah2)"/><text x="130" y="196" text-anchor="middle" class="sm">ok</text></g>
         <g class="g g3"><line class="ln" x1="50" y1="208" x2="236" y2="228" marker-end="url(#ah2)"/><text x="140" y="212" text-anchor="middle" class="sm">COMMIT</text><line class="ln" x1="240" y1="234" x2="54" y2="254" marker-end="url(#ah2)"/><text x="130" y="258" text-anchor="middle" class="sm">ok</text></g>
         <rect class="nd" x="330" y="34" width="80" height="34" rx="8"/><text x="370" y="56" text-anchor="middle">App</text>
         <rect class="nd c4" x="500" y="34" width="90" height="34" rx="8"/><text x="545" y="56" text-anchor="middle">DB</text>
-        <line x1="370" y1="68" x2="370" y2="262" stroke="#e4dcfb" stroke-width="2"/><line x1="545" y1="68" x2="545" y2="262" stroke="#e4dcfb" stroke-width="2"/>
-        <g class="g g4"><line class="ln" x1="370" y1="84" x2="541" y2="104" marker-end="url(#ah3)" style="stroke:#ec4899"/><text x="455" y="86" text-anchor="middle" class="sm">call proc(args)</text>
-          <rect class="nd c3" x="500" y="108" width="90" height="74" rx="8"/><text x="545" y="132" text-anchor="middle" style="font-size:12px">count</text><text x="545" y="150" text-anchor="middle" style="font-size:12px">update</text><text x="545" y="168" text-anchor="middle" style="font-size:12px">commit</text>
-          <line class="ln" x1="545" y1="186" x2="374" y2="206" marker-end="url(#ah3)" style="stroke:#ec4899"/><text x="455" y="212" text-anchor="middle" class="sm">ok</text></g>
+        <line x1="370" y1="68" x2="370" y2="262" stroke="#dce8fb" stroke-width="2"/><line x1="545" y1="68" x2="545" y2="262" stroke="#dce8fb" stroke-width="2"/>
+        <g class="g g4"><line class="ln" x1="370" y1="84" x2="541" y2="104" marker-end="url(#ah3)" style="stroke:#4887ec"/><text x="455" y="86" text-anchor="middle" class="sm">call proc(args)</text>
+          <rect class="nd c3" x="500" y="108" width="90" height="74" rx="8"/><text x="545" y="132" text-anchor="middle" style="font-size:max(12px,var(--htt-min,24px))">count</text><text x="545" y="150" text-anchor="middle" style="font-size:max(12px,var(--htt-min,24px))">update</text><text x="545" y="168" text-anchor="middle" style="font-size:max(12px,var(--htt-min,24px))">commit</text>
+          <line class="ln" x1="545" y1="186" x2="374" y2="206" marker-end="url(#ah3)" style="stroke:#4887ec"/><text x="455" y="212" text-anchor="middle" class="sm">ok</text></g>
       </svg>
       <span class="f ghost" data-act="#sp79|s1" data-say="Interactive: query → chờ kết quả → query tiếp… phần lớn thời gian là <b>network round-trip</b>."></span>
       <span class="f ghost" data-act="#sp79|s2;#sp79|s3" data-say="Nếu chạy serial kiểu này, DB chủ yếu ngồi chờ app gửi query tiếp → throughput tệ. Nên hệ thống serial <b>không cho phép</b> interactive multi-statement transaction."></span>
@@ -1014,7 +1056,7 @@ tr.f{transform:none}
     <div>
       <div class="card bad f"><span class="lbl bad">TIẾNG XẤU</span><ul class="mini2"><li>Mỗi vendor một ngôn ngữ (PL/SQL, T-SQL, PL/pgSQL) — cũ kỹ, thiếu library</li><li>Code trong DB khó debug, version control, deploy, test, monitor</li><li>DB nhạy performance hơn app server: một procedure tệ ảnh hưởng nhiều app</li></ul></div>
       <div class="card good f" style="margin-top:10px"><span class="lbl good">HIỆN ĐẠI</span><p class="ps">Dùng ngôn ngữ general-purpose: <b>VoltDB</b> → Java/Groovy, <b>Datomic</b> → Java/Clojure, <b>Redis</b> → Lua.</p></div>
-      <div class="note blue f" style="font-size:16.5px">VoltDB còn dùng stored procedure cho <b>replication</b>: chạy cùng procedure trên mỗi replica → procedure phải <b>deterministic</b> (ngày giờ phải qua API deterministic riêng).</div>
+      <div class="note blue f" style="font-size:max(16.5px,var(--htt-min,24px))">VoltDB còn dùng stored procedure cho <b>replication</b>: chạy cùng procedure trên mỗi replica → procedure phải <b>deterministic</b> (ngày giờ phải qua API deterministic riêng).</div>
     </div>
   </div>
 </section>
@@ -1037,7 +1079,7 @@ tr.f{transform:none}
         <div class="leg a f"><b>⚡ Mọi transaction nhỏ &amp; nhanh</b><p>Một transaction chậm là stall tất cả.</p></div>
         <div class="leg b f"><b>🧠 Active dataset vừa memory</b><p>Data ít dùng có thể ra disk, nhưng truy cập trong transaction thì rất chậm.</p></div>
         <div class="leg c f"><b>🔂 Write throughput vừa một CPU core</b><p>Hoặc partition được mà không cần cross-partition coordination.</p></div>
-        <div class="leg a f" style="border-left-color:#ec4899"><b>🚧 Cross-partition có giới hạn cứng</b><p>Dùng được, nhưng chỉ ở mức độ hạn chế.</p></div>
+        <div class="leg a f" style="border-left-color:#4887ec"><b>🚧 Cross-partition có giới hạn cứng</b><p>Dùng được, nhưng chỉ ở mức độ hạn chế.</p></div>
       </div>
     </div>
   </div>
@@ -1053,7 +1095,7 @@ tr.f{transform:none}
         <li>A đã <b>đọc</b>, B muốn <b>ghi</b> → B chờ A commit/abort</li>
         <li>A đã <b>ghi</b>, B muốn <b>đọc</b> → B chờ (không được đọc version cũ)</li>
       </ul>
-      <div class="note f" style="font-size:17.5px">Writers chặn writers <b>và</b> readers, ngược lại cũng vậy. Trái với mantra của snapshot isolation: <i>readers never block writers…</i>. Đổi lại: chặn mọi race condition kể cả <b>lost updates</b> và <b>write skew</b>.</div>
+      <div class="note f" style="font-size:max(17.5px,var(--htt-min,24px))">Writers chặn writers <b>và</b> readers, ngược lại cũng vậy. Trái với mantra của snapshot isolation: <i>readers never block writers…</i>. Đổi lại: chặn mọi race condition kể cả <b>lost updates</b> và <b>write skew</b>.</div>
       <p class="ps muted" style="margin-top:8px">Dùng trong: <b>MySQL (InnoDB)</b> &amp; <b>SQL Server</b> serializable, <b>DB2</b> repeatable read.</p>
     </div>
     <div>
@@ -1070,8 +1112,8 @@ tr.f{transform:none}
       <span class="f ghost" data-act="#lkm|r4" data-say="Exclusive: không ai khác được giữ bất kỳ lock nào trên object đó."></span>
       <p class="rowlbl" style="margin-top:12px">Hai phase của một transaction</p>
       <div class="ph" id="ph2">
-        <div class="bar2" id="phA" style="flex:3;background:linear-gradient(90deg,#7c3aed,#a855f7)">① acquire locks (đang chạy)</div>
-        <div class="bar2" id="phB" style="flex:1.3;background:linear-gradient(90deg,#ec4899,#f97316)">② release all @ commit/abort</div>
+        <div class="bar2" id="phA" style="flex:3;background:#3a7fed">① acquire locks (đang chạy)</div>
+        <div class="bar2" id="phB" style="flex:1.3;background:#4887ec">② release all @ commit/abort</div>
       </div>
       <span class="f ghost" data-act="#phA|on2" data-say="Phase 1: trong lúc chạy, transaction chỉ <b>lấy thêm</b> lock và giữ tới cuối."></span>
       <span class="f ghost" data-act="#phB|on2" data-say="Phase 2: commit/abort → <b>nhả toàn bộ</b> lock. Tên “two-phase” từ đây."></span>
@@ -1082,7 +1124,7 @@ tr.f{transform:none}
 </section>
 
 <!-- ===================== 2PL PERF + PREDICATE LOCKS ===================== -->
-<section class="slide" id="pred">
+<section class="slide htt-fs20" id="pred">
   <div class="hdr in"><span class="qn">18b</span><h2>2PL performance · Predicate &amp; index-range locks</h2></div>
   <div class="cols" style="grid-template-columns:1fr 1.15fr;gap:22px">
     <div>
@@ -1103,7 +1145,7 @@ tr.f{transform:none}
       <span class="f ghost" data-now="#plg .tc|hl" data-say="Hoặc trên index thời gian: lock <b>mọi phòng</b> 12:00–13:00. Write khớp predicate gốc chắc chắn khớp xấp xỉ này."></span>
       <span class="f ghost" data-now="#plg .mc:not(.ix)|used" data-say="Không có index phù hợp → fallback: <b>shared lock cả table</b>. Chậm, nhưng an toàn."></span>
       <p class="say">Nhấn → để chạy từng bước.</p>
-      <div class="note blue" style="font-size:17px">Index-range lock kém chính xác hơn predicate lock (có thể lock rộng hơn cần) nhưng <b>overhead thấp hơn nhiều</b> → compromise tốt, chặn hiệu quả phantoms &amp; write skew.</div>
+      <div class="note blue" style="font-size:max(17px,var(--htt-min,24px))">Index-range lock kém chính xác hơn predicate lock (có thể lock rộng hơn cần) nhưng <b>overhead thấp hơn nhiều</b> → compromise tốt, chặn hiệu quả phantoms &amp; write skew.</div>
     </div>
   </div>
 </section>
@@ -1111,22 +1153,27 @@ tr.f{transform:none}
 <!-- ===================== SSI ===================== -->
 <section class="slide" id="ssi">
   <div class="hdr in"><span class="qn">19</span><h2>Serializable Snapshot Isolation (SSI)</h2></div>
-  <p class="in muted" style="font-size:19px;max-width:1180px">Một bên: serializability nhưng chậm (2PL) hoặc khó scale (serial). Bên kia: weak isolation nhanh nhưng dính race condition. SSI (2008, PhD thesis của <b>Michael Cahill</b>): <b>full serializability</b> với penalty nhỏ so với snapshot isolation. Dùng trong <b>PostgreSQL ≥ 9.1</b> (serializable) và <b>FoundationDB</b>.</p>
+  <p class="in muted" style="font-size:max(19px,var(--htt-min,24px));max-width:1180px">Một bên: serializability nhưng chậm (2PL) hoặc khó scale (serial). Bên kia: weak isolation nhanh nhưng dính race condition. SSI (2008, PhD thesis của <b>Michael Cahill</b>): <b>full serializability</b> với penalty nhỏ so với snapshot isolation. Dùng trong <b>PostgreSQL ≥ 9.1</b> (serializable) và <b>FoundationDB</b>.</p>
   <div class="vs2" style="margin-top:16px">
     <div class="card f"><span class="lbl bad">PESSIMISTIC</span><h3>2PL &amp; serial execution</h3><p class="ps">Nếu <i>có thể</i> có gì sai (lock do người khác giữ) → <b>chờ</b> tới khi an toàn. Giống mutual exclusion. Serial execution là pessimistic cực đoan: như lock <b>cả database</b>, bù lại bằng transaction rất nhanh.</p>
       <div class="q-row" style="margin-top:10px"><div class="rq fast wait">T2</div><span class="muted">⏳ chờ lock của</span><div class="rq slow">T1</div></div></div>
     <div class="vs">vs</div>
-    <div class="card f"><span class="lbl good">OPTIMISTIC</span><h3 style="color:#db2777">SSI</h3><p class="ps">Không block — cứ chạy tiếp, hy vọng mọi thứ ổn. Lúc <b>commit</b>, DB kiểm tra isolation có bị vi phạm không; nếu có → <b>abort &amp; retry</b>. Chỉ transaction chạy serializable mới được commit.</p>
+    <div class="card f"><span class="lbl good">OPTIMISTIC</span><h3 style="color:#276cdb">SSI</h3><p class="ps">Không block — cứ chạy tiếp, hy vọng mọi thứ ổn. Lúc <b>commit</b>, DB kiểm tra isolation có bị vi phạm không; nếu có → <b>abort &amp; retry</b>. Chỉ transaction chạy serializable mới được commit.</p>
       <div class="q-row" style="margin-top:10px"><div class="rq fast">T2</div><div class="rq slow" style="width:120px">T1</div><span class="muted">→ check @ commit</span></div></div>
   </div>
-  <div class="cols f" style="margin-top:14px;gap:16px">
-    <div class="note" style="margin:0;font-size:17px"><b>High contention</b> → nhiều abort; hệ thống gần max throughput thì retry làm tệ thêm.</div>
-    <div class="note blue" style="margin:0;font-size:17px">Đủ spare capacity &amp; contention thấp → optimistic thường <b>nhanh hơn</b>. Commutative atomic ops (increment) giảm contention. Khác OCC cũ: mọi read từ <b>consistent snapshot</b>.</div>
+  </section>
+
+<section id="ssi-p2" class="slide htt-cont">
+<div class="hdr in"><span class="qn">19</span><h2>Serializable Snapshot Isolation (SSI)</h2></div>
+<div class="cols f" style="margin-top:14px;gap:16px">
+    <div class="note" style="margin:0;font-size:max(17px,var(--htt-min,24px))"><b>High contention</b> → nhiều abort; hệ thống gần max throughput thì retry làm tệ thêm.</div>
+    <div class="note blue" style="margin:0;font-size:max(17px,var(--htt-min,24px))">Đủ spare capacity &amp; contention thấp → optimistic thường <b>nhanh hơn</b>. Commutative atomic ops (increment) giảm contention. Khác OCC cũ: mọi read từ <b>consistent snapshot</b>.</div>
   </div>
+
 </section>
 
 <!-- ===================== SSI DETECT 1 ===================== -->
-<section class="slide" id="ssi1">
+<section class="slide htt-fs20" id="ssi1">
   <div class="hdr in"><span class="qn">19b</span><h2>Decisions based on an outdated premise</h2></div>
   <div class="cols" style="grid-template-columns:1fr 1.45fr;gap:22px">
     <div>
@@ -1134,7 +1181,7 @@ tr.f{transform:none}
       <p class="ps" style="margin-top:8px">DB không biết app dùng kết quả query thế nào → giả định mọi thay đổi của premise đều có thể làm write <b>invalid</b>. Hai trường hợp cần phát hiện:</p>
       <div class="leg a" style="margin-top:8px"><b>① Stale MVCC read</b><p>uncommitted write xảy ra <b>trước</b> read</p></div>
       <div class="leg b" style="margin-top:8px"><b>② Write affects prior read</b><p>write xảy ra <b>sau</b> read</p></div>
-      <div class="note f" style="font-size:16px">Sao không abort 43 ngay khi đọc stale? Vì có thể 43 là <b>read-only</b>, hoặc 42 rồi sẽ abort. Chờ tới commit giúp tránh abort thừa, giữ được long-running reads trên snapshot.</div>
+      <div class="note f" style="font-size:max(16px,var(--htt-min,24px))">Sao không abort 43 ngay khi đọc stale? Vì có thể 43 là <b>read-only</b>, hoặc 42 rồi sẽ abort. Chờ tới commit giúp tránh abort thừa, giữ được long-running reads trên snapshot.</div>
     </div>
     <div>
       <p class="code-title">① Figure 7-10 · Detecting stale MVCC reads</p>
@@ -1153,7 +1200,7 @@ tr.f{transform:none}
 </section>
 
 <!-- ===================== SSI DETECT 2 ===================== -->
-<section class="slide" id="ssi2">
+<section class="slide htt-fs18" id="ssi2">
   <div class="hdr in"><span class="qn">19c</span><h2>Detecting writes that affect prior reads</h2></div>
   <div class="cols" style="grid-template-columns:1.45fr 1fr;gap:22px">
     <div>
@@ -1175,15 +1222,15 @@ tr.f{transform:none}
       <ul class="mini2">
         <li><b>Granularity</b> tracking: chi tiết → abort chính xác nhưng bookkeeping tốn; thô → nhanh nhưng abort thừa. PostgreSQL dùng lý thuyết để giảm abort không cần thiết.</li>
       </ul>
-      <div class="card good f" style="margin-top:8px"><h3 style="font-size:18px">vs 2PL</h3><p class="ps">Không block chờ lock. Writers không block readers và ngược lại → latency <b>dễ đoán</b>; read-only query chạy trên snapshot không cần lock.</p></div>
-      <div class="card good f" style="margin-top:8px"><h3 style="font-size:18px">vs serial execution</h3><p class="ps">Không bị giới hạn một CPU core: FoundationDB phân tán conflict detection qua nhiều máy.</p></div>
-      <div class="card bad f" style="margin-top:8px"><h3 style="font-size:18px;color:#be123c">Lưu ý</h3><p class="ps">Tỉ lệ abort quyết định performance → read-write transaction cần <b>ngắn</b>. Dù vậy SSI ít nhạy với transaction chậm hơn 2PL hay serial.</p></div>
+      <div class="card good f" style="margin-top:8px"><h3 style="font-size:max(18px,var(--htt-min,24px))">vs 2PL</h3><p class="ps">Không block chờ lock. Writers không block readers và ngược lại → latency <b>dễ đoán</b>; read-only query chạy trên snapshot không cần lock.</p></div>
+      <div class="card good f" style="margin-top:8px"><h3 style="font-size:max(18px,var(--htt-min,24px))">vs serial execution</h3><p class="ps">Không bị giới hạn một CPU core: FoundationDB phân tán conflict detection qua nhiều máy.</p></div>
+      <div class="card bad f" style="margin-top:8px"><h3 style="font-size:max(18px,var(--htt-min,24px));color:#1254be">Lưu ý</h3><p class="ps">Tỉ lệ abort quyết định performance → read-write transaction cần <b>ngắn</b>. Dù vậy SSI ít nhạy với transaction chậm hơn 2PL hay serial.</p></div>
     </div>
   </div>
 </section>
 
 <!-- ===================== SUMMARY MATRIX ===================== -->
-<section class="slide" id="sum">
+<section class="slide htt-fs22" id="sum">
   <div class="hdr in"><span class="qn">20</span><h2>Summary: race conditions vs isolation levels</h2></div>
   <div class="cols" style="grid-template-columns:1.35fr 1fr;gap:22px">
     <div>
@@ -1218,9 +1265,9 @@ tr.f{transform:none}
 <!-- ===================== END ===================== -->
 <section class="slide" id="end">
   <div class="title-wrap" style="align-items:center;text-align:center">
-    <div class="orb" style="width:360px;height:360px;background:#f9a8d4;left:10%;top:10%"></div>
+    <div class="orb" style="width:360px;height:360px;background:#a8c7f9;left:10%;top:10%"></div>
     <h1 class="in" style="font-size:60px">Tóm tắt <span class="grad">Chapter 7</span></h1>
-    <p class="in muted" style="font-size:20px;margin-top:10px;max-width:1050px"><b>Transactions là một abstraction layer</b>: app được “giả vờ” rằng một số concurrency problem và hardware/software fault không tồn tại. Một lớp lớn lỗi thu gọn thành <b>transaction abort</b> — app chỉ cần <b>retry</b>.</p>
+    <p class="in muted" style="font-size:max(20px,var(--htt-min,24px));margin-top:10px;max-width:1050px"><b>Transactions là một abstraction layer</b>: app được “giả vờ” rằng một số concurrency problem và hardware/software fault không tồn tại. Một lớp lớn lỗi thu gọn thành <b>transaction abort</b> — app chỉ cần <b>retry</b>.</p>
     <div class="cols3 in" style="margin-top:22px;text-align:left;max-width:1180px">
       <div class="card"><h3>🧱 Khi nào cần?</h3><p class="ps">Access pattern đơn giản (đọc/ghi một record) có thể sống không cần transaction. Access pattern phức tạp → transaction giảm mạnh số error case phải nghĩ tới; không có nó, denormalized data dễ <b>out of sync</b>.</p></div>
       <div class="card"><h3>🧪 Isolation levels</h3><p class="ps"><b>Read committed</b>, <b>snapshot isolation</b> (“repeatable read”), <b>serializable</b>. Weak isolation chặn một số anomaly, phần còn lại developer tự xử lý (vd. explicit locking).</p></div>
@@ -1320,6 +1367,53 @@ tr.f{transform:none}
   const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
   go(idx>=0?idx:0);
   addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+
+</script>
+<script id="htt-theme-js">
+(function(){
+  // HTT theme runtime: renumber split code blocks, enforce the slide's minimum font size (--htt-min, default 24px)
+  function minOf(el){var s=el&&el.closest?el.closest('.slide'):null;var v=parseFloat(getComputedStyle(s||document.documentElement).getPropertyValue('--htt-min'));return isNaN(v)?24:v}
+  window.HTT_MIN=function(el){return minOf(el)};
+  function renumber(){
+    document.querySelectorAll('.code[class*="htt-start-"]').forEach(function(c){
+      if(c.dataset.httNum)return;var m=c.className.match(/htt-start-(\d+)/);if(!m)return;var off=+m[1];
+      c.querySelectorAll('.ln>.no').forEach(function(n){var v=parseInt(n.textContent,10);if(!isNaN(v))n.textContent=String(v+off)});
+      c.dataset.httNum='1';
+    });
+  }
+  function hasText(el){for(var n=el.firstChild;n;n=n.nextSibling){if(n.nodeType===3&&/\S/.test(n.nodeValue))return true}return /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(el.tagName)}
+  function svgScale(t){var svg=t.ownerSVGElement;if(!svg)return 1;var s=1;
+    while(svg){var vb=svg.viewBox&&svg.viewBox.baseVal;if(vb&&vb.width&&vb.height){var w=svg.clientWidth||svg.getBoundingClientRect().width,h=svg.clientHeight||svg.getBoundingClientRect().height;if(!w||!h)return 0;s*=Math.min(w/vb.width,h/vb.height)}svg=svg.ownerSVGElement}
+    return s}
+  function set(el,v){if(!el.hasAttribute('data-htt-prev'))el.setAttribute('data-htt-prev',el.style.getPropertyValue('font-size')+'|'+el.style.getPropertyPriority('font-size'));el.style.setProperty('font-size',v,'important')}
+  function unfix(sel){document.querySelectorAll((sel||'#deck .slide *')).forEach(function(el){var p=el.getAttribute('data-htt-prev');if(p===null)return;var a=p.split('|');if(a[0])el.style.setProperty('font-size',a[0],a[1]||'');else el.style.removeProperty('font-size');el.removeAttribute('data-htt-prev')})}
+  function fix(sel){
+    renumber();
+    var slides=document.querySelectorAll(typeof sel==='string'?sel:'#deck .slide');
+    for(var j=0;j<slides.length;j++){var sl=slides[j];var MIN=minOf(sl);if(MIN<=0)continue;
+      var els=sl.querySelectorAll('*');
+      for(var i=0;i<els.length;i++){var el=els[i];
+        if(el instanceof SVGElement){
+          if(!/^(text|tspan|textPath)$/.test(el.tagName))continue;
+          if(el.tagName!=='text'&&!hasText(el))continue;
+          var sc=svgScale(el);if(!sc)continue;
+          var fs=parseFloat(getComputedStyle(el).fontSize);if(!fs)continue;
+          if(fs*sc<MIN-0.3)set(el,(MIN/sc).toFixed(2)+'px');
+          continue;
+        }
+        if(!hasText(el))continue;
+        var f=parseFloat(getComputedStyle(el).fontSize);
+        if(f>0&&f<MIN-0.3)set(el,MIN+'px');
+      }
+    }
+  }
+  window.HTT_fix=fix;window.HTT_unfix=unfix;
+  fix();
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){fix()});
+  var t=null;var mo=new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(ms[i].type==='childList'&&ms[i].addedNodes.length){clearTimeout(t);t=setTimeout(function(){fix()},30);return}}});
+  var d=document.getElementById('deck');if(d)mo.observe(d,{childList:true,subtree:true});
+  function act(){setTimeout(function(){fix('#deck .slide.active')},0)}addEventListener('keydown',act);addEventListener('click',act);addEventListener('touchend',act);
 })();
 
 </script>

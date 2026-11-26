@@ -8,18 +8,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
-  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
-  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
-  --sa1:#7c3aed; --sa2:#ec4899;
+  --bg:#ffffff; --panel:#ffffff; --line:#e8eef7; --text:#17263e; --muted:#3d63a0;
+  --accent:#3a7fed; --accent2:#0949b1; --warn:#1d68e1; --gold:#0b58d4; --code:#fcfbff;
+  --k:#3371d6; --t:#3a7fed; --s:#083d93; --n:#0c61ea; --c:#84a1d0; --p:#276cdb; --fn:#0a4fbf;
+  --sa1:#3a7fed; --sa2:#4887ec;
   --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+html,body{height:100%;background:#eff5fe;color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
 #viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
 #deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
-.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
-  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(58,127,237,.14);
+  background:none,none,none,var(--bg);
   opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
 .slide.past{transform:translateX(-60px) scale(.98)}
 .slide.active{opacity:1;transform:none;pointer-events:auto}
@@ -27,81 +27,81 @@ html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff
 .slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
 @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 .hdr{display:flex;align-items:center;gap:16px;margin-bottom:18px}
-.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
-.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
-.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+.slide:nth-of-type(4n+1){--sa1:#3a7fed;--sa2:#4887ec}.slide:nth-of-type(4n+2){--sa1:#0949b1;--sa2:#3a7fed}.slide:nth-of-type(4n+3){--sa1:#4887ec;--sa2:#1c6ef3}.slide:nth-of-type(4n){--sa1:#083d93;--sa2:#0e62e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:var(--sa1)}
+.qn{font-weight:800;font-size:max(17px,var(--htt-min,24px));letter-spacing:.06em;color:#fff;background:var(--sa1);box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
 h1{font-size:70px;line-height:1.1;font-weight:800}
 h2{font-size:38px;line-height:1.2;font-weight:800}
-h3{font-size:23px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
-p,li{font-size:22px;line-height:1.45;color:var(--text)}
+h3{font-size:max(23px,var(--htt-min,24px));font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:max(22px,var(--htt-min,24px));line-height:1.45;color:var(--text)}
 .muted{color:var(--muted)}
 ul{list-style:none}
 ul li{position:relative;padding-left:26px;margin:6px 0}
-ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
-.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
-code.i{font-family:var(--mono);font-size:.88em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 6px;border-radius:6px;color:#be185d}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:var(--sa1)}
+.grad{background:#3a7fed;-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.88em;background:#f0f5fd;border:1px solid #d3e2f9;padding:0 6px;border-radius:6px;color:#1858be}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
 .cols.c64{grid-template-columns:1.25fr 1fr}.cols.c46{grid-template-columns:1fr 1.2fr}
 .cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
-.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
-.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
-.card.bad{border-color:#fecdd3;background:linear-gradient(180deg,#fff1f3,#fff)}
-.card.good{border-color:#a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff)}
-.lbl{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
-.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(58,127,237,.25)}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #3a7fed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0949b1}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #4887ec}.cols4>.card:nth-child(4n){border-top:5px solid #0e65f2}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0949b1}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#276cdb}.cols4>.card:nth-child(4n) h3{color:#0b58d4}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#3a7fed}
+.card.bad{border-color:#cfe0fc;background:#f2f7fe}
+.card.good{border-color:#a7c4f3;background:#ecf3fd}
+.lbl{display:inline-block;font-size:max(15px,var(--htt-min,24px));font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#e5effe;color:#1254be}.lbl.good{background:#d1e1fa;color:#063176}.lbl.info{background:#e3ecfb;color:#3363b0}
 .icon{font-size:34px;margin-bottom:4px}
-.note{margin-top:12px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:20px;line-height:1.4}
-.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
-.code{font-family:var(--mono);font-size:18px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
-.code.sm{font-size:16.5px}.code.xs{font-size:15px;line-height:1.45}.code.xxs{font-size:13.6px;line-height:1.38;padding:8px 0}
+.note{margin-top:12px;padding:10px 16px;border-left:5px solid #0e65f2;background:#e2ecfd;border-radius:8px;font-size:max(20px,var(--htt-min,24px));line-height:1.4}
+.note.blue{border-color:#5c97f6;background:#eef4fe}
+.code{font-family:var(--mono);font-size:max(18px,var(--htt-min,24px));line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
+.code.sm{font-size:max(16.5px,var(--htt-min,24px))}.code.xs{font-size:max(15px,var(--htt-min,24px));line-height:1.45}.code.xxs{font-size:max(13.6px,var(--htt-min,24px));line-height:1.38;padding:8px 0}
 .code .ln{padding:0 14px 0 8px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
-.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.code .no{color:#bdcde6;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
 .k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
-.code.show-a .mark-a{background:rgba(124,58,237,.11);box-shadow:inset 5px 0 #7c3aed}
-.code.show-b .mark-b{background:rgba(6,182,212,.13);box-shadow:inset 5px 0 #06b6d4}
-.code.show-c .mark-c{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
-.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
-.code-title{font-family:var(--mono);font-size:15px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.code.show-a .mark-a{background:rgba(58,127,237,.11);box-shadow:inset 5px 0 #3a7fed}
+.code.show-b .mark-b{background:rgba(11,86,207,.13);box-shadow:inset 5px 0 #0b56cf}
+.code.show-c .mark-c{background:rgba(14,101,242,.16);box-shadow:inset 5px 0 #0e65f2}
+.code.show-d .mark-d{background:rgba(72,135,236,.12);box-shadow:inset 5px 0 #4887ec}
+.code-title{font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));color:var(--muted);margin:0 0 5px 4px;font-weight:600}
 .f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
 .f.on{opacity:1;transform:none}
 .f.ghost{display:none}
 .f.zoom{transform:scale(.85)}.f.zoom.on{transform:none}
-table{border-collapse:separate;border-spacing:0;width:100%;font-size:19px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:max(19px,var(--htt-min,24px));border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
 th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
-th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+th{background:#ebf2fe;font-weight:700}
 tr:last-child td{border-bottom:none}
 td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
 .legend{display:flex;flex-direction:column;gap:10px}
 .leg{border-radius:12px;padding:10px 16px;background:#fff;border:1px solid var(--line)}
-.leg b{display:block;font-size:21px;margin-bottom:2px}
-.leg p{font-size:19px}
-.leg.a{border-left:6px solid #7c3aed}.leg.b{border-left:6px solid #06b6d4}.leg.c{border-left:6px solid #f59e0b}
-.console{font-family:var(--mono);font-size:17px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre}
-.console .in{color:#fbbf24;font-weight:600}
-.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.leg b{display:block;font-size:max(21px,var(--htt-min,24px));margin-bottom:2px}
+.leg p{font-size:max(19px,var(--htt-min,24px))}
+.leg.a{border-left:6px solid #3a7fed}.leg.b{border-left:6px solid #0b56cf}.leg.c{border-left:6px solid #0e65f2}
+.console{font-family:var(--mono);font-size:max(17px,var(--htt-min,24px));line-height:1.5;background:#17263e;border-radius:12px;padding:10px 16px;color:#e7f0fe;white-space:pre}
+.console .in{color:#2b78f4;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#72a4f4;font-size:max(11px,var(--htt-min,24px));letter-spacing:3px;margin-bottom:4px}
 .mem{display:flex;align-items:center;gap:16px;min-height:130px}
-.frame{border:2px solid #e4dcfb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
-.frame .fname{font-family:var(--mono);font-size:16px;color:var(--muted);margin-bottom:6px}
+.frame{border:2px solid #dce8fb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
+.frame .fname{font-family:var(--mono);font-size:max(16px,var(--htt-min,24px));color:var(--muted);margin-bottom:6px}
 .var{display:flex;align-items:center;gap:10px}
-.vn{font-family:var(--mono);font-size:21px;color:var(--t);font-weight:600}
-.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #c4b5fd;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
+.vn{font-family:var(--mono);font-size:max(21px,var(--htt-min,24px));color:var(--t);font-weight:600}
+.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #b7d1fb;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
 .vb .new{display:none}
 .callee,.arw{opacity:0;transform:translateX(-14px);transition:all .5s}
 .mem.s1 .callee,.mem.s1 .arw{opacity:1;transform:none}
 .mem.s2 .chg .old{display:none}.mem.s2 .chg .new{display:inline;animation:pop .5s}
-.mem.s2 .chg{border-color:#f59e0b;box-shadow:0 0 18px rgba(245,158,11,.5)}
+.mem.s2 .chg{border-color:#0e65f2;box-shadow:0 0 18px rgba(14,101,242,.5)}
 .mem.s3 .callee,.mem.s3 .arw{opacity:.15;transform:translateY(10px)}
-.mem.s3 .result{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.5)}
-.arw{font-family:var(--mono);font-size:16px;color:var(--gold);text-align:center;line-height:1.2;font-weight:600}
+.mem.s3 .result{border-color:#1051b9;box-shadow:0 0 18px rgba(16,81,185,.5)}
+.arw{font-family:var(--mono);font-size:max(16px,var(--htt-min,24px));color:var(--#0d65f2);text-align:center;line-height:1.2;font-weight:600}
 .arw .bar{display:block;font-size:30px}
-.alias{font-size:18px;color:var(--accent2);font-weight:600}
+.alias{font-size:max(18px,var(--htt-min,24px));color:var(--accent2);font-weight:600}
 @keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.25)}100%{transform:none;opacity:1}}
 .flow{display:flex;align-items:center;gap:12px;justify-content:center}
-.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:18px;border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
-.box small{display:block;font-family:"Be Vietnam Pro";font-size:14px;color:var(--muted);margin-top:2px;font-weight:400}
-.box.h{border-color:var(--gold)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#c4b5fd}.box.exe{border-color:#ec4899;background:#fdf2f8}
+.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:max(18px,var(--htt-min,24px));border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:max(14px,var(--htt-min,24px));color:var(--muted);margin-top:2px;font-weight:400}
+.box.h{border-color:var(--#0d65f2)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#b7d1fb}.box.exe{border-color:#4887ec;background:#f2f6fd}
 .ar{color:var(--muted);font-size:26px;text-align:center}
 .stack{display:flex;flex-direction:column;gap:8px}
 svg text{font-family:var(--mono);font-weight:600}
@@ -110,44 +110,44 @@ svg.d1 .dr1,svg.d2 .dr2,svg.d3 .dr3{stroke-dashoffset:0}
 .fadein{opacity:0;transition:opacity .6s}
 svg.d1 .fd1,svg.d2 .fd2,svg.d3 .fd3{opacity:1}
 .title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
-.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.kicker{font-family:var(--mono);color:#276cdb;font-size:max(22px,var(--htt-min,24px));margin-bottom:18px;font-weight:600}
 .orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
 @keyframes float{50%{transform:translate(30px,-25px)}}
 .agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:19px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05)}
-.ag:hover{border-color:#ec4899;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
-.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
-.ag b{color:#db2777;margin-right:6px;font-family:var(--mono)}
-.formula{font-family:var(--mono);font-size:23px;text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
-#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
-#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
-#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:16px}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:max(19px,var(--htt-min,24px));line-height:1.3;box-shadow:0 2px 6px rgba(40,67,110,.05)}
+.ag:hover{border-color:#4887ec;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(72,135,236,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #3a7fed}.ag:nth-child(4n+2){border-left:5px solid #0949b1}.ag:nth-child(4n+3){border-left:5px solid #4887ec}.ag:nth-child(4n){border-left:5px solid #0e65f2}
+.ag b{color:#276cdb;margin-right:6px;font-family:var(--mono)}
+.formula{font-family:var(--mono);font-size:max(23px,var(--htt-min,24px));text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:#3a7fed;transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:max(14px,var(--htt-min,24px));color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:max(16px,var(--htt-min,24px))}
 #nav button:hover{border-color:var(--accent)}
-#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+#hint{position:fixed;left:16px;bottom:12px;font-size:max(13px,var(--htt-min,24px));color:#7495ca;z-index:5}
 @media (max-width:700px){#hint{display:none}}
 @media print{#nav,#bar,#hint{display:none}}
 
 /* lec03 additions */
 .chain{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.pv{display:inline-flex;align-items:center;font-family:var(--mono);font-size:18px;font-weight:700;padding:5px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;white-space:nowrap}
-.pv.yes{background:#d1fae5;border-color:#34d399;color:#047857}
-.pv.no{background:#ffe4e6;border-color:#fb7185;color:#be123c}
-.pv.skip{background:#f1f5f9;border-color:#cbd5e1;color:#94a3b8;text-decoration:line-through;border-style:dashed}
+.pv{display:inline-flex;align-items:center;font-family:var(--mono);font-size:max(18px,var(--htt-min,24px));font-weight:700;padding:5px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;white-space:nowrap}
+.pv.yes{background:#d1e1fa;border-color:#3471d3;color:#063176}
+.pv.no{background:#e5effe;border-color:#74a7f8;color:#1254be}
+.pv.skip{background:#f1f4f9;border-color:#c4d2e8;color:#7e9dce;text-decoration:line-through;border-style:dashed}
 .op{font-family:var(--mono);font-size:26px;font-weight:800;color:var(--sa1)}
 .tt th,.tt td{text-align:center}.tt td:first-child{color:var(--text);font-weight:400}
-.tt tr.hit td{background:#fdf2f8;color:#be185d}
+.tt tr.hit td{background:#f2f6fd;color:#1858be}
 tr.f{transform:none}
 .cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
 .code.show-s .mark-s{opacity:.3;text-decoration:line-through}
 .arr{display:flex;gap:12px;justify-content:center;margin-top:6px}
-.cell{width:84px;height:84px;border-radius:16px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:800;transition:all .45s;box-shadow:0 6px 16px -10px rgba(124,58,237,.4)}
-.cell small{font-size:13px;color:var(--muted);font-weight:600}
-.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857;transform:translateY(-6px)}
-.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;transform:translateY(-10px) scale(1.06);box-shadow:0 10px 24px -8px rgba(225,29,72,.5)}
+.cell{width:84px;height:84px;border-radius:16px;border:3px solid #dce8fb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:800;transition:all .45s;box-shadow:0 6px 16px -10px rgba(58,127,237,.4)}
+.cell small{font-size:max(13px,var(--htt-min,24px));color:var(--muted);font-weight:600}
+.cell.ok{border-color:#1051b9;background:#ecf3fd;color:#063176;transform:translateY(-6px)}
+.cell.bad{border-color:#1d68e1;background:#f2f7fe;color:#1254be;transform:translateY(-10px) scale(1.06);box-shadow:0 10px 24px -8px rgba(29,104,225,.5)}
 .cell.skip{opacity:.3;transform:scale(.92)}
 .syn{display:flex;gap:12px;align-items:center;justify-content:center;font-family:var(--mono);font-size:24px;font-weight:700}
 .sy{padding:8px 16px;border-radius:12px;color:#fff}
-.sy.c1{background:linear-gradient(135deg,#7c3aed,#a855f7)}.sy.c2{background:linear-gradient(135deg,#059669,#10b981)}.sy.c3{background:linear-gradient(135deg,#e11d48,#f97316)}
+.sy.c1{background:#3a7fed}.sy.c2{background:#083d93}.sy.c3{background:#1d68e1}
 .spin{display:inline-block;animation:spin 2.4s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
@@ -155,41 +155,41 @@ tr.f{transform:none}
 .cell .new{display:none}
 .cell.fill .old,.inc.p1 .s1 .old,.inc.p2 .s2 .old{display:none}
 .cell.fill .new,.inc.p1 .s1 .new,.inc.p2 .s2 .new{display:inline;animation:pop .5s}
-.cell.fill,.inc.p1 .s1,.inc.p2 .s2{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cell.fill,.inc.p1 .s1,.inc.p2 .s2{border-color:#1051b9;background:#ecf3fd;color:#063176}
 .inc{display:flex;gap:16px}
 .c440{stroke-dasharray:440;stroke-dashoffset:440}.c720{stroke-dasharray:720;stroke-dashoffset:720}
-.bar{height:14px;background:#f1edfd;border-radius:99px;overflow:hidden}
-.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7c3aed,#ec4899);border-radius:99px;transition:width 1.1s .3s ease}
+.bar{height:14px;background:#edf3fd;border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:#3a7fed;border-radius:99px;transition:width 1.1s .3s ease}
 .slide.active .bar i{width:var(--w)}
 .chars{display:flex;margin:5px 0}
-.ch{width:28px;height:38px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:700;border:1px solid #e4dcfb;margin-right:-1px;background:#fff}
-.ch.pad{color:#c4b5fd;font-weight:400}.ch.a{background:#f3edff}.ch.b{background:#e6f8fd}.ch.c{background:#fff7e0;color:#b45309}
-.ch.b.pad[class]{color:#7dd3fc}
+.ch{width:28px;height:38px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:max(20px,var(--htt-min,24px));font-weight:700;border:1px solid #dce8fb;margin-right:-1px;background:#fff}
+.ch.pad{color:#b7d1fb;font-weight:400}.ch.a{background:#eef4fe}.ch.b{background:#e6effd}.ch.c{background:#e2ecfd;color:#094bb4}
+.ch.b.pad[class]{color:#81aff8}
 
 /* oop lec03 additions */
 .xl{margin-top:14px}
-.xlat{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:22px;font-weight:700}
-.xlat .src{padding:8px 16px;border-radius:12px;background:#fff;border:2px solid #e4dcfb}
-.xlat .dst{padding:8px 16px;border-radius:12px;background:linear-gradient(135deg,#f3edff,#fdf2f8);border:2px solid #c4b5fd;color:#4c1d95}
-.xlat .dst b{color:#db2777}
+.xlat{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:max(22px,var(--htt-min,24px));font-weight:700}
+.xlat .src{padding:8px 16px;border-radius:12px;background:#fff;border:2px solid #dce8fb}
+.xlat .dst{padding:8px 16px;border-radius:12px;background:#eef4fe;border:2px solid #b7d1fb;color:#1d4b95}
+.xlat .dst b{color:#276cdb}
 .xlat .arrow{font-size:28px;color:var(--sa1)}
 .xlat.go .dst{animation:pop .6s}
 .opgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
-.opgrid span{display:flex;align-items:center;justify-content:center;height:62px;border-radius:12px;background:#fff;border:2px solid #ece8f7;font-family:var(--mono);font-size:22px;font-weight:700;color:#1e1b3a;box-shadow:0 4px 12px -8px rgba(124,58,237,.4)}
+.opgrid span{display:flex;align-items:center;justify-content:center;height:62px;border-radius:12px;background:#fff;border:2px solid #e8eef7;font-family:var(--mono);font-size:max(22px,var(--htt-min,24px));font-weight:700;color:#17263e;box-shadow:0 4px 12px -8px rgba(58,127,237,.4)}
 .slide.active .opgrid span{animation:pop .5s both}
 .opgrid span:nth-child(7n+2){animation-delay:.04s!important}.opgrid span:nth-child(7n+3){animation-delay:.08s!important}.opgrid span:nth-child(7n+4){animation-delay:.12s!important}.opgrid span:nth-child(7n+5){animation-delay:.16s!important}.opgrid span:nth-child(7n+6){animation-delay:.2s!important}.opgrid span:nth-child(7n){animation-delay:.24s!important}
-.opgrid span.mb{background:#cffafe;border-color:#22d3ee;color:#0e7490}
-.opgrid.lit span.mb{box-shadow:0 0 0 4px rgba(34,211,238,.35),0 8px 20px -6px rgba(8,145,178,.6);transform:scale(1.08);transition:all .4s}
-.opgrid span{font-size:20px}
+.opgrid span.mb{background:#d0e1fd;border-color:#2270ee;color:#0e4090}
+.opgrid.lit span.mb{box-shadow:0 0 0 4px rgba(34,112,238,.35),0 8px 20px -6px rgba(9,73,177,.6);transform:scale(1.08);transition:all .4s}
+.opgrid span{font-size:max(20px,var(--htt-min,24px))}
 .fr-demo{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.frac{display:inline-flex;flex-direction:column;align-items:center;font-family:var(--mono);font-size:22px;font-weight:700;padding:4px 10px;border-radius:10px;background:#fff;border:2px solid #ece8f7}
+.frac{display:inline-flex;flex-direction:column;align-items:center;font-family:var(--mono);font-size:max(22px,var(--htt-min,24px));font-weight:700;padding:4px 10px;border-radius:10px;background:#fff;border:2px solid #e8eef7}
 .frac span:first-child{border-bottom:3px solid currentColor;padding:0 6px}
-.frac.hl{background:#fff7e0;border-color:#fcd34d;color:#b45309;font-size:18px}
-.frac.ok{background:#d1fae5;border-color:#34d399;color:#047857}
+.frac.hl{background:#e2ecfd;border-color:#5391f6;color:#094bb4;font-size:max(18px,var(--htt-min,24px))}
+.frac.ok{background:#d1e1fa;border-color:#3471d3;color:#063176}
 .lr{display:flex;align-items:stretch;gap:10px}
 .lr .side{flex:1;border-radius:14px;padding:10px 14px;border:2px solid;display:flex;flex-direction:column}
-.lr .side b{font-size:20px}.lr .side span{font-family:var(--mono);font-size:16px;color:var(--muted)}
-.lr .l{border-color:#fb7185;background:#fff1f3}.lr .r{border-color:#a78bfa;background:#f5f3ff}
+.lr .side b{font-size:max(20px,var(--htt-min,24px))}.lr .side span{font-family:var(--mono);font-size:max(16px,var(--htt-min,24px));color:var(--muted)}
+.lr .l{border-color:#74a7f8;background:#f2f7fe}.lr .r{border-color:#8cb6f9;background:#f4f8fe}
 .lr .mid{display:flex;align-items:center;font-family:var(--mono);font-size:30px;font-weight:800;color:var(--sa1)}
 .leg p b{display:inline;font-size:inherit;margin:0}
 
@@ -197,21 +197,21 @@ tr.f{transform:none}
 .mm{position:relative;width:100%}
 .mm>*{position:absolute}
 .mm .wires{left:0;top:0;width:100%;height:100%;overflow:visible;pointer-events:none}
-.mm .w{fill:none;stroke:#7c3aed;stroke-width:3;transition:all .5s}
-.lab{font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.12em;color:#a78bfa}
-.obj{left:0;width:180px;border:2.5px solid #c4b5fd;border-radius:14px;background:#fff;box-shadow:0 8px 20px -12px rgba(124,58,237,.5);overflow:hidden;transition:all .5s}
-.obj .oh{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-weight:800;font-size:18px;padding:5px 12px}
-.obj .oh small{font-weight:500;font-size:13px;opacity:.85}
-.obj.dupe .oh{background:linear-gradient(135deg,#db2777,#f472b6)}
-.obj .row{font-family:var(--mono);font-size:18px;font-weight:700;padding:5px 12px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #f1edfd}
-.dot{width:14px;height:14px;border-radius:50%;background:#7c3aed;box-shadow:0 0 0 4px #ede9fe}
+.mm .w{fill:none;stroke:#3a7fed;stroke-width:3;transition:all .5s}
+.lab{font-family:var(--mono);font-size:max(13px,var(--htt-min,24px));font-weight:700;letter-spacing:.12em;color:#8cb6f9}
+.obj{left:0;width:180px;border:2.5px solid #b7d1fb;border-radius:14px;background:#fff;box-shadow:0 8px 20px -12px rgba(58,127,237,.5);overflow:hidden;transition:all .5s}
+.obj .oh{background:#3a7fed;color:#fff;font-weight:800;font-size:max(18px,var(--htt-min,24px));padding:5px 12px}
+.obj .oh small{font-weight:500;font-size:max(13px,var(--htt-min,24px));opacity:.85}
+.obj.dupe .oh{background:#276cdb}
+.obj .row{font-family:var(--mono);font-size:max(18px,var(--htt-min,24px));font-weight:700;padding:5px 12px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #edf3fd}
+.dot{width:14px;height:14px;border-radius:50%;background:#3a7fed;box-shadow:0 0 0 4px #e9f1fe}
 .heap{display:flex;transition:all .5s}
-.heap span{width:46px;height:50px;display:flex;align-items:center;justify-content:center;border:2.5px solid #fbbf24;margin-right:-2.5px;background:#fff7e0;font-family:var(--mono);font-size:20px;font-weight:800;color:#b45309;transition:all .5s}
+.heap span{width:46px;height:50px;display:flex;align-items:center;justify-content:center;border:2.5px solid #2b78f4;margin-right:-2.5px;background:#e2ecfd;font-family:var(--mono);font-size:max(20px,var(--htt-min,24px));font-weight:800;color:#094bb4;transition:all .5s}
 .heap span:first-child{border-radius:10px 0 0 10px}.heap span:last-child{border-radius:0 10px 10px 0}
-.heap.cp span{border-color:#22d3ee;background:#ecfeff;color:#0e7490}
-.tag{font-size:15px;font-weight:600;padding:6px 12px;border-radius:10px;background:#fff7e0;border:1.5px solid #fcd34d;color:#92400e;max-width:250px;line-height:1.3}
-.tag.bad{background:#fff1f3;border-color:#fda4af;color:#be123c}.tag.ok{background:#ecfdf5;border-color:#6ee7b7;color:#047857;max-width:260px}
-.boom{font-size:20px;font-weight:800;padding:8px 16px;border-radius:12px;background:linear-gradient(135deg,#e11d48,#f97316);color:#fff;box-shadow:0 10px 30px -8px rgba(225,29,72,.6)}
+.heap.cp span{border-color:#2270ee;background:#edf4fe;color:#0e4090}
+.tag{font-size:max(15px,var(--htt-min,24px));font-weight:600;padding:6px 12px;border-radius:10px;background:#e2ecfd;border:1.5px solid #5391f6;color:#0e4192;max-width:250px;line-height:1.3}
+.tag.bad{background:#f2f7fe;border-color:#a7c7fa;color:#1254be}.tag.ok{background:#ecf3fd;border-color:#6e9ce7;color:#063176;max-width:260px}
+.boom{font-size:max(20px,var(--htt-min,24px));font-weight:800;padding:8px 16px;border-radius:12px;background:#1d68e1;color:#fff;box-shadow:0 10px 30px -8px rgba(29,104,225,.6)}
 .mm .ap1,.mm .ap2,.mm .ap3,.mm .ap4{opacity:0;transition:opacity .5s}
 .mm.s1 .ap1,.mm.s2 .ap2,.mm.s3 .ap3,.mm.s4 .ap4{opacity:1}
 .mm.s4 .boom{animation:shake .5s 2}
@@ -220,53 +220,75 @@ tr.f{transform:none}
 .mm .chg1 .n,.mm .chg2 .n,.mm .chg3 .n{display:none}
 .mm.s1 .chg1 .o,.mm.s2 .chg2 .o,.mm.s3 .chg3 .o{display:none}
 .mm.s1 .chg1 .n,.mm.s2 .chg2 .n,.mm.s3 .chg3 .n{display:inline;animation:pop .5s}
-.mm.s2 .chg2,.mm.s3 .chg3{background:#ffe4e6!important;border-color:#e11d48!important;color:#be123c!important}
-.mm .fill3{color:transparent}.mm.s3 .fill3{color:#b45309;transition:color .4s}
+.mm.s2 .chg2,.mm.s3 .chg3{background:#e5effe!important;border-color:#1d68e1!important;color:#1254be!important}
+.mm .fill3{color:transparent}.mm.s3 .fill3{color:#094bb4;transition:color .4s}
 .mm.s3 .fill3:nth-child(2){transition-delay:.15s}.mm.s3 .fill3:nth-child(3){transition-delay:.3s}.mm.s3 .fill3:nth-child(4){transition-delay:.45s}.mm.s3 .fill3:nth-child(5){transition-delay:.6s}
-.mm.s3 .free3 span,.mm.s2 .free2 span{background:repeating-linear-gradient(45deg,#f1f5f9 0 6px,#e2e8f0 6px 12px)!important;border-color:#94a3b8!important;border-style:dashed!important;color:#94a3b8!important}
-.mm.s3 .bad3{stroke:#e11d48!important;stroke-dasharray:7 6}
+.mm.s3 .free3 span,.mm.s2 .free2 span{background:#f1f4f9!important;border-color:#7e9dce!important;border-style:dashed!important;color:#7e9dce!important}
+.mm.s3 .bad3{stroke:#1d68e1!important;stroke-dasharray:7 6}
 .mm.s1 .gone1 span{text-decoration:line-through}
 
 /* java Q&A */
-.qcard{background:#fff;border:1px solid var(--line);border-left:6px solid var(--sa1);border-radius:14px;padding:10px 16px;font-size:19px;line-height:1.45;box-shadow:0 6px 18px -12px rgba(124,58,237,.35)}
-.acard{background:linear-gradient(180deg,#f3fcf8,#fff);border:1px solid #bbf7d0;border-radius:14px;padding:10px 16px;margin-bottom:10px}
-.acard p,.acard li{font-size:17.5px;line-height:1.45}
-.qlab{display:inline-block;font-size:13px;font-weight:800;letter-spacing:.06em;padding:2px 10px;border-radius:999px;background:#f3edff;color:#6d28d9;margin-right:8px;vertical-align:2px}
-.qlab.ok{background:#d1fae5;color:#047857;margin-bottom:4px}
-.part-tag{margin-left:auto;font-size:14px;font-weight:700;color:var(--muted);background:#fff;border:1px solid var(--line);padding:4px 12px;border-radius:999px;white-space:nowrap}
-ul.mini li{font-size:16.5px;margin:3px 0}
-.cap{font-size:15px;margin-top:6px}
-.qnote{font-size:16.5px;margin-top:10px}
-.qnote p{font-size:16.5px;line-height:1.45}
+.qcard{background:#fff;border:1px solid var(--line);border-left:6px solid var(--sa1);border-radius:14px;padding:10px 16px;font-size:max(19px,var(--htt-min,24px));line-height:1.45;box-shadow:0 6px 18px -12px rgba(58,127,237,.35)}
+.acard{background:#f3f6fc;border:1px solid #bbd2f7;border-radius:14px;padding:10px 16px;margin-bottom:10px}
+.acard p,.acard li{font-size:max(17.5px,var(--htt-min,24px));line-height:1.45}
+.qlab{display:inline-block;font-size:max(13px,var(--htt-min,24px));font-weight:800;letter-spacing:.06em;padding:2px 10px;border-radius:999px;background:#eef4fe;color:#286cd9;margin-right:8px;vertical-align:2px}
+.qlab.ok{background:#d1e1fa;color:#063176;margin-bottom:4px}
+.part-tag{margin-left:auto;font-size:max(14px,var(--htt-min,24px));font-weight:700;color:var(--muted);background:#fff;border:1px solid var(--line);padding:4px 12px;border-radius:999px;white-space:nowrap}
+ul.mini li{font-size:max(16.5px,var(--htt-min,24px));margin:3px 0}
+.cap{font-size:max(15px,var(--htt-min,24px));margin-top:6px}
+.qnote{font-size:max(16.5px,var(--htt-min,24px));margin-top:10px}
+.qnote p{font-size:max(16.5px,var(--htt-min,24px));line-height:1.45}
 .qnote p+p,.qnote p+ul,.qnote ul+p{margin-top:6px}
-table.io{font-size:16px;margin-bottom:10px}
+table.io{font-size:max(16px,var(--htt-min,24px));margin-bottom:10px}
 table.io td:first-child{color:var(--text);font-weight:400}
-.slide.qs .console{font-size:15px;line-height:1.45;margin-top:2px;white-space:pre-wrap;word-break:break-word}
+.slide.qs .console{font-size:max(15px,var(--htt-min,24px));line-height:1.45;margin-top:2px;white-space:pre-wrap;word-break:break-word}
 .slide.qs .hdr{margin-bottom:12px}
 .slide.qs h2{font-size:33px}
 </style>
+<style id="htt-theme">
+/* HTT theme: logo + layout helpers (font-size >= 24px, single blue) */
+#deck>.htt-logo{position:absolute;top:12px;right:14px;z-index:60;height:40px;padding:0 10px;border-radius:8px;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;font:800 24px/1 "Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.04em;pointer-events:none;user-select:none}
+#deck>.htt-logo span{font-size:24px;color:#fff}
+.htt-stack{grid-template-columns:minmax(0,1fr)!important;grid-template-areas:none!important;flex-direction:column!important;flex-wrap:nowrap!important}
+.htt-stack>*{grid-column:auto!important;grid-row:auto!important;max-width:100%}
+.htt-wrap,.htt-wrap *{white-space:pre-wrap!important;overflow-wrap:anywhere}
+.htt-wrap .ln{flex-wrap:nowrap}
+.htt-flexwrap{flex-wrap:wrap!important}
+#nav,#nav *{font-size:16px!important}
+#hint{font-size:14px!important}
+.orb{display:none!important}
+:root{--htt-min:24px}
+.slide.htt-fs22{--htt-min:22px}.slide.htt-fs20{--htt-min:20px}.slide.htt-fs0{--htt-min:0px}
+.jumpbtn{right:100px!important}
+.slide.htt-fs18{--htt-min:18px}.slide.htt-fs16{--htt-min:16px}
+.slide .hdr{padding-right:84px}
+.sjump{right:100px!important}
+
+</style>
+<script>window.HTT_MIN=function(el){var s=el&&el.closest?el.closest(".slide"):null;var v=parseFloat(getComputedStyle(s||document.documentElement).getPropertyValue("--htt-min"));return isNaN(v)?24:v};</script>
 </head>
 <body>
-<div id="viewport"><div id="deck"><section class="slide" id="title">
-  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
-  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+<div id="viewport"><div id="deck">
+<div class="htt-logo" aria-label="HTT" title="HTT"><span>HTT</span></div><section class="slide" id="title">
+  <div class="orb" style="width:380px;height:380px;background:#a8c7f9;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#81aff8;left:40%;bottom:-120px;animation-delay:-4s"></div>
   <div class="title-wrap">
     <div class="kicker in">// Java 17+ · W03 · Questions &amp; Answers</div>
     <h1 class="in">Java Common Classes<br><span class="grad">String · BigDecimal · Date-Time · Format</span></h1>
     <p class="in muted" style="font-size:25px;margin-top:20px;max-width:900px">50 câu hỏi tình huống thực tế kèm đáp án. Mọi output là kết quả chạy thật trên JDK 21.</p>
-    <p class="in" style="margin-top:22px;font-size:18px"><code class="i">Locale vi = Locale.forLanguageTag("vi-VN");</code> &nbsp; <code class="i">ZoneId VN = ZoneId.of("Asia/Ho_Chi_Minh");</code></p>
-    <p class="in" style="margin-top:18px;font-size:18px;color:#8a91b4">Dùng phím ← → hoặc Space để chuyển · F: toàn màn hình · A: hiện hết slide</p>
+    <p class="in" style="margin-top:22px;font-size:max(18px,var(--htt-min,24px))"><code class="i">Locale vi = Locale.forLanguageTag("vi-VN");</code> &nbsp; <code class="i">ZoneId VN = ZoneId.of("Asia/Ho_Chi_Minh");</code></p>
+    <p class="in" style="margin-top:18px;font-size:max(18px,var(--htt-min,24px));color:#7495ca">Dùng phím ← → hoặc Space để chuyển · F: toàn màn hình · A: hiện hết slide</p>
   </div>
 </section>
 
 <section class="slide" id="agenda">
-  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:18px">· 4 phần · 50 câu</span></div>
-  <div class="cols4 in" style="grid-template-columns:repeat(4,1fr)"><div class="card ag" data-goto="partA" style="cursor:pointer"><div class="icon">🔤</div><h3>Phần A</h3><p style="font-size:18px"><b>String &amp; StringBuilder</b></p><p class="muted" style="font-size:16px;margin-top:6px">Câu 1 – 10</p></div><div class="card ag" data-goto="partB" style="cursor:pointer"><div class="icon">💰</div><h3>Phần B</h3><p style="font-size:18px"><b>BigDecimal</b></p><p class="muted" style="font-size:16px;margin-top:6px">Câu 11 – 15</p></div><div class="card ag" data-goto="partC" style="cursor:pointer"><div class="icon">🕒</div><h3>Phần C</h3><p style="font-size:18px"><b>LocalDateTime, Instant, ZonedDateTime, OffsetDateTime</b></p><p class="muted" style="font-size:16px;margin-top:6px">Câu 16 – 40</p></div><div class="card ag" data-goto="partD" style="cursor:pointer"><div class="icon">🧾</div><h3>Phần D</h3><p style="font-size:18px"><b>DateTimeFormatter, NumberFormat, DecimalFormat, Formatter, CompactNumberFormat</b></p><p class="muted" style="font-size:16px;margin-top:6px">Câu 41 – 50</p></div></div>
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:max(18px,var(--htt-min,24px))">· 4 phần · 50 câu</span></div>
+  <div class="cols4 in" style="grid-template-columns:repeat(4,1fr)"><div class="card ag" data-goto="partA" style="cursor:pointer"><div class="icon">🔤</div><h3>Phần A</h3><p style="font-size:max(18px,var(--htt-min,24px))"><b>String &amp; StringBuilder</b></p><p class="muted" style="font-size:max(16px,var(--htt-min,24px));margin-top:6px">Câu 1 – 10</p></div><div class="card ag" data-goto="partB" style="cursor:pointer"><div class="icon">💰</div><h3>Phần B</h3><p style="font-size:max(18px,var(--htt-min,24px))"><b>BigDecimal</b></p><p class="muted" style="font-size:max(16px,var(--htt-min,24px));margin-top:6px">Câu 11 – 15</p></div><div class="card ag" data-goto="partC" style="cursor:pointer"><div class="icon">🕒</div><h3>Phần C</h3><p style="font-size:max(18px,var(--htt-min,24px))"><b>LocalDateTime, Instant, ZonedDateTime, OffsetDateTime</b></p><p class="muted" style="font-size:max(16px,var(--htt-min,24px));margin-top:6px">Câu 16 – 40</p></div><div class="card ag" data-goto="partD" style="cursor:pointer"><div class="icon">🧾</div><h3>Phần D</h3><p style="font-size:max(18px,var(--htt-min,24px))"><b>DateTimeFormatter, NumberFormat, DecimalFormat, Formatter, CompactNumberFormat</b></p><p class="muted" style="font-size:max(16px,var(--htt-min,24px));margin-top:6px">Câu 41 – 50</p></div></div>
 </section>
 
 <section class="slide" id="partA">
   <div class="hdr in"><span class="qn">PHẦN A</span><h2>🔤 String &amp; StringBuilder</h2></div>
-  <div class="agenda in" style="grid-template-columns:repeat(2,1fr);gap:8px;font-size:18px"><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q1"><b>01</b>isBlank: chặn username rỗng</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q2"><b>02</b>Chuẩn hóa họ tên</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q3"><b>03</b>Đếm chuỗi con với indexOf</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q4"><b>04</b>So sánh email: equals vs ==</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q5"><b>05</b>Che số điện thoại</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q6"><b>06</b>Lấy phần mở rộng file</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q7"><b>07</b>Chuỗi cấu hình → Map</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q8"><b>08</b>Kiểm tra palindrome</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q9"><b>09</b>StringBuilder vs +=</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q10"><b>10</b>Kiểm tra mật khẩu mạnh</div></div>
+  <div class="agenda in" style="grid-template-columns:repeat(2,1fr);gap:8px;font-size:max(18px,var(--htt-min,24px))"><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q1"><b>01</b>isBlank: chặn username rỗng</div><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q2"><b>02</b>Chuẩn hóa họ tên</div><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q3"><b>03</b>Đếm chuỗi con với indexOf</div><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q4"><b>04</b>So sánh email: equals vs ==</div><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q5"><b>05</b>Che số điện thoại</div><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q6"><b>06</b>Lấy phần mở rộng file</div><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q7"><b>07</b>Chuỗi cấu hình → Map</div><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q8"><b>08</b>Kiểm tra palindrome</div><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q9"><b>09</b>StringBuilder vs +=</div><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q10"><b>10</b>Kiểm tra mật khẩu mạnh</div></div>
 </section>
 
 <section class="slide qs" id="q1">
@@ -301,7 +323,7 @@ System.out.println(result);
   
 </section>
 
-<section class="slide qs" id="q3">
+<section class="slide qs htt-fs20" id="q3">
   <div class="hdr in"><span class="qn">CÂU 3</span><h2>Đếm chuỗi con với indexOf</h2><span class="part-tag">Phần A</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Đếm số lần chuỗi con <code class="i">"an"</code> xuất hiện (không chồng lấn) trong <code class="i">"banana an"</code>.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
@@ -355,7 +377,7 @@ System.out.println(phone.replaceAll("\\d(?=\\d{4})", "*"));  // ******5678
 <section class="slide qs" id="q6">
   <div class="hdr in"><span class="qn">CÂU 6</span><h2>Lấy phần mở rộng file</h2><span class="part-tag">Phần A</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Lấy phần mở rộng (viết thường) của tên file <code class="i">"report.final.PDF"</code>. Nếu tên file không có dấu chấm thì trả về <code class="i">""</code>.</div>
-  <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
+  <div class="cols htt-stack" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
     <div class="f"><script type="text/x-cpp" id="c6" data-mark="" style="font-size:12.6px">
 static String ext(String fileName) {
     int dot = fileName.lastIndexOf('.');
@@ -367,7 +389,7 @@ static String ext(String fileName) {
   
 </section>
 
-<section class="slide qs" id="q7">
+<section class="slide qs htt-fs18" id="q7">
   <div class="hdr in"><span class="qn">CÂU 7</span><h2>Chuỗi cấu hình → Map</h2><span class="part-tag">Phần A</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Chuyển chuỗi cấu hình <code class="i">"host=localhost;port=8080;db=example"</code> thành <code class="i">Map&lt;String, String&gt;</code>.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
@@ -385,7 +407,7 @@ System.out.println(map);
   
 </section>
 
-<section class="slide qs" id="q8">
+<section class="slide qs htt-fs20" id="q8">
   <div class="hdr in"><span class="qn">CÂU 8</span><h2>Kiểm tra palindrome</h2><span class="part-tag">Phần A</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Kiểm tra câu <code class="i">"A man, a plan, a canal: Panama"</code> có phải palindrome không, bỏ qua dấu câu, khoảng trắng và hoa/thường.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Dùng <code class="i">replaceAll</code> để loại ký tự không phải chữ/số, <code class="i">toLowerCase()</code>, rồi đảo chuỗi bằng <code class="i">StringBuilder.reverse()</code> (String không có hàm reverse).</p></div><div></div></div>
@@ -399,7 +421,7 @@ System.out.println(isPalindrome);
   
 </section>
 
-<section class="slide qs" id="q9">
+<section class="slide qs htt-fs18" id="q9">
   <div class="hdr in"><span class="qn">CÂU 9</span><h2>StringBuilder vs +=</h2><span class="part-tag">Phần A</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Cần tạo chuỗi <code class="i">"1,2,3,4,5,6,7,8,9,10"</code> bằng vòng lặp. Viết code dùng <code class="i">StringBuilder</code> và giải thích vì sao không nên dùng <code class="i">s += i</code> trong vòng lặp lớn.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
@@ -435,10 +457,10 @@ System.out.println(isStrong("example"));      // false (ngắn, không có chữ
 
 <section class="slide" id="partB">
   <div class="hdr in"><span class="qn">PHẦN B</span><h2>💰 BigDecimal</h2></div>
-  <div class="agenda in" style="grid-template-columns:repeat(2,1fr);gap:8px;font-size:18px"><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q11"><b>11</b>0.1 + 0.2 với BigDecimal</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q12"><b>12</b>Tính VAT, làm tròn HALF_UP</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q13"><b>13</b>Chia đều hóa đơn</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q14"><b>14</b>equals vs compareTo</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q15"><b>15</b>toPlainString()</div></div>
+  <div class="agenda in" style="grid-template-columns:repeat(2,1fr);gap:8px;font-size:max(18px,var(--htt-min,24px))"><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q11"><b>11</b>0.1 + 0.2 với BigDecimal</div><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q12"><b>12</b>Tính VAT, làm tròn HALF_UP</div><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q13"><b>13</b>Chia đều hóa đơn</div><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q14"><b>14</b>equals vs compareTo</div><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q15"><b>15</b>toPlainString()</div></div>
 </section>
 
-<section class="slide qs" id="q11">
+<section class="slide qs htt-fs18" id="q11">
   <div class="hdr in"><span class="qn">CÂU 11</span><h2>0.1 + 0.2 với BigDecimal</h2><span class="part-tag">Phần B</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span><code class="i">System.out.println(0.1 + 0.2)</code> in ra <code class="i">0.30000000000000004</code>. Hãy tính đúng <code class="i">0.1 + 0.2 = 0.3</code> cho bài toán tiền tệ. Vì sao <code class="i">new BigDecimal(0.1)</code> vẫn sai?</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
@@ -485,7 +507,7 @@ System.out.println(each + " + " + each + " + " + last);
   
 </section>
 
-<section class="slide qs" id="q14">
+<section class="slide qs htt-fs18" id="q14">
   <div class="hdr in"><span class="qn">CÂU 14</span><h2>equals vs compareTo</h2><span class="part-tag">Phần B</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span><code class="i">new BigDecimal("2.0").equals(new BigDecimal("2.00"))</code> trả về gì? Khi so sánh hai số tiền, nên dùng hàm nào? Điều này ảnh hưởng thế nào khi đưa BigDecimal vào <code class="i">HashSet</code>?</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
@@ -502,7 +524,7 @@ System.out.println(new TreeSet<>(List.of(x)).contains(y)); // true
   <span class="f ghost" data-act="#c14l0|show;#c14|show-a"></span><span class="f ghost" data-act="#c14l1|show;#c14|show-b"></span><span class="f ghost" data-act="#c14l2|show;#c14|show-c"></span><span class="f ghost" data-act="#c14l3|show;#c14|show-d"></span>
 </section>
 
-<section class="slide qs" id="q15">
+<section class="slide qs htt-fs18" id="q15">
   <div class="hdr in"><span class="qn">CÂU 15</span><h2>toPlainString()</h2><span class="part-tag">Phần B</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Sau khi gọi <code class="i">stripTrailingZeros()</code> cho <code class="i">100.00</code>, in ra lại thành <code class="i">1E+2</code> khiến hóa đơn hiển thị sai. Làm sao in ra <code class="i">100</code>?</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
@@ -520,10 +542,20 @@ System.out.println(new BigDecimal("1E+3").toPlainString()); // 1000
 
 <section class="slide" id="partC">
   <div class="hdr in"><span class="qn">PHẦN C</span><h2>🕒 LocalDateTime, Instant, ZonedDateTime, OffsetDateTime</h2></div>
-  <div class="agenda in" style="grid-template-columns:repeat(3,1fr);gap:8px;font-size:15px"><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q16"><b>16</b>plusMinutes: giờ kết thúc</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q17"><b>17</b>parse &amp; getDayOfWeek</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q18"><b>18</b>Đếm ngày đến Giáng sinh</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q19"><b>19</b>TemporalAdjusters: cuối tháng</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q20"><b>20</b>next vs nextOrSame</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q21"><b>21</b>plusMonths &amp; ngày 31</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q22"><b>22</b>Kiểm tra trùng lịch họp</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q23"><b>23</b>truncatedTo: nhóm theo giờ</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q24"><b>24</b>Duration: giờ làm việc</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q25"><b>25</b>Đo thời gian thực thi</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q26"><b>26</b>Epoch millis → Instant</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q27"><b>27</b>UTC → giờ Việt Nam</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q28"><b>28</b>LocalDateTime → Instant</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q29"><b>29</b>Token hết hạn: Instant.plus</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q30"><b>30</b>JWT exp: epoch second</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q31"><b>31</b>Quy đổi giờ sang New York</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q32"><b>32</b>withZoneSameLocal vs SameInstant</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q33"><b>33</b>DST gap: 02:30 không tồn tại</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q34"><b>34</b>DST overlap: 01:30 hai lần</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q35"><b>35</b>plusDays vs plusHours</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q36"><b>36</b>Khoảng “hôm nay” theo giờ VN</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q37"><b>37</b>ZoneRules: offset &amp; DST</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q38"><b>38</b>OffsetDateTime → UTC</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q39"><b>39</b>equals vs isEqual</div><div class="ag" style="font-size:15px;padding:8px 12px" data-goto="q40"><b>40</b>Sắp xếp sự kiện &amp; java.util.Date</div></div>
+  <div class="agenda in htt-stack" style="grid-template-columns:repeat(3,1fr);gap:8px;font-size:max(15px,var(--htt-min,24px))"><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q16"><b>16</b>plusMinutes: giờ kết thúc</div><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q17"><b>17</b>parse &amp; getDayOfWeek</div><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q18"><b>18</b>Đếm ngày đến Giáng sinh</div><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q19"><b>19</b>TemporalAdjusters: cuối tháng</div><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q20"><b>20</b>next vs nextOrSame</div><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q21"><b>21</b>plusMonths &amp; ngày 31</div><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q22"><b>22</b>Kiểm tra trùng lịch họp</div><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q23"><b>23</b>truncatedTo: nhóm theo giờ</div><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q24"><b>24</b>Duration: giờ làm việc</div><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q25"><b>25</b>Đo thời gian thực thi</div></div>
 </section>
 
-<section class="slide qs" id="q16">
+<section id="partC-p2" class="slide htt-cont">
+<div class="hdr in"><span class="qn">PHẦN C</span><h2>🕒 LocalDateTime, Instant, ZonedDateTime, OffsetDateTime</h2></div>
+<div class="agenda in htt-stack htt-cont-part" style="grid-template-columns:repeat(3,1fr);gap:8px;font-size:max(15px,var(--htt-min,24px))"><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q26"><b>26</b>Epoch millis → Instant</div><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q27"><b>27</b>UTC → giờ Việt Nam</div><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q28"><b>28</b>LocalDateTime → Instant</div><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q29"><b>29</b>Token hết hạn: Instant.plus</div><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q30"><b>30</b>JWT exp: epoch second</div><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q31"><b>31</b>Quy đổi giờ sang New York</div><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q32"><b>32</b>withZoneSameLocal vs SameInstant</div><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q33"><b>33</b>DST gap: 02:30 không tồn tại</div><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q34"><b>34</b>DST overlap: 01:30 hai lần</div><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q35"><b>35</b>plusDays vs plusHours</div></div>
+</section>
+
+<section id="partC-p2-p2" class="slide htt-cont htt-cont">
+<div class="hdr in"><span class="qn">PHẦN C</span><h2>🕒 LocalDateTime, Instant, ZonedDateTime, OffsetDateTime</h2></div>
+<div class="agenda in htt-stack htt-cont-part htt-cont-part" style="grid-template-columns:repeat(3,1fr);gap:8px;font-size:max(15px,var(--htt-min,24px))"><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q36"><b>36</b>Khoảng “hôm nay” theo giờ VN</div><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q37"><b>37</b>ZoneRules: offset &amp; DST</div><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q38"><b>38</b>OffsetDateTime → UTC</div><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q39"><b>39</b>equals vs isEqual</div><div class="ag" style="font-size:max(15px,var(--htt-min,24px));padding:8px 12px" data-goto="q40"><b>40</b>Sắp xếp sự kiện &amp; java.util.Date</div></div>
+</section>
+
+<section class="slide qs htt-fs18" id="q16">
   <div class="hdr in"><span class="qn">CÂU 16</span><h2>plusMinutes: giờ kết thúc</h2><span class="part-tag">Phần C</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Cuộc họp bắt đầu lúc <code class="i">2026-10-12 08:30</code>, kéo dài 90 phút. Tính giờ kết thúc.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
@@ -537,7 +569,7 @@ System.out.println(end);
   
 </section>
 
-<section class="slide qs" id="q17">
+<section class="slide qs htt-fs18" id="q17">
   <div class="hdr in"><span class="qn">CÂU 17</span><h2>parse &amp; getDayOfWeek</h2><span class="part-tag">Phần C</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Hệ thống nhận chuỗi <code class="i">"2026-10-12T08:30:00"</code>. Hãy cho biết ngày đó là thứ mấy và có phải cuối tuần không.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
@@ -552,7 +584,7 @@ System.out.println(dow + " - weekend: " + weekend);
   
 </section>
 
-<section class="slide qs" id="q18">
+<section class="slide qs htt-fs18" id="q18">
   <div class="hdr in"><span class="qn">CÂU 18</span><h2>Đếm ngày đến Giáng sinh</h2><span class="part-tag">Phần C</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Hôm nay là <code class="i">2026-10-12 08:30</code>. Còn bao nhiêu ngày nữa đến Giáng sinh <code class="i">2026-12-25</code>?</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
@@ -567,7 +599,7 @@ System.out.println(days);
   
 </section>
 
-<section class="slide qs" id="q19">
+<section class="slide qs htt-fs20" id="q19">
   <div class="hdr in"><span class="qn">CÂU 19</span><h2>TemporalAdjusters: cuối tháng</h2><span class="part-tag">Phần C</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Ngày lập hóa đơn là <code class="i">2026-02-10 09:00</code>. Tính hạn thanh toán là ngày cuối cùng của tháng đó và ngày đầu của tháng kế tiếp.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">with(TemporalAdjusters.lastDayOfMonth())</code> và <code class="i">with(TemporalAdjusters.firstDayOfNextMonth())</code>.</p></div><div></div></div>
@@ -580,7 +612,7 @@ System.out.println(invoice.with(TemporalAdjusters.firstDayOfNextMonth())); // 20
   <span class="f ghost" data-act="#c19l0|show;#c19|show-a"></span><span class="f ghost" data-act="#c19l1|show;#c19|show-b"></span>
 </section>
 
-<section class="slide qs" id="q20">
+<section class="slide qs htt-fs18" id="q20">
   <div class="hdr in"><span class="qn">CÂU 20</span><h2>next vs nextOrSame</h2><span class="part-tag">Phần C</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Lịch họp team cố định vào thứ Hai. Hôm nay <code class="i">2026-10-12</code> (đúng thứ Hai). Tìm "thứ Hai kế tiếp" trong hai trường hợp: (a) không tính hôm nay, (b) tính cả hôm nay.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">TemporalAdjusters.next()</code> luôn nhảy sang tuần sau; <code class="i">nextOrSame()</code> giữ nguyên nếu hôm nay đã đúng thứ.</p></div><div></div></div>
@@ -607,7 +639,7 @@ System.out.println(start.plusMonths(2));               // 2026-03-31T00:00  (đ�
   <span class="f ghost" data-act="#c21l0|show;#c21|show-a"></span><span class="f ghost" data-act="#c21l1|show;#c21|show-b"></span><span class="f ghost" data-act="#c21l2|show;#c21|show-c"></span>
 </section>
 
-<section class="slide qs" id="q22">
+<section class="slide qs htt-fs18" id="q22">
   <div class="hdr in"><span class="qn">CÂU 22</span><h2>Kiểm tra trùng lịch họp</h2><span class="part-tag">Phần C</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Phòng họp đã có lịch <code class="i">09:00–10:30</code> ngày 2026-10-12. Một yêu cầu mới <code class="i">10:00–11:00</code> cùng ngày. Viết hàm kiểm tra hai khoảng thời gian có bị trùng không.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Hai khoảng <code class="i">[s1, e1)</code> và <code class="i">[s2, e2)</code> giao nhau khi <code class="i">s1 &lt; e2 &amp;&amp; s2 &lt; e1</code>, dùng <code class="i">isBefore()</code>.</p></div><div></div></div>
@@ -635,7 +667,7 @@ System.out.println(t.truncatedTo(ChronoUnit.HOURS));
   
 </section>
 
-<section class="slide qs" id="q24">
+<section class="slide qs htt-fs20" id="q24">
   <div class="hdr in"><span class="qn">CÂU 24</span><h2>Duration: giờ làm việc</h2><span class="part-tag">Phần C</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Nhân viên check-in <code class="i">08:15</code> và check-out <code class="i">17:40</code> ngày 2026-10-12. Hiển thị thời gian làm việc dạng <code class="i">"9 giờ 25 phút"</code>.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">Duration.between()</code> rồi <code class="i">toHours()</code> và <code class="i">toMinutesPart()</code> (Java 9+).</p></div><div></div></div>
@@ -650,7 +682,7 @@ System.out.println(d.toHours() + " giờ " + d.toMinutesPart() + " phút"); // 9
   <span class="f ghost" data-act="#c24l0|show;#c24|show-a"></span><span class="f ghost" data-act="#c24l1|show;#c24|show-b"></span>
 </section>
 
-<section class="slide qs" id="q25">
+<section class="slide qs htt-fs18" id="q25">
   <div class="hdr in"><span class="qn">CÂU 25</span><h2>Đo thời gian thực thi</h2><span class="part-tag">Phần C</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Đo thời gian thực thi của một đoạn code (đơn vị mili giây) bằng Date-Time API.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
@@ -665,7 +697,7 @@ System.out.println(Duration.between(start, end).toMillis() + " ms");
   
 </section>
 
-<section class="slide qs" id="q26">
+<section class="slide qs htt-fs22" id="q26">
   <div class="hdr in"><span class="qn">CÂU 26</span><h2>Epoch millis → Instant</h2><span class="part-tag">Phần C</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>API trả về timestamp dạng epoch millis <code class="i">1760000000000</code>. Chuyển sang <code class="i">Instant</code> (UTC) và giờ Việt Nam.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">Instant.ofEpochMilli()</code> rồi <code class="i">atZone(ZoneId)</code>.</p></div><div></div></div>
@@ -678,7 +710,7 @@ System.out.println(ins.atZone(ZoneId.of("Asia/Ho_Chi_Minh"))); // 2025-10-09T15:
   <span class="f ghost" data-act="#c26l0|show;#c26|show-a"></span><span class="f ghost" data-act="#c26l1|show;#c26|show-b"></span>
 </section>
 
-<section class="slide qs" id="q27">
+<section class="slide qs htt-fs20" id="q27">
   <div class="hdr in"><span class="qn">CÂU 27</span><h2>UTC → giờ Việt Nam</h2><span class="part-tag">Phần C</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Server lưu log bằng UTC: <code class="i">"2026-10-12T01:30:00Z"</code>. Hiển thị cho người dùng Việt Nam thời điểm này theo giờ địa phương (chỉ cần ngày giờ, không cần múi giờ).</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">Instant.parse()</code> → <code class="i">atZone(VN)</code> → <code class="i">toLocalDateTime()</code>.</p></div><div></div></div>
@@ -692,7 +724,7 @@ System.out.println(vnTime.toLocalDateTime()); // 2026-10-12T08:30
   <span class="f ghost" data-act="#c27l0|show;#c27|show-a"></span><span class="f ghost" data-act="#c27l1|show;#c27|show-b"></span>
 </section>
 
-<section class="slide qs" id="q28">
+<section class="slide qs htt-fs18" id="q28">
   <div class="hdr in"><span class="qn">CÂU 28</span><h2>LocalDateTime → Instant</h2><span class="part-tag">Phần C</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Người dùng ở Việt Nam chọn lịch hẹn <code class="i">2026-10-12T08:30</code> (LocalDateTime). Cần lưu xuống DB dưới dạng <code class="i">Instant</code> UTC. Vì sao không có hàm <code class="i">localDateTime.toInstant()</code> không tham số?</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
@@ -726,7 +758,7 @@ Instant plus1Month = issuedAt.atZone(ZoneOffset.UTC).plusMonths(1).toInstant(); 
   <span class="f ghost" data-act="#c29l0|show;#c29|show-a"></span>
 </section>
 
-<section class="slide qs" id="q30">
+<section class="slide qs htt-fs18" id="q30">
   <div class="hdr in"><span class="qn">CÂU 30</span><h2>JWT exp: epoch second</h2><span class="part-tag">Phần C</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Trường <code class="i">exp</code> của JWT là số giây kể từ epoch. Chuyển thời điểm <code class="i">2026-10-12T01:30:00Z</code> thành giá trị <code class="i">exp</code> và ngược lại.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
@@ -741,7 +773,7 @@ System.out.println(Instant.ofEpochSecond(exp));  // 2026-10-12T01:30:00Z
   <span class="f ghost" data-act="#c30l0|show;#c30|show-a"></span><span class="f ghost" data-act="#c30l1|show;#c30|show-b"></span>
 </section>
 
-<section class="slide qs" id="q31">
+<section class="slide qs htt-fs18" id="q31">
   <div class="hdr in"><span class="qn">CÂU 31</span><h2>Quy đổi giờ sang New York</h2><span class="part-tag">Phần C</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Cuộc họp online lúc <code class="i">09:00</code> ngày <code class="i">2026-10-12</code> theo giờ Hà Nội. Đồng nghiệp ở New York sẽ tham gia lúc mấy giờ (giờ địa phương của họ)?</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Tạo <code class="i">ZonedDateTime</code> ở zone <code class="i">Asia/Ho_Chi_Minh</code> rồi <code class="i">withZoneSameInstant(ZoneId.of("America/New_York"))</code> – giữ nguyên thời điểm, đổi cách hiển thị. Tháng 10 New York đang dùng giờ mùa hè EDT (-04:00).</p></div><div></div></div>
@@ -754,7 +786,7 @@ System.out.println(ny);
   
 </section>
 
-<section class="slide qs" id="q32">
+<section class="slide qs htt-fs18" id="q32">
   <div class="hdr in"><span class="qn">CÂU 32</span><h2>withZoneSameLocal vs SameInstant</h2><span class="part-tag">Phần C</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Một developer viết <code class="i">hanoi.withZoneSameLocal(ZoneId.of("America/New_York"))</code> cho bài toán ở câu 31 và ra kết quả sai. Giải thích khác biệt giữa <code class="i">withZoneSameLocal</code> và <code class="i">withZoneSameInstant</code>.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><ul class="mini"><li><code class="i">withZoneSameInstant</code>: giữ nguyên <b>thời điểm tuyệt đối</b>, đổi giờ hiển thị → dùng khi quy đổi múi giờ.</li><li><code class="i">withZoneSameLocal</code>: giữ nguyên <b>giờ đồng hồ</b> (09:00), chỉ gắn zone mới → thành một thời điểm khác hẳn (chênh 11 tiếng).</li></ul></div><div></div></div>
@@ -767,7 +799,7 @@ System.out.println(hanoi.withZoneSameLocal(ZoneId.of("America/New_York")));   //
   <span class="f ghost" data-act="#c32l0|show;#c32|show-a"></span><span class="f ghost" data-act="#c32l1|show;#c32|show-b"></span>
 </section>
 
-<section class="slide qs" id="q33">
+<section class="slide qs htt-fs20" id="q33">
   <div class="hdr in"><span class="qn">CÂU 33</span><h2>DST gap: 02:30 không tồn tại</h2><span class="part-tag">Phần C</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Ngày <code class="i">2026-03-08</code> New York chuyển sang giờ mùa hè: đồng hồ nhảy từ <code class="i">01:59:59</code> lên <code class="i">03:00</code>. Nếu tạo lịch lúc <code class="i">02:30</code> ngày đó ở New York thì Java xử lý thế nào?</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">02:30</code> rơi vào <b>khoảng trống (gap)</b>, không tồn tại. <code class="i">ZonedDateTime.of()</code> tự đẩy về sau đúng bằng độ dài gap (1 giờ) → <code class="i">03:30</code> với offset mới <code class="i">-04:00</code>.</p></div><div></div></div>
@@ -779,7 +811,7 @@ System.out.println(z);
   
 </section>
 
-<section class="slide qs" id="q34">
+<section class="slide qs htt-fs18" id="q34">
   <div class="hdr in"><span class="qn">CÂU 34</span><h2>DST overlap: 01:30 hai lần</h2><span class="part-tag">Phần C</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Ngày <code class="i">2026-11-01</code> New York kết thúc giờ mùa hè: đồng hồ lùi từ <code class="i">02:00</code> về <code class="i">01:00</code>, nên giờ <code class="i">01:30</code> xuất hiện <b>hai lần</b>. Làm sao chọn lần thứ nhất hoặc lần thứ hai?</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Đây là <b>overlap</b>. Mặc định Java chọn offset sớm hơn (<code class="i">-04:00</code>). Dùng <code class="i">withEarlierOffsetAtOverlap()</code> / <code class="i">withLaterOffsetAtOverlap()</code> để chọn rõ ràng.</p></div><div></div></div>
@@ -805,7 +837,7 @@ System.out.println(z.plusHours(24)); // 2026-03-08T13:00-04:00[America/New_York]
   <span class="f ghost" data-act="#c35l0|show;#c35|show-a"></span><span class="f ghost" data-act="#c35l1|show;#c35|show-b"></span>
 </section>
 
-<section class="slide qs" id="q36">
+<section class="slide qs htt-fs16" id="q36">
   <div class="hdr in"><span class="qn">CÂU 36</span><h2>Khoảng “hôm nay” theo giờ VN</h2><span class="part-tag">Phần C</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>DB lưu cột <code class="i">created_at</code> dạng UTC. Viết truy vấn lấy các bản ghi "trong ngày hôm nay theo giờ Việt Nam" (2026-10-12). Hãy tính cặp <code class="i">Instant</code> [start, end) để đưa vào điều kiện <code class="i">WHERE created_at &gt;= ? AND created_at &lt; ?</code>.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
@@ -821,7 +853,7 @@ System.out.println(start + " -> " + end);
   
 </section>
 
-<section class="slide qs" id="q37">
+<section class="slide qs htt-fs18" id="q37">
   <div class="hdr in"><span class="qn">CÂU 37</span><h2>ZoneRules: offset &amp; DST</h2><span class="part-tag">Phần C</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Cần hiển thị chênh lệch múi giờ của New York so với UTC tại hai thời điểm <code class="i">2026-10-12</code> và <code class="i">2026-12-12</code>, đồng thời cho biết lúc đó có đang áp dụng giờ mùa hè không.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">ZoneId.getRules()</code> trả <code class="i">ZoneRules</code>; dùng <code class="i">getOffset(Instant)</code> và <code class="i">isDaylightSavings(Instant)</code>. Offset của một zone <b>không cố định</b>, phụ thuộc thời điểm.</p></div><div></div></div>
@@ -851,7 +883,7 @@ System.out.println(ny.toOffsetDateTime());                     // 2026-10-12T10:
   <span class="f ghost" data-act="#c38l0|show;#c38|show-a"></span><span class="f ghost" data-act="#c38l1|show;#c38|show-b"></span>
 </section>
 
-<section class="slide qs" id="q39">
+<section class="slide qs htt-fs0" id="q39">
   <div class="hdr in"><span class="qn">CÂU 39</span><h2>equals vs isEqual</h2><span class="part-tag">Phần C</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Hai service gửi về hai giá trị <code class="i">"2026-10-12T08:30:00+07:00"</code> và <code class="i">"2026-10-12T01:30:00Z"</code>. Viết code kiểm tra chúng có cùng một thời điểm không. <code class="i">equals()</code> có dùng được không?</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
@@ -891,10 +923,10 @@ System.out.println(back.getTime());                                     // 17917
 
 <section class="slide" id="partD">
   <div class="hdr in"><span class="qn">PHẦN D</span><h2>🧾 DateTimeFormatter, NumberFormat, DecimalFormat, Formatter, CompactNumberFormat</h2></div>
-  <div class="agenda in" style="grid-template-columns:repeat(2,1fr);gap:8px;font-size:18px"><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q41"><b>41</b>DateTimeFormatter: format &amp; parse</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q42"><b>42</b>Ngày tháng tiếng Việt</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q43"><b>43</b>Lỗi YYYY vs yyyy</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q44"><b>44</b>ResolverStyle.STRICT</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q45"><b>45</b>Tiền VND / USD</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q46"><b>46</b>Parse số kiểu Việt &amp; phần trăm</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q47"><b>47</b>DecimalFormat pattern</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q48"><b>48</b>HALF_EVEN vs HALF_UP</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q49"><b>49</b>Formatter: bảng hóa đơn</div><div class="ag" style="font-size:18px;padding:8px 12px" data-goto="q50"><b>50</b>CompactNumberFormat</div></div>
+  <div class="agenda in" style="grid-template-columns:repeat(2,1fr);gap:8px;font-size:max(18px,var(--htt-min,24px))"><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q41"><b>41</b>DateTimeFormatter: format &amp; parse</div><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q42"><b>42</b>Ngày tháng tiếng Việt</div><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q43"><b>43</b>Lỗi YYYY vs yyyy</div><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q44"><b>44</b>ResolverStyle.STRICT</div><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q45"><b>45</b>Tiền VND / USD</div><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q46"><b>46</b>Parse số kiểu Việt &amp; phần trăm</div><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q47"><b>47</b>DecimalFormat pattern</div><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q48"><b>48</b>HALF_EVEN vs HALF_UP</div><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q49"><b>49</b>Formatter: bảng hóa đơn</div><div class="ag" style="font-size:max(18px,var(--htt-min,24px));padding:8px 12px" data-goto="q50"><b>50</b>CompactNumberFormat</div></div>
 </section>
 
-<section class="slide qs" id="q41">
+<section class="slide qs htt-fs20" id="q41">
   <div class="hdr in"><span class="qn">CÂU 41</span><h2>DateTimeFormatter: format &amp; parse</h2><span class="part-tag">Phần D</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Màn hình hiển thị ngày giờ theo dạng <code class="i">dd/MM/yyyy HH:mm</code>. Hãy (a) format <code class="i">2026-10-12T08:30</code> ra chuỗi, (b) đọc chuỗi người dùng nhập <code class="i">"25/12/2026 18:00"</code> thành <code class="i">LocalDateTime</code>.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Tạo <code class="i">DateTimeFormatter.ofPattern(...)</code> (thread-safe, nên khai báo <code class="i">static final</code> dùng lại), dùng <code class="i">format()</code> và <code class="i">LocalDateTime.parse(text, formatter)</code>.</p></div><div></div></div>
@@ -907,7 +939,7 @@ System.out.println(LocalDateTime.parse("25/12/2026 18:00", F));      // 2026-12-
   <span class="f ghost" data-act="#c41l0|show;#c41|show-a"></span><span class="f ghost" data-act="#c41l1|show;#c41|show-b"></span>
 </section>
 
-<section class="slide qs" id="q42">
+<section class="slide qs htt-fs22" id="q42">
   <div class="hdr in"><span class="qn">CÂU 42</span><h2>Ngày tháng tiếng Việt</h2><span class="part-tag">Phần D</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Hiển thị ngày <code class="i">2026-10-12</code> theo kiểu văn bản tiếng Việt: <code class="i">"Thứ Hai, ngày 12 tháng 10 năm 2026"</code>.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p>Pattern <code class="i">EEEE</code> (tên thứ đầy đủ) + <code class="i">Locale</code> vi-VN; phần chữ cố định đặt trong dấu nháy đơn <code class="i">'...'</code>.</p></div><div></div></div>
@@ -920,7 +952,7 @@ System.out.println(LocalDate.of(2026, 10, 12).format(f));
   
 </section>
 
-<section class="slide qs" id="q43">
+<section class="slide qs htt-fs18" id="q43">
   <div class="hdr in"><span class="qn">CÂU 43</span><h2>Lỗi YYYY vs yyyy</h2><span class="part-tag">Phần D</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Báo cáo cuối năm in ngày <code class="i">2026-12-28</code> ra thành <code class="i">28/12/2027</code> dù code dùng <code class="i">ofPattern("dd/MM/YYYY", Locale.US)</code>. Tìm nguyên nhân và sửa.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">Y</code> là <b>week-based-year</b> (năm theo tuần), không phải năm lịch. Với Locale.US, tuần chứa ngày 01/01/2027 bắt đầu từ Chủ nhật 27/12/2026 nên 28/12/2026 thuộc "năm tuần" 2027. Sửa thành <code class="i">yyyy</code> (hoặc <code class="i">uuuu</code>).</p></div><div></div></div>
@@ -954,7 +986,7 @@ try {
   <span class="f ghost" data-act="#c44l0|show;#c44|show-a"></span><span class="f ghost" data-act="#c44l1|show;#c44|show-b"></span>
 </section>
 
-<section class="slide qs" id="q45">
+<section class="slide qs htt-fs22" id="q45">
   <div class="hdr in"><span class="qn">CÂU 45</span><h2>Tiền VND / USD</h2><span class="part-tag">Phần D</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Hiển thị số tiền <code class="i">1234567.891</code> theo định dạng tiền Việt Nam và tiền USD.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">NumberFormat.getCurrencyInstance(Locale)</code>. VND không có phần lẻ nên tự làm tròn về số nguyên; dấu phân nhóm là <code class="i">.</code>.</p></div><div></div></div>
@@ -968,7 +1000,7 @@ System.out.println(usd.format(1234567.891)); // $1,234,567.89
   <span class="f ghost" data-act="#c45l0|show;#c45|show-a"></span><span class="f ghost" data-act="#c45l1|show;#c45|show-b"></span>
 </section>
 
-<section class="slide qs" id="q46">
+<section class="slide qs htt-fs18" id="q46">
   <div class="hdr in"><span class="qn">CÂU 46</span><h2>Parse số kiểu Việt &amp; phần trăm</h2><span class="part-tag">Phần D</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Người dùng Việt Nam nhập số tiền <code class="i">"1.234.567,89"</code> (dấu <code class="i">.</code> phân nhóm, dấu <code class="i">,</code> thập phân). Chuyển chuỗi thành số. Đồng thời hiển thị tỉ lệ <code class="i">0.12345</code> dưới dạng phần trăm có 1 chữ số thập phân theo kiểu Việt Nam.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
@@ -986,7 +1018,7 @@ System.out.println(pct.format(0.12345)); // 12,3%
   <span class="f ghost" data-act="#c46l0|show;#c46|show-a"></span><span class="f ghost" data-act="#c46l1|show;#c46|show-b"></span>
 </section>
 
-<section class="slide qs" id="q47">
+<section class="slide qs htt-fs18" id="q47">
   <div class="hdr in"><span class="qn">CÂU 47</span><h2>DecimalFormat pattern</h2><span class="part-tag">Phần D</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>Báo cáo yêu cầu: (a) số luôn có 2 chữ số thập phân và phân nhóm hàng nghìn, ví dụ <code class="i">1234567.5</code> → <code class="i">1,234,567.50</code> (kiểu Mỹ) và <code class="i">1.234.567,50</code> (kiểu Việt); (b) mã đơn hàng luôn đủ 5 chữ số, <code class="i">42</code> → <code class="i">00042</code>.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);margin-top:10px;gap:16px"><div class="acard f"><span class="qlab ok">💡 Trả lời</span><p><code class="i">DecimalFormat</code> với pattern: <code class="i">#</code> = chữ số tùy chọn, <code class="i">0</code> = chữ số bắt buộc (thêm 0 nếu thiếu), <code class="i">,</code> = phân nhóm, <code class="i">.</code> = thập phân. Ký hiệu thực tế phụ thuộc <code class="i">DecimalFormatSymbols</code> của locale.</p></div><div></div></div>
@@ -1018,7 +1050,7 @@ System.out.println(df.format(new BigDecimal("2.345")));  // 2.35
   <span class="f ghost" data-act="#c48l0|show;#c48|show-a"></span><span class="f ghost" data-act="#c48l1|show;#c48|show-b"></span><span class="f ghost" data-act="#c48l2|show;#c48|show-c"></span>
 </section>
 
-<section class="slide qs" id="q49">
+<section class="slide qs htt-fs18" id="q49">
   <div class="hdr in"><span class="qn">CÂU 49</span><h2>Formatter: bảng hóa đơn</h2><span class="part-tag">Phần D</span></div>
   <div class="qbody"><div class="qcard in"><span class="qlab">❓ Đề bài</span>In hóa đơn dạng bảng thẳng cột ra console: cột tên món căn trái rộng 10, số lượng căn phải rộng 5, thành tiền căn phải rộng 12 có phân nhóm và 2 số lẻ. Dữ liệu: <code class="i">("Cà phê", 2, 45000.0)</code>, <code class="i">("Bánh mì", 10, 250000.5)</code>.</div>
   <div class="cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:10px;gap:18px">
@@ -1064,13 +1096,13 @@ for (long v : new long[]{999, 1_234, 1_234_567, 2_500_000_000L}) {
 
 <section class="slide" id="end">
   <div class="title-wrap" style="align-items:center;text-align:center">
-    <div class="orb" style="width:360px;height:360px;background:#f9a8d4;left:10%;top:10%"></div>
+    <div class="orb" style="width:360px;height:360px;background:#a8c7f9;left:10%;top:10%"></div>
     <h1 class="in">Tóm tắt <span class="grad">nhanh</span></h1>
     <div class="cols4 in" style="margin-top:32px;text-align:left;max-width:1180px">
-      <div class="card"><h3>String</h3><p style="font-size:17px">Immutable. So sánh nội dung bằng <code class="i">equals</code>, không dùng <code class="i">==</code>. Dùng <code class="i">isBlank</code>, <code class="i">strip</code>. Nối chuỗi trong vòng lặp thì dùng <code class="i">StringBuilder</code>.</p></div>
-      <div class="card"><h3>BigDecimal</h3><p style="font-size:17px">Tạo từ <b>String</b>. Luôn chỉ định <code class="i">RoundingMode</code> khi chia. So sánh giá trị bằng <code class="i">compareTo</code>; in bằng <code class="i">toPlainString</code>.</p></div>
-      <div class="card"><h3>Date-Time</h3><p style="font-size:17px">Lưu và so sánh bằng <code class="i">Instant</code> (UTC); hiển thị bằng <code class="i">ZonedDateTime</code>. Cẩn thận DST: <code class="i">plusDays</code> khác <code class="i">plusHours(24)</code>.</p></div>
-      <div class="card"><h3>Format</h3><p style="font-size:17px">Dùng <code class="i">yyyy</code> chứ không phải <code class="i">YYYY</code>, và <code class="i">STRICT</code> khi validate. NumberFormat/DecimalFormat theo <code class="i">Locale</code>; chú ý HALF_EVEN.</p></div>
+      <div class="card"><h3>String</h3><p style="font-size:max(17px,var(--htt-min,24px))">Immutable. So sánh nội dung bằng <code class="i">equals</code>, không dùng <code class="i">==</code>. Dùng <code class="i">isBlank</code>, <code class="i">strip</code>. Nối chuỗi trong vòng lặp thì dùng <code class="i">StringBuilder</code>.</p></div>
+      <div class="card"><h3>BigDecimal</h3><p style="font-size:max(17px,var(--htt-min,24px))">Tạo từ <b>String</b>. Luôn chỉ định <code class="i">RoundingMode</code> khi chia. So sánh giá trị bằng <code class="i">compareTo</code>; in bằng <code class="i">toPlainString</code>.</p></div>
+      <div class="card"><h3>Date-Time</h3><p style="font-size:max(17px,var(--htt-min,24px))">Lưu và so sánh bằng <code class="i">Instant</code> (UTC); hiển thị bằng <code class="i">ZonedDateTime</code>. Cẩn thận DST: <code class="i">plusDays</code> khác <code class="i">plusHours(24)</code>.</p></div>
+      <div class="card"><h3>Format</h3><p style="font-size:max(17px,var(--htt-min,24px))">Dùng <code class="i">yyyy</code> chứ không phải <code class="i">YYYY</code>, và <code class="i">STRICT</code> khi validate. NumberFormat/DecimalFormat theo <code class="i">Locale</code>; chú ý HALF_EVEN.</p></div>
     </div>
   </div>
 </section>
@@ -1175,7 +1207,7 @@ document.querySelectorAll(".chars").forEach(el=>{
 <script>
 // auto-fit: shrink code font to avoid horizontal cut, scale Q&A body to fit slide height
 (function(){
-  function fitCode(root){root.querySelectorAll(".code").forEach(c=>{let fs=parseFloat(getComputedStyle(c).fontSize);let g=0;while(c.scrollWidth>c.clientWidth+1&&fs>10&&g++<40){fs-=0.4;c.style.fontSize=fs+"px";}})}
+  function fitCode(root){root.querySelectorAll(".code").forEach(c=>{let fs=parseFloat(getComputedStyle(c).fontSize);let g=0;while(c.scrollWidth>c.clientWidth+1&&fs>HTT_MIN(c)&&g++<40){fs-=0.4;c.style.fontSize=fs+"px";}})}
   function fitAll(){
     document.querySelectorAll(".qbody").forEach(b=>{b.style.transform="";b.style.width="";});
     fitCode(document);
@@ -1186,6 +1218,53 @@ document.querySelectorAll(".chars").forEach(el=>{
   }
   fitAll(); addEventListener("load",fitAll); if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitAll);
 })();
+</script>
+<script id="htt-theme-js">
+(function(){
+  // HTT theme runtime: renumber split code blocks, enforce the slide's minimum font size (--htt-min, default 24px)
+  function minOf(el){var s=el&&el.closest?el.closest('.slide'):null;var v=parseFloat(getComputedStyle(s||document.documentElement).getPropertyValue('--htt-min'));return isNaN(v)?24:v}
+  window.HTT_MIN=function(el){return minOf(el)};
+  function renumber(){
+    document.querySelectorAll('.code[class*="htt-start-"]').forEach(function(c){
+      if(c.dataset.httNum)return;var m=c.className.match(/htt-start-(\d+)/);if(!m)return;var off=+m[1];
+      c.querySelectorAll('.ln>.no').forEach(function(n){var v=parseInt(n.textContent,10);if(!isNaN(v))n.textContent=String(v+off)});
+      c.dataset.httNum='1';
+    });
+  }
+  function hasText(el){for(var n=el.firstChild;n;n=n.nextSibling){if(n.nodeType===3&&/\S/.test(n.nodeValue))return true}return /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(el.tagName)}
+  function svgScale(t){var svg=t.ownerSVGElement;if(!svg)return 1;var s=1;
+    while(svg){var vb=svg.viewBox&&svg.viewBox.baseVal;if(vb&&vb.width&&vb.height){var w=svg.clientWidth||svg.getBoundingClientRect().width,h=svg.clientHeight||svg.getBoundingClientRect().height;if(!w||!h)return 0;s*=Math.min(w/vb.width,h/vb.height)}svg=svg.ownerSVGElement}
+    return s}
+  function set(el,v){if(!el.hasAttribute('data-htt-prev'))el.setAttribute('data-htt-prev',el.style.getPropertyValue('font-size')+'|'+el.style.getPropertyPriority('font-size'));el.style.setProperty('font-size',v,'important')}
+  function unfix(sel){document.querySelectorAll((sel||'#deck .slide *')).forEach(function(el){var p=el.getAttribute('data-htt-prev');if(p===null)return;var a=p.split('|');if(a[0])el.style.setProperty('font-size',a[0],a[1]||'');else el.style.removeProperty('font-size');el.removeAttribute('data-htt-prev')})}
+  function fix(sel){
+    renumber();
+    var slides=document.querySelectorAll(typeof sel==='string'?sel:'#deck .slide');
+    for(var j=0;j<slides.length;j++){var sl=slides[j];var MIN=minOf(sl);if(MIN<=0)continue;
+      var els=sl.querySelectorAll('*');
+      for(var i=0;i<els.length;i++){var el=els[i];
+        if(el instanceof SVGElement){
+          if(!/^(text|tspan|textPath)$/.test(el.tagName))continue;
+          if(el.tagName!=='text'&&!hasText(el))continue;
+          var sc=svgScale(el);if(!sc)continue;
+          var fs=parseFloat(getComputedStyle(el).fontSize);if(!fs)continue;
+          if(fs*sc<MIN-0.3)set(el,(MIN/sc).toFixed(2)+'px');
+          continue;
+        }
+        if(!hasText(el))continue;
+        var f=parseFloat(getComputedStyle(el).fontSize);
+        if(f>0&&f<MIN-0.3)set(el,MIN+'px');
+      }
+    }
+  }
+  window.HTT_fix=fix;window.HTT_unfix=unfix;
+  fix();
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){fix()});
+  var t=null;var mo=new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(ms[i].type==='childList'&&ms[i].addedNodes.length){clearTimeout(t);t=setTimeout(function(){fix()},30);return}}});
+  var d=document.getElementById('deck');if(d)mo.observe(d,{childList:true,subtree:true});
+  function act(){setTimeout(function(){fix('#deck .slide.active')},0)}addEventListener('keydown',act);addEventListener('click',act);addEventListener('touchend',act);
+})();
+
 </script>
 </body>
 </html>

@@ -8,18 +8,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
-  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
-  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
-  --sa1:#7c3aed; --sa2:#ec4899;
+  --bg:#ffffff; --panel:#ffffff; --line:#e8eef7; --text:#17263e; --muted:#3d63a0;
+  --accent:#3a7fed; --accent2:#0949b1; --warn:#1d68e1; --gold:#0b58d4; --code:#fcfbff;
+  --k:#3371d6; --t:#3a7fed; --s:#083d93; --n:#0c61ea; --c:#84a1d0; --p:#276cdb; --fn:#0a4fbf;
+  --sa1:#3a7fed; --sa2:#4887ec;
   --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+html,body{height:100%;background:#eff5fe;color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
 #viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
 #deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
-.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
-  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(58,127,237,.14);
+  background:none,none,none,var(--bg);
   opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
 .slide.past{transform:translateX(-60px) scale(.98)}
 .slide.active{opacity:1;transform:none;pointer-events:auto}
@@ -27,150 +27,172 @@ html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff
 .slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
 @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 .hdr{display:flex;align-items:center;gap:16px;margin-bottom:18px}
-.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
-.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
-.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
-.rk{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--sa1);border:2px solid var(--sa1);border-radius:999px;padding:3px 10px;white-space:nowrap;margin-left:auto}
+.slide:nth-of-type(4n+1){--sa1:#3a7fed;--sa2:#4887ec}.slide:nth-of-type(4n+2){--sa1:#0949b1;--sa2:#3a7fed}.slide:nth-of-type(4n+3){--sa1:#4887ec;--sa2:#1c6ef3}.slide:nth-of-type(4n){--sa1:#083d93;--sa2:#0e62e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:var(--sa1)}
+.qn{font-weight:800;font-size:max(17px,var(--htt-min,24px));letter-spacing:.06em;color:#fff;background:var(--sa1);box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+.rk{font-family:var(--mono);font-size:max(14px,var(--htt-min,24px));font-weight:700;color:var(--sa1);border:2px solid var(--sa1);border-radius:999px;padding:3px 10px;white-space:nowrap;margin-left:auto}
 h1{font-size:70px;line-height:1.1;font-weight:800}
 h2{font-size:36px;line-height:1.2;font-weight:800}
-h3{font-size:22px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
-p,li{font-size:21px;line-height:1.45;color:var(--text)}
+h3{font-size:max(22px,var(--htt-min,24px));font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:max(21px,var(--htt-min,24px));line-height:1.45;color:var(--text)}
 .muted{color:var(--muted)}
 ul{list-style:none}
 ul li{position:relative;padding-left:26px;margin:6px 0}
-ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
-ul.sm li{font-size:18px;margin:4px 0}
-.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
-code.i{font-family:var(--mono);font-size:.86em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 6px;border-radius:6px;color:#be185d}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:var(--sa1)}
+ul.sm li{font-size:max(18px,var(--htt-min,24px));margin:4px 0}
+.grad{background:#3a7fed;-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.86em;background:#f0f5fd;border:1px solid #d3e2f9;padding:0 6px;border-radius:6px;color:#1858be}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
 .cols>*{min-width:0}
 .cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
-.card p{font-size:18px}
-.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
-.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
-.card.bad{border-color:#fecdd3;background:linear-gradient(180deg,#fff1f3,#fff)}
-.card.good{border-color:#a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff)}
-.lbl{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
-.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
-.note{margin-top:12px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:18px;line-height:1.4}
-.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
-.code{font-family:var(--mono);font-size:18px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
-.code.sm{font-size:16.5px}.code.xs{font-size:15px;line-height:1.45}.code.xxs{font-size:13.4px;line-height:1.4;padding:8px 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(58,127,237,.25)}
+.card p{font-size:max(18px,var(--htt-min,24px))}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #3a7fed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0949b1}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #4887ec}.cols4>.card:nth-child(4n){border-top:5px solid #0e65f2}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0949b1}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#276cdb}.cols4>.card:nth-child(4n) h3{color:#0b58d4}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#3a7fed}
+.card.bad{border-color:#cfe0fc;background:#f2f7fe}
+.card.good{border-color:#a7c4f3;background:#ecf3fd}
+.lbl{display:inline-block;font-size:max(15px,var(--htt-min,24px));font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#e5effe;color:#1254be}.lbl.good{background:#d1e1fa;color:#063176}.lbl.info{background:#e3ecfb;color:#3363b0}
+.note{margin-top:12px;padding:10px 16px;border-left:5px solid #0e65f2;background:#e2ecfd;border-radius:8px;font-size:max(18px,var(--htt-min,24px));line-height:1.4}
+.note.blue{border-color:#5c97f6;background:#eef4fe}
+.code{font-family:var(--mono);font-size:max(18px,var(--htt-min,24px));line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
+.code.sm{font-size:max(16.5px,var(--htt-min,24px))}.code.xs{font-size:max(15px,var(--htt-min,24px));line-height:1.45}.code.xxs{font-size:max(13.4px,var(--htt-min,24px));line-height:1.4;padding:8px 0}
 .code .ln{padding:0 14px 0 8px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
-.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.code .no{color:#bdcde6;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
 .k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
-.code.show-a .mark-a{background:rgba(124,58,237,.11);box-shadow:inset 5px 0 #7c3aed}
-.code.show-b .mark-b{background:rgba(6,182,212,.13);box-shadow:inset 5px 0 #06b6d4}
-.code.show-c .mark-c{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
-.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
-.code.show-e .mark-e{background:rgba(16,185,129,.13);box-shadow:inset 5px 0 #10b981}
-.code.show-f .mark-f{background:rgba(59,130,246,.12);box-shadow:inset 5px 0 #3b82f6}
-.code.show-g .mark-g{background:rgba(249,115,22,.13);box-shadow:inset 5px 0 #f97316}
-.code.show-h .mark-h{background:rgba(225,29,72,.10);box-shadow:inset 5px 0 #e11d48}
-.code-title{font-family:var(--mono);font-size:14px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.code.show-a .mark-a{background:rgba(58,127,237,.11);box-shadow:inset 5px 0 #3a7fed}
+.code.show-b .mark-b{background:rgba(11,86,207,.13);box-shadow:inset 5px 0 #0b56cf}
+.code.show-c .mark-c{background:rgba(14,101,242,.16);box-shadow:inset 5px 0 #0e65f2}
+.code.show-d .mark-d{background:rgba(72,135,236,.12);box-shadow:inset 5px 0 #4887ec}
+.code.show-e .mark-e{background:rgba(16,81,185,.13);box-shadow:inset 5px 0 #1051b9}
+.code.show-f .mark-f{background:rgba(60,131,245,.12);box-shadow:inset 5px 0 #3c83f5}
+.code.show-g .mark-g{background:rgba(28,110,243,.13);box-shadow:inset 5px 0 #1c6ef3}
+.code.show-h .mark-h{background:rgba(29,104,225,.10);box-shadow:inset 5px 0 #1d68e1}
+.code-title{font-family:var(--mono);font-size:max(14px,var(--htt-min,24px));color:var(--muted);margin:0 0 5px 4px;font-weight:600}
 .f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
 .f.on{opacity:1;transform:none}
 .f.ghost{display:none}
-table{border-collapse:separate;border-spacing:0;width:100%;font-size:17px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:max(17px,var(--htt-min,24px));border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
 th,td{padding:7px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
-th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+th{background:#ebf2fe;font-weight:700}
 tr:last-child td{border-bottom:none}
 td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
-td code,th code{font-family:var(--mono);font-size:.92em;color:#6d28d9}
+td code,th code{font-family:var(--mono);font-size:.92em;color:#286cd9}
 tr.f{transform:none}
-.console{font-family:var(--mono);font-size:16px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre}
-.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.console{font-family:var(--mono);font-size:max(16px,var(--htt-min,24px));line-height:1.5;background:#17263e;border-radius:12px;padding:10px 16px;color:#e7f0fe;white-space:pre}
+.console::before{content:"● ● ●";display:block;color:#72a4f4;font-size:max(11px,var(--htt-min,24px));letter-spacing:3px;margin-bottom:4px}
 .cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
 .title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
-.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.kicker{font-family:var(--mono);color:#276cdb;font-size:max(22px,var(--htt-min,24px));margin-bottom:18px;font-weight:600}
 .orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
 @keyframes float{50%{transform:translate(30px,-25px)}}
 .agenda{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:19px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05)}
-.ag:hover{border-color:#ec4899;transform:translateY(-3px);box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
-.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
-.ag b{color:#db2777;margin-right:6px;font-family:var(--mono)}
-.ag small{display:block;font-size:14.5px;color:var(--muted);margin-top:3px}
-.say{font-size:19px;margin-top:12px;min-height:56px;color:var(--muted);line-height:1.45}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:max(19px,var(--htt-min,24px));line-height:1.3;box-shadow:0 2px 6px rgba(40,67,110,.05)}
+.ag:hover{border-color:#4887ec;transform:translateY(-3px);box-shadow:0 10px 24px -10px rgba(72,135,236,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #3a7fed}.ag:nth-child(4n+2){border-left:5px solid #0949b1}.ag:nth-child(4n+3){border-left:5px solid #4887ec}.ag:nth-child(4n){border-left:5px solid #0e65f2}
+.ag b{color:#276cdb;margin-right:6px;font-family:var(--mono)}
+.ag small{display:block;font-size:max(14.5px,var(--htt-min,24px));color:var(--muted);margin-top:3px}
+.say{font-size:max(19px,var(--htt-min,24px));margin-top:12px;min-height:56px;color:var(--muted);line-height:1.45}
 .say b{color:var(--text)}
-.say code{font-family:var(--mono);font-size:.9em;color:#be185d}
+.say code{font-family:var(--mono);font-size:.9em;color:#1858be}
 
 /* ---------- nav + jump ---------- */
-#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
-#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:6;font-family:var(--mono);font-size:14px;color:var(--muted)}
-#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;min-width:36px;height:32px;cursor:pointer;font-size:16px;padding:0 8px}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:#3a7fed;transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:6;font-family:var(--mono);font-size:max(14px,var(--htt-min,24px));color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;min-width:36px;height:32px;cursor:pointer;font-size:max(16px,var(--htt-min,24px));padding:0 8px}
 #nav button:hover{border-color:var(--accent)}
-#nav #menuBtn{font-family:"Be Vietnam Pro",system-ui,sans-serif;font-size:14px;font-weight:700;background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;border:none;padding:0 14px}
-#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
-#jump{position:fixed;inset:0;z-index:20;background:rgba(30,27,58,.35);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+#nav #menuBtn{font-family:"Be Vietnam Pro",system-ui,sans-serif;font-size:max(14px,var(--htt-min,24px));font-weight:700;background:#3a7fed;color:#fff;border:none;padding:0 14px}
+#hint{position:fixed;left:16px;bottom:12px;font-size:max(13px,var(--htt-min,24px));color:#7495ca;z-index:5}
+#jump{position:fixed;inset:0;z-index:20;background:rgba(23,38,62,.35);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
 #jump.open{opacity:1;pointer-events:auto}
-#jump .pane{width:min(900px,94vw);max-height:86vh;overflow:auto;background:#fff;border-radius:18px;padding:20px 22px;box-shadow:0 30px 80px -20px rgba(30,27,58,.5);transform:translateY(16px) scale(.98);transition:transform .25s}
+#jump .pane{width:min(900px,94vw);max-height:86vh;overflow:auto;background:#fff;border-radius:18px;padding:20px 22px;box-shadow:0 30px 80px -20px rgba(23,38,62,.5);transform:translateY(16px) scale(.98);transition:transform .25s}
 #jump.open .pane{transform:none}
 #jump .top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
-#jump .top h3{font-size:22px;margin:0;color:var(--text)}
-#jump .top input{margin-left:auto;width:90px;height:34px;border:1px solid var(--line);border-radius:8px;padding:0 10px;font-family:var(--mono);font-size:15px}
-#jump .top .x{border:none;background:#f3edff;color:#6d28d9;border-radius:8px;height:34px;width:34px;font-size:18px;cursor:pointer}
+#jump .top h3{font-size:max(22px,var(--htt-min,24px));margin:0;color:var(--text)}
+#jump .top input{margin-left:auto;width:90px;height:34px;border:1px solid var(--line);border-radius:8px;padding:0 10px;font-family:var(--mono);font-size:max(15px,var(--htt-min,24px))}
+#jump .top .x{border:none;background:#eef4fe;color:#286cd9;border-radius:8px;height:34px;width:34px;font-size:max(18px,var(--htt-min,24px));cursor:pointer}
 #jumplist{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-#jumplist button{text-align:left;background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-family:"Be Vietnam Pro",system-ui,sans-serif;font-size:15px;color:var(--text);cursor:pointer;transition:all .15s;line-height:1.3}
-#jumplist button b{font-family:var(--mono);color:#db2777;margin-right:8px}
-#jumplist button:hover{border-color:#ec4899;transform:translateY(-2px);box-shadow:0 8px 18px -10px rgba(236,72,153,.5)}
-#jumplist button.cur{background:linear-gradient(135deg,#f3edff,#fdf2f8);border-color:#c084fc}
+#jumplist button{text-align:left;background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-family:"Be Vietnam Pro",system-ui,sans-serif;font-size:max(15px,var(--htt-min,24px));color:var(--text);cursor:pointer;transition:all .15s;line-height:1.3}
+#jumplist button b{font-family:var(--mono);color:#276cdb;margin-right:8px}
+#jumplist button:hover{border-color:#4887ec;transform:translateY(-2px);box-shadow:0 8px 18px -10px rgba(72,135,236,.5)}
+#jumplist button.cur{background:#eef4fe;border-color:#87b3f9}
 @media (max-width:700px){#hint{display:none}#jumplist{grid-template-columns:1fr 1fr}}
 @media print{#nav,#bar,#hint,#jump{display:none}}
 
 /* ---------- Swing window mock ---------- */
 .stage{display:flex;align-items:center;justify-content:center}
-.win{background:#eef1f6;border:1px solid #a9b3c9;border-radius:10px;box-shadow:0 18px 40px -18px rgba(30,27,58,.45);overflow:hidden;display:flex;flex-direction:column;transition:width .6s ease,height .6s ease}
-.win .tb{height:30px;flex:none;background:linear-gradient(180deg,#e9eef8,#cfd8ea);border-bottom:1px solid #a9b3c9;display:flex;align-items:center;gap:7px;padding:0 10px;font-size:13.5px;font-weight:700;color:#3b4463}
-.win .tb i{width:11px;height:11px;border-radius:50%;display:inline-block;background:#f87171}.win .tb i+i{background:#fbbf24}.win .tb i+i+i{background:#34d399;margin-right:6px}
+.win{background:#ecf1f8;border:1px solid #99b2d9;border-radius:10px;box-shadow:0 18px 40px -18px rgba(23,38,62,.45);overflow:hidden;display:flex;flex-direction:column;transition:width .6s ease,height .6s ease}
+.win .tb{height:30px;flex:none;background:#e9eff8;border-bottom:1px solid #99b2d9;display:flex;align-items:center;gap:7px;padding:0 10px;font-size:max(13.5px,var(--htt-min,24px));font-weight:700;color:#2b4773}
+.win .tb i{width:11px;height:11px;border-radius:50%;display:inline-block;background:#71a5f8}.win .tb i+i{background:#2b78f4}.win .tb i+i+i{background:#3471d3;margin-right:6px}
 .win .bd{flex:1;position:relative;min-height:0}
-.jb{font-family:"Be Vietnam Pro",sans-serif;font-size:14px;font-weight:600;color:#1e2a44;background:linear-gradient(180deg,#ffffff,#d9e1ef);border:1px solid #8a98b6;border-radius:5px;padding:6px 12px;white-space:nowrap;display:flex;align-items:center;justify-content:center;min-height:30px}
-.jtf{background:#fff;border:1px solid #8a98b6;border-radius:3px;padding:4px 8px;font-size:14px;font-family:var(--mono);color:#334;min-height:28px;display:flex;align-items:center}
-.jcb{background:linear-gradient(180deg,#fff,#e6ebf4);border:1px solid #8a98b6;border-radius:4px;padding:4px 30px 4px 10px;font-size:14px;position:relative;min-height:28px;display:inline-flex;align-items:center;white-space:nowrap}
+.jb{font-family:"Be Vietnam Pro",sans-serif;font-size:max(14px,var(--htt-min,24px));font-weight:600;color:#1b2c47;background:#ffffff;border:1px solid #7596cb;border-radius:5px;padding:6px 12px;white-space:nowrap;display:flex;align-items:center;justify-content:center;min-height:30px}
+.jtf{background:#fff;border:1px solid #7596cb;border-radius:3px;padding:4px 8px;font-size:max(14px,var(--htt-min,24px));font-family:var(--mono);color:#213556;min-height:28px;display:flex;align-items:center}
+.jcb{background:#fff;border:1px solid #7596cb;border-radius:4px;padding:4px 30px 4px 10px;font-size:max(14px,var(--htt-min,24px));position:relative;min-height:28px;display:inline-flex;align-items:center;white-space:nowrap}
 .jcb::after{content:"▾";position:absolute;right:8px;color:#556}
-.jl{font-size:14px;color:#1e2a44;white-space:nowrap}
-.jr{font-size:14px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
-.jr::before{content:"";width:13px;height:13px;border-radius:50%;border:1.5px solid #8a98b6;background:#fff;box-sizing:border-box}
-.jr.sel::before{background:radial-gradient(circle,#4f46e5 0 3px,#fff 3.5px)}
+.jl{font-size:max(14px,var(--htt-min,24px));color:#1b2c47;white-space:nowrap}
+.jr{font-size:max(14px,var(--htt-min,24px));display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.jr::before{content:"";width:13px;height:13px;border-radius:50%;border:1.5px solid #7596cb;background:#fff;box-sizing:border-box}
+.jr.sel::before{background:#4683e5}
 .pop{opacity:0;transform:scale(.6);transition:opacity .45s,transform .5s cubic-bezier(.3,1.5,.5,1)}
 .pop.show{opacity:1;transform:none}
-.ring{box-shadow:0 0 0 3px #f59e0b,0 0 18px rgba(245,158,11,.6)!important}
-.tag{font-family:var(--mono);font-size:11px;font-weight:700;color:#8b5cf6;letter-spacing:.03em}
+.ring{box-shadow:0 0 0 3px #0e65f2,0 0 18px rgba(14,101,242,.6)!important}
+.tag{font-family:var(--mono);font-size:max(11px,var(--htt-min,24px));font-weight:700;color:#5c97f6;letter-spacing:.03em}
 .dim{opacity:.25}
 
 /* ranking */
 .rank{display:flex;flex-direction:column;gap:7px}
 .rrow{display:grid;grid-template-columns:44px 230px 1fr 360px;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px 12px;cursor:pointer;transition:all .2s}
-.rrow:hover{border-color:#ec4899;transform:translateX(4px)}
-.rrow .no{font-family:var(--mono);font-weight:800;font-size:20px;color:#db2777}
-.rrow .nm{font-weight:700;font-size:18px}
-.rrow .nm small{display:block;font-weight:500;font-size:13px;color:var(--muted);font-family:var(--mono)}
-.rrow .bar{height:14px;border-radius:999px;background:#f1edfb;overflow:hidden}
-.rrow .bar span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#7c3aed,#ec4899);width:0;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.rrow:hover{border-color:#4887ec;transform:translateX(4px)}
+.rrow .no{font-family:var(--mono);font-weight:800;font-size:max(20px,var(--htt-min,24px));color:#276cdb}
+.rrow .nm{font-weight:700;font-size:max(18px,var(--htt-min,24px))}
+.rrow .nm small{display:block;font-weight:500;font-size:max(13px,var(--htt-min,24px));color:var(--muted);font-family:var(--mono)}
+.rrow .bar{height:14px;border-radius:999px;background:#edf2fb;overflow:hidden}
+.rrow .bar span{display:block;height:100%;border-radius:999px;background:#3a7fed;width:0;transition:width 1s cubic-bezier(.2,.8,.2,1)}
 .slide.active .rrow .bar span{width:var(--w)}
-.rrow .why{font-size:14.5px;color:var(--muted);line-height:1.3}
+.rrow .why{font-size:max(14.5px,var(--htt-min,24px));color:var(--muted);line-height:1.3}
 </style>
+<style id="htt-theme">
+/* HTT theme: logo + layout helpers (font-size >= 24px, single blue) */
+#deck>.htt-logo{position:absolute;top:12px;right:14px;z-index:60;height:40px;padding:0 10px;border-radius:8px;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;font:800 24px/1 "Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.04em;pointer-events:none;user-select:none}
+#deck>.htt-logo span{font-size:24px;color:#fff}
+.htt-stack{grid-template-columns:minmax(0,1fr)!important;grid-template-areas:none!important;flex-direction:column!important;flex-wrap:nowrap!important}
+.htt-stack>*{grid-column:auto!important;grid-row:auto!important;max-width:100%}
+.htt-wrap,.htt-wrap *{white-space:pre-wrap!important;overflow-wrap:anywhere}
+.htt-wrap .ln{flex-wrap:nowrap}
+.htt-flexwrap{flex-wrap:wrap!important}
+#nav,#nav *{font-size:16px!important}
+#hint{font-size:14px!important}
+.orb{display:none!important}
+:root{--htt-min:24px}
+.slide.htt-fs22{--htt-min:22px}.slide.htt-fs20{--htt-min:20px}.slide.htt-fs0{--htt-min:0px}
+.jumpbtn{right:100px!important}
+.slide.htt-fs18{--htt-min:18px}.slide.htt-fs16{--htt-min:16px}
+.slide .hdr{padding-right:84px}
+.sjump{right:100px!important}
+
+</style>
+<script>window.HTT_MIN=function(el){var s=el&&el.closest?el.closest(".slide"):null;var v=parseFloat(getComputedStyle(s||document.documentElement).getPropertyValue("--htt-min"));return isNaN(v)?24:v};</script>
 </head>
 <body>
 
 <div id="viewport"><div id="deck">
+<div class="htt-logo" aria-label="HTT" title="HTT"><span>HTT</span></div>
 <!-- ===================== TITLE ===================== -->
 <section class="slide" id="title" data-title="Trang bìa">
-  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
-  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="orb" style="width:380px;height:380px;background:#a8c7f9;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#81aff8;left:40%;bottom:-120px;animation-delay:-4s"></div>
   <div class="title-wrap">
     <div class="kicker in">// Java Swing · Layout Managers</div>
     <h1 class="in">Bố cục giao diện<br><span class="grad">trong Java Swing</span></h1>
     <p class="in muted" style="font-size:26px;margin-top:20px;max-width:960px">9 chương trình demo của Oracle Java Tutorials, sắp từ layout dùng <b>phổ biến nhất</b> đến <b>ít phổ biến nhất</b>. Mỗi demo chạy từng dòng code và vẽ lại cửa sổ Swing tương ứng.</p>
-    <p class="in" style="margin-top:36px;font-size:19px;color:#8a91b4">← → hoặc Space: chạy từng bước · Shift+→: qua slide · A: hiện hết · M hoặc nút ☰: nhảy tới slide bất kỳ · F: toàn màn hình</p>
+    <p class="in" style="margin-top:36px;font-size:max(19px,var(--htt-min,24px));color:#7495ca">← → hoặc Space: chạy từng bước · Shift+→: qua slide · A: hiện hết · M hoặc nút ☰: nhảy tới slide bất kỳ · F: toàn màn hình</p>
   </div>
 </section>
 
 <!-- ===================== AGENDA ===================== -->
 <section class="slide" id="agenda" data-title="Nội dung">
-  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:18px">· bấm vào mục để đi tới</span></div>
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:max(18px,var(--htt-min,24px))">· bấm vào mục để đi tới</span></div>
   <div class="agenda in">
     <div class="ag" data-goto="rank"><b>00</b>Xếp hạng mức độ phổ biến<small>vì sao thứ tự như vậy</small></div>
     <div class="ag" data-goto="border1"><b>01</b>BorderLayoutDemo<small>5 vùng · mặc định của JFrame</small></div>
@@ -196,16 +218,21 @@ tr.f{transform:none}
     <div class="rrow" data-goto="grid1"><span class="no">3</span><span class="nm">GridLayout<small>GridLayoutDemo</small></span><span class="bar"><span style="--w:76%"></span></span><span class="why">Lưới ô đều: bàn phím số, máy tính, bàn cờ, nhóm nút cùng cỡ.</span></div>
     <div class="rrow" data-goto="box1"><span class="no">4</span><span class="nm">BoxLayout<small>BoxLayoutDemo</small></span><span class="bar"><span style="--w:68%"></span></span><span class="why">Xếp dọc/ngang có khoảng đệm: sidebar, hàng nút OK/Cancel.</span></div>
     <div class="rrow" data-goto="gbag1"><span class="no">5</span><span class="nm">GridBagLayout<small>GridBagLayoutDemo</small></span><span class="bar"><span style="--w:60%"></span></span><span class="why">Mạnh nhất trong bộ chuẩn, dùng cho form phức tạp; khó viết tay.</span></div>
-    <div class="rrow" data-goto="tab"><span class="no">6</span><span class="nm">JTabbedPane<small>TabDemo</small></span><span class="bar"><span style="--w:50%"></span></span><span class="why">Không phải layout manager, là component chia tab. Dùng thay CardLayout khi cần tab.</span></div>
+    </div></section>
+
+<section id="rank-p2" class="slide htt-cont" data-title="Xếp hạng phổ biến">
+<div class="hdr in"><span class="qn">TỔNG QUAN</span><h2>Thứ tự trình bày: phổ biến → ít phổ biến</h2></div>
+<div class="rank in htt-cont-part"><div class="rrow" data-goto="tab"><span class="no">6</span><span class="nm">JTabbedPane<small>TabDemo</small></span><span class="bar"><span style="--w:50%"></span></span><span class="why">Không phải layout manager, là component chia tab. Dùng thay CardLayout khi cần tab.</span></div>
     <div class="rrow" data-goto="card1"><span class="no">7</span><span class="nm">CardLayout<small>CardLayoutDemo</small></span><span class="bar"><span style="--w:40%"></span></span><span class="why">Chồng nhiều panel, hiện 1: wizard từng bước, đổi màn hình.</span></div>
     <div class="rrow" data-goto="spring1"><span class="no">8</span><span class="nm">SpringLayout<small>SpringForm</small></span><span class="bar"><span style="--w:24%"></span></span><span class="why">Thiết kế cho công cụ kéo-thả GUI; viết tay dài dòng.</span></div>
     <div class="rrow" data-goto="abs"><span class="no">9</span><span class="nm">null (Absolute)<small>AbsoluteLayoutDemo</small></span><span class="bar"><span style="--w:12%"></span></span><span class="why">Toạ độ cứng, không co giãn. Oracle khuyên tránh dùng.</span></div>
   </div>
-  <p class="in muted" style="font-size:15px;margin-top:10px">Thứ tự là ước lượng theo cách dùng trong code Swing thực tế và giáo trình (không có thống kê chính thức). Bấm vào một dòng để nhảy tới demo đó.</p>
+  <p class="in muted" style="font-size:max(15px,var(--htt-min,24px));margin-top:10px">Thứ tự là ước lượng theo cách dùng trong code Swing thực tế và giáo trình (không có thống kê chính thức). Bấm vào một dòng để nhảy tới demo đó.</p>
+
 </section>
 
 <!-- ===================== 1. BORDER (code + window) ===================== -->
-<section class="slide" id="border1" data-title="1 · BorderLayoutDemo (chạy code)">
+<section class="slide htt-fs18" id="border1" data-title="1 · BorderLayoutDemo (chạy code)">
   <div class="hdr in"><span class="qn">DEMO 1</span><h2>BorderLayoutDemo</h2><span class="rk">#1 phổ biến nhất</span></div>
   <div class="cols" style="grid-template-columns:1.08fr 1fr">
     <div>
@@ -267,18 +294,18 @@ frame.pack();  frame.setVisible(true);
 <style>
 .bl{display:grid;grid-template-columns:auto 1fr auto;grid-template-rows:auto 1fr auto;grid-template-areas:"n n n" "w c e" "s s s";gap:0;height:100%}
 .bl.rtl{grid-template-areas:"n n n" "e c w" "s s s"}
-.rg{position:relative;border:1.5px dashed #c4b5fd;display:flex;min-height:34px;min-width:70px;background:rgba(237,233,254,.35)}
+.rg{position:relative;border:1.5px dashed #b7d1fb;display:flex;min-height:34px;min-width:70px;background:rgba(233,241,254,.35)}
 .rg .jb{flex:1;border-radius:3px}
 .rtag{transition:opacity .3s}.rg:has(.jb.show) .rtag{opacity:0}
 .rg.n{grid-area:n}.rg.s{grid-area:s}.rg.w{grid-area:w}.rg.e{grid-area:e}.rg.c{grid-area:c}
-.rtag{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--mono);font-size:11px;font-weight:700;color:#a78bfa;pointer-events:none}
+.rtag{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--mono);font-size:max(11px,var(--htt-min,24px));font-weight:700;color:#8cb6f9;pointer-events:none}
 .win.big{width:620px!important;height:330px!important}
 </style>
 
 <!-- ===================== 1b. BORDER explained ===================== -->
 <section class="slide" id="border2" data-title="1 · BorderLayout: quy tắc">
   <div class="hdr in"><span class="qn">DEMO 1</span><h2>BorderLayout: quy tắc chia chỗ</h2></div>
-  <div class="cols" style="grid-template-columns:1fr 1.05fr">
+  <div class="cols htt-stack" style="grid-template-columns:1fr 1.05fr">
     <div class="in">
       <table>
         <tr><th>Hằng mới (khuyên dùng)</th><th>Hằng cũ</th><th>Giãn theo</th></tr>
@@ -291,7 +318,12 @@ frame.pack();  frame.setVisible(true);
       <div class="note f">Gọi <code class="i">pane.add(comp)</code> <b>không có vùng</b> thì component vào <b>CENTER</b>. Vùng nào trống thì không chiếm chỗ.</div>
       <div class="note blue f">Khoảng cách giữa các vùng: <code class="i">new BorderLayout(hgap, vgap)</code> hoặc <code class="i">setHgap()</code> / <code class="i">setVgap()</code>.</div>
     </div>
-    <div>
+    </div>
+</section>
+
+<section id="border2-p2" class="slide htt-cont" data-title="1 · BorderLayout: quy tắc">
+<div class="hdr in"><span class="qn">DEMO 1</span><h2>BorderLayout: quy tắc chia chỗ</h2></div>
+<div class="cols htt-stack htt-cont-part" style="grid-template-columns:1fr 1.05fr"><div>
       <div class="card f"><h3>Thuật toán chia chỗ (rút gọn)</h3>
         <ul class="sm">
           <li>Bắc và nam lấy chiều cao <b>ưu tiên</b>, rộng bằng cả container.</li>
@@ -307,13 +339,13 @@ frame.pack();  frame.setVisible(true);
           <li>Mỗi vùng thường là một <b>JPanel</b> có layout riêng → lồng layout.</li>
         </ul>
       </div>
-      <div class="card bad f" style="margin-top:12px"><h3 style="color:#be123c">Lỗi hay gặp</h3><p>Add 2 component vào cùng 1 vùng: chỉ cái <b>sau cùng</b> hiện ra. Muốn nhiều thứ trong 1 vùng thì gom vào 1 JPanel trước.</p></div>
+      <div class="card bad f" style="margin-top:12px"><h3 style="color:#1254be">Lỗi hay gặp</h3><p>Add 2 component vào cùng 1 vùng: chỉ cái <b>sau cùng</b> hiện ra. Muốn nhiều thứ trong 1 vùng thì gom vào 1 JPanel trước.</p></div>
     </div>
   </div>
 </section>
 
 <!-- ===================== 2. FLOW ===================== -->
-<section class="slide" id="flow1" data-title="2 · FlowLayoutDemo (chạy code)">
+<section class="slide htt-fs18" id="flow1" data-title="2 · FlowLayoutDemo (chạy code)">
   <div class="hdr in"><span class="qn">DEMO 2</span><h2>FlowLayoutDemo</h2><span class="rk">#2</span></div>
   <div class="cols" style="grid-template-columns:1.08fr 1fr">
     <div>
@@ -373,7 +405,7 @@ pane.add(controls, BorderLayout.SOUTH);
 <style>
 .fl{flex:1;display:flex;flex-wrap:wrap;justify-content:flex-end;align-content:flex-start;gap:5px;padding:5px;transition:all .4s}
 .fl.rtl{flex-direction:row-reverse}
-.fctl{display:flex;justify-content:center;align-items:center;gap:10px;padding:6px;border-top:1px solid #d5dbe8}
+.fctl{display:flex;justify-content:center;align-items:center;gap:10px;padding:6px;border-top:1px solid #d0dbed}
 .win.narrow{width:380px!important;height:230px!important}
 .jr.x::before{background:#fff}
 </style>
@@ -381,7 +413,7 @@ pane.add(controls, BorderLayout.SOUTH);
 <!-- ===================== 2b. FLOW explained ===================== -->
 <section class="slide" id="flow2" data-title="2 · FlowLayout: căn lề & khoảng cách">
   <div class="hdr in"><span class="qn">DEMO 2</span><h2>FlowLayout: căn lề và khoảng cách</h2></div>
-  <div class="cols" style="grid-template-columns:1fr 1fr">
+  <div class="cols htt-stack" style="grid-template-columns:1fr 1fr">
     <div>
       <div class="card in"><h3>Hàm khởi tạo</h3>
         <div class="code xs" style="border:none;padding:0;background:none"><div class="ln"><span><span class="k">new</span> <span class="t">FlowLayout</span>();                     <span class="c">// CENTER, gap 5</span></span></div><div class="ln"><span><span class="k">new</span> <span class="t">FlowLayout</span>(FlowLayout.LEFT);</span></div><div class="ln"><span><span class="k">new</span> <span class="t">FlowLayout</span>(align, hgap, vgap);</span></div></div>
@@ -397,7 +429,12 @@ pane.add(controls, BorderLayout.SOUTH);
         </div>
       </div>
     </div>
-    <div>
+    </div>
+</section>
+
+<section id="flow2-p2" class="slide htt-cont" data-title="2 · FlowLayout: căn lề & khoảng cách">
+<div class="hdr in"><span class="qn">DEMO 2</span><h2>FlowLayout: căn lề và khoảng cách</h2></div>
+<div class="cols htt-stack htt-cont-part" style="grid-template-columns:1fr 1fr"><div>
       <div class="card f"><h3>Điểm cần nhớ</h3>
         <ul class="sm">
           <li><b>JPanel</b> mặc định dùng FlowLayout(CENTER).</li>
@@ -406,21 +443,21 @@ pane.add(controls, BorderLayout.SOUTH);
           <li>LEADING/TRAILING tự đổi chiều theo <code class="i">ComponentOrientation</code>; LEFT/RIGHT thì không.</li>
         </ul>
       </div>
-      <div class="card good f" style="margin-top:12px"><h3 style="color:#047857">Khi nào dùng</h3><p>Một hàng nút nhỏ, thanh công cụ đơn giản, gom vài control vào một vùng của BorderLayout (như panel <code class="i">controls</code> trong demo).</p></div>
-      <div class="card bad f" style="margin-top:12px"><h3 style="color:#be123c">Hạn chế</h3><p>Không canh thẳng cột được, nên không hợp cho form nhãn – ô nhập. Dùng GridBagLayout hoặc SpringLayout cho việc đó.</p></div>
+      <div class="card good f" style="margin-top:12px"><h3 style="color:#063176">Khi nào dùng</h3><p>Một hàng nút nhỏ, thanh công cụ đơn giản, gom vài control vào một vùng của BorderLayout (như panel <code class="i">controls</code> trong demo).</p></div>
+      <div class="card bad f" style="margin-top:12px"><h3 style="color:#1254be">Hạn chế</h3><p>Không canh thẳng cột được, nên không hợp cho form nhãn – ô nhập. Dùng GridBagLayout hoặc SpringLayout cho việc đó.</p></div>
     </div>
   </div>
 </section>
 <style>
 .algs{display:grid;grid-template-columns:1fr;gap:6px}
-.algs>div{display:grid;grid-template-columns:110px 1fr 180px;align-items:center;gap:10px;font-family:var(--mono);font-size:14px;font-weight:700;color:#6d28d9}
-.algs small{font-family:"Be Vietnam Pro";font-weight:500;color:var(--muted);font-size:13px}
-.ab{display:flex;gap:4px;border:1.5px dashed #c4b5fd;border-radius:6px;padding:4px;background:#faf8ff}
-.ab i{width:34px;height:16px;border-radius:3px;background:linear-gradient(180deg,#fff,#d9e1ef);border:1px solid #8a98b6}
+.algs>div{display:grid;grid-template-columns:110px 1fr 180px;align-items:center;gap:10px;font-family:var(--mono);font-size:max(14px,var(--htt-min,24px));font-weight:700;color:#286cd9}
+.algs small{font-family:"Be Vietnam Pro";font-weight:500;color:var(--muted);font-size:max(13px,var(--htt-min,24px))}
+.ab{display:flex;gap:4px;border:1.5px dashed #b7d1fb;border-radius:6px;padding:4px;background:#faf8ff}
+.ab i{width:34px;height:16px;border-radius:3px;background:#fff;border:1px solid #7596cb}
 </style>
 
 <!-- ===================== 3. GRID ===================== -->
-<section class="slide" id="grid1" data-title="3 · GridLayoutDemo (chạy code)">
+<section class="slide htt-fs18" id="grid1" data-title="3 · GridLayoutDemo (chạy code)">
   <div class="hdr in"><span class="qn">DEMO 3</span><h2>GridLayoutDemo</h2><span class="rk">#3</span></div>
   <div class="cols" style="grid-template-columns:1.08fr 1fr">
     <div>
@@ -483,8 +520,8 @@ pane.add(controls, BorderLayout.SOUTH);
 .gl{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:40px;gap:0;padding:6px;transition:gap .5s}
 .gl.gap{gap:20px 10px}
 .gl .jb{border-radius:3px}
-.gempty{border:1.5px dashed #c4b5fd;display:flex;align-items:center;justify-content:center;font-size:12px;color:#a78bfa;font-family:var(--mono)}
-.gctl{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;padding:8px 6px;border-top:2px solid #c7cfdf;align-items:center}
+.gempty{border:1.5px dashed #b7d1fb;display:flex;align-items:center;justify-content:center;font-size:max(12px,var(--htt-min,24px));color:#8cb6f9;font-family:var(--mono)}
+.gctl{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;padding:8px 6px;border-top:2px solid #bfcee7;align-items:center}
 </style>
 
 <!-- ===================== 3b. GRID explained ===================== -->
@@ -518,12 +555,12 @@ pane.add(controls, BorderLayout.SOUTH);
   </div>
 </section>
 <style>
-.calc{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-width:340px;padding:8px;background:#eef1f6;border:1px solid #a9b3c9;border-radius:10px}
-.calc span{font-family:var(--mono);font-weight:700;font-size:18px;height:40px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#fff,#d9e1ef);border:1px solid #8a98b6;border-radius:5px}
+.calc{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-width:340px;padding:8px;background:#ecf1f8;border:1px solid #99b2d9;border-radius:10px}
+.calc span{font-family:var(--mono);font-weight:700;font-size:max(18px,var(--htt-min,24px));height:40px;display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid #7596cb;border-radius:5px}
 </style>
 
 <!-- ===================== 4. BOX ===================== -->
-<section class="slide" id="box1" data-title="4 · BoxLayoutDemo (chạy code)">
+<section class="slide htt-fs18" id="box1" data-title="4 · BoxLayoutDemo (chạy code)">
   <div class="hdr in"><span class="qn">DEMO 4</span><h2>BoxLayoutDemo</h2><span class="rk">#4</span></div>
   <div class="cols" style="grid-template-columns:1.05fr 1fr">
     <div>
@@ -577,7 +614,7 @@ frame.setVisible(true);
 </style>
 
 <!-- ===================== 4b. BOX explained ===================== -->
-<section class="slide" id="box2" data-title="4 · BoxLayout: glue, strut, rigid area">
+<section class="slide htt-fs18" id="box2" data-title="4 · BoxLayout: glue, strut, rigid area">
   <div class="hdr in"><span class="qn">DEMO 4</span><h2>BoxLayout: chất độn (filler) và trục</h2></div>
   <div class="cols" style="grid-template-columns:1.05fr 1fr">
     <div>
@@ -617,14 +654,14 @@ row.add(new JButton("OK"));
   </div>
 </section>
 <style>
-.hrow{display:flex;align-items:center;gap:0;margin-top:14px;padding:8px;background:#eef1f6;border:1px solid #a9b3c9;border-radius:10px;height:54px}
-.glue{flex:0 0 0;overflow:hidden;opacity:0;font-family:var(--mono);font-size:13px;font-weight:700;color:#a78bfa;text-align:center;border:1.5px dashed #c4b5fd;border-radius:6px;height:34px;display:flex;align-items:center;justify-content:center;transition:flex-grow .7s,opacity .4s}
+.hrow{display:flex;align-items:center;gap:0;margin-top:14px;padding:8px;background:#ecf1f8;border:1px solid #99b2d9;border-radius:10px;height:54px}
+.glue{flex:0 0 0;overflow:hidden;opacity:0;font-family:var(--mono);font-size:max(13px,var(--htt-min,24px));font-weight:700;color:#8cb6f9;text-align:center;border:1.5px dashed #b7d1fb;border-radius:6px;height:34px;display:flex;align-items:center;justify-content:center;transition:flex-grow .7s,opacity .4s}
 .glue.show{flex-grow:1;opacity:1}
-.rig{width:22px;height:34px;background:repeating-linear-gradient(45deg,#fde68a 0 4px,#fff7d6 4px 8px);border-radius:3px;font-size:0}
+.rig{width:22px;height:34px;background:#8eb7f9;border-radius:3px;font-size:0}
 </style>
 
 <!-- ===================== 5. GRIDBAG ===================== -->
-<section class="slide" id="gbag1" data-title="5 · GridBagLayoutDemo (chạy code)">
+<section class="slide htt-fs18" id="gbag1" data-title="5 · GridBagLayoutDemo (chạy code)">
   <div class="hdr in"><span class="qn">DEMO 5</span><h2>GridBagLayoutDemo</h2><span class="rk">#5</span></div>
   <div class="cols" style="grid-template-columns:1fr 1fr">
     <div>
@@ -687,14 +724,14 @@ pane.add(button, c);
 <style>
 .gbg{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:auto auto 1fr;height:100%}
 .gbg .jb{border-radius:3px;z-index:1}
-.gcell{border:1px dashed #d8ccfb;font-family:var(--mono);font-size:10.5px;color:#b4a3ef;padding:2px 4px;z-index:0;min-height:30px}
+.gcell{border:1px dashed #ccdefb;font-family:var(--mono);font-size:max(10.5px,var(--htt-min,24px));color:#a3c0ef;padding:2px 4px;z-index:0;min-height:30px}
 .win.gbig{width:560px!important;height:330px!important}
 </style>
 
 <!-- ===================== 5b. GRIDBAG constraints ===================== -->
 <section class="slide" id="gbag2" data-title="5 · GridBagConstraints: bảng tra">
   <div class="hdr in"><span class="qn">DEMO 5</span><h2>GridBagConstraints: các trường quan trọng</h2></div>
-  <div class="cols" style="grid-template-columns:1.25fr 1fr">
+  <div class="cols htt-stack" style="grid-template-columns:1.25fr 1fr">
     <div>
       <table class="in">
         <tr><th>Trường</th><th>Ý nghĩa</th><th>Trong demo</th></tr>
@@ -707,16 +744,21 @@ pane.add(button, c);
         <tr><td>weightx/weighty</td><td>tỉ lệ chia chỗ dư (0 = không nhận)</td><td>0.5 · 1.0</td></tr>
       </table>
     </div>
-    <div>
-      <div class="card bad f"><h3 style="color:#be123c">Bẫy: tái sử dụng <code class="i">c</code></h3><p>Sau Button 4, <code class="i">gridwidth</code> vẫn = 3 và <code class="i">ipady</code> vẫn = 40. Demo phải <b>tự đặt lại</b> cho Button 5 (<code class="i">ipady = 0</code>, <code class="i">gridwidth = 2</code>). Quên đặt lại là lỗi rất thường gặp.</p></div>
+    </div>
+</section>
+
+<section id="gbag2-p2" class="slide htt-cont" data-title="5 · GridBagConstraints: bảng tra">
+<div class="hdr in"><span class="qn">DEMO 5</span><h2>GridBagConstraints: các trường quan trọng</h2></div>
+<div class="cols htt-stack htt-cont-part" style="grid-template-columns:1.25fr 1fr"><div>
+      <div class="card bad f"><h3 style="color:#1254be">Bẫy: tái sử dụng <code class="i">c</code></h3><p>Sau Button 4, <code class="i">gridwidth</code> vẫn = 3 và <code class="i">ipady</code> vẫn = 40. Demo phải <b>tự đặt lại</b> cho Button 5 (<code class="i">ipady = 0</code>, <code class="i">gridwidth = 2</code>). Quên đặt lại là lỗi rất thường gặp.</p></div>
       <div class="card f" style="margin-top:12px"><h3>weight hoạt động thế nào?</h3><p>Chỗ dư của mỗi cột được chia theo <b>weightx lớn nhất</b> trong cột đó. Nếu mọi weight = 0, toàn bộ lưới co về giữa container.</p></div>
-      <div class="card good f" style="margin-top:12px"><h3 style="color:#047857">Mẹo</h3><p>Viết hàm phụ <code class="i">addAt(comp, x, y, w, h)</code> tạo <code class="i">GridBagConstraints</code> mới mỗi lần để tránh dính giá trị cũ.</p></div>
+      <div class="card good f" style="margin-top:12px"><h3 style="color:#063176">Mẹo</h3><p>Viết hàm phụ <code class="i">addAt(comp, x, y, w, h)</code> tạo <code class="i">GridBagConstraints</code> mới mỗi lần để tránh dính giá trị cũ.</p></div>
     </div>
   </div>
 </section>
 
 <!-- ===================== 6. TAB ===================== -->
-<section class="slide" id="tab" data-title="6 · TabDemo (JTabbedPane)">
+<section class="slide htt-fs18" id="tab" data-title="6 · TabDemo (JTabbedPane)">
   <div class="hdr in"><span class="qn">DEMO 6</span><h2>TabDemo · JTabbedPane</h2><span class="rk">#6</span></div>
   <div class="cols" style="grid-template-columns:1.08fr 1fr">
     <div>
@@ -774,18 +816,18 @@ public void addComponentToPane(Container pane) {
 <style>
 .tabw{padding:8px}
 .tabs{display:flex;gap:2px;padding-left:4px}
-.tab{font-size:13.5px;padding:6px 14px;border:1px solid #8a98b6;border-bottom:none;border-radius:6px 6px 0 0;background:linear-gradient(180deg,#f6f8fc,#dfe5f0);color:#4a5370;position:relative;top:1px}
-.tabw .t1,.tabw.sel2 .t2{background:#fff;color:#1e2a44;font-weight:700;z-index:1}
-.tabw.sel2 .t1{background:linear-gradient(180deg,#f6f8fc,#dfe5f0);color:#4a5370;font-weight:400}
-.tbody{border:1px solid #8a98b6;background:#fff;height:110px;position:relative}
+.tab{font-size:max(13.5px,var(--htt-min,24px));padding:6px 14px;border:1px solid #7596cb;border-bottom:none;border-radius:6px 6px 0 0;background:#f6f8fc;color:#335387;position:relative;top:1px}
+.tabw .t1,.tabw.sel2 .t2{background:#fff;color:#1b2c47;font-weight:700;z-index:1}
+.tabw.sel2 .t1{background:#f6f8fc;color:#335387;font-weight:400}
+.tbody{border:1px solid #7596cb;background:#fff;height:110px;position:relative}
 .pg{position:absolute;inset:0;display:flex;align-items:flex-start;justify-content:center;gap:5px;padding:8px;transition:opacity .35s}
 .pg.p2,.tabw.sel2 .p1{opacity:0}
 .tabw.sel2 .p2{opacity:1}
-.extra{position:absolute;right:6px;bottom:6px;font-family:var(--mono);font-size:12px;color:#d97706;border:1.5px dashed #f59e0b;border-radius:6px;padding:2px 8px}
+.extra{position:absolute;right:6px;bottom:6px;font-family:var(--mono);font-size:max(12px,var(--htt-min,24px));color:#0b58d4;border:1.5px dashed #0e65f2;border-radius:6px;padding:2px 8px}
 </style>
 
 <!-- ===================== 7. CARD ===================== -->
-<section class="slide" id="card1" data-title="7 · CardLayoutDemo (chạy code)">
+<section class="slide htt-fs18" id="card1" data-title="7 · CardLayoutDemo (chạy code)">
   <div class="hdr in"><span class="qn">DEMO 7</span><h2>CardLayoutDemo</h2><span class="rk">#7</span></div>
   <div class="cols" style="grid-template-columns:1.08fr 1fr">
     <div>
@@ -845,17 +887,17 @@ public void itemStateChanged(ItemEvent evt) {
 <style>
 .cbp{display:flex;justify-content:center;padding:8px}
 .deckc{position:relative;height:120px;margin:4px 10px 12px}
-.cd{position:absolute;inset:0;background:#fff;border:1px solid #8a98b6;border-radius:4px;display:flex;align-items:flex-start;justify-content:center;gap:5px;padding:26px 8px 8px;transition:transform .55s cubic-bezier(.2,.8,.2,1),opacity .45s,box-shadow .4s}
-.cname{position:absolute;left:8px;top:4px;font-family:var(--mono);font-size:11px;font-weight:700;color:#a78bfa}
+.cd{position:absolute;inset:0;background:#fff;border:1px solid #7596cb;border-radius:4px;display:flex;align-items:flex-start;justify-content:center;gap:5px;padding:26px 8px 8px;transition:transform .55s cubic-bezier(.2,.8,.2,1),opacity .45s,box-shadow .4s}
+.cname{position:absolute;left:8px;top:4px;font-family:var(--mono);font-size:max(11px,var(--htt-min,24px));font-weight:700;color:#8cb6f9}
 .cw .c2.pop.show{opacity:0}
-.cw.fan .c1{transform:translate(-26px,-8px) rotate(-3deg);box-shadow:0 12px 24px -10px rgba(30,27,58,.4)}
+.cw.fan .c1{transform:translate(-26px,-8px) rotate(-3deg);box-shadow:0 12px 24px -10px rgba(23,38,62,.4)}
 .cw.fan .c2.pop.show{opacity:1;transform:translate(26px,10px) rotate(3deg)}
 .cw.sel2 .c1{opacity:0}
 .cw.sel2 .c2.pop.show{opacity:1}
 </style>
 
 <!-- ===================== 7b. CARD vs TAB ===================== -->
-<section class="slide" id="card2" data-title="7 · CardLayout API & so với JTabbedPane">
+<section class="slide htt-fs18" id="card2" data-title="7 · CardLayout API & so với JTabbedPane">
   <div class="hdr in"><span class="qn">DEMO 7</span><h2>CardLayout: điều khiển thẻ &amp; so sánh với tab</h2></div>
   <div class="cols" style="grid-template-columns:1fr 1fr">
     <div>
@@ -891,21 +933,21 @@ doneBtn.addActionListener(e -> cl.show(cards, "B1"));
 </section>
 <style>
 .wiz{display:flex;gap:10px;margin-top:14px;position:relative}
-.ws{flex:1;text-align:center;padding:14px 8px;border-radius:12px;border:2px solid #e4dcfb;background:#fff;font-weight:700;font-size:18px;transition:all .4s;opacity:.4}
-.ws small{display:block;font-size:13px;color:var(--muted);font-weight:500}
-.wiz .w1{opacity:1;border-color:#7c3aed;background:#f3edff;transform:translateY(-6px)}
-.wiz.s2 .w1,.wiz.s3 .w1{opacity:.4;border-color:#e4dcfb;background:#fff;transform:none}
-.wiz.s2 .w2,.wiz.s3.back .w2{opacity:1;border-color:#7c3aed;background:#f3edff;transform:translateY(-6px)}
-.wiz.s3 .w2{opacity:.4;border-color:#e4dcfb;background:#fff;transform:none}
-.wiz.s3.back .w2{opacity:1;border-color:#7c3aed;background:#f3edff;transform:translateY(-6px)}
-.wiz.s3 .w3{opacity:1;border-color:#7c3aed;background:#f3edff;transform:translateY(-6px)}
-.wiz.s3.back .w3{opacity:.4;border-color:#e4dcfb;background:#fff;transform:none}
-.wiz.s3.home .w1{opacity:1;border-color:#7c3aed;background:#f3edff;transform:translateY(-6px)}
-.wiz.s3.home .w3{opacity:.4;border-color:#e4dcfb;background:#fff;transform:none}
+.ws{flex:1;text-align:center;padding:14px 8px;border-radius:12px;border:2px solid #dce8fb;background:#fff;font-weight:700;font-size:max(18px,var(--htt-min,24px));transition:all .4s;opacity:.4}
+.ws small{display:block;font-size:max(13px,var(--htt-min,24px));color:var(--muted);font-weight:500}
+.wiz .w1{opacity:1;border-color:#3a7fed;background:#eef4fe;transform:translateY(-6px)}
+.wiz.s2 .w1,.wiz.s3 .w1{opacity:.4;border-color:#dce8fb;background:#fff;transform:none}
+.wiz.s2 .w2,.wiz.s3.back .w2{opacity:1;border-color:#3a7fed;background:#eef4fe;transform:translateY(-6px)}
+.wiz.s3 .w2{opacity:.4;border-color:#dce8fb;background:#fff;transform:none}
+.wiz.s3.back .w2{opacity:1;border-color:#3a7fed;background:#eef4fe;transform:translateY(-6px)}
+.wiz.s3 .w3{opacity:1;border-color:#3a7fed;background:#eef4fe;transform:translateY(-6px)}
+.wiz.s3.back .w3{opacity:.4;border-color:#dce8fb;background:#fff;transform:none}
+.wiz.s3.home .w1{opacity:1;border-color:#3a7fed;background:#eef4fe;transform:translateY(-6px)}
+.wiz.s3.home .w3{opacity:.4;border-color:#dce8fb;background:#fff;transform:none}
 </style>
 
 <!-- ===================== 8. SPRING ===================== -->
-<section class="slide" id="spring1" data-title="8 · SpringForm (chạy code)">
+<section class="slide htt-fs18" id="spring1" data-title="8 · SpringForm (chạy code)">
   <div class="hdr in"><span class="qn">DEMO 8</span><h2>SpringForm · SpringLayout</h2><span class="rk">#8</span></div>
   <div class="cols" style="grid-template-columns:1.08fr 1fr">
     <div>
@@ -933,7 +975,7 @@ p.setOpaque(true);  //content panes must be opaque
 frame.setContentPane(p);
 frame.pack();  frame.setVisible(true);
 </script>
-      <div class="note blue" style="font-size:16px">Cần thêm file <code class="i">SpringUtilities.java</code> (có trong project mẫu của Oracle), không thuộc JDK.</div>
+      <div class="note blue" style="font-size:max(16px,var(--htt-min,24px))">Cần thêm file <code class="i">SpringUtilities.java</code> (có trong project mẫu của Oracle), không thuộc JDK.</div>
     </div>
     <div>
       <div class="stage" style="height:300px">
@@ -961,17 +1003,17 @@ frame.pack();  frame.setVisible(true);
 <style>
 .spr{height:164px;position:relative;width:100%;flex:none!important}
 .spr .it{position:absolute;left:0;top:0;height:30px;transition:left .8s cubic-bezier(.2,.8,.2,1),top .8s cubic-bezier(.2,.8,.2,1),width .8s,opacity .45s,transform .5s}
-.spr .lab{width:var(--pw);text-align:right;font-size:14px;line-height:30px;color:#1e2a44;background:rgba(237,233,254,.6);outline:1px dashed #c4b5fd}
-.spr .tf{width:180px;background:#fff;border:1px solid #8a98b6;border-radius:3px;opacity:.0}
+.spr .lab{width:var(--pw);text-align:right;font-size:max(14px,var(--htt-min,24px));line-height:30px;color:#1b2c47;background:rgba(233,241,254,.6);outline:1px dashed #b7d1fb}
+.spr .tf{width:180px;background:#fff;border:1px solid #7596cb;border-radius:3px;opacity:.0}
 .spr .tf.show{opacity:.75}
 .spr.laid .lab{left:8px;top:var(--y);width:70px;background:none;outline:none}
 .spr.laid .tf{left:84px;top:var(--y);opacity:1}
-.gd{position:absolute;font-family:var(--mono);font-size:10px;font-weight:700;color:#d97706}
+.gd{position:absolute;font-family:var(--mono);font-size:max(10px,var(--htt-min,24px));font-weight:700;color:#0b58d4}
 .gx{left:1px;top:56px}.gy{left:104px;top:0}
 </style>
 
 <!-- ===================== 8b. SPRING explained ===================== -->
-<section class="slide" id="spring2" data-title="8 · SpringLayout: putConstraint">
+<section class="slide htt-fs18" id="spring2" data-title="8 · SpringLayout: putConstraint">
   <div class="hdr in"><span class="qn">DEMO 8</span><h2>SpringLayout: ràng buộc từng cạnh</h2></div>
   <div class="cols" style="grid-template-columns:1.1fr 1fr">
     <div>
@@ -1012,16 +1054,16 @@ layout.putConstraint(NORTH, tf, 5, NORTH, p);
   </div>
 </section>
 <style>
-.sp2{position:relative;height:56px;background:#eef1f6;flex:none!important}
+.sp2{position:relative;height:56px;background:#ecf1f8;flex:none!important}
 .sp2 .a{position:absolute;left:0;top:0;transition:left .7s cubic-bezier(.2,.8,.2,1),top .7s cubic-bezier(.2,.8,.2,1)}
-.sp2 .lab{font-size:14px;line-height:28px;width:52px;outline:1px dashed #c4b5fd}
+.sp2 .lab{font-size:max(14px,var(--htt-min,24px));line-height:28px;width:52px;outline:1px dashed #b7d1fb}
 .sp2 .tf{width:200px;opacity:.85}
 .sp2.s1 .lab{left:5px}.sp2.s2 .lab{top:5px}
 .sp2.s3 .tf{left:62px}.sp2.s4 .tf{top:5px}
 </style>
 
 <!-- ===================== 9. ABSOLUTE ===================== -->
-<section class="slide" id="abs" data-title="9 · AbsoluteLayoutDemo (null layout)">
+<section class="slide htt-fs18" id="abs" data-title="9 · AbsoluteLayoutDemo (null layout)">
   <div class="hdr in"><span class="qn">DEMO 9</span><h2>AbsoluteLayoutDemo · <code class="i" style="font-size:28px">setLayout(null)</code></h2><span class="rk">#9 ít dùng nhất</span></div>
   <div class="cols" style="grid-template-columns:1.08fr 1fr">
     <div>
@@ -1077,22 +1119,22 @@ frame.setSize(300 + insets.left + insets.right,
   </div>
 </section>
 <style>
-.ab0{position:relative;background:#eef1f6;overflow:hidden;background-image:linear-gradient(#dfe4ef 1px,transparent 1px),linear-gradient(90deg,#dfe4ef 1px,transparent 1px);background-size:16px 16px}
+.ab0{position:relative;background:#ecf1f8;overflow:hidden;background-image:none,none;background-size:16px 16px}
 .abt{position:absolute;padding:0}
 .abt.b1{left:40px;top:8px;width:96px;height:42px}
 .abt.b2{left:88px;top:64px;width:96px;height:42px}
 .abt.b3{left:240px;top:24px;width:192px;height:74px}
-.xy{position:absolute;left:0;top:-15px;font-family:var(--mono);font-size:10px;color:#d97706;font-weight:700;white-space:nowrap}
+.xy{position:absolute;left:0;top:-15px;font-family:var(--mono);font-size:max(10px,var(--htt-min,24px));color:#0b58d4;font-weight:700;white-space:nowrap}
 .abt.b1 .xy,.abt.b2 .xy{top:auto;bottom:-15px}
-.ax,.ay{position:absolute;font-family:var(--mono);font-size:10px;color:#94a3b8}
+.ax,.ay{position:absolute;font-family:var(--mono);font-size:max(10px,var(--htt-min,24px));color:#7e9dce}
 .ax{right:6px;top:2px}.ay{left:3px;bottom:3px}
 .win.shrink{width:330px!important;height:180px!important}
 </style>
 
 <!-- ===================== SUMMARY ===================== -->
-<section class="slide" id="end" data-title="Tóm tắt: chọn layout nào?">
+<section class="slide htt-fs20" id="end" data-title="Tóm tắt: chọn layout nào?">
   <div class="hdr in"><span class="qn">TÓM TẮT</span><h2>Chọn layout nào?</h2></div>
-  <table class="in" style="font-size:16px">
+  <table class="in" style="font-size:max(16px,var(--htt-min,24px))">
     <tr><th>#</th><th>Layout</th><th>Mặc định của</th><th>Component có bị kéo giãn?</th><th>Dùng khi cần…</th></tr>
     <tr><td>1</td><td><b>BorderLayout</b></td><td>JFrame, JDialog</td><td>có, theo vùng; CENTER nhận phần dư</td><td>khung chính: toolbar, nội dung, status bar</td></tr>
     <tr><td>2</td><td><b>FlowLayout</b></td><td>JPanel</td><td>không, luôn preferred size</td><td>một hàng nút đơn giản, tự xuống dòng</td></tr>
@@ -1215,6 +1257,53 @@ frame.setSize(300 + insets.left + insets.right,
   go(idx>=0?idx:0);
   addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
 })();
+</script>
+<script id="htt-theme-js">
+(function(){
+  // HTT theme runtime: renumber split code blocks, enforce the slide's minimum font size (--htt-min, default 24px)
+  function minOf(el){var s=el&&el.closest?el.closest('.slide'):null;var v=parseFloat(getComputedStyle(s||document.documentElement).getPropertyValue('--htt-min'));return isNaN(v)?24:v}
+  window.HTT_MIN=function(el){return minOf(el)};
+  function renumber(){
+    document.querySelectorAll('.code[class*="htt-start-"]').forEach(function(c){
+      if(c.dataset.httNum)return;var m=c.className.match(/htt-start-(\d+)/);if(!m)return;var off=+m[1];
+      c.querySelectorAll('.ln>.no').forEach(function(n){var v=parseInt(n.textContent,10);if(!isNaN(v))n.textContent=String(v+off)});
+      c.dataset.httNum='1';
+    });
+  }
+  function hasText(el){for(var n=el.firstChild;n;n=n.nextSibling){if(n.nodeType===3&&/\S/.test(n.nodeValue))return true}return /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(el.tagName)}
+  function svgScale(t){var svg=t.ownerSVGElement;if(!svg)return 1;var s=1;
+    while(svg){var vb=svg.viewBox&&svg.viewBox.baseVal;if(vb&&vb.width&&vb.height){var w=svg.clientWidth||svg.getBoundingClientRect().width,h=svg.clientHeight||svg.getBoundingClientRect().height;if(!w||!h)return 0;s*=Math.min(w/vb.width,h/vb.height)}svg=svg.ownerSVGElement}
+    return s}
+  function set(el,v){if(!el.hasAttribute('data-htt-prev'))el.setAttribute('data-htt-prev',el.style.getPropertyValue('font-size')+'|'+el.style.getPropertyPriority('font-size'));el.style.setProperty('font-size',v,'important')}
+  function unfix(sel){document.querySelectorAll((sel||'#deck .slide *')).forEach(function(el){var p=el.getAttribute('data-htt-prev');if(p===null)return;var a=p.split('|');if(a[0])el.style.setProperty('font-size',a[0],a[1]||'');else el.style.removeProperty('font-size');el.removeAttribute('data-htt-prev')})}
+  function fix(sel){
+    renumber();
+    var slides=document.querySelectorAll(typeof sel==='string'?sel:'#deck .slide');
+    for(var j=0;j<slides.length;j++){var sl=slides[j];var MIN=minOf(sl);if(MIN<=0)continue;
+      var els=sl.querySelectorAll('*');
+      for(var i=0;i<els.length;i++){var el=els[i];
+        if(el instanceof SVGElement){
+          if(!/^(text|tspan|textPath)$/.test(el.tagName))continue;
+          if(el.tagName!=='text'&&!hasText(el))continue;
+          var sc=svgScale(el);if(!sc)continue;
+          var fs=parseFloat(getComputedStyle(el).fontSize);if(!fs)continue;
+          if(fs*sc<MIN-0.3)set(el,(MIN/sc).toFixed(2)+'px');
+          continue;
+        }
+        if(!hasText(el))continue;
+        var f=parseFloat(getComputedStyle(el).fontSize);
+        if(f>0&&f<MIN-0.3)set(el,MIN+'px');
+      }
+    }
+  }
+  window.HTT_fix=fix;window.HTT_unfix=unfix;
+  fix();
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){fix()});
+  var t=null;var mo=new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(ms[i].type==='childList'&&ms[i].addedNodes.length){clearTimeout(t);t=setTimeout(function(){fix()},30);return}}});
+  var d=document.getElementById('deck');if(d)mo.observe(d,{childList:true,subtree:true});
+  function act(){setTimeout(function(){fix('#deck .slide.active')},0)}addEventListener('keydown',act);addEventListener('click',act);addEventListener('touchend',act);
+})();
+
 </script>
 </body>
 </html>

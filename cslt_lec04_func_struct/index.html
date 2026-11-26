@@ -8,18 +8,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
-  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
-  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
-  --sa1:#7c3aed; --sa2:#ec4899;
+  --bg:#ffffff; --panel:#ffffff; --line:#e8eef7; --text:#17263e; --muted:#3d63a0;
+  --accent:#3a7fed; --accent2:#0949b1; --warn:#1d68e1; --gold:#0b58d4; --code:#fcfbff;
+  --k:#3371d6; --t:#3a7fed; --s:#083d93; --n:#0c61ea; --c:#84a1d0; --p:#276cdb; --fn:#0a4fbf;
+  --sa1:#3a7fed; --sa2:#4887ec;
   --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+html,body{height:100%;background:#eff5fe;color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
 #viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
 #deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
-.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
-  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(58,127,237,.14);
+  background:none,none,none,var(--bg);
   opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
 .slide.past{transform:translateX(-60px) scale(.98)}
 .slide.active{opacity:1;transform:none;pointer-events:auto}
@@ -27,81 +27,81 @@ html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff
 .slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
 @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 .hdr{display:flex;align-items:center;gap:16px;margin-bottom:18px}
-.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
-.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
-.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+.slide:nth-of-type(4n+1){--sa1:#3a7fed;--sa2:#4887ec}.slide:nth-of-type(4n+2){--sa1:#0949b1;--sa2:#3a7fed}.slide:nth-of-type(4n+3){--sa1:#4887ec;--sa2:#1c6ef3}.slide:nth-of-type(4n){--sa1:#083d93;--sa2:#0e62e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:var(--sa1)}
+.qn{font-weight:800;font-size:max(17px,var(--htt-min,24px));letter-spacing:.06em;color:#fff;background:var(--sa1);box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
 h1{font-size:70px;line-height:1.1;font-weight:800}
 h2{font-size:38px;line-height:1.2;font-weight:800}
-h3{font-size:23px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
-p,li{font-size:22px;line-height:1.45;color:var(--text)}
+h3{font-size:max(23px,var(--htt-min,24px));font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:max(22px,var(--htt-min,24px));line-height:1.45;color:var(--text)}
 .muted{color:var(--muted)}
 ul{list-style:none}
 ul li{position:relative;padding-left:26px;margin:6px 0}
-ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
-.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
-code.i{font-family:var(--mono);font-size:.88em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 6px;border-radius:6px;color:#be185d}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:var(--sa1)}
+.grad{background:#3a7fed;-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.88em;background:#f0f5fd;border:1px solid #d3e2f9;padding:0 6px;border-radius:6px;color:#1858be}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
 .cols.c64{grid-template-columns:1.25fr 1fr}.cols.c46{grid-template-columns:1fr 1.2fr}
 .cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
-.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
-.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
-.card.bad{border-color:#fecdd3;background:linear-gradient(180deg,#fff1f3,#fff)}
-.card.good{border-color:#a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff)}
-.lbl{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
-.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(58,127,237,.25)}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #3a7fed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0949b1}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #4887ec}.cols4>.card:nth-child(4n){border-top:5px solid #0e65f2}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0949b1}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#276cdb}.cols4>.card:nth-child(4n) h3{color:#0b58d4}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#3a7fed}
+.card.bad{border-color:#cfe0fc;background:#f2f7fe}
+.card.good{border-color:#a7c4f3;background:#ecf3fd}
+.lbl{display:inline-block;font-size:max(15px,var(--htt-min,24px));font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#e5effe;color:#1254be}.lbl.good{background:#d1e1fa;color:#063176}.lbl.info{background:#e3ecfb;color:#3363b0}
 .icon{font-size:34px;margin-bottom:4px}
-.note{margin-top:12px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:20px;line-height:1.4}
-.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
-.code{font-family:var(--mono);font-size:18px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
-.code.sm{font-size:16.5px}.code.xs{font-size:15px;line-height:1.45}.code.xxs{font-size:13.6px;line-height:1.38;padding:8px 0}
+.note{margin-top:12px;padding:10px 16px;border-left:5px solid #0e65f2;background:#e2ecfd;border-radius:8px;font-size:max(20px,var(--htt-min,24px));line-height:1.4}
+.note.blue{border-color:#5c97f6;background:#eef4fe}
+.code{font-family:var(--mono);font-size:max(18px,var(--htt-min,24px));line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
+.code.sm{font-size:max(16.5px,var(--htt-min,24px))}.code.xs{font-size:max(15px,var(--htt-min,24px));line-height:1.45}.code.xxs{font-size:max(13.6px,var(--htt-min,24px));line-height:1.38;padding:8px 0}
 .code .ln{padding:0 14px 0 8px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
-.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.code .no{color:#bdcde6;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
 .k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
-.code.show-a .mark-a{background:rgba(124,58,237,.11);box-shadow:inset 5px 0 #7c3aed}
-.code.show-b .mark-b{background:rgba(6,182,212,.13);box-shadow:inset 5px 0 #06b6d4}
-.code.show-c .mark-c{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
-.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
-.code-title{font-family:var(--mono);font-size:15px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.code.show-a .mark-a{background:rgba(58,127,237,.11);box-shadow:inset 5px 0 #3a7fed}
+.code.show-b .mark-b{background:rgba(11,86,207,.13);box-shadow:inset 5px 0 #0b56cf}
+.code.show-c .mark-c{background:rgba(14,101,242,.16);box-shadow:inset 5px 0 #0e65f2}
+.code.show-d .mark-d{background:rgba(72,135,236,.12);box-shadow:inset 5px 0 #4887ec}
+.code-title{font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));color:var(--muted);margin:0 0 5px 4px;font-weight:600}
 .f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
 .f.on{opacity:1;transform:none}
 .f.ghost{display:none}
 .f.zoom{transform:scale(.85)}.f.zoom.on{transform:none}
-table{border-collapse:separate;border-spacing:0;width:100%;font-size:19px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:max(19px,var(--htt-min,24px));border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
 th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
-th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+th{background:#ebf2fe;font-weight:700}
 tr:last-child td{border-bottom:none}
 td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
 .legend{display:flex;flex-direction:column;gap:10px}
 .leg{border-radius:12px;padding:10px 16px;background:#fff;border:1px solid var(--line)}
-.leg b{display:block;font-size:21px;margin-bottom:2px}
-.leg p{font-size:19px}
-.leg.a{border-left:6px solid #7c3aed}.leg.b{border-left:6px solid #06b6d4}.leg.c{border-left:6px solid #f59e0b}
-.console{font-family:var(--mono);font-size:17px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre}
-.console .in{color:#fbbf24;font-weight:600}
-.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.leg b{display:block;font-size:max(21px,var(--htt-min,24px));margin-bottom:2px}
+.leg p{font-size:max(19px,var(--htt-min,24px))}
+.leg.a{border-left:6px solid #3a7fed}.leg.b{border-left:6px solid #0b56cf}.leg.c{border-left:6px solid #0e65f2}
+.console{font-family:var(--mono);font-size:max(17px,var(--htt-min,24px));line-height:1.5;background:#17263e;border-radius:12px;padding:10px 16px;color:#e7f0fe;white-space:pre}
+.console .in{color:#2b78f4;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#72a4f4;font-size:max(11px,var(--htt-min,24px));letter-spacing:3px;margin-bottom:4px}
 .mem{display:flex;align-items:center;gap:16px;min-height:130px}
-.frame{border:2px solid #e4dcfb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
-.frame .fname{font-family:var(--mono);font-size:16px;color:var(--muted);margin-bottom:6px}
+.frame{border:2px solid #dce8fb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
+.frame .fname{font-family:var(--mono);font-size:max(16px,var(--htt-min,24px));color:var(--muted);margin-bottom:6px}
 .var{display:flex;align-items:center;gap:10px}
-.vn{font-family:var(--mono);font-size:21px;color:var(--t);font-weight:600}
-.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #c4b5fd;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
+.vn{font-family:var(--mono);font-size:max(21px,var(--htt-min,24px));color:var(--t);font-weight:600}
+.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #b7d1fb;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
 .vb .new{display:none}
 .callee,.arw{opacity:0;transform:translateX(-14px);transition:all .5s}
 .mem.s1 .callee,.mem.s1 .arw{opacity:1;transform:none}
 .mem.s2 .chg .old{display:none}.mem.s2 .chg .new{display:inline;animation:pop .5s}
-.mem.s2 .chg{border-color:#f59e0b;box-shadow:0 0 18px rgba(245,158,11,.5)}
+.mem.s2 .chg{border-color:#0e65f2;box-shadow:0 0 18px rgba(14,101,242,.5)}
 .mem.s3 .callee,.mem.s3 .arw{opacity:.15;transform:translateY(10px)}
-.mem.s3 .result{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.5)}
-.arw{font-family:var(--mono);font-size:16px;color:var(--gold);text-align:center;line-height:1.2;font-weight:600}
+.mem.s3 .result{border-color:#1051b9;box-shadow:0 0 18px rgba(16,81,185,.5)}
+.arw{font-family:var(--mono);font-size:max(16px,var(--htt-min,24px));color:var(--#0d65f2);text-align:center;line-height:1.2;font-weight:600}
 .arw .bar{display:block;font-size:30px}
-.alias{font-size:18px;color:var(--accent2);font-weight:600}
+.alias{font-size:max(18px,var(--htt-min,24px));color:var(--accent2);font-weight:600}
 @keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.25)}100%{transform:none;opacity:1}}
 .flow{display:flex;align-items:center;gap:12px;justify-content:center}
-.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:18px;border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
-.box small{display:block;font-family:"Be Vietnam Pro";font-size:14px;color:var(--muted);margin-top:2px;font-weight:400}
-.box.h{border-color:var(--gold)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#c4b5fd}.box.exe{border-color:#ec4899;background:#fdf2f8}
+.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:max(18px,var(--htt-min,24px));border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:max(14px,var(--htt-min,24px));color:var(--muted);margin-top:2px;font-weight:400}
+.box.h{border-color:var(--#0d65f2)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#b7d1fb}.box.exe{border-color:#4887ec;background:#f2f6fd}
 .ar{color:var(--muted);font-size:26px;text-align:center}
 .stack{display:flex;flex-direction:column;gap:8px}
 svg text{font-family:var(--mono);font-weight:600}
@@ -110,43 +110,65 @@ svg.d1 .dr1,svg.d2 .dr2,svg.d3 .dr3{stroke-dashoffset:0}
 .fadein{opacity:0;transition:opacity .6s}
 svg.d1 .fd1,svg.d2 .fd2,svg.d3 .fd3{opacity:1}
 .title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
-.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.kicker{font-family:var(--mono);color:#276cdb;font-size:max(22px,var(--htt-min,24px));margin-bottom:18px;font-weight:600}
 .orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
 @keyframes float{50%{transform:translate(30px,-25px)}}
 .agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:19px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05)}
-.ag:hover{border-color:#ec4899;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
-.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
-.ag b{color:#db2777;margin-right:6px;font-family:var(--mono)}
-.formula{font-family:var(--mono);font-size:23px;text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
-#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
-#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
-#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:16px}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:max(19px,var(--htt-min,24px));line-height:1.3;box-shadow:0 2px 6px rgba(40,67,110,.05)}
+.ag:hover{border-color:#4887ec;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(72,135,236,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #3a7fed}.ag:nth-child(4n+2){border-left:5px solid #0949b1}.ag:nth-child(4n+3){border-left:5px solid #4887ec}.ag:nth-child(4n){border-left:5px solid #0e65f2}
+.ag b{color:#276cdb;margin-right:6px;font-family:var(--mono)}
+.formula{font-family:var(--mono);font-size:max(23px,var(--htt-min,24px));text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:#3a7fed;transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:max(14px,var(--htt-min,24px));color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:max(16px,var(--htt-min,24px))}
 #nav button:hover{border-color:var(--accent)}
-#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+#hint{position:fixed;left:16px;bottom:12px;font-size:max(13px,var(--htt-min,24px));color:#7495ca;z-index:5}
 @media (max-width:700px){#hint{display:none}}
 @media print{#nav,#bar,#hint{display:none}}
 .c720{stroke-dasharray:720;stroke-dashoffset:720}
 </style>
+<style id="htt-theme">
+/* HTT theme: logo + layout helpers (font-size >= 24px, single blue) */
+#deck>.htt-logo{position:absolute;top:12px;right:14px;z-index:60;height:40px;padding:0 10px;border-radius:8px;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;font:800 24px/1 "Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.04em;pointer-events:none;user-select:none}
+#deck>.htt-logo span{font-size:24px;color:#fff}
+.htt-stack{grid-template-columns:minmax(0,1fr)!important;grid-template-areas:none!important;flex-direction:column!important;flex-wrap:nowrap!important}
+.htt-stack>*{grid-column:auto!important;grid-row:auto!important;max-width:100%}
+.htt-wrap,.htt-wrap *{white-space:pre-wrap!important;overflow-wrap:anywhere}
+.htt-wrap .ln{flex-wrap:nowrap}
+.htt-flexwrap{flex-wrap:wrap!important}
+#nav,#nav *{font-size:16px!important}
+#hint{font-size:14px!important}
+.orb{display:none!important}
+:root{--htt-min:24px}
+.slide.htt-fs22{--htt-min:22px}.slide.htt-fs20{--htt-min:20px}.slide.htt-fs0{--htt-min:0px}
+.jumpbtn{right:100px!important}
+.slide.htt-fs18{--htt-min:18px}.slide.htt-fs16{--htt-min:16px}
+.slide .hdr{padding-right:84px}
+.sjump{right:100px!important}
+
+</style>
+<script>window.HTT_MIN=function(el){var s=el&&el.closest?el.closest(".slide"):null;var v=parseFloat(getComputedStyle(s||document.documentElement).getPropertyValue("--htt-min"));return isNaN(v)?24:v};</script>
 </head>
 <body>
 <div id="viewport"><div id="deck">
+<div class="htt-logo" aria-label="HTT" title="HTT"><span>HTT</span></div>
 
 <!-- ===================== TITLE ===================== -->
 <section class="slide" id="title">
-  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
-  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="orb" style="width:380px;height:380px;background:#a8c7f9;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#81aff8;left:40%;bottom:-120px;animation-delay:-4s"></div>
   <div class="title-wrap">
     <div class="kicker in">// C++ · Function &amp; Struct</div>
     <h1 class="in">Hàm và Struct<br><span class="grad">trong C++</span></h1>
     <p class="in muted" style="font-size:26.4px;margin-top:20px;max-width:760px">Trả lời 20 câu hỏi: từ lý do cần viết hàm, pass by reference, project nhiều file, cho đến struct <code class="i">Point2D</code> và <code class="i">Rectangle</code>.</p>
-    <p class="in" style="margin-top:36px;font-size:19.2px;color:#8a91b4">Dùng phím ← → hoặc Space để chuyển · F: toàn màn hình</p>
+    <p class="in" style="margin-top:36px;font-size:max(19.2px,var(--htt-min,24px));color:#7495ca">Dùng phím ← → hoặc Space để chuyển · F: toàn màn hình</p>
   </div>
 </section>
 
 <!-- ===================== AGENDA ===================== -->
 <section class="slide" id="agenda">
-  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:18px">· bấm vào câu hỏi để đi tới</span></div>
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:max(18px,var(--htt-min,24px))">· bấm vào câu hỏi để đi tới</span></div>
   <div class="agenda in">
     <div class="ag" data-goto="q1"><b>01</b>Tại sao cần viết function</div>
     <div class="ag" data-goto="q2"><b>02</b>Prototype · Definition · Call</div>
@@ -175,12 +197,16 @@ svg.d1 .fd1,svg.d2 .fd2,svg.d3 .fd3{opacity:1}
 <section class="slide" id="q1">
   <div class="hdr in"><span class="qn">CÂU 1</span><h2>Tại sao phải viết function?</h2></div>
   <div class="cols4" style="margin-bottom:22px">
-    <div class="card f zoom"><div class="icon">♻️</div><h3>Tái sử dụng</h3><p style="font-size:19.2px">Viết một lần, gọi nhiều lần. Tránh copy-paste (nguyên tắc DRY – Don't Repeat Yourself).</p></div>
-    <div class="card f zoom"><div class="icon">🧩</div><h3>Chia để trị</h3><p style="font-size:19.2px">Bài toán lớn được tách thành nhiều bài toán nhỏ, mỗi hàm lo một việc.</p></div>
-    <div class="card f zoom"><div class="icon">📖</div><h3>Dễ đọc</h3><p style="font-size:19.2px">Tên hàm mô tả ý nghĩa: <code class="i">isPrime(n)</code> dễ hiểu hơn 10 dòng vòng lặp.</p></div>
-    <div class="card f zoom"><div class="icon">🛠️</div><h3>Dễ sửa &amp; test</h3><p style="font-size:19.2px">Sửa lỗi ở một chỗ là mọi nơi gọi hàm đều được sửa. Kiểm thử từng hàm riêng.</p></div>
+    <div class="card f zoom"><div class="icon">♻️</div><h3>Tái sử dụng</h3><p style="font-size:max(19.2px,var(--htt-min,24px))">Viết một lần, gọi nhiều lần. Tránh copy-paste (nguyên tắc DRY – Don't Repeat Yourself).</p></div>
+    <div class="card f zoom"><div class="icon">🧩</div><h3>Chia để trị</h3><p style="font-size:max(19.2px,var(--htt-min,24px))">Bài toán lớn được tách thành nhiều bài toán nhỏ, mỗi hàm lo một việc.</p></div>
+    <div class="card f zoom"><div class="icon">📖</div><h3>Dễ đọc</h3><p style="font-size:max(19.2px,var(--htt-min,24px))">Tên hàm mô tả ý nghĩa: <code class="i">isPrime(n)</code> dễ hiểu hơn 10 dòng vòng lặp.</p></div>
+    <div class="card f zoom"><div class="icon">🛠️</div><h3>Dễ sửa &amp; test</h3><p style="font-size:max(19.2px,var(--htt-min,24px))">Sửa lỗi ở một chỗ là mọi nơi gọi hàm đều được sửa. Kiểm thử từng hàm riêng.</p></div>
   </div>
-  <div class="cols f">
+  </section>
+
+<section id="q1-p2" class="slide htt-cont">
+<div class="hdr in"><span class="qn">CÂU 1</span><h2>Tại sao phải viết function?</h2></div>
+<div class="cols f htt-stack">
     <div><div class="code-title">❌ Không dùng hàm – lặp code</div>
 <script type="text/x-cpp" class="sm">
 // tính 5! , 7! , 10! ... viết lại 3 lần
@@ -191,7 +217,13 @@ for (int i = 2; i <= 7; i++)  f2 *= i;
 long long f3 = 1;
 for (int i = 2; i <= 10; i++) f3 *= i;
 </script></div>
-    <div><div class="code-title">✅ Dùng hàm – viết một lần</div>
+    </div>
+
+</section>
+
+<section id="q1-p2-p2" class="slide htt-cont htt-cont">
+<div class="hdr in"><span class="qn">CÂU 1</span><h2>Tại sao phải viết function?</h2></div>
+<div class="cols f htt-stack htt-cont-part"><div><div class="code-title">✅ Dùng hàm – viết một lần</div>
 <script type="text/x-cpp" class="sm">
 long long factorial(int n) {
     long long r = 1;
@@ -205,7 +237,7 @@ long long f2 = factorial(7), f3 = factorial(10);
 </section>
 
 <!-- ===================== Q2 ===================== -->
-<section class="slide" id="q2">
+<section class="slide htt-fs22" id="q2">
   <div class="hdr in"><span class="qn">CÂU 2</span><h2>Prototype · Definition · Call</h2></div>
   <div class="cols" style="grid-template-columns:1.1fr 1fr">
 <script type="text/x-cpp" id="c2" data-mark="4:a;13-15:b;8:c">
@@ -227,7 +259,7 @@ int square(int n) {      // (2) definition
 </script>
     <div class="legend">
       <div class="leg a f" data-act="#c2|show-a"><b>① Prototype / Declaration</b><p>Chỉ có kiểu trả về, tên hàm và kiểu tham số, kết thúc bằng <code class="i">;</code>. Nó báo cho compiler biết hàm tồn tại để có thể gọi trước khi định nghĩa. Có thể bỏ tên tham số: <code class="i">int square(int);</code></p></div>
-      <div class="leg b f" data-act="#c2|show-b"><b>② Definition (header + body)</b><p>Phần cài đặt thật sự. <i>Body</i> là khối <code class="i">{ ... }</code> chứa các câu lệnh. Mỗi hàm chỉ được <b style="display:inline;font-size:19.2px">định nghĩa 1 lần</b>, nhưng có thể khai báo nhiều lần.</p></div>
+      <div class="leg b f" data-act="#c2|show-b"><b>② Definition (header + body)</b><p>Phần cài đặt thật sự. <i>Body</i> là khối <code class="i">{ ... }</code> chứa các câu lệnh. Mỗi hàm chỉ được <b style="display:inline;font-size:max(19.2px,var(--htt-min,24px))">định nghĩa 1 lần</b>, nhưng có thể khai báo nhiều lần.</p></div>
       <div class="leg c f" data-act="#c2|show-c"><b>③ Call / Invocation</b><p>Dùng hàm: tên hàm + đối số (<i>argument</i>) <code class="i">a</code>. Chương trình nhảy vào body, chạy xong thì quay lại đúng chỗ gọi kèm giá trị trả về.</p></div>
     </div>
   </div>
@@ -235,7 +267,7 @@ int square(int n) {      // (2) definition
 </section>
 
 <!-- ===================== Q3 ===================== -->
-<section class="slide" id="q3">
+<section class="slide htt-fs20" id="q3">
   <div class="hdr in"><span class="qn">CÂU 3</span><h2>Từ khóa <code class="i" style="font-size:33.6px">void</code> trong return type</h2></div>
   <div class="cols c64">
 <script type="text/x-cpp" id="c3" data-mark="1-4:a;6-7:b;15:d">
@@ -257,9 +289,9 @@ int main() {
 }
 </script>
     <div>
-      <div class="card f" data-act="#c3|show-a"><h3>void = "không có gì"</h3><p style="font-size:20.4px">Hàm <code class="i">void</code> <b>không trả về giá trị</b>. Nó được gọi để <i>làm một việc</i> (in, ghi file, thay đổi biến qua tham chiếu...) chứ không phải để <i>tính ra một kết quả</i>.</p></div>
-      <div class="card f" style="margin-top:14px" data-act="#c3|show-b"><h3>return; không kèm giá trị</h3><p style="font-size:20.4px">Trong hàm void có thể dùng <code class="i">return;</code> để kết thúc sớm. Không được viết <code class="i">return 5;</code>.</p></div>
-      <div class="card f" style="margin-top:14px" data-act="#c3|show-d"><h3>Không dùng trong biểu thức</h3><p style="font-size:20.4px">Không thể gán, cộng hay so sánh kết quả của hàm void.</p></div>
+      <div class="card f" data-act="#c3|show-a"><h3>void = "không có gì"</h3><p style="font-size:max(20.4px,var(--htt-min,24px))">Hàm <code class="i">void</code> <b>không trả về giá trị</b>. Nó được gọi để <i>làm một việc</i> (in, ghi file, thay đổi biến qua tham chiếu...) chứ không phải để <i>tính ra một kết quả</i>.</p></div>
+      <div class="card f" style="margin-top:14px" data-act="#c3|show-b"><h3>return; không kèm giá trị</h3><p style="font-size:max(20.4px,var(--htt-min,24px))">Trong hàm void có thể dùng <code class="i">return;</code> để kết thúc sớm. Không được viết <code class="i">return 5;</code>.</p></div>
+      <div class="card f" style="margin-top:14px" data-act="#c3|show-d"><h3>Không dùng trong biểu thức</h3><p style="font-size:max(20.4px,var(--htt-min,24px))">Không thể gán, cộng hay so sánh kết quả của hàm void.</p></div>
       <div class="console f" style="margin-top:14px">====================
 Xin chao, An!
 ====================</div>
@@ -270,7 +302,7 @@ Xin chao, An!
 <!-- ===================== Q4 ===================== -->
 <section class="slide" id="q4">
   <div class="hdr in"><span class="qn">CÂU 4</span><h2>Không nên <code class="i" style="font-size:33.6px">cin</code> trong hàm – hãy truyền tham số</h2></div>
-  <div class="cols">
+  <div class="cols htt-stack">
     <div class="card bad in"><span class="lbl bad">❌ CIN TRONG HÀM</span>
 <script type="text/x-cpp" class="sm">
 int sumBad() {
@@ -281,7 +313,11 @@ int sumBad() {
 // Muốn tính 3 + 4? Phải gõ phím.
 // Muốn cộng 2 phần tử mảng? Không được!
 </script></div>
-    <div class="card good in"><span class="lbl good">✅ TRUYỀN THAM SỐ</span>
+    </div></section>
+
+<section id="q4-p2" class="slide htt-cont">
+<div class="hdr in"><span class="qn">CÂU 4</span><h2>Không nên <code class="i" style="font-size:33.6px">cin</code> trong hàm – hãy truyền tham số</h2></div>
+<div class="cols htt-stack htt-cont-part"><div class="card good in"><span class="lbl good">✅ TRUYỀN THAM SỐ</span>
 <script type="text/x-cpp" class="sm">
 int sum(int a, int b) { return a + b; }
 
@@ -298,12 +334,13 @@ cout << sum(sum(1, 2), 10); // từ hàm khác
     <li class="f"><b>Một hàm, một nhiệm vụ:</b> hàm chỉ <i>tính toán</i>; việc nhập liệu để cho nơi gọi lo.</li>
     <li class="f"><b>Không bị chặn:</b> gọi trong vòng lặp 1000 lần sẽ không phải chờ bàn phím 1000 lần.</li>
   </ul>
+
 </section>
 
 <!-- ===================== Q5 ===================== -->
 <section class="slide" id="q5">
   <div class="hdr in"><span class="qn">CÂU 5</span><h2>Không nên <code class="i" style="font-size:33.6px">cout</code> trong hàm – hãy <code class="i" style="font-size:33.6px">return</code></h2></div>
-  <div class="cols">
+  <div class="cols htt-stack">
     <div class="card bad in"><span class="lbl bad">❌ COUT TRONG HÀM</span>
 <script type="text/x-cpp" class="sm">
 void printMax(int a, int b) {
@@ -313,7 +350,11 @@ void printMax(int a, int b) {
 // Max của 3 số? printMax(printMax(a,b), c) → LỖI
 // Muốn lưu kết quả vào biến? Không được!
 </script></div>
-    <div class="card good in"><span class="lbl good">✅ RETURN GIÁ TRỊ</span>
+    </div></section>
+
+<section id="q5-p2" class="slide htt-cont">
+<div class="hdr in"><span class="qn">CÂU 5</span><h2>Không nên <code class="i" style="font-size:33.6px">cout</code> trong hàm – hãy <code class="i" style="font-size:33.6px">return</code></h2></div>
+<div class="cols htt-stack htt-cont-part"><div class="card good in"><span class="lbl good">✅ RETURN GIÁ TRỊ</span>
 <script type="text/x-cpp" class="sm">
 int maxOf(int a, int b) {
     return (a > b) ? a : b;
@@ -329,10 +370,11 @@ cout << "Max = " << m << '\n';  // in tùy ý
     <li class="f"><b>Dễ kiểm thử:</b> <code class="i">assert(maxOf(3,7) == 7);</code>. Còn chữ đã in ra màn hình thì không kiểm tra được.</li>
     <li class="f"><b>Không in thừa:</b> gọi hàm trong vòng lặp sẽ không làm màn hình đầy chữ ngoài ý muốn.</li>
   </ul>
+
 </section>
 
 <!-- ===================== Q6a ===================== -->
-<section class="slide" id="q6">
+<section class="slide htt-fs18" id="q6">
   <div class="hdr in"><span class="qn">CÂU 6</span><h2>Local variable vs Global variable</h2></div>
   <div class="cols" style="grid-template-columns:1fr 1.15fr">
 <script type="text/x-cpp" id="c6" data-mark="4:b;7:a;15:d">
@@ -357,7 +399,7 @@ int main() {
       <div class="console f" data-act="#c6|show-a">times=1 counter=1
 times=1 counter=2
 times=1 counter=3</div>
-      <p class="f" style="font-size:19.8px;margin:12px 0" data-act="#c6|show-b"><b style="color:var(--accent)">times</b> bị tạo lại bằng 0 mỗi lần gọi nên luôn in 1. <b style="color:var(--accent2)">counter</b> sống suốt chương trình nên tăng dần. <b style="color:var(--warn)">main</b> không nhìn thấy <code class="i">times</code>.</p>
+      <p class="f" style="font-size:max(19.8px,var(--htt-min,24px));margin:12px 0" data-act="#c6|show-b"><b style="color:var(--accent)">times</b> bị tạo lại bằng 0 mỗi lần gọi nên luôn in 1. <b style="color:var(--accent2)">counter</b> sống suốt chương trình nên tăng dần. <b style="color:var(--warn)">main</b> không nhìn thấy <code class="i">times</code>.</p>
       <table class="f" data-act="#c6|show-d">
         <tr><th></th><th>Local</th><th>Global</th></tr>
         <tr><td>Khai báo</td><td>Trong hàm / khối { }</td><td>Ngoài mọi hàm</td></tr>
@@ -371,11 +413,11 @@ times=1 counter=3</div>
 </section>
 
 <!-- ===================== Q6b ===================== -->
-<section class="slide" id="q6b">
+<section class="slide htt-fs20" id="q6b">
   <div class="hdr in"><span class="qn">CÂU 6</span><h2>Tại sao không nên dùng global variable?</h2></div>
   <div class="cols c46">
     <div>
-      <p class="in" style="font-size:20.4px;margin-bottom:10px">Mong muốn: in <b>3 dòng</b>, mỗi dòng 5 dấu <code class="i">*</code>.</p>
+      <p class="in" style="font-size:max(20.4px,var(--htt-min,24px));margin-bottom:10px">Mong muốn: in <b>3 dòng</b>, mỗi dòng 5 dấu <code class="i">*</code>.</p>
 <script type="text/x-cpp" id="c6b" data-mark="1:d;3:a;7:b">
 int i;                          // biến đếm GLOBAL
 
@@ -391,7 +433,7 @@ int main() {
       <div class="console f" style="margin-top:12px" data-act="#c6b|show-d">*****          ← chỉ được 1 dòng!</div>
     </div>
     <div>
-      <div class="card f" data-act="#c6b|show-a"><h3>Chuyện gì đã xảy ra?</h3><p style="font-size:19.8px">main đặt <code class="i">i = 0</code> rồi gọi <code class="i">printStars(5)</code>. Hàm này dùng chính biến <code class="i">i</code> đó làm biến đếm, nên khi ra khỏi hàm thì <code class="i">i = 5</code>. Quay lại main, <code class="i">i++</code> thành 6, điều kiện <code class="i">6 &lt; 3</code> sai nên vòng lặp dừng.</p></div>
+      <div class="card f" data-act="#c6b|show-a"><h3>Chuyện gì đã xảy ra?</h3><p style="font-size:max(19.8px,var(--htt-min,24px))">main đặt <code class="i">i = 0</code> rồi gọi <code class="i">printStars(5)</code>. Hàm này dùng chính biến <code class="i">i</code> đó làm biến đếm, nên khi ra khỏi hàm thì <code class="i">i = 5</code>. Quay lại main, <code class="i">i++</code> thành 6, điều kiện <code class="i">6 &lt; 3</code> sai nên vòng lặp dừng.</p></div>
       <ul style="margin-top:12px">
         <li class="f" data-act="#c6b|show-b"><b>Phụ thuộc ngầm:</b> bất kỳ hàm nào cũng sửa được, rất khó tìm ai đã thay đổi giá trị.</li>
         <li class="f"><b>Khó test &amp; tái sử dụng:</b> kết quả của hàm phụ thuộc vào trạng thái bên ngoài.</li>
@@ -406,7 +448,7 @@ int main() {
 <!-- ===================== Q7 ===================== -->
 <section class="slide" id="q7">
   <div class="hdr in"><span class="qn">CÂU 7</span><h2>Project nhiều file: .h · main.cpp · .cpp</h2></div>
-  <div class="cols3" style="margin-bottom:18px">
+  <div class="cols3 htt-stack" style="margin-bottom:18px">
     <div class="f"><div class="code-title">📄 point.h — "mục lục"</div>
 <script type="text/x-cpp" class="xs">
 #pragma once   // chống include 2 lần
@@ -417,8 +459,12 @@ void output(const Point2D &p);
 double distance(const Point2D &a,
                 const Point2D &b);
 </script>
-      <p style="font-size:18px;margin-top:8px"><b style="color:var(--gold)">Header:</b> chứa <i>khai báo</i> (prototype, struct, hằng số). Đây là "giao diện" để các file khác <code class="i">#include</code>.</p></div>
-    <div class="f"><div class="code-title">⚙️ point.cpp — "cài đặt"</div>
+      <p style="font-size:max(18px,var(--htt-min,24px));margin-top:8px"><b style="color:var(--#0d65f2)">Header:</b> chứa <i>khai báo</i> (prototype, struct, hằng số). Đây là "giao diện" để các file khác <code class="i">#include</code>.</p></div>
+    </div></section>
+
+<section id="q7-p2" class="slide htt-cont">
+<div class="hdr in"><span class="qn">CÂU 7</span><h2>Project nhiều file: .h · main.cpp · .cpp</h2></div>
+<div class="cols3 htt-stack htt-cont-part" style="margin-bottom:18px"><div class="f"><div class="code-title">⚙️ point.cpp — "cài đặt"</div>
 <script type="text/x-cpp" class="xs">
 #include "point.h"
 #include <iostream>
@@ -428,8 +474,12 @@ using namespace std;
 void input(Point2D &p) { ... }
 double distance(...) { ... }
 </script>
-      <p style="font-size:18px;margin-top:8px"><b style="color:var(--accent)">Các file .cpp khác:</b> chứa <i>định nghĩa</i> (body) của các hàm đã khai báo trong .h. Mỗi file thường ứng với một module.</p></div>
-    <div class="f"><div class="code-title">🚀 main.cpp — "điểm bắt đầu"</div>
+      <p style="font-size:max(18px,var(--htt-min,24px));margin-top:8px"><b style="color:var(--accent)">Các file .cpp khác:</b> chứa <i>định nghĩa</i> (body) của các hàm đã khai báo trong .h. Mỗi file thường ứng với một module.</p></div>
+    </div></section>
+
+<section id="q7-p2-p2" class="slide htt-cont htt-cont">
+<div class="hdr in"><span class="qn">CÂU 7</span><h2>Project nhiều file: .h · main.cpp · .cpp</h2></div>
+<div class="cols3 htt-stack htt-cont-part htt-cont-part" style="margin-bottom:18px"><div class="f"><div class="code-title">🚀 main.cpp — "điểm bắt đầu"</div>
 <script type="text/x-cpp" class="xs">
 #include "point.h"
 #include <iostream>
@@ -441,20 +491,22 @@ int main() {
     cout << distance(a, b);
 }
 </script>
-      <p style="font-size:18px;margin-top:8px"><b style="color:var(--accent2)">main.cpp:</b> chứa hàm <code class="i">main()</code>, nơi chương trình bắt đầu. Nó chỉ <i>dùng</i> các module, không cài đặt chi tiết.</p></div>
+      <p style="font-size:max(18px,var(--htt-min,24px));margin-top:8px"><b style="color:var(--accent2)">main.cpp:</b> chứa hàm <code class="i">main()</code>, nơi chương trình bắt đầu. Nó chỉ <i>dùng</i> các module, không cài đặt chi tiết.</p></div>
   </div>
   <div class="flow f">
     <div class="stack"><div class="box cpp">point.cpp</div><div class="box m">main.cpp</div></div>
-    <div class="ar">→<br><small style="font-size:13.2px">compile<br>từng file</small></div>
+    <div class="ar">→<br><small style="font-size:max(13.2px,var(--htt-min,24px))">compile<br>từng file</small></div>
     <div class="stack"><div class="box o">point.o</div><div class="box o">main.o</div></div>
-    <div class="ar">→<br><small style="font-size:13.2px">linker</small></div>
+    <div class="ar">→<br><small style="font-size:max(13.2px,var(--htt-min,24px))">linker</small></div>
     <div class="box exe">app.exe<small>chương trình chạy</small></div>
     <div style="margin-left:24px" class="console">$ g++ main.cpp point.cpp -o app</div>
   </div>
+
+
 </section>
 
 <!-- ===================== Q8 ===================== -->
-<section class="slide" id="q8">
+<section class="slide htt-fs20" id="q8">
   <div class="hdr in"><span class="qn">CÂU 8</span><h2>Function overloading</h2></div>
   <p class="in" style="margin-bottom:16px">Nhiều hàm <b>cùng tên</b> nhưng <b>khác danh sách tham số</b> (số lượng, kiểu, hoặc thứ tự). Compiler dựa vào đối số lúc gọi để chọn đúng hàm (overload resolution).</p>
   <div class="cols c64">
@@ -477,15 +529,15 @@ int main() {
 </script>
     <div>
       <div class="f" data-act="#c8|show-a"></div>
-      <div class="card f" data-act="#c8|show-b"><h3>Hợp lệ khi</h3><ul><li style="font-size:19.8px">Khác <b>số lượng</b> tham số</li><li style="font-size:19.8px">Khác <b>kiểu</b> tham số</li><li style="font-size:19.8px">Khác <b>thứ tự</b> kiểu tham số</li></ul></div>
-      <div class="card bad f" style="margin-top:12px" data-act="#c8|show-c"><h3 style="color:var(--warn)">Không hợp lệ</h3><p style="font-size:19.2px">Chỉ khác <b>kiểu trả về</b>:<br><code class="i">int f(int);</code> và <code class="i">double f(int);</code> sẽ báo lỗi.</p></div>
+      <div class="card f" data-act="#c8|show-b"><h3>Hợp lệ khi</h3><ul><li style="font-size:max(19.8px,var(--htt-min,24px))">Khác <b>số lượng</b> tham số</li><li style="font-size:max(19.8px,var(--htt-min,24px))">Khác <b>kiểu</b> tham số</li><li style="font-size:max(19.8px,var(--htt-min,24px))">Khác <b>thứ tự</b> kiểu tham số</li></ul></div>
+      <div class="card bad f" style="margin-top:12px" data-act="#c8|show-c"><h3 style="color:var(--warn)">Không hợp lệ</h3><p style="font-size:max(19.2px,var(--htt-min,24px))">Chỉ khác <b>kiểu trả về</b>:<br><code class="i">int f(int);</code> và <code class="i">double f(int);</code> sẽ báo lỗi.</p></div>
       <div class="note f" data-act="#c8|show-d"><code class="i">maxOf(1, 2.5)</code>: cả hai bản đều cần ép kiểu một đối số nên compiler không biết chọn bản nào.</div>
     </div>
   </div>
 </section>
 
 <!-- ===================== Q9 ===================== -->
-<section class="slide" id="q9">
+<section class="slide htt-fs22" id="q9">
   <div class="hdr in"><span class="qn">CÂU 9</span><h2>Pass by value vs Pass by reference</h2></div>
   <div class="cols">
     <div>
@@ -519,7 +571,7 @@ int main() {
         <div class="arw" style="color:var(--accent2)">alias<span class="bar">⟵</span></div>
         <div class="frame callee"><div class="fname">incR(int &amp;x)</div><div class="var"><span class="vn">x</span><span class="alias">≡ b<br><small class="muted">(không có ô nhớ riêng)</small></span></div></div>
       </div>
-      <p id="memtxt" class="muted" style="font-size:18.6px;margin-top:12px;min-height:46px">Nhấn → để chạy từng bước.</p>
+      <p id="memtxt" class="muted" style="font-size:max(18.6px,var(--htt-min,24px));margin-top:12px;min-height:46px">Nhấn → để chạy từng bước.</p>
       <span class="f ghost" data-act="#mv|s1" data-say="incV: x là ô nhớ MỚI, nhận bản sao giá trị 5."></span>
       <span class="f ghost" data-act="#mv|s2" data-say="x = x + 1 → x thành 6, nhưng a vẫn là 5."></span>
       <span class="f ghost" data-act="#mv|s3" data-say="Hàm kết thúc, x bị hủy. a = 5 không đổi."></span>
@@ -531,7 +583,7 @@ int main() {
 </section>
 
 <!-- ===================== Q10 ===================== -->
-<section class="slide" id="q10">
+<section class="slide htt-fs20" id="q10">
   <div class="hdr in"><span class="qn">CÂU 10</span><h2>Dùng reference để "trả về" nhiều giá trị</h2></div>
   <p class="in" style="margin-bottom:14px">return chỉ trả được 1 giá trị. Giải phương trình bậc 2 <code class="i">ax² + bx + c = 0</code> cần trả <b>số nghiệm</b> và <b>2 nghiệm</b>.</p>
   <div class="cols" style="grid-template-columns:1.3fr 1fr">
@@ -559,7 +611,7 @@ int main() {
       <div class="leg b f" style="margin-top:12px" data-act="#c10|show-b"><b>Ghi vào x1, x2</b><p>Gán <code class="i">x1</code> chính là gán <code class="i">r1</code> trong main.</p></div>
       <div class="leg c f" style="margin-top:12px" data-act="#c10|show-c"><b>return = trạng thái</b><p>Cho biết x1, x2 có hợp lệ không.</p></div>
       <div class="console f" style="margin-top:12px" data-act="#c10|show-d">2 nghiem: 1, 2</div>
-      <div class="note blue f" style="font-size:18px">Ví dụ khác: <code class="i">void splitTime(int sec, int &amp;h, int &amp;m, int &amp;s)</code> đổi 3725 giây thành 1 giờ 2 phút 5 giây.</div>
+      <div class="note blue f" style="font-size:max(18px,var(--htt-min,24px))">Ví dụ khác: <code class="i">void splitTime(int sec, int &amp;h, int &amp;m, int &amp;s)</code> đổi 3725 giây thành 1 giờ 2 phút 5 giây.</div>
     </div>
   </div>
 </section>
@@ -567,7 +619,7 @@ int main() {
 <!-- ===================== Q11 ===================== -->
 <section class="slide" id="q11">
   <div class="hdr in"><span class="qn">CÂU 11</span><h2>Tại sao cần dùng struct?</h2></div>
-  <div class="cols">
+  <div class="cols htt-stack">
     <div class="card bad in"><span class="lbl bad">❌ DỮ LIỆU RỜI RẠC</span>
 <script type="text/x-cpp" class="sm">
 double x1, y1, x2, y2;
@@ -577,7 +629,11 @@ double distance(double x1, double y1,
 double px[100], py[100];
 // Không thể return 1 "điểm"
 </script></div>
-    <div class="card good in"><span class="lbl good">✅ GOM THÀNH 1 KIỂU</span>
+    </div></section>
+
+<section id="q11-p2" class="slide htt-cont">
+<div class="hdr in"><span class="qn">CÂU 11</span><h2>Tại sao cần dùng struct?</h2></div>
+<div class="cols htt-stack htt-cont-part"><div class="card good in"><span class="lbl good">✅ GOM THÀNH 1 KIỂU</span>
 <script type="text/x-cpp" class="sm">
 struct Point2D { double x, y; };
 Point2D A, B;
@@ -588,15 +644,16 @@ Point2D midpoint(Point2D a, Point2D b);
 </script></div>
   </div>
   <div class="cols4" style="margin-top:20px">
-    <div class="card f zoom"><h3>📦 Gom nhóm</h3><p style="font-size:18.6px">Các dữ liệu liên quan đến cùng một đối tượng đi chung với nhau.</p></div>
-    <div class="card f zoom"><h3>🧾 Ít tham số</h3><p style="font-size:18.6px">Truyền 1 struct thay cho nhiều biến lẻ, ít bị truyền nhầm thứ tự.</p></div>
-    <div class="card f zoom"><h3>↩️ Trả về gộp</h3><p style="font-size:18.6px">Hàm có thể return một struct chứa nhiều thuộc tính.</p></div>
-    <div class="card f zoom"><h3>🌍 Mô hình hóa</h3><p style="font-size:18.6px">Biểu diễn thực thể ngoài đời: Student, Point, Rectangle...</p></div>
+    <div class="card f zoom"><h3>📦 Gom nhóm</h3><p style="font-size:max(18.6px,var(--htt-min,24px))">Các dữ liệu liên quan đến cùng một đối tượng đi chung với nhau.</p></div>
+    <div class="card f zoom"><h3>🧾 Ít tham số</h3><p style="font-size:max(18.6px,var(--htt-min,24px))">Truyền 1 struct thay cho nhiều biến lẻ, ít bị truyền nhầm thứ tự.</p></div>
+    <div class="card f zoom"><h3>↩️ Trả về gộp</h3><p style="font-size:max(18.6px,var(--htt-min,24px))">Hàm có thể return một struct chứa nhiều thuộc tính.</p></div>
+    <div class="card f zoom"><h3>🌍 Mô hình hóa</h3><p style="font-size:max(18.6px,var(--htt-min,24px))">Biểu diễn thực thể ngoài đời: Student, Point, Rectangle...</p></div>
   </div>
+
 </section>
 
 <!-- ===================== Q12 ===================== -->
-<section class="slide" id="q12">
+<section class="slide htt-fs22" id="q12">
   <div class="hdr in"><span class="qn">CÂU 12</span><h2>Khai báo <code class="i" style="font-size:33.6px">struct Point2D</code></h2></div>
   <div class="cols c64">
     <div>
@@ -615,24 +672,24 @@ cout << A.x << " " << A.y;     // truy cập bằng dấu .
     </div>
     <div class="f zoom" data-act="#c12|show-b">
       <svg viewBox="0 0 420 340" width="100%" id="sv12">
-        <defs><marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a91b4"/></marker></defs>
-        <g stroke="#efeafc">
+        <defs><marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#7495ca"/></marker></defs>
+        <g stroke="#eaf1fc">
           <line x1="40" y1="40" x2="400" y2="40"/><line x1="40" y1="100" x2="400" y2="100"/><line x1="40" y1="160" x2="400" y2="160"/><line x1="40" y1="220" x2="400" y2="220"/>
           <line x1="110" y1="20" x2="110" y2="300"/><line x1="180" y1="20" x2="180" y2="300"/><line x1="250" y1="20" x2="250" y2="300"/><line x1="320" y1="20" x2="320" y2="300"/>
         </g>
-        <line x1="40" y1="290" x2="405" y2="290" stroke="#8a91b4" stroke-width="2" marker-end="url(#ah)"/>
-        <line x1="40" y1="290" x2="40" y2="15" stroke="#8a91b4" stroke-width="2" marker-end="url(#ah)"/>
-        <text x="395" y="312" fill="#545c80" font-size="16">x</text><text x="18" y="24" fill="#545c80" font-size="16">y</text>
-        <text x="26" y="308" fill="#8a91b4" font-size="14">O</text>
+        <line x1="40" y1="290" x2="405" y2="290" stroke="#7495ca" stroke-width="2" marker-end="url(#ah)"/>
+        <line x1="40" y1="290" x2="40" y2="15" stroke="#7495ca" stroke-width="2" marker-end="url(#ah)"/>
+        <text x="395" y="312" fill="#3a5f9a" font-size="16">x</text><text x="18" y="24" fill="#3a5f9a" font-size="16">y</text>
+        <text x="26" y="308" fill="#7495ca" font-size="14">O</text>
         <!-- scale 70px/unit -->
-        <line x1="145" y1="290" x2="145" y2="150" stroke="#7c3aed" stroke-dasharray="4 4" class="fadein fd1"/>
-        <line x1="40" y1="150" x2="145" y2="150" stroke="#7c3aed" stroke-dasharray="4 4" class="fadein fd1"/>
-        <circle cx="145" cy="150" r="8" fill="#7c3aed" class="fadein fd1"/>
-        <text x="158" y="142" fill="#6d28d9" font-size="17" class="fadein fd1">A(1.5, 2.0)</text>
-        <line x1="320" y1="290" x2="320" y2="80" stroke="#0891b2" stroke-dasharray="4 4" class="fadein fd2"/>
-        <line x1="40" y1="80" x2="320" y2="80" stroke="#0891b2" stroke-dasharray="4 4" class="fadein fd2"/>
-        <circle cx="320" cy="80" r="8" fill="#0891b2" class="fadein fd2"/>
-        <text x="300" y="66" fill="#0e7490" font-size="17" class="fadein fd2">B(4, 3)</text>
+        <line x1="145" y1="290" x2="145" y2="150" stroke="#3a7fed" stroke-dasharray="4 4" class="fadein fd1"/>
+        <line x1="40" y1="150" x2="145" y2="150" stroke="#3a7fed" stroke-dasharray="4 4" class="fadein fd1"/>
+        <circle cx="145" cy="150" r="8" fill="#3a7fed" class="fadein fd1"/>
+        <text x="158" y="142" fill="#286cd9" font-size="17" class="fadein fd1">A(1.5, 2.0)</text>
+        <line x1="320" y1="290" x2="320" y2="80" stroke="#0949b1" stroke-dasharray="4 4" class="fadein fd2"/>
+        <line x1="40" y1="80" x2="320" y2="80" stroke="#0949b1" stroke-dasharray="4 4" class="fadein fd2"/>
+        <circle cx="320" cy="80" r="8" fill="#0949b1" class="fadein fd2"/>
+        <text x="300" y="66" fill="#0e4090" font-size="17" class="fadein fd2">B(4, 3)</text>
       </svg>
     </div>
   </div>
@@ -641,7 +698,7 @@ cout << A.x << " " << A.y;     // truy cập bằng dấu .
 </section>
 
 <!-- ===================== Q13 ===================== -->
-<section class="slide" id="q13">
+<section class="slide htt-fs22" id="q13">
   <div class="hdr in"><span class="qn">CÂU 13</span><h2>Hàm <code class="i" style="font-size:33.6px">input()</code> nhập một tọa độ</h2></div>
   <div class="cols c64">
     <div>
@@ -665,7 +722,7 @@ Point2D A = inputPoint();
 </script>
     </div>
     <div>
-      <div class="card f" data-act="#c13|show-a"><h3>Vì sao là <code class="i">Point2D &amp;p</code>?</h3><p style="font-size:19.8px">Nếu truyền by value thì hàm chỉ điền vào <b>bản sao</b>, và <code class="i">A</code> ở main vẫn là rác (xem câu 9). Dùng <code class="i">&amp;</code> thì <code class="i">p</code> chính là <code class="i">A</code>.</p></div>
+      <div class="card f" data-act="#c13|show-a"><h3>Vì sao là <code class="i">Point2D &amp;p</code>?</h3><p style="font-size:max(19.8px,var(--htt-min,24px))">Nếu truyền by value thì hàm chỉ điền vào <b>bản sao</b>, và <code class="i">A</code> ở main vẫn là rác (xem câu 9). Dùng <code class="i">&amp;</code> thì <code class="i">p</code> chính là <code class="i">A</code>.</p></div>
       <div class="console f" style="margin-top:14px" data-act="#c13|show-b">Nhap diem A:
   x = <span class="in">1</span>
   y = <span class="in">2</span></div>
@@ -690,8 +747,8 @@ cout << "A = ";  output(A);  cout << '\n';
       <div class="console f" style="margin-top:16px" data-act="#c14|show-c">A = (1, 2)</div>
     </div>
     <div>
-      <div class="card f" data-act="#c14|show-a"><h3><code class="i">const Point2D &amp;</code></h3><ul><li style="font-size:19.8px"><b>&amp;</b>: không phải copy struct</li><li style="font-size:19.8px"><b>const</b>: cam kết hàm không sửa điểm. Compiler sẽ báo lỗi nếu lỡ gán <code class="i">p.x = 0;</code></li></ul></div>
-      <div class="card f" style="margin-top:14px" data-act="#c14|show-b"><h3>Không tự xuống dòng</h3><p style="font-size:19.8px">Hàm không in <code class="i">endl</code>, để nơi gọi tự ghép vào câu. Ví dụ: <code class="i">"A = (1, 2), B = (4, 6)"</code>. Điều này giúp output() tái sử dụng được trong output(Rectangle) ở câu 18.</p></div>
+      <div class="card f" data-act="#c14|show-a"><h3><code class="i">const Point2D &amp;</code></h3><ul><li style="font-size:max(19.8px,var(--htt-min,24px))"><b>&amp;</b>: không phải copy struct</li><li style="font-size:max(19.8px,var(--htt-min,24px))"><b>const</b>: cam kết hàm không sửa điểm. Compiler sẽ báo lỗi nếu lỡ gán <code class="i">p.x = 0;</code></li></ul></div>
+      <div class="card f" style="margin-top:14px" data-act="#c14|show-b"><h3>Không tự xuống dòng</h3><p style="font-size:max(19.8px,var(--htt-min,24px))">Hàm không in <code class="i">endl</code>, để nơi gọi tự ghép vào câu. Ví dụ: <code class="i">"A = (1, 2), B = (4, 6)"</code>. Điều này giúp output() tái sử dụng được trong output(Rectangle) ở câu 18.</p></div>
     </div>
   </div>
 </section>
@@ -716,31 +773,31 @@ cout << distance({1, 2}, {4, 6});   // 5
     </div>
     <div>
       <svg viewBox="0 0 400 330" width="100%" id="sv15">
-        <g stroke="#efeafc">
+        <g stroke="#eaf1fc">
           <line x1="40" y1="290" x2="390" y2="290"/><line x1="40" y1="240" x2="390" y2="240"/><line x1="40" y1="190" x2="390" y2="190"/><line x1="40" y1="140" x2="390" y2="140"/><line x1="40" y1="90" x2="390" y2="90"/><line x1="40" y1="40" x2="390" y2="40"/>
           <line x1="90" y1="20" x2="90" y2="300"/><line x1="140" y1="20" x2="140" y2="300"/><line x1="190" y1="20" x2="190" y2="300"/><line x1="240" y1="20" x2="240" y2="300"/><line x1="290" y1="20" x2="290" y2="300"/><line x1="340" y1="20" x2="340" y2="300"/>
         </g>
-        <line x1="40" y1="290" x2="40" y2="20" stroke="#8a91b4" stroke-width="2"/><line x1="40" y1="290" x2="390" y2="290" stroke="#8a91b4" stroke-width="2"/>
+        <line x1="40" y1="290" x2="40" y2="20" stroke="#7495ca" stroke-width="2"/><line x1="40" y1="290" x2="390" y2="290" stroke="#7495ca" stroke-width="2"/>
         <!-- A(1,2)->(90,190)  B(4,6)->(240,-10)?? scale 50: y=290-50*y : A y=190, B y=-10 -> use scale 45 -->
-        <line class="draw dr1" x1="85" y1="200" x2="220" y2="200" stroke="#7c3aed" stroke-width="4"/>
-        <text class="fadein fd1" x="138" y="224" fill="#6d28d9" font-size="18">dx = 3</text>
-        <line class="draw dr2" x1="220" y1="200" x2="220" y2="20" stroke="#0891b2" stroke-width="4"/>
-        <text class="fadein fd2" x="230" y="115" fill="#0e7490" font-size="18">dy = 4</text>
-        <line class="draw dr3" x1="85" y1="200" x2="220" y2="20" stroke="#ea580c" stroke-width="4"/>
-        <text class="fadein fd3" x="150" y="322" fill="#ea580c" font-size="20" font-weight="600">d = √(9+16) = 5</text>
-        <circle cx="85" cy="200" r="8" fill="#7c3aed"/><text x="60" y="226" fill="#1a1e38" font-size="17">A(1,2)</text>
-        <circle cx="220" cy="20" r="8" fill="#0891b2"/><text x="232" y="28" fill="#1a1e38" font-size="17">B(4,6)</text>
+        <line class="draw dr1" x1="85" y1="200" x2="220" y2="200" stroke="#3a7fed" stroke-width="4"/>
+        <text class="fadein fd1" x="138" y="224" fill="#286cd9" font-size="18">dx = 3</text>
+        <line class="draw dr2" x1="220" y1="200" x2="220" y2="20" stroke="#0949b1" stroke-width="4"/>
+        <text class="fadein fd2" x="230" y="115" fill="#0e4090" font-size="18">dy = 4</text>
+        <line class="draw dr3" x1="85" y1="200" x2="220" y2="20" stroke="#0c61ea" stroke-width="4"/>
+        <text class="fadein fd3" x="150" y="322" fill="#0c61ea" font-size="20" font-weight="600">d = √(9+16) = 5</text>
+        <circle cx="85" cy="200" r="8" fill="#3a7fed"/><text x="60" y="226" fill="#17253b" font-size="17">A(1,2)</text>
+        <circle cx="220" cy="20" r="8" fill="#0949b1"/><text x="232" y="28" fill="#17253b" font-size="17">B(4,6)</text>
       </svg>
       <span class="f ghost" data-act="#sv15|d1" data-act2="#c15|show-a"></span>
       <span class="f ghost" data-act="#sv15|d2" data-act2="#c15|show-b"></span>
       <span class="f ghost" data-act="#sv15|d3" data-act2="#c15|show-c"></span>
-      <div class="note blue f" data-act="#c15|show-d" style="font-size:18.6px">Hàm <b>return</b> kết quả, không cout và không cin (câu 4 &amp; 5). Có thể thay bằng <code class="i">hypot(dx, dy)</code>.</div>
+      <div class="note blue f" data-act="#c15|show-d" style="font-size:max(18.6px,var(--htt-min,24px))">Hàm <b>return</b> kết quả, không cout và không cin (câu 4 &amp; 5). Có thể thay bằng <code class="i">hypot(dx, dy)</code>.</div>
     </div>
   </div>
 </section>
 
 <!-- ===================== Q16 ===================== -->
-<section class="slide" id="q16">
+<section class="slide htt-fs20" id="q16">
   <div class="hdr in"><span class="qn">CÂU 16</span><h2>Khai báo <code class="i" style="font-size:33.6px">struct Rectangle</code></h2></div>
   <div class="cols c46">
     <div>
@@ -760,18 +817,18 @@ cout << r.topLeft.x;       // 1  (truy cập lồng)
       </ul>
     </div>
     <svg viewBox="0 0 420 330" width="100%" id="sv16">
-      <g stroke="#efeafc">
+      <g stroke="#eaf1fc">
         <line x1="40" y1="255" x2="400" y2="255"/><line x1="40" y1="210" x2="400" y2="210"/><line x1="40" y1="165" x2="400" y2="165"/><line x1="40" y1="120" x2="400" y2="120"/><line x1="40" y1="75" x2="400" y2="75"/><line x1="40" y1="30" x2="400" y2="30"/>
         <line x1="85" y1="15" x2="85" y2="305"/><line x1="130" y1="15" x2="130" y2="305"/><line x1="175" y1="15" x2="175" y2="305"/><line x1="220" y1="15" x2="220" y2="305"/><line x1="265" y1="15" x2="265" y2="305"/><line x1="310" y1="15" x2="310" y2="305"/><line x1="355" y1="15" x2="355" y2="305"/>
       </g>
-      <line x1="40" y1="300" x2="405" y2="300" stroke="#8a91b4" stroke-width="2"/><line x1="40" y1="300" x2="40" y2="12" stroke="#8a91b4" stroke-width="2"/>
-      <text x="392" y="320" fill="#545c80" font-size="16">x</text><text x="20" y="20" fill="#545c80" font-size="16">y</text>
+      <line x1="40" y1="300" x2="405" y2="300" stroke="#7495ca" stroke-width="2"/><line x1="40" y1="300" x2="40" y2="12" stroke="#7495ca" stroke-width="2"/>
+      <text x="392" y="320" fill="#3a5f9a" font-size="16">x</text><text x="20" y="20" fill="#3a5f9a" font-size="16">y</text>
       <!-- scale 45: TL(1,5)->(85,75) BR(6,2)->(310,210) -->
-      <rect class="draw c720 dr1" x="85" y="75" width="225" height="135" fill="rgba(236,72,153,.08)" stroke="#7c3aed" stroke-width="3"/>
-      <circle cx="85" cy="75" r="8" fill="#7c3aed"/><text x="60" y="62" fill="#6d28d9" font-size="17">topLeft (1,5)</text>
-      <circle cx="310" cy="210" r="8" fill="#0891b2"/><text x="240" y="236" fill="#0e7490" font-size="17">bottomRight (6,2)</text>
-      <text class="fadein fd2" x="160" y="150" fill="#ea580c" font-size="17">width = 6−1 = 5</text>
-      <text class="fadein fd2" x="160" y="172" fill="#ea580c" font-size="17">height = 5−2 = 3</text>
+      <rect class="draw c720 dr1" x="85" y="75" width="225" height="135" fill="rgba(72,135,236,.08)" stroke="#3a7fed" stroke-width="3"/>
+      <circle cx="85" cy="75" r="8" fill="#3a7fed"/><text x="60" y="62" fill="#286cd9" font-size="17">topLeft (1,5)</text>
+      <circle cx="310" cy="210" r="8" fill="#0949b1"/><text x="240" y="236" fill="#0e4090" font-size="17">bottomRight (6,2)</text>
+      <text class="fadein fd2" x="160" y="150" fill="#0c61ea" font-size="17">width = 6−1 = 5</text>
+      <text class="fadein fd2" x="160" y="172" fill="#0c61ea" font-size="17">height = 5−2 = 3</text>
     </svg>
   </div>
   <span class="f ghost" data-act="#sv16|d1" data-act2="#c16|show-a"></span>
@@ -779,7 +836,7 @@ cout << r.topLeft.x;       // 1  (truy cập lồng)
 </section>
 
 <!-- ===================== Q17 ===================== -->
-<section class="slide" id="q17">
+<section class="slide htt-fs22" id="q17">
   <div class="hdr in"><span class="qn">CÂU 17</span><h2>Hàm <code class="i" style="font-size:33.6px">input()</code> nhập một hình chữ nhật</h2></div>
   <div class="cols c64">
     <div>
@@ -802,8 +859,8 @@ Goc phai duoi:
   y = <span class="in">2</span></div>
     </div>
     <div>
-      <div class="card f" data-act="#c17|show-a"><h3>Overloading (câu 8)</h3><p style="font-size:19.8px">Có hai hàm cùng tên <code class="i">input</code>: một nhận <code class="i">Point2D&amp;</code>, một nhận <code class="i">Rectangle&amp;</code>. Compiler chọn hàm theo kiểu đối số.</p></div>
-      <div class="card f" style="margin-top:14px" data-act="#c17|show-b"><h3>Ghép từ hàm nhỏ</h3><p style="font-size:19.8px">Không viết lại cin cho 4 số. Ta gọi lại hàm nhập điểm 2 lần. Đây chính là lợi ích của việc chia hàm ở câu 1.</p></div>
+      <div class="card f" data-act="#c17|show-a"><h3>Overloading (câu 8)</h3><p style="font-size:max(19.8px,var(--htt-min,24px))">Có hai hàm cùng tên <code class="i">input</code>: một nhận <code class="i">Point2D&amp;</code>, một nhận <code class="i">Rectangle&amp;</code>. Compiler chọn hàm theo kiểu đối số.</p></div>
+      <div class="card f" style="margin-top:14px" data-act="#c17|show-b"><h3>Ghép từ hàm nhỏ</h3><p style="font-size:max(19.8px,var(--htt-min,24px))">Không viết lại cin cho 4 số. Ta gọi lại hàm nhập điểm 2 lần. Đây chính là lợi ích của việc chia hàm ở câu 1.</p></div>
     </div>
   </div>
 </section>
@@ -827,14 +884,14 @@ output(r);  cout << '\n';
       <div class="console f" style="margin-top:14px" data-act="#c18|show-b">HCN [(1, 5) -> (6, 2)]</div>
     </div>
     <div>
-      <div class="card f" data-act="#c18|show-a"><h3>const Rectangle &amp;</h3><p style="font-size:19.8px">Chỉ đọc, không copy. Bên trong, <code class="i">r.topLeft</code> cũng là const nên khớp với <code class="i">output(const Point2D&amp;)</code>.</p></div>
+      <div class="card f" data-act="#c18|show-a"><h3>const Rectangle &amp;</h3><p style="font-size:max(19.8px,var(--htt-min,24px))">Chỉ đọc, không copy. Bên trong, <code class="i">r.topLeft</code> cũng là const nên khớp với <code class="i">output(const Point2D&amp;)</code>.</p></div>
       <div class="note blue f">Muốn đổi định dạng in điểm, ví dụ thành <code class="i">[x; y]</code>? Chỉ cần sửa <b>một</b> hàm output(Point2D), và cách in HCN tự đổi theo.</div>
     </div>
   </div>
 </section>
 
 <!-- ===================== Q19 ===================== -->
-<section class="slide" id="q19">
+<section class="slide htt-fs22" id="q19">
   <div class="hdr in"><span class="qn">CÂU 19</span><h2>Hàm <code class="i" style="font-size:33.6px">perimeter()</code> – chu vi</h2></div>
   <div class="cols c64">
     <div>
@@ -853,8 +910,8 @@ double perimeter(const Rectangle &r) {
     </div>
     <div>
       <div class="formula in">P = 2 × (width + height)</div>
-      <div class="card f" style="margin-top:14px" data-act="#c19|show-a"><h3>Hàm phụ width / height</h3><p style="font-size:19.8px">Tách ra để dùng lại ở câu 20 và để code dễ đọc hơn.</p></div>
-      <div class="card f" style="margin-top:12px" data-act="#c19|show-b"><h3>Vì sao dùng fabs?</h3><p style="font-size:19.8px">Nếu dùng tọa độ màn hình (trục y hướng xuống) thì <code class="i">topLeft.y &lt; bottomRight.y</code>. Lấy trị tuyệt đối giúp hàm đúng với cả hai quy ước. Cần <code class="i">#include &lt;cmath&gt;</code>.</p></div>
+      <div class="card f" style="margin-top:14px" data-act="#c19|show-a"><h3>Hàm phụ width / height</h3><p style="font-size:max(19.8px,var(--htt-min,24px))">Tách ra để dùng lại ở câu 20 và để code dễ đọc hơn.</p></div>
+      <div class="card f" style="margin-top:12px" data-act="#c19|show-b"><h3>Vì sao dùng fabs?</h3><p style="font-size:max(19.8px,var(--htt-min,24px))">Nếu dùng tọa độ màn hình (trục y hướng xuống) thì <code class="i">topLeft.y &lt; bottomRight.y</code>. Lấy trị tuyệt đối giúp hàm đúng với cả hai quy ước. Cần <code class="i">#include &lt;cmath&gt;</code>.</p></div>
       <div class="console f" style="margin-top:12px" data-act="#c19|show-c">HCN (1,5)-(6,2): P = 2 × (5 + 3) = 16</div>
     </div>
   </div>
@@ -872,14 +929,14 @@ double area(const Rectangle &r) {
 </script>
       <svg viewBox="0 0 420 210" width="100%" id="sv20" style="margin-top:14px">
         <g id="cells"></g>
-        <text class="fadein fd2" x="320" y="110" fill="#ea580c" font-size="23" font-weight="600">S = 15</text>
-        <text x="110" y="200" fill="#545c80" font-size="16">width = 5</text>
-        <text x="270" y="60" fill="#545c80" font-size="16" transform="rotate(90 270 60)">height = 3</text>
+        <text class="fadein fd2" x="320" y="110" fill="#0c61ea" font-size="23" font-weight="600">S = 15</text>
+        <text x="110" y="200" fill="#3a5f9a" font-size="16">width = 5</text>
+        <text x="270" y="60" fill="#3a5f9a" font-size="16" transform="rotate(90 270 60)">height = 3</text>
       </svg>
     </div>
     <div>
       <div class="formula in">S = width × height</div>
-      <div class="card f" style="margin-top:14px" data-act="#c20|show-a"><h3>Ngắn gọn nhờ tái sử dụng</h3><p style="font-size:19.8px">Chỉ 1 dòng vì đã có sẵn <code class="i">width()</code> và <code class="i">height()</code> từ câu 19.</p></div>
+      <div class="card f" style="margin-top:14px" data-act="#c20|show-a"><h3>Ngắn gọn nhờ tái sử dụng</h3><p style="font-size:max(19.8px,var(--htt-min,24px))">Chỉ 1 dòng vì đã có sẵn <code class="i">width()</code> và <code class="i">height()</code> từ câu 19.</p></div>
       <span class="f ghost" data-act="#sv20|d1"></span>
       <span class="f ghost" data-act="#sv20|d2"></span>
       <div class="console f" style="margin-top:12px">HCN (1,5)-(6,2): S = 5 × 3 = 15</div>
@@ -890,7 +947,7 @@ double area(const Rectangle &r) {
 <!-- ===================== FULL PROGRAM ===================== -->
 <section class="slide" id="full">
   <div class="hdr in"><span class="qn">TỔNG HỢP</span><h2>Chương trình hoàn chỉnh (câu 12 → 20)</h2></div>
-  <div class="cols" style="grid-template-columns:1.25fr 1fr;gap:16px">
+  <div class="cols htt-stack" style="grid-template-columns:1.25fr 1fr;gap:16px">
 <script type="text/x-cpp" class="xxs" style="font-size:14.4px">
 #include <iostream>
 #include <cmath>
@@ -910,6 +967,13 @@ double distance(const Point2D &a, const Point2D &b) {
     return sqrt(dx * dx + dy * dy);
 }
 void input(Rectangle &r) {
+</script>
+</div>
+</section>
+
+<section id="full-p2" class="slide htt-cont">
+<div class="hdr in"><span class="qn">TỔNG HỢP</span><h2>Chương trình hoàn chỉnh (câu 12 → 20)</h2></div>
+<div class="cols htt-stack htt-cont-part" style="grid-template-columns:1.25fr 1fr;gap:16px"><script type="text/x-cpp" class="xxs htt-start-18" style="font-size:14.4px">
     cout << "Goc trai tren:\n"; input(r.topLeft);
     cout << "Goc phai duoi:\n"; input(r.bottomRight);
 }
@@ -918,7 +982,12 @@ void output(const Rectangle &r) {
     cout << " -> ";  output(r.bottomRight); cout << "]";
 }
 </script>
-    <div>
+    </div>
+</section>
+
+<section id="full-p2-p2" class="slide htt-cont htt-cont">
+<div class="hdr in"><span class="qn">TỔNG HỢP</span><h2>Chương trình hoàn chỉnh (câu 12 → 20)</h2></div>
+<div class="cols htt-stack htt-cont-part htt-cont-part" style="grid-template-columns:1.25fr 1fr;gap:16px"><div>
 <script type="text/x-cpp" class="xxs" style="font-size:14.4px">
 double width(const Rectangle &r)
     { return fabs(r.bottomRight.x - r.topLeft.x); }
@@ -938,26 +1007,33 @@ int main() {
     output(r);  cout << '\n';
     cout << "Chu vi    = " << perimeter(r) << '\n';
     cout << "Dien tich = " << area(r) << '\n';
+</script>
+</div>
+  </div>
+</section>
+
+<section id="full-p2-p2-p2" class="slide htt-cont htt-cont htt-cont">
+<div class="hdr in"><span class="qn">TỔNG HỢP</span><h2>Chương trình hoàn chỉnh (câu 12 → 20)</h2></div>
+<div class="cols htt-stack htt-cont-part htt-cont-part htt-cont-part" style="grid-template-columns:1.25fr 1fr;gap:16px"><div class="htt-cont-part"><script type="text/x-cpp" class="xxs htt-start-18" style="font-size:14.4px">
 }
 </script>
-      <div class="console f" style="margin-top:10px;font-size:14.4px;line-height:1.35">A: x=<span class="in">1</span> y=<span class="in">2</span>   B: x=<span class="in">4</span> y=<span class="in">6</span>
+      <div class="console f" style="margin-top:10px;font-size:max(14.4px,var(--htt-min,24px));line-height:1.35">A: x=<span class="in">1</span> y=<span class="in">2</span>   B: x=<span class="in">4</span> y=<span class="in">6</span>
 |AB| = 5
 Goc trai tren: x=<span class="in">1</span> y=<span class="in">5</span>
 Goc phai duoi: x=<span class="in">6</span> y=<span class="in">2</span>
 HCN [(1, 5) -> (6, 2)]
 Chu vi = 16   Dien tich = 15</div>
-    </div>
-  </div>
+    </div></div>
 </section>
 
 <section class="slide" id="end">
   <div class="title-wrap" style="align-items:center;text-align:center">
-    <div class="orb" style="width:360px;height:360px;background:#f9a8d4;left:10%;top:10%"></div>
+    <div class="orb" style="width:360px;height:360px;background:#a8c7f9;left:10%;top:10%"></div>
     <h1 class="in">Tóm tắt <span class="grad">nhanh</span></h1>
     <div class="cols3 in" style="margin-top:32px;text-align:left;max-width:1050px">
-      <div class="card"><h3>Hàm</h3><p style="font-size:19.2px">Nhận dữ liệu qua tham số, trả kết quả bằng return. Một hàm làm một việc. Tránh dùng biến global.</p></div>
-      <div class="card"><h3>Tham chiếu &amp;</h3><p style="font-size:19.2px">Dùng để sửa biến gốc hoặc trả về nhiều giá trị. Dùng <code class="i">const &amp;</code> khi chỉ cần đọc mà không muốn copy.</p></div>
-      <div class="card"><h3>Struct</h3><p style="font-size:19.2px">Gom dữ liệu thành kiểu mới. Có thể lồng nhau (Rectangle chứa Point2D) và tách ra file .h / .cpp.</p></div>
+      <div class="card"><h3>Hàm</h3><p style="font-size:max(19.2px,var(--htt-min,24px))">Nhận dữ liệu qua tham số, trả kết quả bằng return. Một hàm làm một việc. Tránh dùng biến global.</p></div>
+      <div class="card"><h3>Tham chiếu &amp;</h3><p style="font-size:max(19.2px,var(--htt-min,24px))">Dùng để sửa biến gốc hoặc trả về nhiều giá trị. Dùng <code class="i">const &amp;</code> khi chỉ cần đọc mà không muốn copy.</p></div>
+      <div class="card"><h3>Struct</h3><p style="font-size:max(19.2px,var(--htt-min,24px))">Gom dữ liệu thành kiểu mới. Có thể lồng nhau (Rectangle chứa Point2D) và tách ra file .h / .cpp.</p></div>
     </div>
   </div>
 </section>
@@ -1009,8 +1085,8 @@ Chu vi = 16   Dien tich = 15</div>
 
   // area grid cells
   const cells=document.getElementById("cells");
-  if(cells){let h="";for(let r=0;r<3;r++)for(let c=0;c<5;c++){h+=`<rect class="fadein fd1" style="transition-delay:${(r*5+c)*60}ms" x="${40+c*44}" y="${30+r*44}" width="40" height="40" rx="5" fill="rgba(124,58,237,.14)" stroke="#7c3aed"/>`}
-    h+=`<rect x="38" y="28" width="222" height="134" fill="none" stroke="#7c3aed" stroke-width="2" rx="6"/>`;cells.innerHTML=h;}
+  if(cells){let h="";for(let r=0;r<3;r++)for(let c=0;c<5;c++){h+=`<rect class="fadein fd1" style="transition-delay:${(r*5+c)*60}ms" x="${40+c*44}" y="${30+r*44}" width="40" height="40" rx="5" fill="rgba(58,127,237,.14)" stroke="#3a7fed"/>`}
+    h+=`<rect x="38" y="28" width="222" height="134" fill="none" stroke="#3a7fed" stroke-width="2" rx="6"/>`;cells.innerHTML=h;}
 
   // ---------- deck engine ----------
   const deck=document.getElementById("deck");
@@ -1050,6 +1126,53 @@ Chu vi = 16   Dien tich = 15</div>
   go(idx>=0?idx:0);
   addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
 })();
+</script>
+<script id="htt-theme-js">
+(function(){
+  // HTT theme runtime: renumber split code blocks, enforce the slide's minimum font size (--htt-min, default 24px)
+  function minOf(el){var s=el&&el.closest?el.closest('.slide'):null;var v=parseFloat(getComputedStyle(s||document.documentElement).getPropertyValue('--htt-min'));return isNaN(v)?24:v}
+  window.HTT_MIN=function(el){return minOf(el)};
+  function renumber(){
+    document.querySelectorAll('.code[class*="htt-start-"]').forEach(function(c){
+      if(c.dataset.httNum)return;var m=c.className.match(/htt-start-(\d+)/);if(!m)return;var off=+m[1];
+      c.querySelectorAll('.ln>.no').forEach(function(n){var v=parseInt(n.textContent,10);if(!isNaN(v))n.textContent=String(v+off)});
+      c.dataset.httNum='1';
+    });
+  }
+  function hasText(el){for(var n=el.firstChild;n;n=n.nextSibling){if(n.nodeType===3&&/\S/.test(n.nodeValue))return true}return /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(el.tagName)}
+  function svgScale(t){var svg=t.ownerSVGElement;if(!svg)return 1;var s=1;
+    while(svg){var vb=svg.viewBox&&svg.viewBox.baseVal;if(vb&&vb.width&&vb.height){var w=svg.clientWidth||svg.getBoundingClientRect().width,h=svg.clientHeight||svg.getBoundingClientRect().height;if(!w||!h)return 0;s*=Math.min(w/vb.width,h/vb.height)}svg=svg.ownerSVGElement}
+    return s}
+  function set(el,v){if(!el.hasAttribute('data-htt-prev'))el.setAttribute('data-htt-prev',el.style.getPropertyValue('font-size')+'|'+el.style.getPropertyPriority('font-size'));el.style.setProperty('font-size',v,'important')}
+  function unfix(sel){document.querySelectorAll((sel||'#deck .slide *')).forEach(function(el){var p=el.getAttribute('data-htt-prev');if(p===null)return;var a=p.split('|');if(a[0])el.style.setProperty('font-size',a[0],a[1]||'');else el.style.removeProperty('font-size');el.removeAttribute('data-htt-prev')})}
+  function fix(sel){
+    renumber();
+    var slides=document.querySelectorAll(typeof sel==='string'?sel:'#deck .slide');
+    for(var j=0;j<slides.length;j++){var sl=slides[j];var MIN=minOf(sl);if(MIN<=0)continue;
+      var els=sl.querySelectorAll('*');
+      for(var i=0;i<els.length;i++){var el=els[i];
+        if(el instanceof SVGElement){
+          if(!/^(text|tspan|textPath)$/.test(el.tagName))continue;
+          if(el.tagName!=='text'&&!hasText(el))continue;
+          var sc=svgScale(el);if(!sc)continue;
+          var fs=parseFloat(getComputedStyle(el).fontSize);if(!fs)continue;
+          if(fs*sc<MIN-0.3)set(el,(MIN/sc).toFixed(2)+'px');
+          continue;
+        }
+        if(!hasText(el))continue;
+        var f=parseFloat(getComputedStyle(el).fontSize);
+        if(f>0&&f<MIN-0.3)set(el,MIN+'px');
+      }
+    }
+  }
+  window.HTT_fix=fix;window.HTT_unfix=unfix;
+  fix();
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){fix()});
+  var t=null;var mo=new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(ms[i].type==='childList'&&ms[i].addedNodes.length){clearTimeout(t);t=setTimeout(function(){fix()},30);return}}});
+  var d=document.getElementById('deck');if(d)mo.observe(d,{childList:true,subtree:true});
+  function act(){setTimeout(function(){fix('#deck .slide.active')},0)}addEventListener('keydown',act);addEventListener('click',act);addEventListener('touchend',act);
+})();
+
 </script>
 </body>
 </html>

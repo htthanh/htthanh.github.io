@@ -8,18 +8,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
-  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
-  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
-  --sa1:#7c3aed; --sa2:#ec4899;
+  --bg:#ffffff; --panel:#ffffff; --line:#e8eef7; --text:#17263e; --muted:#3d63a0;
+  --accent:#3a7fed; --accent2:#0949b1; --warn:#1d68e1; --gold:#0b58d4; --code:#fcfbff;
+  --k:#3371d6; --t:#3a7fed; --s:#083d93; --n:#0c61ea; --c:#84a1d0; --p:#276cdb; --fn:#0a4fbf;
+  --sa1:#3a7fed; --sa2:#4887ec;
   --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+html,body{height:100%;background:#eff5fe;color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
 #viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
 #deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
-.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
-  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(58,127,237,.14);
+  background:none,none,none,var(--bg);
   opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
 .slide.past{transform:translateX(-60px) scale(.98)}
 .slide.active{opacity:1;transform:none;pointer-events:auto}
@@ -27,81 +27,81 @@ html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff
 .slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
 @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 .hdr{display:flex;align-items:center;gap:16px;margin-bottom:18px}
-.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
-.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
-.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+.slide:nth-of-type(4n+1){--sa1:#3a7fed;--sa2:#4887ec}.slide:nth-of-type(4n+2){--sa1:#0949b1;--sa2:#3a7fed}.slide:nth-of-type(4n+3){--sa1:#4887ec;--sa2:#1c6ef3}.slide:nth-of-type(4n){--sa1:#083d93;--sa2:#0e62e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:var(--sa1)}
+.qn{font-weight:800;font-size:max(17px,var(--htt-min,24px));letter-spacing:.06em;color:#fff;background:var(--sa1);box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
 h1{font-size:70px;line-height:1.1;font-weight:800}
 h2{font-size:38px;line-height:1.2;font-weight:800}
-h3{font-size:23px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
-p,li{font-size:22px;line-height:1.45;color:var(--text)}
+h3{font-size:max(23px,var(--htt-min,24px));font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:max(22px,var(--htt-min,24px));line-height:1.45;color:var(--text)}
 .muted{color:var(--muted)}
 ul{list-style:none}
 ul li{position:relative;padding-left:26px;margin:6px 0}
-ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
-.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
-code.i{font-family:var(--mono);font-size:.88em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 6px;border-radius:6px;color:#be185d}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:10px;height:10px;border-radius:3px;background:var(--sa1)}
+.grad{background:#3a7fed;-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.88em;background:#f0f5fd;border:1px solid #d3e2f9;padding:0 6px;border-radius:6px;color:#1858be}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
 .cols.c64{grid-template-columns:1.25fr 1fr}.cols.c46{grid-template-columns:1fr 1.2fr}
 .cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
-.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
-.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
-.card.bad{border-color:#fecdd3;background:linear-gradient(180deg,#fff1f3,#fff)}
-.card.good{border-color:#a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff)}
-.lbl{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
-.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(58,127,237,.25)}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #3a7fed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0949b1}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #4887ec}.cols4>.card:nth-child(4n){border-top:5px solid #0e65f2}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0949b1}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#276cdb}.cols4>.card:nth-child(4n) h3{color:#0b58d4}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#3a7fed}
+.card.bad{border-color:#cfe0fc;background:#f2f7fe}
+.card.good{border-color:#a7c4f3;background:#ecf3fd}
+.lbl{display:inline-block;font-size:max(15px,var(--htt-min,24px));font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.lbl.bad{background:#e5effe;color:#1254be}.lbl.good{background:#d1e1fa;color:#063176}.lbl.info{background:#e3ecfb;color:#3363b0}
 .icon{font-size:34px;margin-bottom:4px}
-.note{margin-top:12px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:20px;line-height:1.4}
-.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
-.code{font-family:var(--mono);font-size:18px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
-.code.sm{font-size:16.5px}.code.xs{font-size:15px;line-height:1.45}.code.xxs{font-size:13.6px;line-height:1.38;padding:8px 0}
+.note{margin-top:12px;padding:10px 16px;border-left:5px solid #0e65f2;background:#e2ecfd;border-radius:8px;font-size:max(20px,var(--htt-min,24px));line-height:1.4}
+.note.blue{border-color:#5c97f6;background:#eef4fe}
+.code{font-family:var(--mono);font-size:max(18px,var(--htt-min,24px));line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:10px 0;overflow:hidden;position:relative}
+.code.sm{font-size:max(16.5px,var(--htt-min,24px))}.code.xs{font-size:max(15px,var(--htt-min,24px));line-height:1.45}.code.xxs{font-size:max(13.6px,var(--htt-min,24px));line-height:1.38;padding:8px 0}
 .code .ln{padding:0 14px 0 8px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
-.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.code .no{color:#bdcde6;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
 .k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
-.code.show-a .mark-a{background:rgba(124,58,237,.11);box-shadow:inset 5px 0 #7c3aed}
-.code.show-b .mark-b{background:rgba(6,182,212,.13);box-shadow:inset 5px 0 #06b6d4}
-.code.show-c .mark-c{background:rgba(245,158,11,.16);box-shadow:inset 5px 0 #f59e0b}
-.code.show-d .mark-d{background:rgba(236,72,153,.12);box-shadow:inset 5px 0 #ec4899}
-.code-title{font-family:var(--mono);font-size:15px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
+.code.show-a .mark-a{background:rgba(58,127,237,.11);box-shadow:inset 5px 0 #3a7fed}
+.code.show-b .mark-b{background:rgba(11,86,207,.13);box-shadow:inset 5px 0 #0b56cf}
+.code.show-c .mark-c{background:rgba(14,101,242,.16);box-shadow:inset 5px 0 #0e65f2}
+.code.show-d .mark-d{background:rgba(72,135,236,.12);box-shadow:inset 5px 0 #4887ec}
+.code-title{font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));color:var(--muted);margin:0 0 5px 4px;font-weight:600}
 .f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
 .f.on{opacity:1;transform:none}
 .f.ghost{display:none}
 .f.zoom{transform:scale(.85)}.f.zoom.on{transform:none}
-table{border-collapse:separate;border-spacing:0;width:100%;font-size:19px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:max(19px,var(--htt-min,24px));border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
 th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
-th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+th{background:#ebf2fe;font-weight:700}
 tr:last-child td{border-bottom:none}
 td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
 .legend{display:flex;flex-direction:column;gap:10px}
 .leg{border-radius:12px;padding:10px 16px;background:#fff;border:1px solid var(--line)}
-.leg b{display:block;font-size:21px;margin-bottom:2px}
-.leg p{font-size:19px}
-.leg.a{border-left:6px solid #7c3aed}.leg.b{border-left:6px solid #06b6d4}.leg.c{border-left:6px solid #f59e0b}
-.console{font-family:var(--mono);font-size:17px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre}
-.console .in{color:#fbbf24;font-weight:600}
-.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.leg b{display:block;font-size:max(21px,var(--htt-min,24px));margin-bottom:2px}
+.leg p{font-size:max(19px,var(--htt-min,24px))}
+.leg.a{border-left:6px solid #3a7fed}.leg.b{border-left:6px solid #0b56cf}.leg.c{border-left:6px solid #0e65f2}
+.console{font-family:var(--mono);font-size:max(17px,var(--htt-min,24px));line-height:1.5;background:#17263e;border-radius:12px;padding:10px 16px;color:#e7f0fe;white-space:pre}
+.console .in{color:#2b78f4;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#72a4f4;font-size:max(11px,var(--htt-min,24px));letter-spacing:3px;margin-bottom:4px}
 .mem{display:flex;align-items:center;gap:16px;min-height:130px}
-.frame{border:2px solid #e4dcfb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
-.frame .fname{font-family:var(--mono);font-size:16px;color:var(--muted);margin-bottom:6px}
+.frame{border:2px solid #dce8fb;border-radius:12px;padding:8px 14px;background:#faf8ff;min-width:170px;transition:all .5s}
+.frame .fname{font-family:var(--mono);font-size:max(16px,var(--htt-min,24px));color:var(--muted);margin-bottom:6px}
 .var{display:flex;align-items:center;gap:10px}
-.vn{font-family:var(--mono);font-size:21px;color:var(--t);font-weight:600}
-.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #c4b5fd;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
+.vn{font-family:var(--mono);font-size:max(21px,var(--htt-min,24px));color:var(--t);font-weight:600}
+.vb{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:52px;border-radius:10px;background:#fff;border:2px solid #b7d1fb;font-family:var(--mono);font-size:26px;font-weight:700;transition:all .4s}
 .vb .new{display:none}
 .callee,.arw{opacity:0;transform:translateX(-14px);transition:all .5s}
 .mem.s1 .callee,.mem.s1 .arw{opacity:1;transform:none}
 .mem.s2 .chg .old{display:none}.mem.s2 .chg .new{display:inline;animation:pop .5s}
-.mem.s2 .chg{border-color:#f59e0b;box-shadow:0 0 18px rgba(245,158,11,.5)}
+.mem.s2 .chg{border-color:#0e65f2;box-shadow:0 0 18px rgba(14,101,242,.5)}
 .mem.s3 .callee,.mem.s3 .arw{opacity:.15;transform:translateY(10px)}
-.mem.s3 .result{border-color:#10b981;box-shadow:0 0 18px rgba(16,185,129,.5)}
-.arw{font-family:var(--mono);font-size:16px;color:var(--gold);text-align:center;line-height:1.2;font-weight:600}
+.mem.s3 .result{border-color:#1051b9;box-shadow:0 0 18px rgba(16,81,185,.5)}
+.arw{font-family:var(--mono);font-size:max(16px,var(--htt-min,24px));color:var(--#0d65f2);text-align:center;line-height:1.2;font-weight:600}
 .arw .bar{display:block;font-size:30px}
-.alias{font-size:18px;color:var(--accent2);font-weight:600}
+.alias{font-size:max(18px,var(--htt-min,24px));color:var(--accent2);font-weight:600}
 @keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.25)}100%{transform:none;opacity:1}}
 .flow{display:flex;align-items:center;gap:12px;justify-content:center}
-.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:18px;border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
-.box small{display:block;font-family:"Be Vietnam Pro";font-size:14px;color:var(--muted);margin-top:2px;font-weight:400}
-.box.h{border-color:var(--gold)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#c4b5fd}.box.exe{border-color:#ec4899;background:#fdf2f8}
+.box{border-radius:12px;padding:10px 14px;text-align:center;font-family:var(--mono);font-size:max(18px,var(--htt-min,24px));border:2px solid var(--line);background:#fff;min-width:130px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:max(14px,var(--htt-min,24px));color:var(--muted);margin-top:2px;font-weight:400}
+.box.h{border-color:var(--#0d65f2)}.box.cpp{border-color:var(--accent)}.box.m{border-color:var(--accent2)}.box.o{border-color:#b7d1fb}.box.exe{border-color:#4887ec;background:#f2f6fd}
 .ar{color:var(--muted);font-size:26px;text-align:center}
 .stack{display:flex;flex-direction:column;gap:8px}
 svg text{font-family:var(--mono);font-weight:600}
@@ -110,237 +110,237 @@ svg.d1 .dr1,svg.d2 .dr2,svg.d3 .dr3{stroke-dashoffset:0}
 .fadein{opacity:0;transition:opacity .6s}
 svg.d1 .fd1,svg.d2 .fd2,svg.d3 .fd3{opacity:1}
 .title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
-.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.kicker{font-family:var(--mono);color:#276cdb;font-size:max(22px,var(--htt-min,24px));margin-bottom:18px;font-weight:600}
 .orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
 @keyframes float{50%{transform:translate(30px,-25px)}}
 .agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:19px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05)}
-.ag:hover{border-color:#ec4899;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
-.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
-.ag b{color:#db2777;margin-right:6px;font-family:var(--mono)}
-.formula{font-family:var(--mono);font-size:23px;text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
-#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
-#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
-#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:16px}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;font-size:max(19px,var(--htt-min,24px));line-height:1.3;box-shadow:0 2px 6px rgba(40,67,110,.05)}
+.ag:hover{border-color:#4887ec;transform:translateY(-3px);background:#fff;box-shadow:0 10px 24px -10px rgba(72,135,236,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #3a7fed}.ag:nth-child(4n+2){border-left:5px solid #0949b1}.ag:nth-child(4n+3){border-left:5px solid #4887ec}.ag:nth-child(4n){border-left:5px solid #0e65f2}
+.ag b{color:#276cdb;margin-right:6px;font-family:var(--mono)}
+.formula{font-family:var(--mono);font-size:max(23px,var(--htt-min,24px));text-align:center;padding:10px;background:#fff;border-radius:12px;border:1px solid var(--line);font-weight:600}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:#3a7fed;transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:max(14px,var(--htt-min,24px));color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:max(16px,var(--htt-min,24px))}
 #nav button:hover{border-color:var(--accent)}
-#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+#hint{position:fixed;left:16px;bottom:12px;font-size:max(13px,var(--htt-min,24px));color:#7495ca;z-index:5}
 @media (max-width:700px){#hint{display:none}}
 @media print{#nav,#bar,#hint{display:none}}
 
 /* lec03 additions */
 .chain{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.pv{display:inline-flex;align-items:center;font-family:var(--mono);font-size:18px;font-weight:700;padding:5px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;white-space:nowrap}
-.pv.yes{background:#d1fae5;border-color:#34d399;color:#047857}
-.pv.no{background:#ffe4e6;border-color:#fb7185;color:#be123c}
-.pv.skip{background:#f1f5f9;border-color:#cbd5e1;color:#94a3b8;text-decoration:line-through;border-style:dashed}
+.pv{display:inline-flex;align-items:center;font-family:var(--mono);font-size:max(18px,var(--htt-min,24px));font-weight:700;padding:5px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;white-space:nowrap}
+.pv.yes{background:#d1e1fa;border-color:#3471d3;color:#063176}
+.pv.no{background:#e5effe;border-color:#74a7f8;color:#1254be}
+.pv.skip{background:#f1f4f9;border-color:#c4d2e8;color:#7e9dce;text-decoration:line-through;border-style:dashed}
 .op{font-family:var(--mono);font-size:26px;font-weight:800;color:var(--sa1)}
 .tt th,.tt td{text-align:center}.tt td:first-child{color:var(--text);font-weight:400}
-.tt tr.hit td{background:#fdf2f8;color:#be185d}
+.tt tr.hit td{background:#f2f6fd;color:#1858be}
 tr.f{transform:none}
 .cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
 .code.show-s .mark-s{opacity:.3;text-decoration:line-through}
 .arr{display:flex;gap:12px;justify-content:center;margin-top:6px}
-.cell{width:84px;height:84px;border-radius:16px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:800;transition:all .45s;box-shadow:0 6px 16px -10px rgba(124,58,237,.4)}
-.cell small{font-size:13px;color:var(--muted);font-weight:600}
-.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857;transform:translateY(-6px)}
-.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;transform:translateY(-10px) scale(1.06);box-shadow:0 10px 24px -8px rgba(225,29,72,.5)}
+.cell{width:84px;height:84px;border-radius:16px;border:3px solid #dce8fb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:800;transition:all .45s;box-shadow:0 6px 16px -10px rgba(58,127,237,.4)}
+.cell small{font-size:max(13px,var(--htt-min,24px));color:var(--muted);font-weight:600}
+.cell.ok{border-color:#1051b9;background:#ecf3fd;color:#063176;transform:translateY(-6px)}
+.cell.bad{border-color:#1d68e1;background:#f2f7fe;color:#1254be;transform:translateY(-10px) scale(1.06);box-shadow:0 10px 24px -8px rgba(29,104,225,.5)}
 .cell.skip{opacity:.3;transform:scale(.92)}
 .syn{display:flex;gap:12px;align-items:center;justify-content:center;font-family:var(--mono);font-size:24px;font-weight:700}
 .sy{padding:8px 16px;border-radius:12px;color:#fff}
-.sy.c1{background:linear-gradient(135deg,#7c3aed,#a855f7)}.sy.c2{background:linear-gradient(135deg,#059669,#10b981)}.sy.c3{background:linear-gradient(135deg,#e11d48,#f97316)}
+.sy.c1{background:#3a7fed}.sy.c2{background:#083d93}.sy.c3{background:#1d68e1}
 .spin{display:inline-block;animation:spin 2.4s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* lec04 arrays additions */
 .cell .v{display:block;line-height:1}
-.cell.max{border-color:#db2777;background:#fdf2f8;color:#be185d}
-.cell.empty{border-style:dashed;background:#f8fafc;color:#cbd5e1;box-shadow:none}
-.cell.done{border-color:#10b981;background:#ecfdf5;color:#047857}
-.cell.new{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
+.cell.max{border-color:#276cdb;background:#f2f6fd;color:#1858be}
+.cell.empty{border-style:dashed;background:#f8f9fc;color:#c4d2e8;box-shadow:none}
+.cell.done{border-color:#1051b9;background:#ecf3fd;color:#063176}
+.cell.new{border-color:#3a7fed;background:#eef4fe;color:#286cd9}
 .cell.out{opacity:.4;border-style:dashed}
-.cell.gone{border-color:#e11d48;background:#fff1f3;color:#be123c;text-decoration:line-through}
-.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(245,158,11,.55)}
-.cell.cmp{border-color:#0891b2;background:#ecfeff;color:#0e7490;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(8,145,178,.5)}
+.cell.gone{border-color:#1d68e1;background:#f2f7fe;color:#1254be;text-decoration:line-through}
+.cell.cur{border-color:#0e65f2;background:#ecf3fe;color:#094bb4;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(14,101,242,.55)}
+.cell.cmp{border-color:#0949b1;background:#edf4fe;color:#0e4090;transform:translateY(-8px);box-shadow:0 10px 24px -8px rgba(9,73,177,.5)}
 .cell.dots{border:none;box-shadow:none;background:none;width:40px;color:var(--muted)}
 .arr.sm .cell{width:70px;height:74px;font-size:24px;border-radius:14px}
-.arr.xs .cell{width:56px;height:62px;font-size:19px;border-radius:12px}
-.arr.xs .cell small{font-size:11.5px}
+.arr.xs .cell{width:56px;height:62px;font-size:max(19px,var(--htt-min,24px));border-radius:12px}
+.arr.xs .cell small{font-size:max(11.5px,var(--htt-min,24px))}
 .arr.left{justify-content:flex-start}
-.addr{display:flex;gap:12px;justify-content:center;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.addr{display:flex;gap:12px;justify-content:center;font-family:var(--mono);font-size:max(13px,var(--htt-min,24px));color:var(--muted)}
 .addr span{width:84px;text-align:center}
 .vars{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
-.vc{font-family:var(--mono);font-size:19px;font-weight:700;padding:5px 14px;border-radius:12px;background:#fff;border:2px solid #e4dcfb;transition:all .35s}
+.vc{font-family:var(--mono);font-size:max(19px,var(--htt-min,24px));font-weight:700;padding:5px 14px;border-radius:12px;background:#fff;border:2px solid #dce8fb;transition:all .35s}
 .vc b{color:var(--t)}
-.vc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.45)}
-.vc.res{border-color:#10b981;background:#ecfdf5;color:#047857}
+.vc.hot{border-color:#0e65f2;background:#ecf3fe;box-shadow:0 0 14px rgba(14,101,242,.45)}
+.vc.res{border-color:#1051b9;background:#ecf3fd;color:#063176}
 .ci{opacity:0;transition:opacity .4s}.ci.show{opacity:1}
-.say{font-size:20px;margin-top:12px;min-height:56px;color:var(--muted)}
+.say{font-size:max(20px,var(--htt-min,24px));margin-top:12px;min-height:56px;color:var(--muted)}
 .say b{color:var(--text)}
-.rowlbl{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted);margin:10px 0 4px}
-.zone{display:flex;gap:6px;justify-content:center;margin-top:8px;font-size:15px;font-weight:700}
+.rowlbl{font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));font-weight:700;color:var(--muted);margin:10px 0 4px}
+.zone{display:flex;gap:6px;justify-content:center;margin-top:8px;font-size:max(15px,var(--htt-min,24px));font-weight:700}
 .zone span{padding:3px 10px;border-radius:999px}
-.z1{background:#d1fae5;color:#047857}.z2{background:#f1f5f9;color:#64748b}.z3{background:#ffe4e6;color:#be123c}
+.z1{background:#d1e1fa;color:#063176}.z2{background:#f1f4f9;color:#426bad}.z3{background:#e5effe;color:#1254be}
 .brace{display:flex;gap:12px;justify-content:center;margin-top:4px}
-.brace div{border-top:3px solid currentColor;padding-top:4px;text-align:center;font-family:var(--mono);font-size:15px;font-weight:700}
+.brace div{border-top:3px solid currentColor;padding-top:4px;text-align:center;font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));font-weight:700}
 .mx{display:grid;gap:6px;justify-content:center}
-.mc{width:62px;height:52px;border-radius:10px;border:2px solid #e4dcfb;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .4s}
-.mx.sm .mc{width:44px;height:36px;font-size:14px;border-radius:8px}
-.mc.ix{border:none;background:none;color:var(--muted);font-size:14px;font-weight:600;box-shadow:none}
-.mc.unused{border-style:dashed;background:#f8fafc;color:#cbd5e1}
-.mc.used{border-color:#7c3aed;background:#f3edff;color:#6d28d9}
-.mc.hl{background:#fffbeb;border-color:#fcd34d}
-.mc.cur{border-color:#f59e0b;background:#fde68a;color:#92400e;transform:scale(1.12);box-shadow:0 8px 20px -6px rgba(245,158,11,.6)}
-.mc.bd{border-color:#ec4899;border-width:3px}
+.mc{width:62px;height:52px;border-radius:10px;border:2px solid #dce8fb;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:max(20px,var(--htt-min,24px));font-weight:800;transition:all .4s}
+.mx.sm .mc{width:44px;height:36px;font-size:max(14px,var(--htt-min,24px));border-radius:8px}
+.mc.ix{border:none;background:none;color:var(--muted);font-size:max(14px,var(--htt-min,24px));font-weight:600;box-shadow:none}
+.mc.unused{border-style:dashed;background:#f8f9fc;color:#c4d2e8}
+.mc.used{border-color:#3a7fed;background:#eef4fe;color:#286cd9}
+.mc.hl{background:#ecf3fe;border-color:#5391f6}
+.mc.cur{border-color:#0e65f2;background:#8eb7f9;color:#0e4192;transform:scale(1.12);box-shadow:0 8px 20px -6px rgba(14,101,242,.6)}
+.mc.bd{border-color:#4887ec;border-width:3px}
 .mc.inr{opacity:.3}
-.mc.pos{border-color:#10b981;background:#d1fae5;color:#047857}
-.mc.neg{background:#fff1f3;color:#be123c}
-.mc.bad{border-color:#e11d48;background:#fff1f3;color:#be123c;border-style:dashed}
-.strip{display:flex;gap:3px;font-family:var(--mono);font-size:12px;flex-wrap:nowrap;overflow:hidden}
-.strip span{padding:6px 5px;border-radius:5px;background:#f3edff;color:#6d28d9;white-space:nowrap}
-.strip span.r1{background:#e0f2fe;color:#0369a1}
+.mc.pos{border-color:#1051b9;background:#d1e1fa;color:#063176}
+.mc.neg{background:#f2f7fe;color:#1254be}
+.mc.bad{border-color:#1d68e1;background:#f2f7fe;color:#1254be;border-style:dashed}
+.strip{display:flex;gap:3px;font-family:var(--mono);font-size:max(12px,var(--htt-min,24px));flex-wrap:nowrap;overflow:hidden}
+.strip span{padding:6px 5px;border-radius:5px;background:#eef4fe;color:#286cd9;white-space:nowrap}
+.strip span.r1{background:#e1ecfd;color:#08419c}
 .strip span.gap{background:none;color:var(--muted)}
-.trace td,.trace th{font-size:17px;padding:5px 10px}
+.trace td,.trace th{font-size:max(17px,var(--htt-min,24px));padding:5px 10px}
 .trace td:first-child{color:var(--text)}
-.trace tr.now td{background:#fffbeb}
-.sig{font-family:var(--mono);font-size:17px;background:#fff;border:1px dashed #c4b5fd;border-radius:10px;padding:6px 12px;color:#6d28d9;display:inline-block}
+.trace tr.now td{background:#ecf3fe}
+.sig{font-family:var(--mono);font-size:max(17px,var(--htt-min,24px));background:#fff;border:1px dashed #b7d1fb;border-radius:10px;padding:6px 12px;color:#286cd9;display:inline-block}
 
 .cols>*{min-width:0}
 
 /* ===== DDIA ch1 additions ===== */
 .sv{width:100%;height:auto;overflow:visible}
-.sv text{font-family:"Be Vietnam Pro",system-ui,sans-serif;font-weight:700;font-size:15px;fill:#1e1b3a}
-.sv text.sm{font-size:12.5px;fill:#64607d;font-weight:500}
-.sv text.lb{font-size:12.5px;fill:#7c3aed;font-weight:700}
-.sv .nd{fill:#fff;stroke:#c4b5fd;stroke-width:2}
-.sv .nd.c2{stroke:#0891b2}.sv .nd.c3{stroke:#ec4899}.sv .nd.c4{stroke:#f59e0b}.sv .nd.c5{stroke:#10b981}
-.sv .ln{stroke:#a78bfa;stroke-width:2.2;fill:none}
+.sv text{font-family:"Be Vietnam Pro",system-ui,sans-serif;font-weight:700;font-size:max(15px,var(--htt-min,24px));fill:#17263e}
+.sv text.sm{font-size:max(12.5px,var(--htt-min,24px));fill:#3d63a0;font-weight:500}
+.sv text.lb{font-size:max(12.5px,var(--htt-min,24px));fill:#3a7fed;font-weight:700}
+.sv .nd{fill:#fff;stroke:#b7d1fb;stroke-width:2}
+.sv .nd.c2{stroke:#0949b1}.sv .nd.c3{stroke:#4887ec}.sv .nd.c4{stroke:#0e65f2}.sv .nd.c5{stroke:#1051b9}
+.sv .ln{stroke:#8cb6f9;stroke-width:2.2;fill:none}
 .sv .g{opacity:0;transition:opacity .55s}
-.sv .g.hot .ln{stroke:#ec4899;stroke-dasharray:7 6;animation:dash .7s linear infinite}
-.sv .g.hot .nd{filter:drop-shadow(0 6px 10px rgba(236,72,153,.35))}
+.sv .g.hot .ln{stroke:#4887ec;stroke-dasharray:7 6;animation:dash .7s linear infinite}
+.sv .g.hot .nd{filter:drop-shadow(0 6px 10px rgba(72,135,236,.35))}
 @keyframes dash{to{stroke-dashoffset:-13}}
-.sv .box6{fill:none;stroke:#ec4899;stroke-width:2.5;stroke-dasharray:9 7}
-.chip{display:inline-flex;align-items:center;gap:8px;font-size:18px;font-weight:600;padding:6px 14px;border-radius:999px;background:#fff;border:2px solid #e4dcfb;white-space:nowrap}
-.chip.p{border-color:#c4b5fd;background:#f5f0ff;color:#6d28d9}.chip.c{border-color:#a5f3fc;background:#ecfeff;color:#0e7490}.chip.k{border-color:#fbcfe8;background:#fdf2f8;color:#be185d}.chip.y{border-color:#fde68a;background:#fffbeb;color:#b45309}.chip.g{border-color:#a7f3d0;background:#ecfdf5;color:#047857}
+.sv .box6{fill:none;stroke:#4887ec;stroke-width:2.5;stroke-dasharray:9 7}
+.chip{display:inline-flex;align-items:center;gap:8px;font-size:max(18px,var(--htt-min,24px));font-weight:600;padding:6px 14px;border-radius:999px;background:#fff;border:2px solid #dce8fb;white-space:nowrap}
+.chip.p{border-color:#b7d1fb;background:#f1f6fe;color:#286cd9}.chip.c{border-color:#a7c7fa;background:#edf4fe;color:#0e4090}.chip.k{border-color:#cfe0fb;background:#f2f6fd;color:#1858be}.chip.y{border-color:#8eb7f9;background:#ecf3fe;color:#094bb4}.chip.g{border-color:#a7c4f3;background:#ecf3fd;color:#063176}
 .chips{display:flex;flex-wrap:wrap;gap:10px}
-.cell.t{font-size:15px;font-weight:700;text-align:center;line-height:1.15;padding:4px}
-.cell.t .v{font-size:15px}
+.cell.t{font-size:max(15px,var(--htt-min,24px));font-weight:700;text-align:center;line-height:1.15;padding:4px}
+.cell.t .v{font-size:max(15px,var(--htt-min,24px))}
 .cell.big{font-size:30px}
-.stat{font-family:var(--mono);font-size:44px;font-weight:800;line-height:1;background:linear-gradient(90deg,var(--sa1),var(--sa2));-webkit-background-clip:text;background-clip:text;color:transparent}
-.stat small{font-size:18px}
-.sysbox{border-radius:14px;padding:12px 16px;text-align:center;font-weight:700;font-size:20px;border:2px solid #e4dcfb;background:#fff;transition:all .45s}
-.sysbox.fail{border-color:#e11d48;background:#fff1f3;color:#be123c;box-shadow:0 0 22px rgba(225,29,72,.35)}
-.sysbox.ok{border-color:#10b981;background:#ecfdf5;color:#047857;box-shadow:0 0 22px rgba(16,185,129,.3)}
-.shield{opacity:0;transform:scale(.7);transition:all .45s;font-size:15px;font-weight:700;color:#7c3aed;text-align:center;border:2px dashed #a78bfa;border-radius:12px;padding:6px 10px;background:#f5f0ff}
+.stat{font-family:var(--mono);font-size:44px;font-weight:800;line-height:1;background:var(--sa1);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat small{font-size:max(18px,var(--htt-min,24px))}
+.sysbox{border-radius:14px;padding:12px 16px;text-align:center;font-weight:700;font-size:max(20px,var(--htt-min,24px));border:2px solid #dce8fb;background:#fff;transition:all .45s}
+.sysbox.fail{border-color:#1d68e1;background:#f2f7fe;color:#1254be;box-shadow:0 0 22px rgba(29,104,225,.35)}
+.sysbox.ok{border-color:#1051b9;background:#ecf3fd;color:#063176;box-shadow:0 0 22px rgba(16,81,185,.3)}
+.shield{opacity:0;transform:scale(.7);transition:all .45s;font-size:max(15px,var(--htt-min,24px));font-weight:700;color:#3a7fed;text-align:center;border:2px dashed #8cb6f9;border-radius:12px;padding:6px 10px;background:#f1f6fe}
 .shield.on{opacity:1;transform:none}
 .dots{display:grid;grid-template-columns:repeat(25,1fr);gap:5px;padding:12px;background:#fff;border:1px solid var(--line);border-radius:14px}
-.dots i{display:block;aspect-ratio:1;border-radius:4px;background:#e9e3fb;transition:all .4s}
-.dots i.x{background:#e11d48;transform:scale(1.35);box-shadow:0 0 10px rgba(225,29,72,.6)}
-.dots i.r{background:#10b981}
-.node{width:110px;border-radius:14px;border:2.5px solid #c4b5fd;background:#fff;text-align:center;padding:8px 4px;font-weight:700;transition:all .45s}
-.node .ver{display:block;font-family:var(--mono);font-size:22px;color:#6d28d9}
-.node small{display:block;font-size:13px;color:var(--muted);font-weight:600}
-.node.down{border-color:#f59e0b;background:#fffbeb;opacity:.55;transform:translateY(8px)}
-.node.v2{border-color:#10b981;background:#ecfdf5}.node.v2 .ver{color:#047857}
-.node.bad{border-color:#e11d48;background:#fff1f3;color:#be123c}.node.bad .ver{color:#be123c}
+.dots i{display:block;aspect-ratio:1;border-radius:4px;background:#e3ecfb;transition:all .4s}
+.dots i.x{background:#1d68e1;transform:scale(1.35);box-shadow:0 0 10px rgba(29,104,225,.6)}
+.dots i.r{background:#1051b9}
+.node{width:110px;border-radius:14px;border:2.5px solid #b7d1fb;background:#fff;text-align:center;padding:8px 4px;font-weight:700;transition:all .45s}
+.node .ver{display:block;font-family:var(--mono);font-size:max(22px,var(--htt-min,24px));color:#286cd9}
+.node small{display:block;font-size:max(13px,var(--htt-min,24px));color:var(--muted);font-weight:600}
+.node.down{border-color:#0e65f2;background:#ecf3fe;opacity:.55;transform:translateY(8px)}
+.node.v2{border-color:#1051b9;background:#ecf3fd}.node.v2 .ver{color:#063176}
+.node.bad{border-color:#1d68e1;background:#f2f7fe;color:#1254be}.node.bad .ver{color:#1254be}
 .nodes{display:flex;gap:14px;justify-content:center}
 .casc{display:flex;align-items:center;gap:6px;justify-content:center}
-.casc .ar{font-size:22px}
-.tw{display:inline-block;font-size:13px;font-weight:700;padding:2px 8px;border-radius:6px;background:#fdf2f8;color:#be185d;border:1px solid #fbcfe8;margin:2px;opacity:0;transform:translateY(-10px) scale(.6);transition:all .45s}
+.casc .ar{font-size:max(22px,var(--htt-min,24px))}
+.tw{display:inline-block;font-size:max(13px,var(--htt-min,24px));font-weight:700;padding:2px 8px;border-radius:6px;background:#f2f6fd;color:#1858be;border:1px solid #cfe0fb;margin:2px;opacity:0;transform:translateY(-10px) scale(.6);transition:all .45s}
 .tw.show{opacity:1;transform:none}
-.tw.b{background:#ecfeff;color:#0e7490;border-color:#a5f3fc}
-.tw.y{background:#fffbeb;color:#b45309;border-color:#fde68a}
-.mbox{border:2px solid #e4dcfb;border-radius:12px;background:#fff;padding:6px 8px;min-height:84px;transition:all .4s}
-.mbox h4{font-size:14px;color:var(--muted);margin-bottom:4px}
-.mbox.hot{border-color:#0891b2;box-shadow:0 0 16px rgba(8,145,178,.35)}
+.tw.b{background:#edf4fe;color:#0e4090;border-color:#a7c7fa}
+.tw.y{background:#ecf3fe;color:#094bb4;border-color:#8eb7f9}
+.mbox{border:2px solid #dce8fb;border-radius:12px;background:#fff;padding:6px 8px;min-height:84px;transition:all .4s}
+.mbox h4{font-size:max(14px,var(--htt-min,24px));color:var(--muted);margin-bottom:4px}
+.mbox.hot{border-color:#0949b1;box-shadow:0 0 16px rgba(9,73,177,.35)}
 .mboxes{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.who{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:18px;padding:8px 14px;border-radius:12px;background:#fff;border:2px solid #fbcfe8}
+.who{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:max(18px,var(--htt-min,24px));padding:8px 14px;border-radius:12px;background:#fff;border:2px solid #cfe0fb}
 .big-ar{font-size:30px;color:var(--muted);text-align:center;line-height:1}
-.rt{display:flex;height:58px;border-radius:12px;overflow:hidden;border:2px solid #e4dcfb;background:#fff}
-.rt>div{display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;opacity:0;transition:opacity .45s;white-space:nowrap}
+.rt{display:flex;height:58px;border-radius:12px;overflow:hidden;border:2px solid #dce8fb;background:#fff}
+.rt>div{display:flex;align-items:center;justify-content:center;font-size:max(15px,var(--htt-min,24px));font-weight:700;color:#fff;opacity:0;transition:opacity .45s;white-space:nowrap}
 .rt>div.show{opacity:1}
-.rt .n1,.rt .n2{background:#94a3b8}.rt .q{background:#f59e0b}.rt .sv2{background:#7c3aed}
+.rt .n1,.rt .n2{background:#7e9dce}.rt .q{background:#0e65f2}.rt .sv2{background:#3a7fed}
 .brk{position:relative;height:44px;margin-top:6px}
-.brk>div{position:absolute;top:0;border-top:3px solid;text-align:center;font-size:15px;font-weight:700;padding-top:4px;opacity:0;transition:opacity .45s}
+.brk>div{position:absolute;top:0;border-top:3px solid;text-align:center;font-size:max(15px,var(--htt-min,24px));font-weight:700;padding-top:4px;opacity:0;transition:opacity .45s}
 .brk>div.show{opacity:1}
-.pc rect.b{fill:#c4b5fd;transform:translateX(var(--x0));transition:transform 1.3s cubic-bezier(.6,0,.2,1) calc(var(--d)*7ms),fill .4s}
+.pc rect.b{fill:#b7d1fb;transform:translateX(var(--x0));transition:transform 1.3s cubic-bezier(.6,0,.2,1) calc(var(--d)*7ms),fill .4s}
 .pc.sorted rect.b{transform:translateX(var(--x1))}
-.pc.p95 rect.t95{fill:#f472b6}.pc.p99 rect.t99{fill:#e11d48}
+.pc.p95 rect.t95{fill:#72a4f4}.pc.p99 rect.t99{fill:#1d68e1}
 .pc .mk{opacity:0;transition:opacity .5s}
 .pc.mean .mkm,.pc.p50 .mk50,.pc.p95 .mk95,.pc.p99 .mk99{opacity:1}
-.pc text{font-family:var(--mono);font-size:12px;font-weight:700}
+.pc text{font-family:var(--mono);font-size:max(12px,var(--htt-min,24px));font-weight:700}
 .q-row{display:flex;gap:8px;align-items:center}
-.rq{height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;font-weight:700;color:#fff;transition:all .5s}
-.rq.slow{width:190px;background:linear-gradient(135deg,#e11d48,#f97316)}
-.rq.fast{width:54px;background:linear-gradient(135deg,#0891b2,#7c3aed)}
-.rq.wait{box-shadow:0 0 0 3px #fde68a;animation:shake .5s infinite}
+.rq{height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));font-weight:700;color:#fff;transition:all .5s}
+.rq.slow{width:190px;background:#1d68e1}
+.rq.fast{width:54px;background:#0949b1}
+.rq.wait{box-shadow:0 0 0 3px #8eb7f9;animation:shake .5s infinite}
 .rq.done{opacity:.25}
 @keyframes shake{50%{transform:translateY(-3px)}}
-.srv{border:2.5px solid #7c3aed;border-radius:14px;padding:10px 14px;text-align:center;font-weight:800;background:#f5f0ff;min-width:120px}
+.srv{border:2.5px solid #3a7fed;border-radius:14px;padding:10px 14px;text-align:center;font-weight:800;background:#f1f6fe;min-width:120px}
 .be{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;margin:6px 0}
-.be .nm{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--muted)}
-.be .trk{height:26px;border-radius:8px;background:#f5f3ff;position:relative;overflow:hidden}
-.be .bb{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:8px;background:linear-gradient(90deg,#0891b2,#7c3aed);transition:width 1s ease}
-.be .bb.slow{background:linear-gradient(90deg,#f97316,#e11d48)}
+.be .nm{font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));font-weight:700;color:var(--muted)}
+.be .trk{height:26px;border-radius:8px;background:#f4f8fe;position:relative;overflow:hidden}
+.be .bb{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:8px;background:#0949b1;transition:width 1s ease}
+.be .bb.slow{background:#1c6ef3}
 .run .be .bb{width:var(--w)}
-.mach{border:3px solid #7c3aed;border-radius:14px;background:#f5f0ff;display:flex;align-items:center;justify-content:center;font-weight:800;color:#6d28d9;transition:all .7s cubic-bezier(.2,.8,.2,1);width:90px;height:70px;font-size:15px;text-align:center}
-.mach.big{width:220px;height:170px;font-size:22px;border-width:5px;box-shadow:0 14px 30px -12px rgba(124,58,237,.6)}
-.mach.sm2{width:70px;height:56px;font-size:13px;border-color:#0891b2;background:#ecfeff;color:#0e7490;opacity:0;transform:scale(.5)}
+.mach{border:3px solid #3a7fed;border-radius:14px;background:#f1f6fe;display:flex;align-items:center;justify-content:center;font-weight:800;color:#286cd9;transition:all .7s cubic-bezier(.2,.8,.2,1);width:90px;height:70px;font-size:max(15px,var(--htt-min,24px));text-align:center}
+.mach.big{width:220px;height:170px;font-size:max(22px,var(--htt-min,24px));border-width:5px;box-shadow:0 14px 30px -12px rgba(58,127,237,.6)}
+.mach.sm2{width:70px;height:56px;font-size:max(13px,var(--htt-min,24px));border-color:#0949b1;background:#edf4fe;color:#0e4090;opacity:0;transform:scale(.5)}
 .mach.sm2.show{opacity:1;transform:none}
 .farm{display:grid;grid-template-columns:repeat(4,70px);gap:10px;justify-content:center}
-.layer{border-radius:12px;padding:10px 14px;font-weight:700;font-size:17px;text-align:center;transition:all .6s}
-.layer.top{background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;font-size:20px}
-.layer.hid{background:#f8fafc;border:2px dashed #cbd5e1;color:#64748b;font-weight:600;font-size:16px}
+.layer{border-radius:12px;padding:10px 14px;font-weight:700;font-size:max(17px,var(--htt-min,24px));text-align:center;transition:all .6s}
+.layer.top{background:#3a7fed;color:#fff;font-size:max(20px,var(--htt-min,24px))}
+.layer.hid{background:#f8f9fc;border:2px dashed #c4d2e8;color:#426bad;font-weight:600;font-size:max(16px,var(--htt-min,24px))}
 .abs.cover .layer.hid{opacity:.25;filter:blur(1.5px)}
 .toggle{display:flex;gap:10px;align-items:center;justify-content:center}
-.pill{padding:8px 16px;border-radius:999px;font-weight:800;font-size:17px;border:2px solid #e4dcfb;background:#fff;transition:all .4s;color:var(--muted)}
-.pill.on{background:linear-gradient(135deg,var(--sa1),var(--sa2));color:#fff;border-color:transparent;transform:scale(1.06)}
-.quote{font-size:21px;line-height:1.45;font-style:italic;color:#4c4672;border-left:5px solid #ec4899;padding:8px 18px;background:rgba(255,255,255,.7);border-radius:8px}
+.pill{padding:8px 16px;border-radius:999px;font-weight:800;font-size:max(17px,var(--htt-min,24px));border:2px solid #dce8fb;background:#fff;transition:all .4s;color:var(--muted)}
+.pill.on{background:var(--sa1);color:#fff;border-color:transparent;transform:scale(1.06)}
+.quote{font-size:max(21px,var(--htt-min,24px));line-height:1.45;font-style:italic;color:#335285;border-left:5px solid #4887ec;padding:8px 18px;background:rgba(255,255,255,.7);border-radius:8px}
 .quote b{font-style:normal}
-.mini li{font-size:18px;margin:3px 0;line-height:1.35}
-.card p.ps,p.ps{font-size:17px;line-height:1.4}
-.vs{font-weight:800;font-size:22px;color:var(--muted);align-self:center;text-align:center}
-.here{display:inline-block;font-size:13px;font-weight:800;color:#fff;background:#e11d48;border-radius:6px;padding:2px 8px;margin-left:6px;opacity:0;transition:opacity .4s}
+.mini li{font-size:max(18px,var(--htt-min,24px));margin:3px 0;line-height:1.35}
+.card p.ps,p.ps{font-size:max(17px,var(--htt-min,24px));line-height:1.4}
+.vs{font-weight:800;font-size:max(22px,var(--htt-min,24px));color:var(--muted);align-self:center;text-align:center}
+.here{display:inline-block;font-size:max(13px,var(--htt-min,24px));font-weight:800;color:#fff;background:#1d68e1;border-radius:6px;padding:2px 8px;margin-left:6px;opacity:0;transition:opacity .4s}
 .here.show{opacity:1}
-.cols4>.card.lit{box-shadow:0 0 0 3px #ec4899,0 12px 26px -10px rgba(236,72,153,.5);transform:translateY(-4px)}
+.cols4>.card.lit{box-shadow:0 0 0 3px #4887ec,0 12px 26px -10px rgba(72,135,236,.5);transform:translateY(-4px)}
 .card{transition:all .4s}
 
 .chip.c,.leg.c{font-style:normal}.leg.c{color:var(--text)}.leg.c b{color:var(--text)}
 .leg p b{display:inline;font-size:inherit;margin:0}
-.toggle .pill{font-size:15px;white-space:nowrap}
+.toggle .pill{font-size:max(15px,var(--htt-min,24px));white-space:nowrap}
 .abs.cover .layer.hid{opacity:.4;filter:blur(1px)}
-.mach.big{width:260px;font-size:21px}
+.mach.big{width:260px;font-size:max(21px,var(--htt-min,24px))}
 .sv text.lb,.pc text{paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
-.sv.s1 .g1{opacity:1}.sv.s2 .g2{opacity:1}.sv.s3 .g3{opacity:1}.sv.s4 .g4{opacity:1}.sv.s5 .g5{opacity:1}.sv.s6 .g6{opacity:1}.sv.s7 .g7{opacity:1}.sv.s8 .g8{opacity:1}.who.hot{border-color:#ec4899;box-shadow:0 0 18px rgba(236,72,153,.45)}.toggle.flip #ev1{background:#fff;color:var(--muted);border-color:#e4dcfb;transform:none}.toggle.flip #ev2{background:linear-gradient(135deg,var(--sa1),var(--sa2));color:#fff;border-color:transparent;transform:scale(1.06)}.dots{grid-template-columns:repeat(50,1fr);gap:3px}.dots i{border-radius:2px}
+.sv.s1 .g1{opacity:1}.sv.s2 .g2{opacity:1}.sv.s3 .g3{opacity:1}.sv.s4 .g4{opacity:1}.sv.s5 .g5{opacity:1}.sv.s6 .g6{opacity:1}.sv.s7 .g7{opacity:1}.sv.s8 .g8{opacity:1}.who.hot{border-color:#4887ec;box-shadow:0 0 18px rgba(72,135,236,.45)}.toggle.flip #ev1{background:#fff;color:var(--muted);border-color:#dce8fb;transform:none}.toggle.flip #ev2{background:var(--sa1);color:#fff;border-color:transparent;transform:scale(1.06)}.dots{grid-template-columns:repeat(50,1fr);gap:3px}.dots i{border-radius:2px}
 /* ===== DDIA ch11 additions ===== */
 .stg{position:relative;margin:0 auto}
 .wire{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
-.wl{stroke:#ddd3fb;stroke-width:2.2;fill:none;stroke-dasharray:6 6;transition:stroke .4s}
-.wl.hot{stroke:#ec4899;animation:dash .7s linear infinite}
+.wl{stroke:#d3e2fb;stroke-width:2.2;fill:none;stroke-dasharray:6 6;transition:stroke .4s}
+.wl.hot{stroke:#4887ec;animation:dash .7s linear infinite}
 @keyframes dash{to{stroke-dashoffset:-12}}
-.sn{position:absolute;border:2.5px solid #c4b5fd;border-radius:14px;background:#fff;padding:8px 12px;font-weight:700;text-align:center;font-size:16px;transition:all .45s;box-shadow:0 8px 20px -14px rgba(124,58,237,.6)}
-.sn small{display:block;font-size:12.5px;color:var(--muted);font-weight:600}
-.sn .val{display:block;font-family:var(--mono);font-size:24px;color:#6d28d9;margin-top:2px}
-.sn.c2{border-color:#0891b2}.sn.c3{border-color:#ec4899}.sn.c4{border-color:#f59e0b}.sn.c5{border-color:#10b981}
-.sn.hot{box-shadow:0 0 0 3px #fbcfe8,0 0 22px rgba(236,72,153,.45)}
-.sn.dead{border-color:#e11d48;background:#fff1f3;color:#be123c;opacity:.6;transform:rotate(-3deg)}
-.sn.ok{border-color:#10b981;background:#ecfdf5}
-.sn.bad{border-color:#e11d48;background:#fff1f3}.sn.bad .val{color:#be123c}
-.tk{position:absolute;left:var(--x0);top:var(--y0);opacity:var(--o,1);transition:left .75s cubic-bezier(.2,.8,.2,1),top .75s cubic-bezier(.2,.8,.2,1),opacity .45s,transform .45s,background .4s;font-family:var(--mono);font-size:14px;font-weight:700;padding:4px 10px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#7c3aed,#a855f7);white-space:nowrap;box-shadow:0 6px 14px -6px rgba(124,58,237,.6);z-index:2}
+.sn{position:absolute;border:2.5px solid #b7d1fb;border-radius:14px;background:#fff;padding:8px 12px;font-weight:700;text-align:center;font-size:max(16px,var(--htt-min,24px));transition:all .45s;box-shadow:0 8px 20px -14px rgba(58,127,237,.6)}
+.sn small{display:block;font-size:max(12.5px,var(--htt-min,24px));color:var(--muted);font-weight:600}
+.sn .val{display:block;font-family:var(--mono);font-size:24px;color:#286cd9;margin-top:2px}
+.sn.c2{border-color:#0949b1}.sn.c3{border-color:#4887ec}.sn.c4{border-color:#0e65f2}.sn.c5{border-color:#1051b9}
+.sn.hot{box-shadow:0 0 0 3px #cfe0fb,0 0 22px rgba(72,135,236,.45)}
+.sn.dead{border-color:#1d68e1;background:#f2f7fe;color:#1254be;opacity:.6;transform:rotate(-3deg)}
+.sn.ok{border-color:#1051b9;background:#ecf3fd}
+.sn.bad{border-color:#1d68e1;background:#f2f7fe}.sn.bad .val{color:#1254be}
+.tk{position:absolute;left:var(--x0);top:var(--y0);opacity:var(--o,1);transition:left .75s cubic-bezier(.2,.8,.2,1),top .75s cubic-bezier(.2,.8,.2,1),opacity .45s,transform .45s,background .4s;font-family:var(--mono);font-size:max(14px,var(--htt-min,24px));font-weight:700;padding:4px 10px;border-radius:999px;color:#fff;background:#3a7fed;white-space:nowrap;box-shadow:0 6px 14px -6px rgba(58,127,237,.6);z-index:2}
 .tk.p1{left:var(--x1);top:var(--y1)}
 .tk.p2{left:var(--x2);top:var(--y2)}
 .tk.p3{left:var(--x3);top:var(--y3)}
 .tk.vis{opacity:1}
 .tk.gone{opacity:0;transform:scale(.5)}
-.tk.c2{background:linear-gradient(135deg,#0891b2,#06b6d4)}.tk.c3{background:linear-gradient(135deg,#db2777,#ec4899)}.tk.c4{background:linear-gradient(135deg,#d97706,#f59e0b)}.tk.c5{background:linear-gradient(135deg,#059669,#10b981)}
-.tk.red{background:linear-gradient(135deg,#e11d48,#f97316)}
-.tk.ptr{background:none;box-shadow:none;color:#db2777;font-size:15px;padding:0}
-.tk.mv{border-radius:12px;width:136px;text-align:center;padding:8px 6px;font-size:18px}
-.tk.mv small{display:block;font-size:12px;font-weight:600;opacity:.85}
+.tk.c2{background:#0949b1}.tk.c3{background:#276cdb}.tk.c4{background:#0b58d4}.tk.c5{background:#083d93}
+.tk.red{background:#1d68e1}
+.tk.ptr{background:none;box-shadow:none;color:#276cdb;font-size:max(15px,var(--htt-min,24px));padding:0}
+.tk.mv{border-radius:12px;width:136px;text-align:center;padding:8px 6px;font-size:max(18px,var(--htt-min,24px))}
+.tk.mv small{display:block;font-size:max(12px,var(--htt-min,24px));font-weight:600;opacity:.85}
 .ap{opacity:0!important;transform:scale(.4)!important}
 .ap.show{opacity:1!important;transform:none!important}
 .cell.ap.show.cur{transform:translateY(-8px)!important}
 .lane{display:flex;align-items:center;gap:12px;margin:6px 0}
-.lane .ln2{width:150px;flex:none;font-weight:700;font-size:16px;text-align:right;color:var(--muted)}
+.lane .ln2{width:150px;flex:none;font-weight:700;font-size:max(16px,var(--htt-min,24px));text-align:right;color:var(--muted)}
 .lane .arr{margin-top:0}
 .relw{position:relative;height:92px}
 .dropk{display:inline-block}
@@ -348,66 +348,88 @@ tr.f{transform:none}
 .f.on .dropk:nth-child(2){animation-delay:.5s}.f.on .dropk:nth-child(3){animation-delay:1s}
 @keyframes fall{0%{transform:none;opacity:1}100%{transform:translateY(46px) rotate(50deg);opacity:0}}
 .qg{display:flex;gap:4px;height:28px;align-items:center}
-.qg i{display:block;width:16px;height:22px;border-radius:5px;background:#f59e0b;opacity:0}
+.qg i{display:block;width:16px;height:22px;border-radius:5px;background:#0e65f2;opacity:0}
 .f.on .qg i{animation:pop .4s both}
 .f.on .qg i:nth-child(2){animation-delay:.25s}.f.on .qg i:nth-child(3){animation-delay:.5s}.f.on .qg i:nth-child(4){animation-delay:.75s}.f.on .qg i:nth-child(5){animation-delay:1s}.f.on .qg i:nth-child(6){animation-delay:1.25s}.f.on .qg i:nth-child(7){animation-delay:1.5s}.f.on .qg i:nth-child(8){animation-delay:1.75s}
 .blk{display:inline-block}
 .f.on .blk{animation:shake .5s infinite}
-.mini3{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:15px;font-weight:700;margin:8px 0 2px;min-height:52px}
-.mini3 .pb{border:2px solid #c4b5fd;border-radius:10px;padding:5px 9px;background:#fff}
+.mini3{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));font-weight:700;margin:8px 0 2px;min-height:52px}
+.mini3 .pb{border:2px solid #b7d1fb;border-radius:10px;padding:5px 9px;background:#fff}
 .drw{stroke-dasharray:1600;stroke-dashoffset:1600;transition:stroke-dashoffset 1.6s ease}
 .drw.on{stroke-dashoffset:0}
-.kv{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:78px;height:58px;border-radius:12px;border:2.5px solid #e4dcfb;background:#fff;font-family:var(--mono);font-weight:800;font-size:17px;transition:all .45s}
-.kv small{font-size:11px;color:var(--muted);font-weight:600}
-.kv.k1{border-color:#c4b5fd}.kv.k2{border-color:#a5f3fc}.kv.k3{border-color:#fbcfe8}
+.kv{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:78px;height:58px;border-radius:12px;border:2.5px solid #dce8fb;background:#fff;font-family:var(--mono);font-weight:800;font-size:max(17px,var(--htt-min,24px));transition:all .45s}
+.kv small{font-size:max(11px,var(--htt-min,24px));color:var(--muted);font-weight:600}
+.kv.k1{border-color:#b7d1fb}.kv.k2{border-color:#a7c7fa}.kv.k3{border-color:#cfe0fb}
 .kv.old{opacity:.3;text-decoration:line-through;transform:scale(.9)}
-.kv.tomb{background:#1e1b3a;color:#fff;border-color:#1e1b3a}
+.kv.tomb{background:#17263e;color:#fff;border-color:#17263e}
 .kvrow{display:flex;gap:8px;flex-wrap:nowrap;align-items:center}
-.seg{flex:1;height:46px;border-radius:8px;background:#ede9fe;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:700;color:#6d28d9;transition:all .5s}
-.seg.del{background:#f1f5f9;color:#cbd5e1;border:2px dashed #cbd5e1}
+.seg{flex:1;height:46px;border-radius:8px;background:#e9f1fe;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:max(13px,var(--htt-min,24px));font-weight:700;color:#286cd9;transition:all .5s}
+.seg.del{background:#f1f4f9;color:#c4d2e8;border:2px dashed #c4d2e8}
 .segs{display:flex;gap:4px;position:relative}
-.wnd{fill:rgba(124,58,237,.12);stroke:#7c3aed;stroke-width:2}
-.wnd.b{fill:rgba(8,145,178,.12);stroke:#0891b2}.wnd.p{fill:rgba(236,72,153,.12);stroke:#ec4899}.wnd.y{fill:rgba(245,158,11,.14);stroke:#f59e0b}.wnd.g2{fill:rgba(16,185,129,.14);stroke:#10b981}
-.sv circle.evd{fill:#1e1b3a}
+.wnd{fill:rgba(58,127,237,.12);stroke:#3a7fed;stroke-width:2}
+.wnd.b{fill:rgba(9,73,177,.12);stroke:#0949b1}.wnd.p{fill:rgba(72,135,236,.12);stroke:#4887ec}.wnd.y{fill:rgba(14,101,242,.14);stroke:#0e65f2}.wnd.g2{fill:rgba(16,81,185,.14);stroke:#1051b9}
+.sv circle.evd{fill:#17263e}
 .sv.s9 .g9{opacity:1}
-.cmp2 td,.cmp2 th{font-size:17px;padding:7px 12px}
+.cmp2 td,.cmp2 th{font-size:max(17px,var(--htt-min,24px));padding:7px 12px}
 .cmp2 td:first-child{white-space:normal}
 .sumgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.flow .box.on2{border-color:#ec4899;box-shadow:0 0 16px rgba(236,72,153,.35)}
-.ckpt{border:none!important;background:none!important;box-shadow:none!important;width:18px!important;color:#ec4899;font-size:30px!important}
-.ckpt.saved{color:#10b981}
-.zone span.on1{background:#d1fae5;color:#047857}.zone span.on3{background:#ffe4e6;color:#be123c}
-.dots.run i{background:#10b981;animation:pop .5s both}
+.flow .box.on2{border-color:#4887ec;box-shadow:0 0 16px rgba(72,135,236,.35)}
+.ckpt{border:none!important;background:none!important;box-shadow:none!important;width:18px!important;color:#4887ec;font-size:30px!important}
+.ckpt.saved{color:#1051b9}
+.zone span.on1{background:#d1e1fa;color:#063176}.zone span.on3{background:#e5effe;color:#1254be}
+.dots.run i{background:#1051b9;animation:pop .5s both}
 .dots.run i:nth-child(3n){animation-delay:.2s}.dots.run i:nth-child(3n+1){animation-delay:.4s}
-.tk.ptr.red{background:none;color:#e11d48}
+.tk.ptr.red{background:none;color:#1d68e1}
 .sv .g.on{opacity:1}
 .relw{flex:1}
-.pill{font-size:14px!important;white-space:normal!important}
+.pill{font-size:max(14px,var(--htt-min,24px))!important;white-space:normal!important}
 
-.tk.mv{width:80px;font-size:15px;padding:6px 4px}
-#uses .ps{font-size:15px;line-height:1.35}#uses .icon{font-size:24px;margin-bottom:0}#uses h3{font-size:20px}#uses .card{padding:10px 14px}
+.tk.mv{width:80px;font-size:max(15px,var(--htt-min,24px));padding:6px 4px}
+#uses .ps{font-size:max(15px,var(--htt-min,24px));line-height:1.35}#uses .icon{font-size:24px;margin-bottom:0}#uses h3{font-size:max(20px,var(--htt-min,24px))}#uses .card{padding:10px 14px}
 
 </style>
+<style id="htt-theme">
+/* HTT theme: logo + layout helpers (font-size >= 24px, single blue) */
+#deck>.htt-logo{position:absolute;top:12px;right:14px;z-index:60;height:40px;padding:0 10px;border-radius:8px;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;font:800 24px/1 "Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.04em;pointer-events:none;user-select:none}
+#deck>.htt-logo span{font-size:24px;color:#fff}
+.htt-stack{grid-template-columns:minmax(0,1fr)!important;grid-template-areas:none!important;flex-direction:column!important;flex-wrap:nowrap!important}
+.htt-stack>*{grid-column:auto!important;grid-row:auto!important;max-width:100%}
+.htt-wrap,.htt-wrap *{white-space:pre-wrap!important;overflow-wrap:anywhere}
+.htt-wrap .ln{flex-wrap:nowrap}
+.htt-flexwrap{flex-wrap:wrap!important}
+#nav,#nav *{font-size:16px!important}
+#hint{font-size:14px!important}
+.orb{display:none!important}
+:root{--htt-min:24px}
+.slide.htt-fs22{--htt-min:22px}.slide.htt-fs20{--htt-min:20px}.slide.htt-fs0{--htt-min:0px}
+.jumpbtn{right:100px!important}
+.slide.htt-fs18{--htt-min:18px}.slide.htt-fs16{--htt-min:16px}
+.slide .hdr{padding-right:84px}
+.sjump{right:100px!important}
+
+</style>
+<script>window.HTT_MIN=function(el){var s=el&&el.closest?el.closest(".slide"):null;var v=parseFloat(getComputedStyle(s||document.documentElement).getPropertyValue("--htt-min"));return isNaN(v)?24:v};</script>
 </head>
 <body>
 <div id="viewport"><div id="deck">
+<div class="htt-logo" aria-label="HTT" title="HTT"><span>HTT</span></div>
 
 <!-- ===================== TITLE ===================== -->
 <section class="slide" id="title">
-  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
-  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="orb" style="width:380px;height:380px;background:#a8c7f9;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#81aff8;left:40%;bottom:-120px;animation-delay:-4s"></div>
   <div class="title-wrap">
     <div class="kicker in">// DDIA · Part III: Derived Data · Chapter 11</div>
     <h1 class="in" style="font-size:72px"><span class="grad">Stream Processing</span></h1>
     <p class="in muted" style="font-size:24px;margin-top:18px;max-width:1040px"><i>Designing Data-Intensive Applications</i> — Martin Kleppmann. Từ batch trên input <b>bounded</b> sang xử lý liên tục trên <b>unbounded event streams</b>: message brokers, log-based messaging, change data capture, event sourcing, windows, stream joins và fault tolerance.</p>
-    <div class="quote in" style="margin-top:26px;max-width:1040px;font-size:19px">“A complex system that works is invariably found to have evolved from a simple system that works. The inverse proposition also appears to be true: A complex system designed from scratch never works and cannot be made to work.” <b>— John Gall, Systemantics (1975)</b></div>
-    <p class="in" style="margin-top:26px;font-size:18px;color:#8a91b4">Phím ← → hoặc Space: chạy từng bước · Shift+→: qua slide · A: hiện hết · F: toàn màn hình</p>
+    <div class="quote in" style="margin-top:26px;max-width:1040px;font-size:max(19px,var(--htt-min,24px))">“A complex system that works is invariably found to have evolved from a simple system that works. The inverse proposition also appears to be true: A complex system designed from scratch never works and cannot be made to work.” <b>— John Gall, Systemantics (1975)</b></div>
+    <p class="in" style="margin-top:26px;font-size:max(18px,var(--htt-min,24px));color:#7495ca">Phím ← → hoặc Space: chạy từng bước · Shift+→: qua slide · A: hiện hết · F: toàn màn hình</p>
   </div>
 </section>
 
 <!-- ===================== AGENDA ===================== -->
 <section class="slide" id="agenda">
-  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:18px">· bấm vào mục để đi tới</span></div>
+  <div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:max(18px,var(--htt-min,24px))">· bấm vào mục để đi tới</span></div>
   <div class="agenda in" style="gap:10px">
     <div class="ag" data-goto="bvs"><b>01</b>Bounded vs unbounded data</div>
     <div class="ag" data-goto="ev"><b>02</b>Events, producers, consumers</div>
@@ -433,13 +455,13 @@ tr.f{transform:none}
 </section>
 
 <!-- ===================== BOUNDED VS UNBOUNDED ===================== -->
-<section class="slide" id="bvs">
+<section class="slide htt-fs20" id="bvs">
   <div class="hdr in"><span class="qn">01</span><h2>Batch giả định input <span class="grad">bounded</span> — thực tế data là <span class="grad">unbounded</span></h2></div>
   <div class="cols" style="grid-template-columns:1fr 1.25fr;gap:26px">
     <div>
-      <div class="card bad f"><span class="lbl bad">BATCH (Chapter 10)</span><p style="font-size:18px">Input có kích thước <b>known &amp; finite</b> → job biết khi nào đọc xong. Ví dụ sort trong MapReduce phải đọc <b>hết</b> input mới bắt đầu output được.</p></div>
-      <div class="card f" style="margin-top:12px"><span class="lbl info">THỰC TẾ</span><p style="font-size:18px">User tạo data hôm qua, hôm nay, ngày mai… dataset <b>không bao giờ “complete”</b>. Batch phải chia data thành chunk thời gian cố định: mỗi ngày, mỗi giờ.</p></div>
-      <div class="card good f" style="margin-top:12px"><span class="lbl good">STREAM PROCESSING</span><p style="font-size:18px">Bỏ hẳn fixed time slices: xử lý <b>từng event ngay khi nó xảy ra</b>. “Stream” = data được tạo ra <b>dần dần theo thời gian</b> (stdin/stdout, TCP, lazy lists, audio/video…).</p></div>
+      <div class="card bad f"><span class="lbl bad">BATCH (Chapter 10)</span><p style="font-size:max(18px,var(--htt-min,24px))">Input có kích thước <b>known &amp; finite</b> → job biết khi nào đọc xong. Ví dụ sort trong MapReduce phải đọc <b>hết</b> input mới bắt đầu output được.</p></div>
+      <div class="card f" style="margin-top:12px"><span class="lbl info">THỰC TẾ</span><p style="font-size:max(18px,var(--htt-min,24px))">User tạo data hôm qua, hôm nay, ngày mai… dataset <b>không bao giờ “complete”</b>. Batch phải chia data thành chunk thời gian cố định: mỗi ngày, mỗi giờ.</p></div>
+      <div class="card good f" style="margin-top:12px"><span class="lbl good">STREAM PROCESSING</span><p style="font-size:max(18px,var(--htt-min,24px))">Bỏ hẳn fixed time slices: xử lý <b>từng event ngay khi nó xảy ra</b>. “Stream” = data được tạo ra <b>dần dần theo thời gian</b> (stdin/stdout, TCP, lazy lists, audio/video…).</p></div>
     </div>
     <div>
       <div class="card" style="padding:14px 16px">
@@ -452,13 +474,13 @@ tr.f{transform:none}
         </div>
       </div>
       <div class="brace" style="margin-top:14px;justify-content:space-between">
-        <div class="ci" id="br1" style="width:100%;color:#e11d48">[──────── 1 chunk = 1 ngày ────────] → output</div>
+        <div class="ci" id="br1" style="width:100%;color:#1d68e1">[──────── 1 chunk = 1 ngày ────────] → output</div>
       </div>
       <div class="brace" style="justify-content:space-between">
-        <div class="ci" id="br2" style="width:100%;color:#f59e0b">[─ 1h ─][─ 1h ─][─ 1h ─][─ 1h ─][─ 1h ─][─ 1h ─]</div>
+        <div class="ci" id="br2" style="width:100%;color:#0e65f2">[─ 1h ─][─ 1h ─][─ 1h ─][─ 1h ─][─ 1h ─][─ 1h ─]</div>
       </div>
       <div class="brace">
-        <div class="ci" id="br3" style="width:100%;color:#10b981">● → ● → ● → ● → mỗi event được xử lý ngay</div>
+        <div class="ci" id="br3" style="width:100%;color:#1051b9">● → ● → ● → ● → mỗi event được xử lý ngay</div>
       </div>
       <span class="f ghost" data-act="#br1|show;#bz1|on3" data-say="Batch theo ngày: thay đổi ở input chỉ thấy ở output <b>một ngày sau</b> — quá chậm cho nhiều user."></span>
       <span class="f ghost" data-act="#br2|show;#bz2|on1" data-say="Chạy thường xuyên hơn (mỗi giờ, mỗi giây) để giảm delay…"></span>
@@ -469,16 +491,16 @@ tr.f{transform:none}
 </section>
 
 <!-- ===================== EVENTS ===================== -->
-<section class="slide" id="ev">
+<section class="slide htt-fs18" id="ev">
   <div class="hdr in"><span class="qn">02</span><h2>Transmitting Event Streams: <span class="grad">event · producer · consumer · topic</span></h2></div>
   <div class="cols" style="grid-template-columns:1fr 1.1fr;gap:26px">
     <div>
-      <p style="font-size:19px">Trong stream processing, một <b>record</b> thường gọi là <b>event</b>: một object <b>nhỏ, self-contained, immutable</b> mô tả điều gì đó đã xảy ra tại một thời điểm, thường kèm <b>timestamp</b> (time-of-day clock).</p>
-      <div class="console f" style="margin-top:10px;font-size:15px">{ <span class="in">"type"</span>: "page_view",
+      <p style="font-size:max(19px,var(--htt-min,24px))">Trong stream processing, một <b>record</b> thường gọi là <b>event</b>: một object <b>nhỏ, self-contained, immutable</b> mô tả điều gì đó đã xảy ra tại một thời điểm, thường kèm <b>timestamp</b> (time-of-day clock).</p>
+      <div class="console f" style="margin-top:10px;font-size:max(15px,var(--htt-min,24px))">{ <span class="in">"type"</span>: "page_view",
   <span class="in">"user_id"</span>: 42,
   <span class="in">"url"</span>: "/checkout",
   <span class="in">"timestamp"</span>: "2026-11-01T09:15:02Z" }</div>
-      <table class="f" style="margin-top:12px;font-size:17px">
+      <table class="f" style="margin-top:12px;font-size:max(17px,var(--htt-min,24px))">
         <tr><th>Batch world</th><th>Streaming world</th></tr>
         <tr><td>file viết 1 lần</td><td>event được <b>producer</b> (publisher/sender) tạo 1 lần</td></tr>
         <tr><td>nhiều job đọc file</td><td>nhiều <b>consumer</b> (subscriber/recipient) xử lý</td></tr>
@@ -492,7 +514,7 @@ tr.f{transform:none}
         <p class="ps muted ci" id="plt">Poll càng thường xuyên → tỉ lệ request có event mới càng thấp → <b>overhead càng cao</b>.</p>
       </div>
       <div class="card good" style="padding:12px 16px;margin-top:10px">
-        <div class="mini3"><span class="pb">Producer</span><span class="ci" id="nt1">— event mới →</span><span class="pb ci" id="nt2" style="border-color:#10b981">🔔 notify Consumer</span></div>
+        <div class="mini3"><span class="pb">Producer</span><span class="ci" id="nt1">— event mới →</span><span class="pb ci" id="nt2" style="border-color:#1051b9">🔔 notify Consumer</span></div>
         <p class="ps muted ci" id="ntt">Tốt hơn: consumer được <b>notified</b> khi có event. Database triggers làm được nhưng rất hạn chế — nên có các tool chuyên dụng.</p>
       </div>
       <span class="f ghost" data-act="#pl1|show" data-say="Về nguyên tắc, một file hay database là đủ: producer ghi, consumer định kỳ <b>poll</b>."></span>
@@ -506,21 +528,26 @@ tr.f{transform:none}
 <!-- ===================== MESSAGING: 2 QUESTIONS ===================== -->
 <section class="slide" id="msg">
   <div class="hdr in"><span class="qn">03</span><h2>Messaging Systems: <span class="grad">publish/subscribe</span> &amp; 2 câu hỏi</h2></div>
-  <p class="in" style="font-size:19px">Unix pipe / TCP nối đúng <b>1 sender ↔ 1 recipient</b>. Messaging system cho phép <b>nhiều producer</b> gửi vào cùng topic và <b>nhiều consumer</b> nhận từ topic đó.</p>
+  <p class="in" style="font-size:max(19px,var(--htt-min,24px))">Unix pipe / TCP nối đúng <b>1 sender ↔ 1 recipient</b>. Messaging system cho phép <b>nhiều producer</b> gửi vào cùng topic và <b>nhiều consumer</b> nhận từ topic đó.</p>
   <h3 class="in" style="margin-top:12px">❶ Producer gửi nhanh hơn consumer xử lý thì sao?</h3>
   <div class="cols3">
     <div class="card f"><h3>🗑️ Drop messages</h3><div class="mini3"><span class="pb">P</span>→<span class="tk red dropk" style="position:static">m</span><span class="tk red dropk" style="position:static">m</span><span class="tk red dropk" style="position:static">m</span>→<span class="pb">C</span></div><p class="ps">Bỏ bớt message. Chấp nhận được với metrics/sensor gửi định kỳ, nhưng nguy hiểm khi <b>counting</b> events.</p></div>
     <div class="card f"><h3>📦 Buffer in a queue</h3><div class="mini3"><span class="pb">P</span>→<span class="qg"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>→<span class="pb">C</span></div><p class="ps">Queue lớn dần: hết memory thì crash hay ghi xuống disk? Disk access ảnh hưởng performance ra sao?</p></div>
-    <div class="card f"><h3>✋ Backpressure</h3><div class="mini3"><span class="pb blk" style="border-color:#e11d48">P ⛔ blocked</span>→<span class="qg" style="width:60px"><i style="opacity:1"></i><i style="opacity:1"></i></span>→<span class="pb">C</span></div><p class="ps">Còn gọi là <b>flow control</b>: chặn producer đến khi buffer có chỗ. Unix pipes và TCP dùng cách này.</p></div>
+    <div class="card f"><h3>✋ Backpressure</h3><div class="mini3"><span class="pb blk" style="border-color:#1d68e1">P ⛔ blocked</span>→<span class="qg" style="width:60px"><i style="opacity:1"></i><i style="opacity:1"></i></span>→<span class="pb">C</span></div><p class="ps">Còn gọi là <b>flow control</b>: chặn producer đến khi buffer có chỗ. Unix pipes và TCP dùng cách này.</p></div>
   </div>
-  <div class="cols" style="margin-top:14px;grid-template-columns:1fr 1fr">
+  </section>
+
+<section id="msg-p2" class="slide htt-cont">
+<div class="hdr in"><span class="qn">03</span><h2>Messaging Systems: <span class="grad">publish/subscribe</span> &amp; 2 câu hỏi</h2></div>
+<div class="cols" style="margin-top:14px;grid-template-columns:1fr 1fr">
     <div class="card f"><h3>❷ Node crash / offline — có mất message không?</h3><p class="ps">Durability cần <b>ghi xuống disk</b> và/hoặc <b>replication</b> — có chi phí. Nếu chấp nhận đôi khi mất message → <b>throughput cao hơn, latency thấp hơn</b> trên cùng hardware.</p></div>
     <div class="note blue f" style="margin-top:0">Batch (Chapter 10) có reliability guarantee mạnh: task fail được <b>retry</b>, partial output bị <b>discard</b> → output như thể không có failure. Cuối chương sẽ xem stream đạt được điều tương tự thế nào.</div>
   </div>
+
 </section>
 
 <!-- ===================== DIRECT VS BROKER ===================== -->
-<section class="slide" id="broker">
+<section class="slide htt-fs18" id="broker">
   <div class="hdr in"><span class="qn">04</span><h2>Direct messaging <span class="muted" style="font-weight:600">vs</span> <span class="grad">Message brokers</span></h2></div>
   <div class="cols" style="grid-template-columns:1fr 1.15fr;gap:24px">
     <div>
@@ -531,7 +558,7 @@ tr.f{transform:none}
         <li><b>StatsD, Brubeck</b>: thu metrics qua UDP không reliable → counter chỉ <i>xấp xỉ</i>.</li>
         <li><b>Webhooks</b>: đăng ký callback URL, service kia gọi HTTP/RPC khi có event.</li>
       </ul>
-      <div class="note" style="font-size:17px">Hạn chế: app phải biết có thể <b>mất message</b>; giả định producer &amp; consumer luôn online. Consumer offline → bỏ lỡ message; producer crash → mất buffer retry.</div>
+      <div class="note" style="font-size:max(17px,var(--htt-min,24px))">Hạn chế: app phải biết có thể <b>mất message</b>; giả định producer &amp; consumer luôn online. Consumer offline → bỏ lỡ message; producer crash → mất buffer retry.</div>
     </div>
     <div>
       <span class="lbl good">MESSAGE BROKER (message queue)</span>
@@ -555,7 +582,7 @@ tr.f{transform:none}
 <!-- ===================== BROKER VS DB ===================== -->
 <section class="slide" id="bdb">
   <div class="hdr in"><span class="qn">04b</span><h2>Message brokers compared to databases</h2></div>
-  <p class="in muted" style="font-size:19px">Một số broker còn tham gia <b>two-phase commit</b> (XA/JTA) → giống database, nhưng vẫn có khác biệt thực tế quan trọng:</p>
+  <p class="in muted" style="font-size:max(19px,var(--htt-min,24px))">Một số broker còn tham gia <b>two-phase commit</b> (XA/JTA) → giống database, nhưng vẫn có khác biệt thực tế quan trọng:</p>
   <table class="cmp2 in" style="margin-top:10px">
     <tr><th style="width:22%">Khía cạnh</th><th>🗄️ Database</th><th>📨 Message broker (truyền thống)</th></tr>
     <tr class="f"><td>Lưu trữ</td><td>Giữ data đến khi bị <b>xoá tường minh</b></td><td>Tự động <b>xoá message</b> khi đã deliver thành công → không hợp cho long-term storage</td></tr>
@@ -563,7 +590,12 @@ tr.f{transform:none}
     <tr class="f"><td>Chọn data</td><td><b>Secondary indexes</b>, nhiều cách search</td><td>Subscribe vào subset các topic khớp <b>pattern</b></td></tr>
     <tr class="f"><td>Query vs notify</td><td>Kết quả là <b>point-in-time snapshot</b>; không biết khi nó lỗi thời (trừ khi query/poll lại)</td><td>Không query tuỳ ý được, nhưng <b>notify</b> client khi có message mới</td></tr>
   </table>
-  <div class="chips f" style="margin-top:14px"><span class="chip p">JMS</span><span class="chip p">AMQP</span><span class="chip c">RabbitMQ</span><span class="chip c">ActiveMQ</span><span class="chip c">HornetQ</span><span class="chip c">Qpid</span><span class="chip k">TIBCO EMS</span><span class="chip k">IBM MQ</span><span class="chip y">Azure Service Bus</span><span class="chip y">Google Cloud Pub/Sub</span></div>
+  </section>
+
+<section id="bdb-p2" class="slide htt-cont">
+<div class="hdr in"><span class="qn">04b</span><h2>Message brokers compared to databases</h2></div>
+<div class="chips f" style="margin-top:14px"><span class="chip p">JMS</span><span class="chip p">AMQP</span><span class="chip c">RabbitMQ</span><span class="chip c">ActiveMQ</span><span class="chip c">HornetQ</span><span class="chip c">Qpid</span><span class="chip k">TIBCO EMS</span><span class="chip k">IBM MQ</span><span class="chip y">Azure Service Bus</span><span class="chip y">Google Cloud Pub/Sub</span></div>
+
 </section>
 
 <!-- ===================== MULTIPLE CONSUMERS ===================== -->
@@ -610,19 +642,19 @@ tr.f{transform:none}
 </section>
 
 <!-- ===================== ACK & REDELIVERY ===================== -->
-<section class="slide" id="ack">
+<section class="slide htt-fs20" id="ack">
   <div class="hdr in"><span class="qn">06</span><h2>Acknowledgments &amp; redelivery → <span class="grad">message reordering</span></h2></div>
   <div class="cols" style="grid-template-columns:1.35fr 1fr;gap:24px">
     <div class="card" style="padding:14px 16px">
       <div class="lane"><span class="ln2">Producer 1 gửi</span><div class="arr xs left"><div class="cell"><span class="v">m1</span></div><div class="cell"><span class="v">m2</span></div><div class="cell" id="am3"><span class="v">m3</span></div><div class="cell"><span class="v">m4</span></div><div class="cell"><span class="v">m5</span></div></div></div>
       <div class="lane"><span class="ln2" id="ac1l">Consumer 1</span><div class="arr xs left"><div class="cell ap done" id="c1a"><span class="v">m1</span><small>ack ✓</small></div><div class="cell ap" id="c1b"><span class="v">m4</span><small id="c1bs">…</small></div><div class="cell ap cur" id="c1c"><span class="v">m3</span><small>redeliv.</small></div><div class="cell ap" id="c1d"><span class="v">m5</span><small>ack ✓</small></div></div></div>
-      <div class="lane"><span class="ln2" id="ac2l">Consumer 2</span><div class="arr xs left"><div class="cell ap done" id="c2a"><span class="v">m2</span><small>ack ✓</small></div><div class="cell ap" id="c2b"><span class="v">m3</span><small id="c2bs">…</small></div></div><span class="here" id="crash" style="font-size:16px">💥 CRASH — không ack m3</span></div>
-      <div class="formula ci" id="aord" style="margin-top:12px;font-size:20px">Consumer 1 xử lý theo thứ tự: m1, <b style="color:#e11d48">m4, m3</b>, m5 ≠ thứ tự gửi</div>
+      <div class="lane"><span class="ln2" id="ac2l">Consumer 2</span><div class="arr xs left"><div class="cell ap done" id="c2a"><span class="v">m2</span><small>ack ✓</small></div><div class="cell ap" id="c2b"><span class="v">m3</span><small id="c2bs">…</small></div></div><span class="here" id="crash" style="font-size:max(16px,var(--htt-min,24px))">💥 CRASH — không ack m3</span></div>
+      <div class="formula ci" id="aord" style="margin-top:12px;font-size:max(20px,var(--htt-min,24px))">Consumer 1 xử lý theo thứ tự: m1, <b style="color:#1d68e1">m4, m3</b>, m5 ≠ thứ tự gửi</div>
     </div>
     <div>
-      <p style="font-size:18px">Consumer có thể crash bất cứ lúc nào. Để không mất message, client phải <b>acknowledge</b> tường minh khi xử lý xong → broker mới xoá khỏi queue.</p>
-      <p style="font-size:18px;margin-top:8px">Connection đóng/timeout mà chưa có ack → broker coi như chưa xử lý và <b>deliver lại</b> cho consumer khác.</p>
-      <div class="note" style="font-size:16px">Có thể message đã xử lý xong nhưng <b>ack bị mất</b> trên network → cần <b>atomic commit protocol</b> (Chapter 9).</div>
+      <p style="font-size:max(18px,var(--htt-min,24px))">Consumer có thể crash bất cứ lúc nào. Để không mất message, client phải <b>acknowledge</b> tường minh khi xử lý xong → broker mới xoá khỏi queue.</p>
+      <p style="font-size:max(18px,var(--htt-min,24px));margin-top:8px">Connection đóng/timeout mà chưa có ack → broker coi như chưa xử lý và <b>deliver lại</b> cho consumer khác.</p>
+      <div class="note" style="font-size:max(16px,var(--htt-min,24px))">Có thể message đã xử lý xong nhưng <b>ack bị mất</b> trên network → cần <b>atomic commit protocol</b> (Chapter 9).</div>
       <p class="say">Nhấn → để chạy từng bước.</p>
     </div>
   </div>
@@ -643,11 +675,16 @@ tr.f{transform:none}
     <div class="card good f"><span class="lbl good">DATABASE / FILESYSTEM MINDSET</span>
       <ul class="mini"><li>Mọi thứ được ghi lại <b>vĩnh viễn</b> đến khi bị xoá tường minh.</li><li>Batch job chạy lặp lại thoải mái, input <b>read-only</b> không bị hỏng.</li><li>Client mới có thể đọc data ghi từ rất lâu trước.</li></ul></div>
   </div>
-  <div class="note blue f" style="margin-top:16px;font-size:21px">Tại sao không lai cả hai? → <b>log-based message brokers</b>.</div>
-  <div class="cols f" style="margin-top:14px;grid-template-columns:1fr 1fr;gap:20px">
+  <div class="note blue f" style="margin-top:16px;font-size:max(21px,var(--htt-min,24px))">Tại sao không lai cả hai? → <b>log-based message brokers</b>.</div>
+  </section>
+
+<section id="logs-p2" class="slide htt-cont">
+<div class="hdr in"><span class="qn">07</span><h2>Partitioned Logs: <span class="grad">durable storage</span> + <span class="grad">low-latency notification</span></h2></div>
+<div class="cols f" style="margin-top:14px;grid-template-columns:1fr 1fr;gap:20px">
     <div class="card"><h3>📜 Log = append-only sequence of records on disk</h3><p class="ps">Đã gặp ở log-structured storage &amp; write-ahead log (Ch.3), replication (Ch.5). Producer <b>append</b> vào cuối log; consumer <b>đọc tuần tự</b>; tới cuối log thì chờ notification — giống <code class="i">tail -f</code>.</p></div>
     <div class="card"><h3>🧱 Partitioned để scale</h3><p class="ps">Log được chia <b>partitions</b> (Ch.6) trên nhiều máy. <b>Topic</b> = nhóm partitions cùng loại message. Ví dụ: <b>Apache Kafka</b>, <b>Amazon Kinesis Streams</b>, <b>Twitter DistributedLog</b> — hàng triệu msg/s, fault tolerance nhờ replication.</p></div>
   </div>
+
 </section>
 
 <!-- ===================== TOPIC/PARTITION/OFFSET ===================== -->
@@ -698,13 +735,13 @@ tr.f{transform:none}
     <div>
       <div class="card bad f"><span class="lbl info">CHỌN JMS/AMQP-STYLE KHI</span><p class="ps">Message <b>tốn kém</b> để xử lý, muốn parallelize <b>từng message</b>, và <b>thứ tự không quan trọng</b>.</p></div>
       <div class="card good f" style="margin-top:12px"><span class="lbl good">CHỌN LOG-BASED KHI</span><p class="ps"><b>Throughput cao</b>, mỗi message xử lý nhanh, và <b>ordering quan trọng</b>.</p></div>
-      <div class="note f" style="font-size:17px">Mẹo: muốn mọi update cho cùng một entity giữ thứ tự → dùng ID của entity làm <b>partition key</b>, cùng key ⇒ cùng partition.</div>
+      <div class="note f" style="font-size:max(17px,var(--htt-min,24px))">Mẹo: muốn mọi update cho cùng một entity giữ thứ tự → dùng ID của entity làm <b>partition key</b>, cùng key ⇒ cùng partition.</div>
     </div>
   </div>
 </section>
 
 <!-- ===================== DISK / LAG / REPLAY ===================== -->
-<section class="slide" id="disk">
+<section class="slide htt-fs18" id="disk">
   <div class="hdr in"><span class="qn">09</span><h2>Disk space usage · consumer lag · <span class="grad">replaying old messages</span></h2></div>
   <div class="cols" style="grid-template-columns:1.3fr 1fr;gap:24px">
     <div>
@@ -712,8 +749,8 @@ tr.f{transform:none}
         <p class="rowlbl" style="margin-top:0">Log trên disk: chia segments · <b>circular / ring buffer</b></p>
         <div style="position:relative;height:110px">
           <div class="segs"><div class="seg" id="sg1">seg 1</div><div class="seg" id="sg2">seg 2</div><div class="seg">seg 3</div><div class="seg">seg 4</div><div class="seg">seg 5</div><div class="seg">seg 6</div><div class="seg">seg 7</div><div class="seg">seg 8</div></div>
-          <div class="tk ptr" style="--x0:340px;--y0:56px;color:#7c3aed">▲ producer</div>
-          <div class="tk ptr" id="cA" style="--x0:250px;--y0:80px;--x1:300px;--y1:80px;color:#10b981">▲ A</div>
+          <div class="tk ptr" style="--x0:340px;--y0:56px;color:#3a7fed">▲ producer</div>
+          <div class="tk ptr" id="cA" style="--x0:250px;--y0:80px;--x1:300px;--y1:80px;color:#1051b9">▲ A</div>
           <div class="tk ptr" id="cB" style="--x0:70px;--y0:80px;--x1:6px;--y1:80px">▲ consumer B (lag)</div>
         </div>
       </div>
@@ -728,13 +765,13 @@ tr.f{transform:none}
     <div>
       <div class="card f"><h3>🐢 Khi consumer không theo kịp</h3><p class="ps">Log-based = buffer cực lớn trên disk (dạng buffering). Throughput <b>gần như hằng số</b> vì mọi message đều ghi disk — khác broker in-memory chậm hẳn khi phải spill ra disk.</p></div>
       <div class="card good f" style="margin-top:12px"><h3>⏪ Replaying old messages</h3><p class="ps">Đọc message <b>không xoá</b> nó — chỉ là read-only. Có thể copy output sang chỗ khác, rồi <b>reset offset</b> về hôm qua và xử lý lại với code mới.</p></div>
-      <div class="note blue f" style="font-size:17px">→ Log-based messaging giống batch ở chỗ: derived data tách bạch khỏi input qua một quá trình <b>lặp lại được</b> — thuận tiện để thử nghiệm và phục hồi từ lỗi/bug.</div>
+      <div class="note blue f" style="font-size:max(17px,var(--htt-min,24px))">→ Log-based messaging giống batch ở chỗ: derived data tách bạch khỏi input qua một quá trình <b>lặp lại được</b> — thuận tiện để thử nghiệm và phục hồi từ lỗi/bug.</div>
     </div>
   </div>
 </section>
 
 <!-- ===================== DUAL WRITES ===================== -->
-<section class="slide" id="dual">
+<section class="slide htt-fs20" id="dual">
   <div class="hdr in"><span class="qn">10</span><h2>Keeping systems in sync: <span class="grad">dual writes</span></h2></div>
   <div class="cols" style="grid-template-columns:1.2fr 1fr;gap:24px">
     <div class="card" style="padding:12px 14px">
@@ -751,10 +788,10 @@ tr.f{transform:none}
       <p class="say" style="margin-top:4px">Nhấn → để chạy từng bước.</p>
     </div>
     <div>
-      <p style="font-size:18px">Một app thường cần nhiều nơi lưu cùng data: <b>OLTP database</b>, <b>cache</b>, <b>search index</b>, <b>data warehouse</b>. Cách cũ: dump DB định kỳ (batch ETL) — chậm. Cách khác: app ghi vào <b>từng hệ thống</b> = <b>dual writes</b>.</p>
+      <p style="font-size:max(18px,var(--htt-min,24px))">Một app thường cần nhiều nơi lưu cùng data: <b>OLTP database</b>, <b>cache</b>, <b>search index</b>, <b>data warehouse</b>. Cách cũ: dump DB định kỳ (batch ETL) — chậm. Cách khác: app ghi vào <b>từng hệ thống</b> = <b>dual writes</b>.</p>
       <div class="card bad f" style="margin-top:12px"><span class="lbl bad">VẤN ĐỀ 1 · RACE CONDITION</span><p class="ps">Hai client ghi đồng thời, thứ tự đến hai hệ thống <b>khác nhau</b> → hai hệ thống <b>vĩnh viễn lệch nhau</b>, không ai báo lỗi. Cần cơ chế concurrency detection (version vectors…).</p></div>
       <div class="card bad f" style="margin-top:12px"><span class="lbl bad">VẤN ĐỀ 2 · FAULT TOLERANCE</span><p class="ps">Một write thành công, write kia fail → inconsistent. Đảm bảo “cả hai hoặc không” cần <b>atomic commit</b> — đắt (2PC).</p></div>
-      <div class="note blue f" style="font-size:17px">Nếu chỉ có <b>một leader</b> (database) và search index là <b>follower</b> của nó thì sao? → Change Data Capture.</div>
+      <div class="note blue f" style="font-size:max(17px,var(--htt-min,24px))">Nếu chỉ có <b>một leader</b> (database) và search index là <b>follower</b> của nó thì sao? → Change Data Capture.</div>
     </div>
   </div>
   <span class="f ghost" data-act="#d1|vis;#d1|p1;#dbn|hot" data-set="#dbv::X = A" data-say="Client 1 ghi <b>X = A</b> vào database."></span>
@@ -764,7 +801,7 @@ tr.f{transform:none}
 </section>
 
 <!-- ===================== CDC ===================== -->
-<section class="slide" id="cdc">
+<section class="slide htt-fs20" id="cdc">
   <div class="hdr in"><span class="qn">11</span><h2><span class="grad">Change Data Capture</span> (CDC) · Figure 11-5</h2></div>
   <div class="card" style="padding:12px 16px">
     <div class="stg" style="width:1150px;height:230px">
@@ -775,9 +812,9 @@ tr.f{transform:none}
         <p class="rowlbl" style="margin:0 0 4px">replication log → log-based broker</p>
         <div class="arr xs left"><div class="cell t"><span class="v">X=A</span></div><div class="cell t"><span class="v">Y=7</span></div><div class="cell t ap new" id="cl1"><span class="v">X=B</span></div><div class="cell t ap new" id="cl2"><span class="v">Z=1</span></div></div>
       </div>
-      <div class="sn c4" id="cix" style="left:900px;top:6px;width:240px">🔍 Search index <span class="val" id="cixv" style="display:inline;font-size:18px">X = A</span></div>
-      <div class="sn c2" id="cca" style="left:900px;top:90px;width:240px">⚡ Cache <span class="val" id="ccav" style="display:inline;font-size:18px">X = A</span></div>
-      <div class="sn c5" id="cdw" style="left:900px;top:172px;width:240px">📊 Data warehouse <span class="val" id="cdwv" style="display:inline;font-size:18px">X = A</span></div>
+      <div class="sn c4" id="cix" style="left:900px;top:6px;width:240px">🔍 Search index <span class="val" id="cixv" style="display:inline;font-size:max(18px,var(--htt-min,24px))">X = A</span></div>
+      <div class="sn c2" id="cca" style="left:900px;top:90px;width:240px">⚡ Cache <span class="val" id="ccav" style="display:inline;font-size:max(18px,var(--htt-min,24px))">X = A</span></div>
+      <div class="sn c5" id="cdw" style="left:900px;top:172px;width:240px">📊 Data warehouse <span class="val" id="cdwv" style="display:inline;font-size:max(18px,var(--htt-min,24px))">X = A</span></div>
       <div class="tk c3" id="cw" style="--o:0;--x0:20px;--y0:52px;--x1:220px;--y1:30px">set X=B</div>
     </div>
   </div>
@@ -788,11 +825,11 @@ tr.f{transform:none}
     <div class="chips"><span class="chip p">LinkedIn Databus</span><span class="chip p">Facebook Wormhole</span><span class="chip p">Yahoo! Sherpa</span><span class="chip c">Bottled Water (PostgreSQL WAL)</span><span class="chip c">Maxwell, Debezium (MySQL binlog)</span><span class="chip k">Mongoriver (MongoDB oplog)</span><span class="chip y">GoldenGate (Oracle)</span><span class="chip g">Kafka Connect</span></div>
     <p class="say" style="margin-top:0">Nhấn → để chạy từng bước.</p>
   </div>
-  <div class="note f" style="font-size:17px">Database triggers cũng làm được CDC (ghi change vào changelog table) nhưng thường <b>fragile</b> và có overhead đáng kể. Parsing replication log robust hơn — nhưng phải xử lý khi schema thay đổi.</div>
+  <div class="note f" style="font-size:max(17px,var(--htt-min,24px))">Database triggers cũng làm được CDC (ghi change vào changelog table) nhưng thường <b>fragile</b> và có overhead đáng kể. Parsing replication log robust hơn — nhưng phải xử lý khi schema thay đổi.</div>
 </section>
 
 <!-- ===================== SNAPSHOT / COMPACTION ===================== -->
-<section class="slide" id="snap">
+<section class="slide htt-fs20" id="snap">
   <div class="hdr in"><span class="qn">11b</span><h2>Initial snapshot · <span class="grad">log compaction</span> · change stream APIs</h2></div>
   <div class="cols" style="grid-template-columns:1fr 1.25fr;gap:24px">
     <div>
@@ -804,10 +841,10 @@ tr.f{transform:none}
       <h3>Log compaction</h3>
       <p class="ps">Storage engine định kỳ tìm các record <b>cùng key</b>, bỏ bản cũ, chỉ giữ <b>bản mới nhất</b>. Delete = <b>tombstone</b> (value null).</p>
       <p class="rowlbl">Log trước compaction</p>
-      <div class="kvrow"><div class="kv k1" id="k1"><small>key1</small>a</div><div class="kv k2" id="k2"><small>key2</small>b</div><div class="kv k1" id="k3"><small>key1</small>c</div><div class="kv k3" id="k4"><small>key3</small>x</div><div class="kv k2 tomb" id="k5"><small style="color:#cbd5e1">key2</small>null</div><div class="kv k1" id="k6"><small>key1</small>d</div><div class="kv k3" id="k7"><small>key3</small>y</div></div>
+      <div class="kvrow"><div class="kv k1" id="k1"><small>key1</small>a</div><div class="kv k2" id="k2"><small>key2</small>b</div><div class="kv k1" id="k3"><small>key1</small>c</div><div class="kv k3" id="k4"><small>key3</small>x</div><div class="kv k2 tomb" id="k5"><small style="color:#c4d2e8">key2</small>null</div><div class="kv k1" id="k6"><small>key1</small>d</div><div class="kv k3" id="k7"><small>key3</small>y</div></div>
       <p class="rowlbl ci" id="aflbl">Sau compaction</p>
       <div class="kvrow ci" id="afrow"><div class="kv k1"><small>key1</small>d</div><div class="kv k3"><small>key3</small>y</div></div>
-      <div class="note blue ci" id="cmpn" style="font-size:17px">Kích thước log chỉ phụ thuộc <b>nội dung hiện tại</b> của DB, không phụ thuộc số lần ghi → consumer mới có thể bắt đầu từ offset 0 để có <b>full copy</b> của DB mà không cần snapshot riêng. Kafka hỗ trợ tính năng này.</div>
+      <div class="note blue ci" id="cmpn" style="font-size:max(17px,var(--htt-min,24px))">Kích thước log chỉ phụ thuộc <b>nội dung hiện tại</b> của DB, không phụ thuộc số lần ghi → consumer mới có thể bắt đầu từ offset 0 để có <b>full copy</b> của DB mà không cần snapshot riêng. Kafka hỗ trợ tính năng này.</div>
       <p class="say">Nhấn → để chạy từng bước.</p>
     </div>
   </div>
@@ -819,7 +856,7 @@ tr.f{transform:none}
 <!-- ===================== EVENT SOURCING ===================== -->
 <section class="slide" id="es">
   <div class="hdr in"><span class="qn">12</span><h2><span class="grad">Event Sourcing</span> — lưu mọi thay đổi như immutable events</h2></div>
-  <div class="cols" style="grid-template-columns:1fr 1.1fr;gap:24px">
+  <div class="cols htt-stack" style="grid-template-columns:1fr 1.1fr;gap:24px">
     <div>
       <table class="cmp2">
         <tr><th></th><th>CDC</th><th>Event sourcing</th></tr>
@@ -829,7 +866,12 @@ tr.f{transform:none}
       </table>
       <div class="card f" style="margin-top:12px"><h3>🔁 Deriving current state</h3><p class="ps">User muốn thấy <b>state hiện tại</b> → replay event log một cách deterministic. Không compaction kiểu CDC được (event sau không ghi đè event trước) → dùng <b>snapshots</b> để tối ưu đọc.</p></div>
     </div>
-    <div>
+    </div>
+</section>
+
+<section id="es-p2" class="slide htt-cont">
+<div class="hdr in"><span class="qn">12</span><h2><span class="grad">Event Sourcing</span> — lưu mọi thay đổi như immutable events</h2></div>
+<div class="cols htt-stack htt-cont-part" style="grid-template-columns:1fr 1.1fr;gap:24px"><div>
       <h3>Commands vs events</h3>
       <div class="stack">
         <div class="flow f"><div class="box o">Command<small>“Đặt ghế 12A”</small></div><div class="ar">→</div><div class="box m">Validate<small>ghế còn trống?</small></div><div class="ar">→</div><div class="box exe">Event 🔒<small>SeatReserved(12A)</small></div></div>
@@ -837,44 +879,44 @@ tr.f{transform:none}
         <div class="flow f"><div class="box o">Command<small>“Huỷ đặt ghế”</small></div><div class="ar">→</div><div class="box exe">Event 🔒<small>ReservationCancelled</small></div></div>
         <p class="ps f">User đổi ý? Không sửa event cũ — <b>append</b> event mới. Consumer của stream <b>không được reject</b> event: khi nó tới, nó đã là sự thật. Validation phải diễn ra <b>đồng bộ trước</b> khi event thành fact (vd. bằng serializable transaction).</p>
       </div>
-      <div class="note blue f" style="font-size:17px">Event sourcing giống chronicle data model; cũng tương tự <b>star schema</b> fact table ghi các events.</div>
+      <div class="note blue f" style="font-size:max(17px,var(--htt-min,24px))">Event sourcing giống chronicle data model; cũng tương tự <b>star schema</b> fact table ghi các events.</div>
     </div>
   </div>
 </section>
 
 <!-- ===================== STATE & IMMUTABILITY ===================== -->
-<section class="slide" id="state">
+<section class="slide htt-fs16" id="state">
   <div class="hdr in"><span class="qn">13</span><h2>State, Streams &amp; Immutability (Figure 11-6)</h2></div>
   <div class="cols" style="grid-template-columns:1.2fr 1fr;gap:24px">
     <div class="card" style="padding:12px 16px">
       <svg class="sv" id="integ" viewBox="0 0 640 330">
         <text x="10" y="22" class="lb">event stream (changes)</text>
-        <line x1="40" y1="90" x2="630" y2="90" stroke="#e4dcfb" stroke-width="2"/>
+        <line x1="40" y1="90" x2="630" y2="90" stroke="#dce8fb" stroke-width="2"/>
         <g class="g g1">
-          <rect x="60" y="45" width="40" height="45" rx="5" fill="#a78bfa"/><text x="80" y="40" text-anchor="middle" class="sm">+3</text>
-          <rect x="130" y="60" width="40" height="30" rx="5" fill="#a78bfa"/><text x="150" y="55" text-anchor="middle" class="sm">+2</text>
-          <rect x="200" y="90" width="40" height="15" rx="5" fill="#f472b6"/><text x="220" y="122" text-anchor="middle" class="sm">−1</text>
-          <rect x="270" y="30" width="40" height="60" rx="5" fill="#a78bfa"/><text x="290" y="25" text-anchor="middle" class="sm">+4</text>
-          <rect x="340" y="90" width="40" height="30" rx="5" fill="#f472b6"/><text x="360" y="137" text-anchor="middle" class="sm">−2</text>
-          <rect x="410" y="75" width="40" height="15" rx="5" fill="#a78bfa"/><text x="430" y="70" text-anchor="middle" class="sm">+1</text>
-          <rect x="480" y="45" width="40" height="45" rx="5" fill="#a78bfa"/><text x="500" y="40" text-anchor="middle" class="sm">+3</text>
-          <rect x="550" y="90" width="40" height="45" rx="5" fill="#f472b6"/><text x="570" y="152" text-anchor="middle" class="sm">−3</text>
+          <rect x="60" y="45" width="40" height="45" rx="5" fill="#8cb6f9"/><text x="80" y="40" text-anchor="middle" class="sm">+3</text>
+          <rect x="130" y="60" width="40" height="30" rx="5" fill="#8cb6f9"/><text x="150" y="55" text-anchor="middle" class="sm">+2</text>
+          <rect x="200" y="90" width="40" height="15" rx="5" fill="#72a4f4"/><text x="220" y="122" text-anchor="middle" class="sm">−1</text>
+          <rect x="270" y="30" width="40" height="60" rx="5" fill="#8cb6f9"/><text x="290" y="25" text-anchor="middle" class="sm">+4</text>
+          <rect x="340" y="90" width="40" height="30" rx="5" fill="#72a4f4"/><text x="360" y="137" text-anchor="middle" class="sm">−2</text>
+          <rect x="410" y="75" width="40" height="15" rx="5" fill="#8cb6f9"/><text x="430" y="70" text-anchor="middle" class="sm">+1</text>
+          <rect x="480" y="45" width="40" height="45" rx="5" fill="#8cb6f9"/><text x="500" y="40" text-anchor="middle" class="sm">+3</text>
+          <rect x="550" y="90" width="40" height="45" rx="5" fill="#72a4f4"/><text x="570" y="152" text-anchor="middle" class="sm">−3</text>
         </g>
         <text x="10" y="182" class="lb">application state (current value)</text>
-        <line x1="40" y1="320" x2="630" y2="320" stroke="#e4dcfb" stroke-width="2"/>
-        <polyline class="drw" id="stl" points="40,320 80,320 80,275 150,275 150,245 220,245 220,260 290,260 290,200 360,200 360,230 430,230 430,215 500,215 500,170 570,170 570,215 630,215" fill="none" stroke="#0891b2" stroke-width="3.5"/>
-        <g class="g g2"><text x="600" y="205" text-anchor="end" style="font-size:20px;fill:#0891b2">state = 7</text></g>
+        <line x1="40" y1="320" x2="630" y2="320" stroke="#dce8fb" stroke-width="2"/>
+        <polyline class="drw" id="stl" points="40,320 80,320 80,275 150,275 150,245 220,245 220,260 290,260 290,200 360,200 360,230 430,230 430,215 500,215 500,170 570,170 570,215 630,215" fill="none" stroke="#0949b1" stroke-width="3.5"/>
+        <g class="g g2"><text x="600" y="205" text-anchor="end" style="font-size:max(20px,var(--htt-min,24px));fill:#0949b1">state = 7</text></g>
       </svg>
       <div class="cols" style="margin-top:8px;gap:12px">
-        <div class="formula ci" id="fi1" style="font-size:19px">state(now) = ∫<sub>t=0</sub><sup>now</sup> stream(t) dt</div>
-        <div class="formula ci" id="fi2" style="font-size:19px">stream(t) = d state(t) / dt</div>
+        <div class="formula ci" id="fi1" style="font-size:max(19px,var(--htt-min,24px))">state(now) = ∫<sub>t=0</sub><sup>now</sup> stream(t) dt</div>
+        <div class="formula ci" id="fi2" style="font-size:max(19px,var(--htt-min,24px))">stream(t) = d state(t) / dt</div>
       </div>
       <p class="say">Nhấn → để chạy từng bước.</p>
     </div>
     <div>
-      <p style="font-size:18px">State thay đổi nào cũng là kết quả của các events đã làm nó thay đổi: ghế còn trống = kết quả các lần đặt chỗ; số dư = các khoản credit/debit. <b>Mutable state</b> và <b>append-only log of immutable events</b> là <b>hai mặt của một đồng xu</b>.</p>
-      <div class="quote f" style="margin-top:12px;font-size:17px">“Transaction logs record all the changes made to the database… <b>The truth is the log. The database is a cache of a subset of the log.</b> That cached subset happens to be the latest value of each record and index value from the log.” <b>— Pat Helland</b></div>
-      <div class="note blue f" style="font-size:17px">Coi event log là <b>system of record</b>, mọi mutable state là <b>derived</b> → dễ suy luận về dataflow. Log compaction là cầu nối giữa log và database state.</div>
+      <p style="font-size:max(18px,var(--htt-min,24px))">State thay đổi nào cũng là kết quả của các events đã làm nó thay đổi: ghế còn trống = kết quả các lần đặt chỗ; số dư = các khoản credit/debit. <b>Mutable state</b> và <b>append-only log of immutable events</b> là <b>hai mặt của một đồng xu</b>.</p>
+      <div class="quote f" style="margin-top:12px;font-size:max(17px,var(--htt-min,24px))">“Transaction logs record all the changes made to the database… <b>The truth is the log. The database is a cache of a subset of the log.</b> That cached subset happens to be the latest value of each record and index value from the log.” <b>— Pat Helland</b></div>
+      <div class="note blue f" style="font-size:max(17px,var(--htt-min,24px))">Coi event log là <b>system of record</b>, mọi mutable state là <b>derived</b> → dễ suy luận về dataflow. Log compaction là cầu nối giữa log và database state.</div>
     </div>
   </div>
   <span class="f ghost" data-act="#integ|s1" data-say="Event stream: mỗi event là một <b>thay đổi</b> (+/−)."></span>
@@ -891,14 +933,19 @@ tr.f{transform:none}
     <div class="card f"><div class="icon">🪟</div><h3>Nhiều views · CQRS</h3><p class="ps">Từ <b>cùng một event log</b> derive nhiều read-optimized views. Tách nơi data được <b>ghi</b> khỏi cách nó được <b>đọc</b> = <b>Command Query Responsibility Segregation</b>. Tranh luận normalization vs denormalization bớt quan trọng.</p></div>
     <div class="card f"><div class="icon">🔒</div><h3>Concurrency control</h3><p class="ps">Views cập nhật <b>asynchronously</b> → user có thể không đọc thấy write của mình. Nhưng một user action = <b>một event</b>, append atomic → giảm nhu cầu multi-object transactions.</p></div>
   </div>
-  <div class="cols f" style="margin-top:16px;gap:20px">
+  </section>
+
+<section id="imm-p2" class="slide htt-cont">
+<div class="hdr in"><span class="qn">13b</span><h2>Advantages &amp; limitations of <span class="grad">immutable events</span></h2></div>
+<div class="cols f" style="margin-top:16px;gap:20px">
     <div class="card bad"><span class="lbl bad">LIMITATIONS</span><p class="ps">Workload nhiều update/delete trên dataset nhỏ → immutable history phình to, <b>fragmentation</b>, compaction &amp; GC phải tốt. Lý do pháp lý/privacy (vd. user xoá account) → <b>phải xoá thật</b> data.</p></div>
     <div class="card"><span class="lbl info">REWRITE HISTORY</span><p class="ps"><b>Datomic</b>: <i>excision</i>. <b>Fossil</b> VCS: <i>shunning</i>. Xoá thật rất khó vì có nhiều bản copy (storage engine, filesystem, SSD, backups) — thường chỉ là “làm cho khó truy xuất hơn”.</p></div>
   </div>
+
 </section>
 
 <!-- ===================== PROCESSING STREAMS ===================== -->
-<section class="slide" id="proc">
+<section class="slide htt-fs18" id="proc">
   <div class="hdr in"><span class="qn">14</span><h2>Processing Streams: làm gì với một stream?</h2></div>
   <div class="cols" style="grid-template-columns:1.25fr 1fr;gap:24px">
     <div class="card" style="padding:12px 14px">
@@ -915,14 +962,14 @@ tr.f{transform:none}
       <span class="f ghost" data-act="#po3|show;#pw3|hot"></span>
     </div>
     <div>
-      <p style="font-size:18px">Phần lớn chương này nói về option ③: xử lý stream để tạo ra stream khác. Code xử lý gọi là <b>operator</b> hoặc <b>job</b> — rất giống Unix process và MapReduce job (Chapter 10): input read-only, output append-only.</p>
+      <p style="font-size:max(18px,var(--htt-min,24px))">Phần lớn chương này nói về option ③: xử lý stream để tạo ra stream khác. Code xử lý gọi là <b>operator</b> hoặc <b>job</b> — rất giống Unix process và MapReduce job (Chapter 10): input read-only, output append-only.</p>
       <div class="card bad f" style="margin-top:12px"><span class="lbl bad">KHÁC BIỆT CỐT LÕI VỚI BATCH</span><ul class="mini"><li>Stream <b>không bao giờ kết thúc</b> → sort vô nghĩa → không dùng được <b>sort-merge joins</b>.</li><li>Fault tolerance khác hẳn: batch job 1 phút thì restart từ đầu; stream job chạy nhiều năm thì <b>không thể</b> replay từ đầu.</li></ul></div>
     </div>
   </div>
 </section>
 
 <!-- ===================== USES ===================== -->
-<section class="slide" id="uses" style="--ufs:1">
+<section class="slide htt-fs18" id="uses" style="--ufs:1">
   <div class="hdr in"><span class="qn">14b</span><h2>Uses of Stream Processing</h2></div>
   <div class="cols3">
     <div class="card f"><div class="icon">🕵️</div><h3>Complex event processing (CEP)</h3><p class="ps">Tìm <b>patterns</b> của events (như regex trên chuỗi events), khai báo bằng query language (SQL-like). Esper, IBM InfoSphere Streams, Apama, TIBCO StreamBase, SQLstream.</p>
@@ -939,9 +986,9 @@ tr.f{transform:none}
 </section>
 
 <!-- ===================== TIME ===================== -->
-<section class="slide" id="time">
+<section class="slide htt-fs20" id="time">
   <div class="hdr in"><span class="qn">15</span><h2>Reasoning About Time: <span class="grad">event time</span> vs <span class="grad">processing time</span></h2></div>
-  <p class="in" style="font-size:18px">Batch dùng timestamp trong event (deterministic khi chạy lại). Nhiều stream framework lại dùng <b>local system clock</b> của máy xử lý (processing time) — chỉ đúng khi delay giữa lúc event xảy ra và lúc được xử lý không đáng kể. Delay có thể lớn: queueing, network faults, broker contention, consumer restart, replay…</p>
+  <p class="in" style="font-size:max(18px,var(--htt-min,24px))">Batch dùng timestamp trong event (deterministic khi chạy lại). Nhiều stream framework lại dùng <b>local system clock</b> của máy xử lý (processing time) — chỉ đúng khi delay giữa lúc event xảy ra và lúc được xử lý không đáng kể. Delay có thể lớn: queueing, network faults, broker contention, consumer restart, replay…</p>
   <div class="cols" style="grid-template-columns:1.25fr 1fr;gap:22px;margin-top:10px">
     <div class="card" style="padding:12px 14px">
       <h3>🎬 Star Wars: thứ tự xem ≠ thứ tự cốt truyện</h3>
@@ -961,11 +1008,11 @@ tr.f{transform:none}
     <div class="card" style="padding:12px 14px">
       <h3>📉 Nhầm lẫn hai loại time → bad data</h3>
       <svg class="sv" viewBox="0 0 470 230">
-        <line x1="30" y1="190" x2="460" y2="190" stroke="#e4dcfb" stroke-width="2"/>
-        <rect x="170" y="10" width="70" height="180" fill="#fff1f3"/><text x="205" y="208" text-anchor="middle" class="sm">redeploy</text>
-        <polyline class="drw" id="rt1" points="30,120 170,120 172,188 240,188 245,25 262,40 285,100 300,120 460,120" fill="none" stroke="#e11d48" stroke-width="3"/>
-        <polyline class="drw" id="rt2" points="30,128 460,128" fill="none" stroke="#10b981" stroke-width="3" stroke-dasharray="8 5"/>
-        <g class="g g1" id="rtl1"><text x="250" y="20" class="lb" style="fill:#e11d48">processing time: spike giả!</text></g>
+        <line x1="30" y1="190" x2="460" y2="190" stroke="#dce8fb" stroke-width="2"/>
+        <rect x="170" y="10" width="70" height="180" fill="#f2f7fe"/><text x="205" y="208" text-anchor="middle" class="sm">redeploy</text>
+        <polyline class="drw" id="rt1" points="30,120 170,120 172,188 240,188 245,25 262,40 285,100 300,120 460,120" fill="none" stroke="#1d68e1" stroke-width="3"/>
+        <polyline class="drw" id="rt2" points="30,128 460,128" fill="none" stroke="#1051b9" stroke-width="3" stroke-dasharray="8 5"/>
+        <g class="g g1" id="rtl1"><text x="250" y="20" class="lb" style="fill:#1d68e1">processing time: spike giả!</text></g>
       </svg>
       <p class="ps" id="rtp">Đo <b>requests/second</b>. Stream processor bị redeploy, tắt 1 phút rồi xử lý <b>backlog</b>…</p>
       <span class="f ghost" data-act="#rt1|on;#rtl1|on" data-set="#rtp::Theo <b>processing time</b>: tụt về 0 rồi <b>spike bất thường</b> — trong khi lượng request thật vẫn ổn định."></span>
@@ -977,15 +1024,20 @@ tr.f{transform:none}
 <!-- ===================== READY / CLOCKS ===================== -->
 <section class="slide" id="ready">
   <div class="hdr in"><span class="qn">15b</span><h2>Knowing when you're ready · Whose clock are you using?</h2></div>
-  <div class="cols" style="gap:24px">
+  <div class="cols htt-stack" style="gap:24px">
     <div>
       <h3>⏳ Straggler events</h3>
-      <p style="font-size:18px">Đang đếm window 10:37 theo event time. Khi nào thì chắc chắn đã nhận <b>hết</b> events của window đó? Không bao giờ chắc — có event bị delay ở node khác, đến muộn sau khi đã <b>declare window complete</b>.</p>
+      <p style="font-size:max(18px,var(--htt-min,24px))">Đang đếm window 10:37 theo event time. Khi nào thì chắc chắn đã nhận <b>hết</b> events của window đó? Không bao giờ chắc — có event bị delay ở node khác, đến muộn sau khi đã <b>declare window complete</b>.</p>
       <div class="card f" style="margin-top:10px"><h3>Option 1 · Ignore</h3><p class="ps">Bỏ qua straggler (thường chỉ là tỉ lệ nhỏ); track số event bị drop làm metric, <b>alert</b> nếu tăng nhiều.</p></div>
       <div class="card f" style="margin-top:10px"><h3>Option 2 · Publish a correction</h3><p class="ps">Phát lại giá trị đã cập nhật cho window kèm stragglers; có thể phải <b>retract</b> output trước đó.</p></div>
-      <div class="note f" style="font-size:16px">Producer có thể gửi message đặc biệt “từ giờ không còn message nào có timestamp &lt; t” — nhưng nhiều producer, mỗi cái một threshold riêng → phức tạp.</div>
+      <div class="note f" style="font-size:max(16px,var(--htt-min,24px))">Producer có thể gửi message đặc biệt “từ giờ không còn message nào có timestamp &lt; t” — nhưng nhiều producer, mỗi cái một threshold riêng → phức tạp.</div>
     </div>
-    <div>
+    </div>
+</section>
+
+<section id="ready-p2" class="slide htt-cont">
+<div class="hdr in"><span class="qn">15b</span><h2>Knowing when you're ready · Whose clock are you using?</h2></div>
+<div class="cols htt-stack htt-cont-part" style="gap:24px"><div>
       <h3>📱 Device clock không đáng tin</h3>
       <p class="ps">Mobile app có thể dùng offline, buffer events hàng giờ/ngày rồi mới gửi. Device clock có thể sai (cố tình hoặc vô tình). Server clock đúng hơn nhưng ít ý nghĩa với hành động của user.</p>
       <p class="rowlbl">Log ba timestamps:</p>
@@ -994,30 +1046,36 @@ tr.f{transform:none}
         <div class="leg b f"><b>t₂ · event sent to server</b><p>theo <b>device clock</b></p></div>
         <div class="leg c f"><b>t₃ · event received by server</b><p>theo <b>server clock</b></p></div>
       </div>
-      <div class="formula f" style="margin-top:10px;font-size:19px">offset ≈ t₃ − t₂ &nbsp;⇒&nbsp; true time ≈ t₁ + (t₃ − t₂)</div>
-      <p class="ps muted f" style="margin-top:6px">Giả định network delay nhỏ so với độ chính xác cần thiết, và offset của device clock không đổi giữa t₁ và t₂.</p>
-    </div>
+      <div class="formula f" style="margin-top:10px;font-size:max(19px,var(--htt-min,24px))">offset ≈ t₃ − t₂ &nbsp;⇒&nbsp; true time ≈ t₁ + (t₃ − t₂)</div>
+      </div>
   </div>
 </section>
 
+<section id="ready-p2-p2" class="slide htt-cont htt-cont">
+<div class="hdr in"><span class="qn">15b</span><h2>Knowing when you're ready · Whose clock are you using?</h2></div>
+<div class="cols htt-stack htt-cont-part htt-cont-part" style="gap:24px"><div class="htt-cont-part">
+<h3>📱 Device clock không đáng tin</h3><p class="ps muted f" style="margin-top:6px">Giả định network delay nhỏ so với độ chính xác cần thiết, và offset của device clock không đổi giữa t₁ và t₂.</p>
+    </div></div>
+</section>
+
 <!-- ===================== WINDOWS ===================== -->
-<section class="slide" id="win">
+<section class="slide htt-fs20" id="win">
   <div class="hdr in"><span class="qn">16</span><h2>Types of windows</h2></div>
   <div class="cols" style="grid-template-columns:1.6fr 1fr;gap:20px">
     <div class="card" style="padding:10px 12px">
       <svg class="sv" id="wsv" viewBox="0 0 760 400">
         <g>
-          <line x1="40" y1="44" x2="750" y2="44" stroke="#c4b5fd" stroke-width="2"/>
+          <line x1="40" y1="44" x2="750" y2="44" stroke="#b7d1fb" stroke-width="2"/>
           <text x="40" y="18" class="sm">10:03</text><text x="125" y="18" class="sm">10:04</text><text x="210" y="18" class="sm">10:05</text><text x="295" y="18" class="sm">10:06</text><text x="380" y="18" class="sm">10:07</text><text x="465" y="18" class="sm">10:08</text><text x="550" y="18" class="sm">10:09</text><text x="635" y="18" class="sm">10:10</text>
-          <circle class="evd" cx="53" cy="44" r="6"/><circle class="evd" cx="95" cy="44" r="6" style="fill:#ec4899"/><circle class="evd" cx="150" cy="44" r="6"/><circle class="evd" cx="193" cy="44" r="6"/><circle class="evd" cx="244" cy="44" r="6"/><circle class="evd" cx="371" cy="44" r="6"/><circle class="evd" cx="422" cy="44" r="6"/><circle class="evd" cx="482" cy="44" r="6" style="fill:#ec4899"/><circle class="evd" cx="558" cy="44" r="6"/><circle class="evd" cx="584" cy="44" r="6"/><circle class="evd" cx="686" cy="44" r="6"/>
+          <circle class="evd" cx="53" cy="44" r="6"/><circle class="evd" cx="95" cy="44" r="6" style="fill:#4887ec"/><circle class="evd" cx="150" cy="44" r="6"/><circle class="evd" cx="193" cy="44" r="6"/><circle class="evd" cx="244" cy="44" r="6"/><circle class="evd" cx="371" cy="44" r="6"/><circle class="evd" cx="422" cy="44" r="6"/><circle class="evd" cx="482" cy="44" r="6" style="fill:#4887ec"/><circle class="evd" cx="558" cy="44" r="6"/><circle class="evd" cx="584" cy="44" r="6"/><circle class="evd" cx="686" cy="44" r="6"/>
         </g>
         <g class="g g1"><text x="0" y="80" class="lb">Tumbling · 1 min</text>
           <rect class="wnd" x="40" y="88" width="83" height="30" rx="6"/><rect class="wnd b" x="125" y="88" width="83" height="30" rx="6"/><rect class="wnd" x="210" y="88" width="83" height="30" rx="6"/><rect class="wnd b" x="295" y="88" width="83" height="30" rx="6"/><rect class="wnd" x="380" y="88" width="83" height="30" rx="6"/><rect class="wnd b" x="465" y="88" width="83" height="30" rx="6"/><rect class="wnd" x="550" y="88" width="83" height="30" rx="6"/><rect class="wnd b" x="635" y="88" width="83" height="30" rx="6"/></g>
-        <g class="g g2"><text x="0" y="146" class="lb" style="fill:#db2777">Hopping · 5 min, hop 1 min</text>
+        <g class="g g2"><text x="0" y="146" class="lb" style="fill:#276cdb">Hopping · 5 min, hop 1 min</text>
           <rect class="wnd p" x="40" y="154" width="425" height="18" rx="5"/><rect class="wnd p" x="125" y="176" width="425" height="18" rx="5"/><rect class="wnd p" x="210" y="198" width="425" height="18" rx="5"/></g>
-        <g class="g g3"><text x="0" y="246" class="lb" style="fill:#d97706">Sliding · 5 min</text>
-          <rect class="wnd y" x="95" y="254" width="387" height="30" rx="6"/><text x="288" y="274" text-anchor="middle" class="sm" style="fill:#92400e">10:03:39 ↔ 10:08:12 &lt; 5 min → cùng window</text></g>
-        <g class="g g4"><text x="0" y="318" class="lb" style="fill:#059669">Session · gap timeout</text>
+        <g class="g g3"><text x="0" y="246" class="lb" style="fill:#0b58d4">Sliding · 5 min</text>
+          <rect class="wnd y" x="95" y="254" width="387" height="30" rx="6"/><text x="288" y="274" text-anchor="middle" class="sm" style="fill:#0e4192">10:03:39 ↔ 10:08:12 &lt; 5 min → cùng window</text></g>
+        <g class="g g4"><text x="0" y="318" class="lb" style="fill:#083d93">Session · gap timeout</text>
           <rect class="wnd g2" x="45" y="326" width="207" height="30" rx="6"/><rect class="wnd g2" x="363" y="326" width="229" height="30" rx="6"/><rect class="wnd g2" x="678" y="326" width="16" height="30" rx="6"/>
           <text x="308" y="380" text-anchor="middle" class="sm">inactive &gt; timeout</text><text x="635" y="380" text-anchor="middle" class="sm">inactive &gt; timeout</text></g>
       </svg>
@@ -1025,16 +1083,16 @@ tr.f{transform:none}
     <div>
       <div class="stack">
         <div class="leg a f" data-act="#wsv|s1"><b>Tumbling</b><p>Độ dài cố định, mỗi event thuộc <b>đúng một</b> window. Cài đặt: làm tròn timestamp xuống phút gần nhất.</p></div>
-        <div class="leg f" data-act="#wsv|s2" style="border-left:6px solid #ec4899"><b>Hopping</b><p>Độ dài cố định nhưng <b>overlap</b> để smoothing. Tính tumbling 1 phút rồi aggregate nhiều window liền kề.</p></div>
+        <div class="leg f" data-act="#wsv|s2" style="border-left:6px solid #4887ec"><b>Hopping</b><p>Độ dài cố định nhưng <b>overlap</b> để smoothing. Tính tumbling 1 phút rồi aggregate nhiều window liền kề.</p></div>
         <div class="leg c f" data-act="#wsv|s3"><b>Sliding</b><p>Gồm mọi event nằm trong một khoảng của nhau; không có biên cố định. Giữ buffer sort theo time, bỏ event hết hạn.</p></div>
-        <div class="leg b f" data-act="#wsv|s4" style="border-left-color:#10b981"><b>Session</b><p>Không có duration cố định: gom events của <b>cùng user</b> gần nhau, kết thúc khi user inactive (vd. 30 phút). Dùng cho website analytics.</p></div>
+        <div class="leg b f" data-act="#wsv|s4" style="border-left-color:#1051b9"><b>Session</b><p>Không có duration cố định: gom events của <b>cùng user</b> gần nhau, kết thúc khi user inactive (vd. 30 phút). Dùng cho website analytics.</p></div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- ===================== STREAM JOINS 1 ===================== -->
-<section class="slide" id="join1">
+<section class="slide htt-fs22" id="join1">
   <div class="hdr in"><span class="qn">17</span><h2>Stream Joins ①: <span class="grad">stream-stream</span> &amp; <span class="grad">stream-table</span></h2></div>
   <div class="cols" style="gap:22px">
     <div class="card" style="padding:12px 16px">
@@ -1043,8 +1101,8 @@ tr.f{transform:none}
       <div class="lane" style="margin-top:8px"><span class="ln2" style="width:110px">search</span><span class="tw" id="j1s1">s1: “ddia”</span><span class="tw b" id="j1s2">s2: “kafka”</span></div>
       <div class="lane"><span class="ln2" style="width:110px">click</span><span class="tw y" id="j1c1">s1 → result #2</span></div>
       <div class="mbox" id="j1st" style="margin-top:6px"><h4>join state · index theo session ID (giữ trong window)</h4><span class="tw" id="j1x1">s1</span><span class="tw b" id="j1x2">s2</span></div>
-      <div class="lane" style="margin-top:6px"><span class="ln2" style="width:110px">output</span><span class="tw" id="j1o1" style="background:#d1fae5;color:#047857;border-color:#a7f3d0">s1 ✓ clicked</span><span class="tw" id="j1o2" style="background:#f1f5f9;color:#64748b;border-color:#cbd5e1">s2 ✗ not clicked</span></div>
-      <p class="say" style="min-height:44px;font-size:18px">Nhấn → để chạy từng bước.</p>
+      <div class="lane" style="margin-top:6px"><span class="ln2" style="width:110px">output</span><span class="tw" id="j1o1" style="background:#d1e1fa;color:#063176;border-color:#a7c4f3">s1 ✓ clicked</span><span class="tw" id="j1o2" style="background:#f1f4f9;color:#426bad;border-color:#c4d2e8">s2 ✗ not clicked</span></div>
+      <p class="say" style="min-height:44px;font-size:max(18px,var(--htt-min,24px))">Nhấn → để chạy từng bước.</p>
       <span class="f ghost" data-act="#j1s1|show;#j1x1|show;#j1st|hot" data-say="Search event s1 đến → lưu vào state, index theo session ID."></span>
       <span class="f ghost" data-act="#j1s2|show;#j1x2|show" data-say="Search s2 đến → cũng lưu lại."></span>
       <span class="f ghost" data-act="#j1c1|show;#j1o1|show" data-say="Click của s1 đến <b>trong window</b> → match → emit event “search s1 đã được click”."></span>
@@ -1069,20 +1127,25 @@ tr.f{transform:none}
 <!-- ===================== STREAM JOINS 2 ===================== -->
 <section class="slide" id="join2">
   <div class="hdr in"><span class="qn">17b</span><h2>Stream Joins ②: <span class="grad">table-table join</span></h2></div>
-  <div class="cols" style="grid-template-columns:1.1fr 1fr;gap:22px">
+  <div class="cols htt-stack" style="grid-template-columns:1.1fr 1fr;gap:22px">
     <div>
-      <p style="font-size:18px">Ví dụ Twitter <b>home timeline cache</b> (Chapter 1): thay vì query khi đọc, giữ cache theo user, cập nhật bằng stream:</p>
+      <p style="font-size:max(18px,var(--htt-min,24px))">Ví dụ Twitter <b>home timeline cache</b> (Chapter 1): thay vì query khi đọc, giữ cache theo user, cập nhật bằng stream:</p>
       <div class="stack" style="margin-top:8px">
         <div class="leg a f"><b>✍️ tweet</b><p>user gửi tweet mới → thêm vào timeline của <b>mọi follower</b>.</p></div>
         <div class="leg c f"><b>🗑️ delete tweet</b><p>xoá khỏi timeline của mọi follower.</p></div>
         <div class="leg b f"><b>➕ follow</b><p>u₁ follow u₂ → các tweet gần đây của u₂ thêm vào timeline u₁.</p></div>
-        <div class="leg f" style="border-left:6px solid #ec4899"><b>➖ unfollow</b><p>tweet của u₂ bị gỡ khỏi timeline u₁.</p></div>
+        <div class="leg f" style="border-left:6px solid #4887ec"><b>➖ unfollow</b><p>tweet của u₂ bị gỡ khỏi timeline u₁.</p></div>
       </div>
       <p class="ps" style="margin-top:8px">Stream processor cần giữ DB gồm tập followers của mỗi user — join hai stream (tweets &amp; follows) = maintain <b>materialized view</b> của query:</p>
     </div>
-    <div>
+    </div>
+</section>
+
+<section id="join2-p2" class="slide htt-cont">
+<div class="hdr in"><span class="qn">17b</span><h2>Stream Joins ②: <span class="grad">table-table join</span></h2></div>
+<div class="cols htt-stack htt-cont-part" style="grid-template-columns:1.1fr 1fr;gap:22px"><div>
       <div class="code xxs f">
-        <div class="ln"><span class="no">1</span><span><span class="k">SELECT</span> follows.follower_id <span class="k">AS</span> timeline_id,</span></div>
+        <div class="ln htt-flexwrap"><span class="no">1</span><span><span class="k">SELECT</span> follows.follower_id <span class="k">AS</span> timeline_id,</span></div>
         <div class="ln"><span class="no">2</span><span>  array_agg(tweets.* <span class="k">ORDER BY</span> tweets.timestamp <span class="k">DESC</span>)</span></div>
         <div class="ln"><span class="no">3</span><span><span class="k">FROM</span> tweets</span></div>
         <div class="ln"><span class="no">4</span><span><span class="k">JOIN</span> follows</span></div><div class="ln"><span class="no">5</span><span>  <span class="k">ON</span> follows.followee_id = tweets.sender_id</span></div>
@@ -1090,15 +1153,15 @@ tr.f{transform:none}
       </div>
       <p class="ps f" style="margin-top:6px">Mọi thay đổi ở một bên được join với <b>state mới nhất</b> của bên kia → output là stream các thay đổi của view (giống product rule: (u·v)′ = u′v + uv′).</p>
       <div class="card bad f" style="margin-top:12px"><span class="lbl bad">TIME-DEPENDENCE OF JOINS</span><p class="ps">Cả ba loại join đều cần giữ state; nếu state thay đổi theo thời gian, join với <b>phiên bản nào</b>? Vd. bán hàng cần tax rate <b>tại thời điểm bán</b>, không phải hiện tại. Thứ tự giữa các stream không xác định → join <b>nondeterministic</b>.</p></div>
-      <div class="note blue f" style="font-size:16px">Data warehouse gọi đây là <b>slowly changing dimension (SCD)</b>: gắn <b>version ID</b> cho mỗi phiên bản record (mỗi lần tax rate đổi → ID mới), invoice ghi ID đó → join deterministic, đổi lại không dùng được log compaction.</div>
+      <div class="note blue f" style="font-size:max(16px,var(--htt-min,24px))">Data warehouse gọi đây là <b>slowly changing dimension (SCD)</b>: gắn <b>version ID</b> cho mỗi phiên bản record (mỗi lần tax rate đổi → ID mới), invoice ghi ID đó → join deterministic, đổi lại không dùng được log compaction.</div>
     </div>
   </div>
 </section>
 
 <!-- ===================== FAULT TOLERANCE 1 ===================== -->
-<section class="slide" id="ft">
+<section class="slide htt-fs18" id="ft">
   <div class="hdr in"><span class="qn">18</span><h2>Fault Tolerance: <span class="grad">exactly-once</span> (effectively-once) semantics</h2></div>
-  <p class="in" style="font-size:18px">Batch: task fail → restart, discard partial output → output như thể mỗi record được xử lý đúng một lần. Stream vô hạn → <b>không thể</b> đợi task xong mới công bố output. Mục tiêu: kết quả như thể không có fault — dù thực tế record có thể được xử lý lại.</p>
+  <p class="in" style="font-size:max(18px,var(--htt-min,24px))">Batch: task fail → restart, discard partial output → output như thể mỗi record được xử lý đúng một lần. Stream vô hạn → <b>không thể</b> đợi task xong mới công bố output. Mục tiêu: kết quả như thể không có fault — dù thực tế record có thể được xử lý lại.</p>
   <div class="cols" style="grid-template-columns:1.3fr 1fr;gap:22px;margin-top:12px">
     <div class="card" style="padding:12px 16px">
       <h3>Microbatching &amp; checkpointing</h3>
@@ -1109,8 +1172,8 @@ tr.f{transform:none}
         <div class="cell ckpt" id="bar2">┃</div>
         <div class="cell" id="fe7"><span class="v">e7</span></div><div class="cell" id="fe8"><span class="v">e8</span></div><div class="cell" id="fe9"><span class="v">e9</span></div>
       </div>
-      <div class="formula" id="ftmsg" style="margin-top:12px;font-size:18px">stream được chia bởi các <b>barriers</b> ┃</div>
-      <p class="say" style="font-size:18px">Nhấn → để chạy từng bước.</p>
+      <div class="formula" id="ftmsg" style="margin-top:12px;font-size:max(18px,var(--htt-min,24px))">stream được chia bởi các <b>barriers</b> ┃</div>
+      <p class="say" style="font-size:max(18px,var(--htt-min,24px))">Nhấn → để chạy từng bước.</p>
       <span class="f ghost" data-act="#bar1|saved;#fe4|done;#fe5|done;#fe6|done;#bar2|saved" data-set="#ftmsg::✓ checkpoint state tại barrier → ghi durable storage" data-say="Đến mỗi barrier, operator ghi <b>checkpoint</b> state xuống durable storage."></span>
       <span class="f ghost" data-act="#fe7|done;#fe8|bad" data-set="#ftmsg::💥 operator crash khi đang xử lý e8" data-say="Operator crash giữa chừng sau barrier 2."></span>
       <span class="f ghost" data-act="#fe7|cur;#fe8|cur;#fe9|cur" data-set="#ftmsg::↺ restart từ checkpoint gần nhất, discard output sau đó" data-say="Restart từ <b>checkpoint gần nhất</b>, bỏ output sinh ra giữa checkpoint và crash, xử lý lại e7–e9."></span>
@@ -1118,7 +1181,7 @@ tr.f{transform:none}
     <div>
       <div class="card f"><h3>📦 Microbatching · Spark Streaming</h3><p class="ps">Chia stream thành block nhỏ (~<b>1 giây</b>) và xử lý như mini batch. Batch nhỏ → overhead scheduling; batch lớn → delay. Ngầm tạo một <b>tumbling window</b> bằng batch size (theo processing time).</p></div>
       <div class="card f" style="margin-top:12px"><h3>🚩 Checkpointing · Apache Flink</h3><p class="ps">Định kỳ tạo <b>rolling checkpoints</b> của state, trigger bởi <b>barriers</b> trong message stream — như ranh giới microbatch nhưng không ép window size.</p></div>
-      <div class="note f" style="font-size:16px">Trong phạm vi stream framework thì đủ exactly-once. Nhưng output đã rời khỏi framework (ghi DB, gửi email…) thì <b>không thu hồi được</b> → restart sẽ gây side effect hai lần.</div>
+      <div class="note f" style="font-size:max(16px,var(--htt-min,24px))">Trong phạm vi stream framework thì đủ exactly-once. Nhưng output đã rời khỏi framework (ghi DB, gửi email…) thì <b>không thu hồi được</b> → restart sẽ gây side effect hai lần.</div>
     </div>
   </div>
 </section>
@@ -1126,15 +1189,20 @@ tr.f{transform:none}
 <!-- ===================== FAULT TOLERANCE 2 ===================== -->
 <section class="slide" id="ft2">
   <div class="hdr in"><span class="qn">19</span><h2>Atomic commit · <span class="grad">idempotence</span> · rebuilding state</h2></div>
-  <div class="cols3">
+  <div class="cols3 htt-stack">
     <div class="card f"><div class="icon">⚛️</div><h3>Atomic commit revisited</h3><p class="ps">Mọi output &amp; side effect (ghi downstream, message tới broker, ack/offset input) xảy ra <b>khi và chỉ khi</b> xử lý thành công. Không phải XA heterogeneous: giữ transaction <b>nội bộ</b> framework, tận dụng gom nhiều message vào một transaction. Google Cloud Dataflow, VoltDB, Apache Kafka.</p></div>
     <div class="card f"><div class="icon">🔁</div><h3>Idempotence</h3><p class="ps">Làm nhiều lần = làm một lần.</p>
-      <div class="cols" style="gap:8px;margin-top:6px"><div class="pv yes" style="font-size:14px;white-space:normal">SET x = 5 ✓</div><div class="pv no" style="font-size:14px;white-space:normal">counter += 1 ✗</div></div>
+      <div class="cols" style="gap:8px;margin-top:6px"><div class="pv yes" style="font-size:max(14px,var(--htt-min,24px));white-space:normal">SET x = 5 ✓</div><div class="pv no" style="font-size:max(14px,var(--htt-min,24px));white-space:normal">counter += 1 ✗</div></div>
       <p class="ps" style="margin-top:6px">Biến write không-idempotent thành idempotent: lưu kèm <b>Kafka offset</b> của message đã ghi → thấy offset đã áp dụng thì bỏ qua. Cần replay đúng thứ tự, processing deterministic, và <b>fencing</b> khi failover (chặn node bị coi là đã chết).</p></div>
-    <div class="card f"><div class="icon">🧱</div><h3>Rebuilding state after failure</h3><p class="ps">Window aggregations, local table cho join… cần state phục hồi được.</p>
+    </div></section>
+
+<section id="ft2-p2" class="slide htt-cont">
+<div class="hdr in"><span class="qn">19</span><h2>Atomic commit · <span class="grad">idempotence</span> · rebuilding state</h2></div>
+<div class="cols3 htt-stack htt-cont-part"><div class="card f"><div class="icon">🧱</div><h3>Rebuilding state after failure</h3><p class="ps">Window aggregations, local table cho join… cần state phục hồi được.</p>
       <ul class="mini" style="margin-top:4px"><li>Remote datastore + replicate (chậm nếu query mỗi message)</li><li>Local state + <b>periodic snapshot</b> (Flink)</li><li>Gửi thay đổi state lên <b>changelog topic</b> có log compaction (Samza, Kafka Streams)</li><li>Xử lý dư thừa trên nhiều node (VoltDB)</li><li>Hoặc <b>rebuild</b> từ input stream (window ngắn)</li></ul></div>
   </div>
   <div class="note blue f" style="margin-top:14px">Chọn cách nào tuỳ performance của infrastructure: đôi khi network nhanh hơn disk, đôi khi ngược lại — <b>không có lựa chọn lý tưởng chung</b>.</div>
+
 </section>
 
 <!-- ===================== SUMMARY ===================== -->
@@ -1150,12 +1218,17 @@ tr.f{transform:none}
     <div class="card"><h3>⏱️ Time</h3><p class="ps">Event time vs processing time; <b>straggler events</b>; tumbling · hopping · sliding · session windows.</p></div>
     <div class="card"><h3>🛡️ Fault tolerance</h3><p class="ps">Exactly-once qua <b>microbatching</b>, <b>checkpointing</b>, <b>transactions</b>, hoặc <b>idempotent writes</b>.</p></div>
   </div>
-  <table class="cmp2 f" style="margin-top:14px">
+  </section>
+
+<section id="sum-p2" class="slide htt-cont">
+<div class="hdr in"><span class="qn">20</span><h2>Summary</h2></div>
+<table class="cmp2 f" style="margin-top:14px">
     <tr><th>Join</th><th>Inputs</th><th>Kết quả</th></tr>
     <tr><td>Stream-stream</td><td>Hai activity streams (có thể self-join)</td><td>Tìm event liên quan trong cùng <b>window</b> thời gian</td></tr>
     <tr><td>Stream-table</td><td>Activity stream + DB changelog</td><td><b>Enriched</b> activity events</td></tr>
     <tr><td>Table-table</td><td>Hai DB changelogs</td><td>Stream các thay đổi của <b>materialized view</b> join</td></tr>
   </table>
+
 </section>
 
 </div></div>
@@ -1249,6 +1322,53 @@ tr.f{transform:none}
   const h=location.hash.slice(1);const idx=slides.findIndex(s=>s.id===h);
   go(idx>=0?idx:0);
   addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
+})();
+
+</script>
+<script id="htt-theme-js">
+(function(){
+  // HTT theme runtime: renumber split code blocks, enforce the slide's minimum font size (--htt-min, default 24px)
+  function minOf(el){var s=el&&el.closest?el.closest('.slide'):null;var v=parseFloat(getComputedStyle(s||document.documentElement).getPropertyValue('--htt-min'));return isNaN(v)?24:v}
+  window.HTT_MIN=function(el){return minOf(el)};
+  function renumber(){
+    document.querySelectorAll('.code[class*="htt-start-"]').forEach(function(c){
+      if(c.dataset.httNum)return;var m=c.className.match(/htt-start-(\d+)/);if(!m)return;var off=+m[1];
+      c.querySelectorAll('.ln>.no').forEach(function(n){var v=parseInt(n.textContent,10);if(!isNaN(v))n.textContent=String(v+off)});
+      c.dataset.httNum='1';
+    });
+  }
+  function hasText(el){for(var n=el.firstChild;n;n=n.nextSibling){if(n.nodeType===3&&/\S/.test(n.nodeValue))return true}return /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(el.tagName)}
+  function svgScale(t){var svg=t.ownerSVGElement;if(!svg)return 1;var s=1;
+    while(svg){var vb=svg.viewBox&&svg.viewBox.baseVal;if(vb&&vb.width&&vb.height){var w=svg.clientWidth||svg.getBoundingClientRect().width,h=svg.clientHeight||svg.getBoundingClientRect().height;if(!w||!h)return 0;s*=Math.min(w/vb.width,h/vb.height)}svg=svg.ownerSVGElement}
+    return s}
+  function set(el,v){if(!el.hasAttribute('data-htt-prev'))el.setAttribute('data-htt-prev',el.style.getPropertyValue('font-size')+'|'+el.style.getPropertyPriority('font-size'));el.style.setProperty('font-size',v,'important')}
+  function unfix(sel){document.querySelectorAll((sel||'#deck .slide *')).forEach(function(el){var p=el.getAttribute('data-htt-prev');if(p===null)return;var a=p.split('|');if(a[0])el.style.setProperty('font-size',a[0],a[1]||'');else el.style.removeProperty('font-size');el.removeAttribute('data-htt-prev')})}
+  function fix(sel){
+    renumber();
+    var slides=document.querySelectorAll(typeof sel==='string'?sel:'#deck .slide');
+    for(var j=0;j<slides.length;j++){var sl=slides[j];var MIN=minOf(sl);if(MIN<=0)continue;
+      var els=sl.querySelectorAll('*');
+      for(var i=0;i<els.length;i++){var el=els[i];
+        if(el instanceof SVGElement){
+          if(!/^(text|tspan|textPath)$/.test(el.tagName))continue;
+          if(el.tagName!=='text'&&!hasText(el))continue;
+          var sc=svgScale(el);if(!sc)continue;
+          var fs=parseFloat(getComputedStyle(el).fontSize);if(!fs)continue;
+          if(fs*sc<MIN-0.3)set(el,(MIN/sc).toFixed(2)+'px');
+          continue;
+        }
+        if(!hasText(el))continue;
+        var f=parseFloat(getComputedStyle(el).fontSize);
+        if(f>0&&f<MIN-0.3)set(el,MIN+'px');
+      }
+    }
+  }
+  window.HTT_fix=fix;window.HTT_unfix=unfix;
+  fix();
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){fix()});
+  var t=null;var mo=new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(ms[i].type==='childList'&&ms[i].addedNodes.length){clearTimeout(t);t=setTimeout(function(){fix()},30);return}}});
+  var d=document.getElementById('deck');if(d)mo.observe(d,{childList:true,subtree:true});
+  function act(){setTimeout(function(){fix('#deck .slide.active')},0)}addEventListener('keydown',act);addEventListener('click',act);addEventListener('touchend',act);
 })();
 
 </script>

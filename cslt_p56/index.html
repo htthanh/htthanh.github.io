@@ -8,18 +8,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
-  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
-  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
-  --sa1:#7c3aed; --sa2:#ec4899;
+  --bg:#ffffff; --panel:#ffffff; --line:#e8eef7; --text:#17263e; --muted:#3d63a0;
+  --accent:#3a7fed; --accent2:#0949b1; --warn:#1d68e1; --gold:#0b58d4; --code:#fcfbff;
+  --k:#3371d6; --t:#3a7fed; --s:#083d93; --n:#0c61ea; --c:#84a1d0; --p:#276cdb; --fn:#0a4fbf;
+  --sa1:#3a7fed; --sa2:#4887ec;
   --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+html,body{height:100%;background:#eff5fe;color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
 #viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
 #deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
-.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
-  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(58,127,237,.14);
+  background:none,none,none,var(--bg);
   opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
 .slide.past{transform:translateX(-60px) scale(.98)}
 .slide.active{opacity:1;transform:none;pointer-events:auto}
@@ -27,225 +27,225 @@ html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff
 .slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
 @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 .hdr{display:flex;align-items:center;gap:16px;margin-bottom:16px;padding-right:150px}
-.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
-.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
-.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
-.lvl{font-size:14px;font-weight:700;color:var(--muted);white-space:nowrap;margin-left:auto}
-.lvl b{color:#f59e0b;letter-spacing:2px}.lvl s{color:#d9d6e8;text-decoration:none;letter-spacing:2px}
+.slide:nth-of-type(4n+1){--sa1:#3a7fed;--sa2:#4887ec}.slide:nth-of-type(4n+2){--sa1:#0949b1;--sa2:#3a7fed}.slide:nth-of-type(4n+3){--sa1:#4887ec;--sa2:#1c6ef3}.slide:nth-of-type(4n){--sa1:#083d93;--sa2:#0e62e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:var(--sa1)}
+.qn{font-weight:800;font-size:max(17px,var(--htt-min,24px));letter-spacing:.06em;color:#fff;background:var(--sa1);box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+.lvl{font-size:max(14px,var(--htt-min,24px));font-weight:700;color:var(--muted);white-space:nowrap;margin-left:auto}
+.lvl b{color:#0e65f2;letter-spacing:2px}.lvl s{color:#d1dced;text-decoration:none;letter-spacing:2px}
 h1{font-size:66px;line-height:1.1;font-weight:800}
 h2{font-size:30px;line-height:1.2;font-weight:800}
-h3{font-size:21px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
-p,li{font-size:20px;line-height:1.45;color:var(--text)}
+h3{font-size:max(21px,var(--htt-min,24px));font-weight:700;margin-bottom:6px;color:var(--sa1)}
+p,li{font-size:max(20px,var(--htt-min,24px));line-height:1.45;color:var(--text)}
 .muted{color:var(--muted)}
 ul{list-style:none}
 ul li{position:relative;padding-left:24px;margin:5px 0}
-ul li::before{content:"";position:absolute;left:4px;top:.6em;width:9px;height:9px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
-.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
-code.i{font-family:var(--mono);font-size:.86em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 5px;border-radius:6px;color:#be185d;white-space:nowrap}
+ul li::before{content:"";position:absolute;left:4px;top:.6em;width:9px;height:9px;border-radius:3px;background:var(--sa1)}
+.grad{background:#3a7fed;-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i{font-family:var(--mono);font-size:.86em;background:#f0f5fd;border:1px solid #d3e2f9;padding:0 5px;border-radius:6px;color:#1858be;white-space:nowrap}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
 .cols>*{min-width:0}
 .cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
-.card p,.card li{font-size:17px}
-.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}.cols4>.card:nth-child(4n){border-top:5px solid #f59e0b}
-.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#db2777}.cols4>.card:nth-child(4n) h3{color:#d97706}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#7c3aed}
-.note{margin-top:10px;padding:8px 14px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:17px;line-height:1.4}
-.note.blue{border-color:#8b5cf6;background:linear-gradient(90deg,#f3edff,#fbf9ff)}
-.note.red{border-color:#e11d48;background:linear-gradient(90deg,#fff1f3,#fffafa)}
-.code{font-family:var(--mono);font-size:15px;line-height:1.45;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:8px 0;overflow:hidden;position:relative}
-.code.sm{font-size:14px;line-height:1.42}.code.xs{font-size:13px;line-height:1.4}.code.xxs{font-size:12px;line-height:1.36;padding:6px 0}
-.code.x4{font-size:11.4px;line-height:1.33;padding:6px 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px;box-shadow:0 8px 24px -12px rgba(58,127,237,.25)}
+.card p,.card li{font-size:max(17px,var(--htt-min,24px))}
+.cols4>.card:nth-child(4n+1),.cols3>.card:nth-child(3n+1){border-top:5px solid #3a7fed}.cols4>.card:nth-child(4n+2),.cols3>.card:nth-child(3n+2){border-top:5px solid #0949b1}.cols4>.card:nth-child(4n+3),.cols3>.card:nth-child(3n){border-top:5px solid #4887ec}.cols4>.card:nth-child(4n){border-top:5px solid #0e65f2}
+.cols4>.card:nth-child(4n+2) h3,.cols3>.card:nth-child(3n+2) h3{color:#0949b1}.cols4>.card:nth-child(4n+3) h3,.cols3>.card:nth-child(3n) h3{color:#276cdb}.cols4>.card:nth-child(4n) h3{color:#0b58d4}.cols4>.card:nth-child(4n+1) h3,.cols3>.card:nth-child(3n+1) h3{color:#3a7fed}
+.note{margin-top:10px;padding:8px 14px;border-left:5px solid #0e65f2;background:#e2ecfd;border-radius:8px;font-size:max(17px,var(--htt-min,24px));line-height:1.4}
+.note.blue{border-color:#5c97f6;background:#eef4fe}
+.note.red{border-color:#1d68e1;background:#f2f7fe}
+.code{font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));line-height:1.45;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:8px 0;overflow:hidden;position:relative}
+.code.sm{font-size:max(14px,var(--htt-min,24px));line-height:1.42}.code.xs{font-size:max(13px,var(--htt-min,24px));line-height:1.4}.code.xxs{font-size:max(12px,var(--htt-min,24px));line-height:1.36;padding:6px 0}
+.code.x4{font-size:max(11.4px,var(--htt-min,24px));line-height:1.33;padding:6px 0}
 .code .ln{padding:0 12px 0 6px;white-space:pre;transition:background .4s,box-shadow .4s;display:flex}
-.code .no{color:#c9c3e0;width:22px;flex:none;text-align:right;margin-right:10px;user-select:none}
+.code .no{color:#bdcde6;width:22px;flex:none;text-align:right;margin-right:10px;user-select:none}
 .k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
-.code.show-a .mark-a{background:rgba(124,58,237,.13);box-shadow:inset 5px 0 #7c3aed}
-.code.show-b .mark-b{background:rgba(6,182,212,.15);box-shadow:inset 5px 0 #06b6d4}
-.code.show-c .mark-c{background:rgba(245,158,11,.18);box-shadow:inset 5px 0 #f59e0b}
-.code.show-d .mark-d{background:rgba(236,72,153,.14);box-shadow:inset 5px 0 #ec4899}
-.code.show-e .mark-e{background:rgba(16,185,129,.15);box-shadow:inset 5px 0 #10b981}
-.code.show-f .mark-f{background:rgba(124,58,237,.13);box-shadow:inset 5px 0 #7c3aed}
-.code.show-g .mark-g{background:rgba(6,182,212,.15);box-shadow:inset 5px 0 #06b6d4}
-.code.show-h .mark-h{background:rgba(245,158,11,.18);box-shadow:inset 5px 0 #f59e0b}
-.code.show-i .mark-i{background:rgba(236,72,153,.14);box-shadow:inset 5px 0 #ec4899}
-.code.show-j .mark-j{background:rgba(16,185,129,.15);box-shadow:inset 5px 0 #10b981}
+.code.show-a .mark-a{background:rgba(58,127,237,.13);box-shadow:inset 5px 0 #3a7fed}
+.code.show-b .mark-b{background:rgba(11,86,207,.15);box-shadow:inset 5px 0 #0b56cf}
+.code.show-c .mark-c{background:rgba(14,101,242,.18);box-shadow:inset 5px 0 #0e65f2}
+.code.show-d .mark-d{background:rgba(72,135,236,.14);box-shadow:inset 5px 0 #4887ec}
+.code.show-e .mark-e{background:rgba(16,81,185,.15);box-shadow:inset 5px 0 #1051b9}
+.code.show-f .mark-f{background:rgba(58,127,237,.13);box-shadow:inset 5px 0 #3a7fed}
+.code.show-g .mark-g{background:rgba(11,86,207,.15);box-shadow:inset 5px 0 #0b56cf}
+.code.show-h .mark-h{background:rgba(14,101,242,.18);box-shadow:inset 5px 0 #0e65f2}
+.code.show-i .mark-i{background:rgba(72,135,236,.14);box-shadow:inset 5px 0 #4887ec}
+.code.show-j .mark-j{background:rgba(16,81,185,.15);box-shadow:inset 5px 0 #1051b9}
 .hide0{opacity:0;transform:translateY(8px) scale(.96);transition:all .45s}
 .hide0.sh{opacity:1;transform:none}
 .win.pre.sh:not(.vis){opacity:.35;filter:grayscale(1)}
 .gone.sh{display:none}
 .stage{position:relative;display:flex;align-items:center;justify-content:center}
-.chip{display:inline-block;font-family:var(--mono);font-size:12.5px;font-weight:700;padding:2px 9px;border-radius:999px;background:#fef3c7;color:#b45309;border:1px solid #fcd34d}
-.chip.v{background:#ede9fe;color:#6d28d9;border-color:#c4b5fd}.chip.g{background:#d1fae5;color:#047857;border-color:#6ee7b7}.chip.r{background:#ffe4e6;color:#be123c;border-color:#fda4af}
-.hlo{outline:3px solid #f59e0b;outline-offset:3px;border-radius:6px}
-.jb.dis.en{color:#111;border-color:#9aa1b3;background:linear-gradient(180deg,#fff,#e6e8ee)}.jb.dis.en .ico{filter:none;opacity:1}
-.jb.dis.en.dis2{color:#a0a4ad;border-color:#ccd0d8;background:#f1f2f5}
+.chip{display:inline-block;font-family:var(--mono);font-size:max(12.5px,var(--htt-min,24px));font-weight:700;padding:2px 9px;border-radius:999px;background:#c9ddfc;color:#094bb4;border:1px solid #5391f6}
+.chip.v{background:#e9f1fe;color:#286cd9;border-color:#b7d1fb}.chip.g{background:#d1e1fa;color:#063176;border-color:#6e9ce7}.chip.r{background:#e5effe;color:#1254be;border-color:#a7c7fa}
+.hlo{outline:3px solid #0e65f2;outline-offset:3px;border-radius:6px}
+.jb.dis.en{color:#111;border-color:#7f9dce;background:#fff}.jb.dis.en .ico{filter:none;opacity:1}
+.jb.dis.en.dis2{color:#a0a4ad;border-color:#becde6;background:#eef2f8}
 .rad.on.off::before,.chk.on.off::before{background:#fff;content:""}
-.code-title{font-family:var(--mono);font-size:13px;color:var(--muted);margin:0 0 4px 4px;font-weight:600}
+.code-title{font-family:var(--mono);font-size:max(13px,var(--htt-min,24px));color:var(--muted);margin:0 0 4px 4px;font-weight:600}
 .f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
 .f.on{opacity:1;transform:none}
 .f.ghost{display:none}
-table{border-collapse:separate;border-spacing:0;width:100%;font-size:16px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:max(16px,var(--htt-min,24px));border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
 th,td{padding:6px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.3}
-th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+th{background:#ebf2fe;font-weight:700}
 tr:last-child td{border-bottom:none}
 table.t1 td:first-child{color:var(--muted);font-weight:600;white-space:nowrap}
-.console{font-family:var(--mono);font-size:13.5px;line-height:1.45;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:8px 14px;color:#e6f0ff;white-space:pre;min-height:40px;overflow:hidden}
-.console .in{color:#fbbf24;font-weight:600}
-.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:10px;letter-spacing:3px;margin-bottom:3px}
+.console{font-family:var(--mono);font-size:max(13.5px,var(--htt-min,24px));line-height:1.45;background:#17263e;border-radius:12px;padding:8px 14px;color:#e7f0fe;white-space:pre;min-height:40px;overflow:hidden}
+.console .in{color:#2b78f4;font-weight:600}
+.console::before{content:"● ● ●";display:block;color:#72a4f4;font-size:max(10px,var(--htt-min,24px));letter-spacing:3px;margin-bottom:3px}
 .cl{display:block;opacity:0;transition:opacity .4s}.cl.show{opacity:1}
 .flow{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap}
-.box{border-radius:12px;padding:8px 12px;text-align:center;font-family:var(--mono);font-size:15px;border:2px solid var(--line);background:#fff;min-width:110px;font-weight:600}
-.box small{display:block;font-family:"Be Vietnam Pro";font-size:12.5px;color:var(--muted);margin-top:2px;font-weight:400}
-.box.a{border-color:#7c3aed}.box.b{border-color:#0891b2}.box.c{border-color:#ec4899;background:#fdf2f8}.box.d{border-color:#f59e0b;background:#fffbeb}.box.e{border-color:#10b981;background:#ecfdf5}
-.ar{color:var(--muted);font-size:22px;text-align:center}
+.box{border-radius:12px;padding:8px 12px;text-align:center;font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));border:2px solid var(--line);background:#fff;min-width:110px;font-weight:600}
+.box small{display:block;font-family:"Be Vietnam Pro";font-size:max(12.5px,var(--htt-min,24px));color:var(--muted);margin-top:2px;font-weight:400}
+.box.a{border-color:#3a7fed}.box.b{border-color:#0949b1}.box.c{border-color:#4887ec;background:#f2f6fd}.box.d{border-color:#0e65f2;background:#ecf3fe}.box.e{border-color:#1051b9;background:#ecf3fd}
+.ar{color:var(--muted);font-size:max(22px,var(--htt-min,24px));text-align:center}
 .title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center}
-.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.kicker{font-family:var(--mono);color:#276cdb;font-size:max(22px,var(--htt-min,24px));margin-bottom:18px;font-weight:600}
 .orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
 @keyframes float{50%{transform:translate(30px,-25px)}}
-.say{font-size:17px;margin-top:10px;min-height:50px;color:var(--muted);line-height:1.42}
+.say{font-size:max(17px,var(--htt-min,24px));margin-top:10px;min-height:50px;color:var(--muted);line-height:1.42}
 .say b{color:var(--text)}
 .vars{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
-.vc{font-family:var(--mono);font-size:15px;font-weight:700;padding:4px 12px;border-radius:10px;background:#fff;border:2px solid #e4dcfb;transition:all .35s}
+.vc{font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));font-weight:700;padding:4px 12px;border-radius:10px;background:#fff;border:2px solid #dce8fb;transition:all .35s}
 .vc b{color:var(--t)}
-.vc.hot{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 14px rgba(245,158,11,.45)}
-.vc.res{border-color:#10b981;background:#ecfdf5;color:#047857}
+.vc.hot{border-color:#0e65f2;background:#ecf3fe;box-shadow:0 0 14px rgba(14,101,242,.45)}
+.vc.res{border-color:#1051b9;background:#ecf3fd;color:#063176}
 .arr{display:flex;gap:8px;justify-content:center}
-.cell{width:52px;height:56px;border-radius:12px;border:3px solid #e4dcfb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:800;transition:all .45s}
-.cell small{font-size:11px;color:var(--muted);font-weight:600}
-.cell.cur{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-6px)}
-.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857}
-.cell.bad{border-color:#e11d48;background:#fff1f3;color:#be123c}
+.cell{width:52px;height:56px;border-radius:12px;border:3px solid #dce8fb;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:max(20px,var(--htt-min,24px));font-weight:800;transition:all .45s}
+.cell small{font-size:max(11px,var(--htt-min,24px));color:var(--muted);font-weight:600}
+.cell.cur{border-color:#0e65f2;background:#ecf3fe;color:#094bb4;transform:translateY(-6px)}
+.cell.ok{border-color:#1051b9;background:#ecf3fd;color:#063176}
+.cell.bad{border-color:#1d68e1;background:#f2f7fe;color:#1254be}
 .cell.dim{opacity:.35}
-.cell.wide{width:auto;padding:0 10px;font-size:14px}
+.cell.wide{width:auto;padding:0 10px;font-size:max(14px,var(--htt-min,24px))}
 @keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.15)}100%{transform:none;opacity:1}}
 .pop{animation:pop .45s}
 
 /* ===== agenda ===== */
 .agenda{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 10px}
-.sec{grid-column:1/-1;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.08em;margin-top:4px;text-transform:uppercase}
-.ag{background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 10px;cursor:pointer;transition:all .2s;font-size:15.5px;line-height:1.25;box-shadow:0 2px 6px rgba(40,50,110,.05);font-family:var(--mono);font-weight:600}
-.ag:hover{border-color:#ec4899;transform:translateY(-2px);box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
-.ag b{color:#db2777;margin-right:6px}
-.ag.g1{border-left:5px solid #7c3aed}.ag.g2{border-left:5px solid #0891b2}.ag.g3{border-left:5px solid #ec4899}.ag.g4{border-left:5px solid #f59e0b}
-.ag.g5{border-left:5px solid #10b981}.ag.g6{border-left:5px solid #6366f1}.ag.g7{border-left:5px solid #f97316}.ag.g8{border-left:5px solid #0ea5e9}
+.sec{grid-column:1/-1;font-family:var(--mono);font-size:max(13px,var(--htt-min,24px));font-weight:700;color:var(--muted);letter-spacing:.08em;margin-top:4px;text-transform:uppercase}
+.ag{background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 10px;cursor:pointer;transition:all .2s;font-size:max(15.5px,var(--htt-min,24px));line-height:1.25;box-shadow:0 2px 6px rgba(40,67,110,.05);font-family:var(--mono);font-weight:600}
+.ag:hover{border-color:#4887ec;transform:translateY(-2px);box-shadow:0 10px 24px -10px rgba(72,135,236,.45)}
+.ag b{color:#276cdb;margin-right:6px}
+.ag.g1{border-left:5px solid #3a7fed}.ag.g2{border-left:5px solid #0949b1}.ag.g3{border-left:5px solid #4887ec}.ag.g4{border-left:5px solid #0e65f2}
+.ag.g5{border-left:5px solid #1051b9}.ag.g6{border-left:5px solid #6399f1}.ag.g7{border-left:5px solid #1c6ef3}.ag.g8{border-left:5px solid #0e62e9}
 
 /* ===== mock Swing windows ===== */
-.win{border:1px solid #cfc8e6;border-radius:10px;background:#eef0f4;box-shadow:0 18px 40px -18px rgba(30,27,58,.45);font-family:"Segoe UI",system-ui,sans-serif;font-size:14px;color:#222;transition:all .5s;overflow:hidden;position:relative}
-.wt{height:28px;background:linear-gradient(180deg,#f7f7fa,#e2e4ea);border-bottom:1px solid #cfd2da;display:flex;align-items:center;gap:6px;padding:0 10px;font-weight:600;font-size:13px;color:#333}
-.wt i{width:11px;height:11px;border-radius:50%;background:#ff5f57;display:inline-block}.wt i:nth-child(2){background:#febc2e}.wt i:nth-child(3){background:#28c840}
+.win{border:1px solid #c5d3e9;border-radius:10px;background:#ebf0f7;box-shadow:0 18px 40px -18px rgba(23,38,62,.45);font-family:"Segoe UI",system-ui,sans-serif;font-size:max(14px,var(--htt-min,24px));color:#222;transition:all .5s;overflow:hidden;position:relative}
+.wt{height:28px;background:#f6f8fb;border-bottom:1px solid #c1d0e8;display:flex;align-items:center;gap:6px;padding:0 10px;font-weight:600;font-size:max(13px,var(--htt-min,24px));color:#333}
+.wt i{width:11px;height:11px;border-radius:50%;background:#5f99f7;display:inline-block}.wt i:nth-child(2){background:#3880f5}.wt i:nth-child(3){background:#2865c8}
 .wt span{margin-left:8px}
 .wb{padding:12px;position:relative}
 .win.ghost{opacity:.25;filter:grayscale(1)}
 .win.undec .wt{display:none}
-.jb{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid #9aa1b3;border-radius:5px;background:linear-gradient(180deg,#fff,#e6e8ee);font-size:13.5px;color:#111;transition:all .3s;white-space:nowrap;cursor:default}
-.jb.dis{color:#a0a4ad;border-color:#ccd0d8;background:#f1f2f5}
+.jb{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid #7f9dce;border-radius:5px;background:#fff;font-size:max(13.5px,var(--htt-min,24px));color:#111;transition:all .3s;white-space:nowrap;cursor:default}
+.jb.dis{color:#a0a4ad;border-color:#becde6;background:#eef2f8}
 .jb.dis .ico{filter:grayscale(1);opacity:.5}
-.jb.press{background:linear-gradient(180deg,#cfd8ea,#b9c6e2);border-color:#5b74b5;transform:scale(.96)}
-.jb.def{box-shadow:0 0 0 2px #7aa2f7}
+.jb.press{background:#cdd9ec;border-color:#527cbe;transform:scale(.96)}
+.jb.def{box-shadow:0 0 0 2px #7aaaf7}
 .jb.vert{flex-direction:column}
 .jb u{text-decoration:underline}
-.ico{display:inline-block;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#a7f3d0,#059669);flex:none}
-.ico.l{border-radius:4px;background:linear-gradient(135deg,#60a5fa,#2563eb);clip-path:polygon(100% 0,0 50%,100% 100%)}
-.ico.r{border-radius:4px;background:linear-gradient(135deg,#f472b6,#db2777);clip-path:polygon(0 0,100% 50%,0 100%)}
-.splat{display:inline-block;width:34px;height:30px;background:radial-gradient(circle at 50% 50%,#f59e0b 0 30%,transparent 31%),radial-gradient(circle at 25% 30%,#ec4899 0 18%,transparent 19%),radial-gradient(circle at 75% 35%,#7c3aed 0 18%,transparent 19%),radial-gradient(circle at 40% 78%,#0891b2 0 17%,transparent 18%),radial-gradient(circle at 78% 75%,#10b981 0 15%,transparent 16%)}
-.chk,.rad{display:block;padding:3px 0;font-size:14px;transition:all .3s;white-space:nowrap}
+.ico{display:inline-block;width:18px;height:18px;border-radius:50%;background:#a7c4f3;flex:none}
+.ico.l{border-radius:4px;background:#639cf7;clip-path:polygon(100% 0,0 50%,100% 100%)}
+.ico.r{border-radius:4px;background:#72a4f4;clip-path:polygon(0 0,100% 50%,0 100%)}
+.splat{display:inline-block;width:34px;height:30px;background:none,none,none,none,none}
+.chk,.rad{display:block;padding:3px 0;font-size:max(14px,var(--htt-min,24px));transition:all .3s;white-space:nowrap}
 .chk::before,.rad::before{display:inline-block;vertical-align:-2px;margin-right:7px}
-.chk::before{content:"";width:14px;height:14px;border:1px solid #7b8394;border-radius:3px;background:#fff;flex:none;font-size:12px;line-height:14px;text-align:center;font-weight:900;color:#1d4ed8}
-.chk.on::before{content:"✓";background:#dbe7ff}
+.chk::before{content:"";width:14px;height:14px;border:1px solid #7b8394;border-radius:3px;background:#fff;flex:none;font-size:max(12px,var(--htt-min,24px));line-height:14px;text-align:center;font-weight:900;color:#1d65d8}
+.chk.on::before{content:"✓";background:#dde9fd}
 .rad::before{content:"";width:14px;height:14px;border:1px solid #7b8394;border-radius:50%;background:#fff;flex:none;box-sizing:border-box}
-.rad.on::before{background:radial-gradient(circle,#1d4ed8 0 35%,#fff 40%)}
-.chk.hl,.rad.hl{background:#fff3c4;border-radius:4px}
-.tf{display:inline-block;min-width:120px;min-height:26px;border:1px solid #8c93a3;background:#fff;padding:3px 7px;font-family:var(--mono);font-size:13.5px;border-radius:3px;transition:all .3s;white-space:pre;vertical-align:middle}
-.tf.err{background:#ffd1dc}
-.tf.ro{background:#f3f4f6}
+.rad.on::before{background:#1d65d8}
+.chk.hl,.rad.hl{background:#c7dbfc;border-radius:4px}
+.tf{display:inline-block;min-width:120px;min-height:26px;border:1px solid #8c93a3;background:#fff;padding:3px 7px;font-family:var(--mono);font-size:max(13.5px,var(--htt-min,24px));border-radius:3px;transition:all .3s;white-space:pre;vertical-align:middle}
+.tf.err{background:#d3e3fd}
+.tf.ro{background:#f0f3f9}
 .tf .cur{display:inline-block;width:1px;height:15px;background:#111;vertical-align:middle;animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
-.ta{border:1px solid #8c93a3;background:#fff;padding:6px 8px;font-family:var(--mono);font-size:12.5px;line-height:1.5;border-radius:3px;white-space:pre-wrap;overflow:hidden}
+.ta{border:1px solid #8c93a3;background:#fff;padding:6px 8px;font-family:var(--mono);font-size:max(12.5px,var(--htt-min,24px));line-height:1.5;border-radius:3px;white-space:pre-wrap;overflow:hidden}
 /* text area that stays scrolled to bottom */
 .ta.bottom{display:flex;flex-direction:column;justify-content:flex-end}
-mark{background:#d1d5db;color:inherit;border-radius:2px;padding:0 1px}
-mark.sel{background:#bfdbfe}
-.combo{display:inline-flex;align-items:center;justify-content:space-between;min-width:170px;border:1px solid #8c93a3;border-radius:4px;background:linear-gradient(180deg,#fff,#eceef3);padding:4px 8px;font-size:14px;gap:10px;position:relative}
+mark{background:#c4d2e8;color:inherit;border-radius:2px;padding:0 1px}
+mark.sel{background:#c1d8fc}
+.combo{display:inline-flex;align-items:center;justify-content:space-between;min-width:170px;border:1px solid #8c93a3;border-radius:4px;background:#fff;padding:4px 8px;font-size:max(14px,var(--htt-min,24px));gap:10px;position:relative}
 .combo::after{content:"▾";color:#555}
 .combo.ed{background:#fff}
 .dd{position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid #8c93a3;box-shadow:0 8px 18px -8px rgba(0,0,0,.35);z-index:3;display:none;text-align:left}
-.dd div{padding:3px 8px;font-size:13.5px}
-.dd div.s{background:#3b6fd8;color:#fff}
+.dd div{padding:3px 8px;font-size:max(13.5px,var(--htt-min,24px))}
+.dd div.s{background:#3b77d8;color:#fff}
 .open .dd{display:block}
-.lst{border:1px solid #8c93a3;background:#fff;font-size:14px;min-height:90px}
+.lst{border:1px solid #8c93a3;background:#fff;font-size:max(14px,var(--htt-min,24px));min-height:90px}
 .lst div{padding:3px 8px;transition:all .3s}
-.lst div.s{background:#3b6fd8;color:#fff}
+.lst div.s{background:#3b77d8;color:#fff}
 .lst div.nw{animation:pop .5s}
-.jt{border-collapse:collapse;width:100%;font-size:13px;border:1px solid #9aa1b3;border-radius:0;background:#fff;font-family:"Segoe UI",system-ui,sans-serif}
-.jt th{background:linear-gradient(180deg,#fafafa,#e3e5ea);border:1px solid #b9bec9;padding:3px 6px;font-weight:600;font-size:12.5px;white-space:nowrap;text-align:left}
-.jt td{border:1px solid #e1e3e8;padding:3px 6px;color:#111;font-weight:400;white-space:nowrap;vertical-align:middle}
+.jt{border-collapse:collapse;width:100%;font-size:max(13px,var(--htt-min,24px));border:1px solid #7f9dce;border-radius:0;background:#fff;font-family:"Segoe UI",system-ui,sans-serif}
+.jt th{background:#fafafa;border:1px solid #a5badd;padding:3px 6px;font-weight:600;font-size:max(12.5px,var(--htt-min,24px));white-space:nowrap;text-align:left}
+.jt td{border:1px solid #d9e2f0;padding:3px 6px;color:#111;font-weight:400;white-space:nowrap;vertical-align:middle}
 .jt td.num{text-align:right}
 .jt td.ck{text-align:center}
-.jt tr.s td{background:#3b6fd8;color:#fff}
-.jt td.s{background:#3b6fd8;color:#fff}
-.jt td.edit{outline:2px solid #f59e0b;background:#fffbeb}
-.jt th.sorted::after{content:" ▲";color:#3b6fd8}
+.jt tr.s td{background:#3b77d8;color:#fff}
+.jt td.s{background:#3b77d8;color:#fff}
+.jt td.edit{outline:2px solid #0e65f2;background:#ecf3fe}
+.jt th.sorted::after{content:" ▲";color:#3b77d8}
 .jt th.sorted.desc::after{content:" ▼"}
 .jt tr.hide{display:none}
-.jt .cb{display:inline-block;width:13px;height:13px;border:1px solid #7b8394;border-radius:2px;background:#fff;vertical-align:middle;font-size:11px;line-height:12px;text-align:center;font-weight:900;color:#1d4ed8}
+.jt .cb{display:inline-block;width:13px;height:13px;border:1px solid #7b8394;border-radius:2px;background:#fff;vertical-align:middle;font-size:max(11px,var(--htt-min,24px));line-height:12px;text-align:center;font-weight:900;color:#1d65d8}
 .jt .cb.on::before{content:"✓"}
-.pb{height:20px;border:1px solid #8c93a3;border-radius:4px;background:#e5e7eb;position:relative;overflow:hidden;min-width:180px}
-.pb .fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(180deg,#7aa2f7,#3b6fd8);transition:width .6s}
-.pb .txt{position:absolute;inset:0;text-align:center;font-size:12px;line-height:18px;font-weight:600;color:#111}
+.pb{height:20px;border:1px solid #8c93a3;border-radius:4px;background:#dee6f2;position:relative;overflow:hidden;min-width:180px}
+.pb .fill{position:absolute;left:0;top:0;bottom:0;background:#7aaaf7;transition:width .6s}
+.pb .txt{position:absolute;inset:0;text-align:center;font-size:max(12px,var(--htt-min,24px));line-height:18px;font-weight:600;color:#111}
 .pb.ind .fill{width:30%!important;animation:ind 1.2s linear infinite alternate}
 .pb.ind .txt{opacity:0}
 @keyframes ind{from{left:0}to{left:70%}}
-.mbar{display:flex;gap:2px;background:linear-gradient(180deg,#fbfbfc,#e9ebf0);border-bottom:1px solid #cfd2da;padding:2px 6px;font-size:13.5px;position:relative}
+.mbar{display:flex;gap:2px;background:#fbfbfc;border-bottom:1px solid #c1d0e8;padding:2px 6px;font-size:max(13.5px,var(--htt-min,24px));position:relative}
 .mbar>span{padding:2px 8px;border-radius:3px}
-.mbar>span.s{background:#3b6fd8;color:#fff}
-.menu{position:absolute;top:26px;left:6px;background:#fff;border:1px solid #9aa1b3;box-shadow:0 10px 24px -8px rgba(0,0,0,.4);min-width:250px;z-index:4;display:none;font-size:13px}
+.mbar>span.s{background:#3b77d8;color:#fff}
+.menu{position:absolute;top:26px;left:6px;background:#fff;border:1px solid #7f9dce;box-shadow:0 10px 24px -8px rgba(0,0,0,.4);min-width:250px;z-index:4;display:none;font-size:max(13px,var(--htt-min,24px))}
 .menu.open{display:block;animation:pop .3s}
 .mi{display:flex;align-items:center;gap:6px;padding:3px 10px;white-space:nowrap}
-.mi .acc{margin-left:auto;color:#666;font-size:12px;padding-left:16px}
-.mi.s{background:#3b6fd8;color:#fff}.mi.s .acc{color:#e0e7ff}
-.msep{height:1px;background:#d9dce3;margin:3px 0}
+.mi .acc{margin-left:auto;color:#666;font-size:max(12px,var(--htt-min,24px));padding-left:16px}
+.mi.s{background:#3b77d8;color:#fff}.mi.s .acc{color:#e2ecfd}
+.msep{height:1px;background:#cfdbed;margin:3px 0}
 .mi .mk{width:14px;text-align:center;font-weight:900;flex:none}
-.dlgwrap{position:absolute;inset:0;background:rgba(30,27,58,.18);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;z-index:6}
+.dlgwrap{position:absolute;inset:0;background:rgba(23,38,62,.18);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;z-index:6}
 .dlgwrap.on{opacity:1}
 .dlgwrap.on .win{animation:pop .4s}
 .dlgwrap.nomodal{background:none}
-.dlgico{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:20px;flex:none;background:#3b82f6}
-.dlgico.q{background:#10b981}.dlgico.e{background:#e11d48}.dlgico.w{background:#f59e0b;border-radius:6px}
-.tabs{display:flex;gap:2px;border-bottom:1px solid #9aa1b3;margin-bottom:8px}
-.tabs span{padding:3px 10px;border:1px solid #b9bec9;border-bottom:none;border-radius:5px 5px 0 0;background:#e6e8ee;font-size:12.5px}
+.dlgico{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:max(20px,var(--htt-min,24px));flex:none;background:#3c83f5}
+.dlgico.q{background:#1051b9}.dlgico.e{background:#1d68e1}.dlgico.w{background:#0e65f2;border-radius:6px}
+.tabs{display:flex;gap:2px;border-bottom:1px solid #7f9dce;margin-bottom:8px}
+.tabs span{padding:3px 10px;border:1px solid #a5badd;border-bottom:none;border-radius:5px 5px 0 0;background:#e1e8f3;font-size:max(12.5px,var(--htt-min,24px))}
 .tabs span.s{background:#fff;font-weight:600}
-.tip{position:absolute;background:#ffffe1;border:1px solid #777;font-size:12px;padding:2px 6px;box-shadow:2px 2px 4px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;white-space:nowrap;z-index:5}
+.tip{position:absolute;background:#e2edfe;border:1px solid #777;font-size:max(12px,var(--htt-min,24px));padding:2px 6px;box-shadow:2px 2px 4px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;white-space:nowrap;z-index:5}
 .tip.on{opacity:1}
 .pic{display:flex;align-items:center;justify-content:center;font-size:64px;min-height:110px;transition:all .4s}
 .thumb{width:34px;height:34px;border-radius:5px;border:1px solid #888;display:inline-block;transition:all .4s}
-.lane{display:grid;grid-template-columns:110px 1fr;gap:6px;align-items:center;font-size:13px}
-.lane .ln2{height:30px;border-radius:8px;background:#f8fafc;border:1px dashed #cbd5e1;display:flex;align-items:center;gap:6px;padding:0 8px;overflow:hidden}
-.ev{font-family:var(--mono);font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:6px;background:#ede9fe;color:#6d28d9;white-space:nowrap}
-.ev.b{background:#cffafe;color:#0e7490}.ev.c{background:#fce7f3;color:#be185d}.ev.d{background:#fef3c7;color:#b45309}
-.kv{font-family:var(--mono);font-size:13px}
+.lane{display:grid;grid-template-columns:110px 1fr;gap:6px;align-items:center;font-size:max(13px,var(--htt-min,24px))}
+.lane .ln2{height:30px;border-radius:8px;background:#f8f9fc;border:1px dashed #c4d2e8;display:flex;align-items:center;gap:6px;padding:0 8px;overflow:hidden}
+.ev{font-family:var(--mono);font-size:max(11.5px,var(--htt-min,24px));font-weight:700;padding:2px 7px;border-radius:6px;background:#e9f1fe;color:#286cd9;white-space:nowrap}
+.ev.b{background:#d0e1fd;color:#0e4090}.ev.c{background:#e7effc;color:#1858be}.ev.d{background:#c9ddfc;color:#094bb4}
+.kv{font-family:var(--mono);font-size:max(13px,var(--htt-min,24px))}
 .swatch{display:inline-block;width:100%;height:100%;border-radius:4px}
 
 /* ===== nav / jump ===== */
-#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
-#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
-#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;min-width:36px;height:32px;cursor:pointer;font-size:16px;padding:0 8px}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:#3a7fed;transition:width .4s;z-index:5}
+#nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:max(14px,var(--htt-min,24px));color:var(--muted)}
+#nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;min-width:36px;height:32px;cursor:pointer;font-size:max(16px,var(--htt-min,24px));padding:0 8px}
 #nav button:hover{border-color:var(--accent)}
-#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
-.jumpbtn{position:absolute;top:26px;right:30px;z-index:7;font-family:"Be Vietnam Pro",sans-serif;font-size:14px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));border:none;border-radius:999px;padding:7px 14px;cursor:pointer;box-shadow:0 6px 16px -6px var(--sa1);transition:transform .2s}
+#hint{position:fixed;left:16px;bottom:12px;font-size:max(13px,var(--htt-min,24px));color:#7495ca;z-index:5}
+.jumpbtn{position:absolute;top:26px;right:30px;z-index:7;font-family:"Be Vietnam Pro",sans-serif;font-size:max(14px,var(--htt-min,24px));font-weight:700;color:#fff;background:var(--sa1);border:none;border-radius:999px;padding:7px 14px;cursor:pointer;box-shadow:0 6px 16px -6px var(--sa1);transition:transform .2s}
 .jumpbtn:hover{transform:translateY(-2px) scale(1.04)}
-#jump{position:fixed;inset:0;z-index:20;background:rgba(30,27,58,.45);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
+#jump{position:fixed;inset:0;z-index:20;background:rgba(23,38,62,.45);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
 #jump.on{display:flex}
-#jbox{width:min(1100px,94vw);max-height:88vh;overflow:auto;background:#fff;border-radius:18px;padding:20px 24px;box-shadow:0 30px 70px -20px rgba(30,27,58,.6);animation:pop .3s}
+#jbox{width:min(1100px,94vw);max-height:88vh;overflow:auto;background:#fff;border-radius:18px;padding:20px 24px;box-shadow:0 30px 70px -20px rgba(23,38,62,.6);animation:pop .3s}
 #jbox .jh{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-#jbox .jh h3{font-size:22px;color:#7c3aed;margin:0}
-#jbox .jh input{margin-left:auto;font-family:var(--mono);font-size:15px;padding:6px 10px;border:2px solid var(--line);border-radius:10px;width:260px;outline:none}
-#jbox .jh input:focus{border-color:#a78bfa}
-#jbox .jh button{border:none;background:#f1eaff;color:#6d28d9;font-weight:800;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:18px}
+#jbox .jh h3{font-size:max(22px,var(--htt-min,24px));color:#3a7fed;margin:0}
+#jbox .jh input{margin-left:auto;font-family:var(--mono);font-size:max(15px,var(--htt-min,24px));padding:6px 10px;border:2px solid var(--line);border-radius:10px;width:260px;outline:none}
+#jbox .jh input:focus{border-color:#8cb6f9}
+#jbox .jh button{border:none;background:#ebf2fe;color:#286cd9;font-weight:800;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:max(18px,var(--htt-min,24px))}
 #jlist{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-#jlist .ji{display:flex;gap:8px;align-items:center;padding:7px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:14.5px;transition:all .15s;background:#fff}
-#jlist .ji:hover,#jlist .ji.k{border-color:#ec4899;background:#fdf2f8}
-#jlist .ji.cur{background:#f3edff;border-color:#a78bfa}
-#jlist .ji b{font-family:var(--mono);color:#db2777;min-width:26px}
+#jlist .ji{display:flex;gap:8px;align-items:center;padding:7px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:max(14.5px,var(--htt-min,24px));transition:all .15s;background:#fff}
+#jlist .ji:hover,#jlist .ji.k{border-color:#4887ec;background:#f2f6fd}
+#jlist .ji.cur{background:#eef4fe;border-color:#8cb6f9}
+#jlist .ji b{font-family:var(--mono);color:#276cdb;min-width:26px}
 #jlist .ji span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:700px){#hint{display:none}#jlist{grid-template-columns:1fr}}
 @media print{#nav,#bar,#hint,.jumpbtn{display:none}}
@@ -253,85 +253,122 @@ mark.sel{background:#bfdbfe}
 /* ===== matrix visuals (C++ deck) ===== */
 .mx{display:inline-grid;gap:6px;align-items:center;justify-items:center}
 .mx .cell{width:64px;height:56px;font-size:24px;border-radius:12px}
-.mx .hd{font-family:var(--mono);font-size:13px;color:var(--muted);font-weight:700;white-space:nowrap}
-.mx.sm .cell{width:46px;height:42px;font-size:18px;border-width:2px;border-radius:9px}
+.mx .hd{font-family:var(--mono);font-size:max(13px,var(--htt-min,24px));color:var(--muted);font-weight:700;white-space:nowrap}
+.mx.sm .cell{width:46px;height:42px;font-size:max(18px,var(--htt-min,24px));border-width:2px;border-radius:9px}
 .mx.sm{gap:4px}
-.cell.sum{border-style:dashed;background:#faf7ff;color:#6d28d9;font-size:18px}
-.cell.ok{border-color:#10b981;background:#ecfdf5;color:#047857}
+.cell.sum{border-style:dashed;background:#f7faff;color:#286cd9;font-size:max(18px,var(--htt-min,24px))}
+.cell.ok{border-color:#1051b9;background:#ecf3fd;color:#063176}
 .cell.no:not(.rw):not(.cw):not(.foc){opacity:.42}
 .cell.emp{background:#fafafa;border-color:#eee;color:#bbb}
-.cell.used{background:#f3edff;border-color:#c4b5fd;color:#6d28d9}
-.cell.rw{background:#ede9fe;border-color:#8b5cf6;color:#5b21b6}
-.cell.cw{background:#cffafe;border-color:#06b6d4;color:#0e7490}
-.cell.foc{border-color:#f59e0b;background:#fffbeb;color:#b45309;transform:translateY(-5px) scale(1.07);box-shadow:0 8px 18px -6px rgba(245,158,11,.65)}
-.cell.ok.foc{border-color:#10b981;background:#d1fae5;color:#047857;box-shadow:0 8px 18px -6px rgba(16,185,129,.65)}
-.calc{font-family:var(--mono);font-size:18px;background:#fff;border:2px solid var(--line);border-radius:12px;padding:9px 14px;min-height:50px;line-height:1.55}
-.calc .y{color:#047857;font-weight:800}.calc .x{color:#be123c;font-weight:800}
-.calc .r{color:#6d28d9;font-weight:700}.calc .c2{color:#0e7490;font-weight:700}
-.fx{font-family:var(--mono);font-size:22px;font-weight:700;background:#fff;border:2px solid var(--line);border-radius:12px;padding:8px 16px;margin:7px 0}
-.fx .r{color:#6d28d9}.fx .c2{color:#0891b2}.fx .a{color:#d97706}
-.snip{font-family:var(--mono);font-size:13px;line-height:1.4;white-space:pre;border-radius:8px;padding:5px 8px;margin-top:6px;overflow:hidden}
-.snip.bad{background:#fff1f3;border:1px solid #fda4af;color:#9f1239}
-.snip.good{background:#ecfdf5;border:1px solid #6ee7b7;color:#065f46}
-.snip::before{display:block;font-family:"Be Vietnam Pro";font-size:11px;font-weight:800;letter-spacing:.05em;margin-bottom:1px}
+.cell.used{background:#eef4fe;border-color:#b7d1fb;color:#286cd9}
+.cell.rw{background:#e9f1fe;border-color:#5c97f6;color:#215ab6}
+.cell.cw{background:#d0e1fd;border-color:#0b56cf;color:#0e4090}
+.cell.foc{border-color:#0e65f2;background:#ecf3fe;color:#094bb4;transform:translateY(-5px) scale(1.07);box-shadow:0 8px 18px -6px rgba(14,101,242,.65)}
+.cell.ok.foc{border-color:#1051b9;background:#d1e1fa;color:#063176;box-shadow:0 8px 18px -6px rgba(16,81,185,.65)}
+.calc{font-family:var(--mono);font-size:max(18px,var(--htt-min,24px));background:#fff;border:2px solid var(--line);border-radius:12px;padding:9px 14px;min-height:50px;line-height:1.55}
+.calc .y{color:#063176;font-weight:800}.calc .x{color:#1254be;font-weight:800}
+.calc .r{color:#286cd9;font-weight:700}.calc .c2{color:#0e4090;font-weight:700}
+.fx{font-family:var(--mono);font-size:max(22px,var(--htt-min,24px));font-weight:700;background:#fff;border:2px solid var(--line);border-radius:12px;padding:8px 16px;margin:7px 0}
+.fx .r{color:#286cd9}.fx .c2{color:#0949b1}.fx .a{color:#0b58d4}
+.snip{font-family:var(--mono);font-size:max(13px,var(--htt-min,24px));line-height:1.4;white-space:pre;border-radius:8px;padding:5px 8px;margin-top:6px;overflow:hidden}
+.snip.bad{background:#f2f7fe;border:1px solid #a7c7fa;color:#12489f}
+.snip.good{background:#ecf3fd;border:1px solid #6e9ce7;color:#06285f}
+.snip::before{display:block;font-family:"Be Vietnam Pro";font-size:max(11px,var(--htt-min,24px));font-weight:800;letter-spacing:.05em;margin-bottom:1px}
 .snip.bad::before{content:"✗ SAI"}.snip.good::before{content:"✓ ĐÚNG"}
-.barw{display:grid;grid-template-columns:120px 1fr 120px;gap:8px;align-items:center;font-size:15px;margin:6px 0}
-.barw .bt{height:26px;border-radius:8px;background:#f1f0f7;overflow:hidden}
+.barw{display:grid;grid-template-columns:120px 1fr 120px;gap:8px;align-items:center;font-size:max(15px,var(--htt-min,24px));margin:6px 0}
+.barw .bt{height:26px;border-radius:8px;background:#eef2f9;overflow:hidden}
 .barw .bf{height:100%;width:0;border-radius:8px;transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
 .barw .bf.on1{width:100%}.barw .bf.on2{width:1.5%}
 .barw b{font-family:var(--mono)}
-.file{border-radius:12px;padding:8px 12px;border:2px solid var(--line);background:#fff;font-size:15px;line-height:1.35}
-.file .fn2{font-family:var(--mono);font-weight:800;font-size:17px}
+.file{border-radius:12px;padding:8px 12px;border:2px solid var(--line);background:#fff;font-size:max(15px,var(--htt-min,24px));line-height:1.35}
+.file .fn2{font-family:var(--mono);font-weight:800;font-size:max(17px,var(--htt-min,24px))}
 .strip{display:flex;gap:2px;flex-wrap:nowrap}
-.strip span{width:30px;height:30px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;border:2px solid transparent;transition:all .35s}
-.strip .r0{background:#ede9fe}.strip .r1{background:#cffafe}.strip .r2{background:#fce7f3}
-.strip span.foc{border-color:#f59e0b;background:#fffbeb;transform:translateY(-4px)}
-.code.f16{font-size:16px;line-height:1.5}.code.f15{font-size:15px;line-height:1.48}.code.f145{font-size:14.5px;line-height:1.45}.code.f14{font-size:14px;line-height:1.45}.code.f13{font-size:13px;line-height:1.4}
-.ag{font-size:17px!important;padding:8px 12px!important}
+.strip span{width:30px;height:30px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:max(11px,var(--htt-min,24px));font-weight:700;border:2px solid transparent;transition:all .35s}
+.strip .r0{background:#e9f1fe}.strip .r1{background:#d0e1fd}.strip .r2{background:#e7effc}
+.strip span.foc{border-color:#0e65f2;background:#ecf3fe;transform:translateY(-4px)}
+.code.f16{font-size:max(16px,var(--htt-min,24px));line-height:1.5}.code.f15{font-size:max(15px,var(--htt-min,24px));line-height:1.48}.code.f145{font-size:max(14.5px,var(--htt-min,24px));line-height:1.45}.code.f14{font-size:max(14px,var(--htt-min,24px));line-height:1.45}.code.f13{font-size:max(13px,var(--htt-min,24px));line-height:1.4}
+.ag{font-size:max(17px,var(--htt-min,24px))!important;padding:8px 12px!important}
 .vrow{display:flex;align-items:center;gap:6px;margin:4px 0}
-.vrow .lab{font-family:var(--mono);font-size:13px;color:var(--muted);width:64px;text-align:right}
-.vrow .cell{width:42px;height:36px;font-size:16px}
+.vrow .lab{font-family:var(--mono);font-size:max(13px,var(--htt-min,24px));color:var(--muted);width:64px;text-align:right}
+.vrow .cell{width:42px;height:36px;font-size:max(16px,var(--htt-min,24px))}
 
 </style>
+<style id="htt-theme">
+/* HTT theme: logo + layout helpers (font-size >= 24px, single blue) */
+#deck>.htt-logo{position:absolute;top:12px;right:14px;z-index:60;height:40px;padding:0 10px;border-radius:8px;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;font:800 24px/1 "Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.04em;pointer-events:none;user-select:none}
+#deck>.htt-logo span{font-size:24px;color:#fff}
+.htt-stack{grid-template-columns:minmax(0,1fr)!important;grid-template-areas:none!important;flex-direction:column!important;flex-wrap:nowrap!important}
+.htt-stack>*{grid-column:auto!important;grid-row:auto!important;max-width:100%}
+.htt-wrap,.htt-wrap *{white-space:pre-wrap!important;overflow-wrap:anywhere}
+.htt-wrap .ln{flex-wrap:nowrap}
+.htt-flexwrap{flex-wrap:wrap!important}
+#nav,#nav *{font-size:16px!important}
+#hint{font-size:14px!important}
+.orb{display:none!important}
+:root{--htt-min:24px}
+.slide.htt-fs22{--htt-min:22px}.slide.htt-fs20{--htt-min:20px}.slide.htt-fs0{--htt-min:0px}
+.jumpbtn{right:100px!important}
+.slide.htt-fs18{--htt-min:18px}.slide.htt-fs16{--htt-min:16px}
+.slide .hdr{padding-right:84px}
+.sjump{right:100px!important}
+
+</style>
+<script>window.HTT_MIN=function(el){var s=el&&el.closest?el.closest(".slide"):null;var v=parseFloat(getComputedStyle(s||document.documentElement).getPropertyValue("--htt-min"));return isNaN(v)?24:v};</script>
 </head>
 <body>
 
 <div id="viewport"><div id="deck">
+<div class="htt-logo" aria-label="HTT" title="HTT"><span>HTT</span></div>
 
 <!-- ===== title ===== -->
 <section class="slide" id="title" data-title="Trang bìa">
 
-  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
-  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="orb" style="width:380px;height:380px;background:#a8c7f9;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#81aff8;left:40%;bottom:-120px;animation-delay:-4s"></div>
   <div class="title-wrap">
     <div class="kicker in">// C++ · Mảng 2 chiều · Practice 5.6</div>
     <h1 class="in" style="font-size:58px">Ma trận M × N: tìm phần tử bằng<br><span class="grad">tổng các phần tử còn lại trên hàng &amp; cột</span></h1>
     <p class="in muted" style="font-size:24px;margin-top:20px;max-width:1000px">Hướng dẫn từng bước cho sinh viên năm 1: phân tích đề → ý tưởng → giải thuật → chạy tay → code C++ với <code class="i">int a[100][100]</code>, chia hàm và <b>nhiều file</b> → lỗi hay gặp → làm lại bằng <code class="i">vector</code>.</p>
-    <p class="in" style="margin-top:34px;font-size:18px;color:#8a91b4">← → hoặc Space: chạy từng bước · Shift+→: qua slide · <b>G</b> hoặc nút <b>☰ Đi tới slide</b>: nhảy tới slide bất kỳ · A: hiện hết · F: toàn màn hình</p>
+    <p class="in" style="margin-top:34px;font-size:max(18px,var(--htt-min,24px));color:#7495ca">← → hoặc Space: chạy từng bước · Shift+→: qua slide · <b>G</b> hoặc nút <b>☰ Đi tới slide</b>: nhảy tới slide bất kỳ · A: hiện hết · F: toàn màn hình</p>
   </div>
 </section>
 
 <!-- ===== agenda ===== -->
 <section class="slide" id="agenda" data-title="Nội dung">
-<div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:17px">· bấm vào mục để đi tới</span></div><div class="agenda in"><div class="sec">1 · Hiểu bài toán</div><div class="ag g1" data-goto="debai"><b>01</b>Đề bài &amp; phân tích</div><div class="ag g1" data-goto="hieude"><b>02</b>Hiểu đề qua hình</div><div class="ag g1" data-goto="vidu"><b>03</b>Ví dụ Input/Output</div><div class="ag g1" data-goto="mang"><b>04</b>Mảng 2 chiều cơ bản</div><div class="sec">2 · Ý tưởng, giải thuật &amp; chạy tay</div><div class="ag g2" data-goto="ytuong"><b>05</b>Hai ý tưởng</div><div class="ag g2" data-goto="congthuc"><b>06</b>Biến đổi công thức</div><div class="ag g2" data-goto="giaithuat"><b>07</b>Giải thuật</div><div class="ag g2" data-goto="chaytong"><b>08</b>Chạy tay: R[], C[]</div><div class="ag g2" data-goto="chaykt"><b>09</b>Chạy tay: kiểm tra</div><div class="ag g2" data-goto="casekhac"><b>10</b>Các case đặc biệt</div><div></div><div></div><div class="sec">3 · Code C++ nhiều file</div><div class="ag g3" data-goto="project"><b>11</b>Tổ chức project</div><div class="ag g3" data-goto="fileh"><b>12</b>matrix.h</div><div class="ag g3" data-goto="cpp1"><b>13</b>Nhập &amp; in</div><div class="ag g3" data-goto="cpp2"><b>14</b>Tính tổng &amp; kiểm tra</div><div class="ag g3" data-goto="cpp3"><b>15</b>printSpecial</div><div class="ag g3" data-goto="mainf"><b>16</b>main.cpp &amp; chạy thử</div><div></div><div></div><div class="sec">4 · Lỗi hay gặp &nbsp;·&nbsp; 5 · Dùng vector</div><div class="ag g4" data-goto="loi1"><b>17</b>Lỗi logic</div><div class="ag g4" data-goto="loi2"><b>18</b>Lỗi C++ / project</div><div class="ag g4" data-goto="vec"><b>19</b>Giải bằng vector</div><div class="ag g4" data-goto="sosanh"><b>20</b>Mảng tĩnh vs vector</div><div class="ag g5" data-goto="summary"><b>✓</b>Tổng kết</div></div>
+<div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:max(17px,var(--htt-min,24px))">· bấm vào mục để đi tới</span></div><div class="agenda in htt-stack"><div class="sec">1 · Hiểu bài toán</div><div class="ag g1" data-goto="debai"><b>01</b>Đề bài &amp; phân tích</div><div class="ag g1" data-goto="hieude"><b>02</b>Hiểu đề qua hình</div><div class="ag g1" data-goto="vidu"><b>03</b>Ví dụ Input/Output</div><div class="ag g1" data-goto="mang"><b>04</b>Mảng 2 chiều cơ bản</div><div class="sec">2 · Ý tưởng, giải thuật &amp; chạy tay</div><div class="ag g2" data-goto="ytuong"><b>05</b>Hai ý tưởng</div><div class="ag g2" data-goto="congthuc"><b>06</b>Biến đổi công thức</div><div class="ag g2" data-goto="giaithuat"><b>07</b>Giải thuật</div><div class="ag g2" data-goto="chaytong"><b>08</b>Chạy tay: R[], C[]</div><div class="ag g2" data-goto="chaykt"><b>09</b>Chạy tay: kiểm tra</div></div>
+</section>
+
+<section id="agenda-p2" class="slide htt-cont" data-title="Nội dung">
+<div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:max(17px,var(--htt-min,24px))">· bấm vào mục để đi tới</span></div>
+<div class="agenda in htt-stack htt-cont-part"><div class="ag g2" data-goto="casekhac"><b>10</b>Các case đặc biệt</div><div></div><div></div><div class="sec">3 · Code C++ nhiều file</div><div class="ag g3" data-goto="project"><b>11</b>Tổ chức project</div><div class="ag g3" data-goto="fileh"><b>12</b>matrix.h</div><div class="ag g3" data-goto="cpp1"><b>13</b>Nhập &amp; in</div><div class="ag g3" data-goto="cpp2"><b>14</b>Tính tổng &amp; kiểm tra</div><div class="ag g3" data-goto="cpp3"><b>15</b>printSpecial</div><div class="ag g3" data-goto="mainf"><b>16</b>main.cpp &amp; chạy thử</div><div></div><div></div><div class="sec">4 · Lỗi hay gặp &nbsp;·&nbsp; 5 · Dùng vector</div><div class="ag g4" data-goto="loi1"><b>17</b>Lỗi logic</div><div class="ag g4" data-goto="loi2"><b>18</b>Lỗi C++ / project</div></div>
+</section>
+
+<section id="agenda-p2-p2" class="slide htt-cont htt-cont" data-title="Nội dung">
+<div class="hdr in"><h2>Nội dung</h2><span class="muted" style="font-size:max(17px,var(--htt-min,24px))">· bấm vào mục để đi tới</span></div>
+<div class="agenda in htt-stack htt-cont-part htt-cont-part"><div class="ag g4" data-goto="vec"><b>19</b>Giải bằng vector</div><div class="ag g4" data-goto="sosanh"><b>20</b>Mảng tĩnh vs vector</div><div class="ag g5" data-goto="summary"><b>✓</b>Tổng kết</div></div>
 </section>
 
 <!-- ===== debai ===== -->
 <section class="slide" id="debai" data-title="01 · Đề bài &amp; phân tích">
 <div class="hdr in"><span class="qn">01</span><h2>Đề bài &amp; phân tích đề</h2></div>
-  <div class="cols" style="grid-template-columns:1fr 1.1fr">
+  <div class="cols htt-stack" style="grid-template-columns:1fr 1.1fr">
     <div>
-      <div class="card in" style="border-top:5px solid #7c3aed">
+      <div class="card in" style="border-top:5px solid #3a7fed">
         <h3>Practice 5.6 (nguyên văn)</h3>
-        <p style="font-family:var(--mono);font-size:15.5px;line-height:1.5">Write C/C++ program to manipulate matrix<br>(organize in functions and multiple-file project):<br>- Enter a matrix M x N of integers.<br>- Print to screen all elements satisfying its value equals to sum of the remaining elements on its row and column.</p>
+        <p style="font-family:var(--mono);font-size:max(15.5px,var(--htt-min,24px));line-height:1.5">Write C/C++ program to manipulate matrix<br>(organize in functions and multiple-file project):<br>- Enter a matrix M x N of integers.<br>- Print to screen all elements satisfying its value equals to sum of the remaining elements on its row and column.</p>
       </div>
-      <div class="card in" style="margin-top:12px;border-top:5px solid #0891b2">
-        <h3 style="color:#0891b2">Dịch sang tiếng Việt</h3>
-        <p style="font-size:16.5px">Viết chương trình xử lý ma trận (chia thành <b>các hàm</b> và <b>project nhiều file</b>):<br>• Nhập ma trận số nguyên M dòng × N cột.<br>• In ra mọi phần tử có giá trị <b>bằng tổng các phần tử còn lại</b> trên <b>dòng</b> và <b>cột</b> chứa nó.</p>
+      <div class="card in" style="margin-top:12px;border-top:5px solid #0949b1">
+        <h3 style="color:#0949b1">Dịch sang tiếng Việt</h3>
+        <p style="font-size:max(16.5px,var(--htt-min,24px))">Viết chương trình xử lý ma trận (chia thành <b>các hàm</b> và <b>project nhiều file</b>):<br>• Nhập ma trận số nguyên M dòng × N cột.<br>• In ra mọi phần tử có giá trị <b>bằng tổng các phần tử còn lại</b> trên <b>dòng</b> và <b>cột</b> chứa nó.</p>
       </div>
     </div>
-    <div>
-      <table class="t1" style="font-size:17px">
+    </div>
+</section>
+
+<section id="debai-p2" class="slide htt-cont" data-title="01 · Đề bài &amp; phân tích">
+<div class="hdr in"><span class="qn">01</span><h2>Đề bài &amp; phân tích đề</h2></div>
+<div class="cols htt-stack htt-cont-part" style="grid-template-columns:1fr 1.1fr"><div>
+      <table class="t1" style="font-size:max(17px,var(--htt-min,24px))">
         <tr><th style="width:120px">Mục</th><th>Phân tích</th></tr>
         <tr class="f"><td>Input</td><td>2 số nguyên <b>M</b> (số dòng), <b>N</b> (số cột); sau đó M×N số nguyên.</td></tr>
         <tr class="f"><td>Output</td><td>Các phần tử thỏa điều kiện (kèm vị trí dòng, cột). Nếu không có: in thông báo.</td></tr>
@@ -350,7 +387,7 @@ mark.sel{background:#bfdbfe}
   <div class="cols" style="grid-template-columns:1fr 1fr;align-items:center">
     <div class="stage" style="flex-direction:column;gap:14px">
       <div class="mx " id="g0" style="grid-template-columns:auto repeat(4,auto)"><span class="hd"></span><span class="hd">j=0</span><span class="hd">j=1</span><span class="hd">j=2</span><span class="hd">j=3</span><span class="hd">i=0</span><div class="cell" id="g0_0_0">1</div><div class="cell" id="g0_0_1">2</div><div class="cell" id="g0_0_2">4</div><div class="cell" id="g0_0_3">9</div><span class="hd">i=1</span><div class="cell" id="g0_1_0">8</div><div class="cell" id="g0_1_1">1</div><div class="cell" id="g0_1_2">1</div><div class="cell" id="g0_1_3">1</div><span class="hd">i=2</span><div class="cell" id="g0_2_0">4</div><div class="cell" id="g0_2_1">5</div><div class="cell" id="g0_2_2">5</div><div class="cell" id="g0_2_3">1</div></div>
-      <div style="display:flex;gap:10px;font-size:15px"><span class="chip v">tím = còn lại trên dòng</span><span class="chip" style="background:#cffafe;color:#0e7490;border-color:#67e8f9">xanh = còn lại trên cột</span><span class="chip g">xanh lá = thỏa</span></div>
+      <div style="display:flex;gap:10px;font-size:max(15px,var(--htt-min,24px))"><span class="chip v">tím = còn lại trên dòng</span><span class="chip" style="background:#d0e1fd;color:#0e4090;border-color:#699ff7">xanh = còn lại trên cột</span><span class="chip g">xanh lá = thỏa</span></div>
     </div>
     <div>
       <div class="calc" id="hcalc">Ma trận ví dụ 3 × 4 (M = 3, N = 4)</div>
@@ -362,34 +399,34 @@ mark.sel{background:#bfdbfe}
 </section>
 
 <!-- ===== vidu ===== -->
-<section class="slide" id="vidu" data-title="03 · Ví dụ Input / Output">
+<section class="slide htt-fs18" id="vidu" data-title="03 · Ví dụ Input / Output">
 <div class="hdr in"><span class="qn">03</span><h2>Ví dụ Input / Output</h2></div>
-  <table style="font-size:17px">
+  <table style="font-size:max(17px,var(--htt-min,24px))">
     <tr><th style="width:44px">#</th><th style="width:220px">Input</th><th style="width:200px">Output</th><th>Giải thích</th></tr>
-    <tr class="f"><td>1</td><td><pre style="font-family:var(--mono);font-size:16px">3 4
+    <tr class="f"><td>1</td><td><pre style="font-family:var(--mono);font-size:max(16px,var(--htt-min,24px))">3 4
 1 2 4 9
 8 1 1 1
-4 5 5 1</pre></td><td><pre style="font-family:var(--mono);font-size:16px">a[0][3] = 9
+4 5 5 1</pre></td><td><pre style="font-family:var(--mono);font-size:max(16px,var(--htt-min,24px))">a[0][3] = 9
 a[1][0] = 8</pre></td><td>9 = (1+2+4) + (1+1) = 7 + 2.<br>8 = (1+1+1) + (1+4) = 3 + 5. Các ô khác đều không thỏa.</td></tr>
-    <tr class="f"><td>2</td><td><pre style="font-family:var(--mono);font-size:16px">2 2
+    <tr class="f"><td>2</td><td><pre style="font-family:var(--mono);font-size:max(16px,var(--htt-min,24px))">2 2
 2 1
-1 0</pre></td><td><pre style="font-family:var(--mono);font-size:16px">a[0][0] = 2</pre></td><td>2 = 1 (dòng) + 1 (cột). Ô 0 ở góc dưới: còn lại 1 + 1 = 2 ≠ 0.</td></tr>
-    <tr class="f"><td>3</td><td><pre style="font-family:var(--mono);font-size:16px">3 3
+1 0</pre></td><td><pre style="font-family:var(--mono);font-size:max(16px,var(--htt-min,24px))">a[0][0] = 2</pre></td><td>2 = 1 (dòng) + 1 (cột). Ô 0 ở góc dưới: còn lại 1 + 1 = 2 ≠ 0.</td></tr>
+    <tr class="f"><td>3</td><td><pre style="font-family:var(--mono);font-size:max(16px,var(--htt-min,24px))">3 3
 1 2 3
 4 5 6
-7 8 9</pre></td><td><pre style="font-family:var(--mono);font-size:16px">Khong co phan tu
+7 8 9</pre></td><td><pre style="font-family:var(--mono);font-size:max(16px,var(--htt-min,24px))">Khong co phan tu
 nao thoa man.</pre></td><td>Ví dụ ô 5: (4+6) + (2+8) = 20 ≠ 5. Phải in thông báo, <b>không</b> được im lặng.</td></tr>
-    <tr class="f"><td>4</td><td><pre style="font-family:var(--mono);font-size:16px">2 3
+    <tr class="f"><td>4</td><td><pre style="font-family:var(--mono);font-size:max(16px,var(--htt-min,24px))">2 3
 0 0 0
-0 0 0</pre></td><td><pre style="font-family:var(--mono);font-size:16px">(in cả 6 ô)</pre></td><td>Mọi ô: 0 = 0 + 0 ⇒ tất cả đều thỏa. Chương trình phải in được <b>nhiều</b> kết quả.</td></tr>
-    <tr class="f"><td>5</td><td><pre style="font-family:var(--mono);font-size:16px">1 1
-5</pre></td><td><pre style="font-family:var(--mono);font-size:16px">Khong co phan tu
+0 0 0</pre></td><td><pre style="font-family:var(--mono);font-size:max(16px,var(--htt-min,24px))">(in cả 6 ô)</pre></td><td>Mọi ô: 0 = 0 + 0 ⇒ tất cả đều thỏa. Chương trình phải in được <b>nhiều</b> kết quả.</td></tr>
+    <tr class="f"><td>5</td><td><pre style="font-family:var(--mono);font-size:max(16px,var(--htt-min,24px))">1 1
+5</pre></td><td><pre style="font-family:var(--mono);font-size:max(16px,var(--htt-min,24px))">Khong co phan tu
 nao thoa man.</pre></td><td>Ma trận 1×1: không có “phần tử còn lại” ⇒ tổng = 0. Chỉ thỏa khi phần tử = 0.</td></tr>
   </table>
 </section>
 
 <!-- ===== mang ===== -->
-<section class="slide" id="mang" data-title="04 · Mảng 2 chiều cơ bản">
+<section class="slide htt-fs18" id="mang" data-title="04 · Mảng 2 chiều cơ bản">
 <div class="hdr in"><span class="qn">04</span><h2>Kiến thức nền: mảng 2 chiều <code class='i' style='font-size:.8em'>int a[100][100]</code></h2></div>
   <div class="cols" style="grid-template-columns:1.05fr 1fr">
     <div>
@@ -416,12 +453,12 @@ for (int i = 0; i < m; i++) {        // từng dòng
 </section>
 
 <!-- ===== ytuong ===== -->
-<section class="slide" id="ytuong" data-title="05 · Hai ý tưởng giải">
+<section class="slide htt-fs18" id="ytuong" data-title="05 · Hai ý tưởng giải">
 <div class="hdr in"><span class="qn">05</span><h2>Ý tưởng: làm “trâu” hay tính trước?</h2></div>
   <div class="cols">
-    <div class="card f" style="border-top:5px solid #e11d48">
-      <h3 style="color:#be123c">Cách 1 · Với mỗi ô, cộng lại từ đầu</h3>
-      <p style="font-size:16px">Đứng ở từng ô a[i][j], chạy dọc dòng i và cột j để cộng các ô khác.</p>
+    <div class="card f" style="border-top:5px solid #1d68e1">
+      <h3 style="color:#1254be">Cách 1 · Với mỗi ô, cộng lại từ đầu</h3>
+      <p style="font-size:max(16px,var(--htt-min,24px))">Đứng ở từng ô a[i][j], chạy dọc dòng i và cột j để cộng các ô khác.</p>
 <script type="text/x-cpp" class="f14" id="kY1" data-title="" data-mark="">
 for (i...) for (j...) {
     int s = 0;
@@ -430,11 +467,11 @@ for (i...) for (j...) {
     if (a[i][j] == s) // in a[i][j]
 }
 </script>
-      <p style="font-size:16px;margin-top:6px">Dễ nghĩ, nhưng tổng của dòng i bị <b>tính lại N lần</b> (mỗi ô trên dòng tính 1 lần).</p>
+      <p style="font-size:max(16px,var(--htt-min,24px));margin-top:6px">Dễ nghĩ, nhưng tổng của dòng i bị <b>tính lại N lần</b> (mỗi ô trên dòng tính 1 lần).</p>
     </div>
-    <div class="card f" style="border-top:5px solid #10b981">
-      <h3 style="color:#047857">Cách 2 · Tính trước tổng mỗi dòng, mỗi cột</h3>
-      <p style="font-size:16px">Tính 1 lần: <b>R[i]</b> = tổng dòng i, <b>C[j]</b> = tổng cột j. Sau đó mỗi ô chỉ cần 1 phép so sánh.</p>
+    <div class="card f" style="border-top:5px solid #1051b9">
+      <h3 style="color:#063176">Cách 2 · Tính trước tổng mỗi dòng, mỗi cột</h3>
+      <p style="font-size:max(16px,var(--htt-min,24px))">Tính 1 lần: <b>R[i]</b> = tổng dòng i, <b>C[j]</b> = tổng cột j. Sau đó mỗi ô chỉ cần 1 phép so sánh.</p>
 <script type="text/x-cpp" class="f14" id="kY2" data-title="" data-mark="">
 // tính R[0..m-1], C[0..n-1]  (chỉ 1 lần)
 for (i...) for (j...) {
@@ -442,13 +479,13 @@ for (i...) for (j...) {
     if (a[i][j] == conLai) // in a[i][j]
 }
 </script>
-      <p style="font-size:16px;margin-top:6px">Giống tính <b>tổng điểm mỗi lớp</b> 1 lần rồi dùng lại, thay vì cộng lại mỗi khi có người hỏi.</p>
+      <p style="font-size:max(16px,var(--htt-min,24px));margin-top:6px">Giống tính <b>tổng điểm mỗi lớp</b> 1 lần rồi dùng lại, thay vì cộng lại mỗi khi có người hỏi.</p>
     </div>
   </div>
   <div class="card f" style="margin-top:12px">
     <h3>Số phép cộng với ma trận 100 × 100</h3>
-    <div class="barw"><span>Cách 1</span><div class="bt"><div class="bf" id="bar1" style="background:linear-gradient(90deg,#fb7185,#e11d48)"></div></div><b>≈ 1.980.000</b></div>
-    <div class="barw"><span>Cách 2</span><div class="bt"><div class="bf" id="bar2" style="background:linear-gradient(90deg,#34d399,#059669)"></div></div><b>≈ 30.000</b></div>
+    <div class="barw"><span>Cách 1</span><div class="bt"><div class="bf" id="bar1" style="background:#74a7f8"></div></div><b>≈ 1.980.000</b></div>
+    <div class="barw"><span>Cách 2</span><div class="bt"><div class="bf" id="bar2" style="background:#3471d3"></div></div><b>≈ 30.000</b></div>
   </div>
   <span class="f ghost" data-act="#bar1|on1;#bar2|on2"></span>
   <div class="note f">Cả 2 cách đều <b>đúng</b>. Ta chọn <b>Cách 2</b> vì nhanh hơn ~66 lần và chia hàm rất tự nhiên: <code class="i">computeRowSums</code>, <code class="i">computeColSums</code>, <code class="i">isSpecial</code>.</div>
@@ -462,8 +499,8 @@ for (i...) for (j...) {
       <div class="fx f">conLai = (<span class="r">R[i]</span> − <span class="a">a[i][j]</span>) + (<span class="c2">C[j]</span> − <span class="a">a[i][j]</span>)</div>
       <div class="fx f">conLai = <span class="r">R[i]</span> + <span class="c2">C[j]</span> − 2·<span class="a">a[i][j]</span></div>
       <div class="fx f">Điều kiện: <span class="a">a[i][j]</span> == <span class="r">R[i]</span> + <span class="c2">C[j]</span> − 2·<span class="a">a[i][j]</span></div>
-      <div class="fx f" style="border-color:#10b981;background:#ecfdf5">⇔ 3·<span class="a">a[i][j]</span> == <span class="r">R[i]</span> + <span class="c2">C[j]</span></div>
-      <div class="fx f" style="font-size:17px">Kiểm chứng a[0][3] = 9: 3·9 = <b>27</b> và R[0] + C[3] = 16 + 11 = <b>27</b> ✓</div>
+      <div class="fx f" style="border-color:#1051b9;background:#ecf3fd">⇔ 3·<span class="a">a[i][j]</span> == <span class="r">R[i]</span> + <span class="c2">C[j]</span></div>
+      <div class="fx f" style="font-size:max(17px,var(--htt-min,24px))">Kiểm chứng a[0][3] = 9: 3·9 = <b>27</b> và R[0] + C[3] = 16 + 11 = <b>27</b> ✓</div>
       <span class="f ghost" data-say="R[i] = tổng &lt;b&gt;cả&lt;/b&gt; dòng i (có cả a[i][j]). Muốn “phần còn lại” thì phải trừ a[i][j] ra. Tương tự với cột j."></span>
       <span class="f ghost" data-now="#gc_0_3|foc;#gc_0_0|rw;#gc_0_1|rw;#gc_0_2|rw;#gc_1_3|cw;#gc_2_3|cw" data-say="Gộp lại: a[i][j] bị trừ &lt;b&gt;2 lần&lt;/b&gt; vì nó nằm ở &lt;b&gt;cả&lt;/b&gt; dòng i &lt;b&gt;và&lt;/b&gt; cột j (ô giao của chữ thập)."></span>
       <span class="f ghost" data-say="Đây là điều kiện đề bài yêu cầu: giá trị ô = tổng phần còn lại."></span>
@@ -473,13 +510,13 @@ for (i...) for (j...) {
     </div>
     <div class="stage" style="flex-direction:column;gap:10px">
       <div class="mx sm" id="gc" style="grid-template-columns:auto repeat(4,auto) auto"><span class="hd"></span><span class="hd">j=0</span><span class="hd">j=1</span><span class="hd">j=2</span><span class="hd">j=3</span><span class="hd">R[i]</span><span class="hd">i=0</span><div class="cell" id="gc_0_0">1</div><div class="cell" id="gc_0_1">2</div><div class="cell" id="gc_0_2">4</div><div class="cell" id="gc_0_3">9</div><div class="cell sum" id="gc_r0">16</div><span class="hd">i=1</span><div class="cell" id="gc_1_0">8</div><div class="cell" id="gc_1_1">1</div><div class="cell" id="gc_1_2">1</div><div class="cell" id="gc_1_3">1</div><div class="cell sum" id="gc_r1">11</div><span class="hd">i=2</span><div class="cell" id="gc_2_0">4</div><div class="cell" id="gc_2_1">5</div><div class="cell" id="gc_2_2">5</div><div class="cell" id="gc_2_3">1</div><div class="cell sum" id="gc_r2">15</div><span class="hd">C[j]</span><div class="cell sum" id="gc_c0">13</div><div class="cell sum" id="gc_c1">8</div><div class="cell sum" id="gc_c2">10</div><div class="cell sum" id="gc_c3">11</div><span></span></div>
-      <div class="note blue f" style="font-size:15px">Trong code ta viết dạng <b>(R[i] − a) + (C[j] − a)</b> cho dễ đọc, đúng nghĩa đề bài. Dạng 3·a == R + C cũng đúng.</div>
+      <div class="note blue f" style="font-size:max(15px,var(--htt-min,24px))">Trong code ta viết dạng <b>(R[i] − a) + (C[j] − a)</b> cho dễ đọc, đúng nghĩa đề bài. Dạng 3·a == R + C cũng đúng.</div>
     </div>
   </div>
 </section>
 
 <!-- ===== giaithuat ===== -->
-<section class="slide" id="giaithuat" data-title="07 · Giải thuật">
+<section class="slide htt-fs18" id="giaithuat" data-title="07 · Giải thuật">
 <div class="hdr in"><span class="qn">07</span><h2>Giải thuật (mã giả)</h2></div>
   <div class="cols" style="grid-template-columns:1.6fr 1fr">
     <div>
@@ -501,13 +538,13 @@ Bước 5: if dem == 0 then in "Khong co phan tu nao thoa man."
       <span class="f ghost" data-now="#kGt|show-a;#gtB0|hlo" data-act="#gtB0|sh" data-say="Bước 1 – &lt;b&gt;nhập dữ liệu&lt;/b&gt;. Kiểm tra m, n trong [1, 100] để không vượt mảng a[100][100]."></span><span class="f ghost" data-now="#kGt|show-b;#gtB1|hlo" data-act="#gtB1|sh;#gtA1|sh" data-say="Bước 2 – mỗi dòng i cộng hết n phần tử, lưu vào &lt;b&gt;R[i]&lt;/b&gt;. Cần mảng R có m phần tử."></span><span class="f ghost" data-now="#kGt|show-c;#gtB2|hlo" data-act="#gtB2|sh;#gtA2|sh" data-say="Bước 3 – mỗi cột j cộng hết m phần tử, lưu vào &lt;b&gt;C[j]&lt;/b&gt;. Cần mảng C có n phần tử."></span><span class="f ghost" data-now="#kGt|show-d;#gtB3|hlo" data-act="#gtB3|sh;#gtA3|sh" data-say="Bước 4 – duyệt &lt;b&gt;mọi&lt;/b&gt; ô. Mỗi ô tính conLai bằng R, C đã có và so sánh. Thỏa thì in và tăng biến đếm &lt;b&gt;dem&lt;/b&gt;."></span><span class="f ghost" data-now="#kGt|show-e;#gtB4|hlo" data-act="#gtB4|sh;#gtA4|sh" data-say="Bước 5 – sau khi duyệt xong mới biết “không có ô nào”. Biến &lt;b&gt;dem&lt;/b&gt; giúp ta quyết định có in thông báo hay không."></span>
     </div>
     <div class="stage" style="flex-direction:column;gap:4px"><div class="box a hide0" id="gtB0" style="min-width:300px">Nhập m, n, a<small>hàm inputMatrix()</small></div><div class="ar hide0" id="gtA1">↓</div><div class="box b hide0" id="gtB1" style="min-width:300px">Tính R[i]<small>hàm computeRowSums()</small></div><div class="ar hide0" id="gtA2">↓</div><div class="box b hide0" id="gtB2" style="min-width:300px">Tính C[j]<small>hàm computeColSums()</small></div><div class="ar hide0" id="gtA3">↓</div><div class="box d hide0" id="gtB3" style="min-width:300px">Duyệt từng ô, so sánh<small>hàm isSpecial()</small></div><div class="ar hide0" id="gtA4">↓</div><div class="box e hide0" id="gtB4" style="min-width:300px">dem == 0 ? thông báo<small>hàm printSpecial()</small></div>
-      <div class="note f" style="font-size:15px">Mỗi bước ≈ <b>một hàm</b>. Viết giải thuật trước giúp chia hàm dễ dàng.</div>
+      <div class="note f" style="font-size:max(15px,var(--htt-min,24px))">Mỗi bước ≈ <b>một hàm</b>. Viết giải thuật trước giúp chia hàm dễ dàng.</div>
     </div>
   </div>
 </section>
 
 <!-- ===== chaytong ===== -->
-<section class="slide" id="chaytong" data-title="08 · Chạy tay: tính R[] và C[]">
+<section class="slide htt-fs18" id="chaytong" data-title="08 · Chạy tay: tính R[] và C[]">
 <div class="hdr in"><span class="qn">08</span><h2>Chạy tay (1): tính tổng mỗi dòng R[] và mỗi cột C[]</h2></div>
   <div class="cols" style="grid-template-columns:1.15fr 1fr">
     <div>
@@ -537,7 +574,7 @@ void computeColSums(int a[][MAX], int m, int n, int colSum[]) {
 </section>
 
 <!-- ===== chaykt ===== -->
-<section class="slide" id="chaykt" data-title="09 · Chạy tay: kiểm tra từng ô">
+<section class="slide htt-fs18" id="chaykt" data-title="09 · Chạy tay: kiểm tra từng ô">
 <div class="hdr in"><span class="qn">09</span><h2>Chạy tay (2): kiểm tra từng ô với R[], C[] đã có</h2></div>
   <div class="cols" style="grid-template-columns:.92fr 1.08fr">
     <div class="stage" style="flex-direction:column;gap:10px;align-items:stretch">
@@ -565,9 +602,9 @@ if (count == 0)
 </section>
 
 <!-- ===== casekhac ===== -->
-<section class="slide" id="casekhac" data-title="10 · Chạy thêm các case đặc biệt">
+<section class="slide htt-fs20" id="casekhac" data-title="10 · Chạy thêm các case đặc biệt">
 <div class="hdr in"><span class="qn">10</span><h2>Chạy thêm các case đặc biệt</h2></div>
-  <div class="cols4"><div class="card f"><span class="f ghost" data-act="#cA_0_0|ok;#cA_0_1|no;#cA_1_0|no;#cA_1_1|no" data-say="Ma trận 2×2 (ví dụ 2). R = [3, 1], C = [3, 1]. Chỉ &lt;b&gt;a[0][0] = 2&lt;/b&gt; thỏa."></span><h3>2 × 2: một ô thỏa</h3><div style="display:flex;justify-content:center"><div class="mx sm" id="cA" style="grid-template-columns:auto repeat(2,auto) auto"><span class="hd"></span><span class="hd">j=0</span><span class="hd">j=1</span><span class="hd">R</span><span class="hd">i=0</span><div class="cell" id="cA_0_0">2</div><div class="cell" id="cA_0_1">1</div><div class="cell sum" id="cA_r0">3</div><span class="hd">i=1</span><div class="cell" id="cA_1_0">1</div><div class="cell" id="cA_1_1">0</div><div class="cell sum" id="cA_r1">1</div><span class="hd">C</span><div class="cell sum" id="cA_c0">3</div><div class="cell sum" id="cA_c1">1</div><span></span></div></div><p class="calc" style="font-size:14.5px;margin-top:8px;line-height:1.45;min-height:0;padding:6px 10px">a[0][0]=2: (3−2)+(3−2) = 2 ✓<br>a[0][1]=1: (3−1)+(1−1) = 2 ✗<br>a[1][0]=1: (1−1)+(3−1) = 2 ✗<br>a[1][1]=0: (1−0)+(1−0) = 2 ✗</p></div><div class="card f"><span class="f ghost" data-act="#cB_0_0|ok;#cB_0_1|no;#cB_1_0|no;#cB_1_1|no" data-say="Đổi dấu toàn bộ ma trận trên: R = [−3, −1], C = [−3, −1]. Công thức vẫn đúng với &lt;b&gt;số âm&lt;/b&gt;: a[0][0] = −2 thỏa."></span><h3>Số âm</h3><div style="display:flex;justify-content:center"><div class="mx sm" id="cB" style="grid-template-columns:auto repeat(2,auto) auto"><span class="hd"></span><span class="hd">j=0</span><span class="hd">j=1</span><span class="hd">R</span><span class="hd">i=0</span><div class="cell" id="cB_0_0">-2</div><div class="cell" id="cB_0_1">-1</div><div class="cell sum" id="cB_r0">-3</div><span class="hd">i=1</span><div class="cell" id="cB_1_0">-1</div><div class="cell" id="cB_1_1">0</div><div class="cell sum" id="cB_r1">-1</div><span class="hd">C</span><div class="cell sum" id="cB_c0">-3</div><div class="cell sum" id="cB_c1">-1</div><span></span></div></div><p class="calc" style="font-size:14.5px;margin-top:8px;line-height:1.45;min-height:0;padding:6px 10px">a[0][0]=−2: (−3+2)+(−3+2) = −2 ✓<br>a[1][1]=0: (−1−0)+(−1−0) = −2 ✗<br>Số âm vẫn đúng, không cần xử lý riêng.</p></div><div class="card f"><span class="f ghost" data-act="#cC_0_0|ok;#cC_0_1|ok;#cC_0_2|ok;#cC_1_0|ok;#cC_1_1|ok;#cC_1_2|ok" data-say="Ma trận toàn 0: &lt;b&gt;mọi&lt;/b&gt; ô đều thỏa ⇒ phải dùng vòng lặp in &lt;b&gt;tất cả&lt;/b&gt;, không return sớm."></span><h3>Toàn số 0</h3><div style="display:flex;justify-content:center"><div class="mx sm" id="cC" style="grid-template-columns:auto repeat(3,auto) auto"><span class="hd"></span><span class="hd">j=0</span><span class="hd">j=1</span><span class="hd">j=2</span><span class="hd">R</span><span class="hd">i=0</span><div class="cell" id="cC_0_0">0</div><div class="cell" id="cC_0_1">0</div><div class="cell" id="cC_0_2">0</div><div class="cell sum" id="cC_r0">0</div><span class="hd">i=1</span><div class="cell" id="cC_1_0">0</div><div class="cell" id="cC_1_1">0</div><div class="cell" id="cC_1_2">0</div><div class="cell sum" id="cC_r1">0</div><span class="hd">C</span><div class="cell sum" id="cC_c0">0</div><div class="cell sum" id="cC_c1">0</div><div class="cell sum" id="cC_c2">0</div><span></span></div></div><p class="calc" style="font-size:14.5px;margin-top:8px;line-height:1.45;min-height:0;padding:6px 10px">Mọi ô: 0 = (0−0)+(0−0) ✓<br>⇒ in cả <b>6</b> ô.<br>Đừng dừng lại sau ô đầu tiên!</p></div><div class="card f"><span class="f ghost" data-act=";#cD_0_0|no" data-say="Trường hợp biên 1×1: R[0] = C[0] = 5. conLai = 0 ⇒ chỉ thỏa nếu phần tử bằng 0. In thông báo “Khong co…”."></span><h3>1 × 1</h3><div style="display:flex;justify-content:center"><div class="mx sm" id="cD" style="grid-template-columns:auto repeat(1,auto) auto"><span class="hd"></span><span class="hd">j=0</span><span class="hd">R</span><span class="hd">i=0</span><div class="cell" id="cD_0_0">5</div><div class="cell sum" id="cD_r0">5</div><span class="hd">C</span><div class="cell sum" id="cD_c0">5</div><span></span></div></div><p class="calc" style="font-size:14.5px;margin-top:8px;line-height:1.45;min-height:0;padding:6px 10px">Không có ô “còn lại” ⇒ tổng = 0.<br>(5−5)+(5−5) = 0 ≠ 5 ✗<br>Nếu nhập 0 thì 0 == 0 ✓</p></div></div>
+  <div class="cols4"><div class="card f"><span class="f ghost" data-act="#cA_0_0|ok;#cA_0_1|no;#cA_1_0|no;#cA_1_1|no" data-say="Ma trận 2×2 (ví dụ 2). R = [3, 1], C = [3, 1]. Chỉ &lt;b&gt;a[0][0] = 2&lt;/b&gt; thỏa."></span><h3>2 × 2: một ô thỏa</h3><div style="display:flex;justify-content:center"><div class="mx sm" id="cA" style="grid-template-columns:auto repeat(2,auto) auto"><span class="hd"></span><span class="hd">j=0</span><span class="hd">j=1</span><span class="hd">R</span><span class="hd">i=0</span><div class="cell" id="cA_0_0">2</div><div class="cell" id="cA_0_1">1</div><div class="cell sum" id="cA_r0">3</div><span class="hd">i=1</span><div class="cell" id="cA_1_0">1</div><div class="cell" id="cA_1_1">0</div><div class="cell sum" id="cA_r1">1</div><span class="hd">C</span><div class="cell sum" id="cA_c0">3</div><div class="cell sum" id="cA_c1">1</div><span></span></div></div><p class="calc" style="font-size:max(14.5px,var(--htt-min,24px));margin-top:8px;line-height:1.45;min-height:0;padding:6px 10px">a[0][0]=2: (3−2)+(3−2) = 2 ✓<br>a[0][1]=1: (3−1)+(1−1) = 2 ✗<br>a[1][0]=1: (1−1)+(3−1) = 2 ✗<br>a[1][1]=0: (1−0)+(1−0) = 2 ✗</p></div><div class="card f"><span class="f ghost" data-act="#cB_0_0|ok;#cB_0_1|no;#cB_1_0|no;#cB_1_1|no" data-say="Đổi dấu toàn bộ ma trận trên: R = [−3, −1], C = [−3, −1]. Công thức vẫn đúng với &lt;b&gt;số âm&lt;/b&gt;: a[0][0] = −2 thỏa."></span><h3>Số âm</h3><div style="display:flex;justify-content:center"><div class="mx sm" id="cB" style="grid-template-columns:auto repeat(2,auto) auto"><span class="hd"></span><span class="hd">j=0</span><span class="hd">j=1</span><span class="hd">R</span><span class="hd">i=0</span><div class="cell" id="cB_0_0">-2</div><div class="cell" id="cB_0_1">-1</div><div class="cell sum" id="cB_r0">-3</div><span class="hd">i=1</span><div class="cell" id="cB_1_0">-1</div><div class="cell" id="cB_1_1">0</div><div class="cell sum" id="cB_r1">-1</div><span class="hd">C</span><div class="cell sum" id="cB_c0">-3</div><div class="cell sum" id="cB_c1">-1</div><span></span></div></div><p class="calc" style="font-size:max(14.5px,var(--htt-min,24px));margin-top:8px;line-height:1.45;min-height:0;padding:6px 10px">a[0][0]=−2: (−3+2)+(−3+2) = −2 ✓<br>a[1][1]=0: (−1−0)+(−1−0) = −2 ✗<br>Số âm vẫn đúng, không cần xử lý riêng.</p></div><div class="card f"><span class="f ghost" data-act="#cC_0_0|ok;#cC_0_1|ok;#cC_0_2|ok;#cC_1_0|ok;#cC_1_1|ok;#cC_1_2|ok" data-say="Ma trận toàn 0: &lt;b&gt;mọi&lt;/b&gt; ô đều thỏa ⇒ phải dùng vòng lặp in &lt;b&gt;tất cả&lt;/b&gt;, không return sớm."></span><h3>Toàn số 0</h3><div style="display:flex;justify-content:center"><div class="mx sm" id="cC" style="grid-template-columns:auto repeat(3,auto) auto"><span class="hd"></span><span class="hd">j=0</span><span class="hd">j=1</span><span class="hd">j=2</span><span class="hd">R</span><span class="hd">i=0</span><div class="cell" id="cC_0_0">0</div><div class="cell" id="cC_0_1">0</div><div class="cell" id="cC_0_2">0</div><div class="cell sum" id="cC_r0">0</div><span class="hd">i=1</span><div class="cell" id="cC_1_0">0</div><div class="cell" id="cC_1_1">0</div><div class="cell" id="cC_1_2">0</div><div class="cell sum" id="cC_r1">0</div><span class="hd">C</span><div class="cell sum" id="cC_c0">0</div><div class="cell sum" id="cC_c1">0</div><div class="cell sum" id="cC_c2">0</div><span></span></div></div><p class="calc" style="font-size:max(14.5px,var(--htt-min,24px));margin-top:8px;line-height:1.45;min-height:0;padding:6px 10px">Mọi ô: 0 = (0−0)+(0−0) ✓<br>⇒ in cả <b>6</b> ô.<br>Đừng dừng lại sau ô đầu tiên!</p></div><div class="card f"><span class="f ghost" data-act=";#cD_0_0|no" data-say="Trường hợp biên 1×1: R[0] = C[0] = 5. conLai = 0 ⇒ chỉ thỏa nếu phần tử bằng 0. In thông báo “Khong co…”."></span><h3>1 × 1</h3><div style="display:flex;justify-content:center"><div class="mx sm" id="cD" style="grid-template-columns:auto repeat(1,auto) auto"><span class="hd"></span><span class="hd">j=0</span><span class="hd">R</span><span class="hd">i=0</span><div class="cell" id="cD_0_0">5</div><div class="cell sum" id="cD_r0">5</div><span class="hd">C</span><div class="cell sum" id="cD_c0">5</div><span></span></div></div><p class="calc" style="font-size:max(14.5px,var(--htt-min,24px));margin-top:8px;line-height:1.45;min-height:0;padding:6px 10px">Không có ô “còn lại” ⇒ tổng = 0.<br>(5−5)+(5−5) = 0 ≠ 5 ✗<br>Nếu nhập 0 thì 0 == 0 ✓</p></div></div>
   
   <p class="say">Nhấn → để chạy từng bước.</p>
   <div class="note f">Luôn tự thử: <b>ma trận nhỏ nhất</b> (1×1), <b>số âm</b>, <b>số 0</b>, <b>không có kết quả</b>, <b>nhiều kết quả</b>. Đó là nơi lỗi hay trốn.</div>
@@ -578,10 +615,10 @@ if (count == 0)
 <div class="hdr in"><span class="qn">11</span><h2>Tổ chức project nhiều file</h2></div>
   <div class="cols" style="grid-template-columns:1fr 1.15fr">
     <div style="display:flex;flex-direction:column;gap:10px">
-      <div class="file f" style="border-color:#7c3aed"><span class="fn2" style="color:#7c3aed">matrix.h</span> · <b>file tiêu đề</b> (header)<br>Chỉ chứa <b>khai báo</b>: hằng MAX và <b>nguyên mẫu hàm</b> (prototype). Giống “mục lục” của một cuốn sách.</div>
-      <div class="file f" style="border-color:#0891b2"><span class="fn2" style="color:#0891b2">matrix.cpp</span> · <b>cài đặt</b><br><code class="i">#include "matrix.h"</code> rồi viết <b>thân</b> từng hàm: nhập, in, tính tổng, kiểm tra.</div>
-      <div class="file f" style="border-color:#ec4899"><span class="fn2" style="color:#db2777">main.cpp</span> · <b>chương trình chính</b><br><code class="i">#include "matrix.h"</code> rồi chỉ <b>gọi</b> hàm. main ngắn, dễ đọc như kịch bản.</div>
-      <div class="note blue f" style="font-size:15.5px;margin-top:0">Lợi ích: mỗi file một việc · dễ tìm lỗi · tái sử dụng <code class="i">matrix.cpp</code> cho bài khác · nhiều người cùng làm.</div>
+      <div class="file f" style="border-color:#3a7fed"><span class="fn2" style="color:#3a7fed">matrix.h</span> · <b>file tiêu đề</b> (header)<br>Chỉ chứa <b>khai báo</b>: hằng MAX và <b>nguyên mẫu hàm</b> (prototype). Giống “mục lục” của một cuốn sách.</div>
+      <div class="file f" style="border-color:#0949b1"><span class="fn2" style="color:#0949b1">matrix.cpp</span> · <b>cài đặt</b><br><code class="i">#include "matrix.h"</code> rồi viết <b>thân</b> từng hàm: nhập, in, tính tổng, kiểm tra.</div>
+      <div class="file f" style="border-color:#4887ec"><span class="fn2" style="color:#276cdb">main.cpp</span> · <b>chương trình chính</b><br><code class="i">#include "matrix.h"</code> rồi chỉ <b>gọi</b> hàm. main ngắn, dễ đọc như kịch bản.</div>
+      <div class="note blue f" style="font-size:max(15.5px,var(--htt-min,24px));margin-top:0">Lợi ích: mỗi file một việc · dễ tìm lỗi · tái sử dụng <code class="i">matrix.cpp</code> cho bài khác · nhiều người cùng làm.</div>
     </div>
     <div>
       <div class="flow" style="flex-direction:column;gap:6px">
@@ -604,7 +641,7 @@ if (count == 0)
 </section>
 
 <!-- ===== fileh ===== -->
-<section class="slide" id="fileh" data-title="12 · matrix.h">
+<section class="slide htt-fs18" id="fileh" data-title="12 · matrix.h">
 <div class="hdr in"><span class="qn">12</span><h2>matrix.h: khai báo hằng và nguyên mẫu hàm</h2></div>
   <div class="cols" style="grid-template-columns:1.25fr 1fr">
     <div>
@@ -631,9 +668,9 @@ void printSpecial(int a[][MAX], int m, int n);
     </div>
     <div>
       <div class="card f" style="padding:10px 14px"><h3>Vì sao phải ghi <code class="i">a[][MAX]</code>?</h3>
-        <p style="font-size:15px">Trong bộ nhớ, mảng 2 chiều được xếp <b>thành một hàng dài</b>, hết dòng 0 tới dòng 1… (ví dụ thu nhỏ với MAX = 4):</p>
+        <p style="font-size:max(15px,var(--htt-min,24px))">Trong bộ nhớ, mảng 2 chiều được xếp <b>thành một hàng dài</b>, hết dòng 0 tới dòng 1… (ví dụ thu nhỏ với MAX = 4):</p>
         <div style="margin:8px 0"><div class="strip"><span class="r0" id="st00">0,0</span><span class="r0" id="st01">0,1</span><span class="r0" id="st02">0,2</span><span class="r0" id="st03">0,3</span><span class="r1" id="st10">1,0</span><span class="r1" id="st11">1,1</span><span class="r1" id="st12">1,2</span><span class="r1" id="st13">1,3</span><span class="r2" id="st20">2,0</span><span class="r2" id="st21">2,1</span><span class="r2" id="st22">2,2</span><span class="r2" id="st23">2,3</span></div></div>
-        <div class="calc" id="hpos" style="font-size:15px;min-height:0">a[i][j] nằm ở vị trí <b>i × MAX + j</b></div>
+        <div class="calc" id="hpos" style="font-size:max(15px,var(--htt-min,24px));min-height:0">a[i][j] nằm ở vị trí <b>i × MAX + j</b></div>
       </div>
       <span class="f ghost" data-now="#kH|show-a" data-say="&lt;b&gt;Include guard&lt;/b&gt;: lần đầu MATRIX_H chưa được định nghĩa ⇒ lấy nội dung và định nghĩa nó. Nếu file bị include lần 2, toàn bộ bị bỏ qua ⇒ không bị khai báo trùng."></span>
       <span class="f ghost" data-now="#kH|show-b" data-say="&lt;b&gt;const int MAX = 100&lt;/b&gt;: hằng dùng chung. Đổi kích thước tối đa chỉ cần sửa 1 chỗ. Trong main sẽ khai báo &lt;b&gt;int a[MAX][MAX]&lt;/b&gt; = int a[100][100]."></span>
@@ -649,7 +686,7 @@ void printSpecial(int a[][MAX], int m, int n);
 </section>
 
 <!-- ===== cpp1 ===== -->
-<section class="slide" id="cpp1" data-title="13 · matrix.cpp: nhập &amp; in">
+<section class="slide htt-fs18" id="cpp1" data-title="13 · matrix.cpp: nhập &amp; in">
 <div class="hdr in"><span class="qn">13</span><h2>matrix.cpp (1): hàm nhập và in ma trận</h2></div>
   <div class="cols" style="grid-template-columns:1.2fr 1fr">
     <div>
@@ -697,7 +734,7 @@ void printMatrix(int a[][MAX], int m, int n) {
 </section>
 
 <!-- ===== cpp2 ===== -->
-<section class="slide" id="cpp2" data-title="14 · matrix.cpp: tính tổng &amp; kiểm tra">
+<section class="slide htt-fs18" id="cpp2" data-title="14 · matrix.cpp: tính tổng &amp; kiểm tra">
 <div class="hdr in"><span class="qn">14</span><h2>matrix.cpp (2): tính tổng dòng, tổng cột, kiểm tra 1 ô</h2></div>
   <div class="cols" style="grid-template-columns:1.25fr 1fr">
     <div>
@@ -741,7 +778,7 @@ bool isSpecial(int a[][MAX], int i, int j, int rowSum[], int colSum[]) {
 </section>
 
 <!-- ===== cpp3 ===== -->
-<section class="slide" id="cpp3" data-title="15 · matrix.cpp: printSpecial">
+<section class="slide htt-fs18" id="cpp3" data-title="15 · matrix.cpp: printSpecial">
 <div class="hdr in"><span class="qn">15</span><h2>matrix.cpp (3): printSpecial ghép mọi thứ lại</h2></div>
   <div class="cols" style="grid-template-columns:1.5fr 1fr">
     <div>
@@ -776,7 +813,7 @@ void printSpecial(int a[][MAX], int m, int n) {
 </section>
 
 <!-- ===== mainf ===== -->
-<section class="slide" id="mainf" data-title="16 · main.cpp &amp; chạy thử">
+<section class="slide htt-fs18" id="mainf" data-title="16 · main.cpp &amp; chạy thử">
 <div class="hdr in"><span class="qn">16</span><h2>main.cpp và chạy thử chương trình</h2></div>
   <div class="cols" style="grid-template-columns:1.12fr 1fr">
     <div>
@@ -815,38 +852,68 @@ int main() {
 
 <!-- ===== loi1 ===== -->
 <section class="slide" id="loi1" data-title="17 · Lỗi sai hay gặp: logic">
-<div class="hdr in"><span class="qn">17</span><h2>Những lỗi sai hay gặp (1): lỗi logic</h2></div><div class="cols4"><div class="card f"><h3>① Không trừ chính nó</h3><p style="font-size:15.5px;line-height:1.38">“Còn lại” = bỏ chính nó. Ô nằm ở cả dòng và cột ⇒ trừ <b>2 lần</b>. Trừ 1 lần: ví dụ 2×2 sẽ không ra a[0][0] = 2.</p><div class="snip bad">a[i][j] == R[i] + C[j]
+<div class="hdr in"><span class="qn">17</span><h2>Những lỗi sai hay gặp (1): lỗi logic</h2></div><div class="cols4 htt-stack"><div class="card f"><h3>① Không trừ chính nó</h3><p style="font-size:max(15.5px,var(--htt-min,24px));line-height:1.38">“Còn lại” = bỏ chính nó. Ô nằm ở cả dòng và cột ⇒ trừ <b>2 lần</b>. Trừ 1 lần: ví dụ 2×2 sẽ không ra a[0][0] = 2.</p><div class="snip bad">a[i][j] == R[i] + C[j]
 a[i][j] == R[i] + C[j] - a[i][j]</div><div class="snip good">a[i][j] == (R[i]-a[i][j])
-         + (C[j]-a[i][j])</div></div><div class="card f"><h3>② Quên gán tổng = 0</h3><p style="font-size:15.5px;line-height:1.38">Mảng cục bộ chứa <b>giá trị rác</b>. Kết quả sai ngẫu nhiên, mỗi lần chạy một khác.</p><div class="snip bad">int rowSum[MAX];
+         + (C[j]-a[i][j])</div></div></div></section>
+
+<section id="loi1-p2" class="slide htt-cont" data-title="17 · Lỗi sai hay gặp: logic">
+<div class="hdr in"><span class="qn">17</span><h2>Những lỗi sai hay gặp (1): lỗi logic</h2></div>
+<div class="cols4 htt-stack htt-cont-part"><div class="card f"><h3>② Quên gán tổng = 0</h3><p style="font-size:max(15.5px,var(--htt-min,24px));line-height:1.38">Mảng cục bộ chứa <b>giá trị rác</b>. Kết quả sai ngẫu nhiên, mỗi lần chạy một khác.</p><div class="snip bad">int rowSum[MAX];
 for (i...) for (j...)
   rowSum[i] += a[i][j];</div><div class="snip good">for (i...) {
   rowSum[i] = 0;
   for (j...) rowSum[i] += a[i][j];
-}</div></div><div class="card f"><h3>③ Nhầm chỉ số khi tính cột</h3><p style="font-size:15.5px;line-height:1.38">Luôn là <b>a[dòng][cột]</b>. Dòng chạy tới <b>m</b>, cột chạy tới <b>n</b>. Sai chỗ này chỉ lộ khi m ≠ n!</p><div class="snip bad">for (j=0; j&lt;n; j++)
+}</div></div></div></section>
+
+<section id="loi1-p2-p2" class="slide htt-cont htt-cont" data-title="17 · Lỗi sai hay gặp: logic">
+<div class="hdr in"><span class="qn">17</span><h2>Những lỗi sai hay gặp (1): lỗi logic</h2></div>
+<div class="cols4 htt-stack htt-cont-part htt-cont-part"><div class="card f"><h3>③ Nhầm chỉ số khi tính cột</h3><p style="font-size:max(15.5px,var(--htt-min,24px));line-height:1.38">Luôn là <b>a[dòng][cột]</b>. Dòng chạy tới <b>m</b>, cột chạy tới <b>n</b>. Sai chỗ này chỉ lộ khi m ≠ n!</p><div class="snip bad">for (j=0; j&lt;n; j++)
   for (i=0; i&lt;n; i++)
     colSum[j] += a[j][i];</div><div class="snip good">for (j=0; j&lt;n; j++)
   for (i=0; i&lt;m; i++)
-    colSum[j] += a[i][j];</div></div><div class="card f"><h3>④ In “không có” sai chỗ</h3><p style="font-size:15.5px;line-height:1.38">Chỉ biết “không có ô nào” <b>sau khi</b> duyệt hết. Dùng biến đếm <b>count</b>.</p><div class="snip bad">for (...) for (...)
+    colSum[j] += a[i][j];</div></div></div></section>
+
+<section id="loi1-p2-p2-p2" class="slide htt-cont htt-cont htt-cont" data-title="17 · Lỗi sai hay gặp: logic">
+<div class="hdr in"><span class="qn">17</span><h2>Những lỗi sai hay gặp (1): lỗi logic</h2></div>
+<div class="cols4 htt-stack htt-cont-part htt-cont-part htt-cont-part"><div class="card f"><h3>④ In “không có” sai chỗ</h3><p style="font-size:max(15.5px,var(--htt-min,24px));line-height:1.38">Chỉ biết “không có ô nào” <b>sau khi</b> duyệt hết. Dùng biến đếm <b>count</b>.</p><div class="snip bad">for (...) for (...)
   if (thoa) cout &lt;&lt; ...;
   else cout &lt;&lt; &quot;Khong co&quot;;</div><div class="snip good">if (thoa) { cout...; count++; }
 ...
 if (count == 0)
-  cout &lt;&lt; &quot;Khong co&quot;;</div></div></div><div class="note f" style="font-size:15.5px">Thêm: dùng <code class="i">for (i = 1; i &lt;= m; i++)</code> (đếm từ 1) ⇒ bỏ sót dòng 0 và đọc a[m] ngoài vùng dữ liệu · chỉ test ma trận <b>vuông</b> nên không thấy lỗi ③ · <code class="i">return</code> ngay khi gặp ô đầu tiên ⇒ thiếu kết quả (case toàn 0).</div>
+  cout &lt;&lt; &quot;Khong co&quot;;</div></div></div><div class="note f" style="font-size:max(15.5px,var(--htt-min,24px))">Thêm: dùng <code class="i">for (i = 1; i &lt;= m; i++)</code> (đếm từ 1) ⇒ bỏ sót dòng 0 và đọc a[m] ngoài vùng dữ liệu · chỉ test ma trận <b>vuông</b> nên không thấy lỗi ③ · <code class="i">return</code> ngay khi gặp ô đầu tiên ⇒ thiếu kết quả (case toàn 0).</div>
+
+
+
 </section>
 
 <!-- ===== loi2 ===== -->
 <section class="slide" id="loi2" data-title="18 · Lỗi sai hay gặp: C++ &amp; project">
-<div class="hdr in"><span class="qn">18</span><h2>Những lỗi sai hay gặp (2): cú pháp C++ &amp; project</h2></div><div class="cols4"><div class="card f"><h3>⑤ Tham số thiếu số cột</h3><p style="font-size:15.5px;line-height:1.38">Lỗi biên dịch: <i>declaration of 'a' as multidimensional array must have bounds for all dimensions except the first</i>.</p><div class="snip bad">void printMatrix(int a[][],
+<div class="hdr in"><span class="qn">18</span><h2>Những lỗi sai hay gặp (2): cú pháp C++ &amp; project</h2></div><div class="cols4 htt-stack"><div class="card f"><h3>⑤ Tham số thiếu số cột</h3><p style="font-size:max(15.5px,var(--htt-min,24px));line-height:1.38">Lỗi biên dịch: <i>declaration of 'a' as multidimensional array must have bounds for all dimensions except the first</i>.</p><div class="snip bad">void printMatrix(int a[][],
                  int m, int n);</div><div class="snip good">void printMatrix(int a[][MAX],
-                 int m, int n);</div></div><div class="card f"><h3>⑥ Không kiểm tra M, N</h3><p style="font-size:15.5px;line-height:1.38">Vượt 100 ⇒ ghi đè bộ nhớ khác, chương trình chạy sai hoặc crash mà <b>không báo lỗi</b>.</p><div class="snip bad">cin &gt;&gt; m &gt;&gt; n;   // m = 150 ?
+                 int m, int n);</div></div></div></section>
+
+<section id="loi2-p2" class="slide htt-cont" data-title="18 · Lỗi sai hay gặp: C++ &amp; project">
+<div class="hdr in"><span class="qn">18</span><h2>Những lỗi sai hay gặp (2): cú pháp C++ &amp; project</h2></div>
+<div class="cols4 htt-stack htt-cont-part"><div class="card f"><h3>⑥ Không kiểm tra M, N</h3><p style="font-size:max(15.5px,var(--htt-min,24px));line-height:1.38">Vượt 100 ⇒ ghi đè bộ nhớ khác, chương trình chạy sai hoặc crash mà <b>không báo lỗi</b>.</p><div class="snip bad">cin &gt;&gt; m &gt;&gt; n;   // m = 150 ?
 // ghi a[149][..] → tràn mảng</div><div class="snip good">do { cin &gt;&gt; m; }
-while (m &lt; 1 || m &gt; MAX);</div></div><div class="card f"><h3>⑦ Chỉ biên dịch main.cpp</h3><p style="font-size:15.5px;line-height:1.38">Lỗi link: <i>undefined reference to `inputMatrix(int (*) [100], int&amp;, int&amp;)'</i> — có khai báo nhưng không tìm thấy thân hàm.</p><div class="snip bad">g++ main.cpp -o matrix</div><div class="snip good">g++ main.cpp matrix.cpp -o matrix</div></div><div class="card f"><h3>⑧ #include file .cpp</h3><p style="font-size:15.5px;line-height:1.38">Thân hàm bị chép vào 2 nơi ⇒ <i>multiple definition of `inputMatrix…'</i>. Tương tự nếu viết thân hàm trong .h.</p><div class="snip bad">// main.cpp
+while (m &lt; 1 || m &gt; MAX);</div></div></div></section>
+
+<section id="loi2-p2-p2" class="slide htt-cont htt-cont" data-title="18 · Lỗi sai hay gặp: C++ &amp; project">
+<div class="hdr in"><span class="qn">18</span><h2>Những lỗi sai hay gặp (2): cú pháp C++ &amp; project</h2></div>
+<div class="cols4 htt-stack htt-cont-part htt-cont-part"><div class="card f"><h3>⑦ Chỉ biên dịch main.cpp</h3><p style="font-size:max(15.5px,var(--htt-min,24px));line-height:1.38">Lỗi link: <i>undefined reference to `inputMatrix(int (*) [100], int&amp;, int&amp;)'</i> — có khai báo nhưng không tìm thấy thân hàm.</p><div class="snip bad">g++ main.cpp -o matrix</div><div class="snip good">g++ main.cpp matrix.cpp -o matrix</div></div></div></section>
+
+<section id="loi2-p2-p2-p2" class="slide htt-cont htt-cont htt-cont" data-title="18 · Lỗi sai hay gặp: C++ &amp; project">
+<div class="hdr in"><span class="qn">18</span><h2>Những lỗi sai hay gặp (2): cú pháp C++ &amp; project</h2></div>
+<div class="cols4 htt-stack htt-cont-part htt-cont-part htt-cont-part"><div class="card f"><h3>⑧ #include file .cpp</h3><p style="font-size:max(15.5px,var(--htt-min,24px));line-height:1.38">Thân hàm bị chép vào 2 nơi ⇒ <i>multiple definition of `inputMatrix…'</i>. Tương tự nếu viết thân hàm trong .h.</p><div class="snip bad">// main.cpp
 #include &quot;matrix.cpp&quot;</div><div class="snip good">// main.cpp
-#include &quot;matrix.h&quot;</div></div></div><div class="note f" style="font-size:15.5px">Thêm: quên <b>include guard</b> ⇒ khai báo trùng khi .h bị include nhiều lần · viết <code class="i">a[i, j]</code> thay vì <code class="i">a[i][j]</code> · gọi <code class="i">printMatrix(a[][], m, n)</code> (đúng: <code class="i">printMatrix(a, m, n)</code>) · phần tử rất lớn (~10<sup>9</sup>) ⇒ tổng <b>tràn int</b>, nên dùng <code class="i">long long</code> cho rowSum/colSum.</div>
+#include &quot;matrix.h&quot;</div></div></div><div class="note f" style="font-size:max(15.5px,var(--htt-min,24px))">Thêm: quên <b>include guard</b> ⇒ khai báo trùng khi .h bị include nhiều lần · viết <code class="i">a[i, j]</code> thay vì <code class="i">a[i][j]</code> · gọi <code class="i">printMatrix(a[][], m, n)</code> (đúng: <code class="i">printMatrix(a, m, n)</code>) · phần tử rất lớn (~10<sup>9</sup>) ⇒ tổng <b>tràn int</b>, nên dùng <code class="i">long long</code> cho rowSum/colSum.</div>
+
+
+
 </section>
 
 <!-- ===== vec ===== -->
-<section class="slide" id="vec" data-title="19 · Giải bằng vector">
+<section class="slide htt-fs18" id="vec" data-title="19 · Giải bằng vector">
 <div class="hdr in"><span class="qn">19</span><h2>Lưu ý thêm: giải bằng <code class='i' style='font-size:.8em'>vector&lt;vector&lt;int&gt;&gt;</code></h2></div>
   <div class="cols" style="grid-template-columns:1.55fr 1fr">
     <div>
@@ -884,7 +951,7 @@ void printSpecial(const Matrix &a) {
     </div>
     <div>
       <div id="vvis" style="display:flex;flex-direction:column;gap:5px;margin:8px 0"><div class="vrow hide0" id="vv0"><span class="lab">a[0] →</span><div class="cell">1</div><div class="cell">2</div><div class="cell">4</div><div class="cell">9</div></div><div class="vrow hide0" id="vv1"><span class="lab">a[1] →</span><div class="cell">8</div><div class="cell">1</div><div class="cell">1</div><div class="cell">1</div></div><div class="vrow hide0" id="vv2"><span class="lab">a[2] →</span><div class="cell">4</div><div class="cell">5</div><div class="cell">5</div><div class="cell">1</div></div></div>
-      <div class="calc" id="vcalc" style="font-size:15px">#include &lt;vector&gt;</div>
+      <div class="calc" id="vcalc" style="font-size:max(15px,var(--htt-min,24px))">#include &lt;vector&gt;</div>
       <span class="f ghost" data-now="#kV|show-a" data-set="#vcalc::Matrix = vector&amp;lt;vector&amp;lt;int&amp;gt;&amp;gt;" data-say="&lt;b&gt;vector&amp;lt;vector&amp;lt;int&amp;gt;&amp;gt;&lt;/b&gt; = “vector của các dòng”, mỗi dòng là một vector&amp;lt;int&amp;gt;. Đặt tên ngắn &lt;b&gt;Matrix&lt;/b&gt; bằng typedef cho dễ viết."></span>
       <span class="f ghost" data-now="#kV|show-b" data-act="#vv0|sh;#vv1|sh;#vv2|sh" data-set="#vcalc::Matrix a(3, vector&amp;lt;int&amp;gt;(4));" data-say="Biết m, n rồi mới tạo: &lt;b&gt;a(m, vector&amp;lt;int&amp;gt;(n))&lt;/b&gt; = m dòng, mỗi dòng n số (tự bằng 0). Đúng kích thước, &lt;b&gt;không&lt;/b&gt; cần MAX, không giới hạn 100."></span>
       <span class="f ghost" data-now="#kV|show-c" data-set="#vcalc::void printSpecial(&lt;b&gt;const Matrix &amp;amp;a&lt;/b&gt;)" data-say="Truyền vào hàm bằng &lt;b&gt;const &amp;amp;&lt;/b&gt;: không sao chép cả ma trận (nhanh), và const đảm bảo hàm không sửa a. Không cần truyền m, n."></span>
@@ -892,7 +959,7 @@ void printSpecial(const Matrix &a) {
       <span class="f ghost" data-now="#kV|show-e" data-set="#vcalc::rowSum = [0, 0, 0] · colSum = [0, 0, 0, 0]" data-say="&lt;b&gt;vector&amp;lt;int&amp;gt; rowSum(m, 0)&lt;/b&gt;: tạo m phần tử, tất cả bằng 0 ⇒ không còn lỗi “quên gán 0”."></span>
       <span class="f ghost" data-now="#kV|show-f" data-set="#vcalc::rowSum = [16, 11, 15] · colSum = [13, 8, 10, 11]" data-say="Mẹo: tính &lt;b&gt;cả&lt;/b&gt; rowSum và colSum trong &lt;b&gt;một&lt;/b&gt; lần duyệt: ô a[i][j] được cộng vào dòng i và cột j cùng lúc."></span>
       <span class="f ghost" data-now="#kV|show-g" data-set="#vcalc::→ a[0][3] = 9 · a[1][0] = 8 (giống hệt bản mảng tĩnh)" data-say="Phần kiểm tra và in &lt;b&gt;giữ nguyên&lt;/b&gt;: cú pháp a[i][j] của vector giống mảng thường."></span>
-      <div class="note blue f" style="font-size:14.5px">Chia nhiều file với vector: trong <b>matrix.h</b> thêm <code class="i">#include &lt;vector&gt;</code> và viết <code class="i">std::vector</code> (không đặt <code class="i">using namespace std;</code> trong file .h).</div>
+      <div class="note blue f" style="font-size:max(14.5px,var(--htt-min,24px))">Chia nhiều file với vector: trong <b>matrix.h</b> thêm <code class="i">#include &lt;vector&gt;</code> và viết <code class="i">std::vector</code> (không đặt <code class="i">using namespace std;</code> trong file .h).</div>
       <p class="say">Nhấn → để chạy từng bước.</p>
     </div>
   </div>
@@ -901,7 +968,7 @@ void printSpecial(const Matrix &a) {
 <!-- ===== sosanh ===== -->
 <section class="slide" id="sosanh" data-title="20 · Mảng tĩnh vs vector">
 <div class="hdr in"><span class="qn">20</span><h2>So sánh: <code class='i' style='font-size:.8em'>int a[100][100]</code> và <code class='i' style='font-size:.8em'>vector&lt;vector&lt;int&gt;&gt;</code></h2></div>
-  <table class="t1" style="font-size:17.5px">
+  <table class="t1" style="font-size:max(17.5px,var(--htt-min,24px))">
     <tr><th style="width:190px">Tiêu chí</th><th>Mảng tĩnh int a[100][100]</th><th>vector&lt;vector&lt;int&gt;&gt;</th></tr>
     <tr class="f"><td>Khai báo</td><td><code class="i">int a[MAX][MAX];</code> + biến m, n</td><td><code class="i">Matrix a(m, vector&lt;int&gt;(n));</code></td></tr>
     <tr class="f"><td>Kích thước</td><td>Cố định, xin dư 100×100; phải kiểm tra m, n ≤ 100</td><td>Đúng m × n, tạo lúc chạy, không giới hạn 100</td></tr>
@@ -918,13 +985,13 @@ void printSpecial(const Matrix &a) {
 <section class="slide" id="summary" data-title="Tổng kết">
 <div class="hdr in"><span class="qn">TỔNG KẾT</span><h2>Những điều cần nhớ</h2></div>
   <div class="cols3">
-    <div class="card in"><h3>Hiểu đề</h3><ul><li style="font-size:18px">“Còn lại” = bỏ chính nó ở <b>cả</b> dòng và cột</li><li style="font-size:18px">conLai = (R[i] − a) + (C[j] − a)</li><li style="font-size:18px">⇔ 3·a == R[i] + C[j]</li></ul></div>
-    <div class="card in"><h3>Giải thuật</h3><ul><li style="font-size:18px">Tính trước R[], C[] một lần</li><li style="font-size:18px">Duyệt mọi ô, so sánh O(1)</li><li style="font-size:18px">Biến đếm để in “không có”</li></ul></div>
-    <div class="card in"><h3>Code</h3><ul><li style="font-size:18px"><code class="i">a[][MAX]</code> khi truyền mảng 2 chiều</li><li style="font-size:18px">.h khai báo · .cpp cài đặt · main gọi</li><li style="font-size:18px">g++ main.cpp matrix.cpp</li></ul></div>
+    <div class="card in"><h3>Hiểu đề</h3><ul><li style="font-size:max(18px,var(--htt-min,24px))">“Còn lại” = bỏ chính nó ở <b>cả</b> dòng và cột</li><li style="font-size:max(18px,var(--htt-min,24px))">conLai = (R[i] − a) + (C[j] − a)</li><li style="font-size:max(18px,var(--htt-min,24px))">⇔ 3·a == R[i] + C[j]</li></ul></div>
+    <div class="card in"><h3>Giải thuật</h3><ul><li style="font-size:max(18px,var(--htt-min,24px))">Tính trước R[], C[] một lần</li><li style="font-size:max(18px,var(--htt-min,24px))">Duyệt mọi ô, so sánh O(1)</li><li style="font-size:max(18px,var(--htt-min,24px))">Biến đếm để in “không có”</li></ul></div>
+    <div class="card in"><h3>Code</h3><ul><li style="font-size:max(18px,var(--htt-min,24px))"><code class="i">a[][MAX]</code> khi truyền mảng 2 chiều</li><li style="font-size:max(18px,var(--htt-min,24px))">.h khai báo · .cpp cài đặt · main gọi</li><li style="font-size:max(18px,var(--htt-min,24px))">g++ main.cpp matrix.cpp</li></ul></div>
   </div>
   <div class="cols" style="margin-top:14px">
-    <div class="card in" style="border-top:5px solid #f59e0b"><h3 style="color:#d97706">Bộ test tự kiểm tra</h3><p style="font-size:17px;font-family:var(--mono);line-height:1.6">3×4 ví dụ → 9, 8 · 2×2 [2 1;1 0] → 2<br>1..9 → không có · toàn 0 → in hết<br>1×1 [5] → không có · số âm [−2 −1;−1 0] → −2</p></div>
-    <div class="card in" style="border-top:5px solid #10b981"><h3 style="color:#047857">Bài tập mở rộng</h3><p style="font-size:15.5px">In phần tử bằng tổng còn lại <b>chỉ trên dòng</b> · bằng <b>tích</b> các phần tử còn lại · lớn nhất trên dòng và nhỏ nhất trên cột (điểm yên ngựa).</p></div>
+    <div class="card in" style="border-top:5px solid #0e65f2"><h3 style="color:#0b58d4">Bộ test tự kiểm tra</h3><p style="font-size:max(17px,var(--htt-min,24px));font-family:var(--mono);line-height:1.6">3×4 ví dụ → 9, 8 · 2×2 [2 1;1 0] → 2<br>1..9 → không có · toàn 0 → in hết<br>1×1 [5] → không có · số âm [−2 −1;−1 0] → −2</p></div>
+    <div class="card in" style="border-top:5px solid #1051b9"><h3 style="color:#063176">Bài tập mở rộng</h3><p style="font-size:max(15.5px,var(--htt-min,24px))">In phần tử bằng tổng còn lại <b>chỉ trên dòng</b> · bằng <b>tích</b> các phần tử còn lại · lớn nhất trên dòng và nhỏ nhất trên cột (điểm yên ngựa).</p></div>
   </div>
 </section>
 </div></div>
@@ -932,7 +999,7 @@ void printSpecial(const Matrix &a) {
 <div id="bar"></div>
 <div id="hint">← → / Space: từng bước · Shift+→: qua slide · G: đi tới slide bất kỳ · A: hiện hết · F: toàn màn hình</div>
 <div id="nav"><button id="jumpNav" title="Đi tới slide (G)">☰</button><button id="prev" aria-label="Trước">‹</button><span id="count">1/1</span><button id="next" aria-label="Sau">›</button></div>
-<div id="jump"><div id="jbox"><div class="jh"><h3>Đi tới slide</h3><span class="muted" style="font-size:14px">gõ số hoặc tên slide rồi Enter</span><input id="jq" placeholder="vd: 12 hoặc vector" autocomplete="off"><button id="jx" aria-label="Đóng">×</button></div><div id="jlist"></div></div></div>
+<div id="jump"><div id="jbox"><div class="jh"><h3>Đi tới slide</h3><span class="muted" style="font-size:max(14px,var(--htt-min,24px))">gõ số hoặc tên slide rồi Enter</span><input id="jq" placeholder="vd: 12 hoặc vector" autocomplete="off"><button id="jx" aria-label="Đóng">×</button></div><div id="jlist"></div></div></div>
 <script>
 (function(){
   // ---------- C++ highlighter ----------
@@ -1060,6 +1127,53 @@ void printSpecial(const Matrix &a) {
   go(idx>=0?idx:0);
   addEventListener("hashchange",()=>{const j=slides.findIndex(s=>s.id===location.hash.slice(1));if(j>=0&&j!==cur)go(j)});
 })();
+</script>
+<script id="htt-theme-js">
+(function(){
+  // HTT theme runtime: renumber split code blocks, enforce the slide's minimum font size (--htt-min, default 24px)
+  function minOf(el){var s=el&&el.closest?el.closest('.slide'):null;var v=parseFloat(getComputedStyle(s||document.documentElement).getPropertyValue('--htt-min'));return isNaN(v)?24:v}
+  window.HTT_MIN=function(el){return minOf(el)};
+  function renumber(){
+    document.querySelectorAll('.code[class*="htt-start-"]').forEach(function(c){
+      if(c.dataset.httNum)return;var m=c.className.match(/htt-start-(\d+)/);if(!m)return;var off=+m[1];
+      c.querySelectorAll('.ln>.no').forEach(function(n){var v=parseInt(n.textContent,10);if(!isNaN(v))n.textContent=String(v+off)});
+      c.dataset.httNum='1';
+    });
+  }
+  function hasText(el){for(var n=el.firstChild;n;n=n.nextSibling){if(n.nodeType===3&&/\S/.test(n.nodeValue))return true}return /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(el.tagName)}
+  function svgScale(t){var svg=t.ownerSVGElement;if(!svg)return 1;var s=1;
+    while(svg){var vb=svg.viewBox&&svg.viewBox.baseVal;if(vb&&vb.width&&vb.height){var w=svg.clientWidth||svg.getBoundingClientRect().width,h=svg.clientHeight||svg.getBoundingClientRect().height;if(!w||!h)return 0;s*=Math.min(w/vb.width,h/vb.height)}svg=svg.ownerSVGElement}
+    return s}
+  function set(el,v){if(!el.hasAttribute('data-htt-prev'))el.setAttribute('data-htt-prev',el.style.getPropertyValue('font-size')+'|'+el.style.getPropertyPriority('font-size'));el.style.setProperty('font-size',v,'important')}
+  function unfix(sel){document.querySelectorAll((sel||'#deck .slide *')).forEach(function(el){var p=el.getAttribute('data-htt-prev');if(p===null)return;var a=p.split('|');if(a[0])el.style.setProperty('font-size',a[0],a[1]||'');else el.style.removeProperty('font-size');el.removeAttribute('data-htt-prev')})}
+  function fix(sel){
+    renumber();
+    var slides=document.querySelectorAll(typeof sel==='string'?sel:'#deck .slide');
+    for(var j=0;j<slides.length;j++){var sl=slides[j];var MIN=minOf(sl);if(MIN<=0)continue;
+      var els=sl.querySelectorAll('*');
+      for(var i=0;i<els.length;i++){var el=els[i];
+        if(el instanceof SVGElement){
+          if(!/^(text|tspan|textPath)$/.test(el.tagName))continue;
+          if(el.tagName!=='text'&&!hasText(el))continue;
+          var sc=svgScale(el);if(!sc)continue;
+          var fs=parseFloat(getComputedStyle(el).fontSize);if(!fs)continue;
+          if(fs*sc<MIN-0.3)set(el,(MIN/sc).toFixed(2)+'px');
+          continue;
+        }
+        if(!hasText(el))continue;
+        var f=parseFloat(getComputedStyle(el).fontSize);
+        if(f>0&&f<MIN-0.3)set(el,MIN+'px');
+      }
+    }
+  }
+  window.HTT_fix=fix;window.HTT_unfix=unfix;
+  fix();
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){fix()});
+  var t=null;var mo=new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(ms[i].type==='childList'&&ms[i].addedNodes.length){clearTimeout(t);t=setTimeout(function(){fix()},30);return}}});
+  var d=document.getElementById('deck');if(d)mo.observe(d,{childList:true,subtree:true});
+  function act(){setTimeout(function(){fix('#deck .slide.active')},0)}addEventListener('keydown',act);addEventListener('click',act);addEventListener('touchend',act);
+})();
+
 </script>
 </body>
 </html>
