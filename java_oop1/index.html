@@ -8,18 +8,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#ffffff; --panel:#ffffff; --line:#ece8f7; --text:#1e1b3a; --muted:#64607d;
-  --accent:#7c3aed; --accent2:#0891b2; --warn:#e11d48; --gold:#d97706; --code:#fcfbff;
-  --k:#d6336c; --t:#7c3aed; --s:#059669; --n:#ea580c; --c:#9ca3b8; --p:#db2777; --fn:#0284c7;
-  --sa1:#7c3aed; --sa2:#ec4899;
+  --bg:#ffffff; --panel:#ffffff; --line:#e8eef7; --text:#17263e; --muted:#3d63a0;
+  --accent:#3a7fed; --accent2:#0949b1; --warn:#1d68e1; --gold:#0b58d4; --code:#fcfbff;
+  --k:#3371d6; --t:#3a7fed; --s:#083d93; --n:#0c61ea; --c:#84a1d0; --p:#276cdb; --fn:#0a4fbf;
+  --sa1:#3a7fed; --sa2:#4887ec;
   --mono:"JetBrains Mono","Cascadia Code",Consolas,Menlo,"Courier New",monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff1f7);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
+html,body{height:100%;background:#eff5fe;color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden}
 #viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
 #deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
-.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(124,58,237,.14);
-  background:radial-gradient(520px 380px at 100% 0%,#ffe1f0 0%,transparent 70%),radial-gradient(600px 420px at 0% 100%,#d9f6ff 0%,transparent 70%),radial-gradient(400px 300px at 60% 110%,#fff3c9 0%,transparent 70%),var(--bg);
+.slide{position:absolute;inset:0;padding:30px 44px 40px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(58,127,237,.14);
+  background:none,none,none,var(--bg);
   opacity:0;transform:translateX(60px) scale(.98);pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
 .slide.past{transform:translateX(-60px) scale(.98)}
 .slide.active{opacity:1;transform:none;pointer-events:auto}
@@ -27,49 +27,49 @@ html,body{height:100%;background:linear-gradient(135deg,#f3eeff,#e8f8ff 50%,#fff
 .slide.active .in:nth-child(2){animation-delay:.08s}.slide.active .in:nth-child(3){animation-delay:.16s}.slide.active .in:nth-child(4){animation-delay:.24s}
 @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 .hdr{display:flex;align-items:center;gap:16px;margin-bottom:16px}
-.slide:nth-of-type(4n+1){--sa1:#7c3aed;--sa2:#ec4899}.slide:nth-of-type(4n+2){--sa1:#0891b2;--sa2:#7c3aed}.slide:nth-of-type(4n+3){--sa1:#ec4899;--sa2:#f97316}.slide:nth-of-type(4n){--sa1:#059669;--sa2:#0ea5e9}
-.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:linear-gradient(180deg,var(--sa1),var(--sa2))}
-.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,var(--sa1),var(--sa2));box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
+.slide:nth-of-type(4n+1){--sa1:#3a7fed;--sa2:#4887ec}.slide:nth-of-type(4n+2){--sa1:#0949b1;--sa2:#3a7fed}.slide:nth-of-type(4n+3){--sa1:#4887ec;--sa2:#1c6ef3}.slide:nth-of-type(4n){--sa1:#083d93;--sa2:#0e62e9}
+.slide::after{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:var(--sa1)}
+.qn{font-weight:800;font-size:17px;letter-spacing:.06em;color:#fff;background:var(--sa1);box-shadow:0 6px 16px -6px var(--sa1);padding:6px 16px;border-radius:999px;white-space:nowrap}
 h1{font-size:70px;line-height:1.1;font-weight:800}
 h2{font-size:34px;line-height:1.2;font-weight:800}
-h2 code{font-family:var(--mono);font-size:.9em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 8px;border-radius:8px;color:#be185d}
+h2 code{font-family:var(--mono);font-size:.9em;background:#f0f5fd;border:1px solid #d3e2f9;padding:0 8px;border-radius:8px;color:#1858be}
 h3{font-size:21px;font-weight:700;margin-bottom:6px;color:var(--sa1)}
 p,li{font-size:22px;line-height:1.45;color:var(--text)}
 .muted{color:var(--muted)}
 ul{list-style:none}
 ul li{position:relative;padding-left:24px;margin:5px 0}
-ul li::before{content:"";position:absolute;left:3px;top:.55em;width:9px;height:9px;border-radius:3px;background:linear-gradient(135deg,var(--sa1),var(--sa2))}
-.grad{background:linear-gradient(90deg,#7c3aed,#ec4899 55%,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent}
-code.i,p code,li code,td code{font-family:var(--mono);font-size:.86em;background:#fdf0f7;border:1px solid #f9d3e6;padding:0 5px;border-radius:6px;color:#be185d}
+ul li::before{content:"";position:absolute;left:3px;top:.55em;width:9px;height:9px;border-radius:3px;background:var(--sa1)}
+.grad{background:#3a7fed;-webkit-background-clip:text;background-clip:text;color:transparent}
+code.i,p code,li code,td code{font-family:var(--mono);font-size:.86em;background:#f0f5fd;border:1px solid #d3e2f9;padding:0 5px;border-radius:6px;color:#1858be}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
 .cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .qcols{grid-template-columns:.78fr 1.22fr;height:590px}
 .acols{grid-template-columns:.95fr 1.05fr;gap:20px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
-.cols3>.card:nth-child(3n+1){border-top:5px solid #7c3aed}.cols3>.card:nth-child(3n+2){border-top:5px solid #0891b2}.cols3>.card:nth-child(3n){border-top:5px solid #ec4899}
-.cols3>.card:nth-child(3n+2) h3{color:#0891b2}.cols3>.card:nth-child(3n) h3{color:#db2777}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px -12px rgba(58,127,237,.25)}
+.cols3>.card:nth-child(3n+1){border-top:5px solid #3a7fed}.cols3>.card:nth-child(3n+2){border-top:5px solid #0949b1}.cols3>.card:nth-child(3n){border-top:5px solid #4887ec}
+.cols3>.card:nth-child(3n+2) h3{color:#0949b1}.cols3>.card:nth-child(3n) h3{color:#276cdb}
 .lbl{display:inline-block;font-size:14px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:6px;margin-bottom:8px}
-.lbl.bad{background:#ffe4e6;color:#be123c}.lbl.good{background:#d1fae5;color:#047857}.lbl.info{background:#e3e6fb;color:#3341b0}
-.qcard{background:#fff;border:1px solid var(--line);border-left:6px solid var(--sa1);border-radius:16px;padding:16px 20px;box-shadow:0 8px 24px -12px rgba(124,58,237,.25)}
+.lbl.bad{background:#e5effe;color:#1254be}.lbl.good{background:#d1e1fa;color:#063176}.lbl.info{background:#e3ecfb;color:#3363b0}
+.qcard{background:#fff;border:1px solid var(--line);border-left:6px solid var(--sa1);border-radius:16px;padding:16px 20px;box-shadow:0 8px 24px -12px rgba(58,127,237,.25)}
 .qcard p{font-size:21px}
-.note{margin-top:14px;padding:10px 16px;border-left:5px solid #f59e0b;background:linear-gradient(90deg,#fff7e0,#fffdf6);border-radius:8px;font-size:19px;line-height:1.4}
+.note{margin-top:14px;padding:10px 16px;border-left:5px solid #0e65f2;background:#e2ecfd;border-radius:8px;font-size:19px;line-height:1.4}
 .tagline{margin-top:14px}
-.pill{display:inline-block;font-family:var(--mono);font-size:15px;font-weight:600;padding:4px 12px;border-radius:999px;border:1.5px solid #c4b5fd;background:#f5f3ff;color:#5b21b6}
-.ans{border:1px solid #a7f3d0;background:linear-gradient(180deg,#ecfdf5,#fff);border-radius:16px;padding:10px 18px 12px;margin-bottom:14px;box-shadow:0 8px 24px -14px rgba(5,150,105,.35)}
+.pill{display:inline-block;font-family:var(--mono);font-size:15px;font-weight:600;padding:4px 12px;border-radius:999px;border:1.5px solid #b7d1fb;background:#f4f8fe;color:#215ab6}
+.ans{border:1px solid #a7c4f3;background:#ecf3fd;border-radius:16px;padding:10px 18px 12px;margin-bottom:14px;box-shadow:0 8px 24px -14px rgba(8,61,147,.35)}
 .ans .lbl{margin-bottom:4px}
 .ans p{font-size:19px;line-height:1.42}
 .code{font-family:var(--mono);font-size:15px;line-height:1.45;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:8px 0;overflow:hidden;position:relative}
 .code.xs{font-size:14px}
 .code .ln{padding:0 14px 0 6px;white-space:pre;display:flex}
-.code .no{color:#c9c3e0;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
+.code .no{color:#bdcde6;width:24px;flex:none;text-align:right;margin-right:12px;user-select:none}
 .k{color:var(--k);font-weight:600}.t{color:var(--t);font-weight:600}.s{color:var(--s)}.n{color:var(--n)}.c{color:var(--c);font-style:italic}.p{color:var(--p)}.fn{color:var(--fn)}
 .code-title{font-family:var(--mono);font-size:14px;color:var(--muted);margin:0 0 5px 4px;font-weight:600}
 .f{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
 .f.on{opacity:1;transform:none}
-.console{font-family:var(--mono);font-size:15px;line-height:1.5;background:linear-gradient(135deg,#1e1b3a,#2a1f4d);border-radius:12px;padding:10px 16px;color:#e6f0ff;white-space:pre;overflow:hidden}
-.console::before{content:"● ● ●";display:block;color:#f472b6;font-size:11px;letter-spacing:3px;margin-bottom:4px}
-.console.err{color:#fda4af}
-.console.err::before{content:"● ● ●   javac";color:#fb7185}
+.console{font-family:var(--mono);font-size:15px;line-height:1.5;background:#17263e;border-radius:12px;padding:10px 16px;color:#e7f0fe;white-space:pre;overflow:hidden}
+.console::before{content:"● ● ●";display:block;color:#72a4f4;font-size:11px;letter-spacing:3px;margin-bottom:4px}
+.console.err{color:#a7c7fa}
+.console.err::before{content:"● ● ●   javac";color:#74a7f8}
 .cl{display:block;opacity:0;transform:translateX(-6px);transition:opacity .3s,transform .3s}
 .type.on .cl{opacity:1;transform:none}
 .explain{padding:12px 18px 14px}
@@ -77,41 +77,42 @@ code.i,p code,li code,td code{font-family:var(--mono);font-size:.86em;background
 .explain p{margin:4px 0}
 .explain table{border-collapse:separate;border-spacing:0;width:100%;font-size:15px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;margin:6px 0}
 .explain th,.explain td{padding:4px 8px;text-align:center;border-bottom:1px solid var(--line)}
-.explain th{background:linear-gradient(90deg,#f1eaff,#e6f8fd);font-weight:700}
+.explain th{background:#ebf2fe;font-weight:700}
 .explain tr:last-child td{border-bottom:none}
 .explain pre.mini{font-family:var(--mono);font-size:13.5px;line-height:1.4;background:var(--code);border:1px solid var(--line);border-radius:10px;padding:6px 12px;margin:6px 0;white-space:pre;overflow:hidden}
 .explain pre.mini code{background:none;border:none;padding:0;color:var(--text);font-size:inherit}
 .title-wrap{height:100%;display:flex;flex-direction:column;justify-content:center;position:relative}
-.kicker{font-family:var(--mono);color:#db2777;font-size:22px;margin-bottom:18px;font-weight:600}
+.kicker{font-family:var(--mono);color:#276cdb;font-size:22px;margin-bottom:18px;font-weight:600}
 .orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 9s ease-in-out infinite}
 @keyframes float{50%{transform:translate(30px,-25px)}}
 .agenda{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
-.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 12px;cursor:pointer;transition:all .2s;font-size:16px;line-height:1.3;box-shadow:0 2px 6px rgba(40,50,110,.05);display:flex;align-items:center}
-.ag:hover{border-color:#ec4899;transform:translateY(-3px);box-shadow:0 10px 24px -10px rgba(236,72,153,.45)}
-.ag:nth-child(4n+1){border-left:5px solid #7c3aed}.ag:nth-child(4n+2){border-left:5px solid #0891b2}.ag:nth-child(4n+3){border-left:5px solid #ec4899}.ag:nth-child(4n){border-left:5px solid #f59e0b}
-.ag b{color:#db2777;margin-right:8px;font-family:var(--mono)}
-.ag code{font-family:var(--mono);font-size:.88em;color:#be185d}
-#bar{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);transition:width .4s;z-index:5}
+.ag{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 12px;cursor:pointer;transition:all .2s;font-size:16px;line-height:1.3;box-shadow:0 2px 6px rgba(40,67,110,.05);display:flex;align-items:center}
+.ag:hover{border-color:#4887ec;transform:translateY(-3px);box-shadow:0 10px 24px -10px rgba(72,135,236,.45)}
+.ag:nth-child(4n+1){border-left:5px solid #3a7fed}.ag:nth-child(4n+2){border-left:5px solid #0949b1}.ag:nth-child(4n+3){border-left:5px solid #4887ec}.ag:nth-child(4n){border-left:5px solid #0e65f2}
+.ag b{color:#276cdb;margin-right:8px;font-family:var(--mono)}
+.ag code{font-family:var(--mono);font-size:.88em;color:#1858be}
+#bar{position:fixed;left:0;bottom:0;height:5px;background:#3a7fed;transition:width .4s;z-index:5}
 #nav{position:fixed;right:16px;bottom:12px;display:flex;gap:8px;align-items:center;z-index:5;font-family:var(--mono);font-size:14px;color:var(--muted)}
 #nav button{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:8px;width:36px;height:32px;cursor:pointer;font-size:16px}
 #nav button:hover{border-color:var(--accent)}
-#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#8a91b4;z-index:5}
+#hint{position:fixed;left:16px;bottom:12px;font-size:13px;color:#7495ca;z-index:5}
 @media (max-width:700px){#hint{display:none}}
 #deck.fitting .slide{transform:none!important;transition:none!important}
 @media print{#nav,#bar,#hint{display:none}}
 </style>
+<style id="htt-theme">.orb{display:none!important}</style>
 </head>
 <body>
 <div id="viewport"><div id="deck">
 <section class="slide" id="title">
-  <div class="orb" style="width:380px;height:380px;background:#f9a8d4;right:-60px;top:-80px"></div>
-  <div class="orb" style="width:300px;height:300px;background:#7dd3fc;left:40%;bottom:-120px;animation-delay:-4s"></div>
+  <div class="orb" style="width:380px;height:380px;background:#a8c7f9;right:-60px;top:-80px"></div>
+  <div class="orb" style="width:300px;height:300px;background:#81aff8;left:40%;bottom:-120px;animation-delay:-4s"></div>
   <div class="title-wrap">
     <div class="kicker in">// Java Programming · Week 3 · Short Q&amp;A</div>
     <h1 class="in">Java OOP<br><span class="grad">Những điểm khác C++</span></h1>
     <p class="in muted" style="font-size:26px;margin-top:20px;max-width:900px">21 câu hỏi ngắn dựa trên <b>03.02 More on Methods &amp; Classes</b> và <b>03.03 Inheritance</b>. Mỗi câu có input, output (chạy thật với JDK 21), giải thích chi tiết và so sánh với C++.</p>
     <p class="in" style="margin-top:30px;font-size:21px">Hồ Tuấn Thanh · <span class="muted">htthanh@fit.hcmus.edu.vn</span></p>
-    <p class="in" style="margin-top:14px;font-size:18px;color:#8a91b4">Dùng phím ← → hoặc Space để chuyển · A: hiện hết · F: toàn màn hình</p>
+    <p class="in" style="margin-top:14px;font-size:18px;color:#7495ca">Dùng phím ← → hoặc Space để chuyển · A: hiện hết · F: toàn màn hình</p>
   </div>
 </section>
 <section class="slide" id="agenda">
@@ -119,7 +120,7 @@ code.i,p code,li code,td code{font-family:var(--mono);font-size:.86em;background
   <div class="agenda in"><div class="ag" data-goto="q1"><b>01</b><span>Truy cập mặc định (default / package-private)</span></div><div class="ag" data-goto="q2"><b>02</b><span>Truyền tham số kiểu cơ sở (primitive)</span></div><div class="ag" data-goto="q3"><b>03</b><span>Truyền object: sửa field vs gán lại tham số</span></div><div class="ag" data-goto="q4"><b>04</b><span>Trả về object tạo bên trong method</span></div><div class="ag" data-goto="q5"><b>05</b><span>Không có tham số mặc định (default arguments)</span></div><div class="ag" data-goto="q6"><b>06</b><span>Phép gán <code>=</code> và "copy constructor"</span></div><div class="ag" data-goto="q7"><b>07</b><span>Biến static: khai báo, giá trị mặc định, cách truy cập</span></div><div class="ag" data-goto="q8"><b>08</b><span>Hạn chế của static method</span></div><div class="ag" data-goto="q9"><b>09</b><span>Static block (khối khởi tạo static)</span></div><div class="ag" data-goto="q10"><b>10</b><span>Đệ quy không có điểm dừng → StackOverflowError</span></div><div class="ag" data-goto="q11"><b>11</b><span>Từ khóa <code>extends</code> và đơn kế thừa</span></div><div class="ag" data-goto="q12"><b>12</b><span><code>protected</code> trong Java rộng hơn C++</span></div><div class="ag" data-goto="q13"><b>13</b><span>Gọi constructor lớp cha bằng <code>super(...)</code></span></div><div class="ag" data-goto="q14"><b>14</b><span>Thứ tự constructor &amp; gọi method override trong constructor</span></div><div class="ag" data-goto="q15"><b>15</b><span>Truy cập member bị che (name hiding) bằng <code>super.member</code></span></div><div class="ag" data-goto="q16"><b>16</b><span>Mọi method đều "virtual" theo mặc định</span></div><div class="ag" data-goto="q17"><b>17</b><span>Overload ở lớp con không che method lớp cha</span></div><div class="ag" data-goto="q18"><b>18</b><span>Tham chiếu lớp cha trỏ tới object lớp con – không có <em>object slicing</em></span></div><div class="ag" data-goto="q19"><b>19</b><span>Abstract method / abstract class</span></div><div class="ag" data-goto="q20"><b>20</b><span>Từ khóa <code>final</code>: method, class, biến</span></div><div class="ag" data-goto="q21"><b>21</b><span>Lớp gốc <code>Object</code> và <code>toString()</code></span></div></div>
 </section>
 <section class="slide" id="partA">
-  <div class="orb" style="width:340px;height:340px;background:#c4b5fd;right:6%;top:12%"></div>
+  <div class="orb" style="width:340px;height:340px;background:#b7d1fb;right:6%;top:12%"></div>
   <div class="title-wrap">
     <div class="kicker in">// Phần A · 03.02</div>
     <h1 class="in"><span class="grad">More on Methods and Classes</span></h1>
@@ -693,7 +694,7 @@ factR(0);   // C++: tràn stack -> Segmentation fault (core dumped)
   </div>
 </section>
 <section class="slide" id="partB">
-  <div class="orb" style="width:340px;height:340px;background:#c4b5fd;right:6%;top:12%"></div>
+  <div class="orb" style="width:340px;height:340px;background:#b7d1fb;right:6%;top:12%"></div>
   <div class="title-wrap">
     <div class="kicker in">// Phần B · 03.03</div>
     <h1 class="in"><span class="grad">Inheritance</span></h1>
@@ -1370,7 +1371,7 @@ std::ostream& operator<<(std::ostream& os, const Point2& p) {
 </section>
 <section class="slide" id="end">
   <div class="title-wrap" style="align-items:center;text-align:center">
-    <div class="orb" style="width:360px;height:360px;background:#f9a8d4;left:10%;top:10%"></div>
+    <div class="orb" style="width:360px;height:360px;background:#a8c7f9;left:10%;top:10%"></div>
     <h1 class="in">Tóm tắt: <span class="grad">Java ≠ C++</span></h1>
     <div class="cols3 in" style="margin-top:32px;text-align:left;max-width:1150px">
       <div class="card"><h3>Tham chiếu &amp; bộ nhớ</h3><p style="font-size:19px">Luôn <b>call-by-value</b>; biến object là <b>tham chiếu</b>, <code class="i">=</code> không copy object. Object nằm trên heap, có <b>GC</b>, không <code class="i">delete</code>, không destructor.</p></div>
