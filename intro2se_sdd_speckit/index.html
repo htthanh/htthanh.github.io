@@ -1,0 +1,1025 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lưu ý khi áp dụng Spec-Driven Development</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  --bg: #F7F9FC;
+  --bg2: #EAF0FA;
+  --ink: #0F1C36;
+  --body: #33425E;
+  --muted: #5B6983;
+  --blue: #1E56C8;
+  --blue-d: #163F96;
+  --blue-l: #D9E5F8;
+  --card: #FDFEFF;
+  --line: #C7D5EC;
+  --warn: #B0451B;
+  --warn-l: #FBE7DE;
+  --paper: #F7F9FD;
+  --on-blue: #DCE7F9;
+}
+
+body { font-family: 'Be Vietnam Pro', Arial, sans-serif; color: var(--ink); }
+
+section {
+  box-sizing: border-box;
+  padding: 128px 128px 160px;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  counter-increment: page;
+  color: var(--ink);
+  font-family: 'Be Vietnam Pro', Arial, sans-serif;
+}
+section.alt { background: var(--bg2); }
+section.cover { padding: 128px; justify-content: center; }
+section.blue { padding: 128px; background: var(--blue); color: var(--paper); justify-content: center; }
+
+section.std::before {
+  content: "Spec-Driven Development · Lưu ý khi áp dụng";
+  position: absolute; left: 128px; bottom: 64px; width: 1000px;
+  font-size: 24px; color: var(--muted);
+}
+section.std::after {
+  content: attr(data-page);
+  position: absolute; right: 128px; bottom: 64px; width: 200px;
+  text-align: right; font-size: 24px; font-weight: 600; color: var(--muted);
+}
+
+/* ---------- type ---------- */
+.eyebrow { font-size: 24px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--blue); margin: 0 0 16px; }
+h1.hero { font-size: 88px; font-weight: 700; line-height: 1.08; letter-spacing: -1px; color: var(--ink); margin: 0 0 32px; }
+h2.t { font-size: 56px; font-weight: 700; line-height: 1.15; letter-spacing: -0.5px; color: var(--ink); margin: 0 0 44px; }
+h3.ct { font-size: 34px; font-weight: 700; line-height: 1.2; color: var(--ink); margin: 0 0 14px; }
+.lead { font-size: 34px; line-height: 1.4; color: var(--body); margin: 0; }
+.txt { font-size: 28px; line-height: 1.45; color: var(--body); margin: 0; }
+.small { font-size: 24px; line-height: 1.4; color: var(--muted); margin: 0; }
+.meta { font-size: 28px; font-weight: 500; color: var(--muted); margin: 48px 0 0; }
+.strong { font-weight: 700; color: var(--ink); }
+.hl { color: var(--blue); font-weight: 600; }
+
+/* blue slides */
+.kicker { font-size: 28px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--on-blue); margin: 0 0 24px; }
+h2.big { font-size: 96px; font-weight: 700; line-height: 1.08; letter-spacing: -1px; color: var(--paper); margin: 0 0 36px; }
+.sub { font-size: 36px; line-height: 1.4; color: var(--on-blue); margin: 0; max-width: 1400px; }
+.bar { width: 120px; height: 10px; background: var(--paper); border-radius: 5px; margin: 0 0 40px; }
+.ref { font-size: 28px; line-height: 1.5; color: var(--paper); margin: 0 0 8px; }
+
+/* ---------- layout ---------- */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
+.grid4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 24px; }
+.split { display: grid; grid-template-columns: 1.45fr 1fr; gap: 40px; }
+.col { display: flex; flex-direction: column; gap: 20px; }
+.row { display: flex; align-items: flex-start; gap: 24px; }
+.flowrow { display: flex; align-items: center; gap: 20px; }
+
+.card { box-sizing: border-box; background: var(--card); border: 2px solid var(--line); border-radius: 20px; padding: 32px 36px; display: flex; flex-direction: column; }
+.card.tint { background: var(--blue-l); border-color: var(--blue-l); }
+.card.warnc { border-color: #E3B4A0; }
+.tag { font-size: 24px; font-weight: 600; color: var(--blue); background: var(--blue-l); padding: 6px 18px; border-radius: 24px; margin: 0 0 18px; align-self: flex-start; }
+.tag.warn { color: var(--warn); background: var(--warn-l); }
+.cmd { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 24px; font-weight: 600; color: var(--blue); margin: 0 0 10px; }
+.code { box-sizing: border-box; font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 24px; line-height: 1.55; color: var(--ink); background: var(--card); border: 2px solid var(--line); border-radius: 16px; padding: 28px 36px; margin: 0; }
+.code .cm { color: var(--muted); }
+.code .kw { color: var(--blue); font-weight: 600; }
+.quote { box-sizing: border-box; font-size: 28px; line-height: 1.45; color: var(--ink); background: var(--bg2); border-radius: 14px; padding: 24px 28px; margin: 0 0 20px; }
+
+ul.bul { font-size: 28px; line-height: 1.45; color: var(--body); margin: 0; padding-left: 36px; }
+ul.bul li { margin: 0 0 14px; }
+
+.badge { box-sizing: border-box; width: 60px; height: 60px; border-radius: 30px; background: var(--blue); color: var(--paper); font-size: 28px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin: 0; }
+.step { display: flex; align-items: center; gap: 28px; padding: 18px 0; border-bottom: 2px solid var(--line); }
+.icon { width: 56px; height: 56px; color: var(--blue); flex-shrink: 0; }
+.icon.sm { width: 40px; height: 40px; }
+.arrow { width: 64px; height: 32px; background: var(--blue); flex-shrink: 0; }
+
+table.tb { width: 100%; font-size: 26px; color: var(--body); font-family: 'Be Vietnam Pro', Arial, sans-serif; }
+table.tb.sm { font-size: 24px; }
+table.tb tr.hd { background: var(--blue-l); }
+table.tb th { font-weight: 700; color: var(--ink); text-align: left; padding: 14px 18px; }
+table.tb td { text-align: left; padding: 14px 18px; }
+
+/* cover */
+.panel { box-sizing: border-box; position: absolute; left: 1480px; top: 0; width: 440px; height: 1080px; padding: 0 64px; background: var(--blue); display: flex; flex-direction: column; justify-content: center; gap: 6px; }
+.pfile { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 30px; font-weight: 600; color: var(--paper); margin: 0; }
+.parrow { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 30px; color: var(--on-blue); margin: 0; }
+.coverbody { max-width: 1240px; display: flex; flex-direction: column; }
+
+/* ---------- motion ---------- */
+@keyframes rise { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes grow { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
+@keyframes slidein { from { opacity: 0; transform: translateX(80px); } to { opacity: 1; transform: translateX(0); } }
+.r { animation: rise 480ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(var(--i, 0) * 80ms); }
+.g { animation: grow 520ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(var(--i, 0) * 80ms); }
+.sl { animation: slidein 640ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.fragment { opacity: 0; transform: translateY(20px); transition: opacity 400ms ease, transform 400ms ease; }
+.fragment.visible { opacity: 1; transform: translateY(0); }
+
+/* observed-problems slides */
+.lname { font-size: 24px; font-weight: 700; color: var(--ink); margin: 0 0 10px; }
+.lane { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; }
+.lane .lname { width: 200px; flex-shrink: 0; margin: 0; }
+.cells { display: flex; gap: 8px; flex: 1; }
+.cell { font-size: 24px; text-align: center; padding: 10px 6px; border-radius: 10px; background: var(--bg2); color: var(--body); margin: 0; }
+.cells .cell { flex: 1; }
+.cell.b { background: var(--blue-l); color: var(--blue-d); font-weight: 600; margin: 0 0 8px; }
+.vcol { display: flex; flex-direction: column; }
+.erd { position: relative; width: 1000px; height: 580px; flex-shrink: 0; }
+.erdlines { position: absolute; left: 0; top: 0; }
+.ent { position: absolute; box-sizing: border-box; width: 400px; padding: 0 0 10px; background: var(--card); border: 2px solid var(--blue); border-radius: 14px; overflow: hidden; }
+.enth { font-size: 28px; font-weight: 700; color: var(--ink); background: var(--blue-l); padding: 8px 20px; margin: 0 0 6px; }
+.entf { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 24px; line-height: 1.35; color: var(--body); padding: 2px 20px; margin: 0; }
+.card-lbl { position: absolute; width: 30px; font-size: 24px; font-weight: 700; color: var(--blue); margin: 0; }
+
+
+html, body { margin: 0; height: 100%; background: #DDE5F2; overflow: hidden; }
+#stage { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; box-shadow: 0 8px 40px rgba(15,28,54,0.18); }
+#stage > section { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; display: none; }
+#stage > section.active { display: flex; }
+#stage > section > aside { display: none; }
+x-icon { display: inline-block; }
+x-icon svg { width: 100%; height: 100%; display: block; }
+x-shape { display: block; }
+x-shape[kind="arrow-right"] { clip-path: polygon(0 30%, 60% 30%, 60% 0, 100% 50%, 60% 100%, 60% 70%, 0 70%); }
+#progress { position: fixed; left: 0; bottom: 0; height: 6px; background: #1E56C8; transition: width 300ms ease; z-index: 10; }
+#notes { position: fixed; left: 0; right: 0; bottom: 6px; max-height: 34vh; overflow: auto; background: #F7F9FD; color: #0F1C36; border-top: 3px solid #1E56C8; font: 24px/1.5 'Be Vietnam Pro', Arial, sans-serif; padding: 16px 24px; display: none; z-index: 10; box-sizing: border-box; }
+#notes.on { display: block; }
+#help { position: fixed; right: 16px; top: 12px; font: 24px "Be Vietnam Pro", Arial, sans-serif; color: #33425E; background: #F7F9FD; padding: 8px 16px; border-radius: 8px; transition: opacity 600ms; pointer-events: none; z-index: 10; }
+
+</style>
+</head>
+<body>
+<div id="help">← → hoặc click: chuyển · N: ghi chú · F: toàn màn hình</div>
+<div id="stage">
+<section id="cover" class="cover" data-transition="fade">
+<div class="panel sl">
+<p class="pfile">constitution.md</p>
+<p class="parrow">↓</p>
+<p class="pfile">spec.md</p>
+<p class="parrow">↓</p>
+<p class="pfile">plan.md</p>
+<p class="parrow">↓</p>
+<p class="pfile">tasks.md</p>
+<p class="parrow">↓</p>
+<p class="pfile">code + test</p>
+</div>
+<div class="coverbody">
+<p class="eyebrow r" style="--i:0">Seminar · Sinh viên năm 3 CNTT</p>
+<h1 class="hero r" style="--i:1">Spec-Driven Development<br>với Spec Kit</h1>
+<p class="lead r" style="--i:2">Những lưu ý khi áp dụng cho course project web / mobile</p>
+<p class="meta r" style="--i:3">Hồ Tuấn Thanh · 2026-11-28</p>
+</div>
+<aside>Chào lớp, giới thiệu bản thân. Hỏi nhanh bằng giơ tay: Ai đã cài Spec Kit? Ai đã chạy hết một vòng specify → implement? Ai thấy AI "làm sai ý" dù đã viết spec? Dùng câu trả lời để điều chỉnh tốc độ phần 1. Nhấn mạnh: buổi hôm nay không dạy cú pháp lệnh, mà tập trung vào các lưu ý để dùng SDD hiệu quả trong course project.</aside>
+</section>
+<section id="goals" class="std alt">
+<p class="eyebrow r" style="--i:0">Mục tiêu buổi học</p>
+<h2 class="t r" style="--i:1">Sau 120 phút, bạn có thể…</h2>
+<div class="grid3">
+<div class="card r" style="--i:2">
+<x-icon name="Lightbulb" class="icon"></x-icon>
+<h3 class="ct" style="margin-top:20px">Hiểu</h3>
+<p class="txt">Giải thích vòng đời constitution → spec → plan → tasks → code của Spec Kit và vai trò của từng artifact.</p>
+</div>
+<div class="card r" style="--i:3">
+<x-icon name="Tool" class="icon"></x-icon>
+<h3 class="ct" style="margin-top:20px">Áp dụng</h3>
+<p class="txt">Viết constitution và spec đủ tốt cho một feature của project web / mobile, rồi review spec của nhóm khác.</p>
+</div>
+<div class="card r" style="--i:4">
+<x-icon name="Warning" class="icon"></x-icon>
+<h3 class="ct" style="margin-top:20px">Tránh</h3>
+<p class="txt">Nhận diện các anti-pattern phổ biến khi làm việc với AI agent và biết cách sửa trước khi mất cả tuần.</p>
+</div>
+</div>
+<p class="small r" style="--i:5; margin-top:40px">Ngoài phạm vi buổi học: hướng dẫn chi tiết một framework web / mobile cụ thể.</p>
+<aside>Ba mục tiêu tương ứng ba mức: hiểu, áp dụng, tránh lỗi. Nói rõ những gì buổi học KHÔNG làm, đây cũng là một ví dụ về mục "Out of scope" mà ta sẽ yêu cầu có trong spec.</aside>
+</section>
+<section id="s-basics" class="blue" data-transition="fade">
+<div class="bar g" style="--i:0"></div>
+<p class="kicker r" style="--i:1">Phần 1</p>
+<h2 class="big r" style="--i:2">SDD &amp; Spec Kit<br>trong 15 phút</h2>
+<p class="sub r" style="--i:3">Đủ để hiểu vì sao các lưu ý phía sau lại quan trọng.</p>
+<aside>Chuyển phần. Nếu lớp đã quen Spec Kit (theo kết quả hỏi nhanh), có thể đi nhanh phần này còn khoảng 10 phút.</aside>
+</section>
+<section id="vibe-vs-sdd" class="std">
+<p class="eyebrow r" style="--i:0">Vibe coding và Spec-driven</p>
+<h2 class="t r" style="--i:1">Cùng dùng AI, khác nhau ở điểm bắt đầu</h2>
+<table class="tb r" style="--i:2">
+<tr class="hd"><th style="width:22%">Tiêu chí</th><th style="width:39%">Vibe coding: prompt → code</th><th style="width:39%">Spec-driven: spec → plan → tasks → code</th></tr>
+<tr><td>Điểm bắt đầu</td><td>Một câu prompt</td><td>Spec mô tả WHAT &amp; WHY</td></tr>
+<tr><td>Tài liệu</td><td>Gần như không có</td><td>spec.md, plan.md, tasks.md nằm trong repo</td></tr>
+<tr><td>Khi đổi yêu cầu</td><td>Prompt lại, dễ làm vỡ code cũ</td><td>Sửa spec → cập nhật plan, tasks</td></tr>
+<tr><td>Làm nhóm</td><td>Mỗi người một kiểu</td><td>Constitution và spec dùng chung</td></tr>
+<tr><td>Phù hợp</td><td>Prototype vài giờ</td><td>Project nhiều tuần, nhiều người</td></tr>
+<tr><td>Chi phí ban đầu</td><td>Thấp</td><td>Cao hơn: viết và review spec</td></tr>
+</table>
+<aside>Không chê vibe coding: nó hợp với prototype. Course project kéo dài nhiều tuần, nhiều người, phải bảo vệ trước giảng viên, nên chi phí viết spec ban đầu được bù lại. Hỏi lớp: dòng nào là "đau" nhất với nhóm bạn ở các project trước? Thường là "khi đổi yêu cầu" và "làm nhóm".</aside>
+</section>
+<section id="sdd-idea" class="std alt">
+<p class="eyebrow r" style="--i:0">Ý tưởng cốt lõi</p>
+<h2 class="t r" style="--i:1">Spec là nguồn sự thật; code được sinh ra từ spec</h2>
+<div class="grid3">
+<div class="card r" style="--i:2">
+<p class="badge">1</p>
+<h3 class="ct" style="margin-top:24px">Ý định trước cài đặt</h3>
+<p class="txt">Thống nhất người dùng cần gì và vì sao, trước khi bàn framework hay database.</p>
+</div>
+<div class="card r" style="--i:3">
+<p class="badge">2</p>
+<h3 class="ct" style="margin-top:24px">Spec đủ chi tiết để “chạy”</h3>
+<p class="txt">Đủ rõ để AI sinh ra plan, tasks và code mà không phải đoán; mỗi yêu cầu kiểm thử được.</p>
+</div>
+<div class="card r" style="--i:4">
+<p class="badge">3</p>
+<h3 class="ct" style="margin-top:24px">Lặp có kiểm soát</h3>
+<p class="txt">Đổi yêu cầu thì đổi spec trước, rồi sinh lại plan và tasks. Mỗi vòng ứng với một feature nhỏ.</p>
+</div>
+</div>
+<p class="small r" style="--i:5; margin-top:40px">Theo tài liệu spec-driven.md trong repo github/spec-kit.</p>
+<aside>Ba nguyên tắc này là gốc của mọi lưu ý phía sau. Nếu một thao tác vi phạm một trong ba (ví dụ sửa code mà không sửa spec), đó là dấu hiệu sắp gặp rắc rối.</aside>
+</section>
+<section id="workflow" class="std">
+<p class="eyebrow r" style="--i:0">Quy trình Spec Kit</p>
+<h2 class="t r" style="--i:0">8 lệnh, mỗi lệnh để lại một artifact</h2>
+<div class="grid4">
+<div class="card r" style="--i:1; padding:26px 28px"><p class="cmd">1 /speckit.constitution</p><p class="small">constitution.md</p><p class="txt" style="font-size:26px; margin-top:8px">Nguyên tắc chung</p></div>
+<div class="card r" style="--i:2; padding:26px 28px"><p class="cmd">2 /speckit.specify</p><p class="small">spec.md</p><p class="txt" style="font-size:26px; margin-top:8px">WHAT &amp; WHY</p></div>
+<div class="card tint r" style="--i:3; padding:26px 28px"><p class="cmd">3 /speckit.clarify</p><p class="small">spec.md được bổ sung</p><p class="txt" style="font-size:26px; margin-top:8px">Hỏi lại chỗ mơ hồ</p></div>
+<div class="card r" style="--i:4; padding:26px 28px"><p class="cmd">4 /speckit.plan</p><p class="small">plan.md, data-model.md, contracts/</p><p class="txt" style="font-size:26px; margin-top:8px">HOW: stack, kiến trúc</p></div>
+<div class="card r" style="--i:5; padding:26px 28px"><p class="cmd">5 /speckit.tasks</p><p class="small">tasks.md</p><p class="txt" style="font-size:26px; margin-top:8px">Việc cần làm, có thứ tự</p></div>
+<div class="card tint r" style="--i:6; padding:26px 28px"><p class="cmd">6 /speckit.analyze</p><p class="small">báo cáo, không sửa file</p><p class="txt" style="font-size:26px; margin-top:8px">Kiểm tra nhất quán</p></div>
+<div class="card tint r" style="--i:7; padding:26px 28px"><p class="cmd">7 /speckit.checklist</p><p class="small">checklists/*.md</p><p class="txt" style="font-size:26px; margin-top:8px">Kiểm chất lượng yêu cầu</p></div>
+<div class="card r" style="--i:8; padding:26px 28px"><p class="cmd">8 /speckit.implement</p><p class="small">code + test</p><p class="txt" style="font-size:26px; margin-top:8px">Thực thi tasks</p></div>
+</div>
+<p class="small r" style="--i:8; margin-top:32px">Ô nền xanh: tuỳ chọn nhưng nên dùng. Bản Spec Kit cũ dùng /specify, /plan, /tasks; kiểm tra lệnh của phiên bản bạn cài.</p>
+<aside>Đi theo thứ tự 1 → 8. Nhấn mạnh: mỗi lệnh chỉ là một prompt mẫu + template + script; artifact sinh ra là file Markdown trong repo, nhóm đọc và sửa được. Ba bước tô xanh (clarify, analyze, checklist) hay bị bỏ qua nhất, và cũng là nơi chặn lỗi rẻ nhất. Cài đặt: theo README của github/spec-kit (công cụ dòng lệnh specify, lệnh specify init để khởi tạo project và chọn AI agent).</aside>
+</section>
+<section id="files" class="std alt">
+<p class="eyebrow r" style="--i:0">Cấu trúc thư mục</p>
+<h2 class="t r" style="--i:1">Artifact là file Markdown trong repo</h2>
+<div class="grid2" style="grid-template-columns:1fr 1.15fr; gap:48px">
+<p class="code r" style="--i:2; line-height:1.4">my-app/<br>├── .specify/<br>│&#160;&#160;&#160;├── memory/constitution.md<br>│&#160;&#160;&#160;├── scripts/<br>│&#160;&#160;&#160;└── templates/<br>├── specs/<br>│&#160;&#160;&#160;└── <span class="kw">001-expense-log/</span><br>│&#160;&#160;&#160;&#160;&#160;&#160;&#160;├── spec.md<br>│&#160;&#160;&#160;&#160;&#160;&#160;&#160;├── plan.md<br>│&#160;&#160;&#160;&#160;&#160;&#160;&#160;├── research.md<br>│&#160;&#160;&#160;&#160;&#160;&#160;&#160;├── data-model.md<br>│&#160;&#160;&#160;&#160;&#160;&#160;&#160;├── contracts/<br>│&#160;&#160;&#160;&#160;&#160;&#160;&#160;├── checklists/<br>│&#160;&#160;&#160;&#160;&#160;&#160;&#160;└── tasks.md<br>└── src/</p>
+<div class="col">
+<div class="row r" style="--i:3"><x-icon name="Check" class="icon sm"></x-icon><p class="txt">Commit cả <span class="hl">.specify/</span> và <span class="hl">specs/</span>: spec là tài liệu của nhóm, không phải file nháp.</p></div>
+<div class="row r" style="--i:4"><x-icon name="Check" class="icon sm"></x-icon><p class="txt">Mỗi feature = một thư mục + một branch cùng số thứ tự (001, 002…).</p></div>
+<div class="row r" style="--i:5"><x-icon name="Check" class="icon sm"></x-icon><p class="txt">Chỉ sửa templates/ khi cả nhóm đồng ý; sửa lệch sẽ làm các spec không còn cùng khuôn.</p></div>
+<div class="row r" style="--i:6"><x-icon name="Warning" class="icon sm" style="color:#B0451B"></x-icon><p class="txt">Thư mục cấu hình của AI agent có thể chứa token hoặc thông tin đăng nhập: kiểm tra .gitignore trước khi commit.</p></div>
+</div>
+</div>
+<aside>Cho xem cây thư mục thật nếu có demo. Lưu ý cuối: README của Spec Kit cũng cảnh báo về việc thư mục agent có thể chứa credential. Đây là lỗi hay gặp khi sinh viên đẩy repo public để nộp bài.</aside>
+</section>
+<section id="roles" class="std">
+<p class="eyebrow r" style="--i:0">Phân vai</p>
+<h2 class="t r" style="--i:1">Ai làm gì: nhóm sinh viên và AI agent</h2>
+<div class="grid2">
+<div class="card r" style="--i:2">
+<p class="tag">Nhóm bạn chịu trách nhiệm</p>
+<ul class="bul">
+<li>Quyết định phạm vi và độ ưu tiên</li>
+<li>Trả lời câu hỏi ở bước clarify</li>
+<li>Chọn và duyệt tech stack</li>
+<li>Review từng diff, chạy app, chạy test</li>
+<li>Giải thích được mọi dòng code khi vấn đáp</li>
+</ul>
+</div>
+<div class="card r" style="--i:3">
+<p class="tag">AI agent làm tốt</p>
+<ul class="bul">
+<li>Soạn nháp spec, plan, tasks theo template</li>
+<li>Chỉ ra chỗ mơ hồ, thiếu tiêu chí chấp nhận</li>
+<li>Sinh boilerplate, CRUD, khung test</li>
+<li>Đối chiếu nhất quán giữa các artifact</li>
+</ul>
+</div>
+</div>
+<p class="txt r" style="--i:4; margin-top:36px"><span class="strong">Spec Kit chỉ là template + script + prompt.</span> Chất lượng đầu ra phụ thuộc chất lượng suy nghĩ đầu vào.</p>
+<aside>Câu chốt: công cụ không thay thế việc suy nghĩ về yêu cầu. Khi AI làm sai, câu hỏi đầu tiên là "spec của mình đã đủ rõ chưa?", câu hỏi thứ hai mới là "AI có làm đúng spec không?".</aside>
+</section>
+<section id="myths" class="std alt">
+<p class="eyebrow r" style="--i:0">Hiểu lầm thường gặp</p>
+<h2 class="t r" style="--i:1">Bốn hiểu lầm trước khi bắt đầu</h2>
+<div class="grid2">
+<div class="card fragment"><p class="tag warn">“Có spec rồi thì AI làm đúng hết”</p><p class="txt">Spec chỉ giảm mơ hồ. Vẫn phải review code và chạy test.</p></div>
+<div class="card fragment"><p class="tag warn">“Spec càng dài càng tốt”</p><p class="txt">Spec dài thì khó review. Ưu tiên rõ ràng và kiểm thử được.</p></div>
+<div class="card fragment"><p class="tag warn">“Viết spec một lần là xong”</p><p class="txt">Spec là tài liệu sống, cập nhật mỗi khi yêu cầu thay đổi.</p></div>
+<div class="card fragment"><p class="tag warn">“SDD là waterfall”</p><p class="txt">SDD lặp theo từng feature nhỏ; mỗi feature đi hết một vòng trong vài ngày.</p></div>
+</div>
+<aside>Bấm để hiện từng thẻ. Trước mỗi thẻ, hỏi lớp đồng ý hay không. Hiểu lầm số 4 quan trọng: nhiều nhóm viết spec cho toàn bộ project ở tuần 2 rồi không bao giờ mở lại, đó chính là waterfall.</aside>
+</section>
+<section id="s-steps" class="blue" data-transition="fade">
+<div class="bar g" style="--i:0"></div>
+<p class="kicker r" style="--i:1">Phần 2</p>
+<h2 class="big r" style="--i:2">Lưu ý theo từng bước<br>của Spec Kit</h2>
+<p class="sub r" style="--i:3">constitution → specify → clarify → plan → tasks → analyze → implement</p>
+<aside>Phần trọng tâm. Mỗi bước có: mục đích, lưu ý, ví dụ tốt / chưa tốt. Ví dụ xuyên suốt: ứng dụng quản lý chi tiêu cho sinh viên.</aside>
+</section>
+<section id="const-what" class="std">
+<p class="eyebrow r" style="--i:0">Bước 1 · /speckit.constitution</p>
+<h2 class="t r" style="--i:1">Constitution: luật chơi chung, ngắn và kiểm chứng được</h2>
+<div class="grid2">
+<div class="card r" style="--i:2">
+<p class="tag">Nên có</p>
+<ul class="bul">
+<li>Stack và phiên bản nhóm đã chốt</li>
+<li>Quy ước code: lint, format, đặt tên, cấu trúc thư mục</li>
+<li>Chuẩn test: mỗi user story có test tự động</li>
+<li>Ràng buộc môn học: deadline, không dùng dịch vụ trả phí, nơi deploy</li>
+<li>Nguyên tắc đơn giản: không thêm thư viện khi chưa cần</li>
+</ul>
+</div>
+<div class="card warnc r" style="--i:3">
+<p class="tag warn">Nên tránh</p>
+<ul class="bul">
+<li>Câu chung chung: “code sạch, hiệu năng cao”</li>
+<li>Chép nguyên constitution mẫu của nhóm khác</li>
+<li>Mâu thuẫn nội bộ, ví dụ “dùng MongoDB” và “chỉ dùng SQL”</li>
+<li>Dài quá 2 trang: cả người và AI đều bỏ qua</li>
+</ul>
+</div>
+</div>
+<aside>Constitution được Spec Kit dùng làm "cổng kiểm tra" khi lập plan. Một nguyên tắc tốt là nguyên tắc mà người review có thể trả lời "đạt / không đạt". "Code sạch" không kiểm được; "mọi API đều có test tích hợp" thì kiểm được. Ràng buộc môn học (deadline, ngân sách 0 đồng, phải deploy được để demo) rất hay bị quên.</aside>
+</section>
+<section id="const-example" class="std alt">
+<p class="eyebrow r" style="--i:0">Bước 1 · Ví dụ</p>
+<h2 class="t r" style="--i:1">Một constitution “đủ dùng” cho course project</h2>
+<div class="split">
+<p class="code r" style="--i:2"><span class="kw"># Constitution: SpendWise</span><br><span class="kw">## I. Simplicity First</span><br>One web app + one PostgreSQL DB.<br>No microservices, no queues.<br><span class="kw">## II. Test per User Story</span><br>Each P1 story MUST have an<br>automated test before merge.<br><span class="kw">## III. Mobile-first UI</span><br>Every screen MUST work at 360px.<br><span class="kw">## IV. No Secrets in Repo</span><br>Keys live in .env (gitignored).<br><span class="cm">Version 1.0 · changes need 2 approvals</span></p>
+<div class="col" style="gap:24px">
+<h3 class="ct r" style="--i:3">Vì sao ổn?</h3>
+<div class="row r" style="--i:4"><x-icon name="Check" class="icon sm"></x-icon><p class="txt">Mỗi nguyên tắc dùng MUST kèm điều kiện đo được.</p></div>
+<div class="row r" style="--i:5"><x-icon name="Check" class="icon sm"></x-icon><p class="txt">Có tên, đánh số, có phiên bản: plan có thể trích dẫn khi kiểm tra.</p></div>
+<div class="row r" style="--i:6"><x-icon name="Check" class="icon sm"></x-icon><p class="txt">Phản ánh ràng buộc thật: thời gian ngắn, demo trên điện thoại.</p></div>
+<div class="row r" style="--i:7"><x-icon name="Check" class="icon sm"></x-icon><p class="txt">Đổi nguyên tắc phải qua quy trình, không ai tự sửa.</p></div>
+</div>
+</div>
+<aside>Đây là ví dụ minh hoạ, không phải mẫu bắt buộc. Có thể viết bằng tiếng Việt; tiếng Anh giúp AI bám keyword MUST/SHOULD tốt hơn nhưng không bắt buộc. Gợi ý: chạy /speckit.constitution kèm mô tả các nguyên tắc nhóm muốn, rồi đọc và cắt bớt những gì AI tự thêm.</aside>
+</section>
+<section id="spec-what-why" class="std">
+<p class="eyebrow r" style="--i:0">Bước 2 · /speckit.specify</p>
+<h2 class="t r" style="--i:1">Spec nói WHAT &amp; WHY, chưa nói HOW</h2>
+<div class="grid2">
+<div class="card warnc r" style="--i:2">
+<p class="tag warn">Chưa tốt</p>
+<p class="quote">“Làm app quản lý chi tiêu bằng React Native + Firebase, có login Google, dùng Redux, giao diện đẹp và nhanh.”</p>
+<ul class="bul">
+<li>Trộn tech stack vào spec</li>
+<li>“Đẹp, nhanh” không kiểm thử được</li>
+<li>Không nói ai dùng, để làm gì</li>
+</ul>
+</div>
+<div class="card fragment">
+<p class="tag">Tốt hơn</p>
+<p class="quote">“Giúp sinh viên ghi một khoản chi trong dưới 10 giây, xem tổng chi theo tuần / tháng và nhận cảnh báo khi vượt ngân sách tự đặt. Dữ liệu chỉ người dùng đó xem được. Ngoài phạm vi: chi tiêu nhóm, kết nối ngân hàng.”</p>
+<p class="txt">Có người dùng, mục đích, tiêu chí đo được và ranh giới.</p>
+</div>
+</div>
+<aside>Bấm để hiện ví dụ tốt hơn. Tech stack để dành cho bước plan. Lý do: nếu spec chứa stack, khi đổi stack phải sửa spec; và AI dễ nhảy thẳng vào code mà bỏ qua việc làm rõ yêu cầu. Hỏi lớp: trong ví dụ tốt, câu nào có thể biến thành test? ("dưới 10 giây", "chỉ người dùng đó xem được").</aside>
+</section>
+<section id="spec-stories" class="std alt">
+<p class="eyebrow r" style="--i:0">Bước 2 · User story</p>
+<h2 class="t r" style="--i:1">Mỗi story có ưu tiên và kiểm thử độc lập được</h2>
+<div class="split" style="grid-template-columns:1.25fr 1fr">
+<div class="card r" style="--i:2; padding:28px 32px">
+<h3 class="ct">Story 1: Ghi chi tiêu nhanh (P1)</h3>
+<p class="txt" style="margin:0 0 18px">Là sinh viên, tôi muốn thêm một khoản chi trong tối đa 3 thao tác để không bỏ dở giữa chừng.</p>
+<p class="quote" style="font-size:26px; margin:0 0 14px"><b>Given</b> đã đăng nhập, <b>When</b> nhập 35.000 và chọn “Ăn uống”, <b>Then</b> khoản chi hiện đầu danh sách và tổng ngày tăng 35.000.</p>
+<p class="quote" style="font-size:26px; margin:0"><b>Given</b> chưa nhập số tiền, <b>When</b> bấm Lưu, <b>Then</b> hiện lỗi “Vui lòng nhập số tiền”.</p>
+</div>
+<div class="col">
+<div class="row r" style="--i:3"><p class="badge">P1</p><p class="txt">= MVP. Chỉ làm xong các story P1 vẫn demo được.</p></div>
+<div class="row r" style="--i:4"><p class="badge">✓</p><p class="txt">Story test được độc lập; Spec Kit nhóm tasks theo từng story.</p></div>
+<div class="row r" style="--i:5"><p class="badge">#</p><p class="txt">Acceptance dạng Given / When / Then, có số liệu cụ thể.</p></div>
+<div class="row r" style="--i:6"><p class="badge">!</p><p class="txt">Điền Edge cases và Success criteria đo được, ví dụ “90% lượt thêm chi dưới 10 giây”.</p></div>
+</div>
+</div>
+<aside>Template spec của Spec Kit có các mục: User Scenarios &amp; Testing (story có ưu tiên), Edge Cases, Functional Requirements, Success Criteria. Lưu ý quan trọng nhất: "độc lập". Nếu story 2 chỉ test được khi story 3 xong thì nên gộp hoặc tách lại. Mỗi Given/When/Then về sau sẽ thành một test case.</aside>
+</section>
+<section id="spec-scope" class="std">
+<p class="eyebrow r" style="--i:0">Bước 2 · Phạm vi</p>
+<h2 class="t r" style="--i:1">Chốt phạm vi trước khi AI tự “sáng tạo”</h2>
+<div class="grid3">
+<div class="card r" style="--i:2">
+<x-icon name="Star" class="icon"></x-icon>
+<h3 class="ct" style="margin-top:18px">MVP</h3>
+<p class="txt">3–5 story P1 đủ để demo cuối kỳ. Mọi thứ khác xếp P2, P3.</p>
+</div>
+<div class="card r" style="--i:3">
+<x-icon name="Lock" class="icon"></x-icon>
+<h3 class="ct" style="margin-top:18px">Ngoài phạm vi</h3>
+<p class="txt">Ghi rõ những gì KHÔNG làm: thanh toán, chat realtime, trang admin… để chặn AI tự thêm.</p>
+</div>
+<div class="card r" style="--i:4">
+<x-icon name="Activity" class="icon"></x-icon>
+<h3 class="ct" style="margin-top:18px">Phi chức năng</h3>
+<p class="txt">Responsive, thời gian phản hồi, offline, phân quyền, dữ liệu cá nhân: viết thành tiêu chí đo được.</p>
+</div>
+</div>
+<div class="card tint r" style="--i:5; margin-top:36px; padding:24px 36px">
+<p class="txt"><span class="strong">Gợi ý:</span> một spec ≈ một feature nhóm làm xong trong một sprint (1–2 tuần). Lớn hơn thì tách.</p>
+</div>
+<aside>AI agent có xu hướng "làm thêm cho đủ bộ": thêm phân quyền admin, thêm dark mode, thêm export PDF. Mục Ngoài phạm vi là cách rẻ nhất để chặn. Con số 1–2 tuần là gợi ý kinh nghiệm, không phải quy định của Spec Kit.</aside>
+</section>
+<section id="clarify" class="std alt">
+<p class="eyebrow r" style="--i:0">Bước 3 · /speckit.clarify</p>
+<h2 class="t r" style="--i:1">Đừng bỏ qua clarify: mỗi câu hỏi chặn một bug từ sớm</h2>
+<div class="grid2">
+<div class="card r" style="--i:2">
+<p class="tag">AI hỏi</p>
+<p class="txt strong" style="margin:0 0 16px">Khi mất mạng, khoản chi mới được xử lý thế nào?</p>
+<p class="txt">A. Chặn không cho lưu<br>B. Lưu trên máy, đồng bộ sau<br>C. Ngoài phạm vi MVP</p>
+<p class="quote" style="margin:24px 0 0">Nhóm chọn C, ghi vào mục Clarifications và Out of scope của spec.md.</p>
+</div>
+<div class="col">
+<div class="row r" style="--i:3"><x-icon name="Users" class="icon sm"></x-icon><p class="txt">Cả nhóm cùng trả lời; không để AI tự chọn đáp án mặc định.</p></div>
+<div class="row r" style="--i:4"><x-icon name="Chat" class="icon sm"></x-icon><p class="txt">Câu nào chưa chắc: hỏi giảng viên hoặc “khách hàng”, rồi ghi lại.</p></div>
+<div class="row r" style="--i:5"><x-icon name="Clock" class="icon sm"></x-icon><p class="txt">Chạy clarify trước plan. Đổi spec sau khi đã plan thì phải plan lại.</p></div>
+<div class="row r" style="--i:6"><x-icon name="Search" class="icon sm"></x-icon><p class="txt">Tìm trong spec: không còn dấu [NEEDS CLARIFICATION] trước khi sang bước 4.</p></div>
+</div>
+</div>
+<aside>Clarify đặt các câu hỏi ngắn có phương án gợi ý và ghi câu trả lời ngược vào spec. Lưu ý: AI hay đề xuất phương án "đầy đủ nhất" (như B), trong khi với course project phương án C thường hợp lý hơn. Quyết định là của nhóm.</aside>
+</section>
+<section id="plan-notes" class="std">
+<p class="eyebrow r" style="--i:0">Bước 4 · /speckit.plan</p>
+<h2 class="t r" style="--i:1">Plan: nhóm quyết định HOW, AI chỉ đề xuất</h2>
+<p class="code r" style="--i:2; margin:0 0 28px">/speckit.plan Next.js + PostgreSQL (Prisma), deploy lên Vercel. Không thêm thư viện quản lý state.</p>
+<div class="grid2" style="gap:24px">
+<div class="card r" style="--i:3; padding:24px 32px"><h3 class="ct" style="font-size:30px">Stack nhóm đã biết</h3><p class="txt">Course project không phải lúc học ba framework mới cùng lúc.</p></div>
+<div class="card r" style="--i:4; padding:24px 32px"><h3 class="ct" style="font-size:30px">Đọc research.md</h3><p class="txt">Thư viện có thật, còn được bảo trì, đúng phiên bản. AI có thể bịa API.</p></div>
+<div class="card r" style="--i:5; padding:24px 32px"><h3 class="ct" style="font-size:30px">Soát data-model và contracts/</h3><p class="txt">Entity, quan hệ, endpoint khớp spec: chỗ sửa rẻ nhất.</p></div>
+<div class="card r" style="--i:6; padding:24px 32px"><h3 class="ct" style="font-size:30px">Constitution Check</h3><p class="txt">Vi phạm nguyên tắc nào thì phải có lý do trong Complexity Tracking.</p></div>
+</div>
+<aside>Câu lệnh mẫu chỉ là minh hoạ, nhóm thay bằng stack của mình. Plan sinh ra nhiều file: plan.md, research.md, data-model.md, contracts/, quickstart.md. Đừng chỉ đọc plan.md. data-model.md là nơi dễ phát hiện spec thiếu (ví dụ: chưa nói một khoản chi có thuộc nhiều danh mục không).</aside>
+</section>
+<section id="plan-pitfalls" class="std alt">
+<p class="eyebrow r" style="--i:0">Bước 4 · Dấu hiệu cần dừng lại</p>
+<h2 class="t r" style="--i:1">Năm dấu hiệu plan đang đi sai hướng</h2>
+<table class="tb r" style="--i:2">
+<tr class="hd"><th style="width:34%">Dấu hiệu trong plan</th><th style="width:28%">Rủi ro</th><th style="width:38%">Cách xử lý</th></tr>
+<tr><td>Microservices, Kubernetes, message queue</td><td>Trễ deadline, khó deploy</td><td>Một app + một DB, ghi vào constitution</td></tr>
+<tr><td>Thư viện lạ, phiên bản không tồn tại</td><td>Build lỗi, mất ngày debug</td><td>Tra npm / pub.dev / Maven trước khi duyệt</td></tr>
+<tr><td>Stack khác constitution</td><td>Code lệch chuẩn nhóm</td><td>Chạy lại plan, ghi rõ stack trong lệnh</td></tr>
+<tr><td>Không nhắc xác thực, phân quyền</td><td>Lỗ hổng bảo mật</td><td>Bổ sung yêu cầu auth vào spec</td></tr>
+<tr><td>Data model thiếu ràng buộc</td><td>Dữ liệu rác, bug khó tìm</td><td>Soát khoá, unique, nullable trước tasks</td></tr>
+</table>
+<aside>Hỏi lớp: nhóm nào từng gặp dòng 1 hoặc dòng 2? Thư viện không tồn tại là lỗi kinh điển của LLM. Ngoài ra còn rủi ro bảo mật: package có tên gần giống package thật (typosquatting). Luôn tra registry chính thức.</aside>
+</section>
+<section id="tasks" class="std">
+<p class="eyebrow r" style="--i:0">Bước 5 · /speckit.tasks</p>
+<h2 class="t r" style="--i:1">tasks.md: nhỏ, có thứ tự, truy về được user story</h2>
+<p class="code r" style="--i:2; margin:0 0 32px"><span class="kw">## Phase 3: User Story 1, Ghi chi tiêu (P1)</span><br>- [ ] T010 [P] [US1] Test POST /expenses in tests/api/expenses.test.ts<br>- [ ] T011 [P] [US1] Expense model in src/models/expense.ts<br>- [ ] T012 [US1] ExpenseService.create in src/services/expense.ts<br>- [ ] T013 [US1] Add-expense screen in src/app/add/page.tsx<br><span class="cm">Checkpoint: US1 chạy và test được độc lập</span></p>
+<div class="grid3" style="gap:24px">
+<div class="card r" style="--i:3; padding:24px 30px"><p class="cmd">[P]</p><p class="txt">Chạy song song được, nhưng chỉ khi khác file và không phụ thuộc nhau.</p></div>
+<div class="card r" style="--i:4; padding:24px 30px"><p class="cmd">Kích thước</p><p class="txt">Một task khoảng 1–2 giờ. Lớn hơn thì tách nhỏ.</p></div>
+<div class="card r" style="--i:5; padding:24px 30px"><p class="cmd">Đọc trước</p><p class="txt">Thiếu test? Sai thứ tự? Thừa task ngoài phạm vi? Sửa tasks.md trước khi implement.</p></div>
+</div>
+<aside>Định dạng ID task, nhãn [P] và [US1] theo template tasks của Spec Kit; tasks được nhóm theo phase: Setup, Foundational, rồi mỗi user story một phase. Con số 1–2 giờ là gợi ý để review được. Task "Implement toàn bộ backend" là dấu hiệu tasks quá thô.</aside>
+</section>
+<section id="analyze" class="std alt">
+<p class="eyebrow r" style="--i:0">Bước 6 · /speckit.analyze &amp; /speckit.checklist</p>
+<h2 class="t r" style="--i:1">Kiểm tra trước khi viết code: rẻ hơn sửa sau</h2>
+<div class="grid2">
+<div class="card r" style="--i:2">
+<p class="cmd">/speckit.analyze</p>
+<ul class="bul">
+<li>Đọc chéo spec ↔ plan ↔ tasks, chỉ báo cáo, không sửa file</li>
+<li>Bắt lỗi: yêu cầu không có task, task không gắn yêu cầu, thuật ngữ lệch, vi phạm constitution</li>
+<li>Xử lý hết mục CRITICAL trước khi implement</li>
+</ul>
+</div>
+<div class="card r" style="--i:3">
+<p class="cmd">/speckit.checklist</p>
+<ul class="bul">
+<li>“Unit test cho yêu cầu”: kiểm chất lượng spec, không kiểm code</li>
+<li>Ví dụ: “Đã định nghĩa thông báo lỗi cho mọi trường bắt buộc chưa?”</li>
+<li>Tạo theo chủ đề: UX, bảo mật, API…</li>
+</ul>
+</div>
+</div>
+<aside>Analyze là bước chỉ đọc, phân loại mức độ vấn đề. Checklist hay bị hiểu nhầm là checklist test code; thực chất nó kiểm câu chữ của yêu cầu: có đầy đủ, rõ ràng, nhất quán, đo được không. Với course project, một checklist UX và một checklist bảo mật là đủ.</aside>
+</section>
+<section id="implement" class="std">
+<p class="eyebrow r" style="--i:0">Bước 7 · /speckit.implement</p>
+<h2 class="t r" style="--i:1">Implement từng phase, đừng “bấm một lần rồi đi ngủ”</h2>
+<div class="step fragment"><p class="badge">1</p><p class="txt">Chạy theo phase hoặc theo user story, ví dụ chỉ Phase 1–2 (Setup, Foundational) trước.</p></div>
+<div class="step fragment"><p class="badge">2</p><p class="txt">Sau mỗi phase: chạy app, chạy test, đọc diff. Không hiểu đoạn nào thì hỏi AI giải thích.</p></div>
+<div class="step fragment"><p class="badge">3</p><p class="txt">Commit nhỏ, message trỏ về task: <span class="hl">feat(US1): T012 ExpenseService.create</span></p></div>
+<div class="step fragment"><p class="badge">4</p><p class="txt">Gặp lỗi: do yêu cầu sai thì sửa spec / plan; do cài đặt sai thì sửa code + test.</p></div>
+<div class="step fragment" style="border-bottom:none"><p class="badge">5</p><p class="txt">Chỉ đánh dấu [X] trong tasks.md khi đã tự kiểm chứng task chạy đúng.</p></div>
+<aside>Bấm để hiện từng bước. Chạy implement cho cả tasks.md một lần sẽ tạo diff hàng nghìn dòng, không ai review nổi, và khi hỏng thì không biết hỏng từ đâu. Bước 4 là phân loại quan trọng: lỗi yêu cầu khác lỗi cài đặt.</aside>
+</section>
+<section id="own-it" class="blue" data-transition="fade">
+<div class="bar g" style="--i:0"></div>
+<h2 class="big r" style="--i:1">AI viết code.<br>Nhóm bạn ký tên.</h2>
+<p class="sub r" style="--i:3">Mỗi dòng code trong repo phải có ít nhất một thành viên hiểu và giải thích được khi vấn đáp.</p>
+<aside>Câu chốt phần 2. Dừng lại vài giây. Đây là tiêu chí giảng viên thường dùng khi vấn đáp: chọn ngẫu nhiên một đoạn code và hỏi thành viên phụ trách.</aside>
+</section>
+<section id="s-cross" class="blue" data-transition="fade">
+<div class="bar g" style="--i:0"></div>
+<p class="kicker r" style="--i:1">Phần 3</p>
+<h2 class="big r" style="--i:2">Lưu ý xuyên suốt</h2>
+<p class="sub r" style="--i:3">Git · làm việc nhóm · spec drift · context · test và bảo mật · web / mobile · liêm chính học thuật</p>
+<aside>Những lưu ý không thuộc riêng một bước nào nhưng quyết định project có trôi chảy hay không.</aside>
+</section>
+<section id="git" class="std">
+<p class="eyebrow r" style="--i:0">Git</p>
+<h2 class="t r" style="--i:1">Spec và code đi cùng một branch, một PR</h2>
+<div class="grid2" style="grid-template-columns:1fr 1fr; gap:40px">
+<p class="code r" style="--i:2">$ git log --oneline<br>a91c2e feat(US1): T013 add screen<br>7d03b1 feat(US1): T012 service<br>4f2a88 test(US1): T010 POST /expenses<br>c19e07 docs(001): tasks.md<br>b2d6f4 docs(001): plan, data-model<br>e83a10 docs(001): spec, clarify<br><span class="cm">branch: 001-expense-log</span></p>
+<div class="col">
+<div class="row r" style="--i:3"><x-icon name="Link" class="icon sm"></x-icon><p class="txt">Spec Kit tạo branch theo số feature; script dựa vào tên branch, đừng đổi tuỳ tiện.</p></div>
+<div class="row r" style="--i:4"><x-icon name="Check" class="icon sm"></x-icon><p class="txt">Commit sau mỗi bước Spec Kit để rollback được khi AI làm hỏng.</p></div>
+<div class="row r" style="--i:5"><x-icon name="Search" class="icon sm"></x-icon><p class="txt">PR chứa cả specs/ để reviewer đối chiếu code với yêu cầu.</p></div>
+<div class="row r" style="--i:6"><x-icon name="Lock" class="icon sm"></x-icon><p class="txt">Không commit .env, khoá API, cấu hình agent có credential.</p></div>
+</div>
+</div>
+<aside>Lịch sử commit như bên trái cũng là bằng chứng quá trình làm việc khi chấm điểm: thấy được spec có trước code. Các script của Spec Kit xác định thư mục feature hiện tại dựa vào tên branch, nên đổi tên branch có thể khiến lệnh tìm sai thư mục spec.</aside>
+</section>
+<section id="team" class="std alt">
+<p class="eyebrow r" style="--i:0">Làm việc nhóm</p>
+<h2 class="t r" style="--i:1">Chia việc theo feature, không chia theo bước</h2>
+<div class="grid2">
+<div class="card r" style="--i:2"><p class="tag">Nên</p><p class="txt">Mỗi thành viên sở hữu 1–2 feature từ spec đến code. Một người khác review spec trước khi plan.</p></div>
+<div class="card warnc r" style="--i:3"><p class="tag warn">Không nên</p><p class="txt">Chia ngang theo layer (A frontend, B backend, C database) hoặc theo bước (spec / plan / code): không ai ghép được trọn một chức năng.</p></div>
+<div class="card r" style="--i:4"><p class="tag">Trùng số feature</p><p class="txt">Hai người cùng tạo 003-… trên hai branch. Giữ một bảng đăng ký feature trong README hoặc issue.</p></div>
+<div class="card r" style="--i:5"><p class="tag">Constitution chung</p><p class="txt">Chỉ đổi qua PR, cả nhóm duyệt. Ghi phiên bản và lý do thay đổi.</p></div>
+</div>
+<aside>Chia theo bước nghe công bằng nhưng tạo "dây chuyền" chờ nhau và không ai chịu trách nhiệm trọn vẹn. Chia theo feature giúp mỗi người có câu chuyện riêng khi vấn đáp. Vấn đề trùng số feature xảy ra vì Spec Kit đánh số dựa trên những gì có trên máy / branch hiện tại. Phần 4 sẽ phân tích kỹ vấn đề chia ngang theo layer mà nhiều nhóm đang gặp.</aside>
+</section>
+<section id="drift" class="std">
+<p class="eyebrow r" style="--i:0">Spec drift</p>
+<h2 class="t r" style="--i:1">Khi code và spec nói hai điều khác nhau</h2>
+<div class="flowrow" style="margin:0 0 40px">
+<div class="card tint g" style="--i:2; flex:1; padding:24px 28px"><p class="txt strong">Yêu cầu đổi</p></div>
+<div class="g" style="--i:3"><x-shape kind="arrow-right" class="arrow"></x-shape></div>
+<div class="card g" style="--i:4; flex:1; padding:24px 28px"><p class="txt strong">Sửa spec.md</p></div>
+<div class="g" style="--i:5"><x-shape kind="arrow-right" class="arrow"></x-shape></div>
+<div class="card g" style="--i:6; flex:1; padding:24px 28px"><p class="txt strong">Cập nhật plan, tasks</p></div>
+<div class="g" style="--i:7"><x-shape kind="arrow-right" class="arrow"></x-shape></div>
+<div class="card g" style="--i:8; flex:1; padding:24px 28px"><p class="txt strong">Implement + test</p></div>
+</div>
+<div class="grid2">
+<div class="card warnc fragment"><p class="tag warn">Sửa thẳng code, quên spec</p><p class="txt">Lần implement sau, AI “sửa lại” theo spec cũ; spec mất giá trị khi chấm và khi bàn giao.</p></div>
+<div class="card fragment"><p class="tag">Quy tắc</p><p class="txt">Đổi hành vi: sửa spec trước, code sau.<br>Sửa bug cài đặt: chỉ sửa code + test.</p></div>
+</div>
+<aside>Sơ đồ chạy khi vào slide; bấm để hiện hai thẻ. Hỏi lớp: đổi màu nút có cần sửa spec không? (Không, trừ khi spec có yêu cầu về màu.) Đổi luật cảnh báo ngân sách từ 100% sang 80%? (Có, đó là hành vi.)</aside>
+</section>
+<section id="context" class="std alt">
+<p class="eyebrow r" style="--i:0">Context &amp; chi phí</p>
+<h2 class="t r" style="--i:1">AI agent không nhớ mãi: hãy để file nhớ thay</h2>
+<div class="grid2" style="grid-template-columns:1fr 1.4fr">
+<div class="card warnc r" style="--i:2">
+<p class="tag warn">Triệu chứng</p>
+<ul class="bul">
+<li>Quên quy ước đã thống nhất</li>
+<li>Viết lại hàm đã có</li>
+<li>Sửa file không liên quan</li>
+<li>Hết hạn mức đúng tuần demo</li>
+</ul>
+</div>
+<div class="col">
+<div class="row r" style="--i:3"><p class="badge">1</p><p class="txt">Mở phiên chat mới cho mỗi bước lớn; để AI đọc lại spec, plan thay vì dựa vào lịch sử chat.</p></div>
+<div class="row r" style="--i:4"><p class="badge">2</p><p class="txt">tasks.md dài: implement theo phase để không tràn context.</p></div>
+<div class="row r" style="--i:5"><p class="badge">3</p><p class="txt">Spec Kit chạy với nhiều agent (Claude Code, GitHub Copilot, Gemini CLI, Cursor…): cả nhóm nên dùng cùng một agent.</p></div>
+<div class="row r" style="--i:6"><p class="badge">4</p><p class="txt">Theo dõi hạn mức gói miễn phí / sinh viên; lưu lại prompt quan trọng cho báo cáo.</p></div>
+</div>
+</div>
+<aside>Nguyên lý: thông tin quan trọng phải nằm trong file (constitution, spec, plan) chứ không nằm trong lịch sử chat. Khi phiên chat dài, chất lượng giảm dần. Danh sách agent được hỗ trợ thay đổi theo phiên bản, xem README của Spec Kit.</aside>
+</section>
+<section id="testing" class="std">
+<p class="eyebrow r" style="--i:0">Test &amp; bảo mật</p>
+<h2 class="t r" style="--i:1">Không giao phó hoàn toàn cho AI</h2>
+<div class="grid2">
+<div class="card r" style="--i:2">
+<div class="row" style="align-items:center; margin:0 0 18px"><x-icon name="CheckCircle" class="icon"></x-icon><h3 class="ct" style="margin:0">Test</h3></div>
+<ul class="bul">
+<li>Mỗi Given / When / Then thành ít nhất một test case</li>
+<li>Tự chạy test; đừng tin câu “All tests pass” trong câu trả lời của AI</li>
+<li>Cảnh giác AI “làm xanh” test bằng cách xoá assert hoặc skip</li>
+<li>Lint + CI đơn giản (GitHub Actions) cho mỗi PR</li>
+</ul>
+</div>
+<div class="card r" style="--i:3">
+<div class="row" style="align-items:center; margin:0 0 18px"><x-icon name="Lock" class="icon"></x-icon><h3 class="ct" style="margin:0">Bảo mật</h3></div>
+<ul class="bul">
+<li>Không dán API key, mật khẩu vào prompt hay spec</li>
+<li>Kiểm tra validate input và phân quyền ở từng API</li>
+<li>Soát dependency lạ AI tự thêm vào</li>
+<li>Dùng dữ liệu giả khi demo, không dùng dữ liệu thật của bạn bè</li>
+</ul>
+</div>
+</div>
+<aside>Kể ví dụ điển hình: AI không sửa được bug nên sửa test cho khớp với code sai. Cách phát hiện: luôn đọc diff của thư mục tests/. Về bảo mật: lỗi phổ biến nhất trong course project là API trả dữ liệu của người khác khi đổi id trên URL (thiếu kiểm tra quyền sở hữu).</aside>
+</section>
+<section id="web" class="std alt">
+<p class="eyebrow r" style="--i:0">Lưu ý riêng · Web</p>
+<h2 class="t r" style="--i:1">Project web: những điều spec hay bỏ sót</h2>
+<table class="tb r" style="--i:2">
+<tr class="hd"><th style="width:24%">Hạng mục</th><th style="width:76%">Cần viết vào spec / plan</th></tr>
+<tr><td>Responsive</td><td>Kích thước tối thiểu (ví dụ 360 / 768 / 1280px), màn hình nào ưu tiên mobile</td></tr>
+<tr><td>Auth &amp; phiên</td><td>Đăng ký, quên mật khẩu, hết phiên đăng nhập, phân quyền theo vai trò</td></tr>
+<tr><td>API contract</td><td>contracts/ (OpenAPI): mã lỗi, phân trang, định dạng ngày giờ, múi giờ</td></tr>
+<tr><td>Trạng thái UI</td><td>Đang tải, danh sách rỗng, lỗi mạng: cho mọi màn hình</td></tr>
+<tr><td>Deploy</td><td>Môi trường, biến môi trường, dữ liệu mẫu (seed) cho buổi demo</td></tr>
+<tr><td>Accessibility</td><td>Nhãn cho form, độ tương phản, điều hướng bằng bàn phím</td></tr>
+</table>
+<aside>Trạng thái UI (loading, empty, error) là thứ AI hay bỏ qua nếu spec không nhắc, và là thứ giảng viên thấy ngay khi demo. Gợi ý thêm một checklist UX bằng /speckit.checklist để soát các mục này.</aside>
+</section>
+<section id="mobile" class="std">
+<p class="eyebrow r" style="--i:0">Lưu ý riêng · Mobile</p>
+<h2 class="t r" style="--i:1">Project mobile: những điều spec hay bỏ sót</h2>
+<table class="tb r" style="--i:2">
+<tr class="hd"><th style="width:24%">Hạng mục</th><th style="width:76%">Cần viết vào spec / plan</th></tr>
+<tr><td>Nền tảng</td><td>Android, iOS hay cả hai; framework (Flutter, React Native, native) chốt ở plan</td></tr>
+<tr><td>Mạng yếu</td><td>Hành vi khi mất mạng: có cache, đồng bộ, hay ghi rõ ngoài phạm vi</td></tr>
+<tr><td>Quyền hệ thống</td><td>Camera, vị trí, thông báo: xin lúc nào, bị từ chối thì app làm gì</td></tr>
+<tr><td>Vòng đời app</td><td>App vào nền, bị tắt, xoay màn hình: dữ liệu đang nhập còn không</td></tr>
+<tr><td>Thiết bị test</td><td>Thiết bị / emulator nào, kích thước màn hình nhỏ nhất</td></tr>
+<tr><td>Bản demo</td><td>APK, TestFlight hay Expo: chuẩn bị trước tuần demo</td></tr>
+</table>
+<aside>Với mobile, xử lý quyền bị từ chối và vòng đời app là hai mục hay bị thiếu nhất. Nhắc: build iOS cần máy Mac và tài khoản developer cho TestFlight, nên chốt sớm nền tảng demo.</aside>
+</section>
+<section id="integrity" class="std alt">
+<p class="eyebrow r" style="--i:0">Liêm chính học thuật</p>
+<h2 class="t r" style="--i:1">Dùng AI minh bạch và có trách nhiệm</h2>
+<div class="grid3">
+<div class="card r" style="--i:2">
+<x-icon name="Book" class="icon"></x-icon>
+<h3 class="ct" style="margin-top:18px">Minh bạch</h3>
+<p class="txt">Tuân thủ quy định dùng AI của môn học; ghi nhận công cụ, prompt chính, phần do AI sinh ra.</p>
+</div>
+<div class="card r" style="--i:3">
+<x-icon name="GraduationCap" class="icon"></x-icon>
+<h3 class="ct" style="margin-top:18px">Hiểu</h3>
+<p class="txt">Mỗi thành viên giải thích được spec và code của feature mình phụ trách.</p>
+</div>
+<div class="card r" style="--i:4">
+<x-icon name="Verified" class="icon"></x-icon>
+<h3 class="ct" style="margin-top:18px">Chứng cứ</h3>
+<p class="txt">Lịch sử Git, spec, log prompt cho thấy quá trình, không chỉ sản phẩm cuối.</p>
+</div>
+</div>
+<p class="small r" style="--i:5; margin-top:40px">Quy định cụ thể do giảng viên từng môn ban hành: đọc kỹ đề cương môn học.</p>
+<aside>SDD có lợi thế: artifact và lịch sử commit tự nhiên trở thành bằng chứng quá trình. Nhắc sinh viên kiểm tra yêu cầu báo cáo AI usage của môn mình.</aside>
+</section>
+<section id="s-observed" class="blue" data-transition="fade">
+<div class="bar g" style="--i:0"></div>
+<p class="kicker r" style="--i:1">Phần 4</p>
+<h2 class="big r" style="--i:2">Bốn vấn đề quan sát<br>từ các nhóm</h2>
+<p class="sub r" style="--i:3">Business rule nói miệng · chia việc theo layer · xem nhẹ kiến trúc &amp; dữ liệu · thiếu dữ liệu demo</p>
+<aside>Đây là các vấn đề thực tế quan sát được khi trao đổi với các nhóm trong lớp. Mỗi vấn đề: hiện trạng, vì sao nguy hiểm khi làm với AI, và cách sửa cụ thể với Spec Kit.</aside>
+</section>
+<section id="br-why" class="std">
+<p class="eyebrow r" style="--i:0">Vấn đề 1 · Business rule</p>
+<h2 class="t r" style="--i:1">Business rule chỉ nói miệng thì AI không biết</h2>
+<div class="grid2" style="grid-template-columns:1fr 1.25fr">
+<div class="card warnc r" style="--i:2">
+<p class="tag warn">Hiện trạng</p>
+<ul class="bul">
+<li>Rule chỉ trao đổi miệng hoặc trong nhóm chat</li>
+<li>Mỗi thành viên nhớ một kiểu</li>
+<li>AI tự đoán rule; code chạy được nhưng sai nghiệp vụ</li>
+<li>Thành viên mới, giảng viên không kiểm chứng được</li>
+</ul>
+</div>
+<div class="card fragment">
+<p class="tag">Nên: Markdown có cấu trúc trong repo</p>
+<p class="txt" style="margin:0 0 12px"><span class="hl">docs/business-rules.md</span>: rule toàn hệ thống, mỗi rule một ID (BR-001…)</p>
+<p class="txt" style="margin:0 0 12px"><span class="hl">docs/glossary.md</span>: thuật ngữ nghiệp vụ dùng thống nhất</p>
+<p class="txt" style="margin:0 0 12px"><span class="hl">specs/NNN/spec.md</span>: requirement của feature, tham chiếu BR-xxx</p>
+<p class="txt"><span class="hl">docs/decisions/</span>: quyết định đã chốt, ai chốt, khi nào</p>
+</div>
+</div>
+<p class="txt fragment" style="margin-top:28px"><span class="strong">Lưu ý:</span> Spec Kit không tự đọc docs/. Nhắc file này trong prompt /speckit.specify, và thêm vào constitution: “Spec MUST reference related BR IDs”.</p>
+<aside>Trả lời câu hỏi "có nên chuyển business rule thành Markdown không": có, nhưng không phải ghi chú rời rạc. Nguyên tắc: thứ gì AI cần biết thì phải nằm trong file mà AI được yêu cầu đọc. Rule dùng chung nhiều feature để ở docs/, rule riêng một feature để ngay trong spec.md. Việc Spec Kit chỉ đọc những file được nhắc tới là suy luận từ cách các lệnh hoạt động (lệnh đọc spec, plan, constitution theo đường dẫn cố định); nên kiểm tra với agent nhóm đang dùng.</aside>
+</section>
+<section id="br-format" class="std alt">
+<p class="eyebrow r" style="--i:0">Vấn đề 1 · Ví dụ</p>
+<h2 class="t r" style="--i:1">Mỗi rule: ID, phát biểu kiểm chứng được, ví dụ, nguồn</h2>
+<div class="split" style="grid-template-columns:1.5fr 1fr">
+<p class="code r" style="--i:2"><span class="kw">## BR-001 Số tiền một khoản chi</span><br>Rule: số nguyên, 0 &lt; amount ≤ 100.000.000 VND<br>Ví dụ: 35.000 đúng · 0 sai · -5.000 sai<br>Nguồn: buổi gặp GV [ngày] · Chốt: [tên]<br>Áp dụng: specs/001-expense-log (FR-003)<br><br><span class="kw">## BR-002 Cảnh báo ngân sách</span><br>Rule: cảnh báo khi tổng chi tháng ≥ 80%<br>ngân sách của tháng đó<br><span class="cm">Câu hỏi mở: tháng dương lịch hay 30 ngày?</span><br><span class="cm">→ đưa vào /speckit.clarify</span></p>
+<div class="col" style="gap:22px">
+<div class="row r" style="--i:3"><p class="badge">1</p><p class="txt">ID ổn định để spec, test, commit tham chiếu</p></div>
+<div class="row r" style="--i:4"><p class="badge">2</p><p class="txt">Ví dụ đúng / sai: biến thẳng thành test case</p></div>
+<div class="row r" style="--i:5"><p class="badge">3</p><p class="txt">Nguồn và người chốt: hết cảnh “tưởng đã thống nhất”</p></div>
+<div class="row r" style="--i:6"><p class="badge">4</p><p class="txt">5 phút cuối mỗi buổi họp: cập nhật file, commit</p></div>
+</div>
+</div>
+<aside>Ví dụ minh hoạ cho app quản lý chi tiêu. Câu hỏi mở chưa trả lời được thì không đoán: ghi lại và đưa vào bước clarify, hoặc hỏi giảng viên. Quy tắc "5 phút cuối buổi họp" là thói quen đơn giản nhất để rule không còn nằm trong trí nhớ của từng người.</aside>
+</section>
+<section id="vertical-slice" class="std">
+<p class="eyebrow r" style="--i:0">Vấn đề 2 · Chia việc</p>
+<h2 class="t r" style="--i:1">Chia theo lát dọc, không chia theo layer</h2>
+<div class="grid2">
+<div class="card warnc r" style="--i:2">
+<p class="tag warn">Đang làm: chia ngang</p>
+<div class="lane"><p class="lname">An · Frontend</p><div class="cells"><p class="cell">Ghi chi</p><p class="cell">Ngân sách</p><p class="cell">Báo cáo</p></div></div>
+<div class="lane"><p class="lname">Bình · Backend</p><div class="cells"><p class="cell">Ghi chi</p><p class="cell">Ngân sách</p><p class="cell">Báo cáo</p></div></div>
+<div class="lane"><p class="lname">Chi · Database</p><div class="cells"><p class="cell">Ghi chi</p><p class="cell">Ngân sách</p><p class="cell">Báo cáo</p></div></div>
+<p class="txt" style="margin-top:16px">Ghép ở cuối: lệch API, lệch tên trường, chưa chức năng nào chạy trọn.</p>
+</div>
+<div class="card fragment">
+<p class="tag">Nên làm: chia dọc</p>
+<div class="grid3" style="gap:16px">
+<div class="vcol"><p class="lname">An · Ghi chi</p><p class="cell b">UI</p><p class="cell b">API</p><p class="cell b">DB</p></div>
+<div class="vcol"><p class="lname">Bình · Ngân sách</p><p class="cell b">UI</p><p class="cell b">API</p><p class="cell b">DB</p></div>
+<div class="vcol"><p class="lname">Chi · Báo cáo</p><p class="cell b">UI</p><p class="cell b">API</p><p class="cell b">DB</p></div>
+</div>
+<p class="txt" style="margin-top:8px">Mỗi tuần demo được một chức năng chạy thật từ màn hình đến database.</p>
+</div>
+</div>
+<aside>Vấn đề quan sát được: mỗi thành viên phụ trách một layer (frontend, backend, database) của cùng một chức năng, nên đến lúc ghép thì không khớp. Spec Kit vốn tổ chức tasks theo user story, tức là theo lát dọc; chia việc theo layer đi ngược lại cấu trúc này. Tên An, Bình, Chi chỉ là ví dụ.</aside>
+</section>
+<section id="vertical-how" class="std alt">
+<p class="eyebrow r" style="--i:0">Vấn đề 2 · Cách làm</p>
+<h2 class="t r" style="--i:1">Năm việc để lát dọc chạy được</h2>
+<div class="step fragment"><p class="badge">1</p><p class="txt"><span class="strong">Chốt contracts/ và data-model trước khi code:</span> đó là “hợp đồng” giữa UI, API và DB.</p></div>
+<div class="step fragment"><p class="badge">2</p><p class="txt"><span class="strong">Walking skeleton tuần đầu:</span> một màn hình → một API → một bảng, chạy được và deploy được.</p></div>
+<div class="step fragment"><p class="badge">3</p><p class="txt"><span class="strong">Một user story, một người sở hữu</span> từ UI đến DB; người khác review PR.</p></div>
+<div class="step fragment"><p class="badge">4</p><p class="txt"><span class="strong">Definition of Done:</span> chạy trên UI với seed data, có test, đã merge vào main.</p></div>
+<div class="step fragment" style="border-bottom:none"><p class="badge">5</p><p class="txt"><span class="strong">Tích hợp thường xuyên:</span> merge ít nhất 2 lần mỗi tuần, không để branch sống quá lâu.</p></div>
+<aside>Walking skeleton giúp lộ ra các vấn đề tích hợp (CORS, cấu hình DB, deploy) ngay tuần đầu thay vì tuần cuối. Nếu một thành viên rất mạnh frontend, vẫn có thể làm "người hỗ trợ" UI cho các bạn khác, nhưng mỗi người vẫn sở hữu trọn ít nhất một chức năng.</aside>
+</section>
+<section id="arch" class="std">
+<p class="eyebrow r" style="--i:0">Vấn đề 3 · Kiến trúc &amp; dữ liệu</p>
+<h2 class="t r" style="--i:1">Thiết kế kiến trúc và dữ liệu trước, đừng để AI tự quyết</h2>
+<div class="flowrow" style="margin:0 0 36px">
+<div class="card tint g" style="--i:2; flex:1; padding:22px 28px"><p class="txt strong">Web / Mobile app</p></div>
+<div class="g" style="--i:3"><x-shape kind="arrow-right" class="arrow"></x-shape></div>
+<div class="card g" style="--i:4; flex:1; padding:22px 28px"><p class="txt strong">Backend API</p></div>
+<div class="g" style="--i:5"><x-shape kind="arrow-right" class="arrow"></x-shape></div>
+<div class="card g" style="--i:6; flex:1; padding:22px 28px"><p class="txt strong">Database</p></div>
+</div>
+<div class="grid2">
+<div class="card r" style="--i:7">
+<p class="tag">Cần có trước /speckit.tasks</p>
+<ul class="bul">
+<li>Sơ đồ kiến trúc: các khối và cách chúng giao tiếp</li>
+<li>ERD: entity, quan hệ 1–n / n–n, ràng buộc</li>
+<li>So ERD của nhóm với data-model.md AI sinh ra</li>
+</ul>
+</div>
+<div class="card r" style="--i:8">
+<p class="tag">Câu hỏi bắt buộc trả lời</p>
+<ul class="bul">
+<li>Bản ghi thuộc về ai?</li>
+<li>Xoá bản ghi cha thì bản ghi con ra sao?</li>
+<li>Trường nào bắt buộc, trường nào unique?</li>
+</ul>
+</div>
+</div>
+<aside>Vấn đề quan sát được: các nhóm xem nhẹ thiết kế kiến trúc, database và quan hệ giữa các entity, để AI tự sinh. Hậu quả: mỗi lần implement một feature, AI thêm bảng hoặc trường theo cách riêng, dữ liệu trùng lặp, quan hệ sai. Sửa schema khi đã có code và dữ liệu đắt hơn rất nhiều so với sửa ERD trên giấy. Với course project, sơ đồ khối đơn giản (kiểu C4 mức Context và Container) là đủ.</aside>
+</section>
+<section id="erd" class="std alt">
+<p class="eyebrow r" style="--i:0">Vấn đề 3 · Ví dụ ERD</p>
+<h2 class="t r" style="--i:1">ERD của SpendWise: bốn entity, bốn quan hệ</h2>
+<div style="display:flex; gap:48px">
+<div class="erd g" style="--i:2">
+<svg class="erdlines" width="1000" height="580" viewBox="0 0 1000 580" aria-label="Đường quan hệ giữa các entity"><g stroke="#1E56C8" stroke-width="3" fill="none"><line x1="300" y1="90" x2="700" y2="90"/><line x1="200" y1="100" x2="200" y2="400"/><line x1="800" y1="150" x2="800" y2="400"/><line x1="350" y1="150" x2="650" y2="420"/></g></svg>
+<div class="ent" style="left:0; top:0"><p class="enth">User</p><p class="entf">id PK</p><p class="entf">email UNIQUE</p><p class="entf">name</p></div>
+<div class="ent" style="left:600px; top:0"><p class="enth">Expense</p><p class="entf">id PK</p><p class="entf">user_id FK</p><p class="entf">category_id FK</p><p class="entf">amount &gt; 0</p><p class="entf">spent_at</p></div>
+<div class="ent" style="left:0; top:330px"><p class="enth">Budget</p><p class="entf">id PK</p><p class="entf">user_id FK</p><p class="entf">month</p><p class="entf">UNIQUE(user_id, month)</p></div>
+<div class="ent" style="left:600px; top:330px"><p class="enth">Category</p><p class="entf">id PK</p><p class="entf">user_id FK, null</p><p class="entf">name</p></div>
+<p class="card-lbl" style="left:410px; top:48px">1</p>
+<p class="card-lbl" style="left:568px; top:48px">n</p>
+<p class="card-lbl" style="left:212px; top:184px">1</p>
+<p class="card-lbl" style="left:212px; top:292px">n</p>
+<p class="card-lbl" style="left:812px; top:292px">1</p>
+<p class="card-lbl" style="left:812px; top:250px">n</p>
+<p class="card-lbl" style="left:430px; top:200px">1</p>
+<p class="card-lbl" style="left:540px; top:300px">n</p>
+</div>
+<div class="col" style="flex:1; gap:18px">
+<p class="txt r" style="--i:3">User 1–n Expense, Budget, Category</p>
+<p class="txt r" style="--i:4">Category 1–n Expense</p>
+<p class="txt r" style="--i:5">Category.user_id = null: danh mục mặc định dùng chung</p>
+<p class="txt r" style="--i:6">Mỗi tháng một ngân sách: UNIQUE(user_id, month)</p>
+<p class="txt r" style="--i:7"><span class="strong">Còn mở:</span> xoá Category đã có Expense thì sao?</p>
+</div>
+</div>
+<aside>Đọc ERD cùng lớp. Câu hỏi "xoá Category đã có Expense thì sao" là một business rule (chặn xoá, chuyển sang "Khác", hay xoá luôn) — nối lại với vấn đề 1: câu trả lời phải được ghi vào business-rules.md. Bài tập nhanh: mỗi nhóm vẽ ERD của project mình trong 3 phút và tìm một câu hỏi "còn mở".</aside>
+</section>
+<section id="demo-data" class="std">
+<p class="eyebrow r" style="--i:0">Vấn đề 4 · Dữ liệu demo &amp; test</p>
+<h2 class="t r" style="--i:1">Seed data: giống thật, đủ nhiều, tạo lại được</h2>
+<div class="grid3">
+<div class="card r" style="--i:2">
+<x-icon name="Users" class="icon"></x-icon>
+<h3 class="ct" style="margin-top:18px">Giống thật</h3>
+<p class="txt">Tên tiếng Việt, số tiền VND, ngày trải đều 3–6 tháng, danh mục hợp lý. Không dùng dữ liệu cá nhân thật.</p>
+</div>
+<div class="card r" style="--i:3">
+<x-icon name="Database" class="icon"></x-icon>
+<h3 class="ct" style="margin-top:18px">Đủ nhiều, đủ khó</h3>
+<p class="txt">Vài trăm bản ghi để thử phân trang, báo cáo. Có ca biên: rỗng, rất dài, 0, âm, ký tự đặc biệt.</p>
+</div>
+<div class="card r" style="--i:4">
+<x-icon name="Settings" class="icon"></x-icon>
+<h3 class="ct" style="margin-top:18px">Tạo lại được</h3>
+<p class="txt">Script seed trong repo, reset bằng một lệnh, cố định random seed, tài khoản demo cho mỗi vai trò.</p>
+</div>
+</div>
+<div class="card tint r" style="--i:5; margin-top:32px; padding:24px 36px">
+<p class="txt"><span class="strong">Với Spec Kit:</span> thêm task seed cho từng user story, ghi cách chạy vào quickstart.md, và chạy lại từng Given / When / Then trên dữ liệu này trước khi đánh dấu [X].</p>
+</div>
+<aside>Vấn đề quan sát được: các nhóm chưa tạo dữ liệu thực tế để demo và để kiểm tra các chức năng AI implement. Với vài bản ghi "test 1, test 2", các lỗi như phân trang, tổng theo tháng, hiển thị tên dài, sắp xếp tiếng Việt sẽ không lộ ra. Seed data cũng là công cụ kiểm chứng: AI nói đã xong, nhóm mở app với dữ liệu seed và tự chạy acceptance scenario.</aside>
+</section>
+<section id="demo-seed" class="std alt">
+<p class="eyebrow r" style="--i:0">Vấn đề 4 · Ví dụ</p>
+<h2 class="t r" style="--i:1">Một script seed ngắn với Faker (locale vi_VN)</h2>
+<p class="code r" style="--i:2"><span class="cm"># seed.py · chạy: python seed.py --reset</span><br>from faker import Faker<br>import random<br>fake = Faker("vi_VN"); Faker.seed(42); random.seed(42)<br>CATS = ["Ăn uống", "Đi lại", "Học tập", "Giải trí"]<br>for _ in range(20):<br>&#160;&#160;&#160;&#160;user = create_user(name=fake.name(), email=fake.unique.email())<br>&#160;&#160;&#160;&#160;for _ in range(random.randint(30, 120)):<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;create_expense(user, amount=random.randrange(5_000, 500_000, 1_000),<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;category=random.choice(CATS), spent_at=fake.date_between("-180d", "today"))<br>create_user(name="Tài khoản demo", email="demo@example.com")&#160;&#160;<span class="cm"># dùng khi demo</span></p>
+<p class="small r" style="--i:3; margin-top:24px">create_user, create_expense là hàm của project. JavaScript: thư viện @faker-js/faker có locale tiếng Việt.</p>
+<aside>Điểm cần nhấn: Faker.seed(42) và random.seed(42) giúp mỗi lần chạy ra cùng một bộ dữ liệu, nên lỗi tái hiện được. Thêm các bản ghi ca biên viết tay (tên rất dài, số tiền lớn nhất cho phép theo BR-001) bên cạnh dữ liệu ngẫu nhiên. Có thể yêu cầu AI viết script seed, nhưng nhóm phải đọc lại để chắc dữ liệu tuân thủ business rules.</aside>
+</section>
+<section id="s-anti" class="blue" data-transition="fade">
+<div class="bar g" style="--i:0"></div>
+<p class="kicker r" style="--i:1">Phần 5</p>
+<h2 class="big r" style="--i:2">Anti-pattern<br>&amp; case study</h2>
+<p class="sub r" style="--i:3">Những lỗi lặp lại ở hầu hết các nhóm mới dùng SDD, và cách sửa.</p>
+<aside>Chuyển phần. Khuyến khích lớp tự nhận "nhóm mình đang mắc lỗi nào".</aside>
+</section>
+<section id="anti-table" class="std">
+<p class="eyebrow r" style="--i:0">Anti-pattern</p>
+<h2 class="t r" style="--i:1">Bảy anti-pattern và cách sửa</h2>
+<table class="tb sm r" style="--i:2">
+<tr class="hd"><th style="width:28%">Anti-pattern</th><th style="width:36%">Triệu chứng</th><th style="width:36%">Cách sửa</th></tr>
+<tr><td>Spec là prompt một dòng</td><td>AI tự bịa yêu cầu</td><td>Story + acceptance criteria</td></tr>
+<tr><td>Bỏ clarify, analyze</td><td>Làm lại nhiều lần cuối kỳ</td><td>Chạy đủ trước implement</td></tr>
+<tr><td>Implement cả tasks.md</td><td>Diff hàng nghìn dòng</td><td>Theo phase, commit nhỏ</td></tr>
+<tr><td>Sửa code, quên spec</td><td>Spec lỗi thời, AI ghi đè</td><td>Spec trước, code sau</td></tr>
+<tr><td>Over-engineering</td><td>Chưa xong MVP đã hết giờ</td><td>Kiến trúc đơn giản, P1 trước</td></tr>
+<tr><td>Spec y nguyên template</td><td>Còn “[FEATURE NAME]”, mục rỗng</td><td>Xoá mục thừa, điền cụ thể</td></tr>
+<tr><td>Tin AI “đã test”</td><td>Demo lỗi trước lớp</td><td>Tự chạy test và app</td></tr>
+</table>
+<aside>Cho lớp 30 giây tự đánh dấu những dòng nhóm mình đang mắc, sau đó hỏi 2–3 nhóm. Dòng "spec y nguyên template" dễ phát hiện nhất khi chấm: còn placeholder, còn ví dụ mẫu.</aside>
+</section>
+<section id="case-study" class="std alt">
+<p class="eyebrow r" style="--i:0">Case study · Ứng dụng học nhóm</p>
+<h2 class="t r" style="--i:1">Từ một spec ôm đồm đến ba spec dùng được</h2>
+<div class="grid2" style="grid-template-columns:1fr 1.2fr">
+<div class="card warnc r" style="--i:2">
+<p class="tag warn">Trước</p>
+<p class="quote">“Người dùng tạo nhóm học, mời bạn, đặt lịch, chat, nhận thông báo, đồng bộ Google Calendar.”</p>
+<ul class="bul">
+<li>Sáu tính năng trong một spec</li>
+<li>Không có ưu tiên</li>
+<li>Không có tiêu chí chấp nhận</li>
+</ul>
+</div>
+<div class="card fragment">
+<p class="tag">Sau</p>
+<p class="txt" style="margin:0 0 14px"><span class="hl">001-study-group</span> (P1): tạo nhóm, mời bằng mã 6 ký tự</p>
+<p class="txt" style="margin:0 0 14px"><span class="hl">002-session-scheduling</span> (P1): đề xuất giờ, bình chọn, báo trùng lịch</p>
+<p class="txt" style="margin:0 0 14px"><span class="hl">003-reminders</span> (P2): nhắc trước 30 phút</p>
+<p class="txt" style="margin:0 0 14px"><span class="strong">Ngoài phạm vi:</span> chat, Google Calendar</p>
+<p class="small">Mỗi spec có story, Given / When / Then và Success criteria riêng.</p>
+</div>
+</div>
+<aside>Đây là ví dụ minh hoạ. Hỏi lớp trước khi bấm: bạn sẽ tách spec này thế nào? Sau đó hiện phương án. Nhấn mạnh: chat và Google Calendar không phải là "bỏ", chỉ là chưa làm trong MVP. Nếu còn thời gian, có thể thành P3.</aside>
+</section>
+<section id="timeline" class="std">
+<p class="eyebrow r" style="--i:0">Lịch áp dụng gợi ý</p>
+<h2 class="t r" style="--i:1">SDD trong một course project khoảng 10 tuần</h2>
+<table class="tb sm r" style="--i:2">
+<tr class="hd"><th style="width:12%">Tuần</th><th style="width:52%">Hoạt động</th><th style="width:36%">Artifact</th></tr>
+<tr><td>1–2</td><td>Ý tưởng, business rules, constitution, kiến trúc và ERD sơ bộ</td><td>business-rules.md, constitution.md, ERD</td></tr>
+<tr><td>3</td><td>Specify + clarify cho các feature P1</td><td>specs/001–003/spec.md</td></tr>
+<tr><td>4</td><td>Plan, tasks, analyze cho P1</td><td>plan.md, tasks.md</td></tr>
+<tr><td>5–6</td><td>Implement P1 theo lát dọc, seed data, test</td><td>code, seed, test, PR</td></tr>
+<tr><td>7</td><td>Demo nội bộ MVP, điều chỉnh spec</td><td>spec cập nhật</td></tr>
+<tr><td>8–9</td><td>Feature P2 theo cùng vòng lặp</td><td>specs/004…</td></tr>
+<tr><td>10</td><td>Đóng băng tính năng, sửa lỗi, báo cáo</td><td>README, báo cáo dùng AI</td></tr>
+</table>
+<p class="small r" style="--i:3; margin-top:24px">Gợi ý tham khảo; điều chỉnh theo lịch và yêu cầu nộp bài của từng môn.</p>
+<aside>Điểm mấu chốt: tuần 7 có một demo nội bộ để phát hiện sai lệch sớm, và feature P2 chạy lại đúng vòng lặp như P1, không phải viết hết spec từ tuần 2.</aside>
+</section>
+<section id="activity" class="std alt" data-transition="fade">
+<p class="eyebrow r" style="--i:0">Phần 6 · Thực hành theo nhóm</p>
+<h2 class="t r" style="--i:1">17 phút: viết và review một spec</h2>
+<div class="split" style="grid-template-columns:1.5fr 1fr">
+<div class="col" style="gap:0">
+<div class="step r" style="--i:2"><p class="badge">5’</p><p class="txt">Chọn một feature P1 trong project của nhóm.</p></div>
+<div class="step r" style="--i:3"><p class="badge">7’</p><p class="txt">Viết: 1 user story, 2 acceptance Given / When / Then, 1 edge case, mục Ngoài phạm vi.</p></div>
+<div class="step r" style="--i:4" ><p class="badge">5’</p><p class="txt">Đổi bài với nhóm bên cạnh, review theo checklist ở slide sau, ghi ít nhất 2 góp ý.</p></div>
+</div>
+<div class="card tint r" style="--i:5">
+<x-icon name="PaperPlane" class="icon"></x-icon>
+<h3 class="ct" style="margin-top:18px">Đầu ra</h3>
+<p class="txt">Một trang spec nháp, dùng làm input cho /speckit.specify của nhóm trong tuần này.</p>
+</div>
+</div>
+<aside>Bật đồng hồ. Đi vòng quanh lớp, chú ý các nhóm viết tech stack vào spec hoặc viết acceptance không có số liệu. Khi đổi bài, chuyển sang slide checklist để các nhóm dùng làm tiêu chí review.</aside>
+</section>
+<section id="checklist" class="std">
+<p class="eyebrow r" style="--i:0">Checklist</p>
+<h2 class="t r" style="--i:1">Mười hai câu hỏi trước khi chạy /speckit.implement</h2>
+<div class="grid2" style="gap:14px 48px">
+<div class="row r" style="--i:2"><x-icon name="Check" class="icon sm"></x-icon><p class="txt">Constitution ngắn, kiểm chứng được, cả nhóm đã duyệt</p></div>
+<div class="row r" style="--i:2"><x-icon name="Check" class="icon sm"></x-icon><p class="txt">Plan đúng stack nhóm chọn, thư viện có thật</p></div>
+<div class="row r" style="--i:3"><x-icon name="Check" class="icon sm"></x-icon><p class="txt">Spec không chứa tech stack</p></div>
+<div class="row r" style="--i:3"><x-icon name="Check" class="icon sm"></x-icon><p class="txt">data-model và contracts khớp spec</p></div>
+<div class="row r" style="--i:4"><x-icon name="Check" class="icon sm"></x-icon><p class="txt">Mỗi story có ưu tiên P1 / P2 / P3, test độc lập được</p></div>
+<div class="row r" style="--i:4"><x-icon name="Check" class="icon sm"></x-icon><p class="txt">tasks.md đã được đọc, sửa; mỗi task gắn một story</p></div>
+<div class="row r" style="--i:5"><x-icon name="Check" class="icon sm"></x-icon><p class="txt">Acceptance dạng Given / When / Then, có số liệu</p></div>
+<div class="row r" style="--i:5"><x-icon name="Check" class="icon sm"></x-icon><p class="txt">/speckit.analyze không còn mục CRITICAL</p></div>
+<div class="row r" style="--i:6"><x-icon name="Check" class="icon sm"></x-icon><p class="txt">Có mục Ngoài phạm vi và yêu cầu phi chức năng đo được</p></div>
+<div class="row r" style="--i:6"><x-icon name="Check" class="icon sm"></x-icon><p class="txt">Không còn [NEEDS CLARIFICATION]; .env đã nằm trong .gitignore</p></div>
+<div class="row r" style="--i:7"><x-icon name="Check" class="icon sm"></x-icon><p class="txt">Business rule đã có ID trong docs/business-rules.md và được spec tham chiếu</p></div>
+<div class="row r" style="--i:7"><x-icon name="Check" class="icon sm"></x-icon><p class="txt">Có seed data giống thật và tài khoản demo cho từng vai trò</p></div>
+</div>
+<aside>Dùng trong phần thực hành (bước review chéo). Cột trái là spec, cột phải là plan / tasks / an toàn. Gợi ý các nhóm chụp lại slide này để dùng cho project.</aside>
+</section>
+<section id="takeaways" class="std alt">
+<p class="eyebrow r" style="--i:0">Tổng kết</p>
+<h2 class="t r" style="--i:1">Năm điều mang về project của nhóm</h2>
+<div class="step fragment"><p class="badge">1</p><p class="txt"><span class="strong">Spec là WHAT / WHY, plan là HOW.</span> Đừng trộn hai thứ.</p></div>
+<div class="step fragment"><p class="badge">2</p><p class="txt"><span class="strong">Lát dọc và lặp:</span> mỗi người làm trọn một chức năng, P1 trước.</p></div>
+<div class="step fragment"><p class="badge">3</p><p class="txt"><span class="strong">Clarify và analyze</span> là những bước rẻ nhất để chặn bug.</p></div>
+<div class="step fragment"><p class="badge">4</p><p class="txt"><span class="strong">Spec trước, code sau,</span> và luôn giữ hai thứ đồng bộ.</p></div>
+<div class="step fragment" style="border-bottom:none"><p class="badge">5</p><p class="txt"><span class="strong">AI viết; nhóm hiểu, review, test</span> và chịu trách nhiệm.</p></div>
+<aside>Bấm để hiện từng ý; mỗi ý gắn lại với một slide đã học (spec-what-why, timeline, clarify, drift, own-it). Kết thúc bằng câu hỏi: nhóm bạn sẽ thay đổi điều gì ngay trong tuần này?</aside>
+</section>
+<section id="qa" class="blue">
+<div class="bar g" style="--i:0"></div>
+<h2 class="big r" style="--i:1">Hỏi &amp; đáp</h2>
+<p class="kicker r" style="--i:2; margin-top:24px">Tài liệu tham khảo</p>
+<p class="ref r" style="--i:3">github/spec-kit: README và spec-driven.md · https://github.com/github/spec-kit</p>
+<p class="ref r" style="--i:4">[Đề cương môn học và quy định sử dụng AI của môn]</p>
+<p class="ref r" style="--i:5">[Repo mẫu / template của lớp, nếu có]</p>
+<aside>Hỏi đáp. Nhắc lại: tên lệnh và cấu trúc thư mục có thể thay đổi giữa các phiên bản Spec Kit, luôn đối chiếu README của phiên bản đang cài.</aside>
+</section>
+</div>
+<div id="notes"></div>
+<div id="progress"></div>
+<script>
+
+(function () {
+  var ICONS = {"Database": "<ellipse cx=\"12\" cy=\"5\" rx=\"9\" ry=\"3\"/><path d=\"M21 12c0 1.66-4 3-9 3s-9-1.34-9-3\"/><path d=\"M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5\"/>", "Settings": "<circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83\"/>", "Check": "<polyline points=\"20 6 9 17 4 12\"/>", "CheckCircle": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><polyline points=\"16 9 10.5 15 8 12.5\"/>", "Warning": "<path d=\"M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z\"/><line x1=\"12\" y1=\"9\" x2=\"12\" y2=\"13\"/><line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"/>", "Lightbulb": "<path d=\"M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z\"/>", "Tool": "<path d=\"M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z\"/>", "Star": "<polygon points=\"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2\"/>", "Lock": "<rect x=\"3\" y=\"11\" width=\"18\" height=\"11\" rx=\"2\"/><path d=\"M7 11V7a5 5 0 0 1 10 0v4\"/>", "Activity": "<polyline points=\"22 12 18 12 15 21 9 3 6 12 2 12\"/>", "Users": "<path d=\"M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75\"/>", "Chat": "<path d=\"M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z\"/>", "Clock": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><polyline points=\"12 6 12 12 16 14\"/>", "Search": "<circle cx=\"11\" cy=\"11\" r=\"8\"/><line x1=\"21\" y1=\"21\" x2=\"16.65\" y2=\"16.65\"/>", "Link": "<path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\"/><path d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\"/>", "Book": "<path d=\"M4 19.5A2.5 2.5 0 0 1 6.5 17H20\"/><path d=\"M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z\"/>", "GraduationCap": "<path d=\"M22 10 12 5 2 10l10 5 10-5z\"/><path d=\"M6 12v5c3 3 9 3 12 0v-5\"/>", "Verified": "<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z\"/><polyline points=\"9 12 11 14 15 10\"/>", "PaperPlane": "<line x1=\"22\" y1=\"2\" x2=\"11\" y2=\"13\"/><polygon points=\"22 2 15 22 11 13 2 9 22 2\"/>"};
+  var NS = 'http://www.w3.org/2000/svg';
+  document.querySelectorAll('x-icon').forEach(function (el) {
+    var p = ICONS[el.getAttribute('name')] || '';
+    el.innerHTML = '<svg xmlns="' + NS + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>';
+  });
+  var stage = document.getElementById('stage');
+  var slides = Array.prototype.slice.call(stage.children).filter(function (s) { return s.tagName === 'SECTION'; });
+  slides.forEach(function (s, i) { s.setAttribute('data-page', i + 1); });
+  var notes = document.getElementById('notes'), bar = document.getElementById('progress');
+  var cur = -1;
+  function fit() {
+    var k = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    stage.style.transform = 'scale(' + k + ') translate(-50%, -50%)';
+  }
+  function frags(s) { return Array.prototype.slice.call(s.querySelectorAll('.fragment')); }
+  function show(i, allVisible) {
+    i = Math.max(0, Math.min(slides.length - 1, i));
+    if (cur >= 0) slides[cur].classList.remove('active');
+    cur = i;
+    var s = slides[i];
+    frags(s).forEach(function (f) { f.classList.toggle('visible', !!allVisible); f.classList.remove('current-fragment'); });
+    s.classList.add('active');
+    var a = s.querySelector('aside');
+    notes.textContent = (i + 1) + '/' + slides.length + ' — ' + (a ? a.textContent : '(không có ghi chú)');
+    bar.style.width = ((i + 1) / slides.length * 100) + '%';
+    history.replaceState(null, '', '#' + (i + 1));
+  }
+  function next() {
+    var hidden = frags(slides[cur]).filter(function (f) { return !f.classList.contains('visible'); });
+    if (hidden.length) {
+      frags(slides[cur]).forEach(function (f) { f.classList.remove('current-fragment'); });
+      hidden[0].classList.add('visible', 'current-fragment');
+    } else if (cur < slides.length - 1) show(cur + 1, false);
+  }
+  function prev() {
+    var vis = frags(slides[cur]).filter(function (f) { return f.classList.contains('visible'); });
+    if (vis.length) vis[vis.length - 1].classList.remove('visible', 'current-fragment');
+    else if (cur > 0) show(cur - 1, true);
+  }
+  document.addEventListener('keydown', function (e) {
+    var k = e.key;
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ' || k === 'Enter') { e.preventDefault(); next(); }
+    else if (k === 'ArrowLeft' || k === 'PageUp' || k === 'Backspace') { e.preventDefault(); prev(); }
+    else if (k === 'ArrowDown') show(cur + 1, false);
+    else if (k === 'ArrowUp') show(cur - 1, true);
+    else if (k === 'Home') show(0, false);
+    else if (k === 'End') show(slides.length - 1, false);
+    else if (k === 'n' || k === 'N') notes.classList.toggle('on');
+    else if (k === 'f' || k === 'F') { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+  });
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('#notes') || e.target.closest('a')) return;
+    if (e.clientX < window.innerWidth / 4) prev(); else next();
+  });
+  window.addEventListener('resize', fit);
+  fit(); setTimeout(function () { document.getElementById("help").style.opacity = 0; }, 4000);
+  var start = parseInt((location.hash || '#1').slice(1), 10);
+  show(isNaN(start) ? 0 : start - 1, false);
+})();
+
+</script>
+</body>
+</html>
